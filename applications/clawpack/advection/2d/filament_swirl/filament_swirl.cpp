@@ -159,8 +159,7 @@ overlap_consumer_t;
 
 typedef struct overlap_geometry
 {
-    int mi;
-    int mj;
+    fclaw_options_t *fclaw_opt;
     fclaw2d_block_t *blocks;
 }
 overlap_geometry_t;
@@ -254,26 +253,39 @@ static
 int apply_inverse_producer_mapping (overlap_point_t * op, double xy[3],
                                     int blockno, overlap_geometry_t * geo)
 {
+    fclaw_options_t *fclaw_opt = geo->fclaw_opt;
+
     /* check, if the point lies in the filament domain: do this properly */
-    if (op->xy[0] < 0. || op->xy[0] > 2. || op->xy[1] < 0. || op->xy[1] > 2. ||
-        op->xy[2] < 0. || op->xy[2] > 1.)   /* filament extruded to [0, 1] */
+    if (op->xy[0] < fclaw_opt->ax || op->xy[0] > fclaw_opt->bx ||
+        op->xy[1] < fclaw_opt->ay || op->xy[1] > fclaw_opt->by ||
+        op->xy[2] < fclaw_opt->az || op->xy[2] > fclaw_opt->bz) /* filament extruded to [az,bz] */
     {
         return 0;
     }
 
     /* Here, we apply the inverse mapping of the producer domain (in this
      * example the filament domain). We only consider the example case that we
-     * map a geo->mi x geo->mj brick to the [0,1]x[0,1]x[0,1] cube in physical
-     * space. The mapping (and thereby the inverse mapping) depends on the block
-     * we are in.
-     * First, we map xy back from physical space  to the [0,geo->mi]x[0,geo->mj]
-     * reference coordinate system of the whole brick. */
-    xy[0] = op->xy[0] * geo->mi;
-    xy[1] = op->xy[1] * geo->mj;
-    xy[2] = op->xy[2];          /* z coordinate identity transformation here */
+     * map a mi x mj brick to the [ax,bx]x[ay,by]x[az,bz] cube in physical
+     * space (where mi, mj, ax, bx, ay, by, az and az are as defined in the
+     * fclaw_options_t). The mapping (and thereby the inverse mapping) depends
+     * on the block we are in.
+     * First, we want to map xy back from physical space to the [0,mi]x[0,mj]x[0,1]
+     * reference coordinate system of the whole brick.
+     * We shift the domain, so that the front lower left corner of the brick
+     * lies in (0,0,0). */
+    xy[0] = op->xy[0] - fclaw_opt->ax;
+    xy[1] = op->xy[1] - fclaw_opt->ay;
+    xy[2] = op->xy[2] - fclaw_opt->az;
 
-    /* Secondly, we shift xy back to the [0,1]x[0,1]x[0,1] reference system of
-     * the block with index blockno on which we want to operate. */
+    /* We scale from the physical extent in each dimension to the brick extent. */
+    xy[0] = xy[0] * (fclaw_opt->mi / (fclaw_opt->bx - fclaw_opt->ax));
+    xy[1] = xy[1] * (fclaw_opt->mj / (fclaw_opt->by - fclaw_opt->ay));
+    xy[2] = xy[2] * (1 / (fclaw_opt->bz - fclaw_opt->az)); /* only 1 brick in z-dimension */
+
+    /* The coordinates are now in the [0,mi]x[0,mj]x[0,1] reference coordinate
+     * system of the whole brick. Next, we shift xy back to the
+     * [0,1]x[0,1]x[0,1] reference system of the block with index blockno on
+     *  which we are operating right now. */
     xy[0] = xy[0] - geo->blocks[blockno].vertices[0];
     xy[1] = xy[1] - geo->blocks[blockno].vertices[1];
     xy[2] = xy[2] - geo->blocks[blockno].vertices[2];
@@ -303,6 +315,7 @@ int overlap_interpolate (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
     FCLAW_ASSERT (user != NULL);
     geo = (overlap_geometry_t *) user;
     FCLAW_ASSERT (geo->blocks != NULL);
+    FCLAW_ASSERT (geo->fclaw_opt != NULL);
 
     /* Apply the inverse mapping of the producer side to the point. The result
      * lies in the same reference coordinate system as the patch-boundaries.
@@ -497,10 +510,9 @@ main (int argc, char **argv)
             swirl_clawpatch_opt->mx * swirl_clawpatch_opt->my;
         create_query_points (c);
 
-        /* initalize the filament geometry information that is needed for
+        /* initialize the filament geometry information that is needed for
          * mapping between the swirl and the filament domain */
-        geo->mi = filament_fclaw_opt->mi;
-        geo->mj = filament_fclaw_opt->mj;
+        geo->fclaw_opt = filament_fclaw_opt;
         geo->blocks = filament_domain->blocks;
 
         /* obtain interpolation data of the points from the producer side */
