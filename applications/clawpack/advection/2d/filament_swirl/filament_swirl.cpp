@@ -406,11 +406,19 @@ void output_query_points (overlap_consumer_t * c)
     for (iz = 0; iz < npz; iz++)
     {
         op = (overlap_point_t *) sc_array_index (c->query_points, iz);
-        fclaw_infof
-            ("Query point %ld on process %d is [%f,%f] and has interpolation data %f.\n",
-             iz, c->domain->mpirank, op->xy[0], op->xy[1],
-             op->prodata.myvalue[0]);
-
+        if (op->prodata.isset)
+        {
+            fclaw_infof
+                ("Query point %ld on process %d is [%f,%f] and has interpolation data %f.\n",
+                 iz, c->domain->mpirank, op->xy[0], op->xy[1],
+                 op->prodata.myvalue[0]);
+        }
+        else
+        {
+            fclaw_infof
+                ("Query point %ld on process %d is [%f,%f] and has no interpolation data.\n",
+                 iz, c->domain->mpirank, op->xy[0], op->xy[1]);
+        }
     }
 }
 
