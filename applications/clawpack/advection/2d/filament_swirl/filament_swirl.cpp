@@ -157,6 +157,13 @@ typedef struct overlap_consumer
 }
 overlap_consumer_t;
 
+typedef struct overlap_geometry
+{
+    fclaw_options_t *fclaw_opt;
+    fclaw2d_block_t *blocks;
+}
+overlap_geometry_t;
+
 static
 void apply_consumer_mapping (overlap_point_t * op)
 {
@@ -243,23 +250,47 @@ void create_query_points (overlap_consumer_t * c)
 }
 
 static
-int apply_inverse_producer_mapping (overlap_point_t * op, double xy[3])
+int apply_inverse_producer_mapping (overlap_point_t * op, double xy[3],
+                                    int blockno, overlap_geometry_t * geo)
 {
+    fclaw_options_t *fclaw_opt = geo->fclaw_opt;
+
     /* check, if the point lies in the filament domain: do this properly */
-    if (op->xy[0] < 0. || op->xy[0] > 2. || op->xy[1] < 0. || op->xy[1] > 2. ||
-        op->xy[2] < 0. || op->xy[2] > 1.)   /* filament extruded to [0, 1] */
+    if (op->xy[0] < fclaw_opt->ax || op->xy[0] > fclaw_opt->bx ||
+        op->xy[1] < fclaw_opt->ay || op->xy[1] > fclaw_opt->by ||
+        op->xy[2] < fclaw_opt->az || op->xy[2] > fclaw_opt->bz) /* filament extruded to [az,bz] */
     {
         return 0;
     }
 
     /* Here, we apply the inverse mapping of the producer domain (in this
-     * example the filament domain). We only consider the example case of the
-     * linear mapping to the [0,2]x[0,2]-block. */
-    xy[0] = op->xy[0] / 2;
-    xy[1] = op->xy[1] / 2;
-    xy[2] = op->xy[2];      /* z coordinate identity transformation here */
+     * example the filament domain). We only consider the example case that we
+     * map a mi x mj brick to the [ax,bx]x[ay,by]x[az,bz] cube in physical
+     * space (where mi, mj, ax, bx, ay, by, az and az are as defined in the
+     * fclaw_options_t). The mapping (and thereby the inverse mapping) depends
+     * on the block we are in.
+     * First, we want to map xy back from physical space to the [0,mi]x[0,mj]x[0,1]
+     * reference coordinate system of the whole brick.
+     * We shift the domain, so that the front lower left corner of the brick
+     * lies in (0,0,0). */
+    xy[0] = op->xy[0] - fclaw_opt->ax;
+    xy[1] = op->xy[1] - fclaw_opt->ay;
+    xy[2] = op->xy[2] - fclaw_opt->az;
 
-    return 1; /* the point lies in the domain */
+    /* We scale from the physical extent in each dimension to the brick extent. */
+    xy[0] = xy[0] * (fclaw_opt->mi / (fclaw_opt->bx - fclaw_opt->ax));
+    xy[1] = xy[1] * (fclaw_opt->mj / (fclaw_opt->by - fclaw_opt->ay));
+    xy[2] = xy[2] * (1 / (fclaw_opt->bz - fclaw_opt->az)); /* only 1 brick in z-dimension */
+
+    /* The coordinates are now in the [0,mi]x[0,mj]x[0,1] reference coordinate
+     * system of the whole brick. Next, we shift xy back to the
+     * [0,1]x[0,1]x[0,1] reference system of the block with index blockno on
+     *  which we are operating right now. */
+    xy[0] = xy[0] - geo->blocks[blockno].vertices[0];
+    xy[1] = xy[1] - geo->blocks[blockno].vertices[1];
+    xy[2] = xy[2] - geo->blocks[blockno].vertices[2];
+
+    return 1;                   /* the point lies in the domain */
 }
 
 static
@@ -267,6 +298,7 @@ int overlap_interpolate (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
                          int blockno, int patchno, void *point, void *user)
 {
     overlap_point_t *op;
+    overlap_geometry_t *geo;
     double xy[3];   /* this is 3D extruded reference for filament */
     double tol;
     int consumer_side;
@@ -275,12 +307,22 @@ int overlap_interpolate (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
     FCLAW_ASSERT (point != NULL);
     op = (overlap_point_t *) point;
 
+    /* Assert that we got passed a valid overlap_geometry_t.
+     * We have to pass the fclaw2d_blocks_t array via the user pointer, because
+     * the input domain to this callback is not equal to the filament_domain
+     * passed to fclaw2d_exchange. Whenever the input domain is artificial
+     * (domain_is_meta(domain) evaluates to true), domain->blocks is NULL. */
+    FCLAW_ASSERT (user != NULL);
+    geo = (overlap_geometry_t *) user;
+    FCLAW_ASSERT (geo->blocks != NULL);
+    FCLAW_ASSERT (geo->fclaw_opt != NULL);
+
     /* Apply the inverse mapping of the producer side to the point. The result
      * lies in the same reference coordinate system as the patch-boundaries.
      * The inversely mapped point is stored in xy, which we will use for further
      * geometrical operations.
      * If the point lies outside of the domain, we immediately return 0. */
-    if (!apply_inverse_producer_mapping (op, xy))
+    if (!apply_inverse_producer_mapping (op, xy, blockno, geo))
     {
         return 0;
     }
@@ -311,9 +353,9 @@ int overlap_interpolate (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
     }
 
     fclaw_debugf
-        ("Found inversely-mapped point [%f,%f] in patch [%f,%f]x[%f,%f].\n",
+        ("Found inversely-mapped point [%f,%f] in patch [%f,%f]x[%f,%f] of block %d.\n",
          xy[0], xy[1], patch->xlower, patch->xupper, patch->ylower,
-         patch->yupper);
+         patch->yupper, blockno);
 
     /* Although the point is located within a certain tolerance of the patch,
      * it may still lie outside of the [0,1]x[0,1]-block on which the domain is
@@ -364,11 +406,19 @@ void output_query_points (overlap_consumer_t * c)
     for (iz = 0; iz < npz; iz++)
     {
         op = (overlap_point_t *) sc_array_index (c->query_points, iz);
-        fclaw_infof
-            ("Query point %ld on process %d is [%f,%f] and has interpolation data %f.\n",
-             iz, c->domain->mpirank, op->xy[0], op->xy[1],
-             op->prodata.myvalue[0]);
-
+        if (op->prodata.isset)
+        {
+            fclaw_infof
+                ("Query point %ld on process %d is [%f,%f] and has interpolation data %f.\n",
+                 iz, c->domain->mpirank, op->xy[0], op->xy[1],
+                 op->prodata.myvalue[0]);
+        }
+        else
+        {
+            fclaw_infof
+                ("Query point %ld on process %d is [%f,%f] and has no interpolation data.\n",
+                 iz, c->domain->mpirank, op->xy[0], op->xy[1]);
+        }
     }
 }
 
@@ -379,6 +429,7 @@ main (int argc, char **argv)
     int first_arg;
     fclaw_exit_type_t vexit;
     overlap_consumer_t consumer, *c = &consumer;
+    overlap_geometry_t filament_geometry, *geo = &filament_geometry;
 
     /* Options */
     sc_options_t                *options;
@@ -467,9 +518,14 @@ main (int argc, char **argv)
             swirl_clawpatch_opt->mx * swirl_clawpatch_opt->my;
         create_query_points (c);
 
+        /* initialize the filament geometry information that is needed for
+         * mapping between the swirl and the filament domain */
+        geo->fclaw_opt = filament_fclaw_opt;
+        geo->blocks = filament_domain->blocks;
+
         /* obtain interpolation data of the points from the producer side */
         fclaw2d_overlap_exchange (filament_glob->domain, c->query_points,
-                                  overlap_interpolate, NULL);
+                                  overlap_interpolate, geo);
 
         /* output the interpolation data for all query points */
         output_query_points (c);
