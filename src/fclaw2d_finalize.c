@@ -54,7 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *  read_input_and_check_<extension>():
  *  - Reads CSV data of type 'typename' from the provided file using the specified format.
  *  - Compares the read value with the provided 'actual' value.
- *  - If reading fails, prints an error message and exits the program with a non-zero status.
+ *  - If reading fails prints an error message, returns 1 (failure).
  *  - If the read value does not match the actual value, prints an error message and returns 1 (failure).
  *  - If the read is successful, returns 0 (success).
  *
@@ -65,39 +65,36 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define DEFINE_READ_AND_WRITE(typename, extension, format) \
 static int read_input_and_check_##extension(FILE* file, const char* name, typename actual) \
 { \
-    int name_length = strlen(name); \
-    char* format = FCLAW_ALLOC(char, name_length+11); \
-    strncpy(format, name, name_length + 1); \
-    strcat(format, ",%"#format"\n"); \
- \
+    char actual_name[50]; \
     typename expected; \
-    int fprintf_value = fscanf(file, format, &expected); \
+    int fprintf_value = fscanf(file, "%49[^,],%"#format"\n", actual_name, &expected); \
  \
-    if(fprintf_value < 0) \
+    if(fprintf_value != 2) \
     { \
         fclaw_global_essentialf("Failed to read form input file\n"); \
-        exit(1); \
+        return 1; \
     } \
  \
-    int failure = 0; \
-    if(expected != actual) \
+    if(strcmp(name, actual_name) == 0) \
     { \
-        fclaw_global_essentialf("Expected %s to be %"#format", but was %"#format"\n", name, expected, actual); \
-        failure = 1; \
+        if(expected != actual) \
+        { \
+            fclaw_global_essentialf("Expected %s to be %"#format", but was %"#format"\n", name, expected, actual); \
+            return 1; \
+        } \
+    } \
+    else \
+    { \
+        fclaw_global_essentialf("Expected to be reading %s, but got %s\n", name, actual_name); \
+        return 1; \
     } \
  \
-    FCLAW_FREE(format); \
- \
-    return failure; \
+    return 0; \
 } \
 static void write_output_##extension(FILE* file, const char* name, typename actual) \
 { \
  \
-    int name_length = strlen(name); \
-    char* format = FCLAW_ALLOC(char, name_length+11); \
-    strncpy(format, name, name_length + 1); \
-    strcat(format, ","#format"\n"); \
-    int fprintf_value = fprintf(file, format, actual); \
+    int fprintf_value = fprintf(file, "%s,%"#format"\n",name, actual); \
  \
     if(fprintf_value < 0) \
     { \
