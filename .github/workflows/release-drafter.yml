@@ -28,3 +28,21 @@ jobs:
         #   disable-autolabeler: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  upload_tarball_to_release:
+    runs-on: ubuntu-latest
+    needs: update_release_draft
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Create tarball
+        run: |
+          tar -czvf source-code.tar.gz --exclude='.git*' --exclude='.gitignore' .
+
+      - name: Attach tarball to release
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: ./source-code.tar.gz
+          asset_name: source-code.tar.gz
+          asset_content_type: application/gzip
