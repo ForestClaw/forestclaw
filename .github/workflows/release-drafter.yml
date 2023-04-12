@@ -21,17 +21,16 @@ jobs:
       #    echo "GHE_HOST=${GITHUB_SERVER_URL##https:\/\/}" >> $GITHUB_ENV
 
       # Drafts your next Release notes as Pull Requests are merged into "master"
-      - uses: release-drafter/release-drafter@v5
+      - name : Create Release Draft
+        id: release_draft
+        uses: release-drafter/release-drafter@v5
         # (Optional) specify config name to use, relative to .github/. Default: release-drafter.yml
         # with:
         #   config-name: my-config.yml
         #   disable-autolabeler: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  upload_tarball_to_release:
-    runs-on: ubuntu-latest
-    needs: update_release_draft
-    steps:
+
       - name: Checkout code
         uses: actions/checkout@v2
         with:
@@ -44,7 +43,7 @@ jobs:
       - name: Attach tarball to release
         uses: actions/upload-release-asset@v1
         with:
-          upload_url: ${{ github.event.release.upload_url }}
+          upload_url: ${{ steps.release_draft.outputs.upload_url }}
           asset_path: ./source-code.tar.gz
           asset_name: source-code.tar.gz
           asset_content_type: application/gzip
