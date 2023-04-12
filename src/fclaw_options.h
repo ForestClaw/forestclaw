@@ -239,7 +239,7 @@ struct fclaw_options
 
     const char * logging_prefix; /**< prefix presented in logging ie. [prefix] */
 
-    const char * regression_check; /**< prefix presented in logging ie. [prefix] */
+    const char * regression_check; /**< filename of regression check values */
 };
 
 #ifdef __cplusplus
