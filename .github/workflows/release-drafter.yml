@@ -41,5 +41,7 @@ jobs:
           tar -czvf source-code.tar.gz --exclude='.git*' --exclude='.gitignore' forestclaw
 
       - name: Attach tarball to release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh release upload ${{ steps.release_draft.outputs.tag_name }} source-code.tar.gz
