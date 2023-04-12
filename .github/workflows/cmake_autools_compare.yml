@@ -2,6 +2,9 @@ name: Compare Autotools and CMake build systems
 
 on:
   push:
+    paths-ignore:
+       - '.github/workflows/*.yml'
+       - '!.github/workflows/cmake_autools_compare.yml'
   pull_request:
   release:
     types: [published]

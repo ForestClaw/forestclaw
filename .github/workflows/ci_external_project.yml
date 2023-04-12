@@ -2,6 +2,9 @@ name: External Project Tests
 
 on:
   push:
+    paths-ignore:
+       - '.github/workflows/*.yml'
+       - '!.github/workflows/ci_external_project.yml'
   pull_request:
   release:
     types: [published]

@@ -7,7 +7,8 @@ on:
       - "**.cmake.in"
       - "cmake/**"
       - "CMake*"
-      - ".github/workflows/ci_cmake.yml"
+      - ".github/workflows/*.yml"
+      - "!.github/workflows/ci_automake.yml"
   pull_request:
   release:
     types: [published]
