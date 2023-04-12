@@ -32,6 +32,50 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_domain.h>
 #include <fclaw2d_forestclaw.h>
 
+
+static void write_output(FILE* file, const char* format, ...)
+{
+
+    va_list args;
+    va_start(args, format);
+    int fprintf_value = vfprintf(file, format, args);
+    va_end(args);
+
+    if(fprintf_value < 0)
+    {
+        fclaw_global_essentialf("Failed to write to output file");
+        exit(1);
+    }
+}
+
+static int read_input_and_check(FILE* file, const char* name, int actual)
+{
+    int name_length = strlen(name);
+    char* format = FCLAW_ALLOC(char, name_length+4+1);
+    strncpy(format, name, name_length + 1);
+    strcat(format, ",%d\n");
+
+    int expected;
+    int fprintf_value = fscanf(file, format, &expected);
+
+    if(fprintf_value < 0)
+    {
+        fclaw_global_essentialf("Failed to write to output file");
+        exit(1);
+    }
+
+    int failure = 0;
+    if(expected != actual)
+    {
+        fclaw_global_essentialf("Expected %s to be %d, but was %d", name, expected, actual);
+        failure = 1;
+    }
+
+    FCLAW_FREE(format);
+
+    return failure;
+}
+
 /**
  * @brief Output expected values for regression testing in a fortran style output
  * 
@@ -41,53 +85,43 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 static void 
 output_expected_values(fclaw2d_global_t* glob, const char* filename)
 {
-    // append .expected to the filename
-    char* expected_filename = FCLAW_ALLOC(char, strlen(filename) + 9);
-    strcpy(expected_filename, filename);
-    strcat(expected_filename, ".expected");
-
-    // open the file
-    FILE* file = fopen(expected_filename, "w");
-    if (file == NULL)
+    if(glob->mpirank == 0)
     {
-        fclaw_global_essentialf("Failed to open expected values file %s\n", expected_filename);
-        exit(FCLAW_EXIT_ERROR);
-    }
+        // append .expected to the filename
+        char* expected_filename = FCLAW_ALLOC(char, strlen(filename) + 10);
+        strcpy(expected_filename, filename);
+        strcat(expected_filename, ".expected");
 
-    //write amr_dvance in fortran style output
-    fprintf(file, "amr_advance_steps,%d\n", glob->count_amr_advance);
-
-    //close file
-    fclose(file);
-
-    FCLAW_FREE(expected_filename);
-
-    // open file to get expected results
-    file = fopen(filename, "r");
-    if (file == NULL)
-    {
-        fclaw_global_essentialf("Failed to open regressions file %s\n", expected_filename);
-        exit(FCLAW_EXIT_ERROR);
-    }
-
-    int expected_amr_advance_steps;
-    if(fscanf(file, "amr_advance_steps,%d", &expected_amr_advance_steps) == 1)
-    {
-        if (expected_amr_advance_steps != glob->count_amr_advance)
+        // open the file
+        FILE* file = fopen(expected_filename, "w");
+        if (file == NULL)
         {
-            fclaw_global_essentialf("ERROR: Expected amr_advance_steps = %d, got %d\n",
-                                    expected_amr_advance_steps, glob->count_amr_advance);
+            fclaw_global_essentialf("Failed to open expected values file %s\n", expected_filename);
             exit(FCLAW_EXIT_ERROR);
         }
-    }
-    else
-    {
-        fclaw_global_essentialf("Failed to read expected amr_advance_steps from %s\n", expected_filename);
-        exit(FCLAW_EXIT_ERROR);
-    }
 
-    // close file
-    fclose(file);
+        //write amr_dvance in fortran style output
+        write_output(file, "amr_advance_steps,%d\n", glob->count_amr_advance);
+        //write_output(file, "global_num_patches,%d\n", glob->domain->global_num_patches);
+
+        //close file
+        fclose(file);
+
+        FCLAW_FREE(expected_filename);
+
+        // open file to get expected results
+        file = fopen(filename, "r");
+        if (file == NULL)
+        {
+            fclaw_global_essentialf("Failed to open regressions file %s\n", expected_filename);
+            exit(FCLAW_EXIT_ERROR);
+        }
+
+        read_input_and_check(file, "amr_advance_steps,%d", glob->count_amr_advance);
+
+        // close file
+        fclose(file);
+    }
 }
 /* ------------------------------------------------------------------
    Public interface
