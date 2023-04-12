@@ -34,10 +34,12 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+        with:
+          path: forestclaw
 
       - name: Create tarball
         run: |
-          tar -czvf source-code.tar.gz --exclude='.git*' --exclude='.gitignore' .
+          tar -czvf source-code.tar.gz --exclude='.git*' --exclude='.gitignore' forestclaw
 
       - name: Attach tarball to release
         uses: actions/upload-release-asset@v1
