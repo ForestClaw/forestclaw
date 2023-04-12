@@ -41,9 +41,5 @@ jobs:
           tar -czvf source-code.tar.gz --exclude='.git*' --exclude='.gitignore' forestclaw
 
       - name: Attach tarball to release
-        uses: actions/upload-release-asset@v1
-        with:
-          upload_url: ${{ steps.release_draft.outputs.upload_url }}
-          asset_path: ./source-code.tar.gz
-          asset_name: source-code.tar.gz
-          asset_content_type: application/gzip
+        run: |
+          gh release upload ${{ steps.release_draft.outputs.tag_name }} source-code.tar.gz
