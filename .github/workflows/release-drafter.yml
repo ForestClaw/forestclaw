@@ -40,6 +40,11 @@ jobs:
         run: |
           tar -czvf forestclaw-${{ steps.release_draft.outputs.tag_name }}.tar.gz --exclude='.git*' --exclude='.gitignore' forestclaw-${{ steps.release_draft.outputs.tag_name }}
 
+      - name: Delete previous assets
+        run: |
+          gh release view ${{ steps.release_draft.outputs.tag_name }} --json assets --jq ".assets[] | .name"  \
+              | tr '\n' '\0' \
+              |  xargs -t0 -n1 -I{} gh release delete-asset ${{ steps.release_draft.outputs.tag_name }} "{}" -y
       - name: Attach tarball to release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
