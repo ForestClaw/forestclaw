@@ -34,14 +34,14 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
         with:
-          path: forestclaw
+          path: forestclaw-${{ steps.release_draft.outputs.tag_name }}
 
       - name: Create tarball
         run: |
-          tar -czvf source-code.tar.gz --exclude='.git*' --exclude='.gitignore' forestclaw
+          tar -czvf forestclaw-${{ steps.release_draft.outputs.tag_name }}.tar.gz --exclude='.git*' --exclude='.gitignore' forestclaw-${{ steps.release_draft.outputs.tag_name }}
 
       - name: Attach tarball to release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release upload ${{ steps.release_draft.outputs.tag_name }} source-code.tar.gz#"Source code (tar.gz)" -R ${{ github.repository }} --clobber
+          gh release upload ${{ steps.release_draft.outputs.tag_name }} forestclaw-${{ steps.release_draft.outputs.tag_name }}.tar.gz -R ${{ github.repository }} --clobber
