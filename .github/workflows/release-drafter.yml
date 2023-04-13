@@ -41,6 +41,9 @@ jobs:
           tar -czvf forestclaw-${{ steps.release_draft.outputs.tag_name }}.tar.gz --exclude='.git*' --exclude='.gitignore' forestclaw-${{ steps.release_draft.outputs.tag_name }}
 
       - name: Delete previous assets
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        working-directory: forestclaw-${{ steps.release_draft.outputs.tag_name }}
         run: |
           gh release view ${{ steps.release_draft.outputs.tag_name }} --json assets --jq ".assets[] | .name"  \
               | tr '\n' '\0' \
