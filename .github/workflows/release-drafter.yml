@@ -44,4 +44,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release upload ${{ steps.release_draft.outputs.tag_name }} source-code.tar.gz#source -R ${{ github.repository }} --clobber
+          gh release upload ${{ steps.release_draft.outputs.tag_name }} source-code.tar.gz#"Source code (tar.gz)" -R ${{ github.repository }} --clobber
