@@ -46,6 +46,15 @@ jobs:
         working-directory: forestclaw-${{ steps.release_draft.outputs.tag_name }}
         run: ./bootstrap
 
+      - name: Generate .tarball-verison
+        working-directory: forestclaw-${{ steps.release_draft.outputs.tag_name }}
+        run: |
+          echo "${{ steps.release_draft.outputs.tag_name }}" > .tarball-version
+          cd p4est
+          sh build-aux/git-version-gen .tarball-version > .tarball-version
+          cd ../sc
+          sh build-aux/git-version-gen .tarball-version > .tarball-version
+
       - name: Create tarball
         run: |
           tar -czvf forestclaw-${{ steps.release_draft.outputs.tag_name }}.tar.gz --exclude='.git*' --exclude='.gitignore' forestclaw-${{ steps.release_draft.outputs.tag_name }}
