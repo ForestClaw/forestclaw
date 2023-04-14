@@ -42,10 +42,6 @@ jobs:
           git submodule init
           git submodule update
 
-      - name: Run bootstrap Script
-        working-directory: forestclaw-${{ steps.release_draft.outputs.tag_name }}
-        run: ./bootstrap
-
       - name: Generate .tarball-verison
         working-directory: forestclaw-${{ steps.release_draft.outputs.tag_name }}
         run: |
@@ -54,6 +50,12 @@ jobs:
           sh build-aux/git-version-gen .tarball-version > .tarball-version
           cd ../sc
           sh build-aux/git-version-gen .tarball-version > .tarball-version
+
+      - name: Run bootstrap Script
+        working-directory: forestclaw-${{ steps.release_draft.outputs.tag_name }}
+        run: |
+          ./bootstrap
+          rm ./bootstrap
 
       - name: Create tarball
         run: |
