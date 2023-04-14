@@ -87,8 +87,8 @@ cd $srcdir
 # First try "git describe", then see if there is a tarball-only version file, then default
 
 if { test -d .git || test -f .git ; } \
-  && v=`git describe --abbrev=4 --match='v*' --dirty=-dirty 2>/dev/null \
-  || git describe --abbrev=4 --dirty=-dirty 2>/dev/null` \
+  && v=`git describe --tags --abbrev=4 --match='v*' --dirty=-dirty 2>/dev/null \
+  || git describe --tags --abbrev=4 --dirty=-dirty 2>/dev/null` \
   && case $v in
   v[0-9]*) ;;
   *) (exit 1) ;;
