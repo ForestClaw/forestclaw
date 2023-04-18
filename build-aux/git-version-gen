@@ -124,6 +124,8 @@ else
     v=UNKNOWN
 fi
 
+# remove the first character from the variable
+v=$(expr "$v" : '.\(.*\)')
 
 # Omit the trailing newline, so that m4_esyscmd can use the result directly.
 echo "$v" | tr -d '\012'
