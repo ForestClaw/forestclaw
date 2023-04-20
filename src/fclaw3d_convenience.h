@@ -143,29 +143,28 @@ void fclaw3d_domain_list_adapted (fclaw3d_domain_t * old_domain,
 /** Search triples of (block number, x, y, z coordinates) in the mesh.
  * The x, y, z coordinates must be in [0, 1]^3.
  * The input data must be equal on every process: This is a collective call.
- * The results will also be equal on every process.
  *
- * A point is found correctly even if it is on a patch boundary.
+ * A point is found at most once even if it is on a patch boundary.
  * We return the smallest patch number on the smallest processor touching it.
  * However, if a point is on a block boundary, it must be decided before
  * calling this function which tree shall be queried for it.
  *
- * \note Currently we do not find the smallest matching process, but instead
- *       instead a point on a parallel boundary may be found on multiple processes.
- *       This should be fixed in the near future.
- *
  * \param [in] domain           Must be valid domain structure.  Will not be changed.
- * \param [in] block_offsets    Array of (num_blocks + 1) int variables.
+ * \param [in] block_offsets    Monotonous array of (num_blocks + 1) int variables.
  *                              The points to search in block t in [0, num_blocks)
  *                              have indices [block_offsets[t], block_offsets[t + 1])
  *                              in the \b coordinates and results arrays.
- * \param [in] coordinates      An array of elem_size == 2 * sizeof (double) with
+ * \param [in] coordinates      An array of elem_size == 3 * sizeof (double) with
  *                              entries (x, y, z) in [0, 1]^3.  Of these entries,
  *                              there are \b block_offsets[num_blocks] many.
- * \param [in,out] results      On input, an array of type int and
- *                              \b block_offsets[num_blocks] many entries.
- *                              On output, each entry will be -1 if the point has
- *                              not been found, or the patch number within its block.
+ *                              We do not enforce the x, y and z ranges
+ *                              and simply do not find any point outside its block.
+ * \param [in,out] results      On input, an array of type int and an element
+ *                              count of \b block_offsets[num_blocks].
+ *                              The data in \b results is ignored on input.
+ *                              On output, an entry will be -1 if the point has
+ *                              not been found on this process, or the patch
+ *                              number within its block otherwise.
  */
 void fclaw3d_domain_search_points (fclaw3d_domain_t * domain,
                                    sc_array_t * block_offsets,
