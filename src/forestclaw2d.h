@@ -75,10 +75,13 @@ typedef enum
     FCLAW2D_PATCH_ON_BLOCK_FACE_2 = 0x100,
     /** Face 3 is on a block boundary */
     FCLAW2D_PATCH_ON_BLOCK_FACE_3 = 0x200,
+#if 0
+    /* reserve these bit combinations since they are needed in 3D */
     /** Face 4 is on a block boundary */
     FCLAW2D_PATCH_ON_BLOCK_FACE_4_ONLY_FOR_3D = 0x400,
     /** Face 5 is on a block boundary */
     FCLAW2D_PATCH_ON_BLOCK_FACE_5_ONLY_FOR_3D = 0x800,
+#endif
     /** Patch is on a block boundary */
     FCLAW2D_PATCH_ON_BLOCK_BOUNDARY = 0xFC0
 }
