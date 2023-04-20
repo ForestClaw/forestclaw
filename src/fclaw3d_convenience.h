@@ -145,7 +145,7 @@ void fclaw3d_domain_list_adapted (fclaw3d_domain_t * old_domain,
  * The input data must be equal on every process: This is a collective call.
  * The results will also be equal on every process.
  *
- * A point is found correctly even if it is on a patch boundary.
+ * A point is found at most once even if it is on a patch boundary.
  * We return the smallest patch number on the smallest processor touching it.
  * However, if a point is on a block boundary, it must be decided before
  * calling this function which tree shall be queried for it.
