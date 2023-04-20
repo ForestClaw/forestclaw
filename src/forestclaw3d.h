@@ -1015,6 +1015,31 @@ void fclaw3d_domain_serialization_enter (fclaw3d_domain_t * domain);
 void fclaw3d_domain_serialization_leave (fclaw3d_domain_t * domain);
 
 ///@}
+/* ---------------------------------------------------------------------- */
+///                      @name Meta Domains
+/* ---------------------------------------------------------------------- */
+///@{
+
+/** Return true if \a domain is an artifical domain.
+ *
+ * This function can be used in \ref fclaw3d_interpolate_point_t callbacks to
+ * distinguish domains that were created during a partition search (and only
+ * contain some meta information) from real domains in a local search.
+ */
+int fclaw3d_domain_is_meta (fclaw3d_domain_t * domain);
+
+/** Initialize a meta domain.
+ *
+ * Initializes \a domain in an artificial manner, where the entry mpirank is
+ * used to store arbitrary context information. The remaining entries are
+ * initialized to -1 or NULL.
+ * The resulting domain can be passed to an \ref fclaw3d_interpolate_point_t
+ * in case the domain to interpolate on is not available locally (also see
+ * \ref fclaw3d_overlap_exchange for an example).
+ */
+void fclaw3d_domain_init_meta (fclaw3d_domain_t *domain, int mpirank);
+
+///@}
 #ifdef __cplusplus
 #if 0
 {                               /* need this because indent is dumb */

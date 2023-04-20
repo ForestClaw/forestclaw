@@ -86,6 +86,10 @@ struct fclaw3d_global
     struct fclaw3d_domain *domain;
 
 #if 0
+    /* CB: is this a good place for the accumulator?
+           Would it be possible to add and retrieve it as an anonymous
+           object that does not need to be known to this file? */
+
     struct fclaw3d_diagnostics_accumulator *acc;
 #endif
 
@@ -152,6 +156,20 @@ void fclaw3d_global_unset_global (void);
  */
 fclaw3d_global_t* fclaw3d_global_get_global (void);
 
+/**
+ * @brief
+ *
+ * @param glob
+ */
+void fclaw3d_set_global_context(fclaw3d_global_t *glob);
+
+/**
+ * @brief
+ *
+ * @param glob
+ */
+void fclaw3d_clear_global_context(fclaw3d_global_t *glob);
+
 #ifdef __cplusplus
 #if 0
 {                               /* need this because indent is dumb */
@@ -159,4 +177,4 @@ fclaw3d_global_t* fclaw3d_global_get_global (void);
 }
 #endif
 
-#endif /* FCLAW3D_GLOBAL_H */
+#endif /* !FCLAW3D_GLOBAL_H */
