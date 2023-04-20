@@ -158,6 +158,8 @@ void fclaw3d_domain_list_adapted (fclaw3d_domain_t * old_domain,
  * \param [in] coordinates      An array of elem_size == 3 * sizeof (double) with
  *                              entries (x, y, z) in [0, 1]^3.  Of these entries,
  *                              there are \b block_offsets[num_blocks] many.
+ *                              We do not enforce the x, y and z ranges
+ *                              and simply do not find any point outside its block.
  * \param [in,out] results      On input, an array of type int and an element
  *                              count of \b block_offsets[num_blocks].
  *                              The data in \b results is ignored on input.

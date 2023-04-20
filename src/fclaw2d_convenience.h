@@ -179,7 +179,7 @@ void fclaw2d_domain_list_adapted (fclaw2d_domain_t * old_domain,
  * \param [in] coordinates      An array of elem_size == 2 * sizeof (double) with
  *                              entries (x, y) in [0, 1]^2.  Of these entries,
  *                              there are \b block_offsets[num_blocks] many.
- *                              Currently we do not enforce the x and y ranges
+ *                              We do not enforce the x and y ranges
  *                              and simply do not find any point outside its block.
  * \param [in,out] results      On input, an array of type int and an element
  *                              count of \b block_offsets[num_blocks].
