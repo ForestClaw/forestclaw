@@ -1006,16 +1006,14 @@ int fclaw2d_domain_is_meta (fclaw2d_domain_t * domain);
 
 /** Initialize a meta domain.
  *
- * This function sets mpi and basic structure information of \a domain according
- * to the input parameters. The remaining entries are initialized to 0 or -1,
- * to mark \a domain as being meta.
+ * Initializes \a domain in an artificial manner, where the entry mpirank is
+ * used to store arbitrary context information. The remaining entries are
+ * initialized to -1 or NULL.
  * The resulting domain can be passed to an \ref fclaw2d_interpolate_point_t
  * in case the domain to interpolate on is not available locally (also see
  * \ref fclaw2d_overlap_exchange for an example).
  */
-void fclaw2d_domain_init_meta (fclaw2d_domain_t *domain, sc_MPI_Comm mpicomm,
-                               int mpisize, int mpirank, void *pp,
-                               sc_keyvalue_t *attributes);
+void fclaw2d_domain_init_meta (fclaw2d_domain_t *domain, int mpirank);
 
 ///@}
 #ifdef __cplusplus

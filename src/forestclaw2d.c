@@ -2185,21 +2185,27 @@ fclaw2d_domain_is_meta (fclaw2d_domain_t * domain)
 }
 
 void
-fclaw2d_domain_init_meta (fclaw2d_domain_t * domain, sc_MPI_Comm mpicomm,
-                          int mpisize, int mpirank, void *pp,
-                          sc_keyvalue_t *attributes)
+fclaw2d_domain_init_meta (fclaw2d_domain_t * domain, int mpirank)
 {
     FCLAW_ASSERT(domain != NULL);
-    memset (domain, 0, sizeof (fclaw2d_domain_t));      /* initialize to zero */
-    domain->local_num_patches = -1;     /* mark as artifical patch */
-    domain->mpicomm = mpicomm;
-    domain->mpisize = mpisize;
-    domain->mpirank = mpirank;
 
-    /* give access to basic tree structure and connectivity information */
-    domain->pp = pp;
+    /* initialize to -1 and set pointers to NULL */
+    memset (domain, -1, sizeof (fclaw2d_domain_t));
+    domain->mpicomm = sc_MPI_COMM_NULL;
+    domain->blocks = NULL;
+    domain->exchange_patches = NULL;
+    domain->ghost_patches = NULL;
+    domain->mirror_target_levels = NULL;
+    domain->ghost_target_levels = NULL;
+    domain->pp = NULL;
+    domain->attributes = NULL;
+    domain->just_adapted = 0;
+    domain->just_partitioned = 0;
     domain->pp_owned = 0;
-    domain->attributes = attributes;
+
+    domain->local_num_patches = -1; /* mark as artifical patch */
+
+    domain->mpirank = mpirank; /* set mpirank to provide context information */
 }
 
 #if 0

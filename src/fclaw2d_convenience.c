@@ -1423,9 +1423,7 @@ interpolate_partition_fn (p4est_t * p4est, p4est_topidx_t which_tree,
     domain = FCLAW_ALLOC (fclaw2d_domain_t, 1);
     /* Todo: works only for congruent communicators. Do we really need all this
      * information? */
-    fclaw2d_domain_init_meta (domain, p4est->mpicomm, p4est->mpisize,
-                              (pfirst == plast) ? pfirst : -1, c->domain->pp,
-                              c->domain->attributes);
+    fclaw2d_domain_init_meta (domain, (pfirst == plast) ? pfirst : -1);
 
     /* create artifical patch and fill it based on the quadrant */
     patch = &fclaw2d_patch;
