@@ -162,7 +162,7 @@ void fclaw2d_domain_list_adapted (fclaw2d_domain_t * old_domain,
                                   fclaw2d_domain_t * new_domain,
                                   int log_priority);
 
-/** Search triples of (block number, x coordinate, y coordinate) in the mesh.
+/** Search triples of (block number, x, y coordinates) in the mesh.
  * The x, y coordinates must be in [0, 1]^2.
  * The input data must be equal on every process: This is a collective call.
  *
