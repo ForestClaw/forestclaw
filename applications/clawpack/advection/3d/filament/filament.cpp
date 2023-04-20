@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -25,9 +25,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "filament_user.h"
 
+#include "../all/advection_user.h"
+
 static
-fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, fclaw_options_t* fclaw_opt, 
-                                user_options_t* user)
+fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, 
+                                fclaw_options_t* fclaw_opt, 
+                                user_options_t* user,
+                                fclaw3dx_clawpatch_options_t* clawpatch_opt,
+                                fc3d_clawpack46_options_t *claw3_opt)
 {
     /* Mapped, multi-block domain */
     p4est_connectivity_t     *conn = NULL;
@@ -39,10 +44,71 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, fclaw_options_t* fclaw_opt,
     int a = 0; /* non-periodic */
     int b = 0;
 
-    /* Square brick domain */
-    conn = p4est_connectivity_new_brick(mi,mj,a,b);
-    brick = fclaw2d_map_new_brick(conn,mi,mj);
-    cont = fclaw2d_map_new_nomap_brick(brick);
+    int mx = clawpatch_opt->mx;
+    int minlevel = fclaw_opt->minlevel;
+    int check = mi*mx*pow_int(2,minlevel);
+
+    switch (user->example) 
+    {
+    case 0:
+        FCLAW_ASSERT(claw3_opt->mcapa == 0);
+        FCLAW_ASSERT(fclaw_opt->manifold == 0);
+
+        /* Size is set by [ax,bx] x [ay, by], set in .ini file */
+        conn = p4est_connectivity_new_brick(mi,mj,a,b);
+        brick = fclaw2d_map_new_brick_conn (conn,mi,mj);
+        cont = fclaw2d_map_new_nomap_brick(brick);
+        break;
+
+    case 1:
+        /* Square brick domain */
+        FCLAW_ASSERT(fclaw_opt->manifold != 0);
+        /* Square brick domain */
+        conn = p4est_connectivity_new_brick(mi,mj,a,b);
+        brick = fclaw2d_map_new_brick_conn (conn,mi,mj);
+        /* Square in [-1,1]x[-1,1], shifted by (1,1,0) */
+        cont = fclaw2d_map_new_cart(brick,
+                                    fclaw_opt->scale,
+                                    fclaw_opt->shift);
+
+        break;
+    case 2:
+        FCLAW_ASSERT(fclaw_opt->manifold != 0);
+        if (check < 32)
+        {
+            printf("mi*pow_int(mx,minlevel) = %d\n",check);
+            fclaw_global_essentialf("The five patch mapping requires mi*mx*2^minlevel > 32\n");
+            exit(0);
+
+        }
+        /* Five patch square domain */
+        conn = p4est_connectivity_new_disk (0, 0);
+        cont = fclaw2d_map_new_fivepatch (fclaw_opt->scale,
+                                          fclaw_opt->shift,
+                                          user->alpha);
+
+        break;
+
+    case 3:
+        /* bilinear square domain : maps to [-1,1]x[-1,1] */
+        FCLAW_ASSERT(mi == 2 && mj == 2);
+        FCLAW_ASSERT(fclaw_opt->manifold != 0);
+        conn = p4est_connectivity_new_brick(mi,mj,a,b);
+        brick = fclaw2d_map_new_brick_conn (conn,mi,mj);
+        cont = fclaw2d_map_new_bilinear (brick, 
+                                         fclaw_opt->scale,
+                                         fclaw_opt->shift, 
+                                         user->center);
+        break;
+
+    default:
+        SC_ABORT_NOT_REACHED ();
+    }
+
+    if (user->example > 0)
+    {
+        filament_map_extrude(cont,user->maxelev);
+    }
     
     domain = fclaw2d_domain_new_conn_map (mpicomm, fclaw_opt->minlevel, conn, cont);
     fclaw2d_domain_list_levels(domain, FCLAW_VERBOSITY_ESSENTIAL);
@@ -69,11 +135,11 @@ void run_program(fclaw2d_global_t* glob)
 
     if (user->claw_version == 4)
     {
-      fc3d_clawpack46_solver_initialize();
+      fc3d_clawpack46_solver_initialize(glob);
     }
     else if (user->claw_version == 5)
     {
-        printf("swirl.cpp : Example not implemented for Claw version 5.\n");
+        printf("filament.cpp : 3d example not implemented for Claw version 5.\n");
         exit(0);
     }
 
@@ -110,10 +176,10 @@ main (int argc, char **argv)
     app = fclaw_app_new (&argc, &argv, NULL);
 
     /* Register packages */
-    fclaw_opt                    = fclaw_options_register(app,"fclaw_options.ini");
-    clawpatch_opt   = fclaw3dx_clawpatch_options_register(app,"fclaw_options.ini");
-    claw46_opt         = fc3d_clawpack46_options_register(app,"fclaw_options.ini");
-    user_opt =                  filament_options_register(app,"fclaw_options.ini");  
+    fclaw_opt                    = fclaw_options_register(app,  NULL,        "fclaw_options.ini");
+    clawpatch_opt   = fclaw3dx_clawpatch_options_register(app, "clawpatch",  "fclaw_options.ini");
+    claw46_opt         = fc3d_clawpack46_options_register(app, "claw3",      "fclaw_options.ini");
+    user_opt =                  filament_options_register(app,               "fclaw_options.ini");  
 
     /* Read configuration file(s) */
     options = fclaw_app_get_options (app);
@@ -125,13 +191,17 @@ main (int argc, char **argv)
         /* Options have been checked and are valid */
 
         mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
-        domain = create_domain(mpicomm, fclaw_opt, user_opt);
+        domain = create_domain(mpicomm, 
+                               fclaw_opt, 
+                               user_opt,
+                               clawpatch_opt,
+                               claw46_opt);
             
         glob = fclaw2d_global_new();
         fclaw2d_global_store_domain(glob, domain);
 
         fclaw2d_options_store            (glob, fclaw_opt);
-        fclaw3dx_clawpatch_options_store (glob, clawpatch_opt);
+        fclaw3dx_clawpatch_options_store  (glob, clawpatch_opt);
         fc3d_clawpack46_options_store    (glob, claw46_opt);
         filament_options_store           (glob, user_opt);
 

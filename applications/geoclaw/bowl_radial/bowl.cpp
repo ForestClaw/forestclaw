@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+  Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -61,7 +61,7 @@ void run_program(fclaw2d_global_t* glob)
 
     fclaw2d_vtables_initialize(glob);
 
-    fc2d_geoclaw_solver_initialize();
+    fc2d_geoclaw_solver_initialize(glob);
 
     bowl_link_solvers(glob);
 
@@ -97,9 +97,9 @@ main (int argc, char **argv)
     /* Initialize application */
     app = fclaw_app_new (&argc, &argv, NULL);
 
-    gparms                   = fclaw_options_register(app,"fclaw_options.ini");
-    clawpatchopt = fclaw2d_clawpatch_options_register(app, "fclaw_options.ini");
-    geoclawopt        = fc2d_geoclaw_options_register(app, "fclaw_options.ini");
+    gparms                   = fclaw_options_register(app,  NULL,       "fclaw_options.ini");
+    clawpatchopt = fclaw2d_clawpatch_options_register(app, "clawpatch", "fclaw_options.ini");
+    geoclawopt        = fc2d_geoclaw_options_register(app, "geoclaw",   "fclaw_options.ini");
 
     /* Read configuration file(s) and command line, and process options */
     options = fclaw_app_get_options (app);

@@ -22,9 +22,9 @@
 
       integer i,j, k
 
-      integer*8 cont, get_context
+      integer*8 cont, fclaw_map_get_context
 
-      cont = get_context()
+      cont = fclaw_map_get_context()
 
 c     # Cell-centered velocities : entries (4,5,6) 
       do i = 1-mbc,mx+mbc

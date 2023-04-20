@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -64,10 +64,18 @@ fclaw_exit_type_t fc3d_clawpack5_postprocess (fc3d_clawpack5_options_t *
 fclaw_exit_type_t fc3d_clawpack5_check (fc3d_clawpack5_options_t * clawopt);
 void fc3d_clawpack5_reset (fc3d_clawpack5_options_t * clawopt);
 
-fc3d_clawpack5_options_t *fc3d_clawpack5_options_register (fclaw_app_t *
-                                                             app,
-                                                             const char
-                                                             *configfile);
+/**
+ * @brief Register options in SC
+ * 
+ * @param a the app context
+ * @param section the section name
+ * @param configfile the config file
+ * @return fc3d_clawpack5_options_t* a newly allocated options struct
+ */
+fc3d_clawpack5_options_t *fc3d_clawpack5_options_register (fclaw_app_t *app,
+                                                           const char *section,
+                                                           const char *configfile);
+
 #define SET_AMR_MODULE FCLAW_F77_FUNC(set_amr_module,SET_AMR_MODULE)
 void SET_AMR_MODULE(const int* mwaves_in, const int* mcapa_in,
                     const int mthlim_in[], const int method_in[]);

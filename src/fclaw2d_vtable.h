@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -34,50 +34,78 @@ extern "C"
 #endif
 #endif
 
+/** 
+ *  @file 
+ *  @brief ForestClaw vtable
+ */
+
 struct fclaw2d_global;
 struct fclaw2d_patch;
 
-
-void fclaw2d_after_regrid(struct fclaw2d_global *glob);
-
-void fclaw2d_after_init(struct fclaw2d_global *glob);
-
-
 /* ---------------------------------- Typedefs ---------------------------------------- */  
-typedef void (*fclaw2d_vtable_initialize_t)();
-
+/**
+ * @brief Sets up common blocks in Fortran
+ * 
+ * @param glob the global context
+ */
 typedef void (*fclaw2d_problem_setup_t)(struct fclaw2d_global *glob);
 
+/**
+ * @brief Sets up common blocks in Fortran
+ * 
+ * @param glob the global context
+ * @param iframe frame number
+ */
 typedef void (*fclaw2d_output_frame_t)(struct fclaw2d_global * glob, int iframe);
 
+/**
+ * @brief Called after each regridding
+ *  
+ * @param glob the global context
+ */
 typedef void (*fclaw2d_after_regrid_t)(struct fclaw2d_global *glob);
 
-typedef void (*fclaw2d_after_initialization_t)(struct fclaw2d_global *glob);
-
 /* ------------------------------------ vtable ---------------------------------------- */  
+/**
+ * @brief vtable for general ForestClaw functions
+ */
 typedef struct fclaw2d_vtable
 {
-
-	fclaw2d_vtable_initialize_t          vtable_init;
+	/** @brief sets up common blocks in Fortran */
 	fclaw2d_problem_setup_t              problem_setup;
-	fclaw2d_after_initialization_t       after_init;
 
-	/* regridding functions */
+	/** @brief called after each regridding */
 	fclaw2d_after_regrid_t               after_regrid;
 
-	/* Output functions */
+	/** @brief called for output */
 	fclaw2d_output_frame_t               output_frame;
 
+	/** @brief true if vtable is set */
 	int is_set;
-
 
 } fclaw2d_vtable_t;
 
 
-fclaw2d_vtable_t* fclaw2d_vt();
+/**
+ * @brief get the fclaw2d vtable
+ * 
+ * @param glob the global context
+ */
+fclaw2d_vtable_t* fclaw2d_vt(struct fclaw2d_global* glob);
 
-void fclaw2d_vtable_initialize();
+/**
+ * @brief Initialize fclaw2d vtable
+ * 
+ * @param glob the global context
+ */
+void fclaw2d_vtable_initialize(struct fclaw2d_global* glob);
 
+/**
+ * @brief Called after each regridding
+ * 
+ * @param glob the global context
+ */
+void fclaw2d_after_regrid(struct fclaw2d_global *glob);
 
 #ifdef __cplusplus
 #if 0

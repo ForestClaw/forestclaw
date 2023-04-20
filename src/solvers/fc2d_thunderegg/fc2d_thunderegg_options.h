@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2019 Carsten Burstedde, Donna Calhoun, Scott Aiton, Grady Wright
+Copyright (c) 2019-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton, Grady Wright
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -52,6 +52,7 @@ typedef enum {
 typedef enum {
     FFT = 0,    /* Must use starpatch or fivepoint */
     BICG,       /* Can be used with any operator */
+    CG,         /* Can be used with any operator */
     USER_SOLVER
 } fc2d_thunderegg_solver_types;
 
@@ -71,7 +72,7 @@ struct fc2d_thunderegg_options
     int max_it;
     double tol;
 
-    /* thunderegg cyle settings */
+    /* thunderegg cycle settings */
     int pre_sweeps;
     int post_sweeps;
     int mid_sweeps;
@@ -80,12 +81,9 @@ struct fc2d_thunderegg_options
 
     int verbosity_level;
 
-    /* bicgstab patch solver settings*/
-    int patch_bcgs_max_it;
-    double patch_bcgs_tol;
-
-    /* Used by starpatch only */
-    const char *patch_solver_type;
+    /* iterative patch solver settings*/
+    int patch_iter_max_it;
+    double patch_iter_tol;
 
     int patch_operator;
     sc_keyvalue_t *kv_patch_operator;
@@ -104,7 +102,16 @@ fclaw_exit_type_t fc2d_thunderegg_check (fc2d_thunderegg_options_t * mg_opt);
 
 void fc2d_thunderegg_reset (fc2d_thunderegg_options_t * mg_opt);
 
+/**
+ * @brief Register options in SC
+ * 
+ * @param a the app context
+ * @param section the section name
+ * @param configfile the config file
+ * @return fc2d_thunderegg_options_t* a newly allocated options struct
+ */
 fc2d_thunderegg_options_t*  fc2d_thunderegg_options_register (fclaw_app_t * app,
+                                                              const char *section,
                                                               const char *configfile);
 
 void fc2d_thunderegg_package_register(fclaw_app_t* app,

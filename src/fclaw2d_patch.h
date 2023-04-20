@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -24,7 +24,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 /** 
  * @file
- * Patch related functions and typedefs
+ * @brief Patch related functions and typedefs
  */
 
 
@@ -491,7 +491,7 @@ void fclaw2d_patch_destroy_user_data(struct fclaw2d_global* glob,
  * 
  * @param[in] glob the global context
  * @param[in] patch the patch context
- * @param[in] blockno the block number
+ * @param[in] blockno the block number, -1 if ghost patch
  * @param[in] patchno the patch number
  * @param[in,out] tdata the stransform data structure
  */
@@ -503,6 +503,7 @@ void fclaw2d_patch_transform_init_data(struct fclaw2d_global* glob,
 /**
  * @brief Get the transform on a block face
  * 
+ * @param[in] glob the global context
  * @param[in] faceno 
  * @param[in] rfaceno 
  * @param[out]  ftransform  This array holds 9 integers.
@@ -520,12 +521,14 @@ void fclaw2d_patch_transform_init_data(struct fclaw2d_global* glob,
  *                                   the \a ftransform contents are ignored.
  *              [1,4,7]     0 (unused for compatibility with 3D).ftransform 
  */
-void fclaw2d_patch_transform_blockface(int faceno, int rfaceno,
+void fclaw2d_patch_transform_blockface(struct fclaw2d_global* glob,
+                                       int faceno, int rfaceno,
                                        int ftransform[]);
 
 /**
  * @brief Get the transform for within a block (the identity transform)
  * 
+ * @param[in] glob the global context
  * @param[out]  ftransform  This array holds 9 integers.
  *              [0,2]       The coordinate axis sequence of the origin face,
  *                          the first referring to the tangential and the second
@@ -541,7 +544,8 @@ void fclaw2d_patch_transform_blockface(int faceno, int rfaceno,
  *                                   the \a ftransform contents are ignored.
  *              [1,4,7]     0 (unused for compatibility with 3D).ftransform 
  */
-void fclaw2d_patch_transform_blockface_intra(int ftransform[]);
+void fclaw2d_patch_transform_blockface_intra(struct fclaw2d_global* glob, 
+                                             int ftransform[]);
   
 ///@}
 /* ------------------------------------------------------------------------------------ */
@@ -1566,16 +1570,19 @@ struct fclaw2d_patch_vtable
 };
 
 /**
- * @brief Get the pointer to the global vtable variable
+ * @brief Get the patch vtable
  * 
+ * @param glob the global context
  * @return fclaw2d_patch_vtable_t* the vtable
  */
-fclaw2d_patch_vtable_t* fclaw2d_patch_vt();
+fclaw2d_patch_vtable_t* fclaw2d_patch_vt(struct fclaw2d_global* glob);
 
 /**
- * @brief Initialize the global vtable variable
+ * @brief Initialize the patch vtable
+ * 
+ * @param glob the global context
  */
-void fclaw2d_patch_vtable_initialize();
+void fclaw2d_patch_vtable_initialize(struct fclaw2d_global* glob);
 
 
 ///@}
@@ -1646,10 +1653,12 @@ void* fclaw2d_patch_get_user_data(struct fclaw2d_global* glob,
 /**
  * @brief Get the metric patch
  * 
+ * @param glob the global context
  * @param patch the patch context
  * @return void* pointer to the metric patch
  */
-void* fclaw2d_patch_metric_patch(struct fclaw2d_patch *patch);
+void* fclaw2d_patch_metric_patch(struct fclaw2d_global* glob,
+                                 struct fclaw2d_patch *patch);
 
 /**
  * @brief Get the block number

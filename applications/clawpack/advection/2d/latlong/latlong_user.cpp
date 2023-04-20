@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -25,6 +25,27 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "latlong_user.h"
 
+void latlong_problem_setup(fclaw2d_global_t *glob)
+{
+    const user_options_t* user = latlong_get_options(glob);
+    fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
+    if (glob->mpirank == 0)
+    {
+        FILE *f = fopen("setprob.data","w");
+        fprintf(f,  "%-24d   %s",user->example,"\% example\n");
+        fprintf(f,  "%-24d   %s",fclaw_opt->manifold,"\% manifold\n");
+        fprintf(f,  "%-24.6f %s",user->revs_per_second,"\% revs_per_second\n");
+        fprintf(f,  "%-24.6f %s",user->longitude[0],"\% longitude[0]\n");
+        fprintf(f,  "%-24.6f %s",user->longitude[1],"\% longitude[1]\n");
+        fprintf(f,  "%-24.6f %s",user->latitude[0],"\% latitude[0]\n");
+        fprintf(f,  "%-24.6f %s",user->latitude[1],"\% latitude[1]\n");
+        fclose(f);
+    }
+    fclaw2d_domain_barrier (glob->domain);
+    SETPROB();
+}
+
+
 static
 void latlong_patch_setup(fclaw2d_global_t *glob,
                          fclaw2d_patch_t *patch,
@@ -38,13 +59,16 @@ void latlong_patch_setup(fclaw2d_global_t *glob,
 
 void latlong_link_solvers(fclaw2d_global_t *glob)
 {
-    fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt();
+    fclaw2d_vtable_t *fclaw_vt = fclaw2d_vt(glob);
+    fclaw_vt->problem_setup = latlong_problem_setup;
+    
+    fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt(glob);
     patch_vt->setup = &latlong_patch_setup;
 
     const user_options_t   *user = latlong_get_options(glob);
     if (user->claw_version == 4)
     {
-        fc2d_clawpack46_vtable_t *claw46_vt = fc2d_clawpack46_vt();
+        fc2d_clawpack46_vtable_t *claw46_vt = fc2d_clawpack46_vt(glob);
         claw46_vt->fort_setprob     = SETPROB;
         claw46_vt->fort_qinit       = CLAWPACK46_QINIT;
         claw46_vt->fort_rpn2        = CLAWPACK46_RPN2ADV_MANIFOLD;
@@ -52,7 +76,7 @@ void latlong_link_solvers(fclaw2d_global_t *glob)
     }
     else if (user->claw_version == 5)
     {
-        fc2d_clawpack5_vtable_t *claw5_vt = fc2d_clawpack5_vt();
+        fc2d_clawpack5_vtable_t *claw5_vt = fc2d_clawpack5_vt(glob);
         claw5_vt->fort_setprob   = &SETPROB;
         claw5_vt->fort_qinit     = &CLAWPACK5_QINIT;
         claw5_vt->fort_rpn2      = &CLAWPACK5_RPN2ADV_MANIFOLD;

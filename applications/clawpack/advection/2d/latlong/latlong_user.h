@@ -47,6 +47,8 @@ typedef struct user_options
     const char *longitude_string;
     double *longitude;
 
+    double revs_per_second;
+
     int is_registered;
 }
 user_options_t;

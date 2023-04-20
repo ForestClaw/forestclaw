@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -23,10 +23,33 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <fclaw2d_map.h>
-#include <fclaw2d_global.h>
+#ifndef REFINE_DIM
+#define REFINE_DIM 2
+#endif
 
+#ifndef PATCH_DIM
+#define PATCH_DIM 2
+#endif
+
+
+#if PATCH_DIM == 2
+
+#include <fclaw2d_global.h>
+#include <fclaw2d_map.h>
 #include <fclaw2d_map_query.h>  /* Needed for pillowsphere query */
+
+#elif PATCH_DIM == 3 && REFINE_DIM == 2
+
+#include <fclaw2d_global.h>
+#include <fclaw3dx_map.h>
+//#include <fclaw3d_map_query.h>  /* Needed for pillowsphere query */
+//#include <_fclaw2d_to_fclaw3d.h>
+
+#else /* this is full 3D */
+#include <fclaw3d_map.h>
+#endif
+
+#ifndef P4_TO_P8
 
 /* This function can be called from Fortran inside of ClawPatch. */
 void
@@ -38,17 +61,20 @@ FCLAW2D_MAP_QUERY (fclaw2d_map_context_t ** pcont,
 }
 
 /* This function can be called from Fortran inside of ClawPatch. */
+
 void
 FCLAW2D_MAP_C2M (fclaw2d_map_context_t ** pcont, int *blockno,
                  const double *xc, const double *yc,
                  double *xp, double *yp, double *zp)
 {
     fclaw2d_map_context_t *cont = *pcont;
+    FCLAW_ASSERT(cont->mapc2m != NULL);
     cont->mapc2m (cont, *blockno, *xc, *yc, xp, yp, zp);
 }
 
 
 /* This function can be called from Fortran inside of ClawPatch. */
+
 void
 FCLAW2D_MAP_C2M_BASIS (fclaw2d_map_context_t ** pcont,
                        const double *xc, const double *yc,
@@ -62,6 +88,38 @@ FCLAW2D_MAP_C2M_BASIS (fclaw2d_map_context_t ** pcont,
 }
 
 
+/* This pragma requires a fclaw3dx_map.{c,h} file, so I"ll hold off for 
+   now on adding these.   Ideally, the patch metric won't know whether
+   the mapping is for an extruded mesh or for a full octree mesh. 
+*/
+
+//#if PATCH_DIM == 3 && REFINE_DIM == 2
+void
+FCLAW3D_MAP_C2M (fclaw2d_map_context_t ** pcont, int *blockno,
+                 const double *xc, const double *yc, const double *zc,
+                 double *xp, double *yp, double *zp)
+{
+    fclaw2d_map_context_t *cont = *pcont;
+    FCLAW_ASSERT(cont->mapc2m_3dx != NULL);
+    cont->mapc2m_3dx (cont, *blockno, *xc, *yc, *zc, xp, yp, zp);
+}
+
+
+
+void
+FCLAW3D_MAP_C2M_BASIS (fclaw2d_map_context_t ** pcont,
+                       const double *xc, const double *yc, const double *zc, 
+                       double *t, double *tinv, double *tderivs,
+                       int *flag)
+{
+    fclaw2d_map_context_t *cont = *pcont;
+    FCLAW_ASSERT(cont->basis_3dx != NULL);
+
+    /* DAC : Still need to decide what should go here */
+    cont->basis_3dx (cont, *xc, *yc, *zc, t, tinv, tderivs, *flag);
+}
+//#endif
+
 void FCLAW2D_MAP_BRICK2C (fclaw2d_map_context_t ** pcont, int *blockno,
                           const double *xc, const double *yc,
                           double *xp, double *yp, double *zp)
@@ -70,7 +128,7 @@ void FCLAW2D_MAP_BRICK2C (fclaw2d_map_context_t ** pcont, int *blockno,
 
     if (cont->brick != NULL)
     {
-        fclaw2d_map_context_t *brick = cont->brick;    
+        fclaw2d_map_context_t *brick = cont->brick;  
         brick->mapc2m (brick, *blockno, *xc, *yc, xp, yp, zp);
     }
     else
@@ -83,15 +141,18 @@ void FCLAW2D_MAP_BRICK2C (fclaw2d_map_context_t ** pcont, int *blockno,
     }
 }
 
+#endif /* !P4_TO_P8 */
 
 /* This function is expected to be called from C or C++. */
 void
 fclaw2d_map_destroy (fclaw2d_map_context_t * cont)
 {
+#ifndef P4_TO_P8
     if (cont->brick != NULL)
     {
         fclaw2d_map_destroy(cont->brick);  /* recursive call */
     }
+#endif
     if (cont->destroy == NULL)
     {
         FCLAW_FREE (cont);
@@ -102,73 +163,9 @@ fclaw2d_map_destroy (fclaw2d_map_context_t * cont)
     }
 }
 
-/* Torus.  Uses user_double[0,1] for R1 and R2, respectively. */
+#ifndef P4_TO_P8
 
-/* This mapping is now in a separate file in the 'torus' example */
 #if 0
-static int
-fclaw2d_map_query_torus (fclaw2d_map_context_t * cont, int query_identifier)
-{
-    switch (query_identifier)
-    {
-    case FCLAW2D_MAP_QUERY_IS_USED:
-        return 1;
-        /* no break necessary after return statement */
-    case FCLAW2D_MAP_QUERY_IS_SCALEDSHIFT:
-        return 0;
-    case FCLAW2D_MAP_QUERY_IS_AFFINE:
-        return 0;
-    case FCLAW2D_MAP_QUERY_IS_NONLINEAR:
-        return 1;
-    case FCLAW2D_MAP_QUERY_IS_GRAPH:
-        return 0;
-    case FCLAW2D_MAP_QUERY_IS_PLANAR:
-        return 0;
-    case FCLAW2D_MAP_QUERY_IS_ALIGNED:
-        return 0;
-    default:
-        printf("\n");
-        printf("fclaw2d_map_query_torus (fclaw2d_map.c) : Query id not " \
-               "identified;  Maybe the query is not up to date?\nSee "  \
-               "fclaw2d_map_query.h.\n");
-        printf("Requested query id : %d\n",query_identifier);
-        SC_ABORT_NOT_REACHED ();
-    }
-    return 0;
-}
-
-static void
-fclaw2d_map_c2m_torus (fclaw2d_map_context_t * cont, int blockno,
-                       double xc, double yc,
-                       double *xp, double *yp, double *zp)
-{
-    const double R1 = cont->user_double[0];
-    const double R2 = cont->user_double[1];
-    /* const double L = cont->user_double[0] + R2 * cos (2. * M_PI * yc); */
-    const double L = R1 + R2 * cos (2. * M_PI * yc);
-
-    *xp = L * cos (2. * M_PI * xc);
-    *yp = L * sin (2. * M_PI * xc);
-    *zp = R2 * sin (2. * M_PI * yc);
-}
-
-fclaw2d_map_context_t *
-fclaw2d_map_new_torus (double R1, double R2)
-{
-    fclaw2d_map_context_t *cont;
-
-    FCLAW_ASSERT (0. <= R2 && R2 <= R1);
-
-    cont = FCLAW_ALLOC_ZERO (fclaw2d_map_context_t, 1);
-    cont->query = fclaw2d_map_query_torus;
-    cont->mapc2m = fclaw2d_map_c2m_torus;
-    cont->user_double[0] = R1;
-    cont->user_double[1] = R2;
-
-    return cont;
-}
-#endif   /* end of torus */
-
 /* Cubed sphere surface.  Matches p4est_connectivity_new_cubed (). */
 
 static int
@@ -215,7 +212,6 @@ fclaw2d_map_query_csphere (fclaw2d_map_context_t * cont, int query_identifier)
     }
     return 0;
 }
-
 
 static inline void
 fclaw2d_map_c2m_csphere_help (double R, double xi, double eta,
@@ -391,6 +387,7 @@ fclaw2d_map_new_disk (double R1, double R2)
 
     return cont;
 }
+#endif
 
 #if 0
 /* Use an existing Fortran mapc2m routine.
@@ -520,7 +517,6 @@ void set_default_transform(double scale[],double shift[],double rotate[])
   rotate[1] = 0;
 }
 
-
 void set_rotate(fclaw2d_map_context_t* cont, const double rotate[])
 {
     double rotate_mat[9];
@@ -563,3 +559,5 @@ void rotate_map(fclaw2d_map_context_t* cont, double *xp, double *yp, double *zp)
     *yp = vrot[1];
     *zp = vrot[2];
 }
+
+#endif /* !P4_TO_P8 */

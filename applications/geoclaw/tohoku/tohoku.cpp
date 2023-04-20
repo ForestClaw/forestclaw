@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+  Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -50,7 +50,7 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, fclaw_options_t* fclaw_opt)
 
     /* Rectangular brick domain */
     conn = p4est_connectivity_new_brick(mi,mj,a,b);
-    brick = fclaw2d_map_new_brick(conn,mi,mj);
+    brick = fclaw2d_map_new_brick_conn (conn,mi,mj);
     cont = fclaw2d_map_new_nomap_brick(brick);
 
     domain = fclaw2d_domain_new_conn_map (mpicomm, fclaw_opt->minlevel, conn, cont);
@@ -74,7 +74,7 @@ void run_program(fclaw2d_global_t* glob)
     /* Initialize virtual table for ForestClaw */
     fclaw2d_vtables_initialize(glob);
 
-    fc2d_geoclaw_solver_initialize();
+    fc2d_geoclaw_solver_initialize(glob);
 
     tohoku_link_solvers(glob);
 
@@ -112,9 +112,9 @@ main (int argc, char **argv)
     /* Initialize application */
     app = fclaw_app_new (&argc, &argv, NULL);
 
-    fclaw_opt       =             fclaw_options_register(app,"fclaw_options.ini");
-    clawpatch_opt   = fclaw2d_clawpatch_options_register(app,"fclaw_options.ini");
-    geoclaw_opt     =      fc2d_geoclaw_options_register(app,"fclaw_options.ini");
+    fclaw_opt       =             fclaw_options_register(app,  NULL,       "fclaw_options.ini");
+    clawpatch_opt   = fclaw2d_clawpatch_options_register(app, "clawpatch", "fclaw_options.ini");
+    geoclaw_opt     =      fc2d_geoclaw_options_register(app, "geoclaw",   "fclaw_options.ini");
 
     /* Read configuration file(s) and command line, and process options */
     options = fclaw_app_get_options (app);

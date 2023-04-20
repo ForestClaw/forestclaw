@@ -48,3 +48,23 @@ AM_CPPFLAGS  += $(FCLAW_CLAWPACK46_CPPFLAGS)
 LDADD        += $(FCLAW_CLAWPACK46_LDADD)
 
 include_HEADERS += $(libclawpack4_6_installed_headers)
+
+## UNIT TESTS
+check_PROGRAMS += src/solvers/fc2d_clawpack4.6/fc2d_clawpack46.TEST
+TESTS += src/solvers/fc2d_clawpack4.6/fc2d_clawpack46.TEST
+
+src_solvers_fc2d_clawpack4_6_fc2d_clawpack46_TEST_SOURCES = \
+    src/solvers/fc2d_clawpack4.6/fc2d_clawpack46.h.TEST.cpp \
+    src/solvers/fc2d_clawpack4.6/fc2d_clawpack46_options.h.TEST.cpp
+
+src_solvers_fc2d_clawpack4_6_fc2d_clawpack46_TEST_CPPFLAGS = \
+	$(test_libtestutils_la_CPPFLAGS) \
+    $(FCLAW_CLAWPACK46_CPPFLAGS)
+
+src_solvers_fc2d_clawpack4_6_fc2d_clawpack46_TEST_LDADD = \
+	test/libtestutils.la \
+	$(test_libtestutils_la_LDADD) \
+    $(LDADD) \
+    $(FCLAW_CLAWPACK46_LDADD) \
+    $(FCLAW_CLAWPATCH_LDADD) \
+    $(FCLAW_LDADD)

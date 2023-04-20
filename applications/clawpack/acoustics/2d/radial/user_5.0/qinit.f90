@@ -12,14 +12,14 @@ SUBROUTINE clawpack5_qinit(meqn,mbc,mx,my,xlower,ylower, &
   INTEGER i,j
 
   INTEGER blockno, fc2d_clawpack5_get_block
-  INTEGER*8 cont, get_context
+  INTEGER*8 cont, fclaw_map_get_context
   LOGICAL fclaw2d_map_is_used
 
   DOUBLE PRECISION pi
   COMMON /compi/ pi
 
   blockno = fc2d_clawpack5_get_block()
-  cont = get_context()
+  cont = fclaw_map_get_context()
 
   width = 0.2d0
 

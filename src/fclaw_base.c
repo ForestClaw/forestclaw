@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -58,6 +58,7 @@ struct fclaw_app
     char ***argv;             /**< Pointer to main function's argument list. */
     sc_options_t *opt;        /**< Central options structure. */
     void *user;               /**< Set by fclaw_app_new, not touched by forestclaw. */
+    int core_registered;    /**< True if core options (-h,etc) have been registered */
 
     /* paths and configuration files */
     const char *configdir;    /**< Defaults to fclaw_configdir under $HOME, may
@@ -165,6 +166,68 @@ fclaw_debugf (const char *fmt, ...)
     va_end (ap);
 }
 
+static int logging_rank = 0;
+static const char* logging_prefix = NULL;
+
+void 
+fclaw_set_logging_prefix(const char* new_name)
+{
+    logging_prefix=new_name;
+}
+
+static void
+log_handler (const char *name, FILE * log_stream, const char *filename, int lineno,
+                int package, int category, int priority, const char *msg)
+{
+    int                 wi = 0;
+    int                 lindent = 0;
+
+    wi = (category == SC_LC_NORMAL);
+
+    if(logging_prefix != NULL){
+        fprintf(log_stream, "[%s]",logging_prefix);
+    }
+    fputc ('[', log_stream);
+    fprintf (log_stream, "%s", name);
+    if (wi){
+        fputc (' ', log_stream);
+        fprintf (log_stream, "%d", logging_rank);
+    }
+    fprintf (log_stream, "] %*s", lindent, "");
+
+    if (priority == SC_LP_TRACE) {
+        char                bn[BUFSIZ], *bp;
+
+        snprintf (bn, BUFSIZ, "%s", filename);
+        bp = basename (bn);
+        fprintf (log_stream, "%s:%d ", bp, lineno);
+    }
+
+    fputs (msg, log_stream);
+    fflush (log_stream);
+}
+
+static void
+sc_log_handler (FILE * log_stream, const char *filename, int lineno,
+                int package, int category, int priority, const char *msg)
+{
+    log_handler("libsc",log_stream,filename,lineno,package,category,priority,msg);
+}
+
+static void
+p4est_log_handler (FILE * log_stream, const char *filename, int lineno,
+                int package, int category, int priority, const char *msg)
+{
+    log_handler("p4est",log_stream,filename,lineno,package,category,priority,msg);
+}
+
+static void
+fclaw_log_handler (FILE * log_stream, const char *filename, int lineno,
+                int package, int category, int priority, const char *msg)
+{
+    log_handler("fclaw",log_stream,filename,lineno,package,category,priority,msg);
+}
+
 void
 fclaw_init (sc_log_handler_t log_handler, int log_threshold)
 {
@@ -190,7 +253,7 @@ fclaw_init (sc_log_handler_t log_handler, int log_threshold)
 }
 
 fclaw_app_t *
-fclaw_app_new (int *argc, char ***argv, void *user)
+fclaw_app_new_on_comm (sc_MPI_Comm mpicomm, int *argc, char ***argv, void *user)
 {
     //TODO seperate intialize from creating new app (makes testing difficult)
 #ifdef FCLAW_ENABLE_DEBUG
@@ -201,16 +264,11 @@ fclaw_app_new (int *argc, char ***argv, void *user)
     const int LP_fclaw = SC_LP_PRODUCTION;
 #endif
     int mpiret;
-    sc_MPI_Comm mpicomm;
     fclaw_app_t *a;
 
-    mpicomm = sc_MPI_COMM_WORLD;
-
-    mpiret = sc_MPI_Init (argc, argv);
-    SC_CHECK_MPI (mpiret);
-    sc_init (mpicomm, 1, 1, NULL, LP_lib);
-    p4est_init (NULL, LP_lib);
-    fclaw_init (NULL, LP_fclaw);
+    sc_init (mpicomm, 1, 1, sc_log_handler, LP_lib);
+    p4est_init (p4est_log_handler, LP_lib);
+    fclaw_init (fclaw_log_handler, LP_fclaw);
 
     a = FCLAW_ALLOC (fclaw_app_t, 1);
     a->mpicomm = mpicomm;
@@ -218,6 +276,7 @@ fclaw_app_new (int *argc, char ***argv, void *user)
     SC_CHECK_MPI (mpiret);
     mpiret = sc_MPI_Comm_rank (a->mpicomm, &a->mpirank);
     SC_CHECK_MPI (mpiret);
+    logging_rank = a->mpirank;
 
     srand (a->mpirank);
     a->first_arg = -1;
@@ -226,6 +285,7 @@ fclaw_app_new (int *argc, char ***argv, void *user)
     a->user = user;
     a->opt = sc_options_new ((*argv)[0]);
     sc_options_set_spacing (a->opt, 40, 56);
+    a->core_registered = 0;
 
     a->opt_pkg = sc_array_new (sizeof (fclaw_app_options_t));
 
@@ -235,6 +295,20 @@ fclaw_app_new (int *argc, char ***argv, void *user)
     a->attributes = sc_keyvalue_new ();
 
     return a;
+}
+
+fclaw_app_t *
+fclaw_app_new (int *argc, char ***argv, void *user)
+{
+    int mpiret;
+    sc_MPI_Comm mpicomm;
+
+    mpicomm = sc_MPI_COMM_WORLD;
+
+    mpiret = sc_MPI_Init (argc, argv);
+    SC_CHECK_MPI (mpiret);
+
+    return fclaw_app_new_on_comm(mpicomm, argc, argv, user);
 }
 
 void
@@ -247,6 +321,10 @@ fclaw_app_destroy (fclaw_app_t * a)
     FCLAW_ASSERT (a != NULL);
     FCLAW_ASSERT (a->opt_pkg != NULL);
     FCLAW_ASSERT (a->opt != NULL);
+
+    /* destroy central structures */
+    sc_keyvalue_destroy (a->attributes);
+    sc_options_destroy (a->opt);
 
     /* let the options packages clean up their memory */
     for (zz = a->opt_pkg->elem_count; zz > 0; --zz)
@@ -262,9 +340,6 @@ fclaw_app_destroy (fclaw_app_t * a)
     }
     sc_array_destroy (a->opt_pkg);
 
-    /* free central structures */
-    sc_keyvalue_destroy (a->attributes);
-    sc_options_destroy (a->opt);
     FCLAW_FREE (a);
 
     sc_finalize ();
@@ -468,6 +543,12 @@ static const fclaw_app_options_vtable_t options_vtable_core = {
     options_destroy_core
 };
 
+int
+fclaw_app_options_core_registered (fclaw_app_t * a)
+{
+    return a->core_registered;
+}
+
 void
 fclaw_app_options_register_core (fclaw_app_t * a, const char *configfile)
 {
@@ -483,6 +564,14 @@ fclaw_app_options_register_core (fclaw_app_t * a, const char *configfile)
     /* when there are more parameters to pass, create a structure to pass */
     fclaw_app_options_register (a, NULL, configfile, &options_vtable_core,
                                 core);
+    a->core_registered = 1;
+}
+
+
+void fclaw_app_print_options(fclaw_app_t *app)
+{
+        sc_options_print_summary (fclaw_get_package_id (),
+                                  FCLAW_VERBOSITY_ESSENTIAL, app->opt);    
 }
 
 fclaw_exit_type_t

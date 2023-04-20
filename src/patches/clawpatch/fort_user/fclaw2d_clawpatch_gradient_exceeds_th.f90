@@ -16,14 +16,15 @@
 !! @param[in] is_ghost true if cell is a ghost cell
 !! @return 1 if exceeds threshold, 0 if not, -1 if inconclusive.
 !  --------------------------------------------------------------
-integer function fclaw2d_clawpatch_gradient_exceeds_th(blockno,& 
+integer function fclaw2d_clawpatch_gradient_exceeds_th(blockno, meqn, & 
                                      qval,qmin,qmax,quad, & 
-                                     dx,dy,xc,yc,threshold, &
-                                     init_flag, is_ghost)
+                                     dx,dy,xc,yc,ivar_threshold, &
+                                     threshold, init_flag, is_ghost)
     implicit none
     
-    double precision :: qval,qmin,qmax,threshold
-    double precision :: quad(-1:1,-1:1)
+    integer :: meqn, ivar_threshold
+    double precision :: qval(meqn),qmin(meqn),qmax(meqn),threshold
+    double precision :: quad(-1:1,-1:1,meqn)
     double precision :: dx,dy, xc, yc
     integer :: blockno, init_flag
     logical(kind=4) :: is_ghost
@@ -35,12 +36,14 @@ integer function fclaw2d_clawpatch_gradient_exceeds_th(blockno,&
     double precision :: grad(3), dx2, dy2, d, ds
 
 
-    integer*8 :: cont, get_context
+    integer*8 :: cont, fclaw_map_get_context
     integer :: fclaw2d_map_is_used
 
     double precision :: clawpatch_gradient_dot
     integer :: refine
-    integer :: m
+    integer :: m, mq
+
+    mq = ivar_threshold
 
     if (is_ghost) then
 !!      # quad may have uninitialized values.  Test is inconclusive
@@ -48,13 +51,14 @@ integer function fclaw2d_clawpatch_gradient_exceeds_th(blockno,&
         return
     endif
 
-    cont = get_context()
+    cont = fclaw_map_get_context()
 
     dx2 = 2*dx
     dy2 = 2*dy
 
-    dqx = (quad(1,0) - quad(-1,0))/dx2
-    dqy = (quad(0,1) - quad(0,-1))/dy2
+    dqx = (quad(1,0,mq) - quad(-1,0,mq))/dx2
+    dqy = (quad(0,1,mq) - quad(0,-1,mq))/dy2
+
 
     refine = 0
     if (fclaw2d_map_is_used(cont) .ne. 0) THEN

@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -28,7 +28,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_clawpatch.h>
 #include <fclaw2d_clawpatch_options.h>
 
-static int s_user_options_package_id = -1;
+#include <fclaw_pointer_map.h>
 
 static void *
 radial_register (user_options_t *user, sc_options_t * opt)
@@ -58,21 +58,15 @@ radial_postprocess (user_options_t *user)
 }
 
 static fclaw_exit_type_t
-radial_check (user_options_t *user,
-             fclaw_options_t *fclaw_opt,
-             fclaw2d_clawpatch_options_t *clawpatch_opt)
+radial_check (user_options_t *user)
 {
     if (user->example < 0 || user->example > 2) {
         fclaw_global_essentialf ("Option --user:example must be 0 or 1\n");
         return FCLAW_EXIT_QUIET;
     }
-    if (user->example > 0)
-        if (clawpatch_opt->mx*pow_int(2,fclaw_opt->minlevel) < 32)
-        {
-            fclaw_global_essentialf("The five patch mapping requires mx*2^minlevel >= 32\n");
-            return FCLAW_EXIT_QUIET;
-        }
-    return FCLAW_NOEXIT;
+    /* Don't print output values yet.  Wait until we have done a global options
+       checking */
+    return FCLAW_EXIT_QUIET;
 }
 
 static void
@@ -125,13 +119,7 @@ options_check(fclaw_app_t *app, void *package,void *registered)
     FCLAW_ASSERT(registered == NULL);
 
     user = (user_options_t*) package;
-    fclaw_options_t *fclaw_opt = 
-                 (fclaw_options_t*) fclaw_app_get_attribute(app,"Options",NULL);
-
-    fclaw2d_clawpatch_options_t *clawpatch_opt = 
-                 (fclaw2d_clawpatch_options_t*)  fclaw_app_get_attribute(app,"clawpatch",NULL);
-
-    return radial_check(user,fclaw_opt, clawpatch_opt);
+    return radial_check(user);
 }
 
 static void
@@ -178,14 +166,28 @@ user_options_t* radial_options_register (fclaw_app_t * app,
 
 void radial_options_store (fclaw2d_global_t* glob, user_options_t* user)
 {
-    FCLAW_ASSERT(s_user_options_package_id == -1);
-    int id = fclaw_package_container_add_pkg(glob,user);
-    s_user_options_package_id = id;
+    FCLAW_ASSERT(fclaw_pointer_map_get(glob->options,"user") == NULL);
+    fclaw_pointer_map_insert(glob->options, "user", user, NULL);
 }
 
 user_options_t* radial_get_options(fclaw2d_global_t* glob)
 {
-    int id = s_user_options_package_id;
-    return (user_options_t*) fclaw_package_get_options(glob, id);    
+    user_options_t* user = (user_options_t*) 
+                              fclaw_pointer_map_get(glob->options, "user");
+    FCLAW_ASSERT(user != NULL);
+    return user;   
 }
+
+void radial_global_post_process(fclaw_options_t *fclaw_opt,
+                                fclaw2d_clawpatch_options_t *clawpatch_opt,
+                                user_options_t *user_opt)
+{
+    if (user_opt->example == 1)
+        if (clawpatch_opt->mx*pow_int(2,fclaw_opt->minlevel) < 32)
+        {
+            fclaw_global_essentialf("The five patch mapping requires mx*2^minlevel >= 32\n");
+            exit(0);
+        }
+}
+
 

@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -78,6 +78,7 @@ struct fclaw2d_clawpatch_options
 
     int refinement_criteria; /**< The refinement criteria */
     sc_keyvalue_t *kv_refinement_criteria; /**< The refinement criteria */
+    int threshold_variable;
 
     /* Advanced options */
     int interp_stencil_width; /**< The width of the interpolation stencil */
@@ -90,14 +91,16 @@ struct fclaw2d_clawpatch_options
 };
 
 /**
- * @brief Register options from SC
+ * @brief Register options in SC
  * 
  * @param app the app context
+ * @param name the name of the options group
  * @param configfile the config file
  * @return fclaw2d_clawpatch_options_t* a newly allocated options struct
  */
 fclaw2d_clawpatch_options_t *
-fclaw2d_clawpatch_options_register(fclaw_app_t* app, const char* configfile);
+fclaw2d_clawpatch_options_register(fclaw_app_t* app, const char* name, const char* configfile);
+
 
 /**
  * @brief Store the options in the global context
@@ -115,26 +118,6 @@ void fclaw2d_clawpatch_options_store (struct fclaw2d_global *glob,
  * @return fclaw2d_clawpatch_options_t* the options
  */
 fclaw2d_clawpatch_options_t* fclaw2d_clawpatch_get_options(struct fclaw2d_global* glob);
-
-
-/**
- * @brief Set the refinment critera
- * 
- * Sets a global variable
- * 
- * @param r the refinement criteria
- */
-void fclaw2d_clawpatch_set_refinement_criteria(int r);
-
-/**
- * @brief Get the refinement criteria be used
- * 
- * Gets the value from a global variable
- * 
- * @return int the refinement criteria
- */
-int fclaw2d_clawpatch_get_refinement_criteria();
-
 
 
 #ifdef __cplusplus

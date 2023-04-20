@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -76,6 +76,11 @@ void radial_options_store (fclaw2d_global_t* glob, user_options_t* user);
 
 user_options_t* radial_get_options(fclaw2d_global_t* glob);
 
+void radial_global_post_process(fclaw_options_t *fclaw_opt,
+                                fclaw2d_clawpatch_options_t *clawpatch_opt,
+                                user_options_t *user_opt);
+
+
 /* --------------------------------- Fortran ------------------------------------- */
 
 #define CLAWPACK46_SETAUX_MANIFOLD FCLAW_F77_FUNC(clawpack46_setaux_manifold, \
@@ -111,8 +116,7 @@ fclaw2d_map_context_t* fclaw2d_map_new_pillowdisk5(const double scale[],
 
 fclaw2d_map_context_t* fclaw2d_map_new_pillowdisk(const double scale[],
                                                   const double shift[],
-                                                  const double rotate[],
-                                                  const double alpha);
+                                                  const double rotate[]);
 
 
 #ifdef __cplusplus

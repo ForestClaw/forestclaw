@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -29,9 +29,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef __cplusplus
 extern "C"
 {
-#if 0
-}
-#endif
 #endif
 
 struct fclaw2d_global;
@@ -46,6 +43,8 @@ struct fclaw2d_diagnostics_accumulator
     void* patch_accumulator;
     void* solver_accumulator;
     void* user_accumulator;
+    void* gauge_accumulator;
+    void* ray_accumulator;
 };
 
 /* Diagnostic information */
@@ -74,12 +73,26 @@ struct fclaw2d_diagnostics_vtable
     fclaw2d_diagnostics_reset_t          patch_reset_diagnostics;
     fclaw2d_diagnostics_finalize_t       patch_finalize_diagnostics;
 
-    /* solver diagnostic functions (gauges, fgmax, and so on) */
+    /* gauge diagnostic functions  */
     fclaw2d_diagnostics_initialize_t     solver_init_diagnostics;
     fclaw2d_diagnostics_compute_t        solver_compute_diagnostics;
     fclaw2d_diagnostics_gather_t         solver_gather_diagnostics;
     fclaw2d_diagnostics_reset_t          solver_reset_diagnostics;
     fclaw2d_diagnostics_finalize_t       solver_finalize_diagnostics;
+
+    /* solver diagnostic functions (other solver functions) */
+    fclaw2d_diagnostics_initialize_t     gauges_init_diagnostics;
+    fclaw2d_diagnostics_compute_t        gauges_compute_diagnostics;
+    fclaw2d_diagnostics_gather_t         gauges_gather_diagnostics;
+    fclaw2d_diagnostics_reset_t          gauges_reset_diagnostics;
+    fclaw2d_diagnostics_finalize_t       gauges_finalize_diagnostics;
+
+    /* ray defined diagnostics */
+    fclaw2d_diagnostics_initialize_t     ray_init_diagnostics;
+    fclaw2d_diagnostics_compute_t        ray_compute_diagnostics;
+    fclaw2d_diagnostics_gather_t         ray_gather_diagnostics;
+    fclaw2d_diagnostics_reset_t          ray_reset_diagnostics;
+    fclaw2d_diagnostics_finalize_t       ray_finalize_diagnostics;
 
     /* user defined diagnostics */
     fclaw2d_diagnostics_initialize_t     user_init_diagnostics;
@@ -91,9 +104,9 @@ struct fclaw2d_diagnostics_vtable
     int is_set;
 };
 
-fclaw2d_diagnostics_vtable_t* fclaw2d_diagnostics_vt();
+fclaw2d_diagnostics_vtable_t* fclaw2d_diagnostics_vt(struct fclaw2d_global* glob);
 
-void fclaw2d_diagnostics_vtable_initialize();
+void fclaw2d_diagnostics_vtable_initialize(struct fclaw2d_global* glob);
 
 double fclaw2d_domain_global_minimum (struct fclaw2d_domain* domain, double d);
 
@@ -106,9 +119,6 @@ void fclaw2d_diagnostics_reset(struct fclaw2d_global *glob);
 void fclaw2d_diagnostics_finalize(struct fclaw2d_global *glob);
 
 #ifdef __cplusplus
-#if 0
-{
-#endif
 }
 #endif
 

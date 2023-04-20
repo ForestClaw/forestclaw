@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -32,23 +32,22 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 void fclaw2d_metric_compute_mesh_default(fclaw2d_global_t *glob,
-                                         fclaw2d_patch_t* this_patch,
+                                         fclaw2d_patch_t* patch,
                                          int blockno,
                                          int patchno)
 {
-    fclaw2d_metric_vtable_t *metric_vt = fclaw2d_metric_vt();
+    fclaw2d_metric_vtable_t *metric_vt = fclaw2d_metric_vt(glob);
     FCLAW_ASSERT(metric_vt->fort_compute_mesh);
 
     int mx,my,mbc;
     double xlower,ylower,dx,dy;
+    fclaw2d_metric_patch_grid_data(glob,patch,&mx,&my,&mbc,
+                                    &xlower,&ylower,&dx,&dy);
+
     double *xp,*yp,*zp;
     double *xd,*yd,*zd;
     double *area;
-
-    fclaw2d_metric_patch_grid_data(glob,this_patch,&mx,&my,&mbc,
-                                   &xlower,&ylower,&dx,&dy);
-
-    fclaw2d_metric_patch_mesh_data(glob,this_patch,
+    fclaw2d_metric_patch_mesh_data(glob,patch,
                                          &xp,&yp,&zp,&xd,&yd,&zd,&area);
 
     /* Compute centers and corners of mesh cell */
@@ -57,34 +56,34 @@ void fclaw2d_metric_compute_mesh_default(fclaw2d_global_t *glob,
 }
 
 
-void fclaw2d_metric_compute_tensors_default(fclaw2d_global_t *glob,
-                                            fclaw2d_patch_t *this_patch,
+void fclaw2d_metric_compute_basis_default(fclaw2d_global_t *glob,
+                                            fclaw2d_patch_t *patch,
                                             int blockno,
                                             int patchno)
 {
-    fclaw2d_metric_vtable_t *metric_vt = fclaw2d_metric_vt();
+    fclaw2d_metric_vtable_t *metric_vt = fclaw2d_metric_vt(glob);
+
 
     int mx,my,mbc;
     double xlower,ylower,dx,dy;
+    fclaw2d_metric_patch_grid_data(glob,patch,&mx,&my,&mbc,
+                                   &xlower,&ylower,&dx,&dy);
+
     double *xp,*yp,*zp;
     double *xd,*yd,*zd;
+    double *area;
+    fclaw2d_metric_patch_mesh_data(glob,patch,
+                                   &xp,&yp,&zp,&xd,&yd,&zd,&area);
+
     double *xnormals, *ynormals;
     double *xtangents, *ytangents;
     double *edgelengths;
     double *surfnormals, *curvature;
-    double *area;
-
-    fclaw2d_metric_patch_grid_data(glob,this_patch,&mx,&my,&mbc,
-                                   &xlower,&ylower,&dx,&dy);
-
-    fclaw2d_metric_patch_mesh_data(glob,this_patch,
-                                &xp,&yp,&zp,&xd,&yd,&zd,&area);
-
-    fclaw2d_metric_patch_mesh_data2(glob,this_patch,
-                                 &xnormals,&ynormals,
-                                 &xtangents,&ytangents,
-                                 &surfnormals,&edgelengths,
-                                 &curvature);
+    fclaw2d_metric_patch_mesh_data2(glob,patch,
+                                    &xnormals,&ynormals,
+                                    &xtangents,&ytangents,
+                                    &surfnormals,&edgelengths,
+                                    &curvature);
 
     /* The user could set these to NULL to avoid doing these computations ... */
 
@@ -109,57 +108,57 @@ void fclaw2d_metric_compute_tensors_default(fclaw2d_global_t *glob,
 
 
 void fclaw2d_metric_compute_area_default(fclaw2d_global_t *glob,
-                                         fclaw2d_patch_t *this_patch,
+                                         fclaw2d_patch_t *patch,
                                          int blockno,
                                          int patchno)
 {
     int mx,my,mbc;
     double xlower,ylower,dx,dy;
-    fclaw2d_metric_patch_grid_data(glob,this_patch,&mx,&my,&mbc,
+    fclaw2d_metric_patch_grid_data(glob,patch,&mx,&my,&mbc,
                                    &xlower,&ylower,&dx,&dy);
 
-    double *area = fclaw2d_metric_patch_get_area(this_patch);
+    double *area = fclaw2d_metric_patch_get_area(glob, patch);
 
-    const fclaw_options_t* gparms = fclaw2d_get_options(glob);
-    int level = this_patch->level;
-    int maxlevel = gparms->maxlevel;
-    int refratio = gparms->refratio;
+    const fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
+    int level = patch->level;
+    int maxlevel = fclaw_opt->maxlevel;
+    int refratio = fclaw_opt->refratio;
     int m = pow_int(refratio,maxlevel-level);
     double *quadstore = FCLAW_ALLOC(double,3*(m+1)*(m+1));
 
+    /* Fix this so we allocate quadstore in the Fortran routine */
     int ghost_only = 0;
-    FCLAW2D_FORT_COMPUTE_AREA(&mx, &my, &mbc, &dx, &dy, &xlower, &ylower,
-                              &blockno, area, &m, quadstore, &ghost_only);
+    FCLAW2D_METRIC_FORT_COMPUTE_AREA(&mx, &my, &mbc, &dx, &dy, &xlower, &ylower,
+                                     &blockno, area, &m, quadstore, &ghost_only);
 
     FCLAW_FREE(quadstore);
 }
 
 void fclaw2d_metric_compute_area_ghost_default(fclaw2d_global_t* glob,
-                                               fclaw2d_patch_t* this_patch,
+                                               fclaw2d_patch_t* patch,
                                                int blockno,
                                                int patchno)
 {
+
     int mx,my, mbc;
     double xlower,ylower,dx,dy;
-    double *area;
-
-    fclaw2d_metric_patch_grid_data(glob,this_patch,&mx,&my,&mbc,
+    fclaw2d_metric_patch_grid_data(glob,patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
-    area = fclaw2d_metric_patch_get_area(this_patch);
+    double *area = fclaw2d_metric_patch_get_area(glob, patch);
 
     /* Set area in ghost cells not set above */
-    const fclaw_options_t* gparms = fclaw2d_get_options(glob);
-    int level = this_patch->level;
-    int maxlevel = gparms->maxlevel;
-    int refratio = gparms->refratio;
-    int ghost_only = 1;
+    const fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
+    int level = patch->level;
+    int maxlevel = fclaw_opt->maxlevel;
+    int refratio = fclaw_opt->refratio;
 
     int m = pow_int(refratio,maxlevel-level);
     double *quadstore = FCLAW_ALLOC(double,3*(m+1)*(m+1));
 
-    FCLAW2D_FORT_COMPUTE_AREA(&mx, &my, &mbc, &dx, &dy, &xlower, &ylower,
-                              &blockno, area, &m, quadstore,
-                              &ghost_only);
+    int ghost_only = 1;
+    FCLAW2D_METRIC_FORT_COMPUTE_AREA(&mx, &my, &mbc, &dx, &dy, &xlower, &ylower,
+                                     &blockno, area, &m, quadstore,
+                                     &ghost_only);
     FCLAW_FREE(quadstore);
 }

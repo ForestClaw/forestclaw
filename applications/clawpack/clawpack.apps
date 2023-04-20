@@ -28,6 +28,9 @@ include applications/clawpack/advection/2d/disk/Makefile.am
 ## filament  (square, multi-block disk)
 include applications/clawpack/advection/2d/filament/Makefile.am
 
+## filament_swirl
+include applications/clawpack/advection/2d/filament_swirl/Makefile.am
+
 ## hemisphere (manifold, multi-block)
 include applications/clawpack/advection/2d/hemisphere/Makefile.am
 
@@ -45,6 +48,9 @@ include applications/clawpack/advection/2d/sphere/Makefile.am
 
 ## swirl  (single block, square)
 include applications/clawpack/advection/2d/swirl/Makefile.am
+
+## swirl_rays (single block, square)
+include applications/clawpack/advection/2d/swirl_rays/Makefile.am
 
 ## torus  (manifold, periodic in both directions)
 include applications/clawpack/advection/2d/torus/Makefile.am

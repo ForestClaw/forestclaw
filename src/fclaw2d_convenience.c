@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -23,6 +23,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include <sc_notify.h>
 #ifndef P4_TO_P8
 #include <fclaw2d_convenience.h>
 #include <p4est_bits.h>
@@ -359,38 +360,48 @@ fclaw2d_domain_new_cubedsphere (sc_MPI_Comm mpicomm, int initial_level)
 }
 
 fclaw2d_domain_t *
-fclaw2d_domain_new_disk (sc_MPI_Comm mpicomm, int initial_level)
+fclaw2d_domain_new_disk (sc_MPI_Comm mpicomm,
+                         int periodic_in_x, int periodic_in_y,
+                         int initial_level)
 {
     fclaw2d_check_initial_level (mpicomm, initial_level);
     return fclaw2d_domain_new
-        (p4est_wrap_new_disk (mpicomm, 0, 0, initial_level), NULL);
+        (p4est_wrap_new_disk (mpicomm, periodic_in_x, periodic_in_y,
+                              initial_level), NULL);
 }
 
+#endif /* 0 */
+
 fclaw2d_domain_t *
-fclaw2d_domain_new_brick_map (sc_MPI_Comm mpicomm,
-                              int blocks_in_x, int blocks_in_y,
-                              int periodic_in_x, int periodic_in_y,
-                              int initial_level, fclaw2d_map_context_t * cont)
+fclaw2d_domain_new_brick (sc_MPI_Comm mpicomm,
+                          int blocks_in_x, int blocks_in_y,
+#ifdef P4_TO_P8
+                          int blocks_in_z,
+#endif
+                          int periodic_in_x, int periodic_in_y,
+#ifdef P4_TO_P8
+                          int periodic_in_z,
+#endif
+                          int initial_level)
 {
     p4est_wrap_t *wrap;
-    fclaw2d_domain_t *domain;
 
     fclaw2d_check_initial_level (mpicomm, initial_level);
     wrap = p4est_wrap_new_brick (mpicomm, blocks_in_x, blocks_in_y,
-                                 periodic_in_x, periodic_in_y, initial_level);
-    domain = fclaw2d_domain_new (wrap, NULL);
-    if (cont != NULL)
-    {
-        fclaw2d_domain_attribute_add (domain, "fclaw_map_context", cont);
-    }
-
-    return domain;
+#ifdef P4_TO_P8
+                                 blocks_in_z,
+#endif
+                                 periodic_in_x, periodic_in_y,
+#ifdef P4_TO_P8
+                                 periodic_in_z,
+#endif
+                                 initial_level);
+    return fclaw2d_domain_new (wrap, NULL);
 }
 
 fclaw2d_domain_t *
-fclaw2d_domain_new_conn_map (sc_MPI_Comm mpicomm, int initial_level,
-                             p4est_connectivity_t * conn,
-                             fclaw2d_map_context_t * cont)
+fclaw2d_domain_new_conn (sc_MPI_Comm mpicomm, int initial_level,
+                         p4est_connectivity_t * conn)
 {
     p4est_wrap_t *wrap;
     fclaw2d_domain_t *domain;
@@ -398,6 +409,22 @@ fclaw2d_domain_new_conn_map (sc_MPI_Comm mpicomm, int initial_level,
     fclaw2d_check_initial_level (mpicomm, initial_level);
     wrap = p4est_wrap_new_conn (mpicomm, conn, initial_level);
     domain = fclaw2d_domain_new (wrap, NULL);
+
+    return domain;
+}
+
+#ifndef P4_TO_P8
+
+/* function to be removed once no longer called by applications */
+
+fclaw2d_domain_t *
+fclaw2d_domain_new_conn_map (sc_MPI_Comm mpicomm, int initial_level,
+                             p4est_connectivity_t * conn,
+                             fclaw2d_map_context_t * cont)
+{
+    fclaw2d_domain_t *domain =
+      fclaw2d_domain_new_conn (mpicomm, initial_level, conn);
+
     fclaw2d_domain_attribute_add (domain, "fclaw_map_context", cont);
 
     return domain;
@@ -787,7 +814,7 @@ fclaw2d_domain_list_neighbors_callback (fclaw2d_domain_t * domain,
         (fclaw2d_domain_list_neighbors_t *) user;
     fclaw2d_patch_relation_t fnt;
     int faceno, cornerno, rcorner;
-    int rproc[2], rblockno, rpatchno[2], rfaceno;
+    int rproc[P4EST_FACES], rblockno, rpatchno[P4EST_FACES], rfaceno;
 
     FCLAW_ASSERT (0 <= block_no && block_no < domain->num_blocks);
     FCLAW_ASSERT (0 <= patch_no &&
@@ -1018,11 +1045,14 @@ fclaw2d_domain_search_points (fclaw2d_domain_t * domain,
                               sc_array_t * block_offsets,
                               sc_array_t * coordinates, sc_array_t * results)
 {
-    int ip, jb;
+    int ip, jb, mpiret;
     int num_blocks;
     int num_points;
     int pbegin, pend;
     int *pentry;
+    int *found;
+    int *found_buffer;
+    int *resi;
     sc_array_t *points;
 
     p4est_t *p4est;
@@ -1095,7 +1125,888 @@ fclaw2d_domain_search_points (fclaw2d_domain_t * domain,
     p4est->user_pointer = user_save;
 
     /* synchronize results in parallel */
+    found = FCLAW_ALLOC (int, num_points);
+    for (ip = 0; ip < num_points; ++ip)
+    {
+        resi = (int *) sc_array_index (results, ip);
+        found[ip] = (*resi < 0 ? domain->mpisize : domain->mpirank);
+    }
+
+    found_buffer = FCLAW_ALLOC (int, num_points);
+    mpiret = sc_MPI_Allreduce (found, found_buffer, num_points, sc_MPI_INT,
+                               sc_MPI_MIN, domain->mpicomm);
+    SC_CHECK_MPI (mpiret);
+    FCLAW_FREE (found);
+
+    for (ip = 0; ip < num_points; ++ip)
+    {
+        if (found_buffer[ip] != domain->mpirank) {
+            *(int *) sc_array_index (results, ip) = -1;
+        }
+    }
 
     /* tidy up memory */
+    FCLAW_FREE (found_buffer);
     sc_array_destroy (points);
 }
+
+typedef struct fclaw2d_ray_integral
+{
+    void *ray;
+    double *integral;
+}
+fclaw2d_ray_integral_t;
+
+typedef struct fclaw2d_integrate_ray_data
+{
+    fclaw2d_domain_t *domain;
+    fclaw2d_integrate_ray_t integrate_ray;
+    void *user;
+}
+fclaw2d_integrate_ray_data_t;
+
+static int
+integrate_ray_fn (p4est_t * p4est, p4est_topidx_t which_tree,
+                  p4est_quadrant_t * quadrant, p4est_locidx_t local_num,
+                  void *point)
+{
+    double integral;
+    int intersects;
+    fclaw2d_domain_t *domain;
+    fclaw2d_patch_t *patch;
+    fclaw2d_patch_t fclaw2d_patch;
+    int patchno;
+
+    /* assert that the user_pointer contains a valid integrate_ray_data_t */
+    fclaw2d_integrate_ray_data_t *ird
+        = (fclaw2d_integrate_ray_data_t *) p4est->user_pointer;
+    FCLAW_ASSERT (ird != NULL);
+    FCLAW_ASSERT (ird->domain != NULL);
+    FCLAW_ASSERT (ird->integrate_ray != NULL);
+
+    /* assert that point is a valid ray_integral_t */
+    fclaw2d_ray_integral_t *ri = (fclaw2d_ray_integral_t *) point;
+    FCLAW_ASSERT (ri != NULL);
+    FCLAW_ASSERT (ri->ray != NULL);
+    FCLAW_ASSERT (ri->integral != NULL);
+
+    /* collect patch information */
+    domain = ird->domain;
+    if (local_num >= 0)
+    {
+        fclaw2d_block_t *block = domain->blocks + which_tree;
+        patchno = local_num - block->num_patches_before;
+        patch = block->patches + patchno;
+    }
+    else
+    {
+        /* create artifical patch and fill it based on the quadrant */
+        patchno = -1;
+        patch = &fclaw2d_patch;
+        patch->level = quadrant->level;
+        patch->target_level = quadrant->level;
+        patch->flags = p4est_quadrant_child_id (quadrant);
+        fclaw2d_patch_set_boundary_xylower (patch, quadrant);
+        patch->u.next = NULL;
+        patch->user = NULL;
+    }
+
+    /* compute local integral and add it onto the ray integral */
+    integral = 0.;
+    intersects = ird->integrate_ray (domain, patch, which_tree, patchno,
+                                     ri->ray, &integral, ird->user);
+    if (local_num >= 0)
+    {
+        *(ri->integral) += integral;
+    }
+    return intersects;
+}
+
+void
+fclaw2d_domain_integrate_rays (fclaw2d_domain_t * domain,
+                               fclaw2d_integrate_ray_t intersect,
+                               sc_array_t * rays, sc_array_t * integrals,
+                               void * user)
+{
+    int i;
+    size_t nintz;
+    sc_array_t lints[1];
+    sc_array_t ri[1];
+    fclaw2d_ray_integral_t *rayint;
+    fclaw2d_integrate_ray_data_t integrate_ray_data, *ird =
+        &integrate_ray_data;
+    p4est_t p4est;
+    p4est_wrap_t *wrap;
+
+    /* assert validity of parameters */
+    FCLAW_ASSERT (domain != NULL);
+    FCLAW_ASSERT (intersect != NULL);
+    FCLAW_ASSERT (rays != NULL);
+    FCLAW_ASSERT (integrals != NULL);
+    FCLAW_ASSERT (integrals->elem_size == sizeof (double));
+    FCLAW_ASSERT (rays->elem_count == integrals->elem_count);
+
+    /* create local storage for integral values */
+    nintz = integrals->elem_count;
+    sc_array_init_count (lints, sizeof (double), nintz);
+    memset (lints->array, 0, sizeof (double) * nintz);
+
+    /* construct ray_integral_t array from rays */
+    sc_array_init_count (ri, sizeof (fclaw2d_ray_integral_t), nintz);
+    for (i = 0; i < (int) nintz; ++i)
+    {
+        rayint = (fclaw2d_ray_integral_t *) sc_array_index_int (ri, i);
+        rayint->ray = sc_array_index_int (rays, i);
+        rayint->integral = (double *) sc_array_index_int (lints, i);
+    }
+
+    /* construct fclaw2d_integrate_ray_data_t */
+    ird->domain = domain;
+    ird->integrate_ray = intersect;
+    ird->user = user;
+
+    /* process-local integration through p4est */
+    wrap = (p4est_wrap_t *) domain->pp;
+    FCLAW_ASSERT (wrap != NULL);
+    FCLAW_ASSERT (wrap->p4est != NULL);
+    p4est = *(wrap->p4est);
+    p4est.user_pointer = ird;
+    p4est_search_local (&p4est, 0, NULL, integrate_ray_fn, ri);
+
+    /* allreduce local integral values in parallel */
+    sc_MPI_Allreduce (lints->array, integrals->array, nintz,
+                      sc_MPI_DOUBLE, sc_MPI_SUM, domain->mpicomm);
+
+    sc_array_reset (ri);
+    sc_array_reset (lints);
+}
+
+#ifndef P4_TO_P8
+
+typedef enum comm_tag
+{
+    COMM_TAG_CONSDATA = 5526,
+    COMM_TAG_PRODATA = 5527
+}
+comm_tag_t;
+
+typedef struct overlap_query_ind
+{
+    int rank;
+    sc_array_t oqs;
+}
+overlap_ind_t;
+
+typedef struct overlap_send_buf
+{
+    int rank;
+    sc_array_t ops;
+}
+overlap_buf_t;
+
+typedef struct overlap_point
+{
+    void *point;
+    int rank;
+    size_t id;
+} overlap_point_t;
+
+typedef struct overlap_producer_comm
+{
+    fclaw2d_domain_t *domain;
+    fclaw2d_interpolate_point_t interpolate;
+    void *user;
+    p4est_t *pro4est;
+    sc_MPI_Comm glocomm;
+    int prorank;
+    int iprorank;
+    size_t point_size;
+    sc_array_t *recv_buffer;
+    sc_array_t *recv_reqs;
+    sc_array_t *send_reqs;
+} overlap_producer_comm_t;
+
+typedef struct overlap_consumer_comm
+{
+    fclaw2d_domain_t *domain;
+    fclaw2d_interpolate_point_t interpolate;
+    void *user;
+    sc_array_t *query_points;
+    sc_array_t *query_indices;
+    sc_MPI_Comm glocomm;
+    int conrank;
+    int iconrank;
+    size_t point_size;
+    sc_array_t *send_buffer;
+    sc_array_t *send_reqs;
+    sc_array_t *recv_buffer;
+    sc_array_t *recv_reqs;
+} overlap_consumer_comm_t;
+
+typedef struct overlap_global_comm
+{
+    sc_MPI_Comm glocomm;
+    overlap_producer_comm_t pro, *p;
+    overlap_consumer_comm_t con, *c;
+}
+overlap_global_comm_t;
+
+static void
+overlap_consumer_add (overlap_consumer_comm_t * c, void *point, int rank)
+{
+    size_t bcount;
+    overlap_buf_t *sb;
+    overlap_ind_t *qi;
+
+    P4EST_ASSERT (c != NULL);
+    P4EST_ASSERT (c->send_buffer != NULL && c->query_indices != NULL);
+    P4EST_ASSERT (0 <= rank && rank < c->domain->mpisize);
+    overlap_point_t *op = (overlap_point_t *) point;
+    FCLAW_ASSERT (op != NULL && op->point != NULL);
+    op->rank = rank;            /* mark, that we added this point to the process buffer */
+
+    /* if we have a new rank, push new send buffer */
+    bcount = c->send_buffer->elem_count;
+    sb = NULL;
+    qi = NULL;
+    if (bcount > 0)
+    {
+        sb = (overlap_buf_t *) sc_array_index (c->send_buffer, bcount - 1);
+        qi = (overlap_ind_t *) sc_array_index (c->query_indices, bcount - 1);
+        P4EST_ASSERT (sb->rank == qi->rank);
+        P4EST_ASSERT (sb->rank <= rank);
+        P4EST_ASSERT (sb->ops.elem_count == qi->oqs.elem_count);
+        P4EST_ASSERT (sb->ops.elem_count > 0);
+    }
+    if (bcount == 0 || sb->rank < rank)
+    {
+        sb = (overlap_buf_t *) sc_array_push (c->send_buffer);
+        qi = (overlap_ind_t *) sc_array_push (c->query_indices);
+        sb->rank = qi->rank = rank;
+        sc_array_init (&sb->ops, c->point_size);
+        sc_array_init (&qi->oqs, sizeof (size_t));
+    }
+    memcpy (sc_array_push (&sb->ops), op->point, c->point_size);
+    memcpy (sc_array_push (&qi->oqs), &op->id, qi->oqs.elem_size);
+}
+
+int
+domain_is_meta (fclaw2d_domain_t * domain)
+{
+    FCLAW_ASSERT (domain != NULL);
+    if (domain->local_num_patches == -1)
+    {
+        return 1;
+    }
+    else
+    {
+        return 0;
+    }
+}
+
+static int
+interpolate_partition_fn (p4est_t * p4est, p4est_topidx_t which_tree,
+                          p4est_quadrant_t * quadrant, int pfirst, int plast,
+                          void *point)
+{
+    fclaw2d_domain_t *domain;
+    fclaw2d_patch_t *patch;
+    fclaw2d_patch_t fclaw2d_patch;
+    int patchno;
+    int intersects;
+
+    /* assert that the point is a valid overlap_point_t and was not added yet */
+    overlap_point_t *op = (overlap_point_t *) point;
+    FCLAW_ASSERT (op != NULL && op->point != NULL);
+    if (op->rank >= 0)
+    {
+        return 0;               /* avoid sending the same point twice */
+    }
+
+    /* assert that the user_pointer contains a valid interpolation_data_t */
+    overlap_consumer_comm_t *c
+        = (overlap_consumer_comm_t *) p4est->user_pointer;
+    FCLAW_ASSERT (c != NULL);
+    FCLAW_ASSERT (c->domain != NULL && c->domain->pp != NULL);
+    FCLAW_ASSERT (c->interpolate != NULL);
+
+    /* create artifical domain, that only contains mpi and tree structure data */
+    domain = FCLAW_ALLOC (fclaw2d_domain_t, 1);
+    memset (domain, 0, sizeof (fclaw2d_domain_t));      /* initialize to zero */
+    domain->local_num_patches = -1;     /* mark as artifical patch */
+    domain->mpicomm = p4est->mpicomm;
+    domain->mpisize = p4est->mpisize;
+    domain->mpirank = (pfirst == plast) ? pfirst : -1;
+
+    /* give access to basic tree structure and connectivity information */
+    domain->pp = c->domain->pp;
+    domain->pp_owned = 0;
+    domain->attributes = c->domain->attributes;
+
+    /* create artifical patch and fill it based on the quadrant */
+    patch = &fclaw2d_patch;
+    patch->level = quadrant->level;
+    patch->target_level = quadrant->level;
+    patch->flags = p4est_quadrant_child_id (quadrant);
+    fclaw2d_patch_set_boundary_xylower (patch, quadrant);
+    patch->u.next = NULL;
+    patch->user = NULL;
+    patchno = -1;               /* marks patch as artifical patch */
+
+    /* check if the patch (or its decendants) may contribute to the
+     * interpolation data of the point */
+    intersects =
+        c->interpolate (domain, patch, which_tree, patchno, op->point,
+                        c->user);
+
+    fclaw2d_domain_destroy (domain);
+
+    if (!intersects)
+    {
+        return 0;
+    }
+
+    /* we have located the point in the intersection quadrant */
+    if (pfirst == plast)
+    {
+        /* we have intersected with a leaf quadrant */
+        overlap_consumer_add (c, op, pfirst);
+    }
+    return 1;
+}
+
+static int
+interpolate_local_fn (p4est_t * p4est, p4est_topidx_t which_tree,
+                      p4est_quadrant_t * quadrant, p4est_locidx_t local_num,
+                      void *point)
+{
+    fclaw2d_domain_t *domain;
+    fclaw2d_patch_t *patch;
+    fclaw2d_patch_t fclaw2d_patch;
+    int patchno;
+
+    /* assert that the user_pointer contains a valid interpolation_data_t */
+    overlap_producer_comm_t *p
+        = (overlap_producer_comm_t *) p4est->user_pointer;
+    FCLAW_ASSERT (p != NULL);
+    FCLAW_ASSERT (p->domain != NULL);
+    FCLAW_ASSERT (p->interpolate != NULL);
+
+    domain = p->domain;
+    if (local_num >= 0)
+    {
+        fclaw2d_block_t *block = domain->blocks + which_tree;
+        patchno = local_num - block->num_patches_before;
+        patch = block->patches + patchno;
+    }
+    else
+    {
+        /* create artifical patch and fill it based on the quadrant */
+        patchno = -1;
+        patch = &fclaw2d_patch;
+        patch->level = quadrant->level;
+        patch->target_level = quadrant->level;
+        patch->flags = p4est_quadrant_child_id (quadrant);
+        fclaw2d_patch_set_boundary_xylower (patch, quadrant);
+        patch->u.next = NULL;
+        patch->user = NULL;
+    }
+
+    return p->interpolate (domain, patch, which_tree, patchno, point,
+                           p->user);
+}
+
+#ifdef FCLAW_ENABLE_MPI
+static void
+consumer_producer_notify (overlap_global_comm_t * g)
+{
+    overlap_producer_comm_t *p = g->p;
+    overlap_consumer_comm_t *c = g->c;
+    size_t bz, bcount;
+    sc_array_t *receivers, *senders;
+    sc_array_t *payload_in, *payload_out;
+    int num_receivers, num_senders;
+    overlap_buf_t *sb, *rb;
+    int same_rank, num_ops, i;
+    int mpiret;
+
+    /* assemble and execute receiver and payload query */
+    num_receivers = (int) (bcount = c->send_buffer->elem_count);
+    receivers = sc_array_new_count (sizeof (int), bcount);
+    senders = sc_array_new (sizeof (p4est_locidx_t));
+    payload_in = sc_array_new_count (sizeof (int), bcount);
+    payload_out = sc_array_new (sizeof (p4est_locidx_t));
+    for (bz = 0; bz < bcount; ++bz)
+    {
+        sb = (overlap_buf_t *) sc_array_index (c->send_buffer, bz);
+        *(int *) sc_array_index (receivers, bz) = sb->rank;
+        *(p4est_locidx_t *) sc_array_index (payload_in, bz) =
+            (p4est_locidx_t) sb->ops.elem_count;
+    }
+    sc_notify_ext (receivers, senders, payload_in, payload_out, g->glocomm);
+    num_senders = (int) senders->elem_count;
+    P4EST_LDEBUGF ("Overlap exchange receivers %d senders %d\n",
+                   num_receivers, num_senders);
+
+    /* post nonblocking receives for the point data of the consumer side */
+    p->recv_buffer = sc_array_new_count (sizeof (overlap_buf_t), num_senders);
+    p->recv_reqs = sc_array_new_count (sizeof (sc_MPI_Request), num_senders);
+    p->iprorank = c->iconrank = -1;
+    for (i = 0; i < num_senders; ++i)
+    {
+        /* initalize and allocate the buffer according to the payload */
+        rb = (overlap_buf_t *) sc_array_index_int (p->recv_buffer, i);
+        rb->rank = *(int *) sc_array_index_int (senders, i);
+        same_rank = (rb->rank == p->prorank);
+        num_ops =
+            same_rank ? 0 : *(int *) sc_array_index_int (payload_out, i);
+        sc_array_init_size (&(rb->ops), p->point_size, (size_t) num_ops);
+        if (same_rank)
+        {
+            p->iprorank = i;    /* save the index in the producer buffer */
+            *(sc_MPI_Request *) sc_array_index_int (p->recv_reqs, i) =
+                sc_MPI_REQUEST_NULL;
+            continue;
+        }
+
+        /* receive the array of overlap_point_t data and store it in the buffer */
+        mpiret =
+            sc_MPI_Irecv (rb->ops.array, num_ops * p->point_size,
+                          sc_MPI_BYTE, rb->rank, COMM_TAG_CONSDATA,
+                          p->glocomm,
+                          (sc_MPI_Request *) sc_array_index_int (p->recv_reqs,
+                                                                 i));
+        SC_CHECK_MPI (mpiret);
+    }
+
+    sc_array_destroy (receivers);
+    sc_array_destroy (senders);
+    sc_array_destroy (payload_in);
+    sc_array_destroy (payload_out);
+}
+
+static void
+consumer_post_messages (overlap_consumer_comm_t * c)
+{
+    overlap_buf_t *sb, *rb;
+    int num_receivers, same_rank, num_ops, i;
+    int mpiret;
+
+    /* send the point data to the producer side in a nonblocking way */
+    num_receivers = (int) c->send_buffer->elem_count;
+    c->send_reqs =
+        sc_array_new_count (sizeof (sc_MPI_Request), num_receivers);
+    for (i = 0; i < num_receivers; ++i)
+    {
+        sb = (overlap_buf_t *) sc_array_index_int (c->send_buffer, i);
+
+        if (sb->rank == c->conrank)
+        {
+            c->iconrank = i;    /* save the index in the consumer buffer */
+            *(sc_MPI_Request *) sc_array_index_int (c->send_reqs, i) =
+                sc_MPI_REQUEST_NULL;
+            continue;
+        }
+
+        mpiret =
+            sc_MPI_Isend (sb->ops.array,
+                          sb->ops.elem_count * c->point_size,
+                          sc_MPI_BYTE, sb->rank, COMM_TAG_CONSDATA,
+                          c->glocomm,
+                          (sc_MPI_Request *) sc_array_index_int (c->send_reqs,
+                                                                 i));
+        SC_CHECK_MPI (mpiret);
+    }
+
+    /* recv the updated point data from the producer side in a nonblocking way */
+    c->recv_reqs =
+        sc_array_new_count (sizeof (sc_MPI_Request), num_receivers);
+    c->recv_buffer =
+        sc_array_new_size (sizeof (overlap_buf_t), num_receivers);
+    for (i = 0; i < num_receivers; ++i)
+    {
+        rb = (overlap_buf_t *) sc_array_index_int (c->recv_buffer, i);
+        sb = (overlap_buf_t *) sc_array_index_int (c->send_buffer, i);
+        rb->rank = sb->rank;
+        same_rank = (rb->rank == c->conrank);
+        num_ops = same_rank ? 0 : (int) sb->ops.elem_count;
+        sc_array_init_size (&(rb->ops), c->point_size, (size_t) num_ops);
+
+        if (same_rank)
+        {
+            *(sc_MPI_Request *) sc_array_index_int (c->recv_reqs,
+                                                    c->iconrank) =
+                sc_MPI_REQUEST_NULL;
+            continue;
+        }
+
+        /* receive the array of overlap_point_t data and store it in the buffer */
+        mpiret =
+            sc_MPI_Irecv (rb->ops.array,
+                          rb->ops.elem_count * c->point_size,
+                          sc_MPI_BYTE, rb->rank, COMM_TAG_PRODATA, c->glocomm,
+                          (sc_MPI_Request *) sc_array_index_int (c->recv_reqs,
+                                                                 i));
+        SC_CHECK_MPI (mpiret);
+    }
+}
+
+static void
+producer_interpolate (overlap_producer_comm_t * p)
+{
+    overlap_buf_t *rb;
+    int num_senders, i;
+    int remaining, received;
+    int *prod_indices;
+    int mpiret;
+
+    /* compute producer data for all incoming messages as soon as they come in */
+    num_senders = (int) p->recv_reqs->elem_count;
+    prod_indices = FCLAW_ALLOC (int, num_senders);
+    p->send_reqs = sc_array_new_count (sizeof (sc_MPI_Request), num_senders);
+    remaining = num_senders;
+    if (p->iprorank >= 0)
+    {
+        *(sc_MPI_Request *) sc_array_index_int (p->send_reqs, p->iprorank) =
+            sc_MPI_REQUEST_NULL;
+        remaining--;            /* since we set the iprorank-th request to null earlier */
+    }
+    while (remaining > 0)
+    {
+        mpiret =
+            sc_MPI_Waitsome (num_senders,
+                             (sc_MPI_Request *) p->recv_reqs->array,
+                             &received, prod_indices, sc_MPI_STATUSES_IGNORE);
+        SC_CHECK_MPI (mpiret);
+        P4EST_ASSERT (received != sc_MPI_UNDEFINED);
+        P4EST_ASSERT (received > 0);
+
+        for (i = 0; i < received; ++i)
+        {
+            /* compute the prodata for the points sent by process prod_indices[i] */
+            P4EST_ASSERT (0 <= prod_indices[i]
+                          && prod_indices[i] < num_senders);
+            rb = (overlap_buf_t *) sc_array_index_int (p->recv_buffer,
+                                                       prod_indices[i]);
+            p4est_search_local (p->pro4est, 0, NULL, interpolate_local_fn,
+                                &(rb->ops));
+
+            /* send the requested producer data back in a nonblocking way */
+            mpiret =
+                sc_MPI_Isend (rb->ops.array,
+                              rb->ops.elem_count * p->point_size,
+                              sc_MPI_BYTE, rb->rank, COMM_TAG_PRODATA,
+                              p->glocomm,
+                              (sc_MPI_Request *)
+                              sc_array_index_int (p->send_reqs,
+                                                  prod_indices[i]));
+            SC_CHECK_MPI (mpiret);
+        }
+
+        remaining -= received;
+    }
+
+    FCLAW_FREE (prod_indices);
+}
+#endif /* FCLAW_ENABLE_MPI */
+
+static void
+consumer_update_from_buffer (overlap_consumer_comm_t * c, sc_array_t * buffer,
+                             int bi)
+{
+    overlap_buf_t *rb;
+    overlap_ind_t *qi;
+    void *p, *qp;
+    size_t *pi;
+    int i;
+
+    /* obtain the array of points we want to update the query points with */
+    P4EST_ASSERT (0 <= bi && bi < (int) buffer->elem_count);
+    rb = (overlap_buf_t *) sc_array_index_int (buffer, bi);
+    qi = (overlap_ind_t *) sc_array_index_int (c->query_indices, bi);
+
+    /* copy updated points into the query-point array */
+    for (i = 0; i < (int) rb->ops.elem_count; ++i)
+    {
+        p = sc_array_index_int (&rb->ops, i);
+        pi = (size_t *) sc_array_index_int (&qi->oqs, i);
+        qp = sc_array_index (c->query_points, *pi);
+        memcpy (qp, p, rb->ops.elem_size);
+    }
+}
+
+#ifdef FCLAW_ENABLE_MPI
+static void
+consumer_update_query_points (overlap_consumer_comm_t * c)
+{
+    int num_receivers, i;
+    int remaining, received;
+    int *cons_indices;
+    int mpiret;
+
+    /* compute producer data for all incoming messages as soon as they come in */
+    num_receivers = (int) c->recv_reqs->elem_count;
+    cons_indices = FCLAW_ALLOC (int, num_receivers);
+    remaining = (c->iconrank >= 0) ? num_receivers - 1 : num_receivers;
+    while (remaining > 0)
+    {
+        mpiret =
+            sc_MPI_Waitsome (num_receivers,
+                             (sc_MPI_Request *) c->recv_reqs->array,
+                             &received, cons_indices, sc_MPI_STATUSES_IGNORE);
+        SC_CHECK_MPI (mpiret);
+        P4EST_ASSERT (received != sc_MPI_UNDEFINED);
+        P4EST_ASSERT (received > 0);
+
+        for (i = 0; i < received; ++i)
+        {
+            consumer_update_from_buffer (c, c->recv_buffer, cons_indices[i]);
+        }
+
+        remaining -= received;
+    }
+
+    FCLAW_FREE (cons_indices);
+}
+
+static void
+consumer_waitall (overlap_consumer_comm_t * c)
+{
+    int mpiret;
+    int num_receivers;
+
+    /* wait for the nonblocking sends to complete */
+    num_receivers = (int) c->send_reqs->elem_count;
+    mpiret =
+        sc_MPI_Waitall (num_receivers, (sc_MPI_Request *) c->send_reqs->array,
+                        sc_MPI_STATUSES_IGNORE);
+    SC_CHECK_MPI (mpiret);
+}
+
+static void
+producer_waitall (overlap_producer_comm_t * p)
+{
+    int mpiret;
+    int num_senders;
+
+    /* wait for the nonblocking sends to complete */
+    num_senders = (int) p->send_reqs->elem_count;
+    mpiret =
+        sc_MPI_Waitall (num_senders, (sc_MPI_Request *) p->send_reqs->array,
+                        sc_MPI_STATUSES_IGNORE);
+    SC_CHECK_MPI (mpiret);
+}
+#endif
+
+static void
+consumer_free_communication_data (overlap_consumer_comm_t * c)
+{
+    overlap_ind_t *qi;
+    overlap_buf_t *sb;
+    int i, num_queries;
+#ifdef FCLAW_ENABLE_MPI
+    overlap_buf_t *rb;
+#ifdef FCLAW_ENABLE_DEBUG
+    int prev_rank;
+#endif
+    size_t bz, bcount;
+
+    sc_array_destroy (c->recv_reqs);
+    sc_array_destroy (c->send_reqs);
+#ifdef FCLAW_ENABLE_DEBUG
+    prev_rank = -1;
+#endif
+    bcount = c->send_buffer->elem_count;
+    for (bz = 0; bz < bcount; ++bz)
+    {
+        sb = (overlap_buf_t *) sc_array_index (c->send_buffer, bz);
+        rb = (overlap_buf_t *) sc_array_index (c->recv_buffer, bz);
+        SC_ASSERT (sb->rank == rb->rank);
+        SC_ASSERT (prev_rank < sb->rank);
+#ifdef FCLAW_ENABLE_DEBUG
+        prev_rank = sb->rank;
+        if (bz == (size_t) c->iconrank)
+        {
+            P4EST_ASSERT (rb->ops.elem_count == 0);
+        }
+        else
+        {
+            P4EST_ASSERT (rb->ops.elem_count == sb->ops.elem_count);
+        }
+#endif
+        FCLAW_ASSERT (sb->ops.elem_count > 0);
+        sc_array_reset (&sb->ops);
+        sc_array_reset (&rb->ops);
+    }
+    sc_array_destroy_null (&c->recv_buffer);
+#else /* !FCLAW_ENABLE_MPI */
+    if (c->send_buffer->elem_count)
+    {
+        sb = (overlap_buf_t *) sc_array_index_int (c->send_buffer, 0);
+        sc_array_reset (&sb->ops);
+    }
+#endif
+    num_queries = (int) c->query_indices->elem_count;
+    for (i = 0; i < num_queries; i++)
+    {
+        qi = (overlap_ind_t *) sc_array_index_int (c->query_indices, i);
+        sc_array_reset (&qi->oqs);
+    }
+    sc_array_destroy_null (&c->query_indices);
+    sc_array_destroy_null (&c->send_buffer);
+}
+
+static void
+producer_free_communication_data (overlap_producer_comm_t * p)
+{
+#ifdef FCLAW_ENABLE_MPI
+    overlap_buf_t *rb;
+    int num_senders, i;
+
+    sc_array_destroy (p->recv_reqs);
+    sc_array_destroy (p->send_reqs);
+    num_senders = (int) p->recv_buffer->elem_count;
+    for (i = 0; i < num_senders; ++i)
+    {
+        rb = (overlap_buf_t *) sc_array_index_int (p->recv_buffer, i);
+#ifdef FCLAW_ENABLE_DEBUG
+        if (i == p->iprorank)
+        {
+            P4EST_ASSERT (rb->ops.elem_count == 0);
+        }
+        else
+        {
+            P4EST_ASSERT (rb->ops.elem_count > 0);
+        }
+#endif
+        sc_array_reset (&rb->ops);
+    }
+    sc_array_destroy_null (&p->recv_buffer);
+#endif
+}
+
+static void
+consumer_producer_update_local (overlap_global_comm_t * g)
+{
+    overlap_consumer_comm_t *c = g->c;
+    overlap_producer_comm_t *p = g->p;
+    overlap_buf_t *sb;
+
+    if (c->iconrank >= 0 && c->send_buffer->elem_count)
+    {
+        /* Interpolate point-data of local points. Instead of copying to the
+         * producer buffer, we update the points in-place. */
+        sb = (overlap_buf_t *) sc_array_index_int (c->send_buffer,
+                                                   c->iconrank);
+        p4est_search_local (p->pro4est, 0, NULL, interpolate_local_fn,
+                            &(sb->ops));
+        consumer_update_from_buffer (c, c->send_buffer, c->iconrank);
+    }
+}
+
+void
+fclaw2d_overlap_exchange (fclaw2d_domain_t * domain,
+                          sc_array_t * query_points,
+                          fclaw2d_interpolate_point_t interpolate, void *user)
+{
+    p4est_t p4est;
+    p4est_connectivity_t conn;
+    p4est_wrap_t *wrap;
+    size_t iz, nipz;
+    sc_array_t *iquery_points;
+    overlap_point_t *ip;
+    overlap_global_comm_t global, *g = &global;
+    overlap_producer_comm_t *p = g->p = &g->pro;
+    overlap_consumer_comm_t *c = g->c = &g->con;
+
+    /* assert validity of parameters */
+    FCLAW_ASSERT (domain != NULL);
+    FCLAW_ASSERT (query_points != NULL);
+    FCLAW_ASSERT (interpolate != NULL);
+
+    fclaw_global_essentialf ("OVERLAP: exchange partition\n");
+
+    /* extract p4est data from wrapper */
+    wrap = (p4est_wrap_t *) domain->pp;
+    FCLAW_ASSERT (wrap != NULL);
+    FCLAW_ASSERT (wrap->p4est != NULL);
+    FCLAW_ASSERT (wrap->conn != NULL);
+    p4est = *(wrap->p4est);
+    conn = *(wrap->conn);
+
+    /* initialize communication data */
+    /*we assume that consumer and producer operate on congruent communicators */
+    g->glocomm = c->glocomm = p->glocomm = domain->mpicomm;
+    c->domain = p->domain = domain;
+    c->interpolate = p->interpolate = interpolate;
+    c->user = p->user = user;
+    c->query_points = query_points;
+    c->query_indices = sc_array_new (sizeof (overlap_ind_t));
+    c->point_size = p->point_size = query_points->elem_size;
+    c->conrank = p->prorank = domain->mpirank;
+    c->send_buffer = sc_array_new (sizeof (overlap_buf_t));
+    p4est.user_pointer = p;
+    p->pro4est = &p4est;
+
+    fclaw_global_essentialf ("OVERLAP: customer partition search\n");
+
+    /* store the query points as overlap_point_t to be able to mark their last
+     * appearance in the search */
+    nipz = query_points->elem_count;
+    iquery_points = sc_array_new_count (sizeof (overlap_point_t), nipz);
+    for (iz = 0; iz < nipz; ++iz)
+    {
+        ip = (overlap_point_t *) sc_array_index (iquery_points, iz);
+        ip->point = sc_array_index (query_points, iz);
+        ip->rank = -1;
+        ip->id = iz;
+    }
+
+    /* search for the query points in the producer-partition and create a buffer
+     * to send them to the respective producer ranks */
+    p4est_search_partition_gfx (p4est.global_first_quadrant,
+                                p4est.global_first_position, p4est.mpisize,
+                                conn.num_trees, 0, c, NULL,
+                                interpolate_partition_fn, iquery_points);
+
+#ifdef FCLAW_ENABLE_MPI
+    /* notify the producer about the point-array-messages it will receive,
+     * allocate an receive buffer according to the transmitted payloads and
+     * post Irecvs for the point-arrays */
+    consumer_producer_notify (g);
+
+    /* post Isends for the point-arrays as well as Irecvs for the updated
+     * point-arrays containing the interpolation prodata */
+    consumer_post_messages (c);
+
+    fclaw_global_essentialf ("OVERLAP: producer local search\n");
+
+    /* interpolate the point-arrays as soon as they arrive and send them back to
+     * the consumer side in a non-blocking way */
+    producer_interpolate (p);
+
+    fclaw_global_essentialf ("OVERLAP: consumer query point update\n");
+
+    /* compute the interpolation data of the query points based on the
+     * updated point-arrays */
+    consumer_update_query_points (c);
+
+    /* wait for the communication to complete */
+    consumer_waitall (c);
+    producer_waitall (p);
+#else
+    c->iconrank = 0;
+#endif
+
+    fclaw_global_essentialf ("OVERLAP: local interpolation\n");
+
+    /* local, in-place part of the interpolation */
+    consumer_producer_update_local (g);
+
+    /* free remaining communication data */
+    consumer_free_communication_data (c);
+    producer_free_communication_data (p);
+    sc_array_destroy (iquery_points);
+}
+
+#endif /* !P4_TO_P8 */

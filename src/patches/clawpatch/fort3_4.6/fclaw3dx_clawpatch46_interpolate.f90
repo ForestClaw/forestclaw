@@ -298,8 +298,8 @@ end subroutine fclaw3dx_clawpatch46_fort_interpolate_corner
 
 !! # Conservative intepolation to fine grid patch
 subroutine fclaw3dx_clawpatch46_fort_interpolate2fine & 
-          (mx,my,mz,mbc,meqn,qcoarse, qfine, areacoarse, &
-           areafine, igrid, manifold)
+          (mx,my,mz,mbc,meqn,qcoarse, qfine, volcoarse, &
+           volfine, igrid, manifold)
     implicit none
 
     integer :: mx,my,mz,mbc,meqn
@@ -308,8 +308,8 @@ subroutine fclaw3dx_clawpatch46_fort_interpolate2fine &
     double precision :: qcoarse(1-mbc:mx+mbc,1-mbc:my+mbc,1-mbc:mz+mbc,meqn)
     double precision ::   qfine(1-mbc:mx+mbc,1-mbc:my+mbc,1-mbc:mz+mbc,meqn)
 
-    double precision :: areacoarse(-mbc:mx+mbc+1,-mbc:my+mbc+1)
-    double precision ::   areafine(-mbc:mx+mbc+1,-mbc:my+mbc+1)
+    double precision :: volcoarse(-mbc:mx+mbc+1,-mbc:my+mbc+1,-mbc:mz+mbc+1)
+    double precision ::   volfine(-mbc:mx+mbc+1,-mbc:my+mbc+1,-mbc:mz+mbc+1)
 
     integer :: ii, jj, i,j, i1, i2, j1, j2, ig, jg, mq, mth, k
     integer :: ic,jc,ic_add, jc_add, ifine, jfine
@@ -371,10 +371,10 @@ subroutine fclaw3dx_clawpatch46_fort_interpolate2fine &
     end do mq_loop
 
     if (manifold .ne. 0) then
-        write(6,*) 'interpolate:fixcapaq2 : Manifold not yet implemented in 3D'
-        stop
+        !!write(6,*) 'interpolate:fixcapaq2 : Manifold not yet implemented in 3D'
+        !!stop
         call fclaw3dx_clawpatch46_fort_fixcapaq2(mx,my,mz,mbc,meqn, & 
-                        qcoarse,qfine, areacoarse,areafine,igrid)
+                        qcoarse,qfine, volcoarse,volfine,igrid)
     endif
 
 
@@ -387,7 +387,7 @@ end subroutine  fclaw3dx_clawpatch46_fort_interpolate2fine
     !! # be used by the ghost cell routines as well?
     !! # ------------------------------------------------------
 subroutine fclaw3dx_clawpatch46_fort_fixcapaq2(mx,my,mz,mbc,meqn, & 
-           qcoarse,qfine, areacoarse,areafine,igrid)
+           qcoarse,qfine, volcoarse,volfine,igrid)
     implicit none
 
     integer :: mx,my,mz,mbc,meqn, refratio, igrid
@@ -395,8 +395,8 @@ subroutine fclaw3dx_clawpatch46_fort_fixcapaq2(mx,my,mz,mbc,meqn, &
 
     double precision ::  qcoarse(1-mbc:mx+mbc,1-mbc:my+mbc,1-mbc:mz+mbc,meqn)
     double precision ::    qfine(1-mbc:mx+mbc,1-mbc:my+mbc,1-mbc:mz+mbc,meqn)
-    double precision ::  areacoarse(-mbc:mx+mbc+1,-mbc:my+mbc+1)
-    double precision ::    areafine(-mbc:mx+mbc+1,-mbc:my+mbc+1)
+    double precision ::  volcoarse(-mbc:mx+mbc+1,-mbc:my+mbc+1,-mbc:mz+mbc+1)
+    double precision ::    volfine(-mbc:mx+mbc+1,-mbc:my+mbc+1,-mbc:mz+mbc+1)
 
     integer :: i,j,k,ii, jj, ifine, jfine, m, ig, jg, ic_add, jc_add
     double precision :: kf, kc, r2, sum, cons_diff, qf, qc, volf, dz, volc
@@ -430,14 +430,14 @@ subroutine fclaw3dx_clawpatch46_fort_fixcapaq2(mx,my,mz,mbc,meqn, &
                         do jj = 1,refratio
                            ifine = (i-1)*refratio + ii
                            jfine = (j-1)*refratio + jj
-                           kf = areafine(ifine,jfine)
+                           kf = volfine(ifine,jfine,k)
                            volf = kf*dz
                            qf = qfine(ifine,jfine,k,m)
                            sum = sum + volf*qf
                         enddo
                     enddo
 
-                    kc = areacoarse(i+ic_add,j+jc_add)
+                    kc = volcoarse(i+ic_add,j+jc_add,k)
                     volc = kc*dz
                     qc = qcoarse(i+ic_add, j+jc_add,k,m)
                     cons_diff = (qc*volc - sum)/r2
@@ -446,7 +446,7 @@ subroutine fclaw3dx_clawpatch46_fort_fixcapaq2(mx,my,mz,mbc,meqn, &
                         do jj = 1,refratio
                            ifine  = (i-1)*refratio + ii
                            jfine  = (j-1)*refratio + jj
-                           kf = areafine(ifine,jfine)
+                           kf = volfine(ifine,jfine,k)
                            volf = kf*dz
                            qfine(ifine,jfine,k,m) = qfine(ifine,jfine,k,m) + cons_diff/volf
                        end do

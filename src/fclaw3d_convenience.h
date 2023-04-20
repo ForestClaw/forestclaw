@@ -27,9 +27,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define FCLAW3D_CONVENIENCE_H
 
 #include <forestclaw3d.h>
-#if 0
-#include <fclaw3d_map.h>
-#endif
 #include <p8est_connectivity.h>
 
 #ifdef __cplusplus
@@ -40,19 +37,8 @@ extern "C"
 #endif
 #endif
 
-/* TODO: The unit cube is a special case of the brick.  Use that instead. */
 fclaw3d_domain_t *fclaw3d_domain_new_unitcube (sc_MPI_Comm mpicomm,
                                                int initial_level);
-
-#if 0
-
-/* TODO: The torus is a special case of the brick.  Use that instead. */
-fclaw3d_domain_t *fclaw3d_domain_new_torus (sc_MPI_Comm mpicomm,
-                                            int initial_level);
-fclaw3d_domain_t *fclaw3d_domain_new_twosphere (sc_MPI_Comm mpicomm,
-                                                int initial_level);
-fclaw3d_domain_t *fclaw3d_domain_new_cubedsphere (sc_MPI_Comm mpicomm,
-                                                  int initial_level);
 
 /** Create a brick connectivity, that is, a rectangular grid of blocks.
  * The origin is in the lower-left corner of the brick.
@@ -64,30 +50,25 @@ fclaw3d_domain_t *fclaw3d_domain_new_cubedsphere (sc_MPI_Comm mpicomm,
  *                              leftmost blocks.
  * \param [in] periodic_in_y    Periodicity along the vertical direction.
  * \param [in] initial_level    A non-negative integer <= P4EST_QMAXLEVEL.
- * \param [in] cont             We do NOT take ownership of the mapping.
- *                              It is legal to pass NULL for this parameter.
  * \return                      A fully initialized domain structure.
  */
-fclaw2d_domain_t *fclaw2d_domain_new_brick (sc_MPI_Comm mpicomm,
+fclaw3d_domain_t *fclaw3d_domain_new_brick (sc_MPI_Comm mpicomm,
                                             int blocks_in_x, int blocks_in_y,
+                                            int blocks_in_z,
                                             int periodic_in_x,
                                             int periodic_in_y,
-                                            int initial_level,
-                                            fclaw2d_map_context_t * cont);
+                                            int periodic_in_z,
+                                            int initial_level);
 
-/** Create a domain from a given forest connectivity and matching map.
+/** Create a domain from a given forest connectivity.
  * \param [in] mpicomm          We expect sc_MPI_Init to be called earlier.
  * \param [in] initial_level    A non-negative integer <= P4EST_QMAXLEVEL.
  * \param [in] conn             We DO take ownership of the connectivity.
- * \param [in] cont             We do NOT take ownership of the mapping.
  * \return                      A fully initialized domain structure.
  */
-fclaw2d_domain_t *fclaw2d_domain_new_conn_map (sc_MPI_Comm mpicomm,
-                                               int initial_level,
-                                               p4est_connectivity_t * conn,
-                                               fclaw2d_map_context_t * cont);
-
-#endif /* 0 */
+fclaw3d_domain_t *fclaw3d_domain_new_conn (sc_MPI_Comm mpicomm,
+                                           int initial_level,
+                                           p8est_connectivity_t * conn);
 
 void fclaw3d_domain_destroy (fclaw3d_domain_t * domain);
 
@@ -190,6 +171,76 @@ void fclaw3d_domain_search_points (fclaw3d_domain_t * domain,
                                    sc_array_t * block_offsets,
                                    sc_array_t * coordinates,
                                    sc_array_t * results);
+
+/** Callback function to compute the integral of a "ray" within a patch.
+ *
+ * This function can be passed to \ref fclaw3d_domain_integrate_rays to
+ * eventually compute the integrals over the whole domain for an array of rays.
+ *
+ * \param [in] domain           The domain to integrate on.
+ * \param [in] patch            The patch under consideration.
+ *                              When on a leaf, this is a valid forestclaw patch.
+ *                              Otherwise, this is a temporary artificial patch
+ *                              containing all standard patch information except
+ *                              for the pointer to the next patch and user-data.
+ *                              Only the FCLAW3D_PATCH_CHILDID and the
+ *                              FCLAW3D_PATCH_ON_BLOCK_FACE_* flags are set.
+ *                              Artificial patches are generally ancestors of
+ *                              valid forestclaw patches that are leaves.
+ * \param [in] blockno          The block id of the patch under consideration.
+ * \param [in] patchno          When on a leaf, this is a valid patch number,
+ *                              as always relative to its block.  For a leaf,
+ *                              this callback must set the integral value to
+ *                              the local contribution of this patch and ray.
+ *                              Otherwise, patchno is -1.  In this case, the
+ *                              integral value is ignored.
+ * \param [in] ray              Representation of a "ray"; user-defined.
+ *                              Points to an array element of the rays passed
+ *                              to \ref fclaw3d_domain_integrate_rays.
+ * \param [in,out] integral     The integral value associated with the ray.
+ *                              On input this is 0.
+ *                              For leaves this callback must set it to the
+ *                              exact integral contribution for this patch and
+ *                              ray.
+ * \param [in,out] user         Arbitrary data passed in earlier.
+ * \return                      True if there is a possible/partial intersection of the
+ *                              patch (which may be an ancestor) with the ray.
+ *                              This may be a false positive; we'll be fine.
+ *                              Return false if there is definitely no intersection.
+ *                              Only for leaves, this function must compute
+ *                              the exact integral contribution for this
+ *                              patch by intersecting this ray and store it in
+ *                              the \a integral output argument.
+ *                              The integral value may well be 0. if the intersection
+ *                              is, in fact, none (a false positive).
+ */
+typedef int (*fclaw3d_integrate_ray_t) (fclaw3d_domain_t * domain,
+                                        fclaw3d_patch_t * patch,
+                                        int blockno, int patchno,
+                                        void *ray, double *integral,
+                                        void *user);
+
+/** Compute the integrals of an array of user-defined rays.
+ * The integral for each ray and intersection quadrant is supplied by a callback.
+ * We store the results in an array of integral values of type double.
+ *
+ * \param [in] domain           The domain to integrate on.
+ * \param [in] intersect        Callback function that returns true if a ray
+ *                              intersects a patch and -- when called for a leaf
+ *                              -- shall output the integral of the ray segment.
+ * \param [in] rays             Array containing the rays of user-defined type.
+ *                              Each entry contains one item of arbitrary data.
+ *                              We do not dereference, just pass pointers around.
+ * \param [in,out] integrals    Array of double variables.  The number of entries
+ *                              must equal the number of rays.  Input values ignored.
+ *                              On output, we provide the final integral values.
+ * \param [in,out] user         Arbitrary data to be passed to the callback.
+ */
+void fclaw3d_domain_integrate_rays (fclaw3d_domain_t * domain,
+                                    fclaw3d_integrate_ray_t intersect,
+                                    sc_array_t * rays,
+                                    sc_array_t * integrals,
+                                    void * user);
 
 #ifdef __cplusplus
 #if 0

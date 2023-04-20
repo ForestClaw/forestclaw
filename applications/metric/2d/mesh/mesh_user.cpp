@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -36,23 +36,23 @@ void mesh_link_solvers(fclaw2d_global_t *glob)
 {
     const user_options_t* user = mesh_user_get_options(glob);
 
-    fclaw2d_vt()->problem_setup = &mesh_problem_setup;  /* Version-independent */
+    fclaw2d_vt(glob)->problem_setup = &mesh_problem_setup;  /* Version-independent */
 
     if (user->claw_version == 4)
     {
-        fc2d_clawpack46_vt()->qinit     = &CLAWPACK46_QINIT;
-        fc2d_clawpack46_vt()->setaux    = &CLAWPACK46_SETAUX;
-        fc2d_clawpack46_vt()->rpn2      = &CLAWPACK46_RPN2ADV;
-        fc2d_clawpack46_vt()->rpt2      = &CLAWPACK46_RPT2ADV;
-        fc2d_clawpack46_vt()->b4step2   = &CLAWPACK46_B4STEP2;
+        fc2d_clawpack46_vt(glob)->qinit     = &CLAWPACK46_QINIT;
+        fc2d_clawpack46_vt(glob)->setaux    = &CLAWPACK46_SETAUX;
+        fc2d_clawpack46_vt(glob)->rpn2      = &CLAWPACK46_RPN2ADV;
+        fc2d_clawpack46_vt(glob)->rpt2      = &CLAWPACK46_RPT2ADV;
+        fc2d_clawpack46_vt(glob)->b4step2   = &CLAWPACK46_B4STEP2;
     }
     else if (user->claw_version == 5)
     {
-        fc2d_clawpack5_vt()->qinit     = &CLAWPACK5_QINIT;
-        fc2d_clawpack5_vt()->setaux    = &CLAWPACK5_SETAUX;
-        fc2d_clawpack5_vt()->b4step2   = &CLAWPACK5_B4STEP2;
-        fc2d_clawpack5_vt()->rpn2      = &CLAWPACK5_RPN2ADV;
-        fc2d_clawpack5_vt()->rpt2      = &CLAWPACK5_RPT2ADV;
+        fc2d_clawpack5_vt(glob)->qinit     = &CLAWPACK5_QINIT;
+        fc2d_clawpack5_vt(glob)->setaux    = &CLAWPACK5_SETAUX;
+        fc2d_clawpack5_vt(glob)->b4step2   = &CLAWPACK5_B4STEP2;
+        fc2d_clawpack5_vt(glob)->rpn2      = &CLAWPACK5_RPN2ADV;
+        fc2d_clawpack5_vt(glob)->rpt2      = &CLAWPACK5_RPT2ADV;
     }
 }
 

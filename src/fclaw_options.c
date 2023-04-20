@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -51,6 +51,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 static void* 
 fclaw_register (fclaw_options_t* fclaw_opt, sc_options_t * opt)
 {
+    sc_options_add_string (opt, 0, "run-directory", 
+                           &fclaw_opt->run_directory,
+                           NULL, "Directory for running simulation in, can be relative for absolute [cwd]");    
+
     /* -------------------------- Time stepping control ------------------------------- */
 
     sc_options_add_double (opt, 0, "initial_dt", &fclaw_opt->initial_dt, 0.1,
@@ -93,6 +97,9 @@ fclaw_register (fclaw_options_t* fclaw_opt, sc_options_t * opt)
     sc_options_add_bool (opt, 0, "subcycle", &fclaw_opt->subcycle, 1,
                          "Use subcycling in time [T]");
 
+    sc_options_add_bool (opt, 0, "ghost-fill-uses-time-interp", &fclaw_opt->timeinterp2fillghost, 1,
+                         "Use linear time interpolation when subcycling [T]");
+
     sc_options_add_bool (opt, 0, "weighted_partition", &fclaw_opt->weighted_partition, 1,
                          "Weight grids when partitioning [T]");
 
@@ -122,6 +129,11 @@ fclaw_register (fclaw_options_t* fclaw_opt, sc_options_t * opt)
     sc_options_add_int(opt, 0, "gauge-buffer-length",
                        &fclaw_opt->gauge_buffer_length, 1,
                        "Number of lines of gauge output to buffer before printing [1]");
+
+    /* ---------------------------------------- Rays  --------------------------------- */
+    /* Gauge options */
+    sc_options_add_bool (opt, 0, "output-rays", &fclaw_opt->output_rays, 0,
+                            "Print ray output [F]");
 
     /* -------------------------------- tikz output ----------------------------------- */
     sc_options_add_bool (opt, 0, "tikz-out", &fclaw_opt->tikz_out, 0,
@@ -241,15 +253,15 @@ fclaw_register (fclaw_options_t* fclaw_opt, sc_options_t * opt)
 
     /* ---------------------------- Ghost packing options ----------------------------- */
 
-    sc_options_add_bool (opt, 0, "ghost_patch_pack_area", 
-                         &fclaw_opt->ghost_patch_pack_area,1,
-                         "Pack area for parallel comm. of ghost patches [T]");
+    sc_options_add_bool (opt, 0, "ghost-patch-pack-area", 
+                         &fclaw_opt->ghost_patch_pack_area,0,
+                         "Pack area for parallel comm. of ghost patches [F]");
 
-    sc_options_add_bool (opt, 0, "ghost_patch_pack_extra", 
+    sc_options_add_bool (opt, 0, "ghost-patch-pack-extra", 
                          &fclaw_opt->ghost_patch_pack_extra,
                         0, "Pack extra fields for parallel comm. of ghost patches [F]");
 
-    sc_options_add_int (opt, 0, "ghost_patch_pack_numextrafields", 
+    sc_options_add_int (opt, 0, "ghost-patch-pack-numextrafields", 
                         &fclaw_opt->ghost_patch_pack_numextrafields,
                         0, "Number of extra fields to pack [0]");
 
@@ -320,6 +332,14 @@ fclaw_register (fclaw_options_t* fclaw_opt, sc_options_t * opt)
     sc_options_add_inifile (opt, 'F', "inifile",
                             "File used to override one or more options " \
                             "in fclaw_options.ini [empty]");
+
+    sc_options_add_string (opt, 0, "logging-prefix",
+                           &fclaw_opt->logging_prefix, 
+                           0,"prefixed used for logging [NULL]");    
+
+    sc_options_add_string (opt, 0, "regression-check",
+                           &fclaw_opt->regression_check, 
+                           0,"filename of expected regresssion values [NULL]");    
 
     fclaw_opt->is_registered = 1;
 
@@ -477,28 +497,29 @@ static const fclaw_app_options_vtable_t options_vtable = {
    Public interface to ForestClaw options
    --------------------------------------------------------- */
 fclaw_options_t* fclaw_options_register (fclaw_app_t * a, 
-                                       const char *configfile)
+                                         const char *section,
+                                         const char *configfile)
 {
     fclaw_options_t* fclaw_opt;
 
     FCLAW_ASSERT (a != NULL);
 
     /* Basic options for print out help message, current options, etc */
-    fclaw_app_options_register_core (a, configfile);
+    if(!fclaw_app_options_core_registered(a)){
+        fclaw_app_options_register_core (a, configfile);
+    }
 
     /* allocate storage for fclaw_options */
     /* we will free it in the options_destroy callback */
     fclaw_opt = FCLAW_ALLOC(fclaw_options_t,1);
 
     /* Could also pass in a section header (set to NULL for now) */
-    fclaw_app_options_register (a,NULL,
+    fclaw_app_options_register (a,
+                                section,
                                 configfile,
                                 &options_vtable,
                                 fclaw_opt);
     
-    /* this is to retrieve the option key-value pair */
-    fclaw_app_set_attribute(a,"Options",fclaw_opt);
-
     return fclaw_opt;
 }
 

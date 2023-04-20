@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -124,13 +124,13 @@ void get_face_neighbors(fclaw2d_global_t *glob,
 	{
 		*neighbor_block_idx = is_block_face ? rblockno : -1;
 		/* Get encoding of transforming a neighbor coordinate across a face */
-		fclaw2d_patch_transform_blockface (iface, rfaceno, ftransform);
+		fclaw2d_patch_transform_blockface (glob, iface, rfaceno, ftransform);
 
 		int iface1, rface1;
 		iface1 = iface;
 		rface1 = rfaceno;
 		fclaw2d_patch_face_swap(&iface1,&rface1);
-		fclaw2d_patch_transform_blockface (iface1, rface1,
+		fclaw2d_patch_transform_blockface (glob, iface1, rface1,
 										   ftransform_finegrid->transform);
 		ftransform_finegrid->block_iface = iface1;
 		**iface_neighbor_ptr = iface1;
@@ -140,9 +140,9 @@ void get_face_neighbors(fclaw2d_global_t *glob,
 		{
 			/* If we are within one patch this is a special case */
 			FCLAW_ASSERT (*neighbor_block_idx == -1);
-			fclaw2d_patch_transform_blockface_intra (ftransform);
+			fclaw2d_patch_transform_blockface_intra (glob, ftransform);
 			fclaw2d_patch_transform_blockface_intra
-				(ftransform_finegrid->transform);
+				(glob, ftransform_finegrid->transform);
 		}
 
 		if (neighbor_type == FCLAW2D_PATCH_SAMESIZE)
@@ -499,6 +499,10 @@ void fclaw2d_face_neighbor_ghost(fclaw2d_global_t* glob,
 		int this_ghost_idx = i;
 
 		transform_data.this_patch = this_ghost_patch;
+		fclaw2d_patch_transform_init_data(glob,this_ghost_patch,
+		                              	  -1,
+		                                  i,
+		                                  &transform_data);
 
 		for (iface = 0; iface < FCLAW2D_NUMFACES; iface++)
 		{
@@ -527,12 +531,12 @@ void fclaw2d_face_neighbor_ghost(fclaw2d_global_t* glob,
 				int is_block_face = intersects_block[iface];
 
 
-				fclaw2d_patch_transform_blockface (iface, rfaceno,
+				fclaw2d_patch_transform_blockface (glob, iface, rfaceno,
 												   transform_data.transform);
 
 				if (!is_block_face)
 				{
-					fclaw2d_patch_transform_blockface_intra(transform_data.transform);
+					fclaw2d_patch_transform_blockface_intra(glob, transform_data.transform);
 				}
 				if (neighbor_type == FCLAW2D_PATCH_SAMESIZE)
 				{

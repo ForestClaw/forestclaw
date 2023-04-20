@@ -2,13 +2,10 @@
 
 #include <fclaw2d_map.h>
 
-#ifdef __cplusplus
-extern "C"
-{
 #if 0
-}
-#endif
-#endif
+/* Fix syntax highlighting */
+#endif    
+
 
 static int
 fclaw2d_map_query_latlong (fclaw2d_map_context_t * cont, int query_identifier)
@@ -85,13 +82,19 @@ fclaw2d_map_c2m_latlong (fclaw2d_map_context_t * cont, int blockno,
        a single "logical" block in [long0,long1]x[lat0,lat1] */
     MAPC2M_LATLONG(&blockno,&xc2,&yc2,xp,yp,zp);
 
-    scale_map(cont,xp,yp,zp);
-
+    if (cont->is_extruded == 0)
+    {        
+        scale_map(cont,xp,yp,zp);
+        rotate_map(cont,xp,yp,zp);
+    }
 }
+
+
 
 fclaw2d_map_context_t *
     fclaw2d_map_new_latlong (fclaw2d_map_context_t* brick,
                              const double scale[],
+                             const double rotate[],
                              const double lat[],
                              const double longitude[],
                              const int a, const int b)
@@ -100,25 +103,27 @@ fclaw2d_map_context_t *
 
     cont = FCLAW_ALLOC_ZERO (fclaw2d_map_context_t, 1);
     cont->query = fclaw2d_map_query_latlong;
-    cont->mapc2m = fclaw2d_map_c2m_latlong;
+    cont->mapc2m = fclaw2d_map_c2m_latlong;    
 
     cont->user_double[0] = lat[0];
     cont->user_double[1] = lat[1];
     cont->user_double[2] = longitude[0];
     if (a == 1)
     {
+        // Make sure periodic case as full 360 degrees.
         cont->user_double[3] = longitude[0] + 360.0;
     }
+    else
+    {
+        cont->user_double[3] = longitude[1];
+    }
+
     set_scale(cont,scale);
+    set_rotate(cont,rotate);
 
     cont->brick = brick;
 
+    cont->is_extruded = 0;
+
     return cont;
 }
-
-#ifdef __cplusplus
-#if 0
-{
-#endif
-}
-#endif

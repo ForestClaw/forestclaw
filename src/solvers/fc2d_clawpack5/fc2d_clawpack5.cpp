@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -28,7 +28,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "fc2d_clawpack5_options.h"
 
 
+#include <fclaw_pointer_map.h>
+
 #include <fclaw2d_clawpatch.h>
+#include <fclaw2d_clawpatch_options.h>
 #include <fclaw2d_clawpatch.hpp>
 
 #include <fclaw2d_clawpatch_output_ascii.h>
@@ -44,14 +47,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_defs.h>
 
 
-static fc2d_clawpack5_vtable_t s_clawpack5_vt;
-
 /* -------------------------- Clawpack solver functions ------------------------------ */
 
 static
 void clawpack5_setprob(fclaw2d_global_t *glob)
 {
-    fc2d_clawpack5_vtable_t*  claw5_vt = fc2d_clawpack5_vt();
+    fc2d_clawpack5_vtable_t*  claw5_vt = fc2d_clawpack5_vt(glob);
     if (claw5_vt->fort_setprob != NULL)
     {
         claw5_vt->fort_setprob();
@@ -65,7 +66,7 @@ void clawpack5_setaux(fclaw2d_global_t *glob,
                       int this_block_idx,
                       int this_patch_idx)
 {
-    fc2d_clawpack5_vtable_t*  claw5_vt = fc2d_clawpack5_vt();
+    fc2d_clawpack5_vtable_t*  claw5_vt = fc2d_clawpack5_vt(glob);
     if (claw5_vt->fort_setaux == NULL)
     {
         return;
@@ -99,7 +100,7 @@ void clawpack5_qinit(fclaw2d_global_t *glob,
                      int this_block_idx,
                      int this_patch_idx)
 {
-    fc2d_clawpack5_vtable_t*  claw5_vt = fc2d_clawpack5_vt();
+    fc2d_clawpack5_vtable_t*  claw5_vt = fc2d_clawpack5_vt(glob);
     
     FCLAW_ASSERT(claw5_vt->fort_qinit != NULL); /* Must initialized */
     int mx,my,mbc,meqn,maux;
@@ -127,7 +128,7 @@ void clawpack5_b4step2(fclaw2d_global_t *glob,
                        double t, double dt)
 
 {
-    fc2d_clawpack5_vtable_t*  claw5_vt = fc2d_clawpack5_vt();
+    fc2d_clawpack5_vtable_t*  claw5_vt = fc2d_clawpack5_vt(glob);
     
     if (claw5_vt->fort_b4step2 == NULL)
     {
@@ -158,7 +159,7 @@ void clawpack5_src2(fclaw2d_global_t *glob,
                     double t,
                     double dt)
 {
-    fc2d_clawpack5_vtable_t*  claw5_vt = fc2d_clawpack5_vt();
+    fc2d_clawpack5_vtable_t*  claw5_vt = fc2d_clawpack5_vt(glob);
     
     if (claw5_vt->fort_src2 == NULL)
     {
@@ -191,7 +192,7 @@ void clawpack5_bc2(fclaw2d_global_t *glob,
                    int intersects_phys_bdry[],
                    int time_interp)
 {
-    fc2d_clawpack5_vtable_t*  claw5_vt = fc2d_clawpack5_vt();
+    fc2d_clawpack5_vtable_t*  claw5_vt = fc2d_clawpack5_vt(glob);
 
     fc2d_clawpack5_options_t *clawopt = fc2d_clawpack5_get_options(glob);
     
@@ -247,7 +248,7 @@ double clawpack5_step2(fclaw2d_global_t *glob,
                        double t,
                        double dt)
 {
-    fc2d_clawpack5_vtable_t*  claw5_vt = fc2d_clawpack5_vt();
+    fc2d_clawpack5_vtable_t*  claw5_vt = fc2d_clawpack5_vt(glob);
 
     fc2d_clawpack5_options_t* clawpack_options;
     int level;
@@ -371,7 +372,7 @@ double clawpack5_update(fclaw2d_global_t *glob,
                         double dt,
                         void* user)
 {    
-    fc2d_clawpack5_vtable_t*  claw5_vt = fc2d_clawpack5_vt();
+    fc2d_clawpack5_vtable_t*  claw5_vt = fc2d_clawpack5_vt(glob);
 
     const fc2d_clawpack5_options_t* clawpack_options;
     clawpack_options = fc2d_clawpack5_get_options(glob);
@@ -426,24 +427,40 @@ void clawpack5_output(fclaw2d_global_t *glob, int iframe)
 /* ---------------------------------- Virtual table  ------------------------------------- */
 
 static
-fc2d_clawpack5_vtable_t* fc2d_clawpack5_vt_init()
+fc2d_clawpack5_vtable_t* fc2d_clawpack5_vt_new()
 {
-    FCLAW_ASSERT(s_clawpack5_vt.is_set == 0);
-    return &s_clawpack5_vt;
+    return (fc2d_clawpack5_vtable_t*) FCLAW_ALLOC_ZERO (fc2d_clawpack5_vtable_t, 1);
 }
 
+static
+void fc2d_clawpack5_vt_destroy(void* vt)
+{
+    FCLAW_FREE (vt);
+}
 
 /* This is called from the user application. */
-void fc2d_clawpack5_solver_initialize()
+void fc2d_clawpack5_solver_initialize(fclaw2d_global_t* glob)
 {
+	fclaw2d_clawpatch_options_t* clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
+	fc2d_clawpack5_options_t* clawopt = fc2d_clawpack5_get_options(glob);
+
+    clawopt->method[6] = clawpatch_opt->maux;
+
+    if (clawpatch_opt->maux == 0 && clawopt->mcapa > 0)
+    {
+        fclaw_global_essentialf("clawpack5 : mcapa > 0 but maux == 0.\n");
+        exit(FCLAW_EXIT_ERROR);
+    }
+
+
     int claw_version = 5;
-    fclaw2d_clawpatch_vtable_initialize(claw_version);
+    fclaw2d_clawpatch_vtable_initialize(glob, claw_version);
 
-    fclaw2d_vtable_t*          fclaw_vt = fclaw2d_vt();
-    fclaw2d_patch_vtable_t*    patch_vt = fclaw2d_patch_vt();
-    fclaw2d_clawpatch_vtable_t*      clawpatch_vt = fclaw2d_clawpatch_vt();
+    fclaw2d_vtable_t*          fclaw_vt = fclaw2d_vt(glob);
+    fclaw2d_patch_vtable_t*    patch_vt = fclaw2d_patch_vt(glob);
+    fclaw2d_clawpatch_vtable_t*      clawpatch_vt = fclaw2d_clawpatch_vt(glob);
 
-    fc2d_clawpack5_vtable_t*   claw5_vt = fc2d_clawpack5_vt_init();
+    fc2d_clawpack5_vtable_t*   claw5_vt = fc2d_clawpack5_vt_new();
 
     fclaw_vt->output_frame      = clawpack5_output;
     fclaw_vt->problem_setup     = clawpack5_setprob;    
@@ -475,6 +492,9 @@ void fc2d_clawpack5_solver_initialize()
     claw5_vt->fort_src2      = NULL;
 
     claw5_vt->is_set = 1;
+
+	FCLAW_ASSERT(fclaw_pointer_map_get(glob->vtables,"fc2d_clawpack5") == NULL);
+	fclaw_pointer_map_insert(glob->vtables, "fc2d_clawpack5", claw5_vt, fc2d_clawpack5_vt_destroy);
 }
 
 
@@ -483,10 +503,13 @@ void fc2d_clawpack5_solver_initialize()
 
 /* These are here in case the user wants to call Clawpack routines directly */
 
-fc2d_clawpack5_vtable_t* fc2d_clawpack5_vt()
+fc2d_clawpack5_vtable_t* fc2d_clawpack5_vt(fclaw2d_global_t* glob)
 {
-    FCLAW_ASSERT(s_clawpack5_vt.is_set != 0);
-    return &s_clawpack5_vt;
+    fc2d_clawpack5_vtable_t* claw5_vt = (fc2d_clawpack5_vtable_t*) 
+	   							fclaw_pointer_map_get(glob->vtables, "fc2d_clawpack5");
+	FCLAW_ASSERT(claw5_vt != NULL);
+	FCLAW_ASSERT(claw5_vt->is_set != 0);
+	return claw5_vt;
 }
 
 

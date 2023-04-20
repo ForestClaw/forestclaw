@@ -9,6 +9,7 @@ target_include_directories(testutils PUBLIC ${PROJECT_SOURCE_DIR})
 target_include_directories(testutils PUBLIC ${PROJECT_BINARY_DIR})
 
 
+target_include_directories(testutils PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(testutils PUBLIC forestclaw)
 
 if(TARGET ThunderEgg::ThunderEgg)
@@ -19,8 +20,9 @@ if(mpi)
   target_link_libraries(testutils PUBLIC MPI::MPI_C)
 endif(mpi)
 
+
 function(register_unit_tests test_target)
   include(CTest)
-  include(Catch)
-  catch_discover_tests(${test_target} TEST_PREFIX "unit_test: " PROPERTIES LABELS "unit_test")
+  include(doctest)
+  doctest_discover_tests(${test_target} TEST_PREFIX "unit_test: " PROPERTIES LABELS "unit_test")
 endfunction()

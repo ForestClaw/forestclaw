@@ -38,17 +38,19 @@ extern "C"
 #endif
 #endif
 
-/* TODO: The unit square is a special case of the brick.  Use that instead. */
 fclaw2d_domain_t *fclaw2d_domain_new_unitsquare (sc_MPI_Comm mpicomm,
                                                  int initial_level);
-/* TODO: The torus is a special case of the brick.  Use that instead. */
+
 fclaw2d_domain_t *fclaw2d_domain_new_torus (sc_MPI_Comm mpicomm,
                                             int initial_level);
+
 fclaw2d_domain_t *fclaw2d_domain_new_twosphere (sc_MPI_Comm mpicomm,
                                                 int initial_level);
 fclaw2d_domain_t *fclaw2d_domain_new_cubedsphere (sc_MPI_Comm mpicomm,
                                                   int initial_level);
 fclaw2d_domain_t *fclaw2d_domain_new_disk (sc_MPI_Comm mpicomm,
+                                           int periodic_in_x,
+                                           int periodic_in_y,
                                            int initial_level);
 
 /** Create a brick connectivity, that is, a rectangular grid of blocks.
@@ -61,16 +63,23 @@ fclaw2d_domain_t *fclaw2d_domain_new_disk (sc_MPI_Comm mpicomm,
  *                              leftmost blocks.
  * \param [in] periodic_in_y    Periodicity along the vertical direction.
  * \param [in] initial_level    A non-negative integer <= P4EST_QMAXLEVEL.
- * \param [in] cont             We do NOT take ownership of the mapping.
- *                              It is legal to pass NULL for this parameter.
  * \return                      A fully initialized domain structure.
  */
 fclaw2d_domain_t *fclaw2d_domain_new_brick (sc_MPI_Comm mpicomm,
                                             int blocks_in_x, int blocks_in_y,
                                             int periodic_in_x,
                                             int periodic_in_y,
-                                            int initial_level,
-                                            fclaw2d_map_context_t * cont);
+                                            int initial_level);
+
+/** Create a domain from a given forest connectivity.
+ * \param [in] mpicomm          We expect sc_MPI_Init to be called earlier.
+ * \param [in] initial_level    A non-negative integer <= P4EST_QMAXLEVEL.
+ * \param [in] conn             We DO take ownership of the connectivity.
+ * \return                      A fully initialized domain structure.
+ */
+fclaw2d_domain_t *fclaw2d_domain_new_conn (sc_MPI_Comm mpicomm,
+                                           int initial_level,
+                                           p4est_connectivity_t * conn);
 
 /** Create a domain from a given forest connectivity and matching map.
  * \param [in] mpicomm          We expect sc_MPI_Init to be called earlier.
@@ -156,9 +165,8 @@ void fclaw2d_domain_list_adapted (fclaw2d_domain_t * old_domain,
 /** Search triples of (block number, x coordinate, y coordinate) in the mesh.
  * The x, y coordinates must be in [0, 1]^2.
  * The input data must be equal on every process: This is a collective call.
- * The results will also be equal on every process.
  *
- * A point is found correctly even if it is on a patch boundary.
+ * A point is found at most once even if it is on a patch boundary.
  * We return the smallest patch number on the smallest processor touching it.
  * However, if a point is on a block boundary, it must be decided before
  * calling this function which tree shall be queried for it.
@@ -168,22 +176,197 @@ void fclaw2d_domain_list_adapted (fclaw2d_domain_t * old_domain,
  *       This should be fixed in the near future.
  *
  * \param [in] domain           Must be valid domain structure.  Will not be changed.
- * \param [in] block_offsets    Array of (num_blocks + 1) int variables.
+ * \param [in] block_offsets    Monotonous array of (num_blocks + 1) int variables.
  *                              The points to search in block t in [0, num_blocks)
  *                              have indices [block_offsets[t], block_offsets[t + 1])
  *                              in the \b coordinates and results arrays.
  * \param [in] coordinates      An array of elem_size == 2 * sizeof (double) with
  *                              entries (x, y) in [0, 1]^2.  Of these entries,
  *                              there are \b block_offsets[num_blocks] many.
+ *                              Currently we do not enforce the x and y ranges
+ *                              and simply do not find any point outside its block.
  * \param [in,out] results      On input, an array of type int and
- *                              \b block_offsets[num_blocks] many entries.
- *                              On output, each entry will be -1 if the point has
- *                              not been found, or the patch number within its block.
+ *                              \b block_offsets[num_blocks] many (ignored) entries.
+ *                              On output, an entry will be -1 if the point has
+ *                              not been found on this process, or the patch
+ *                              number within its block otherwise.
  */
 void fclaw2d_domain_search_points (fclaw2d_domain_t * domain,
                                    sc_array_t * block_offsets,
                                    sc_array_t * coordinates,
                                    sc_array_t * results);
+
+/** Callback function to compute the integral of a "ray" within a patch.
+ *
+ * This function can be passed to \ref fclaw2d_domain_integrate_rays to
+ * eventually compute the integrals over the whole domain for an array of rays.
+ *
+ * \param [in] domain           The domain to integrate on.
+ * \param [in] patch            The patch under consideration.
+ *                              When on a leaf, this is a valid forestclaw patch.
+ *                              Otherwise, this is a temporary artificial patch
+ *                              containing all standard patch information except
+ *                              for the pointer to the next patch and user-data.
+ *                              Only the FCLAW2D_PATCH_CHILDID and the
+ *                              FCLAW2D_PATCH_ON_BLOCK_FACE_* flags are set.
+ *                              Artificial patches are generally ancestors of
+ *                              valid forestclaw patches that are leaves.
+ * \param [in] blockno          The block id of the patch under consideration.
+ * \param [in] patchno          When on a leaf, this is a valid patch number,
+ *                              as always relative to its block.  For a leaf,
+ *                              this callback must set the integral value to
+ *                              the local contribution of this patch and ray.
+ *                              Otherwise, patchno is -1.  In this case, the
+ *                              integral value is ignored.
+ * \param [in] ray              Representation of a "ray"; user-defined.
+ *                              Points to an array element of the rays passed
+ *                              to \ref fclaw2d_domain_integrate_rays.
+ * \param [in,out] integral     The integral value associated with the ray.
+ *                              On input this is 0.
+ *                              For leaves this callback must set it to the
+ *                              exact integral contribution for this patch and
+ *                              ray.
+ * \param [in,out] user         Arbitrary data passed in earlier.
+ * \return                      True if there is a possible/partial intersection of the
+ *                              patch (which may be an ancestor) with the ray.
+ *                              This may be a false positive; we'll be fine.
+ *                              Return false if there is definitely no intersection.
+ *                              Only for leaves, this function must compute
+ *                              the exact integral contribution for this
+ *                              patch by intersecting this ray and store it in
+ *                              the \a integral output argument.
+ *                              The integral value may well be 0. if the intersection
+ *                              is, in fact, none (a false positive).
+ */
+typedef int (*fclaw2d_integrate_ray_t) (fclaw2d_domain_t * domain,
+                                        fclaw2d_patch_t * patch,
+                                        int blockno, int patchno,
+                                        void *ray, double *integral,
+                                        void *user);
+
+/** Compute the integrals of an array of user-defined rays.
+ * The integral for each ray and intersection quadrant is supplied by a callback.
+ * We store the results in an array of integral values of type double.
+ *
+ * \param [in] domain           The domain to integrate on.
+ * \param [in] intersect        Callback function that returns true if a ray
+ *                              intersects a patch and -- when called for a leaf
+ *                              -- shall output the integral of the ray segment.
+ * \param [in] rays             Array containing the rays of user-defined type.
+ *                              Each entry contains one item of arbitrary data.
+ *                              We do not dereference, just pass pointers around.
+ * \param [in,out] integrals    Array of double variables.  The number of entries
+ *                              must equal the number of rays.  Input values ignored.
+ *                              On output, we provide the final integral values.
+ * \param [in,out] user         Arbitrary data to be passed to the callback.
+ */
+void fclaw2d_domain_integrate_rays (fclaw2d_domain_t * domain,
+                                    fclaw2d_integrate_ray_t intersect,
+                                    sc_array_t * rays,
+                                    sc_array_t * integrals,
+                                    void * user);
+
+/** Return true if \b domain is an artifical domain.
+ *
+ * This function can be used in \ref fclaw2d_interpolate_point_t callbacks to
+ * distinguish domains that were created during a consumer-side partition search
+ * (and only contain some meta information) from real domains in a producer-side
+ * local search.
+ */
+int domain_is_meta (fclaw2d_domain_t * domain);
+
+/** Callback function to compute the interpolation data for a point and a patch.
+ *
+ * This function can be passed to \ref fclaw2d_overlap_exchange to eventually
+ * compute the interpolation data over the whole producer domain for an
+ * array of points.
+ * It will be called both in a partition search and a local search of the
+ * producer domain. Use \ref domain_is_meta, to determine which is the case.
+ *
+ * \param [in] domain           The domain we interpolate on.
+ *                              On the producer side, this is a valid forestclaw
+ *                              domain.
+ *                              On the consumer side, this is a temporary
+ *                              artifical domain. Only the mpi-information
+ *                              (mpicomm, mpisize and mpirank) as well as the
+ *                              backend data (pp, pp_owned and attributes) are
+ *                              set. The backend data is not owned and shall
+ *                              not be changed by the callback. The mpirank is
+ *                              set to a valid rank only when we are at a leaf
+ *                              (a patch that belongs to exactly one process)
+ *                              of the partition search, else it will be -1.
+ * \param [in] patch            The patch under consideration.
+ *                              When on a leaf on the producer side, this is a
+ *                              valid patch from the producer domain.
+ *                              Otherwise, this is a temporary artificial patch
+ *                              containing all standard patch information except
+ *                              for the pointer to the next patch and user-data.
+ *                              Only the FCLAW2D_PATCH_CHILDID and the
+ *                              FCLAW2D_PATCH_ON_BLOCK_FACE_* flags are set.
+ *                              Artificial patches are generally ancestors of
+ *                              valid forestclaw patches that are leaves.
+ * \param [in] blockno          The block id of the patch under consideration.
+ * \param [in] patchno          If patchno is -1, we are on an artifical patch.
+ *                              Otherwise, this is a valid patchno from the
+ *                              producer domain.
+ * \param [in,out] point        Representation of a point; user-defined.
+ *                              Points to an array element of the query points
+ *                              passed to \ref fclaw2d_overlap_exchange.
+ *                              If patchno is non-negative, the points
+ *                              interpolation data should be updated by the
+ *                              local patch's contribution.
+ * \param [in, out] user        Arbitrary data passed in earlier.
+ * \return                      True, if there is a possible contribution of the
+ *                              patch or one of its ancestors to the point
+ *                              interpolation data.
+ *                              Return false if there is definitely no
+ *                              contribution.
+ *                              If we are on a leaf on the producer side
+ *                              (patchno is non-negative) or the consumer side
+ *                              (domain_is_meta and mpirank is non-negative)
+ *                              this callback should do an exact test for
+ *                              contribution.
+ *                              Else, the return value may be a false positive,
+ *                              we'll be fine.
+ */
+typedef int (*fclaw2d_interpolate_point_t) (fclaw2d_domain_t * domain,
+                                            fclaw2d_patch_t * patch,
+                                            int blockno, int patchno,
+                                            void *point, void *user);
+
+/** Exchange interpolation data of query points between two domains.
+ *
+ * We compute the user-defined interpolation data of an array of user-defined
+ * query points, which originate from the so-called consumer side.
+ * The interpolation data will be computed on the domain of the so-called
+ * producer-side based on a \ref fclaw2d_interpolate_point_t callback function.
+ * Afterwards, the results will be collected and combined on the consumer side.
+ *
+ * \param [in] domain           The producer domain to interpolate on.
+ * \param [in,out] query_points Array containing points of user-defined type.
+ *                              Each entry contains one item of arbitrary data.
+ *                              We do not dereference, just pass pointers around.
+ *                              The points will be sent via MPI, so they may not
+ *                              contain pointers to further data.
+ *                              The array is defined processor-local and may
+ *                              contain different points on different processes.
+ *                              The query points are supposed to be computed
+ *                              (and transformed to the producer space by an
+ *                              inverse mapping) locally on the consumer side.
+ *                              On output, the points will contain collected
+ *                              interpolation data according to \b interpolate.
+ * \param [in] interpolate      Callback function that returns true if a point
+ *                              intersects a patch and -- when called for a leaf
+ *                              on the producer side -- shall write the
+ *                              interpolation data for the current
+ *                              point-patch-combination into the user-defined
+ *                              point structure.
+ * \param [in,out] user         Arbitrary data to be passed to the callback.
+ */
+void fclaw2d_overlap_exchange (fclaw2d_domain_t * domain,
+                               sc_array_t * query_points,
+                               fclaw2d_interpolate_point_t interpolate,
+                               void *user);
 
 #ifdef __cplusplus
 #if 0

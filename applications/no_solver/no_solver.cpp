@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -30,25 +30,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_clawpatch_options.h>
 #include <fclaw2d_clawpatch.h>
 
-
-
-
 static
-fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, 
-                                fclaw_options_t* fclaw_opt)
+void create_domain_map (fclaw2d_global_t *glob,
+                        fclaw_options_t* fclaw_opt)
 {
-    /* Mapped, multi-block domain */
-    p4est_connectivity_t     *conn = NULL;
-    fclaw2d_domain_t         *domain;
-    fclaw2d_map_context_t    *cont = NULL;
+    fclaw2d_domain_t         *domain = NULL;
 
-    conn = p4est_connectivity_new_unitsquare();
-    cont = fclaw2d_map_new_nomap();
-
-    domain = fclaw2d_domain_new_conn_map (mpicomm, fclaw_opt->minlevel, conn, cont);
-    fclaw2d_domain_list_levels(domain, FCLAW_VERBOSITY_ESSENTIAL);
-    fclaw2d_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);  
-    return domain;
+    domain = fclaw2d_domain_new_unitsquare (mpicomm, fclaw_opt->minlevel);
+    fclaw2d_domain_list_levels (domain, FCLAW_VERBOSITY_ESSENTIAL);
+    fclaw2d_domain_list_neighbors (domain, FCLAW_VERBOSITY_DEBUG);
+    fclaw2d_global_store_domain (glob, domain);
+    fclaw2d_global_store_map (glob, fclaw2d_map_new_nomap ());
 }
 
 static
@@ -62,7 +54,7 @@ void run_program(fclaw2d_global_t* glob)
     fclaw2d_domain_data_new(glob->domain);
 
     /* Initialize virtual table for ForestClaw */
-    fclaw2d_vtable_initialize();
+    fclaw2d_vtable_initialize(glob);
     fclaw2d_diagnostics_vtable_initialize();
 
     fclaw2d_clawpatch_vtable_initialize(user->clawpatch_version);
@@ -90,19 +82,15 @@ main (int argc, char **argv)
     fclaw_options_t             *fclaw_opt;
     fclaw2d_clawpatch_options_t *clawpatch_opt;
 
-    fclaw2d_global_t            *glob;
-    fclaw2d_domain_t            *domain;
-    sc_MPI_Comm mpicomm;
-
     int retval;
 
     /* Initialize application */
     app = fclaw_app_new (&argc, &argv, NULL);
 
     /* Create new options packages */
-    fclaw_opt =                   fclaw_options_register(app,"fclaw_options.ini");
-    clawpatch_opt =   fclaw2d_clawpatch_options_register(app,"fclaw_options.ini");
-    user_opt =                no_solver_options_register(app,"fclaw_options.ini");  
+    fclaw_opt =                   fclaw_options_register(app,  NULL,       "fclaw_options.ini");
+    clawpatch_opt =   fclaw2d_clawpatch_options_register(app, "clawpatch", "fclaw_options.ini");
+    user_opt =                no_solver_options_register(app,              "fclaw_options.ini");
 
     /* Read configuration file(s) and command line, and process options */
     options = fclaw_app_get_options (app);
@@ -112,12 +100,11 @@ main (int argc, char **argv)
     /* Run the program */
     if (!retval & !vexit)
     {
-        mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
-        domain = create_domain(mpicomm, fclaw_opt);
-    
         /* Create global structure which stores the domain, timers, etc */
-        glob = fclaw2d_global_new();
-        fclaw2d_global_store_domain(glob, domain);
+        int size, rank;
+        sc_MPI_Comm mpicomm = fclaw_app_get_mpi_size_rank (app, &size, &rank);
+        fclaw2d_global_t *glob = fclaw2d_global_new_comm (glob->mpicomm, size, rank);
+        create_domain_map (glob, fclaw_opt);
 
         /* Store option packages in glob */
         fclaw2d_options_store           (glob, fclaw_opt);
@@ -128,10 +115,8 @@ main (int argc, char **argv)
 
         fclaw2d_global_destroy(glob);
     }
-    
+
     fclaw_app_destroy (app);
 
     return 0;
 }
-
-

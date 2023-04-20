@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun, Scott Aiton
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -280,6 +280,7 @@ typedef void (*fclaw3dx_clawpatch_fort_tag4coarsening_t)(const int* mx,
  * @deprecated Checks if solution exceeds a threshold
  */
 typedef int (*fclaw3dx_clawpatch_fort_exceeds_threshold_t)(const int *blockno,
+                                                           const int* meqn,
                                                            const double *qval, 
                                                            const double *qmin, 
                                                            const double *qmax,
@@ -290,6 +291,7 @@ typedef int (*fclaw3dx_clawpatch_fort_exceeds_threshold_t)(const int *blockno,
                                                            const double *xc, 
                                                            const double *yc, 
                                                            const double *zc,
+                                                           const int* ivar_variable,
                                                            const double *tag_threshold,
                                                            const int *init_flag,
                                                            const int *is_ghost);
@@ -569,6 +571,27 @@ typedef void (*fclaw3dx_clawpatch_fort_norm_t)(int* blockno,
 
 /** @} */
 
+/** 
+ * @brief Checks if solution exceeds a threshold
+ */
+typedef int (*fclaw3dx_fort_exceeds_threshold_t)(const int *blockno,
+                                                 const int* meqn, 
+                                                 const double *qval, 
+                                                 const double *qmin, 
+                                                 const double *qmax,
+                                                 const double quad[], 
+                                                 const double *dx, 
+                                                 const double *dy, 
+                                                 const double *dz,
+                                                 const double *xc, 
+                                                 const double *yc,
+                                                 const double *zc, 
+                                                 const int* ivar_threshold,
+                                                 const double *tag_threshold,
+                                                 const int    *init_flag,
+                                                 const int    *is_ghost);
+
+
 /** @{ @name Fortran Headers *//*-------------------------------------------------------*/
 
 /** @brief Fortran subroutine name */
@@ -580,6 +603,41 @@ int FCLAW3DX_CLAWPATCH_GET_REFINEMENT_CRITERIA();
 
 
 /* ------------------------------- General threshold ---------------------------------- */
+
+/** Fortran subroutine name */
+#define FCLAW3DX_CLAWPATCH_TAG_CRITERIA \
+                  FCLAW_F77_FUNC(fclaw3dx_clawpatch_tag_criteria, \
+                                  FCLAW3DX_CLAWPATCH_TAG_CRITERIA)
+
+/**
+ * @brief Check if the refinment threshold is exceeded
+ *
+ * @param[in] blockno the block number
+ * @param[in] qval the 
+ * @param[in] qmin the minimum q value
+ * @param[in] qmax the maximum q value
+ * @param[in] quad the value and adjacent values of q
+ * @param[in] dx, dy the spacing in the x and y directions
+ * @param[in] xc, yc the coordinate of the cell
+ * @param[in] threshold the threshold
+ * @param[in] init_flag true if in init stage
+ * @param[in] is_ghost true if cell is a ghost cell
+ * @return 1 if exceeds threshold, 0 if not, -1 if inconclusive.
+ */
+int FCLAW3DX_CLAWPATCH_TAG_CRITERIA(const int *blockno,
+                                        const double *qval, 
+                                        const double *qmin, 
+                                        const double *qmax,
+                                        const double quad[], 
+                                        const double *dx, 
+                                        const double *dy, 
+                                        const double *dz,
+                                        const double *xc, 
+                                        const double *yc,
+                                        const double *zc, 
+                                        const double *tag_threshold,
+                                        const int *init_flag,
+                                        const int *is_ghost);
 
 /** Fortran subroutine name */
 #define FCLAW3DX_CLAWPATCH_EXCEEDS_THRESHOLD \
@@ -602,6 +660,7 @@ int FCLAW3DX_CLAWPATCH_GET_REFINEMENT_CRITERIA();
  * @return 1 if exceeds threshold, 0 if not, -1 if inconclusive.
  */
 int FCLAW3DX_CLAWPATCH_EXCEEDS_THRESHOLD(const int *blockno,
+                                         const int* meqn, 
                                         const double *qval, 
                                         const double *qmin, 
                                         const double *qmax,
@@ -612,6 +671,7 @@ int FCLAW3DX_CLAWPATCH_EXCEEDS_THRESHOLD(const int *blockno,
                                         const double *xc, 
                                         const double *yc,
                                         const double *zc, 
+                                        const int* ivar_variable,
                                         const double *tag_threshold,
                                         const int *init_flag,
                                         const int *is_ghost);
@@ -625,6 +685,7 @@ int FCLAW3DX_CLAWPATCH_EXCEEDS_THRESHOLD(const int *blockno,
     
 /** @brief C declaration of fclaw3dx_clawpatch_value_exceeds_th() subroutine */
 int FCLAW3DX_CLAWPATCH_VALUE_EXCEEDS_TH(const int* blockno,
+                                        const int* meqn, 
                                        const double *qval, 
                                        const double* qmin, 
                                        const double *qmax,
@@ -635,6 +696,7 @@ int FCLAW3DX_CLAWPATCH_VALUE_EXCEEDS_TH(const int* blockno,
                                        const double *xc, 
                                        const double *yc,
                                        const double *zc, 
+                                       const int* ivar_variable,
                                        const double* tag_threshold,
                                        const int* init_flag,
                                        const int* is_ghost);
@@ -648,6 +710,7 @@ int FCLAW3DX_CLAWPATCH_VALUE_EXCEEDS_TH(const int* blockno,
 
 /** @brief C declaration of fclaw3dx_clawpatch_difference_exceeds_th() subroutine */
 int FCLAW3DX_CLAWPATCH_DIFFERENCE_EXCEEDS_TH(const int *blockno,
+                                             const int *meqn,
                                             const double *qval, 
                                             const double *qmin, 
                                             const double *qmax,
@@ -658,6 +721,7 @@ int FCLAW3DX_CLAWPATCH_DIFFERENCE_EXCEEDS_TH(const int *blockno,
                                             const double *xc, 
                                             const double *yc,
                                             const double *zc, 
+                                            const int* ivar_variable, 
                                             const double *tag_threshold,
                                             const int *init_flag,
                                             const int *is_ghost);
@@ -671,6 +735,7 @@ int FCLAW3DX_CLAWPATCH_DIFFERENCE_EXCEEDS_TH(const int *blockno,
 
 /** @brief C declaration of fclaw3dx_clawpatch_minmax_exceeds_th() subroutine */
 int FCLAW3DX_CLAWPATCH_MINMAX_EXCEEDS_TH(const int *blockno,
+                                         const int* meqn,
                                          const double *qval, 
                                          const double* qmin, 
                                          const double *qmax,
@@ -681,6 +746,7 @@ int FCLAW3DX_CLAWPATCH_MINMAX_EXCEEDS_TH(const int *blockno,
                                          const double *xc, 
                                          const double *yc,
                                          const double *zc, 
+                                         const int* ivar_variable,
                                          const double *tag_threshold,                        
                                          const int *init_flag,
                                          const int *is_ghost);
@@ -693,6 +759,7 @@ int FCLAW3DX_CLAWPATCH_MINMAX_EXCEEDS_TH(const int *blockno,
 
 /** @brief C declaration of fclaw3dx_clawpatch_gradient_exceeds_th() subroutine */
 int FCLAW3DX_CLAWPATCH_GRADIENT_EXCEEDS_TH(const int *blockno,
+                                           const int* meqn,
                                            const double *qval, 
                                            const double* qmin, 
                                            const double *qmax,
@@ -703,6 +770,7 @@ int FCLAW3DX_CLAWPATCH_GRADIENT_EXCEEDS_TH(const int *blockno,
                                            const double *xc, 
                                            const double *yc,
                                            const double *zc, 
+                                           const int* ivar_variable,
                                            const double *tag_threshold,
                                            const int *init_flag,
                                            const int *is_ghost);
@@ -710,24 +778,27 @@ int FCLAW3DX_CLAWPATCH_GRADIENT_EXCEEDS_TH(const int *blockno,
 
 /* ------------------------------- user threshold --------------------------------- */
 /** Fortran subroutine name */
-#define USER_EXCEEDS_TH FCLAW_F77_FUNC(user_exceeds_th, \
-                                 USER_EXCEEDS_TH)
+#define FCLAW3DX_USER_EXCEEDS_TH FCLAW_F77_FUNC( \
+                             fclaw3dx_user_exceeds_th, \
+                             FCLAW3DX_USER_EXCEEDS_TH)
 
 /** @brief C declaration of user_exceeds_th() subroutine */
-int USER_EXCEEDS_TH(const int *blockno,
-                    const double *qval, 
-                    const double* qmin, 
-                    const double *qmax,
-                    const double quad[], 
-                    const double *dx, 
-                    const double *dy, 
-                    const double *dz,
-                    const double *xc, 
-                    const double *yc,
-                    const double *zc, 
-                    const double *tag_threshold,
-                    const int *init_flag,
-                    const int *is_ghost);
+int FCLAW3DX_USER_EXCEEDS_TH(const int *blockno,
+                             const int* meqn,
+                             const double *qval, 
+                             const double* qmin, 
+                             const double *qmax,
+                             const double quad[], 
+                             const double *dx, 
+                             const double *dy, 
+                             const double *dz,
+                             const double *xc, 
+                             const double *yc,
+                             const double *zc, 
+                             const int* ivar_variable,
+                             const double *tag_threshold,
+                             const int *init_flag,
+                             const int *is_ghost);
 
 /* -------------------------- User convenience headers -------------------------------- */
 

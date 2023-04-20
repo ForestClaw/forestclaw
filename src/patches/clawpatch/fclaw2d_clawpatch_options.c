@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -33,33 +33,20 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #if REFINE_DIM == 2 && PATCH_DIM == 2
 
+#define CLAWPATCH_OPTION_NAME "fclaw2d_clawpatch"
+
 #include <fclaw2d_clawpatch_options.h>
 
 #elif REFINE_DIM == 2 && PATCH_DIM == 3
+
+#define CLAWPATCH_OPTION_NAME "fclaw3dx_clawpatch"
 
 #include <fclaw3dx_clawpatch_options.h>
 #include <_fclaw2d_to_fclaw3dx.h>
 
 #endif
 #include <fclaw2d_global.h>
-#include <fclaw_package.h>
-
-static int s_clawpatch_options_package_id = -1;
-
-
-static int s_refine_criteria = -1;
-
-void fclaw2d_clawpatch_set_refinement_criteria(int r)
-{
-    //FCLAW_ASSERT(s_refine_criteria == -1);
-    s_refine_criteria = r;
-}
-
-int fclaw2d_clawpatch_get_refinement_criteria()
-{
-    FCLAW_ASSERT(s_refine_criteria != -1);
-    return s_refine_criteria;
-}
+#include <fclaw_pointer_map.h>
 
 static void *
 clawpatch_register(fclaw2d_clawpatch_options_t *clawpatch_options,
@@ -112,6 +99,11 @@ clawpatch_register(fclaw2d_clawpatch_options_t *clawpatch_options,
                              &clawpatch_options->refinement_criteria, "minmax",
                              kv, "Refinement criteria [minmax]");
 
+    sc_options_add_int (opt, 0, "threshold-variable",
+                        &clawpatch_options->threshold_variable,
+                        1, "Index of variable used for tagging in [1,meqn] [1]");
+
+
     clawpatch_options->is_registered = 1;
 
     return NULL;
@@ -127,11 +119,13 @@ clawpatch_postprocess(fclaw2d_clawpatch_options_t *clawpatch_opt)
 static fclaw_exit_type_t
 clawpatch_check(fclaw2d_clawpatch_options_t *clawpatch_opt)
 {
+#if 0
     if (clawpatch_opt->mx != clawpatch_opt->my)
     {
         fclaw_global_essentialf("Clawpatch error : mx != my\n");
         return FCLAW_EXIT_ERROR;    
     }
+#endif
 
     if (2*clawpatch_opt->mbc > clawpatch_opt->mx)
     {
@@ -154,8 +148,6 @@ clawpatch_check(fclaw2d_clawpatch_options_t *clawpatch_opt)
                                 "'gradient', or 'user'.\n");
         return FCLAW_EXIT_ERROR;            
     }
-    /* This is needed so that the refine */
-    fclaw2d_clawpatch_set_refinement_criteria(clawpatch_opt->refinement_criteria);   
 
     return FCLAW_NOEXIT;
 }
@@ -246,7 +238,7 @@ const fclaw_app_options_vtable_t fclaw2d_clawpatch_options_vtable = {
    --------------------------------------------------------- */
 
 fclaw2d_clawpatch_options_t *
-fclaw2d_clawpatch_options_register(fclaw_app_t* app, const char* configfile)
+fclaw2d_clawpatch_options_register(fclaw_app_t* app, const char* name, const char* configfile)
 {
     fclaw2d_clawpatch_options_t* clawpatch_options;
 
@@ -255,12 +247,13 @@ fclaw2d_clawpatch_options_register(fclaw_app_t* app, const char* configfile)
     /* allocate storage for fclaw_options */
     clawpatch_options = FCLAW_ALLOC(fclaw2d_clawpatch_options_t,1);
 
-    fclaw_app_options_register (app,"clawpatch",
+    fclaw_app_options_register (app,
+                                name,
                                 configfile,
                                 &fclaw2d_clawpatch_options_vtable,
                                 clawpatch_options);
 
-    fclaw_app_set_attribute(app,"clawpatch",clawpatch_options);
+    fclaw_app_set_attribute(app, name, clawpatch_options);
     return clawpatch_options;
 }
 
@@ -268,18 +261,15 @@ void
 fclaw2d_clawpatch_options_store (fclaw2d_global_t *glob, 
                                  fclaw2d_clawpatch_options_t* clawpatch_options)
 {
-    int id;
-
-    //FCLAW_ASSERT(s_clawpatch_options_package_id == -1);
-    id = fclaw_package_container_add_pkg(glob,
-                                         clawpatch_options);
-    s_clawpatch_options_package_id = id;
+	FCLAW_ASSERT(fclaw_pointer_map_get(glob->options,CLAWPATCH_OPTION_NAME) == NULL);
+	fclaw_pointer_map_insert(glob->options, CLAWPATCH_OPTION_NAME, clawpatch_options, NULL);
 }
 
 fclaw2d_clawpatch_options_t* 
 fclaw2d_clawpatch_get_options(fclaw2d_global_t* glob)
 {
-    FCLAW_ASSERT(s_clawpatch_options_package_id != -1);
-    return (fclaw2d_clawpatch_options_t*) 
-            fclaw_package_get_options(glob, s_clawpatch_options_package_id);
+    fclaw2d_clawpatch_options_t* clawptch_options = (fclaw2d_clawpatch_options_t*) 
+	   							fclaw_pointer_map_get(glob->options, CLAWPATCH_OPTION_NAME);
+	FCLAW_ASSERT(clawptch_options != NULL);
+	return clawptch_options;
 }

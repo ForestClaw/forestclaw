@@ -1,14 +1,23 @@
 name: CI for Automake
 on:
   push:
+    paths-ignore:
+      - "**/CMakeLists.txt"
+      - "**.cmake"
+      - "**.cmake.in"
+      - "cmake/**"
+      - "CMake*"
+      - ".github/workflows/ci_cmake.yml"
   pull_request:
   release:
     types: [published]
+
 env:
   CFLAGS: -lgfortran
   CXXFLAGS: -lgfortran --std=c++17
   FCFLAGS: -lgfortran -cpp
   FFLAGS: -lgfortran -cpp
+
 jobs:
   linux:
     runs-on: ubuntu-20.04
@@ -39,6 +48,9 @@ jobs:
         - name: "MPI Minimal"
           configure_flags: "--enable-mpi"
           ubuntu_packages: "libopenmpi-dev openmpi-bin"
+        - name: "MPI Debug With CXX"
+          configure_flags: "--enable-mpi --enable-debug CC=mpicxx"
+          ubuntu_packages: "libopenmpi-dev openmpi-bin"
         - name: "MPI With Clawpack"
           configure_flags: "--enable-clawpack --enable-mpi"
           ubuntu_packages: "libopenmpi-dev openmpi-bin"
@@ -61,15 +73,15 @@ jobs:
 
     name: Automake ${{ matrix.name }} Build on Linux
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       name: "Checkout Source code"
 
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       name: "Checkout ThunderEgg Source code"
       if: ${{ matrix.thunderegg }}
       with:
         repository: ThunderEgg/ThunderEgg
-        ref: develop
+        ref: v1.0.5
         path: ThunderEggSrc
 
     - name: Install dependencies
@@ -80,10 +92,8 @@ jobs:
     - name: Install Cuda Toolkit 11.3
       if: ${{ matrix.cuda_11_3 }}
       run: |
-        wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/cuda-ubuntu2004.pin
-        sudo mv cuda-ubuntu2004.pin /etc/apt/preferences.d/cuda-repository-pin-600
-        sudo apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/7fa2af80.pub
-        sudo add-apt-repository "deb https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/ /"
+        wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/cuda-keyring_1.0-1_all.deb
+        sudo dpkg -i cuda-keyring_1.0-1_all.deb
         sudo apt-get update
         sudo apt-get -y install cuda-toolkit-11-3
 
@@ -110,11 +120,15 @@ jobs:
       run: cat config.log
 
     - name: Build
-      run: make
+      run: |
+       export V=0
+       make -j -C sc
+       make -j -C p4est
+       make -j || make -j || make -j || make -j || make -j
 
     - name: Tests
       if: ${{ !matrix.cuda }}
-      run: make check
+      run: make -j check V=0
 
     - name: Print Test log
       if: ${{ failure() }}
@@ -124,4 +138,4 @@ jobs:
        cat test-suite.log
 
     - name: Install
-      run: sudo make install
+      run: sudo make -j install V=0

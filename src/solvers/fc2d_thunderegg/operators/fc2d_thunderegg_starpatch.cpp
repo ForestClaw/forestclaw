@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2019-2020 Carsten Burstedde, Donna Calhoun, Scott Aiton, Grady Wright
+Copyright (c) 2019-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton, Grady Wright
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -80,7 +80,7 @@ void fc2d_thunderegg_starpatch_solve(fclaw2d_global_t *glob)
     GhostFillingType fill_type = GhostFillingType::Faces;
   
 #if 0  
-    fc2d_thunderegg_vtable_t *mg_vt = fc2d_thunderegg_vt();
+    fc2d_thunderegg_vtable_t *mg_vt = fc2d_thunderegg_vt(glob);
 #endif  
 
     // create thunderegg vector for eqn 0
@@ -88,6 +88,7 @@ void fc2d_thunderegg_starpatch_solve(fclaw2d_global_t *glob)
 
     // get patch size
     array<int, 2> ns = {clawpatch_opt->mx, clawpatch_opt->my};
+    int mbc = clawpatch_opt->mbc;
 
     // get p4est structure
     fclaw2d_domain_t *domain = glob->domain;
@@ -109,7 +110,7 @@ void fc2d_thunderegg_starpatch_solve(fclaw2d_global_t *glob)
     }
 
     // generates levels of patches for GMG
-    P4estDomainGenerator domain_gen(wrap->p4est, ns, 1, bmf);
+    P4estDomainGenerator domain_gen(wrap->p4est, ns, mbc, bmf);
 
     // get finest level
     Domain<2> te_domain = domain_gen.getFinestDomain();
@@ -137,17 +138,30 @@ void fc2d_thunderegg_starpatch_solve(fclaw2d_global_t *glob)
     VarPoisson::StarPatchOperator op(beta_vec, te_domain, ghost_filler);
 
     // set the patch solver
-    Iterative::BiCGStab<2> p_bcgs;
-    p_bcgs.setTolerance(mg_opt->patch_bcgs_tol);
-    p_bcgs.setMaxIterations(mg_opt->patch_bcgs_max_it);
+    Iterative::BiCGStab<2> p_cg;
+    p_cg.setTolerance(mg_opt->patch_iter_tol);
+    p_cg.setMaxIterations(mg_opt->patch_iter_max_it);
+    Iterative::BiCGStab<2> p_bicg;
+    p_bicg.setTolerance(mg_opt->patch_iter_tol);
+    p_bicg.setMaxIterations(mg_opt->patch_iter_max_it);
 
     unique_ptr<PatchSolver<2>>  solver;
-    if(strcmp(mg_opt->patch_solver_type , "BCGS") == 0){
-        solver.reset(new Iterative::PatchSolver<2>(p_bcgs, op));
-    }else if(strcmp(mg_opt->patch_solver_type , "FFT") == 0){
+    switch(mg_opt->patch_solver){
+        case CG:
+            solver.reset(new Iterative::PatchSolver<2>(p_cg, op));
+            break;
+        case BICG:
+            solver.reset(new Iterative::PatchSolver<2>(p_bicg, op));
+            break;
 #ifdef THUNDEREGG_FFTW_ENABLED
-        solver.reset(new Poisson::FFTWPatchSolver<2>(op, neumann_bitset));
+        case FFT:
+            solver.reset(new Poisson::FFTWPatchSolver<2>(op, neumann_bitset));
+            break;
 #endif
+        default:
+            fclaw_global_essentialf("thunderegg_starpatch : No valid " \
+                                    "patch solver specified\n");
+            exit(0);            
     }
 
     // create gmg preconditioner
@@ -194,12 +208,22 @@ void fc2d_thunderegg_starpatch_solve(fclaw2d_global_t *glob)
 
             //smoother
             unique_ptr<GMG::Smoother<2>> smoother;
-            if(strcmp(mg_opt->patch_solver_type , "BCGS") == 0){
-                smoother.reset(new Iterative::PatchSolver<2>(p_bcgs, patch_operator));
-            }else if(strcmp(mg_opt->patch_solver_type , "FFT") == 0){
+            switch(mg_opt->patch_solver){
+                case CG:
+                    smoother.reset(new Iterative::PatchSolver<2>(p_cg, patch_operator));
+                    break;
+                case BICG:
+                    smoother.reset(new Iterative::PatchSolver<2>(p_bicg, patch_operator));
+                    break;
 #ifdef THUNDEREGG_FFTW_ENABLED
-                smoother.reset(new Poisson::FFTWPatchSolver<2>(patch_operator, neumann_bitset));
+                case FFT:
+                    smoother.reset(new Poisson::FFTWPatchSolver<2>(patch_operator, neumann_bitset));
+                    break;
 #endif
+                default:
+                    fclaw_global_essentialf("thunderegg_starpatch : No valid " \
+                                            "patch solver specified\n");
+                    exit(0);            
             }
 
             //restrictor
@@ -225,13 +249,25 @@ void fc2d_thunderegg_starpatch_solve(fclaw2d_global_t *glob)
 
         //smoother
         unique_ptr<GMG::Smoother<2>> smoother;
-        if(strcmp(mg_opt->patch_solver_type , "BCGS") == 0){
-            smoother.reset(new Iterative::PatchSolver<2>(p_bcgs, patch_operator));
-        }else if(strcmp(mg_opt->patch_solver_type , "FFT") == 0){
+        switch(mg_opt->patch_solver){
+            case CG:
+                smoother.reset(new Iterative::PatchSolver<2>(p_cg, patch_operator));
+                break;
+            case BICG:
+                smoother.reset(new Iterative::PatchSolver<2>(p_bicg, patch_operator));
+                break;
 #ifdef THUNDEREGG_FFTW_ENABLED
-            smoother.reset(new Poisson::FFTWPatchSolver<2>(patch_operator, neumann_bitset));
+            case FFT:
+                smoother.reset(new Poisson::FFTWPatchSolver<2>(patch_operator, neumann_bitset));
+                break;
 #endif
+            default:
+                fclaw_global_essentialf("thunderegg_starpatch : No valid " \
+                                        "patch solver specified\n");
+                exit(0);            
         }
+
+
 
         //interpolator
         GMG::DirectInterpolator<2> interpolator(curr_domain, 
@@ -250,7 +286,7 @@ void fc2d_thunderegg_starpatch_solve(fclaw2d_global_t *glob)
     Iterative::BiCGStab<2> iter_solver;
     iter_solver.setMaxIterations(mg_opt->max_it);
     iter_solver.setTolerance(mg_opt->tol);
-    bool vl = mg_opt->verbosity_level != 0;
+    bool vl = mg_opt->verbosity_level > 0 && glob->mpirank == 0;
     int its = iter_solver.solve(op, u, f, M.get(), vl);
 
     fclaw_global_productionf("Iterations: %i\n", its);

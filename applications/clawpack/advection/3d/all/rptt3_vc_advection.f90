@@ -74,11 +74,16 @@ subroutine clawpack46_rptt3(ixyz,icoor,imp,impt,maxm,meqn,mwaves,&
     dimension     aux2(maux,1-mbc:maxm+mbc,3)
     dimension     aux3(maux,1-mbc:maxm+mbc,3)
 
-    integer :: i, i1, iuvw
+    integer manifold
+    common /com_manifold/ manifold
+
+    integer :: i, i1, iuvw, mcapa
 
     ! set iuvw = 1 for u, 2 for v, 3 for w component of velocity
     ! depending on transverse direction:
+    mcapa = manifold
     iuvw = ixyz + icoor - 1
+    
     if (iuvw.gt.3) iuvw = iuvw-3
 
     do i=2-mbc,mx+mbc
@@ -86,22 +91,22 @@ subroutine clawpack46_rptt3(ixyz,icoor,imp,impt,maxm,meqn,mwaves,&
         if (icoor == 2) then
             !! double-transverse dir. is the y-like direction
             if (impt == 1) then
-                cmbsasdq(1,i) = dmin1(aux2(iuvw,i1,1),0.d0)*bsasdq(1,i)
-                cpbsasdq(1,i) = dmax1(aux3(iuvw,i1,1),0.d0)*bsasdq(1,i)
+                cmbsasdq(1,i) = dmin1(aux2(iuvw + mcapa,i1,1),0.d0)*bsasdq(1,i)
+                cpbsasdq(1,i) = dmax1(aux3(iuvw + mcapa,i1,1),0.d0)*bsasdq(1,i)
             elseif (impt == 2) then
-                cmbsasdq(1,i) = dmin1(aux2(iuvw,i1,3),0.d0)*bsasdq(1,i)
-                cpbsasdq(1,i) = dmax1(aux3(iuvw,i1,3),0.d0)*bsasdq(1,i)
+                cmbsasdq(1,i) = dmin1(aux2(iuvw + mcapa,i1,3),0.d0)*bsasdq(1,i)
+                cpbsasdq(1,i) = dmax1(aux3(iuvw + mcapa,i1,3),0.d0)*bsasdq(1,i)
             endif
         else
             !! double-transverse dir. is the z-like direction
             if (impt == 1) then
                 !! bmasdq is split into cmbmasdq and cpbmasdq
-                cmbsasdq(1,i) = dmin1(aux1(iuvw,i1,2),0.d0)*bsasdq(1,i)
-                cpbsasdq(1,i) = dmax1(aux1(iuvw,i1,3),0.d0)*bsasdq(1,i)
+                cmbsasdq(1,i) = dmin1(aux1(iuvw + mcapa,i1,2),0.d0)*bsasdq(1,i)
+                cpbsasdq(1,i) = dmax1(aux1(iuvw + mcapa,i1,3),0.d0)*bsasdq(1,i)
             elseif (impt == 2) then
                 !! bpasdq is split into cmbpasdq and cpbpasdq
-                cmbsasdq(1,i) = dmin1(aux3(iuvw,i1,2),0.d0)*bsasdq(1,i)
-                cpbsasdq(1,i) = dmax1(aux3(iuvw,i1,3),0.d0)*bsasdq(1,i)
+                cmbsasdq(1,i) = dmin1(aux3(iuvw + mcapa,i1,2),0.d0)*bsasdq(1,i)
+                cpbsasdq(1,i) = dmax1(aux3(iuvw + mcapa,i1,3),0.d0)*bsasdq(1,i)
             endif
         endif
     end do
