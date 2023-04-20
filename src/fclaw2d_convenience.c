@@ -1312,8 +1312,6 @@ typedef struct overlap_point
 }
 overlap_point_t;
 
-#ifndef P4_TO_P8
-
 typedef struct overlap_producer_comm
 {
     fclaw2d_domain_t *domain;
@@ -1994,5 +1992,3 @@ fclaw2d_overlap_exchange (fclaw2d_domain_t * domain,
     producer_free_communication_data (p);
     sc_array_destroy (iquery_points);
 }
-
-#endif /* !P4_TO_P8 */
