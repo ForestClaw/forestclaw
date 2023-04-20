@@ -2170,6 +2170,38 @@ fclaw2d_domain_serialization_leave (fclaw2d_domain_t * domain)
     }
 }
 
+int
+fclaw2d_domain_is_meta (fclaw2d_domain_t * domain)
+{
+    FCLAW_ASSERT (domain != NULL);
+    if (domain->local_num_patches == -1)
+    {
+        return 1;
+    }
+    else
+    {
+        return 0;
+    }
+}
+
+void
+fclaw2d_domain_init_meta (fclaw2d_domain_t * domain, sc_MPI_Comm mpicomm,
+                          int mpisize, int mpirank, void *pp,
+                          sc_keyvalue_t *attributes)
+{
+    FCLAW_ASSERT(domain != NULL);
+    memset (domain, 0, sizeof (fclaw2d_domain_t));      /* initialize to zero */
+    domain->local_num_patches = -1;     /* mark as artifical patch */
+    domain->mpicomm = mpicomm;
+    domain->mpisize = mpisize;
+    domain->mpirank = mpirank;
+
+    /* give access to basic tree structure and connectivity information */
+    domain->pp = pp;
+    domain->pp_owned = 0;
+    domain->attributes = attributes;
+}
+
 #if 0
 
 /* This is how it used to work.  Never needed it */
