@@ -171,10 +171,6 @@ void fclaw2d_domain_list_adapted (fclaw2d_domain_t * old_domain,
  * However, if a point is on a block boundary, it must be decided before
  * calling this function which tree shall be queried for it.
  *
- * \note Currently we do not find the smallest matching process, but instead
- *       instead a point on a parallel boundary may be found on multiple processes.
- *       This should be fixed in the near future.
- *
  * \param [in] domain           Must be valid domain structure.  Will not be changed.
  * \param [in] block_offsets    Monotonous array of (num_blocks + 1) int variables.
  *                              The points to search in block t in [0, num_blocks)
