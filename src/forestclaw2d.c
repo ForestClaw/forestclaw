@@ -2203,7 +2203,7 @@ fclaw2d_domain_init_meta (fclaw2d_domain_t * domain, int mpirank)
     domain->just_partitioned = 0;
     domain->pp_owned = 0;
 
-    domain->local_num_patches = -1; /* mark as artifical patch */
+    domain->local_num_patches = -1; /* mark as meta domain */
 
     domain->mpirank = mpirank; /* set mpirank to provide context information */
 }
