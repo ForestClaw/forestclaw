@@ -181,8 +181,9 @@ void fclaw2d_domain_list_adapted (fclaw2d_domain_t * old_domain,
  *                              there are \b block_offsets[num_blocks] many.
  *                              Currently we do not enforce the x and y ranges
  *                              and simply do not find any point outside its block.
- * \param [in,out] results      On input, an array of type int and
- *                              \b block_offsets[num_blocks] many (ignored) entries.
+ * \param [in,out] results      On input, an array of type int and an element
+ *                              count of \b block_offsets[num_blocks].
+ *                              The data in \b results is ignored on input.
  *                              On output, an entry will be -1 if the point has
  *                              not been found on this process, or the patch
  *                              number within its block otherwise.

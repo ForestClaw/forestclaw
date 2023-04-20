@@ -158,10 +158,12 @@ void fclaw3d_domain_list_adapted (fclaw3d_domain_t * old_domain,
  * \param [in] coordinates      An array of elem_size == 3 * sizeof (double) with
  *                              entries (x, y, z) in [0, 1]^3.  Of these entries,
  *                              there are \b block_offsets[num_blocks] many.
- * \param [in,out] results      On input, an array of type int and
- *                              \b block_offsets[num_blocks] many entries.
- *                              On output, each entry will be -1 if the point has
- *                              not been found, or the patch number within its block.
+ * \param [in,out] results      On input, an array of type int and an element
+ *                              count of \b block_offsets[num_blocks].
+ *                              The data in \b results is ignored on input.
+ *                              On output, an entry will be -1 if the point has
+ *                              not been found on this process, or the patch
+ *                              number within its block otherwise.
  */
 void fclaw3d_domain_search_points (fclaw3d_domain_t * domain,
                                    sc_array_t * block_offsets,
