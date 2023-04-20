@@ -143,7 +143,6 @@ void fclaw3d_domain_list_adapted (fclaw3d_domain_t * old_domain,
 /** Search triples of (block number, x, y, z coordinates) in the mesh.
  * The x, y, z coordinates must be in [0, 1]^3.
  * The input data must be equal on every process: This is a collective call.
- * The results will also be equal on every process.
  *
  * A point is found at most once even if it is on a patch boundary.
  * We return the smallest patch number on the smallest processor touching it.
