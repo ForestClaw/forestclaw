@@ -263,25 +263,14 @@ void fclaw2d_domain_integrate_rays (fclaw2d_domain_t * domain,
                                     sc_array_t * integrals,
                                     void * user);
 
-/** Return true if \b domain is an artifical domain.
- *
- * This function can be used in \ref fclaw2d_interpolate_point_t callbacks to
- * distinguish domains that were created during a consumer-side partition search
- * (and only contain some meta information) from real domains in a producer-side
- * local search.
- *
- * TODO: This function may rather be in forestclaw2d.h and fully legalized
- *       and we may add support functions there (fclaw2d_domain_init_meta).
- */
-int fclaw2d_domain_is_meta (fclaw2d_domain_t * domain);
-
 /** Callback function to compute the interpolation data for a point and a patch.
  *
  * This function can be passed to \ref fclaw2d_overlap_exchange to eventually
  * compute the interpolation data over the whole producer domain for an
  * array of points.
  * It will be called both in a partition search and a local search of the
- * producer domain. Use \ref domain_is_meta, to determine which is the case.
+ * producer domain. Use \ref fclaw2d_domain_is_meta, to determine which is the
+ * case.
  *
  * \param [in] domain           The domain we interpolate on.
  *                              On the producer side, this is a valid forestclaw

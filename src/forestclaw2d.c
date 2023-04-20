@@ -2170,6 +2170,44 @@ fclaw2d_domain_serialization_leave (fclaw2d_domain_t * domain)
     }
 }
 
+int
+fclaw2d_domain_is_meta (fclaw2d_domain_t * domain)
+{
+    FCLAW_ASSERT (domain != NULL);
+    if (domain->local_num_patches == -1)
+    {
+        return 1;
+    }
+    else
+    {
+        return 0;
+    }
+}
+
+void
+fclaw2d_domain_init_meta (fclaw2d_domain_t * domain, int mpirank)
+{
+    FCLAW_ASSERT(domain != NULL);
+
+    /* initialize to -1 and set pointers to NULL */
+    memset (domain, -1, sizeof (fclaw2d_domain_t));
+    domain->mpicomm = sc_MPI_COMM_NULL;
+    domain->blocks = NULL;
+    domain->exchange_patches = NULL;
+    domain->ghost_patches = NULL;
+    domain->mirror_target_levels = NULL;
+    domain->ghost_target_levels = NULL;
+    domain->pp = NULL;
+    domain->attributes = NULL;
+    domain->just_adapted = 0;
+    domain->just_partitioned = 0;
+    domain->pp_owned = 0;
+
+    domain->local_num_patches = -1; /* mark as meta domain */
+
+    domain->mpirank = mpirank; /* set mpirank to provide context information */
+}
+
 #if 0
 
 /* This is how it used to work.  Never needed it */

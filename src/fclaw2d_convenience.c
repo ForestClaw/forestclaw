@@ -1312,8 +1312,6 @@ typedef struct overlap_point
 }
 overlap_point_t;
 
-#ifndef P4_TO_P8
-
 typedef struct overlap_producer_comm
 {
     fclaw2d_domain_t *domain;
@@ -1395,20 +1393,6 @@ overlap_consumer_add (overlap_consumer_comm_t * c, void *point, int rank)
     memcpy (sc_array_push (&qi->oqs), &op->id, qi->oqs.elem_size);
 }
 
-int
-fclaw2d_domain_is_meta (fclaw2d_domain_t * domain)
-{
-    FCLAW_ASSERT (domain != NULL);
-    if (domain->local_num_patches == -1)
-    {
-        return 1;
-    }
-    else
-    {
-        return 0;
-    }
-}
-
 static int
 interpolate_partition_fn (p4est_t * p4est, p4est_topidx_t which_tree,
                           p4est_quadrant_t * quadrant, int pfirst, int plast,
@@ -1437,16 +1421,9 @@ interpolate_partition_fn (p4est_t * p4est, p4est_topidx_t which_tree,
 
     /* create artifical domain, that only contains mpi and tree structure data */
     domain = FCLAW_ALLOC (fclaw2d_domain_t, 1);
-    memset (domain, 0, sizeof (fclaw2d_domain_t));      /* initialize to zero */
-    domain->local_num_patches = -1;     /* mark as artifical patch */
-    domain->mpicomm = p4est->mpicomm;
-    domain->mpisize = p4est->mpisize;
-    domain->mpirank = (pfirst == plast) ? pfirst : -1;
-
-    /* give access to basic tree structure and connectivity information */
-    domain->pp = c->domain->pp;
-    domain->pp_owned = 0;
-    domain->attributes = c->domain->attributes;
+    /* Todo: works only for congruent communicators. Do we really need all this
+     * information? */
+    fclaw2d_domain_init_meta (domain, (pfirst == plast) ? pfirst : -1);
 
     /* create artifical patch and fill it based on the quadrant */
     patch = &fclaw2d_patch;
@@ -2013,5 +1990,3 @@ fclaw2d_overlap_exchange (fclaw2d_domain_t * domain,
     producer_free_communication_data (p);
     sc_array_destroy (iquery_points);
 }
-
-#endif /* !P4_TO_P8 */
