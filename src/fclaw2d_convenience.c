@@ -1004,7 +1004,7 @@ search_point_fn (p4est_t * p4est, p4est_topidx_t which_tree,
         /* this is not a leaf */
         return 1;
     }
-    /* new we know that we have found the point in a leaf */
+    /* now we know that we have found the point in a leaf */
 
     FCLAW_ASSERT (0 <= jb && jb < sd->domain->num_blocks);
     block = sd->domain->blocks + jb;
