@@ -370,7 +370,7 @@ fclaw2d_domain_new_disk (sc_MPI_Comm mpicomm,
                               initial_level), NULL);
 }
 
-#endif /* 0 */
+#endif /* P4_TO_P8 */
 
 fclaw2d_domain_t *
 fclaw2d_domain_new_brick (sc_MPI_Comm mpicomm,
@@ -1281,7 +1281,7 @@ fclaw2d_domain_integrate_rays (fclaw2d_domain_t * domain,
     sc_array_reset (lints);
 }
 
-#ifndef P4_TO_P8
+/******* code for overlap exchange algorithm *******/
 
 typedef enum comm_tag
 {
@@ -1309,7 +1309,10 @@ typedef struct overlap_point
     void *point;
     int rank;
     size_t id;
-} overlap_point_t;
+}
+overlap_point_t;
+
+#ifndef P4_TO_P8
 
 typedef struct overlap_producer_comm
 {
@@ -1324,7 +1327,8 @@ typedef struct overlap_producer_comm
     sc_array_t *recv_buffer;
     sc_array_t *recv_reqs;
     sc_array_t *send_reqs;
-} overlap_producer_comm_t;
+}
+overlap_producer_comm_t;
 
 typedef struct overlap_consumer_comm
 {
@@ -1341,7 +1345,8 @@ typedef struct overlap_consumer_comm
     sc_array_t *send_reqs;
     sc_array_t *recv_buffer;
     sc_array_t *recv_reqs;
-} overlap_consumer_comm_t;
+}
+overlap_consumer_comm_t;
 
 typedef struct overlap_global_comm
 {
@@ -1391,7 +1396,7 @@ overlap_consumer_add (overlap_consumer_comm_t * c, void *point, int rank)
 }
 
 int
-domain_is_meta (fclaw2d_domain_t * domain)
+fclaw2d_domain_is_meta (fclaw2d_domain_t * domain)
 {
     FCLAW_ASSERT (domain != NULL);
     if (domain->local_num_patches == -1)

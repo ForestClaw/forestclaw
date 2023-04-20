@@ -272,8 +272,11 @@ void fclaw2d_domain_integrate_rays (fclaw2d_domain_t * domain,
  * distinguish domains that were created during a consumer-side partition search
  * (and only contain some meta information) from real domains in a producer-side
  * local search.
+ *
+ * TODO: This function may rather be in forestclaw2d.h and fully legalized
+ *       and we may add support functions there (fclaw2d_domain_init_meta).
  */
-int domain_is_meta (fclaw2d_domain_t * domain);
+int fclaw2d_domain_is_meta (fclaw2d_domain_t * domain);
 
 /** Callback function to compute the interpolation data for a point and a patch.
  *
