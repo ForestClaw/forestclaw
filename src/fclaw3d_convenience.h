@@ -151,7 +151,7 @@ void fclaw3d_domain_list_adapted (fclaw3d_domain_t * old_domain,
  * calling this function which tree shall be queried for it.
  *
  * \param [in] domain           Must be valid domain structure.  Will not be changed.
- * \param [in] block_offsets    Array of (num_blocks + 1) int variables.
+ * \param [in] block_offsets    Monotonous array of (num_blocks + 1) int variables.
  *                              The points to search in block t in [0, num_blocks)
  *                              have indices [block_offsets[t], block_offsets[t + 1])
  *                              in the \b coordinates and results arrays.
