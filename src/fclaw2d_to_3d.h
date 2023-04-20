@@ -126,6 +126,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define fclaw2d_domain_free_after_exchange  fclaw3d_domain_free_after_exchange
 #define fclaw2d_domain_serialization_enter  fclaw3d_domain_serialization_enter
 #define fclaw2d_domain_serialization_leave  fclaw3d_domain_serialization_leave
+#define fclaw2d_domain_is_meta          fclaw3d_domain_is_meta
+#define fclaw2d_domain_init_meta        fclaw3d_domain_init_meta
 #define fclaw2d_domain_destroy          fclaw3d_domain_destroy
 #define fclaw2d_domain_adapt            fclaw3d_domain_adapt
 #define fclaw2d_domain_partition        fclaw3d_domain_partition
