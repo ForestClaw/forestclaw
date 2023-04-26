@@ -1,7 +1,7 @@
 # This is an equivalent of build-aux/git-version-gen used in auto tools.
 
 # This CMake script emulates git describe for repositories with a .tarball-version or .repository-version file.
-# If the .tarball-version file exists, it reads the version from that file (removing the leading character) and sets the build_number variable accordingly.
+# If the .tarball-version file exists, it reads the version from that file (removing the leading character) and sets the VERSION variable accordingly.
 # If the .tarball-version file does not exist, it generates a build number based on the version number and commit hash.
 # If the current commit is tagged with the version number, the build number will be the version number.
 # Otherwise, the build number will be the version number appended with the short commit hash.
@@ -21,8 +21,14 @@ else()
   # Get the current commit hash (short version) and check if the current commit is tagged with the version number
   find_package(Git)
   if(GIT_FOUND)
-    execute_process(COMMAND ${GIT_EXECUTABLE} rev-parse --short HEAD OUTPUT_VARIABLE current_commit OUTPUT_STRIP_TRAILING_WHITESPACE)
-    execute_process(COMMAND ${GIT_EXECUTABLE} rev-list --abbrev-commit -n 1 "refs/tags/${FORESTCLAW_FULL_VERSION}" OUTPUT_VARIABLE tagged_commit OUTPUT_STRIP_TRAILING_WHITESPACE)
+    execute_process(COMMAND ${GIT_EXECUTABLE} rev-parse --short HEAD 
+                    OUTPUT_VARIABLE current_commit 
+                    ERROR_QUIET
+                    OUTPUT_STRIP_TRAILING_WHITESPACE)
+    execute_process(COMMAND ${GIT_EXECUTABLE} rev-list --abbrev-commit -n 1 "refs/tags/${FORESTCLAW_FULL_VERSION}" 
+                    OUTPUT_VARIABLE tagged_commit 
+                    ERROR_QUIET
+                    OUTPUT_STRIP_TRAILING_WHITESPACE)
 
     if(NOT "${tagged_commit}" STREQUAL "${current_commit}")
       # If the current commit is not tagged, append the short commit hash to the version number
@@ -30,7 +36,9 @@ else()
     endif()
 
     # Check if the repository is dirty
-    execute_process(COMMAND ${GIT_EXECUTABLE} status --porcelain -uno -z OUTPUT_VARIABLE git_status)
+    execute_process(COMMAND ${GIT_EXECUTABLE} status --porcelain -uno -z 
+                    OUTPUT_VARIABLE git_status
+                    ERROR_QUIET)
 
     if(NOT "${git_status}" STREQUAL "")
         # If the repository is dirty, append -dirty to the build_number variable
