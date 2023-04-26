@@ -59,8 +59,9 @@ jobs:
 
       - name: Create zip and tarball
         run: |
-          zip -r forestclaw-${{ steps.release_draft.outputs.tag_name }}.zip forestclaw-${{ steps.release_draft.outputs.tag_name }} -y -x '*.git*' '.gitignore'
           tar -czvf forestclaw-${{ steps.release_draft.outputs.tag_name }}.tar.gz --exclude='.git*' --exclude='.gitignore' forestclaw-${{ steps.release_draft.outputs.tag_name }}
+          find forestclaw-${{ steps.release_draft.outputs.tag_name }} -type f -exec touch -d "1 day ago" {} \;
+          zip -r forestclaw-${{ steps.release_draft.outputs.tag_name }}.zip forestclaw-${{ steps.release_draft.outputs.tag_name }} -y -x '*.git*' '.gitignore'
 
       - name: Delete previous assets
         env:
