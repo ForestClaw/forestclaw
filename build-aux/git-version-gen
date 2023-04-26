@@ -20,7 +20,7 @@ else
   version=$(cat .repository-version)
 
   # Check if the current commit is tagged with this version number
-  tagged_commit=$(git rev-list -n 1 "refs/tags/$version" 2>/dev/null)
+  tagged_commit=$(git rev-list --abbrev-commit -n 1 "refs/tags/$version" 2>/dev/null)
 
   # Get the current commit hash (short version)
   current_commit=$(git rev-parse --short HEAD)
@@ -34,7 +34,7 @@ else
   fi
 
   # Check if the repository is dirty
-  if [ -n "$(git status --porcelain)" ]; then
+  if [ -n "$(git status --porcelain -uno -z)" ]; then
     # If the repository is dirty, append -dirty to the output version string
     version="${version}-dirty"
   fi
@@ -44,5 +44,5 @@ fi
 # remove the first character from the variable
 version=$(expr "$version" : '.\(.*\)')
 
-printf %s "$v"
+printf %s "$version"
 

@@ -22,7 +22,7 @@ else()
   find_package(Git)
   if(GIT_FOUND)
     execute_process(COMMAND ${GIT_EXECUTABLE} rev-parse --short HEAD OUTPUT_VARIABLE current_commit OUTPUT_STRIP_TRAILING_WHITESPACE)
-    execute_process(COMMAND ${GIT_EXECUTABLE} rev-list -n 1 "refs/tags/${FORESTCLAW_FULL_VERSION}" OUTPUT_VARIABLE tagged_commit OUTPUT_STRIP_TRAILING_WHITESPACE)
+    execute_process(COMMAND ${GIT_EXECUTABLE} rev-list --abbrev-commit -n 1 "refs/tags/${FORESTCLAW_FULL_VERSION}" OUTPUT_VARIABLE tagged_commit OUTPUT_STRIP_TRAILING_WHITESPACE)
 
     if(NOT "${tagged_commit}" STREQUAL "${current_commit}")
       # If the current commit is not tagged, append the short commit hash to the version number
@@ -30,7 +30,7 @@ else()
     endif()
 
     # Check if the repository is dirty
-    execute_process(COMMAND ${GIT_EXECUTABLE} status --porcelain OUTPUT_VARIABLE git_status)
+    execute_process(COMMAND ${GIT_EXECUTABLE} status --porcelain -uno -z OUTPUT_VARIABLE git_status)
 
     if(NOT "${git_status}" STREQUAL "")
         # If the repository is dirty, append -dirty to the build_number variable
