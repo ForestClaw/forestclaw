@@ -57,8 +57,9 @@ jobs:
           ./bootstrap
           rm ./bootstrap
 
-      - name: Create tarball
+      - name: Create zip and tarball
         run: |
+          zip -r forestclaw-${{ steps.release_draft.outputs.tag_name }}.zip forestclaw-${{ steps.release_draft.outputs.tag_name }} -x '*.git*' '.gitignore'
           tar -czvf forestclaw-${{ steps.release_draft.outputs.tag_name }}.tar.gz --exclude='.git*' --exclude='.gitignore' forestclaw-${{ steps.release_draft.outputs.tag_name }}
 
       - name: Delete previous assets
@@ -70,8 +71,9 @@ jobs:
               | tr '\n' '\0' \
               |  xargs -t0 -I{} gh release delete-asset ${{ steps.release_draft.outputs.tag_name }} "{}" -y
 
-      - name: Attach tarball to release
+      - name: Attach zip and tarball to release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          gh release upload ${{ steps.release_draft.outputs.tag_name }} forestclaw-${{ steps.release_draft.outputs.tag_name }}.zip -R ${{ github.repository }} --clobber
           gh release upload ${{ steps.release_draft.outputs.tag_name }} forestclaw-${{ steps.release_draft.outputs.tag_name }}.tar.gz -R ${{ github.repository }} --clobber
