@@ -32,4 +32,4 @@ template: |
 
   $CHANGES
 
-  Please use the  forestclaw-v$RESOLVED_VERSION.tar.gz or forestclaw-v$RESOLVED_VERSION.zip files for this release. The other zip and tarball files will not work.
+  Please use the  `forestclaw-v$RESOLVED_VERSION.tar.gz` or `forestclaw-v$RESOLVED_VERSION.zip` files for this release. The other zip and tarball files will not work.
