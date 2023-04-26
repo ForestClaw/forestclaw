@@ -44,5 +44,5 @@ fi
 # remove the first character from the variable
 version=$(expr "$version" : '.\(.*\)')
 
-echo "$version"
+printf %s "$v"
 
