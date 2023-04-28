@@ -2047,11 +2047,11 @@ fclaw2d_domain_indirect_end (fclaw2d_domain_t * domain,
 }
 
 fclaw2d_patch_relation_t
-fclaw2d_domain_indirect_neighbors (fclaw2d_domain_t * domain,
-                                   fclaw2d_domain_indirect_t * ind,
-                                   int ghostno, int faceno, int rproc[2],
-                                   int *rblockno, int rpatchno[2],
-                                   int *rfaceno)
+fclaw2d_domain_indirect_face_neighbors (fclaw2d_domain_t * domain,
+                                        fclaw2d_domain_indirect_t * ind,
+                                        int ghostno, int faceno, int rproc[2],
+                                        int *rblockno, int rpatchno[2],
+                                        int *rfaceno)
 {
     int *pi;
     int *grproc, *grblockno, *grpatchno, *grfaceno;
@@ -2124,6 +2124,16 @@ fclaw2d_domain_indirect_neighbors (fclaw2d_domain_t * domain,
 
     /* and return */
     return prel;
+}
+
+fclaw2d_patch_relation_t
+fclaw2d_domain_indirect_corner_neighbor (fclaw2d_domain_t * domain,
+                                         fclaw2d_domain_indirect_t * ind,
+                                         int ghostno, int faceno, int *rproc,
+                                         int *rblockno, int *rpatchno,
+                                         int *rfaceno)
+{
+    return FCLAW2D_PATCH_BOUNDARY;
 }
 
 void

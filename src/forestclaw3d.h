@@ -929,7 +929,9 @@ fclaw3d_domain_indirect_t
 /** End sending messages to determine neighbors of ghost patches.
  * This call must not be interleaved with any ghost_exchange calls.
  * When this function returns, the necessary information is complete
- * and \ref fclaw3d_domain_indirect_neighbors may be called any number of times.
+ * and \ref fclaw3d_domain_indirect_face neighbors
+ * and \ref fclaw3d_domain_indirect_corner_neighbor
+ * may be called any number of times.
  * \param [in] domain           Must be the same domain used in the begin call.
  * \param [in,out] ind          Must be returned by an earlier call to
  *                              \ref fclaw3d_domain_indirect_begin
@@ -962,11 +964,13 @@ void fclaw3d_domain_indirect_end (fclaw3d_domain_t * domain,
  *                              \ref FCLAW3D_PATCH_BOUNDARY.
  */
 fclaw3d_patch_relation_t
-fclaw3d_domain_indirect_neighbors (fclaw3d_domain_t * domain,
-                                   fclaw3d_domain_indirect_t * ind,
-                                   int ghostno, int faceno, int rproc[2],
-                                   int *rblockno, int rpatchno[2],
-                                   int *rfaceno);
+fclaw3d_domain_indirect_face_neighbors (fclaw3d_domain_t * domain,
+                                        fclaw3d_domain_indirect_t * ind,
+                                        int ghostno, int faceno, int rproc[4],
+                                        int *rblockno, int rpatchno[4],
+                                        int *rfaceno);
+
+/* To do: add indirect_corner_neighbor for 3D. */
 
 /** Destroy all context data for indirect ghost neighbor patches.
  * \param [in] domain           Must be the same domain used in begin and end.
