@@ -30,10 +30,15 @@ c--------------------------------------------------------------------
       integer i,j,ibc,jbc,mq, idir
       integer i1,j1, i2, j2
 
+      integer a(2,2), f(2)
+
       idir = iface/2
 
 c     # High side of 'qthis' exchanges with low side of
 c     # 'qneighbor'
+      call fclaw2d_clawpatch_build_transform_same(transform_ptr, 
+     &                                             a, f)
+
       do mq = 1,meqn
          if (idir .eq. 0) then
             do j = 1,my
@@ -47,8 +52,8 @@ c                 # x-direction (idir == 0)
                      i1 = mx+ibc
                      j1 = j
                   endif
-                  call fclaw2d_clawpatch_transform_face(i1,j1,i2,j2,
-     &                  transform_ptr)
+                  i2 = a(1,1)*i1 + a(1,2)*j1 + f(1)
+                  j2 = a(2,1)*i1 + a(2,2)*j1 + f(2)
                   qthis(i1,j1,mq) = qneighbor(i2,j2,mq)
                enddo
             enddo
@@ -64,8 +69,8 @@ c                 # y-direction (idir == 1)
                      i1 = i
                      j1 = my+jbc
                   endif
-                  call fclaw2d_clawpatch_transform_face(i1,j1,i2,j2,
-     &                  transform_ptr)
+                  i2 = a(1,1)*i1 + a(1,2)*j1 + f(1)
+                  j2 = a(2,1)*i1 + a(2,2)*j1 + f(2)
                   qthis(i1,j1,mq) = qneighbor(i2,j2,mq)
                enddo
             enddo
