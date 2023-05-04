@@ -39,43 +39,51 @@ c     # 'qneighbor'
       call fclaw2d_clawpatch_build_transform_same(transform_ptr, 
      &                                             a, f)
 
-      do mq = 1,meqn
-         if (idir .eq. 0) then
-            do j = 1,my
-               do ibc = 1,mbc
-c                 # Exchange at low side of 'this' grid in
-c                 # x-direction (idir == 0)
-                  if (iface .eq. 0) then
-                     i1 = 1-ibc
-                     j1 = j
-                  elseif (iface .eq. 1) then
-                     i1 = mx+ibc
-                     j1 = j
-                  endif
+      if (iface .eq. 0) then
+         do mq = 1,meqn
+            do j1 = 1,my
+               do i1 = 1-mbc,0
+c                 # Lower side
                   i2 = a(1,1)*i1 + a(1,2)*j1 + f(1)
                   j2 = a(2,1)*i1 + a(2,2)*j1 + f(2)
                   qthis(i1,j1,mq) = qneighbor(i2,j2,mq)
                enddo
             enddo
-         else
-            do jbc = 1,mbc
-               do i = 1,mx
-c                 # Exchange at high side of 'this' grid in
-c                 # y-direction (idir == 1)
-                  if (iface .eq. 2) then
-                     i1 = i
-                     j1 = 1-jbc
-                  elseif (iface .eq. 3) then
-                     i1 = i
-                     j1 = my+jbc
-                  endif
+         enddo
+      else if (iface .eq. 1) then
+         do mq = 1,meqn
+            do j1 = 1,my
+               do i1 = mx+1,mx+mbc
+c                 # Upper side
                   i2 = a(1,1)*i1 + a(1,2)*j1 + f(1)
                   j2 = a(2,1)*i1 + a(2,2)*j1 + f(2)
                   qthis(i1,j1,mq) = qneighbor(i2,j2,mq)
                enddo
             enddo
-         endif
-      enddo
+         enddo
+      else if (iface .eq. 2) then
+         do mq = 1,meqn
+            do j1 = 1-mbc,0
+               do i1 = 1,mx
+c                 # left side
+                  i2 = a(1,1)*i1 + a(1,2)*j1 + f(1)
+                  j2 = a(2,1)*i1 + a(2,2)*j1 + f(2)
+                  qthis(i1,j1,mq) = qneighbor(i2,j2,mq)
+               enddo
+            enddo
+         enddo
+      else if (iface .eq. 3) then
+         do mq = 1,meqn
+            do j1 = my+1,my+mbc
+               do i1 = 1,mx
+c                 # right side
+                  i2 = a(1,1)*i1 + a(1,2)*j1 + f(1)
+                  j2 = a(2,1)*i1 + a(2,2)*j1 + f(2)
+                  qthis(i1,j1,mq) = qneighbor(i2,j2,mq)
+               enddo
+            enddo
+         enddo
+      endif
 
       end
 
