@@ -26,7 +26,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_filesystem.h>
 #include <fclaw_global.h>
 
-#include <fclaw_package.h>
 #include <fclaw_timer.h>
 #include <fclaw_pointer_map.h>
 
@@ -88,7 +87,6 @@ fclaw2d_global_t* fclaw2d_global_new (void)
     glob->mpisize = 0;
     glob->mpirank = -1;
 
-    glob->pkg_container = fclaw_package_container_new ();
     glob->vtables = fclaw_pointer_map_new ();
     glob->options = fclaw_pointer_map_new ();
 
@@ -166,7 +164,6 @@ fclaw2d_global_destroy (fclaw2d_global_t * glob)
 {
     FCLAW_ASSERT (glob != NULL);
 
-    fclaw_package_container_destroy ((fclaw_package_container_t *)glob->pkg_container);
     fclaw_pointer_map_destroy (glob->vtables);
     fclaw_pointer_map_destroy (glob->options);
 
