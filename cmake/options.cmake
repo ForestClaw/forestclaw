@@ -2,6 +2,7 @@ option(mpi "use MPI library")
 option(openmp "use OpenMP")
 option(applications "build applications" ON)
 
+option(clawpatch "build Clawpatch")
 option(clawpack "build Clawpack")
 option(geoclaw "build Geoclaw")
 option(cudaclaw "build CudaClaw")

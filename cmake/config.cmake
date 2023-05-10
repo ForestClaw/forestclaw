@@ -64,8 +64,6 @@ check_include_file(signal.h FCLAW_HAVE_SIGNAL_H)
 check_include_file(unistd.h FCLAW_HAVE_UNISTD_H)
 
 set(FCLAW_PACKAGE \"${PROJECT_NAME}\")
-set(FCLAW_PACKAGE_VERSION \"${PROJECT_VERSION}\")
-set(FCLAW_VERSION \"${PROJECT_VERSION}\")
 
 
 configure_file(${CMAKE_CURRENT_LIST_DIR}/fclaw_config.h.in ${PROJECT_BINARY_DIR}/include/fclaw_config.h)

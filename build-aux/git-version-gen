@@ -1,136 +1,48 @@
 #!/bin/sh
-# Print a version string.
-scriptversion=2022-09-14.1
 
-# Copyright (C) 2007-2008 Free Software Foundation
+# This script emulates git describe for repositories with a .tarball-version or .repository-version file.
+# If the .tarball-version file exists, it reads the version from that file (removing the leading character) and outputs it directly.
+# If the .tarball-version file does not exist, it generates a build number based on the version number and commit hash.
+# If the current commit is tagged with the version number, the build number will be the version number.
+# Otherwise, the build number will be the version number appended with the short commit hash.
+# If the repository is dirty, it appends -dirty to the output version string.
 #
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 3, or (at your option)
-# any later version.
+# This script is intended for use with POSIX-compatible shells and shallow copies of repositories.
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
-# 02110-1301, USA.
+# Usage: ./get_build_number.sh
+# Output: <version>-<short_commit_hash> or <version> if the current commit is tagged or .tarball-version exists, with -dirty appended if the repository is dirty
 
-# This script is derived from GIT-VERSION-GEN from GIT: http://git.or.cz/.
-# It may be run two ways:
-# - from a git repository in which the "git describe" command below
-#   produces useful output (thus requiring at least one signed tag)
-# - from a non-git-repo directory containing a .tarball-version file, which
-#   presumes this script is invoked like "./git-version-gen .tarball-version".
-
-# In order to use intra-version strings in your project, you will need two
-# separate generated version string files:
-#
-# .tarball-version - present in repository, updated each release
-#
-# .version - present in a checked-out repository and in a distribution
-#   tarball.  Usable in dependencies, particularly for files that don't
-#   want to depend on config.h but do want to track version changes.
-#   Delete this file prior to any autoconf run where you want to rebuild
-#   files to pick up a version string change; and leave it stale to
-#   minimize rebuild time after unrelated changes to configure sources.
-#
-# It is probably wise to add these two files to .gitignore, so that you
-# don't accidentally commit either generated file.
-#
-# Use the following line in your configure.ac, so that $(VERSION) will
-# automatically be up-to-date each time configure is run (and note that
-# since configure.ac no longer includes a version string, Makefile rules
-# should not depend on configure.ac for version updates).
-#
-# AC_INIT([GNU project],
-#         m4_esyscmd([build-aux/git-version-gen .tarball-version]),
-#         [bug-project@example])
-#
-# Then use the following lines in your Makefile.am, so that .version
-# will be present for dependencies, and so that .tarball-version will
-# exist in distribution tarballs.
-#
-# BUILT_SOURCES = $(top_srcdir)/.version
-# $(top_srcdir)/.version:
-#	echo $(VERSION) > $@-t && mv $@-t $@
-# dist-hook:
-#	echo $(VERSION) > $(distdir)/.tarball-version
-
-# Copyright (C) 2014 Carsten Burstedde
-#
-# With the new style of git submodules, .git may be a file: added test -f .git
-
-# Copyright (C) 2022 Scott Aiton
-# switch to vMAJOR.MINOR.PATCH-NUMCOMMITS-HASH format
-# switch to using git version even if .tarbal-version exists,
-# having .tarball-version in the repo makes the github release workflow easier
-#
-
-case $# in
-  1) ;;
-  *) echo 1>&2 "Usage: $0 \$srcdir/.tarball-version"; exit 1;;
-esac
-
-srcdir=`dirname $1`
-tarball_version_file=`basename $1`
-nl='
-'
-
-# Change directory into the srcdir.  This should allow
-# for out of source make dist.
-cd $srcdir
-
-# First try "git describe", then see if there is a tarball-only version file, then default
-
-if { test -d .git || test -f .git ; } \
-  && v=`git describe --abbrev=4 --match='v*' --dirty=-dirty 2>/dev/null \
-  || git describe --abbrev=4 --dirty=-dirty 2>/dev/null` \
-  && case $v in
-  v[0-9]*) ;;
-  *) (exit 1) ;;
-esac
-then
-  # Is this a new git that lists number of commits since the last
-  # tag or the previous older version that did not?
-  #   Newer: v6.10-77-g0f8faeb
-  #   Older: v6.10-g0f8faeb
-  case $v in
-    *-*-*) : git describe is okay three part flavor ;;
-    *-*)
-    : git describe is older two part flavor
-    # Recreate the number of commits and rewrite such that the
-    # result is the same as if we were using the newer version
-    # of git describe.
-    vtag=`echo "$v" | sed 's/-.*//'`
-    numcommits=`git rev-list "$vtag"..HEAD | wc -l`
-    v=`echo "$v" | sed "s/\(.*\)-\(.*\)/\1-$numcommits-\2/"`;
-    ;;
-  esac
-elif test -f $tarball_version_file
-then
-  v=`cat $tarball_version_file` || exit 1
-  case $v in
-    *$nl*) v= ;; # reject multi-line output
-    v[0-9]*) ;;
-    *) v= ;;
-  esac
-  test -z "$v" \
-  && echo "$0: WARNING: $tarball_version_file seems to be damaged" 1>&2
+if [ -e .tarball-version ]; then
+  # If .tarball-version exists, read the version from it and remove the leading character
+  version=$(cat .tarball-version)
 else
-    v=UNKNOWN
+  # If .tarball-version does not exist, read the latest version number from the .repository-version file and remove the leading character
+  version=$(cat .repository-version)
+
+  # Check if the current commit is tagged with this version number
+  tagged_commit=$(git rev-list --abbrev-commit -n 1 "refs/tags/$version" 2>/dev/null)
+
+  # Get the current commit hash (short version)
+  current_commit=$(git rev-parse --short HEAD)
+
+  if [ "$tagged_commit" = "$current_commit" ]; then
+    # If the current commit is tagged, use the version number as the build number
+    version="$version"
+  else
+    # If the current commit is not tagged, append the short commit hash to the version number
+    version="${version}-${current_commit}"
+  fi
+
+  # Check if the repository is dirty
+  if [ -n "$(git status --porcelain -uno -z)" ]; then
+    # If the repository is dirty, append -dirty to the output version string
+    version="${version}-dirty"
+  fi
+
 fi
 
+# remove the first character from the variable
+version=$(expr "$version" : '.\(.*\)')
 
-# Omit the trailing newline, so that m4_esyscmd can use the result directly.
-echo "$v" | tr -d '\012'
+printf %s "$version"
 
-# Local variables:
-# eval: (add-hook 'write-file-hooks 'time-stamp)
-# time-stamp-start: "scriptversion="
-# time-stamp-format: "%:y-%02m-%02d.%02H"
-# time-stamp-end: "$"
-# End:
