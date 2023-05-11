@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
+Copyright (c) 2012-2023 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -24,8 +24,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "replicated_user.h"
-
-#include <fclaw_pointer_map.h>
 
 static void *
 replicated_register (user_options_t *user_opt, sc_options_t * opt)
@@ -152,16 +150,12 @@ user_options_t* replicated_options_register (fclaw_app_t * app,
 
 void replicated_options_store (fclaw2d_global_t* glob, user_options_t* user)
 {
-    FCLAW_ASSERT(fclaw_pointer_map_get(glob->options,"user") == NULL);
-    fclaw_pointer_map_insert(glob->options, "user", user, NULL);
+    fclaw2d_global_options_store(glob, "user", user);
 }
 
 const user_options_t* replicated_get_options(fclaw2d_global_t* glob)
 {
-    user_options_t* user = (user_options_t*) 
-                              fclaw_pointer_map_get(glob->options, "user");
-    FCLAW_ASSERT(user != NULL);
-    return user;   
+    return (user_options_t*) fclaw2d_global_get_options(glob, "user");
 }
 
 void replicated_global_post_process(fclaw_options_t *fclaw_opt, 

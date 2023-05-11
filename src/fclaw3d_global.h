@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2023 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -136,6 +136,23 @@ void fclaw3d_global_iterate_partitioned (fclaw3d_global_t * glob,
                                          struct fclaw3d_domain * new_domain,
                                          fclaw3d_transfer_callback_t tcb,
                                          void *user);
+/**
+ * @brief Store an options structure in the glob
+ * 
+ * @param glob the global context
+ * @param key the key to store the options under
+ * @param options the options structure
+ */
+void fclaw3d_global_options_store (fclaw3d_global_t* glob, const char* key, void* options);
+
+/**
+ * @brief Get an options structure from the glob
+ * 
+ * @param glob the global context
+ * @param key the key to retrieve the options from
+ * @return void* the options
+ */
+void* fclaw3d_global_get_options (fclaw3d_global_t* glob, const char* key);
 
 /**
  * @brief Store a glob variable in static memory

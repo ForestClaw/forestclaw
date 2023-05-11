@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
+Copyright (c) 2012-2023 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -26,23 +26,58 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_global.h>
 #include <test.hpp>
 
+TEST_CASE("fclaw2d_global_options_store and fclaw2d_global_get_options test") {
+    fclaw2d_global_t* glob = fclaw2d_global_new();
+
+    // Test with an integer
+    int option1 = 10;
+    const char* key1 = "option1";
+    fclaw2d_global_options_store(glob, key1, &option1);
+
+    int* retrieved_option1 = static_cast<int*>(fclaw2d_global_get_options(glob, key1));
+    CHECK_EQ(*retrieved_option1, option1);
+
+    // Test with a string
+    const char* option2 = "Test string";
+    const char* key2 = "option2";
+    fclaw2d_global_options_store(glob, key2, &option2);
+
+    const char** retrieved_option2 = static_cast<const char**>(fclaw2d_global_get_options(glob, key2));
+    CHECK_EQ(retrieved_option2, &option2);
+
+#ifdef FCLAW_ENABLE_DEBUG
+    // TEST inserting twice
+    CHECK_SC_ABORTED(fclaw2d_global_options_store(glob, key2, &option2));
+#endif
+    // Test with a non-existing key
+    const char* key3 = "non-existing key";
+#ifdef FCLAW_ENABLE_DEBUG
+    CHECK_SC_ABORTED(fclaw2d_global_get_options(glob, key3));
+#else
+    void* retrieved_option3 = fclaw2d_global_get_options(glob, key3);
+    CHECK_EQ(retrieved_option3, nullptr);
+#endif
+
+    fclaw2d_global_destroy(glob);
+}
+
 TEST_CASE("fclaw2d_global_set_global")
 {
-	fclaw2d_global_t* glob = (fclaw2d_global_t*)123;
-	fclaw2d_global_set_global(glob);
-	CHECK_EQ(fclaw2d_global_get_global(), glob);
-	fclaw2d_global_unset_global();
+    fclaw2d_global_t* glob = (fclaw2d_global_t*)123;
+    fclaw2d_global_set_global(glob);
+    CHECK_EQ(fclaw2d_global_get_global(), glob);
+    fclaw2d_global_unset_global();
 }
 
 TEST_CASE("fclaw2d_global_unset_global")
 {
-	fclaw2d_global_t* glob = (fclaw2d_global_t*)123;
-	fclaw2d_global_set_global(glob);
-	fclaw2d_global_unset_global();
+    fclaw2d_global_t* glob = (fclaw2d_global_t*)123;
+    fclaw2d_global_set_global(glob);
+    fclaw2d_global_unset_global();
 #ifdef FCLAW_ENABLE_DEBUG
-	CHECK_SC_ABORTED(fclaw2d_global_get_global());
+    CHECK_SC_ABORTED(fclaw2d_global_get_global());
 #else
-	CHECK_EQ(fclaw2d_global_get_global(), nullptr);
+    CHECK_EQ(fclaw2d_global_get_global(), nullptr);
 #endif
 }
 
@@ -50,20 +85,20 @@ TEST_CASE("fclaw2d_global_unset_global")
 
 TEST_CASE("fclaw2d_global_set_global twice fails")
 {
-	fclaw2d_global_t* glob = (fclaw2d_global_t*)123;
-	fclaw2d_global_set_global(glob);
-	CHECK_SC_ABORTED(fclaw2d_global_set_global(glob));
-	fclaw2d_global_unset_global();
+    fclaw2d_global_t* glob = (fclaw2d_global_t*)123;
+    fclaw2d_global_set_global(glob);
+    CHECK_SC_ABORTED(fclaw2d_global_set_global(glob));
+    fclaw2d_global_unset_global();
 }
 
 TEST_CASE("fclaw2d_global_unset_global assert fails when NULL")
 {
-	CHECK_SC_ABORTED(fclaw2d_global_unset_global());
+    CHECK_SC_ABORTED(fclaw2d_global_unset_global());
 }
 
 TEST_CASE("fclaw2d_global_get_global assert fails when NULL")
 {
-	CHECK_SC_ABORTED(fclaw2d_global_get_global());
+    CHECK_SC_ABORTED(fclaw2d_global_get_global());
 }
 
 #endif

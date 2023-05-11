@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
+Copyright (c) 2012-2023 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -31,8 +31,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "fc3d_clawpack5.h"
 #include "fc3d_clawpack5_options.h"
-
-static int s_clawpack5_package_id = -1;
 
 static fc3d_clawpack5_vtable_t classic_vt;
 // static fclaw2d_clawpatch_vtable_t clawpatch_vt;
@@ -127,8 +125,8 @@ void fc3d_clawpack5_set_vtable_defaults()
 
 fc3d_clawpack5_options_t* fc3d_clawpack5_get_options(fclaw2d_global_t *glob)
 {
-    int id = fc3d_clawpack5_get_package_id();
-    return (fc3d_clawpack5_options_t*) fclaw_package_get_options(glob,id);
+    return (fc3d_clawpack5_options_t*) fclaw2d_global_get_options(glob,
+                                                                  "fc3d_clawpack5");
 }
 
 /* -----------------------------------------------------------
@@ -156,13 +154,7 @@ void fc3d_clawpack5_register (fclaw_app_t* app, const char *configfile, fclaw2d_
 
 void fc3d_clawpack5_set_options (fclaw2d_global_t* glob, fc3d_clawpack5_options_t* clawopt)
 {
-    int id; 
-    /* Don't register a package more than once */
-    FCLAW_ASSERT(s_clawpack5_package_id == -1);
-
-    id = fclaw_package_container_add_pkg(glob,clawopt);
-
-    s_clawpack5_package_id = id;
+    fclaw2d_global_options_store(glob, "fc3d_clawpack5", clawopt);
 }
 
 void fc3d_clawpack5_aux_data(fclaw2d_global_t *glob,
