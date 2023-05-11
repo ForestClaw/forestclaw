@@ -19,7 +19,7 @@ subroutine fclaw3dx_clawpatch46_fort_copy_face(mx,my,mz,mbc, &
     double precision     qthis(1-mbc:mx+mbc,1-mbc:my+mbc,1-mbc:mz+mbc,meqn)
     double precision qneighbor(1-mbc:mx+mbc,1-mbc:my+mbc,1-mbc:mz+mbc,meqn)
 
-    integer i,j,ibc,jbc,mq, idir, k
+    integer mq, k
     integer i1,j1, i2, j2
 
     integer a(2,2), f(2)

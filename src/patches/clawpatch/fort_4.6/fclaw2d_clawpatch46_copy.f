@@ -27,12 +27,10 @@ c--------------------------------------------------------------------
       double precision qthis(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
       double precision qneighbor(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
 
-      integer i,j,ibc,jbc,mq, idir
+      integer mq
       integer i1,j1, i2, j2
 
       integer a(2,2), f(2)
-
-      idir = iface/2
 
 c     # High side of 'qthis' exchanges with low side of
 c     # 'qneighbor'
