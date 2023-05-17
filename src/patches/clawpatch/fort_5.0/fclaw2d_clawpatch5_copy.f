@@ -24,52 +24,63 @@ c--------------------------------------------------------------------
       double precision qthis(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
       double precision qneighbor(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
 
-      integer i,j,ibc,jbc,mq, idir
+      integer mq
       integer i1,j1, i2, j2
 
-      idir = iface/2
+      integer a(2,2), f(2)
 
 c     # High side of 'qthis' exchanges with low side of
 c     # 'qneighbor'
-      do mq = 1,meqn
-         if (idir .eq. 0) then
-            do j = 1,my
-               do ibc = 1,mbc
-c                 # Exchange at low side of 'this' grid in
-c                 # x-direction (idir == 0)
-                  if (iface .eq. 0) then
-                     i1 = 1-ibc
-                     j1 = j
-                  elseif (iface .eq. 1) then
-                     i1 = mx+ibc
-                     j1 = j
-                  endif
-                  call fclaw2d_clawpatch_transform_face(i1,j1,i2,j2,
-     &                  transform_ptr)
-                  qthis(mq,i1,j1) = qneighbor(mq,i2,j2)
+      call fclaw2d_clawpatch_build_transform_same(transform_ptr, 
+     &                                             a, f)
 
+      if (iface .eq. 0) then
+         do j1 = 1,my
+            do i1 = 1-mbc,0
+               do mq = 1,meqn
+c                 # Lower side
+                  i2 = a(1,1)*i1 + a(1,2)*j1 + f(1)
+                  j2 = a(2,1)*i1 + a(2,2)*j1 + f(2)
+                  qthis(mq,i1,j1) = qneighbor(mq,i2,j2)
                enddo
             enddo
-         else
-            do jbc = 1,mbc
-               do i = 1,mx
-c                 # Exchange at high side of 'this' grid in
-c                 # y-direction (idir == 1)
-                  if (iface .eq. 2) then
-                     i1 = i
-                     j1 = 1-jbc
-                  elseif (iface .eq. 3) then
-                     i1 = i
-                     j1 = my+jbc
-                  endif
-                  call fclaw2d_clawpatch_transform_face(i1,j1,i2,j2,
-     &                  transform_ptr)
+         enddo
+      else if (iface .eq. 1) then
+         do j1 = 1,my
+            do i1 = mx+1,mx+mbc
+               do mq = 1,meqn
+c                 # Upper side
+                  i2 = a(1,1)*i1 + a(1,2)*j1 + f(1)
+                  j2 = a(2,1)*i1 + a(2,2)*j1 + f(2)
                   qthis(mq,i1,j1) = qneighbor(mq,i2,j2)
-
                enddo
             enddo
-         endif
-      enddo
+         enddo
+      else if (iface .eq. 2) then
+         do j1 = 1-mbc,0
+            do i1 = 1,mx
+               do mq = 1,meqn
+c                 # left side
+                  i2 = a(1,1)*i1 + a(1,2)*j1 + f(1)
+                  j2 = a(2,1)*i1 + a(2,2)*j1 + f(2)
+                  qthis(mq,i1,j1) = qneighbor(mq,i2,j2)
+               enddo
+            enddo
+         enddo
+      else if (iface .eq. 3) then
+         do j1 = my+1,my+mbc
+            do i1 = 1,mx
+               do mq = 1,meqn
+c                 # right side
+                  i2 = a(1,1)*i1 + a(1,2)*j1 + f(1)
+                  j2 = a(2,1)*i1 + a(2,2)*j1 + f(2)
+                  qthis(mq,i1,j1) = qneighbor(mq,i2,j2)
+               enddo
+            enddo
+         enddo
+      endif
+
+
       end
 
 
