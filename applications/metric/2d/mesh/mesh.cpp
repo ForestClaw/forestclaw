@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
+  Copyright (c) 2012-2023 Carsten Burstedde, Donna Calhoun, Scott Aiton
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -26,8 +26,6 @@
 #include "mesh_user.h"
 
 #include <fclaw2d_forestclaw.h>
-
-static int s_user_package_id = -1;
 
 static void *
 options_register_user (fclaw_app_t * app, void *package, sc_options_t * opt)
@@ -73,16 +71,12 @@ void register_user_options (fclaw_app_t * app,
 static 
 void user_set_options (fclaw2d_global_t* glob, user_options_t* user)
 {
-    FCLAW_ASSERT(s_user_package_id == -1);
-    int id = fclaw_package_container_add_pkg(glob,user);
-    s_user_package_id = id;
+    fclaw2d_global_options_store(glob, "user", user);
 }
 
 const user_options_t* mesh_user_get_options(fclaw2d_global_t* glob)
 {
-    int id = s_user_package_id;
-    return (user_options_t*) 
-            fclaw_package_get_options(glob, id);    
+    return (user_options_t*) fclaw2d_global_get_options(glob, "user");
 }
 
 static

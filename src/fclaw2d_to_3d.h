@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2023 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -168,6 +168,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define fclaw2d_global_iterate_adapted  fclaw3d_global_iterate_adapted
 #define fclaw2d_global_iterate_level_mthread fclaw3d_global_iterate_level_mthread
 #define fclaw2d_global_iterate_partitioned fclaw3d_global_iterate_partitioned
+#define fclaw2d_global_options_store    fclaw3d_global_options_store
+#define fclaw2d_global_get_options      fclaw3d_global_get_options
 #define fclaw2d_global_set_global       fclaw3d_global_set_global
 #define fclaw2d_global_unset_global     fclaw3d_global_unset_global
 #define fclaw2d_global_get_global       fclaw3d_global_get_global
