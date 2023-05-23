@@ -580,12 +580,30 @@ fclaw_app_options_parse (fclaw_app_t * a, int *first_arg,
 {
     int retval;
     size_t zz;
+    int fclaw_package_id;
     fclaw_exit_type_t vexit;
     fclaw_app_options_t *ao;
 
     FCLAW_ASSERT (a != NULL);
 
-    /* TODO: read configuration files */
+    vexit = FCLAW_NOEXIT;
+
+    fclaw_package_id = fclaw_get_package_id ();
+    retval = sc_options_load (fclaw_package_id, FCLAW_VERBOSITY_ESSENTIAL, a->opt,
+                              "fclaw_options.ini");
+    if (retval < 0)
+    {
+        fclaw_global_essentialf("Problem reading fclaw_options.ini.\n");
+    }
+    else
+    {
+        fclaw_global_infof ("Reading file fclaw_options.ini.\n");
+    }
+
+    if(retval > 0)
+    {
+        vexit = FCLAW_EXIT_ERROR;
+    }
 
     /* parse command line options with given priority for errors */
     a->first_arg =
@@ -601,7 +619,6 @@ fclaw_app_options_parse (fclaw_app_t * a, int *first_arg,
     else
     {
         /* go through options packages for further processing and verification */
-        vexit = FCLAW_NOEXIT;
         for (zz = 0; zz < a->opt_pkg->elem_count; ++zz)
         {
             fclaw_exit_type_t aoexit;

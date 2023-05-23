@@ -524,24 +524,9 @@ fclaw_options_t* fclaw_options_register (fclaw_app_t * a,
 }
 
 
-/* This is still needed as long as the config file option in app isn't yet implemented */
 int fclaw_options_read_from_file(sc_options_t* opt)
 {
-    int retval;
-
-    int fclaw_package_id;
-    fclaw_package_id = fclaw_get_package_id ();
-    retval = sc_options_load (fclaw_package_id, FCLAW_VERBOSITY_ESSENTIAL, opt,
-                              "fclaw_options.ini");
-    if (retval < 0)
-    {
-        fclaw_global_essentialf("Problem reading fclaw_options.ini.\n");
-    }
-    else
-    {
-        fclaw_global_infof ("Reading file fclaw_options.ini.\n");
-    }
-    return retval;
+    return 0;
 }
 
 /* ------------------------------------------------------------------------
