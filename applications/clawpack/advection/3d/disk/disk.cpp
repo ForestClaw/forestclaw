@@ -139,7 +139,6 @@ main (int argc, char **argv)
     fclaw_exit_type_t vexit;
 
     /* Options */
-    sc_options_t                *options;
     user_options_t              *user_opt;
     fclaw_options_t             *fclaw_opt;
     fclaw3dx_clawpatch_options_t *clawpatch_opt;
@@ -148,8 +147,6 @@ main (int argc, char **argv)
     fclaw2d_global_t            *glob;
     fclaw2d_domain_t            *domain;
     sc_MPI_Comm mpicomm;
-
-    int retval;
 
     /* Initialize application */
     app = fclaw_app_new (&argc, &argv, NULL);
@@ -161,12 +158,10 @@ main (int argc, char **argv)
     user_opt =                    disk_options_register(app,"fclaw_options.ini");  
 
     /* Read configuration file(s) and command line, and process options */
-    options = fclaw_app_get_options (app);
-    retval = fclaw_options_read_from_file(options);
     vexit =  fclaw_app_options_parse (app, &first_arg,"fclaw_options.ini.used");
 
 
-    if (!retval & (vexit < 2))
+    if (vexit < 2)
     {
         fclaw_app_print_options(app);
 

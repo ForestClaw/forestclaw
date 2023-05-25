@@ -432,7 +432,6 @@ main (int argc, char **argv)
     overlap_geometry_t filament_geometry, *geo = &filament_geometry;
 
     /* Options */
-    sc_options_t                *options;
 
     filament_options_t          *filament_user_opt;
     fclaw_options_t             *filament_fclaw_opt;
@@ -454,8 +453,6 @@ main (int argc, char **argv)
 
     sc_MPI_Comm mpicomm;
 
-    int retval;
-
     /* Initialize application */
     app = fclaw_app_new (&argc, &argv, NULL);
 
@@ -473,11 +470,9 @@ main (int argc, char **argv)
     swirl_user_opt =                    swirl_options_register(app, "swirl-user",       "fclaw_options.ini");  
 
     /* Read configuration file(s) */
-    options = fclaw_app_get_options (app);
-    retval = fclaw_options_read_from_file(options);
     vexit =  fclaw_app_options_parse (app, &first_arg,"fclaw_options.ini.used");
 
-    if (!retval & !vexit)
+    if (!vexit)
     {
         /* Options have been checked and are valid */
 
