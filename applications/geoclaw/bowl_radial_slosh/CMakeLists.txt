@@ -3,6 +3,7 @@ add_executable(bowl_radial_slosh
 	radial/radial_options.c
 	slosh/slosh_user.cpp
 	slosh/slosh_options.c
+	slosh/qinit.f90
 	bowl.cpp
 )
 

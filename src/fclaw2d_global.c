@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
+Copyright (c) 2012-2023 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -318,6 +318,21 @@ void fclaw2d_global_iterate_partitioned (fclaw2d_global_t * glob,
     g.glob = glob;
     g.user = user;
     fclaw2d_domain_iterate_partitioned (glob->domain,new_domain,tcb,&g);
+}
+
+void fclaw2d_global_options_store (fclaw2d_global_t* glob, const char* key, void* options)
+{
+    
+    FCLAW_ASSERT(fclaw_pointer_map_get(glob->options,key) == NULL);
+    fclaw_pointer_map_insert(glob->options, key, options, NULL);
+}
+
+void* fclaw2d_global_get_options (fclaw2d_global_t* glob, const char* key)
+{
+    
+    void* options = fclaw_pointer_map_get(glob->options, key);
+    FCLAW_ASSERT(options != NULL);
+    return options;   
 }
 
 static fclaw2d_global_t* fclaw2d_global_glob = NULL;

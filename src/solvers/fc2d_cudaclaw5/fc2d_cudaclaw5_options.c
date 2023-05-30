@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2023 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -28,9 +28,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_clawpatch_options.h>
 #include <fclaw2d_global.h>
 #include <fclaw_options.h>
-#include <fclaw_package.h>
-
-static int s_cudaclaw5_options_package_id = -1;
 
 static void*
 cudaclaw5_register (fc2d_cudaclaw5_options_t* clawopt, sc_options_t * opt)
@@ -236,12 +233,10 @@ fc2d_cudaclaw5_options_t*  fc2d_cudaclaw5_options_register (fclaw_app_t * app,
 
 fc2d_cudaclaw5_options_t* fc2d_cudaclaw5_get_options(fclaw2d_global_t *glob)
 {
-    int id = s_cudaclaw5_options_package_id;
-    return (fc2d_cudaclaw5_options_t*) fclaw_package_get_options(glob,id);
+    return (fc2d_cudaclaw5_options_t*) fclaw2d_global_get_options(glob, "cudaclaw5");
 }
 
 void fc2d_cudaclaw5_options_store (fclaw2d_global_t* glob, fc2d_cudaclaw5_options_t* clawopt)
 {
-    int id = fclaw_package_container_add_pkg(glob,clawopt);
-    s_cudaclaw5_options_package_id = id;
+    fclaw2d_global_options_store(glob, "cudaclaw5", clawopt);
 }

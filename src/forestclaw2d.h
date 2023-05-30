@@ -75,10 +75,13 @@ typedef enum
     FCLAW2D_PATCH_ON_BLOCK_FACE_2 = 0x100,
     /** Face 3 is on a block boundary */
     FCLAW2D_PATCH_ON_BLOCK_FACE_3 = 0x200,
+#if 0
+    /* reserve these bit combinations since they are needed in 3D */
     /** Face 4 is on a block boundary */
     FCLAW2D_PATCH_ON_BLOCK_FACE_4_ONLY_FOR_3D = 0x400,
     /** Face 5 is on a block boundary */
     FCLAW2D_PATCH_ON_BLOCK_FACE_5_ONLY_FOR_3D = 0x800,
+#endif
     /** Patch is on a block boundary */
     FCLAW2D_PATCH_ON_BLOCK_BOUNDARY = 0xFC0
 }
@@ -989,6 +992,31 @@ void fclaw2d_domain_serialization_enter (fclaw2d_domain_t * domain);
  * \param [in] domain           The domain is not modified.
  */
 void fclaw2d_domain_serialization_leave (fclaw2d_domain_t * domain);
+
+///@}
+/* ---------------------------------------------------------------------- */
+///                      @name Meta Domains
+/* ---------------------------------------------------------------------- */
+///@{
+
+/** Return true if \a domain is an artifical domain.
+ *
+ * This function can be used in \ref fclaw2d_interpolate_point_t callbacks to
+ * distinguish domains that were created during a partition search (and only
+ * contain some meta information) from real domains in a local search.
+ */
+int fclaw2d_domain_is_meta (fclaw2d_domain_t * domain);
+
+/** Initialize a meta domain.
+ *
+ * Initializes \a domain in an artificial manner, where the entry mpirank is
+ * used to store arbitrary context information. The remaining entries are
+ * initialized to -1 or NULL.
+ * The resulting domain can be passed to an \ref fclaw2d_interpolate_point_t
+ * in case the domain to interpolate on is not available locally (also see
+ * \ref fclaw2d_overlap_exchange for an example).
+ */
+void fclaw2d_domain_init_meta (fclaw2d_domain_t *domain, int mpirank);
 
 ///@}
 #ifdef __cplusplus

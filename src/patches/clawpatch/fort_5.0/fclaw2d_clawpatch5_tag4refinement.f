@@ -21,7 +21,7 @@ c--------------------------------------------------------------------
 
       integer i,j, mq, ii, jj
       double precision qmin, qmax, xc,yc,quad(-1:1,-1:1)
-      integer :: fclaw2d_clawpatch_exceeds_threshold, exceeds_th
+      integer :: fclaw2d_clawpatch_tag_criteria, exceeds_th
 
       logical(kind=4) :: is_ghost, fclaw2d_clawpatch5_is_ghost
 
@@ -45,7 +45,7 @@ c     # Refine based only on first variable in system.
                   end do
                end do
             endif
-            exceeds_th = fclaw2d_clawpatch_exceeds_threshold(
+            exceeds_th = fclaw2d_clawpatch_tag_criteria(
      &             blockno, q(mq,i,j),qmin,qmax,quad, dx,dy,xc,yc,
      &             tag_threshold,init_flag,is_ghost)
             

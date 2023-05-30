@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2023 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -52,6 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define fclaw2d_transfer_callback_t     fclaw3d_transfer_callback_t
 #define fclaw2d_domain_exchange_t       fclaw3d_domain_exchange_t
 #define fclaw2d_integrate_ray_t         fclaw3d_integrate_ray_t
+#define fclaw2d_interpolate_point_t     fclaw3d_interpolate_point_t
 
 /* redefine enums */
 #define FCLAW2D_PATCH_CHILDID           FCLAW3D_PATCH_CHILDID
@@ -126,6 +127,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define fclaw2d_domain_free_after_exchange  fclaw3d_domain_free_after_exchange
 #define fclaw2d_domain_serialization_enter  fclaw3d_domain_serialization_enter
 #define fclaw2d_domain_serialization_leave  fclaw3d_domain_serialization_leave
+#define fclaw2d_domain_is_meta          fclaw3d_domain_is_meta
+#define fclaw2d_domain_init_meta        fclaw3d_domain_init_meta
 #define fclaw2d_domain_destroy          fclaw3d_domain_destroy
 #define fclaw2d_domain_adapt            fclaw3d_domain_adapt
 #define fclaw2d_domain_partition        fclaw3d_domain_partition
@@ -151,6 +154,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define fclaw2d_iterate_patch_cb        fclaw3d_iterate_patch_cb
 #define fclaw2d_iterate_family_cb       fclaw3d_iterate_family_cb
 #define fclaw2d_domain_integrate_rays   fclaw3d_domain_integrate_rays
+#define fclaw2d_overlap_exchange        fclaw3d_overlap_exchange
 #define fclaw2d_global_t                fclaw3d_global_t
 #define fclaw2d_global_iterate_t        fclaw3d_global_iterate_t
 #define fclaw2d_global_new              fclaw3d_global_new
@@ -164,9 +168,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define fclaw2d_global_iterate_adapted  fclaw3d_global_iterate_adapted
 #define fclaw2d_global_iterate_level_mthread fclaw3d_global_iterate_level_mthread
 #define fclaw2d_global_iterate_partitioned fclaw3d_global_iterate_partitioned
+#define fclaw2d_global_options_store    fclaw3d_global_options_store
+#define fclaw2d_global_get_options      fclaw3d_global_get_options
 #define fclaw2d_global_set_global       fclaw3d_global_set_global
 #define fclaw2d_global_unset_global     fclaw3d_global_unset_global
 #define fclaw2d_global_get_global       fclaw3d_global_get_global
+#define fclaw2d_set_global_context      fclaw3d_set_global_context
+#define fclaw2d_clear_global_context    fclaw3d_clear_global_context
 
 /* translations not found in p4est */
 #ifndef p4est_wrap_new_unitsquare

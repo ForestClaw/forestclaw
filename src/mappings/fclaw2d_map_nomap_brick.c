@@ -78,7 +78,7 @@ fclaw3dx_map_c2m_nomap_brick(fclaw2d_map_context_t * cont, int blockno,
                              double *xp, double *yp, double *zp)
 {
     fclaw_global_essentialf("fclaw3dx_map_c2m_nomap_brick : Why is this being " \
-                            "called?\n");
+                            "called? Maybe manifold=T.\n");
     exit(0);
 
     /* Call 2d mapping to get surface.  2d mapping is not scaled in the 

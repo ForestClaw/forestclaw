@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
+Copyright (c) 2012-2023 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -26,7 +26,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_options.h>
 #include <fclaw2d_global.h>
 #include <fclaw_base.h>
-#include <fclaw_pointer_map.h>
 
 /* ---------------------------------------------------------
    Public interface to ForestClaw options
@@ -34,15 +33,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 void fclaw2d_options_store (fclaw2d_global_t *glob, fclaw_options_t* gparms)
 {
-	FCLAW_ASSERT(fclaw_pointer_map_get(glob->options,"fclaw2d") == NULL);
-	fclaw_pointer_map_insert(glob->options, "fclaw2d", gparms, NULL);
+    fclaw2d_global_options_store(glob, "fclaw2d", gparms);
 }
 
 fclaw_options_t* fclaw2d_get_options(fclaw2d_global_t* glob)
 {
-    fclaw_options_t* gparms = (fclaw_options_t*) 
-	   							fclaw_pointer_map_get(glob->options, "fclaw2d");
-	FCLAW_ASSERT(gparms != NULL);
-	return gparms;
+    return (fclaw_options_t*) fclaw2d_global_get_options(glob, "fclaw2d");
 }
 

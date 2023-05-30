@@ -19,50 +19,68 @@ subroutine fclaw3dx_clawpatch46_fort_copy_face(mx,my,mz,mbc, &
     double precision     qthis(1-mbc:mx+mbc,1-mbc:my+mbc,1-mbc:mz+mbc,meqn)
     double precision qneighbor(1-mbc:mx+mbc,1-mbc:my+mbc,1-mbc:mz+mbc,meqn)
 
-    integer i,j,ibc,jbc,mq, idir, k
+    integer mq, k
     integer i1,j1, i2, j2
 
-    idir = iface/2
+    integer a(2,2), f(2)
 
-    !! # High side of 'qthis' exchanges with low side of
-    !! # 'qneighbor'
-    mq_loop : do mq = 1,meqn
-        k_loop : do k = 1,mz
-            if (idir .eq. 0) then
-                do j = 1,my
-                    do ibc = 1,mbc
-                        !! # Exchange at low side of 'this' grid in
-                        !! # x-direction (idir == 0)
-                        if (iface .eq. 0) then
-                            i1 = 1-ibc
-                            j1 = j
-                        elseif (iface .eq. 1) then
-                            i1 = mx+ibc
-                            j1 = j
-                        endif
-                        call fclaw3dx_clawpatch_transform_face(i1,j1,i2,j2,transform_ptr)
-                        qthis(i1,j1,k,mq) = qneighbor(i2,j2,k,mq)
-                    enddo
-                enddo
-            else
-                do jbc = 1,mbc
-                    do i = 1,mx
-                        !! # Exchange at high side of 'this' grid in
-                        !! # y-direction (idir == 1)
-                        if (iface .eq. 2) then
-                           i1 = i
-                           j1 = 1-jbc
-                        elseif (iface .eq. 3) then
-                           i1 = i
-                           j1 = my+jbc
-                        endif
-                        call fclaw3dx_clawpatch_transform_face(i1,j1,i2,j2,transform_ptr)
-                        qthis(i1,j1,k,mq) = qneighbor(i2,j2,k,mq)
-                    enddo
-                enddo
-            endif
-        end do k_loop
-    enddo mq_loop
+    call fclaw3dx_clawpatch_build_transform_same(transform_ptr, a, f)
+
+    if (iface .eq. 0) then
+       do mq = 1,meqn
+          do k = 1,mz
+            do j1 = 1,my
+               do i1 = 1-mbc,0
+                  ! Lower side
+                  i2 = a(1,1)*i1 + a(1,2)*j1 + f(1)
+                  j2 = a(2,1)*i1 + a(2,2)*j1 + f(2)
+                  qthis(i1,j1,k,mq) = qneighbor(i2,j2,k,mq)
+               enddo
+            enddo
+          enddo
+       enddo
+    else if (iface .eq. 1) then
+       do mq = 1,meqn
+          do k = 1,mz
+            do j1 = 1,my
+               do i1 = mx+1,mx+mbc
+                  ! Upper side
+                  i2 = a(1,1)*i1 + a(1,2)*j1 + f(1)
+                  j2 = a(2,1)*i1 + a(2,2)*j1 + f(2)
+                  qthis(i1,j1,k,mq) = qneighbor(i2,j2,k,mq)
+               enddo
+            enddo
+          enddo
+       enddo
+    else if (iface .eq. 2) then
+       do mq = 1,meqn
+          do k = 1,mz
+            do j1 = 1-mbc,0
+               do i1 = 1,mx
+                  ! left side
+                  i2 = a(1,1)*i1 + a(1,2)*j1 + f(1)
+                  j2 = a(2,1)*i1 + a(2,2)*j1 + f(2)
+                  qthis(i1,j1,k,mq) = qneighbor(i2,j2,k,mq)
+               enddo
+            enddo
+          enddo
+       enddo
+    else if (iface .eq. 3) then
+       do mq = 1,meqn
+          do k = 1,mz
+            do j1 = my+1,my+mbc
+               do i1 = 1,mx
+                  ! right side
+                  i2 = a(1,1)*i1 + a(1,2)*j1 + f(1)
+                  j2 = a(2,1)*i1 + a(2,2)*j1 + f(2)
+                  qthis(i1,j1,k,mq) = qneighbor(i2,j2,k,mq)
+               enddo
+            enddo
+          enddo
+       enddo
+    endif
+
+
 
 end subroutine fclaw3dx_clawpatch46_fort_copy_face
 

@@ -23,7 +23,7 @@ c--------------------------------------------------------------------
       double precision q3(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
 
       integer mq
-      double precision qmin, qmax
+      double precision qmin(meqn), qmax(meqn)
 
 c     # Don't coarsen when initializing the mesh
       if (initflag .ne. 0) then
@@ -34,27 +34,28 @@ c     # Don't coarsen when initializing the mesh
 c     # Assume that we will coarsen a family unless we find a grid
 c     # that doesn't pass the coarsening test.
       tag_patch = 1
-      mq = 1
-      qmin = q0(1,1,mq)
-      qmax = q0(1,1,mq)
+      do mq = 1,meqn
+         qmin(mq) = q0(1,1,mq)
+         qmax(mq) = q0(1,1,mq)
+      end do
 
       call fclaw2d_clawpatch46_test_refine(blockno,mx,my,mbc,meqn,
-     &      mq,q0,qmin,qmax, dx,dy,xlower(0), ylower(0), 
+     &      q0,qmin,qmax, dx,dy,xlower(0), ylower(0), 
      &      coarsen_threshold,initflag, tag_patch)
       if (tag_patch == 0) return
 
       call fclaw2d_clawpatch46_test_refine(blockno,mx,my,mbc,meqn,
-     &      mq,q1,qmin,qmax,dx,dy,xlower(1), ylower(1), 
+     &      q1,qmin,qmax,dx,dy,xlower(1), ylower(1), 
      &      coarsen_threshold,initflag, tag_patch)
       if (tag_patch == 0) return
 
       call fclaw2d_clawpatch46_test_refine(blockno,mx,my,mbc,meqn,
-     &      mq,q2,qmin,qmax,dx,dy,xlower(2), ylower(2),
+     &      q2,qmin,qmax,dx,dy,xlower(2), ylower(2),
      &      coarsen_threshold,initflag, tag_patch)
       if (tag_patch == 0) return
 
       call fclaw2d_clawpatch46_test_refine(blockno,mx,my,mbc,meqn,
-     &      mq,q3,qmin,qmax,dx,dy,xlower(3), ylower(3),
+     &      q3,qmin,qmax,dx,dy,xlower(3), ylower(3),
      &      coarsen_threshold,initflag, tag_patch)
 
       end
@@ -78,38 +79,42 @@ c> @param[in,out] tag_patch passed in as [1] may be set to [0] if it
 c>                should not be coarsened
 c--------------------------------------------------------------------
       subroutine fclaw2d_clawpatch46_test_refine(blockno,mx,my,mbc,
-     &      meqn,mq,q, qmin,qmax,dx,dy,xlower,ylower,
+     &      meqn,q, qmin,qmax,dx,dy,xlower,ylower, 
      &      coarsen_threshold,init_flag,tag_patch)
 
       implicit none
-      integer mx,my,mbc,meqn,mq,tag_patch, init_flag, blockno
+      integer mx,my,mbc,meqn,tag_patch, init_flag, blockno
       double precision coarsen_threshold
-      double precision qmin,qmax, dx, dy, xlower, ylower
+      double precision qmin(meqn),qmax(meqn), dx, dy, xlower, ylower
       double precision q(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)
 
-      double precision xc,yc,quad(-1:1,-1:1),qval
+      double precision xc,yc,quad(-1:1,-1:1,meqn),qval(meqn)
 
-      integer i,j, ii, jj
+      integer :: i,j, ii, jj, mq
 
-      integer exceeds_th, fclaw2d_clawpatch_exceeds_threshold
+      integer exceeds_th, fclaw2d_clawpatch_tag_criteria
       logical(kind=4) :: is_ghost, fclaw2d_clawpatch46_is_ghost
 
       do i = 1-mbc,mx+mbc
          do j = 1-mbc,my+mbc
             xc = xlower + (i-0.5)*dx
             yc = ylower + (j-0.5)*dy
-            qmin = min(q(i,j,mq),qmin)
-            qmax = max(q(i,j,mq),qmax)
-            qval = q(i,j,mq)
+            do mq = 1,meqn
+               qval(mq) = q(i,j,mq)
+               qmin(mq) = min(q(i,j,mq),qmin(mq))
+               qmax(mq) = max(q(i,j,mq),qmax(mq))
+            end do
             is_ghost = fclaw2d_clawpatch46_is_ghost(i,j,mx,my)
             if (.not. is_ghost) then
                do ii = -1,1               
                   do jj = -1,1
-                     quad(ii,jj) = q(i+ii,j+jj,mq)
+                     do mq = 1,meqn
+                        quad(ii,jj,mq) = q(i+ii,j+jj,mq)
+                     end do
                   end do
                end do
             endif
-            exceeds_th = fclaw2d_clawpatch_exceeds_threshold(
+            exceeds_th = fclaw2d_clawpatch_tag_criteria(
      &             blockno, qval,qmin,qmax,quad, dx,dy,xc,yc,
      &             coarsen_threshold, init_flag, is_ghost)
             

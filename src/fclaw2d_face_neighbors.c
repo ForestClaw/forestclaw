@@ -499,6 +499,10 @@ void fclaw2d_face_neighbor_ghost(fclaw2d_global_t* glob,
 		int this_ghost_idx = i;
 
 		transform_data.this_patch = this_ghost_patch;
+		fclaw2d_patch_transform_init_data(glob,this_ghost_patch,
+		                              	  -1,
+		                                  i,
+		                                  &transform_data);
 
 		for (iface = 0; iface < FCLAW2D_NUMFACES; iface++)
 		{

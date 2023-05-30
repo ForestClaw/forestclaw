@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
+Copyright (c) 2012-2023 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -25,7 +25,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "fc2d_geoclaw_options.h"
 #include <fclaw_options.h>
-#include <fclaw_pointer_map.h>
 
 #include <fclaw2d_clawpatch_options.h>
 #include <fclaw2d_global.h>
@@ -232,17 +231,13 @@ fc2d_geoclaw_options_register (fclaw_app_t * app,
 
 fc2d_geoclaw_options_t* fc2d_geoclaw_get_options(fclaw2d_global_t *glob)
 {
-    fc2d_geoclaw_options_t* geo_opt = (fc2d_geoclaw_options_t*) 
-	   							fclaw_pointer_map_get(glob->options, "fc2d_geoclaw");
-	FCLAW_ASSERT(geo_opt != NULL);
-	return geo_opt;
+    return (fc2d_geoclaw_options_t*) fclaw2d_global_get_options(glob, "fc2d_geoclaw");
 }
 
 void fc2d_geoclaw_options_store (fclaw2d_global_t* glob, 
                                fc2d_geoclaw_options_t* geo_opt)
 {
-	FCLAW_ASSERT(fclaw_pointer_map_get(glob->options,"fc2d_geoclaw") == NULL);
-	fclaw_pointer_map_insert(glob->options, "fc2d_geoclaw", geo_opt, NULL);
+    fclaw2d_global_options_store(glob, "fc2d_geoclaw", geo_opt);
 }
 
 

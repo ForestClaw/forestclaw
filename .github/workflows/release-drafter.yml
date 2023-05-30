@@ -21,10 +21,67 @@ jobs:
       #    echo "GHE_HOST=${GITHUB_SERVER_URL##https:\/\/}" >> $GITHUB_ENV
 
       # Drafts your next Release notes as Pull Requests are merged into "master"
-      - uses: release-drafter/release-drafter@v5
+      - name : Create Release Draft
+        id: release_draft
+        uses: release-drafter/release-drafter@v5
         # (Optional) specify config name to use, relative to .github/. Default: release-drafter.yml
         # with:
         #   config-name: my-config.yml
         #   disable-autolabeler: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Checkout code
+        if: github.event_name == 'push'
+        uses: actions/checkout@v3
+        with:
+          path: forestclaw-${{ steps.release_draft.outputs.tag_name }}
+
+      - name: Init and Update Submodules
+        if: github.event_name == 'push'
+        working-directory: forestclaw-${{ steps.release_draft.outputs.tag_name }}
+        run: |
+          git submodule init
+          git submodule update
+
+      - name: Generate .tarball-verison
+        if: github.event_name == 'push'
+        working-directory: forestclaw-${{ steps.release_draft.outputs.tag_name }}
+        run: |
+          echo "${{ steps.release_draft.outputs.tag_name }}" > .tarball-version
+          cd p4est
+          sh build-aux/git-version-gen .tarball-version > .tarball-version
+          cd ../sc
+          sh build-aux/git-version-gen .tarball-version > .tarball-version
+
+      - name: Run bootstrap Script
+        if: github.event_name == 'push'
+        working-directory: forestclaw-${{ steps.release_draft.outputs.tag_name }}
+        run: |
+          ./bootstrap
+          rm ./bootstrap
+
+      - name: Create zip and tarball
+        if: github.event_name == 'push'
+        run: |
+          tar -czvf forestclaw-${{ steps.release_draft.outputs.tag_name }}.tar.gz --exclude='.git*' --exclude='.gitignore' forestclaw-${{ steps.release_draft.outputs.tag_name }}
+          find forestclaw-${{ steps.release_draft.outputs.tag_name }} -type f -exec touch -d "6 months ago" {} \;
+          zip -r forestclaw-${{ steps.release_draft.outputs.tag_name }}.zip forestclaw-${{ steps.release_draft.outputs.tag_name }} -y -x '*.git*' '.gitignore'
+
+      - name: Delete previous assets
+        if: github.event_name == 'push'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        working-directory: forestclaw-${{ steps.release_draft.outputs.tag_name }}
+        run: |
+          gh release view ${{ steps.release_draft.outputs.tag_name }} --json assets --jq ".assets[] | .name"  \
+              | tr '\n' '\0' \
+              |  xargs -t0 -I{} gh release delete-asset ${{ steps.release_draft.outputs.tag_name }} "{}" -y
+
+      - name: Attach zip and tarball to release
+        if: github.event_name == 'push'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release upload ${{ steps.release_draft.outputs.tag_name }} forestclaw-${{ steps.release_draft.outputs.tag_name }}.zip -R ${{ github.repository }} --clobber
+          gh release upload ${{ steps.release_draft.outputs.tag_name }} forestclaw-${{ steps.release_draft.outputs.tag_name }}.tar.gz -R ${{ github.repository }} --clobber

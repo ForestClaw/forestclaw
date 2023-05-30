@@ -16,14 +16,15 @@
 !! @param[in] is_ghost true if cell is a ghost cell
 !! @return 1 if exceeds threshold, 0 if not, -1 if inconclusive.
 !  --------------------------------------------------------------
-integer function fclaw3dx_clawpatch_gradient_exceeds_th(blockno,& 
+integer function fclaw3dx_clawpatch_gradient_exceeds_th(blockno, meqn, & 
                                      qval,qmin,qmax,quad, & 
-                                     dx,dy,dz, xc,yc,zc, threshold, &
+                                     dx,dy,dz, xc,yc,zc, ivar_threshold, threshold, &
                                      init_flag, is_ghost)
     implicit none
     
-    double precision :: qval,qmin,qmax,threshold
-    double precision :: quad(-1:1,-1:1,-1:1)
+    integer :: meqn, ivar_threshold
+    double precision :: qval(meqn),qmin(meqn),qmax(meqn),threshold
+    double precision :: quad(-1:1,-1:1,-1:1,meqn)
     double precision :: dx,dy, dz, xc, yc, zc
     integer :: blockno, init_flag
     logical(kind=4) :: is_ghost
@@ -34,6 +35,10 @@ integer function fclaw3dx_clawpatch_gradient_exceeds_th(blockno,&
 
     double precision :: clawpatch_gradient_dot3
     integer :: refine
+    integer :: mq
+
+    mq = ivar_threshold
+
 
     if (is_ghost) then
 !!      # quad may have uninitialized values.  Test is inconclusive
@@ -45,9 +50,10 @@ integer function fclaw3dx_clawpatch_gradient_exceeds_th(blockno,&
     dy2 = 2*dy
     dz2 = 2*dz
 
-    dqx = (quad(1,0,0) - quad(-1,0,0))/dx2
-    dqy = (quad(0,1,0) - quad(0,-1,0))/dy2
-    dqz = (quad(0,0,1) - quad(0,0,-1))/dz2
+    !! Only compute gradients for non-mapped grids
+    dqx = (quad(1,0,0,mq) - quad(-1,0,0,mq))/dx2
+    dqy = (quad(0,1,0,mq) - quad(0,-1,0,mq))/dy2
+    dqz = (quad(0,0,1,mq) - quad(0,0,-1,mq))/dz2
 
     refine = 0
     grad(1) = dqx

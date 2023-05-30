@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
+Copyright (c) 2012-2023 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -85,8 +85,14 @@ struct fclaw2d_global
     struct fclaw2d_map_context* cont;
     struct fclaw2d_domain *domain;
 
+    /* CB: is this a good place for the accumulator?
+           Would it be possible to add and retrieve it as an anonymous
+           object that does not need to be known to this file? */
     struct fclaw2d_diagnostics_accumulator *acc;
 
+    /* CB: this is application specific.
+           Would it not be cleaner to add the gauges in a way to global
+           that this file does not need to know about gauges at all? */
     struct fclaw_gauge_info* gauge_info;
 
     void *user;
@@ -99,6 +105,10 @@ struct fclaw2d_global_iterate
 };
 
 /* Use forward references here, since this file gets included everywhere */
+/* CB: is there a way not to need the forward references?
+       Depending on fclaw2d_domain, _map, package seems entirely acceptable.
+       For those, including the respective headers might not be so bad.
+       About the diagnostics accumulator see remark above. */
 struct fclaw2d_domain;
 struct fclaw2d_map_context;
 struct fclaw_package_container;
@@ -166,6 +176,24 @@ void fclaw2d_global_iterate_partitioned (fclaw2d_global_t * glob,
                                          void *user);
 
 /**
+ * @brief Store an options structure in the glob
+ * 
+ * @param glob the global context
+ * @param key the key to store the options under
+ * @param options the options structure
+ */
+void fclaw2d_global_options_store (fclaw2d_global_t* glob, const char* key, void* options);
+
+/**
+ * @brief Get an options structure from the glob
+ * 
+ * @param glob the global context
+ * @param key the key to retrieve the options from
+ * @return void* the options
+ */
+void* fclaw2d_global_get_options (fclaw2d_global_t* glob, const char* key);
+
+/**
  * @brief Store a glob variable in static memory
  *
  * @param glob the glob variable
@@ -185,16 +213,16 @@ void fclaw2d_global_unset_global (void);
 fclaw2d_global_t* fclaw2d_global_get_global (void);
 
 /**
- * @brief 
- * 
- * @param glob 
+ * @brief
+ *
+ * @param glob
  */
 void fclaw2d_set_global_context(fclaw2d_global_t *glob);
 
 /**
- * @brief 
- * 
- * @param glob 
+ * @brief
+ *
+ * @param glob
  */
 void fclaw2d_clear_global_context(fclaw2d_global_t *glob);
 

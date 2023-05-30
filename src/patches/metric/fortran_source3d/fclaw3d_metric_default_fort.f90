@@ -75,11 +75,11 @@ end subroutine fclaw3d_metric_fort_compute_mesh
 
 
 !! ----------------------------------------------------------
-!!> @brief @copybrief ::fclaw3d_fort_compute_area_t
+!!> @brief @copybrief ::fclaw3d_fort_compute_volume_t
 !!>
 !!> Default implementation
 !!>
-!!> @details @copydetails ::fclaw3d_fort_compute_area_t
+!!> @details @copydetails ::fclaw3d_fort_compute_volume_t
 !! ---------------------------------------------------------
 subroutine fclaw3d_metric_fort_compute_volume(mx,my,mz, mbc,blockno, & 
            dx,dy,dz, xlower, ylower, zlower, xd,yd,zd, & 

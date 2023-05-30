@@ -51,3 +51,36 @@ c     # calls to T.
       a(2,2) = mj(1) - f(2)
 
       end
+
+      subroutine fclaw3dx_clawpatch_build_transform_same(transform_ptr,a
+     &      ,f)
+      implicit none
+
+      integer a(2,2)
+      integer*8 transform_ptr
+      integer f(2)
+      integer mi(4),mj(4)
+      integer i1,j1
+
+      i1 = 0
+      j1 = 0
+      call fclaw3dx_clawpatch_transform_face(i1,j1,mi,mj,
+     &      transform_ptr)
+      f(1) = mi(1)
+      f(2) = mj(1)
+
+      i1 = 1
+      j1 = 0
+      call fclaw3dx_clawpatch_transform_face(i1,j1,mi,mj,
+     &      transform_ptr)
+      a(1,1) = mi(1) - f(1)
+      a(2,1) = mj(1) - f(2)
+
+      i1 = 0
+      j1 = 1
+      call fclaw3dx_clawpatch_transform_face(i1,j1,mi,mj,
+     &      transform_ptr)
+      a(1,2) = mi(1) - f(1)
+      a(2,2) = mj(1) - f(2)
+
+      end

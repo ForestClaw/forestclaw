@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2023 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -86,6 +86,10 @@ struct fclaw3d_global
     struct fclaw3d_domain *domain;
 
 #if 0
+    /* CB: is this a good place for the accumulator?
+           Would it be possible to add and retrieve it as an anonymous
+           object that does not need to be known to this file? */
+
     struct fclaw3d_diagnostics_accumulator *acc;
 #endif
 
@@ -132,6 +136,23 @@ void fclaw3d_global_iterate_partitioned (fclaw3d_global_t * glob,
                                          struct fclaw3d_domain * new_domain,
                                          fclaw3d_transfer_callback_t tcb,
                                          void *user);
+/**
+ * @brief Store an options structure in the glob
+ * 
+ * @param glob the global context
+ * @param key the key to store the options under
+ * @param options the options structure
+ */
+void fclaw3d_global_options_store (fclaw3d_global_t* glob, const char* key, void* options);
+
+/**
+ * @brief Get an options structure from the glob
+ * 
+ * @param glob the global context
+ * @param key the key to retrieve the options from
+ * @return void* the options
+ */
+void* fclaw3d_global_get_options (fclaw3d_global_t* glob, const char* key);
 
 /**
  * @brief Store a glob variable in static memory
@@ -152,6 +173,20 @@ void fclaw3d_global_unset_global (void);
  */
 fclaw3d_global_t* fclaw3d_global_get_global (void);
 
+/**
+ * @brief
+ *
+ * @param glob
+ */
+void fclaw3d_set_global_context(fclaw3d_global_t *glob);
+
+/**
+ * @brief
+ *
+ * @param glob
+ */
+void fclaw3d_clear_global_context(fclaw3d_global_t *glob);
+
 #ifdef __cplusplus
 #if 0
 {                               /* need this because indent is dumb */
@@ -159,4 +194,4 @@ fclaw3d_global_t* fclaw3d_global_get_global (void);
 }
 #endif
 
-#endif /* FCLAW3D_GLOBAL_H */
+#endif /* !FCLAW3D_GLOBAL_H */

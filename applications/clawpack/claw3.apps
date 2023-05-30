@@ -3,6 +3,10 @@
 # -----------------------------------------------
 
 
+# -----------------------------------------------
+# Advection
+# -----------------------------------------------
+
 # Swirl : Scalar advection
 include applications/clawpack/advection/3d/swirl/Makefile.am
 
@@ -17,3 +21,12 @@ include applications/clawpack/advection/3d/sphere/Makefile.am
 
 # Latlong : beach ball
 include applications/clawpack/advection/3d/latlong/Makefile.am
+
+
+# -----------------------------------------------
+# Euler
+# -----------------------------------------------
+
+# Euler : overpressure (mapped/non-mapped)
+include applications/clawpack/euler/3d/overpressure/Makefile.am
+

@@ -491,7 +491,7 @@ void fclaw2d_patch_destroy_user_data(struct fclaw2d_global* glob,
  * 
  * @param[in] glob the global context
  * @param[in] patch the patch context
- * @param[in] blockno the block number
+ * @param[in] blockno the block number, -1 if ghost patch
  * @param[in] patchno the patch number
  * @param[in,out] tdata the stransform data structure
  */

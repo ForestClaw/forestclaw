@@ -97,6 +97,13 @@ void poisson_rhs(fclaw2d_global_t *glob,
     mg_vt->fort_rhs(&blockno,&mbc,&mx,&my,&mfields, &xlower,&ylower,&dx,&dy,rhs);
 }
 
+static void poisson_patch_setup(struct fclaw2d_global *glob,
+                                struct fclaw2d_patch *patch,
+                                int blockno,
+                                int patchno)
+{
+    poisson_rhs(glob,patch,blockno,patchno);
+}
 
 static
 void poisson_compute_error(fclaw2d_global_t *glob,
@@ -375,6 +382,9 @@ void poisson_link_solvers(fclaw2d_global_t *glob)
     clawpatch_vt->fort_tag4refinement = &TAG4REFINEMENT;
     clawpatch_vt->fort_tag4coarsening = &TAG4COARSENING;
 #endif    
+
+    // Setup routine
+    patch_vt->setup = poisson_patch_setup;
 
     // Output routines
 

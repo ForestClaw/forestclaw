@@ -162,7 +162,7 @@ void fclaw2d_domain_list_adapted (fclaw2d_domain_t * old_domain,
                                   fclaw2d_domain_t * new_domain,
                                   int log_priority);
 
-/** Search triples of (block number, x coordinate, y coordinate) in the mesh.
+/** Search triples of (block number, x, y coordinates) in the mesh.
  * The x, y coordinates must be in [0, 1]^2.
  * The input data must be equal on every process: This is a collective call.
  *
@@ -179,10 +179,11 @@ void fclaw2d_domain_list_adapted (fclaw2d_domain_t * old_domain,
  * \param [in] coordinates      An array of elem_size == 2 * sizeof (double) with
  *                              entries (x, y) in [0, 1]^2.  Of these entries,
  *                              there are \b block_offsets[num_blocks] many.
- *                              Currently we do not enforce the x and y ranges
+ *                              We do not enforce the x and y ranges
  *                              and simply do not find any point outside its block.
- * \param [in,out] results      On input, an array of type int and
- *                              \b block_offsets[num_blocks] many (ignored) entries.
+ * \param [in,out] results      On input, an array of type int and an element
+ *                              count of \b block_offsets[num_blocks].
+ *                              The data in \b results is ignored on input.
  *                              On output, an entry will be -1 if the point has
  *                              not been found on this process, or the patch
  *                              number within its block otherwise.
@@ -261,6 +262,100 @@ void fclaw2d_domain_integrate_rays (fclaw2d_domain_t * domain,
                                     sc_array_t * rays,
                                     sc_array_t * integrals,
                                     void * user);
+
+/** Callback function to compute the interpolation data for a point and a patch.
+ *
+ * This function can be passed to \ref fclaw2d_overlap_exchange to eventually
+ * compute the interpolation data over the whole producer domain for an
+ * array of points.
+ * It will be called both in a partition search and a local search of the
+ * producer domain. Use \ref fclaw2d_domain_is_meta, to determine which is the
+ * case.
+ *
+ * \param [in] domain           The domain we interpolate on.
+ *                              On the producer side, this is a valid forestclaw
+ *                              domain.
+ *                              On the consumer side, this is a temporary
+ *                              artifical domain. Only the mpi-information
+ *                              (mpicomm, mpisize and mpirank) as well as the
+ *                              backend data (pp, pp_owned and attributes) are
+ *                              set. The backend data is not owned and shall
+ *                              not be changed by the callback. The mpirank is
+ *                              set to a valid rank only when we are at a leaf
+ *                              (a patch that belongs to exactly one process)
+ *                              of the partition search, else it will be -1.
+ * \param [in] patch            The patch under consideration.
+ *                              When on a leaf on the producer side, this is a
+ *                              valid patch from the producer domain.
+ *                              Otherwise, this is a temporary artificial patch
+ *                              containing all standard patch information except
+ *                              for the pointer to the next patch and user-data.
+ *                              Only the FCLAW2D_PATCH_CHILDID and the
+ *                              FCLAW2D_PATCH_ON_BLOCK_FACE_* flags are set.
+ *                              Artificial patches are generally ancestors of
+ *                              valid forestclaw patches that are leaves.
+ * \param [in] blockno          The block id of the patch under consideration.
+ * \param [in] patchno          If patchno is -1, we are on an artifical patch.
+ *                              Otherwise, this is a valid patchno from the
+ *                              producer domain.
+ * \param [in,out] point        Representation of a point; user-defined.
+ *                              Points to an array element of the query points
+ *                              passed to \ref fclaw2d_overlap_exchange.
+ *                              If patchno is non-negative, the points
+ *                              interpolation data should be updated by the
+ *                              local patch's contribution.
+ * \param [in, out] user        Arbitrary data passed in earlier.
+ * \return                      True, if there is a possible contribution of the
+ *                              patch or one of its ancestors to the point
+ *                              interpolation data.
+ *                              Return false if there is definitely no
+ *                              contribution.
+ *                              If we are on a leaf on the producer side
+ *                              (patchno is non-negative) or the consumer side
+ *                              (domain_is_meta and mpirank is non-negative)
+ *                              this callback should do an exact test for
+ *                              contribution.
+ *                              Else, the return value may be a false positive,
+ *                              we'll be fine.
+ */
+typedef int (*fclaw2d_interpolate_point_t) (fclaw2d_domain_t * domain,
+                                            fclaw2d_patch_t * patch,
+                                            int blockno, int patchno,
+                                            void *point, void *user);
+
+/** Exchange interpolation data of query points between two domains.
+ *
+ * We compute the user-defined interpolation data of an array of user-defined
+ * query points, which originate from the so-called consumer side.
+ * The interpolation data will be computed on the domain of the so-called
+ * producer-side based on a \ref fclaw2d_interpolate_point_t callback function.
+ * Afterwards, the results will be collected and combined on the consumer side.
+ *
+ * \param [in] domain           The producer domain to interpolate on.
+ * \param [in,out] query_points Array containing points of user-defined type.
+ *                              Each entry contains one item of arbitrary data.
+ *                              We do not dereference, just pass pointers around.
+ *                              The points will be sent via MPI, so they may not
+ *                              contain pointers to further data.
+ *                              The array is defined processor-local and may
+ *                              contain different points on different processes.
+ *                              The query points are supposed to be computed
+ *                              (and transformed to the producer space by an
+ *                              inverse mapping) locally on the consumer side.
+ *                              On output, the points will contain collected
+ *                              interpolation data according to \b interpolate.
+ * \param [in] interpolate      Callback function that returns true if a point
+ *                              intersects a patch and -- when called for a leaf
+ *                              on the producer side -- shall write the
+ *                              interpolation data for the current
+ *                              point-patch-combination into the user-defined
+ *                              point structure.
+ * \param [in,out] user         Arbitrary data to be passed to the callback.
+ */
+void fclaw2d_overlap_exchange (fclaw2d_domain_t * domain,
+                               sc_array_t * query_points,
+                               fclaw2d_interpolate_point_t interpolate,
+                               void *user);
 
 #ifdef __cplusplus
 #if 0

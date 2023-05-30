@@ -110,7 +110,7 @@
 
 /* Define to the full name and version of this package. */
 
-#define FCLAW_PACKAGE_STRING "ForestClaw 0.1.4880-4dae"
+#define FCLAW_PACKAGE_STRING "ForestClaw @FORESTCLAW_FULL_VERSION@"
 
 
 /* Define to the one symbol short name of this package. */
@@ -124,7 +124,7 @@
 
 
 /* Define to the version of this package. */
-#define FCLAW_PACKAGE_VERSION @FCLAW_PACKAGE_VERSION@
+#define FCLAW_PACKAGE_VERSION "@FORESTCLAW_FULL_VERSION@"
 
 /* Version number of package */
-#define FCLAW_VERSION @FCLAW_VERSION@
+#define FCLAW_VERSION "@FORESTCLAW_FULL_VERSION@"
