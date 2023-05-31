@@ -52,6 +52,9 @@ FCLAW_ARG_ENABLE([activeflux], [Enable activeflux project],
 FCLAW_ARG_ENABLE([thunderegg], [Enable thunderegg solver],
                  [THUNDEREGG])
 
+P4EST_ARG_ENABLE([file-deprecated], [use depreacted data file format],
+                 [FILE_DEPRECATED])
+
 echo "o---------------------------------------"
 echo "| Checking MPI and related programs"
 echo "o---------------------------------------"
