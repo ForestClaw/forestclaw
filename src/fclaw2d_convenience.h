@@ -29,6 +29,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <forestclaw2d.h>
 #include <fclaw2d_map.h>
 #include <p4est_connectivity.h>
+#include <p4est_extended.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -37,6 +38,12 @@ extern "C"
 }                               /* need this because indent is dumb */
 #endif
 #endif
+
+int fclaw2d_domain_write (const char* filename, fclaw2d_domain_t *domain);
+
+fclaw2d_domain_t *fclaw2d_domain_read (sc_MPI_Comm mpicomm, const char *filename,
+                     p4est_replace_t replace_fn, sc_keyvalue_t *attributes,
+                     void *wrap_user_pointer);
 
 fclaw2d_domain_t *fclaw2d_domain_new_unitsquare (sc_MPI_Comm mpicomm,
                                                  int initial_level);
