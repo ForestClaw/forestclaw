@@ -42,6 +42,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <p8est_algorithms.h>
 #endif
 
+#define FCLAW_WRAP_PARAM_SIZE (2 * sizeof (uint64_t))
+
 const double fclaw2d_smallest_h = 1. / (double) P4EST_ROOT_LEN;
 
 static void
@@ -328,14 +330,14 @@ fclaw2d_check_initial_level (sc_MPI_Comm mpicomm, int initial_level)
 
 /* TODO: Pass and use user string for the file */
 int
-fclaw2d_domain_write (const char* filename, fclaw2d_domain_t *domain)
+fclaw2d_domain_write (const char *filename, fclaw2d_domain_t * domain)
 {
     int errcode;
     p4est_t *p4est;
     p4est_wrap_t *wrap;
     p4est_file_context_t *fc;
-    uint64_t       parameters_buffer[2];
-    sc_array_t            parameters;
+    uint64_t parameters_buffer[2];
+    sc_array_t parameters;
 
     FCLAW_ASSERT (filename != NULL);
     FCLAW_ASSERT (domain != NULL);
@@ -371,11 +373,12 @@ fclaw2d_domain_write (const char* filename, fclaw2d_domain_t *domain)
     parameters_buffer[0] = (uint64_t) wrap->hollow;
     parameters_buffer[1] = (uint64_t) wrap->btype;
 
-    sc_array_init_data (&parameters, (void *) parameters_buffer, 2 * 64, 1);
+    sc_array_init_data (&parameters, (void *) parameters_buffer,
+                        FCLAW_WRAP_PARAM_SIZE, 1);
 
     /* Write parameters for \ref p4est_wrap_new_p4est. */
-    fc = p4est_file_write_block (fc, 2 * 64, &parameters, "p4est wrap hollow and btype",
-                                 &errcode);
+    fc = p4est_file_write_block (fc, FCLAW_WRAP_PARAM_SIZE, &parameters,
+                                 "p4est wrap hollow and btype", &errcode);
     SC_CHECK_ABORT (fc != NULL
                     && errcode == P4EST_FILE_ERR_SUCCESS,
                     "fclaw2d_domain_write: write p4est wrap paramters");
@@ -397,17 +400,20 @@ fclaw2d_domain_write (const char* filename, fclaw2d_domain_t *domain)
 */
 fclaw2d_domain_t *
 fclaw2d_domain_read (sc_MPI_Comm mpicomm, const char *filename,
-                     p4est_replace_t replace_fn, sc_keyvalue_t *attributes,
+                     p4est_replace_t replace_fn, sc_keyvalue_t * attributes,
                      void *wrap_user_pointer)
 {
     int errcode;
-    char                user_string[P4EST_FILE_USER_STRING_BYTES],
-    quad_string[P4EST_FILE_USER_STRING_BYTES],
-    quad_data_string[P4EST_FILE_USER_STRING_BYTES];
+    char user_string[P4EST_FILE_USER_STRING_BYTES],
+        quad_string[P4EST_FILE_USER_STRING_BYTES],
+        quad_data_string[P4EST_FILE_USER_STRING_BYTES];
+    uint64_t wrap_param_buffer[2];
     p4est_file_context_t *fc;
-    p4est_connectivity_t  *conn;
-    p4est_t               *p4est;
-    p4est_gloidx_t      global_num_quadrants;
+    p4est_connectivity_t *conn;
+    p4est_t *p4est;
+    p4est_wrap_t *wrap;
+    p4est_gloidx_t global_num_quadrants;
+    sc_array_t wrap_param;
 
     FCLAW_ASSERT (filename != NULL);
 
@@ -415,26 +421,40 @@ fclaw2d_domain_read (sc_MPI_Comm mpicomm, const char *filename,
     fc = p4est_file_open_read_ext (mpicomm, filename, user_string,
                                    &global_num_quadrants, &errcode);
     SC_CHECK_ABORT (fc != NULL
-                  && errcode == P4EST_FILE_ERR_SUCCESS,
-                  "fclaw2d_domain_read: Error opening file");
+                    && errcode == P4EST_FILE_ERR_SUCCESS,
+                    "fclaw2d_domain_read: Error opening file");
 
     /** We expect first a p4est connectivity stored according to the
      * p4est convention.
      */
     fc = p4est_file_read_connectivity (fc, &conn, user_string, &errcode);
     SC_CHECK_ABORT (fc != NULL
-                  && errcode == P4EST_FILE_ERR_SUCCESS,
-                  "fclaw2d_domain_read: Error reading connectivity");
+                    && errcode == P4EST_FILE_ERR_SUCCESS,
+                    "fclaw2d_domain_read: Error reading connectivity");
 
     /* Read p4est. */
     fc = p4est_file_read_p4est (fc, conn, 0, &p4est, quad_string,
                                 quad_data_string, &errcode);
     SC_CHECK_ABORT (fc != NULL
-                  && errcode == P4EST_FILE_ERR_SUCCESS,
-                  "fclaw2d_domain_read: Error reading p4est");
+                    && errcode == P4EST_FILE_ERR_SUCCESS,
+                    "fclaw2d_domain_read: Error reading p4est");
     FCLAW_ASSERT (p4est_is_valid (p4est));
-    p4est_connectivity_destroy (p4est->connectivity);
-    p4est_destroy (p4est);
+
+    /* Read p4est wrap parameters. */
+    sc_array_init_data (&wrap_param, wrap_param_buffer, FCLAW_WRAP_PARAM_SIZE,
+                        1);
+    fc = p4est_file_read_block (fc, FCLAW_WRAP_PARAM_SIZE, &wrap_param,
+                                user_string, &errcode);
+    SC_CHECK_ABORT (fc != NULL
+                    && errcode == P4EST_FILE_ERR_SUCCESS,
+                    "fclaw2d_domain_read: Error reading p4est");
+
+    /* Create a p4est_wrap from the read p4est. */
+    wrap = p4est_wrap_new_p4est (p4est, (int) wrap_param_buffer[0],
+                                 (p4est_connect_type_t) wrap_param_buffer[1],
+                                 replace_fn, wrap_user_pointer);
+    /* temporary to ensure memory balance */
+    p4est_wrap_destroy (wrap);
 
     /* Close the file. */
     p4est_file_close (fc, &errcode);
