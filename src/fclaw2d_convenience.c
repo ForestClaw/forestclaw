@@ -42,7 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <p8est_algorithms.h>
 #endif
 
-#define FCLAW_WRAP_PARAM_SIZE (2 * sizeof (uint64_t))
+#define FCLAW_WRAP_PARAM_SIZE (2 * sizeof (int64_t))
 
 const double fclaw2d_smallest_h = 1. / (double) P4EST_ROOT_LEN;
 
@@ -336,7 +336,7 @@ fclaw2d_domain_write (const char *filename, fclaw2d_domain_t * domain)
     p4est_t *p4est;
     p4est_wrap_t *wrap;
     p4est_file_context_t *fc;
-    uint64_t parameters_buffer[2];
+    int64_t parameters_buffer[2];
     sc_array_t parameters;
 
     FCLAW_ASSERT (filename != NULL);
@@ -362,7 +362,7 @@ fclaw2d_domain_write (const char *filename, fclaw2d_domain_t * domain)
                     && errcode == P4EST_FILE_ERR_SUCCESS,
                     "fclaw2d_domain_write: write connectivity");
 
-    /* TODO: We may want to write p4est_wrap or create it from the p4est */
+    /* Write the underlying p4est. */
     fc = p4est_file_write_p4est (fc, p4est, "p4est quadrants",
                                  "p4est quadrant data", &errcode);
     SC_CHECK_ABORT (fc != NULL
@@ -383,6 +383,10 @@ fclaw2d_domain_write (const char *filename, fclaw2d_domain_t * domain)
                     && errcode == P4EST_FILE_ERR_SUCCESS,
                     "fclaw2d_domain_write: write p4est wrap paramters");
 
+    /* Pack the patch data. */
+
+    /* Write the patch data. */
+
     /* Close the file. */
     /* TODO: This must be in an own function. */
     p4est_file_close (fc, &errcode);
@@ -395,7 +399,7 @@ fclaw2d_domain_write (const char *filename, fclaw2d_domain_t * domain)
 
 /** This function also reads the patch data and relies on the forestclaw
  * file convention.
- * TODO: Do we set the p4est user pointer to? This would correspond to block
+ * TODO: Do we set the p4est user pointer too? This would correspond to a block
  * section.
 */
 fclaw2d_domain_t *
@@ -407,7 +411,7 @@ fclaw2d_domain_read (sc_MPI_Comm mpicomm, const char *filename,
     char user_string[P4EST_FILE_USER_STRING_BYTES],
         quad_string[P4EST_FILE_USER_STRING_BYTES],
         quad_data_string[P4EST_FILE_USER_STRING_BYTES];
-    uint64_t wrap_param_buffer[2];
+    int64_t wrap_param_buffer[2];
     p4est_file_context_t *fc;
     p4est_connectivity_t *conn;
     p4est_t *p4est;
@@ -453,15 +457,13 @@ fclaw2d_domain_read (sc_MPI_Comm mpicomm, const char *filename,
     wrap = p4est_wrap_new_p4est (p4est, (int) wrap_param_buffer[0],
                                  (p4est_connect_type_t) wrap_param_buffer[1],
                                  replace_fn, wrap_user_pointer);
-    /* temporary to ensure memory balance */
-    p4est_wrap_destroy (wrap);
 
     /* Close the file. */
     p4est_file_close (fc, &errcode);
     SC_CHECK_ABORT (errcode == P4EST_FILE_ERR_SUCCESS,
                     "fclaw2d_domain_read: Error closing file");
 
-    return NULL;
+    return fclaw2d_domain_new (wrap, attributes);
 }
 
 fclaw2d_domain_t *

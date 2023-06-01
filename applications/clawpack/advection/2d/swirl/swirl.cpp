@@ -76,7 +76,7 @@ void run_program(fclaw2d_global_t* glob)
 
     /* Debug: write the domain */
     fclaw2d_domain_write ("swirl.f4d", glob->domain);
-    fclaw2d_domain_read (glob->mpicomm, "swirl.f4d", NULL, NULL, NULL);
+    fclaw2d_domain_destroy (fclaw2d_domain_read (glob->mpicomm, "swirl.f4d", NULL, NULL, NULL));
 
     fclaw2d_finalize(glob);
 }
