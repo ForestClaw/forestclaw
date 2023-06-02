@@ -39,7 +39,278 @@ extern "C"
 #endif
 #endif
 
+#define FCLAW2D_FILE_USER_STRING_BYTES P4EST_FILE_USER_STRING_BYTES
 
+/** Opaque context used for writing a fclaw2d data file. */
+typedef struct fclaw2d_file_context fclaw2d_file_context_t;
+
+/** Questions: Do we want to fix the glob for each writing process?
+ * Do we want to store the user pointer of the p4est and/or the p4est_wrap
+ * structure?
+ */
+
+/** Create and open a file that is associated with the given domain structure.
+ *
+ * This is a collective function call that overwrites the file if it exists
+ * already. This function writes a header with metadata on the underlying
+ * p4est of \b domain to the file.
+ *
+ * The opened file can be used to write to the file using the functions
+ * \ref fclaw2d_file_write_glob_options, \ref fclaw2d_file_write_domain,
+ * \ref fclaw2d_file_write_patch_data.
+ *
+ * This function does not abort on MPI I/O errors but returns NULL.
+ * Without MPI I/O the function may abort on file system dependent
+ * errors.
+ *
+ * \param [in]   domain    The underlying p4est is used for the metadata of the
+ *                         the created file. Later function calls, e.g. the
+ *                         writing of the domain must have \b domain as passed
+ *                         to this function.
+ * \param [in] filename    Path to parallel file that is to be created.
+ * \param [in] user_string A user string that is written to the file header.
+ *                         Only \ref FCLAW2D_FILE_USER_STRING_BYTES
+ *                         bytes without NUL-termination are
+ *                         written to the file. If the user gives less
+ *                         bytes the user_string in the file header is padded
+ *                         by spaces.
+ * \param [out] errcode    An errcode that can be interpreted by
+ *                         \ref fclaw2d_file_error_string.
+ * \return                 Newly allocated context to continue writing and
+ *                         eventually closing the file. NULL in case of error.
+ */
+fclaw2d_file_context_t *fclaw2d_file_open_create (fclaw2d_domain_t * domain,
+                                                  const char *filename,
+                                                  const char *user_string,
+                                                  int *errcode);
+
+/** Open a file for reading and read its user string on rank zero.
+ * The user string is broadcasted to all ranks after reading.
+ * The file must exist and be at least of the size of the file header.
+ *
+ * If the file has wrong metadata the function reports the error using
+ * /ref P4EST_LERRORF, collectively close the file and deallocate
+ * the file context. In this case the function returns NULL on all ranks.
+ * The wrong file format or a wrong file header causes \ref P4EST_FILE_ERR_FORMAT
+ * as errcode.
+ *
+ * This function does not abort on MPI I/O errors but returns NULL.
+ * Without MPI I/O the function may abort on file system dependent
+ * errors.
+ *
+ * \param [in]  mpicomm       MPI communicator that is used to read the file and
+ *                            must be used for potentially later read domain
+ *                            and glob.
+ * \param [in]  filename      The path to the file that is opened.
+ * \param [out] user_string   At least \ref FCLAW2D_FILE_USER_STRING_BYTES
+ *                            bytes. The user string is written
+ *                            to the passed array including padding spaces
+ *                            and a trailing NUL-termination.
+ * \return                    Newly allocated context to continue reading
+ *                            and eventually closing the file. NULL in
+ *                            case of error.
+ */
+fclaw2d_file_context_t *fclaw2d_file_open_read (sc_MPI_Comm mpicomm,
+                                                const char *filename,
+                                                char *user_string,
+                                                int *errcode);
+
+/** Write a domain to an opened parallel file.
+ *
+ * This function writes a domain without the patch data to an opened parallel
+ * file. One can only write the domain that was used by openeing the file using
+ * \ref fclaw2d_file_open_create.
+ *
+ * The mesh data is written in parallel using the partition of the mesh, i.e.
+ * the domain and the underlying p4est, repectivley.
+ *
+ * See \ref fclaw2d_file_write_patch_data to write the patch data of \b domain.
+ *
+ * This function does not abort on MPI I/O errors but returns NULL.
+ * Without MPI I/O the function may abort on file system dependent
+ * errors.
+ *
+ * \param [in, out] fc          Context previously created by \ref
+ *                              fclaw2d_file_open_create.  It keeps track
+ *                              of the data sets written one after another.
+ * \param [in]      domain      The domain that is written to the file. This
+ *                              function does not write the patch data of
+ *                              \b domain. See \ref
+ *                              fclaw2d_file_write_patch_data to write the patch
+ *                              data. \b domain must coincide with the domain
+ *                              that was passed for opening the file.
+ * \param [in]      user_string A user string that is written to the file.
+ *                              Only \ref FCLAW2D_FILE_USER_STRING_BYTES
+ *                              bytes without NUL-termination are
+ *                              written to the file. If the user gives less
+ *                              bytes the user_string in the file header is padded
+ *                              by spaces.
+ * \param [in]      errcode     An errcode that can be interpreted by
+ *                              \ref fclaw2d_file_error_string.
+ * \return                      Return a pointer to input context or NULL in case
+ *                              of errors that does not abort the program.
+ *                              In case of error the file is tried to close
+ *                              and \b fc is freed.
+ */
+fclaw2d_file_context_t *fclaw2d_file_write_domain (fclaw2d_file_context_t *
+                                                   fc,
+                                                   fclaw2d_domain_t * domain,
+                                                   const char *user_string,
+                                                   int *errcode);
+
+/** Read a domain from an opened file using the MPI communicator of \b fc.
+ *
+ * The read domain does not have patch data, which can be read by
+ * \ref fclaw2d_file_read_patch_data.
+ *
+ * This function does not abort on MPI I/O errors but returns NULL.
+ * Without MPI I/O the function may abort on file system dependent
+ * errors.
+ *
+ * \param [in]  fc            Context previously created by \ref
+ *                            fclaw2d_file_open_read.  It keeps track
+ *                            of the data sets read one after another.
+ * \param [in]  filename      The path to the file that is opened.
+ * \param [out] user_string   At least \ref FCLAW2D_FILE_USER_STRING_BYTES
+ *                            bytes. The user string is written
+ *                            to the passed array including padding spaces
+ *                            and a trailing NUL-termination.
+ * \param [in] replace_fn     Qudrant replace callback that is passed to
+ *                            \ref p4est_wrap_new_p4est. This callback can be
+ *                            NULL.
+ * \param [in] attributes     Attributes of the read domain. Currently the
+ *                            attributes of the domain are not written to the
+ *                            file by \ref fclaw2d_file_write_domain and
+ *                            therefore must be passed to this function. Can be
+ *                            NULL.
+ * \param [in] wrap_user_pointer  A pointer to anonymous user data that is
+ *                            passed to \ref p4est_wrap_new_p4est to create
+ *                            the p4est_wrap structure that is used as element
+ *                            of the read domain.
+ * \param [out] domain        Newly allocated domain that is read from the file.
+ * \return                    Return a pointer to input context or NULL in case
+ *                            of errors that does not abort the program.
+ *                            In case of error the file is tried to close
+ *                            and fc is freed.
+ */
+fclaw2d_file_context_t *fclaw2d_file_read_domain (fclaw2d_file_context_t * fc,
+                                                  const char *filename,
+                                                  char *user_string,
+                                                  p4est_replace_t replace_fn,
+                                                  sc_keyvalue_t * attributes,
+                                                  void *wrap_user_pointer,
+                                                  fclaw2d_domain_t ** domain,
+                                                  int *errcode);
+
+/** Write patch data to an opened parallel file.
+ *
+ * This function writes the patch data of a given domain to the opened file.
+ * \b domain must coincide with the domain that was passed in for opening the
+ * file by \ref fclaw2d_file_open_create.
+ *
+ * The patch data is written in parallel according to the partition of the
+ * domain and the underlying p4est, respectively.
+ *
+ * This function does not abort on MPI I/O errors but returns NULL.
+ * Without MPI I/O the function may abort on file system dependent
+ * errors.
+ *
+ * \param [in, out] fc          Context previously created by \ref
+ *                              fclaw2d_file_open_create.  It keeps track
+ *                              of the data sets written one after another.
+ * \param [in]      user_string A user string that is written to the file.
+ *                              Only \ref FCLAW2D_FILE_USER_STRING_BYTES
+ *                              bytes without NUL-termination are
+ *                              written to the file. If the user gives less
+ *                              bytes the user_string in the file header is padded
+ *                              by spaces.
+ * \param [in]      domain      The domain that points to the patch data that
+ *                              is written to the opened parallel file.
+ * \param [in] patch_data_size  The patch data size in number of bytes.
+ * \param [out]     errcode     An errcode that can be interpreted by
+ *                              \ref fclaw2d_file_error_string.
+ * \return                      Return a pointer to input context or NULL in case
+ *                              of errors that does not abort the program.
+ *                              In case of error the file is tried to close
+ *                              and \b fc is freed.
+ */
+fclaw2d_file_write_t *fclaw2d_file_write_patch_data (fclaw2d_file_context_t *
+                                                     fc, char *user_string,
+                                                     fclaw2d_domain_t *
+                                                     domain,
+                                                     size_t patch_data_size,
+                                                     int *errcode);
+
+/** Read a patch data from an opened file using the MPI communicator of \b fc.
+ *
+ * This function does not abort on MPI I/O errors but returns NULL.
+ * Without MPI I/O the function may abort on file system dependent
+ * errors.
+ *
+ * \param [in]  fc            Context previously created by \ref
+ *                            fclaw2d_file_open_read.  It keeps track
+ *                            of the data sets read one after another.
+ * \param [out] user_string   At least \ref FCLAW2D_FILE_USER_STRING_BYTES
+ *                            bytes. The user string is written
+ *                            to the passed array including padding spaces
+ *                            and a trailing NUL-termination.
+ * \param [in, out] domain    The domain for that the patch data is read.
+ *                            The patch data will be assigned to the domain
+ *                            after a successful call of this function.
+ * \param [in] patch_data_size The patch data size in number of bytes.
+ * \return                    Return a pointer to input context or NULL in case
+ *                            of errors that does not abort the program.
+ *                            In case of error the file is tried to close
+ *                            and fc is freed.
+ * \param [out]     errcode   An errcode that can be interpreted by
+ *                            \ref fclaw2d_file_error_string.
+ * \return                    Return a pointer to input context or NULL in case
+ *                            of errors that does not abort the program.
+ *                            In case of error the file is tried to close
+ *                            and \b fc is freed.
+ * \note                      The patch data size can not be read from
+ *                            the file since it is not written by \ref
+ *                            fclaw2d_file_write_patch_data. In practice
+ *                            one can use \ref
+ *                            fclaw2d_file_write_global_opt and then
+ *                            retrieve from this information the patch
+ *                            data size and call this function. See also
+ *                            the implementation of \ref
+ *                            fclaw2d_file_read_global.
+ */
+fclaw2d_file_write_t *fclaw2d_file_read_patch_data (fclaw2d_file_context_t *
+                                                    fc, char *user_string,
+                                                    fclaw2d_domain_t * domain,
+                                                    size_t patch_data_size,
+                                                    int *errcode);
+
+/** Close a file opened for parallel write/read and free the context.
+ *
+ * This function does not abort on MPI I/O errors but returns NULL.
+ * Without MPI I/O the function may abort on file system dependent
+ * errors.
+ *
+ * \param [in,out] fc       Context previously created by \ref
+ *                          fclaw2d_file_open_create or \ref
+ *                          fclaw2d_file_open_read.  Is freed.
+ * \param [out] errcode     An errcode that can be interpreted by \ref
+ *                          fclaw2d_file_error_string.
+ * \return                  0 for a successful call and -1 in case of
+ *                          an error. See also errcode argument.
+ */
+int fclaw2d_file_close (fclaw2d_file_context_t * fc, int *errcode);
+
+/** Turn fclaw2d_file errcode into a string.
+ *
+ * \param [in] errcode      An errcode that is output by a
+ *                          fclaw_file function.
+ * \param [in,out] string   At least sc_MPI_MAX_ERROR_STRING bytes.
+ * \param [out] resultlen   Length of string on return.
+ * \return                  \ref 1 on success or
+ *                          something else on invalid arguments.
+ */
+int
+fclaw2d_file_error_string (int errcode, char *string, int *resultlen);
 
 fclaw2d_domain_t *fclaw2d_domain_new_unitsquare (sc_MPI_Comm mpicomm,
                                                  int initial_level);
