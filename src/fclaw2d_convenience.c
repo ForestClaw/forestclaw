@@ -42,7 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <p8est_algorithms.h>
 #endif
 
-#define FCLAW_WRAP_PARAM_SIZE (2 * sizeof (int64_t))
+#define FCLAW_WRAP_PARAM_SIZE (2 * sizeof (uint64_t))
 
 const double fclaw2d_smallest_h = 1. / (double) P4EST_ROOT_LEN;
 
@@ -328,6 +328,98 @@ fclaw2d_check_initial_level (sc_MPI_Comm mpicomm, int initial_level)
                      "Initial level %d too fine for p4est", initial_level);
 }
 
+typedef struct fclaw2d_file_context
+{
+    fclaw2d_domain_t *domain;
+    p4est_file_context_t *fc;
+}
+fclaw2d_file_context_t;
+
+#if 0
+fclaw2d_file_context_t *
+fclaw2d_file_open_create (fclaw2d_global_t * glob, const char *filename,
+                          const char *user_string, int *errcode)
+{
+    FCLAW_ASSERT (glob != NULL);
+    FCLAW_ASSERT (filename != NULL);
+    FCLAW_ASSERT (user_string != NULL);
+    FCLAW_ASSERT (errcode != NULL);
+
+    p4est_file_context_t *fc;
+    /* get p4est_wrap_t from domain */
+    p4est_wrap_t *wrap = (p4est_wrap_t *) glob->domain->pp;
+    p4est_t *p4est = wrap->p4est;
+    fclaw2d_file_context_t *ffc = FCLAW_ALLOC (fclaw2d_file_context_t, 1);
+
+    /* create p4est file context */
+    fc = p4est_file_open_create (p4est, filename, user_string, errcode);
+    if (*errcode != P4EST_FILE_ERR_SUCCESS)
+    {
+        FCLAW_ASSERT (fc == NULL);
+        return NULL;
+    }
+
+    /* fill fclaw file context */
+    ffc->glob = glob;
+    ffc->fc = fc;
+
+    return ffc;
+}
+
+/* This function requires that fc was opened with glob address as passed. */
+/* Maybe write glob_opt function and then write_domain and write_patch_data
+ * and then combined in a new write_glob.
+ */
+fclaw2d_file_context_t *
+fclaw2d_file_write_glob (fclaw2d_file_context_t * fc, fclaw2d_global_t * glob,
+                         const char *user_string, int *errcode)
+{
+    FCLAW_ASSERT (fc != NULL && fc->glob != NULL && fc->fc != NULL);
+    FCLAW_ASSERT (glob != NULL);
+    /* TODO: we may want to compare these globs */
+    FCLAW_ASSERT (glob == fc->glob);
+    FCLAW_ASSERT (errcode != NULL);
+
+    size_t buffer_size = fclaw2d_global_packsize (glob);
+    char *buffer = FCLAW_ALLOC (char, buffer_size);
+    sc_array_t buffer_arr;
+
+    /* fill glob buffer */
+    /* TODO: this does not pack the complete glob */
+    fclaw2d_global_pack (glob, buffer);
+
+    /* initialize sc_array to buffer */
+    sc_array_init_data (&buffer_arr, (void *) buffer, buffer_size, 1);
+
+    /* write glob buffer to file */
+    fc->fc = p4est_file_write_block (fc->fc, buffer_size, &buffer_arr,
+                                     user_string, errcode);
+    if (*errcode != P4EST_FILE_ERR_SUCCESS)
+    {
+        FCLAW_ASSERT (fc->fc == NULL);
+        FCLAW_FREE (fc);
+        return NULL;
+    }
+
+    return fc;
+}
+
+int
+fclaw2d_file_close (fclaw2d_file_context_t * fc, int *errcode)
+{
+    FCLAW_ASSERT (fc != NULL && fc->glob != NULL && fc->fc != NULL);
+    FCLAW_ASSERT (errcode != NULL);
+
+    int retval;
+
+    /* close p4est file context */
+    retval = p4est_file_close (fc->fc, errcode);
+
+    FCLAW_FREE (fc);
+
+    return retval;
+}
+
 /* TODO: Pass and use user string for the file */
 int
 fclaw2d_domain_write (const char *filename, fclaw2d_domain_t * domain)
@@ -336,7 +428,7 @@ fclaw2d_domain_write (const char *filename, fclaw2d_domain_t * domain)
     p4est_t *p4est;
     p4est_wrap_t *wrap;
     p4est_file_context_t *fc;
-    int64_t parameters_buffer[2];
+    uint64_t parameters_buffer[2];
     sc_array_t parameters;
 
     FCLAW_ASSERT (filename != NULL);
@@ -362,7 +454,7 @@ fclaw2d_domain_write (const char *filename, fclaw2d_domain_t * domain)
                     && errcode == P4EST_FILE_ERR_SUCCESS,
                     "fclaw2d_domain_write: write connectivity");
 
-    /* Write the underlying p4est. */
+    /* TODO: We may want to write p4est_wrap or create it from the p4est */
     fc = p4est_file_write_p4est (fc, p4est, "p4est quadrants",
                                  "p4est quadrant data", &errcode);
     SC_CHECK_ABORT (fc != NULL
@@ -383,10 +475,6 @@ fclaw2d_domain_write (const char *filename, fclaw2d_domain_t * domain)
                     && errcode == P4EST_FILE_ERR_SUCCESS,
                     "fclaw2d_domain_write: write p4est wrap paramters");
 
-    /* Pack the patch data. */
-
-    /* Write the patch data. */
-
     /* Close the file. */
     /* TODO: This must be in an own function. */
     p4est_file_close (fc, &errcode);
@@ -399,7 +487,7 @@ fclaw2d_domain_write (const char *filename, fclaw2d_domain_t * domain)
 
 /** This function also reads the patch data and relies on the forestclaw
  * file convention.
- * TODO: Do we set the p4est user pointer too? This would correspond to a block
+ * TODO: Do we set the p4est user pointer to? This would correspond to block
  * section.
 */
 fclaw2d_domain_t *
@@ -411,7 +499,7 @@ fclaw2d_domain_read (sc_MPI_Comm mpicomm, const char *filename,
     char user_string[P4EST_FILE_USER_STRING_BYTES],
         quad_string[P4EST_FILE_USER_STRING_BYTES],
         quad_data_string[P4EST_FILE_USER_STRING_BYTES];
-    int64_t wrap_param_buffer[2];
+    uint64_t wrap_param_buffer[2];
     p4est_file_context_t *fc;
     p4est_connectivity_t *conn;
     p4est_t *p4est;
@@ -457,14 +545,17 @@ fclaw2d_domain_read (sc_MPI_Comm mpicomm, const char *filename,
     wrap = p4est_wrap_new_p4est (p4est, (int) wrap_param_buffer[0],
                                  (p4est_connect_type_t) wrap_param_buffer[1],
                                  replace_fn, wrap_user_pointer);
+    /* temporary to ensure memory balance */
+    p4est_wrap_destroy (wrap);
 
     /* Close the file. */
     p4est_file_close (fc, &errcode);
     SC_CHECK_ABORT (errcode == P4EST_FILE_ERR_SUCCESS,
                     "fclaw2d_domain_read: Error closing file");
 
-    return fclaw2d_domain_new (wrap, attributes);
+    return NULL;
 }
+#endif
 
 fclaw2d_domain_t *
 fclaw2d_domain_new_unitsquare (sc_MPI_Comm mpicomm, int initial_level)

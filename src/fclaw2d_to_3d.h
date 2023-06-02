@@ -45,6 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define fclaw2d_patch_t                 fclaw3d_patch_t
 #define fclaw2d_block_t                 fclaw3d_block_t
 #define fclaw2d_domain_t                fclaw3d_domain_t
+#define fclaw2d_file_context_t          fclaw3d_file_context_t
 #define fclaw2d_domain_persist_t        fclaw3d_domain_persist_t
 #define fclaw2d_patch_callback_t        fclaw3d_patch_callback_t
 #define fclaw2d_patch_relation_t        fclaw3d_patch_relation_t
@@ -78,6 +79,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define fclaw2d_domain_barrier          fclaw3d_domain_barrier
 #define fclaw2d_domain_dimension        fclaw3d_domain_dimension
 #define fclaw2d_check_initial_level     fclaw3d_check_initial_level
+#define fclaw2d_file_open_create        fclaw3d_file_open_create
+#define fclaw2d_file_write_glob         fclaw3d_file_write_glob
+#define fclaw2d_file_close              fclaw3d_file_close
 #define fclaw2d_domain_write            fclaw3d_domain_write
 #define fclaw2d_domain_read             fclaw3d_domain_read
 #define fclaw2d_domain_new_unitsquare   fclaw3d_domain_new_unitcube
@@ -164,6 +168,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define fclaw2d_global_destroy          fclaw3d_global_destroy
 #define fclaw2d_global_store_domain     fclaw3d_global_store_domain
 #define fclaw2d_global_store_map        fclaw3d_global_store_map
+#define fclaw2d_global_unpack           fclaw3d_global_unpack
+#define fclaw2d_global_pack             fclaw3d_global_pack
+#define fclaw2d_global_packsize         fclaw3d_global_packsize
 #define fclaw2d_global_iterate_level    fclaw3d_global_iterate_level
 #define fclaw2d_global_iterate_patches  fclaw3d_global_iterate_patches
 #define fclaw2d_global_iterate_families fclaw3d_global_iterate_families
