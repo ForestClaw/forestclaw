@@ -44,7 +44,7 @@ extern "C"
 /** Opaque context used for writing a fclaw2d data file. */
 typedef struct fclaw2d_file_context fclaw2d_file_context_t;
 
-/** Questions: Do we want to fix the glob for each writing process?
+/** Questions: Do we want to fix the glob for each writing workflow?
  * Do we want to store the user pointer of the p4est and/or the p4est_wrap
  * structure?
  */
@@ -52,8 +52,8 @@ typedef struct fclaw2d_file_context fclaw2d_file_context_t;
 /** Create and open a file that is associated with the given domain structure.
  *
  * This is a collective function call that overwrites the file if it exists
- * already. This function writes a header with metadata on the underlying
- * p4est of \b domain to the file.
+ * already. This function writes a header with metadata of the underlying
+ * p4est of the passed \b domain to the file.
  *
  * The opened file can be used to write to the file using the functions
  * \ref fclaw2d_file_write_global_opt, \ref fclaw2d_file_write_domain,
@@ -88,11 +88,16 @@ fclaw2d_file_context_t *fclaw2d_file_open_create (fclaw2d_domain_t * domain,
  * The user string is broadcasted to all ranks after reading.
  * The file must exist and be at least of the size of the file header.
  *
+ * This is a collective function.
  * If the file has wrong metadata the function reports the error using
  * /ref P4EST_LERRORF, collectively close the file and deallocate
  * the file context. In this case the function returns NULL on all ranks.
  * The wrong file format or a wrong file header causes \ref P4EST_FILE_ERR_FORMAT
  * as errcode.
+ *
+ * After calling this function the user can continue reading the opened file
+ * by calling \ref fclaw2d_file_read_domain, \ref fclaw2d_file_read_patch_data,
+ * \ref fclaw2d_file_read_global_opt or \ref fclaw2d_file_read_global. 
  *
  * This function does not abort on MPI I/O errors but returns NULL.
  * Without MPI I/O the function may abort on file system dependent
@@ -121,6 +126,7 @@ fclaw2d_file_context_t *fclaw2d_file_open_read (sc_MPI_Comm mpicomm,
  * file. One can only write the domain that was used by openeing the file using
  * \ref fclaw2d_file_open_create.
  *
+ * This is a collective function.
  * The mesh data is written in parallel using the partition of the mesh, i.e.
  * the domain and the underlying p4est, repectivley.
  *
@@ -145,7 +151,7 @@ fclaw2d_file_context_t *fclaw2d_file_open_read (sc_MPI_Comm mpicomm,
  *                              written to the file. If the user gives less
  *                              bytes the user_string in the file header is padded
  *                              by spaces.
- * \param [in]      errcode     An errcode that can be interpreted by
+ * \param [out]     errcode     An errcode that can be interpreted by
  *                              \ref fclaw2d_file_error_string.
  * \return                      Return a pointer to input context or NULL in case
  *                              of errors that does not abort the program.
@@ -160,6 +166,7 @@ fclaw2d_file_context_t *fclaw2d_file_write_domain (fclaw2d_file_context_t *
 
 /** Read a domain from an opened file using the MPI communicator of \b fc.
  *
+ * This is a collective function.
  * The read domain does not have patch data, which can be read by
  * \ref fclaw2d_file_read_patch_data.
  *
@@ -188,6 +195,8 @@ fclaw2d_file_context_t *fclaw2d_file_write_domain (fclaw2d_file_context_t *
  *                            the p4est_wrap structure that is used as element
  *                            of the read domain.
  * \param [out] domain        Newly allocated domain that is read from the file.
+ * \param [out]     errcode   An errcode that can be interpreted by
+ *                            \ref fclaw2d_file_error_string.
  * \return                    Return a pointer to input context or NULL in case
  *                            of errors that does not abort the program.
  *                            In case of error the file is tried to close
@@ -204,6 +213,7 @@ fclaw2d_file_context_t *fclaw2d_file_read_domain (fclaw2d_file_context_t * fc,
 
 /** Write patch data to an opened parallel file.
  *
+ * This is a collective function.
  * This function writes the patch data of a given domain to the opened file.
  * \b domain must coincide with the domain that was passed in for opening the
  * file by \ref fclaw2d_file_open_create.
@@ -242,6 +252,8 @@ fclaw2d_file_context_t *fclaw2d_file_write_patch_data (fclaw2d_file_context_t *
                                                      int *errcode);
 
 /** Read a patch data from an opened file using the MPI communicator of \b fc.
+ *
+ * This is a collective function.
  *
  * This function does not abort on MPI I/O errors but returns NULL.
  * Without MPI I/O the function may abort on file system dependent
@@ -285,6 +297,8 @@ fclaw2d_file_context_t *fclaw2d_file_read_patch_data (fclaw2d_file_context_t *
                                                     int *errcode);
 
 /** Close a file opened for parallel write/read and free the context.
+ *
+ * This is a collective function.
  *
  * This function does not abort on MPI I/O errors but returns NULL.
  * Without MPI I/O the function may abort on file system dependent

@@ -153,8 +153,9 @@ size_t fclaw2d_global_packsize(const fclaw2d_global_t * glob);
  */
 size_t fclaw2d_global_unpack(char* buffer, fclaw2d_global_t** glob);
 
-/** Write the options of global to the an opened file.
+/** Write the options of global to the opened file.
  *
+ * This is a collective function.
  * This function also writes the pack size of the global options to the
  * file. 
  *
@@ -189,6 +190,8 @@ fclaw2d_file_context_t * fclaw2d_file_write_global_opt (fclaw2d_file_context_t *
 
 /** Read the options of global to the an opened file.
  *
+ * This is a collective function.
+ *
  * This function does not abort on MPI I/O errors but returns NULL.
  * Without MPI I/O the function may abort on file system dependent
  * errors.
@@ -216,6 +219,7 @@ fclaw2d_file_context_t * fclaw2d_file_read_global_opt (fclaw2d_file_context_t *f
 
 /** Write the global struct to an opened file such that it can be used to restart.
  *
+ * This is a collective function.
  * The data is written in so-called file sections according to a prescribed
  * convention for storing data in ForestClaw.
  * TODO: Explicitly specify and document this convention.
@@ -237,7 +241,7 @@ fclaw2d_file_context_t * fclaw2d_file_read_global_opt (fclaw2d_file_context_t *f
  *                              written to the file. If the user gives less
  *                              bytes the user_string in the file header is padded
  *                              by spaces.
- * \param [in]      errcode     An errcode that can be interpreted by
+ * \param [out]       errcode   An errcode that can be interpreted by
  *                              \ref fclaw2d_file_error_string.
  * \return                      Return a pointer to input context or NULL in case
  *                              of errors that does not abort the program.
@@ -250,6 +254,8 @@ fclaw2d_file_context_t * fclaw2d_file_write_global (fclaw2d_file_context_t *fc,
                                                     int *errcode);
 
 /** Read a global struct to an opened file such that it can be used to restart.
+ *
+ * This is a collective function.
  *
  * This function does not abort on MPI I/O errors but returns NULL.
  * Without MPI I/O the function may abort on file system dependent
@@ -276,6 +282,8 @@ fclaw2d_file_context_t * fclaw2d_file_write_global (fclaw2d_file_context_t *fc,
  *                            the p4est_wrap structure that is used as element
  *                            of the read domain.
  * \param [out] global        Newly allocated global that is read from the file.
+ * \param [out] errcode       An errcode that can be interpreted by
+ *                            \ref fclaw2d_file_error_string.
  * \return                    Return a pointer to input context or NULL in case
  *                            of errors that does not abort the program.
  *                            In case of error the file is tried to close
