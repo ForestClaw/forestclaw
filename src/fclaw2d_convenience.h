@@ -56,8 +56,8 @@ typedef struct fclaw2d_file_context fclaw2d_file_context_t;
  * p4est of \b domain to the file.
  *
  * The opened file can be used to write to the file using the functions
- * \ref fclaw2d_file_write_glob_options, \ref fclaw2d_file_write_domain,
- * \ref fclaw2d_file_write_patch_data.
+ * \ref fclaw2d_file_write_global_opt, \ref fclaw2d_file_write_domain,
+ * \ref fclaw2d_file_write_patch_data and \ref fclaw2d_file_write_global. 
  *
  * This function does not abort on MPI I/O errors but returns NULL.
  * Without MPI I/O the function may abort on file system dependent
@@ -234,7 +234,7 @@ fclaw2d_file_context_t *fclaw2d_file_read_domain (fclaw2d_file_context_t * fc,
  *                              In case of error the file is tried to close
  *                              and \b fc is freed.
  */
-fclaw2d_file_write_t *fclaw2d_file_write_patch_data (fclaw2d_file_context_t *
+fclaw2d_file_context_t *fclaw2d_file_write_patch_data (fclaw2d_file_context_t *
                                                      fc, char *user_string,
                                                      fclaw2d_domain_t *
                                                      domain,
@@ -278,7 +278,7 @@ fclaw2d_file_write_t *fclaw2d_file_write_patch_data (fclaw2d_file_context_t *
  *                            the implementation of \ref
  *                            fclaw2d_file_read_global.
  */
-fclaw2d_file_write_t *fclaw2d_file_read_patch_data (fclaw2d_file_context_t *
+fclaw2d_file_context_t *fclaw2d_file_read_patch_data (fclaw2d_file_context_t *
                                                     fc, char *user_string,
                                                     fclaw2d_domain_t * domain,
                                                     size_t patch_data_size,
@@ -309,8 +309,7 @@ int fclaw2d_file_close (fclaw2d_file_context_t * fc, int *errcode);
  * \return                  \ref 1 on success or
  *                          something else on invalid arguments.
  */
-int
-fclaw2d_file_error_string (int errcode, char *string, int *resultlen);
+int fclaw2d_file_error_string (int errcode, char *string, int *resultlen);
 
 fclaw2d_domain_t *fclaw2d_domain_new_unitsquare (sc_MPI_Comm mpicomm,
                                                  int initial_level);
