@@ -3,7 +3,7 @@ fprintf("qmin = %12.4e\n",qmin);
 fprintf("qmax = %12.4e\n",qmax);
 
 
-plot_soln = true;
+plot_soln = false;
 if plot_soln
     N = 500;
     if (t > 0)
@@ -36,9 +36,16 @@ shg;
 
 
 NoQuery = 0;
-prt = false;
+prt = true;
 if (prt)
-  MaxFrames = 32;
-  filename = sprintf('filament_%04d.png',Frame)
-  print('-dpng',filename);
+    hidepatchborders;
+    figsize=[4,4];   
+    minlevel = 3;
+    maxlevel = 5;
+    mi = 2; 
+    mj = 2;
+    mx = 8;
+    maxres = mi*mx*2^maxlevel;   % 8*32 = 256
+    dpi = maxres/4;
+    plot_tikz_fig(Frame,figsize,'plot',dpi);
 end
