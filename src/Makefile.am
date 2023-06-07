@@ -69,7 +69,7 @@ libforestclaw_compiled_sources = \
 	src/fclaw_gauges.c \
 	src/fclaw_package.c \
 	src/fclaw_filesystem.cpp \
-	src/fclaw_pointer_map.cpp \
+	src/fclaw_pointer_map.c \
 	src/fclaw_math.c \
 	src/fclaw_timer.c \
 	src/fclaw_mpi.c \

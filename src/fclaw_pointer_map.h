@@ -85,6 +85,32 @@ void fclaw_pointer_map_insert(fclaw_pointer_map_t* map, const char* key, void* v
  */
 void* fclaw_pointer_map_get(fclaw_pointer_map_t* map, const char* key);
 
+/**
+ * @brief callback for pointer map iterator
+ * 
+ * @param key the key
+ * @param value the value associated with the key
+ * @param user the user pointer passed into iterator call
+ */
+typedef void (*fclaw_pointer_map_iterate_cb_t)(const char* key, void* pointer, void* user);
+
+/**
+ * @brief Iterate over all key-value pairs in the map
+ * 
+ * @param map the map to iterate over
+ * @param cb the callback called on eacy key-value pair
+ * @param user user pointer passed to the callback
+ */
+void fclaw_pointer_map_iterate(fclaw_pointer_map_t* map,fclaw_pointer_map_iterate_cb_t cb, void* user);
+
+/**
+ * @brief Get the number of key-value pairs in the map
+ * 
+ * @param map the map
+ * @return int the number of key-value pairs
+ */
+int fclaw_pointer_map_size(fclaw_pointer_map_t* map);
+
 #ifdef __cplusplus
 #if 0
 {
