@@ -25,6 +25,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw_base.h>
 #include <fclaw_mpi.h>
+#include <iniparser.h>
 
 static const char *fclaw_configdir = ".forestclaw";
 static const char *fclaw_env_configdir = "FCLAW_INI_DIR";
@@ -406,7 +407,7 @@ fclaw_app_options_register (fclaw_app_t * a,
 
     ao = (fclaw_app_options_t *) sc_array_push (a->opt_pkg);
     ao->section = section == NULL ? NULL : FCLAW_STRDUP (section);
-    ao->configfile = configfile == NULL ? NULL : FCLAW_STRDUP (section);
+    ao->configfile = configfile == NULL ? NULL : FCLAW_STRDUP (configfile);
     ao->vt = *vt;
     ao->package = package;
 
@@ -574,13 +575,84 @@ void fclaw_app_print_options(fclaw_app_t *app)
                                   FCLAW_VERBOSITY_ESSENTIAL, app->opt);    
 }
 
+int get_keys(const char *key,
+            const sc_keyvalue_entry_type_t type, 
+            void *entry,
+            const void *u)
+{
+    sc_array_t* filenames = (sc_array_t*) u;
+    sc_array_push(filenames);
+    const char** last = (const char**) sc_array_index(filenames, filenames->elem_count-1);
+    *last = key;
+    return 1;
+}
+
+static sc_array_t*
+check_sections_in_files(fclaw_app_t* a, fclaw_exit_type_t* vexit_ptr){
+
+    // section to filename
+    sc_keyvalue_t * section_to_file = sc_keyvalue_new();
+    for (size_t zz = 0; zz < a->opt_pkg->elem_count; ++zz)
+    {
+        fclaw_app_options_t* ao = (fclaw_app_options_t *) sc_array_index (a->opt_pkg, zz);
+        sc_keyvalue_set_pointer(section_to_file, (ao->section == NULL) ? "Options" : ao->section, ao->configfile);
+    }
+
+    // get an array of files
+    // key value just to get a set of unique filenames (the keys)
+    sc_keyvalue_t* filenames_kv = sc_keyvalue_new();
+    for (size_t zz = 0; zz < a->opt_pkg->elem_count; ++zz)
+    {
+        fclaw_app_options_t* ao = (fclaw_app_options_t *) sc_array_index (a->opt_pkg, zz);
+        sc_keyvalue_set_pointer(filenames_kv, ao->configfile, NULL);
+    }
+    sc_array_t* filenames  = sc_array_new(sizeof(char*));
+    sc_keyvalue_foreach(filenames_kv, get_keys, filenames);
+    sc_keyvalue_destroy(filenames_kv);
+
+    // read ini files
+    sc_array_t* ini_files  = sc_array_new(sizeof(dictionary*));
+    sc_array_resize(ini_files, filenames->elem_count);
+    for(size_t i = 0; i < filenames->elem_count; i++)
+    {
+        const char* filename = *(const char**) sc_array_index(filenames, i);
+        *(dictionary**) sc_array_index(ini_files, i) = iniparser_load(filename);
+    }
+
+    // go though all sections and check if they are in the correct files
+    for (size_t zz = 0; zz < a->opt_pkg->elem_count; ++zz)
+    {
+        fclaw_app_options_t* ao = (fclaw_app_options_t *) sc_array_index (a->opt_pkg, zz);
+        for(size_t i = 0; i < filenames->elem_count; i++)
+        {
+            const char* filename = *(const char**) sc_array_index(filenames, i);
+            dictionary* ini = (dictionary*) sc_array_index(ini_files, i);
+
+            // if there are keys in an unexpected file, print a warning
+            if(strcmp(filename, ao->configfile) != 0 && iniparser_getsecnkeys(ini, ao->section) > 0)
+            {
+                //
+                fclaw_global_productionf("Warning: section [%s] in file %s \n", ao->section, filename);
+            }
+        }
+    }
+
+    for(size_t i = 0; i < ini_files->elem_count; i++)
+    {
+        dictionary* ini = *(dictionary**) sc_array_index(ini_files, i);
+        iniparser_freedict(ini);
+    }
+    sc_array_destroy(ini_files);
+    sc_keyvalue_destroy(section_to_file);
+    return filenames;
+}
+
 fclaw_exit_type_t
 fclaw_app_options_parse (fclaw_app_t * a, int *first_arg,
                          const char *savefile)
 {
     int retval;
     size_t zz;
-    int fclaw_package_id;
     fclaw_exit_type_t vexit;
     fclaw_app_options_t *ao;
 
@@ -588,9 +660,18 @@ fclaw_app_options_parse (fclaw_app_t * a, int *first_arg,
 
     vexit = FCLAW_NOEXIT;
 
-    fclaw_package_id = fclaw_get_package_id ();
-    retval = sc_options_load (fclaw_package_id, FCLAW_VERBOSITY_ESSENTIAL, a->opt,
-                              "fclaw_options.ini");
+    sc_array_t* filenames = check_sections_in_files(a,&vexit);
+
+    for(size_t i = 0; i < filenames->elem_count; i++)
+    {
+        const char* filename = *(const char**) sc_array_index(filenames, i);
+        retval = sc_options_load (fclaw_package_id, FCLAW_VERBOSITY_ESSENTIAL, a->opt,
+                                  filename);
+
+    }
+
+    sc_array_destroy(filenames);
+
     if (retval < 0)
     {
         fclaw_global_essentialf("Problem reading fclaw_options.ini.\n");
