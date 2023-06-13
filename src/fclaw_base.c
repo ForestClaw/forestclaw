@@ -669,12 +669,12 @@ fclaw_app_options_parse (fclaw_app_t * a, int *first_arg,
                                       a->opt, filename);
         if (retval > 0)
         {
-            fclaw_global_essentialf("Problem reading fclaw_options.ini.\n");
+            fclaw_global_essentialf("ERROR: Problem reading %s\n", filename);
             vexit = FCLAW_EXIT_ERROR;
         }
         else
         {
-            fclaw_global_infof ("Reading file fclaw_options.ini.\n");
+            fclaw_global_infof ("Reading file %s\n", filename);
         }
     }
 
@@ -774,9 +774,7 @@ fclaw_app_options_parse (fclaw_app_t * a, int *first_arg,
 
     if(sc_is_root())
     {
-        fclaw_global_productionf("\n");
         check_sections_in_files(a, filenames);
-        fclaw_global_productionf("\n");
     }
 
     sc_array_destroy(filenames);
