@@ -588,16 +588,8 @@ int get_keys(const char *key,
 }
 
 static sc_array_t*
-check_sections_in_files(fclaw_app_t* a, fclaw_exit_type_t* vexit_ptr){
-
-    // section to filename
-    sc_keyvalue_t * section_to_file = sc_keyvalue_new();
-    for (size_t zz = 0; zz < a->opt_pkg->elem_count; ++zz)
-    {
-        fclaw_app_options_t* ao = (fclaw_app_options_t *) sc_array_index (a->opt_pkg, zz);
-        sc_keyvalue_set_pointer(section_to_file, (ao->section == NULL) ? "Options" : ao->section, ao->configfile);
-    }
-
+get_config_filenames(fclaw_app_t* a)
+{
     // get an array of files
     // key value just to get a set of unique filenames (the keys)
     sc_keyvalue_t* filenames_kv = sc_keyvalue_new();
@@ -606,9 +598,25 @@ check_sections_in_files(fclaw_app_t* a, fclaw_exit_type_t* vexit_ptr){
         fclaw_app_options_t* ao = (fclaw_app_options_t *) sc_array_index (a->opt_pkg, zz);
         sc_keyvalue_set_pointer(filenames_kv, ao->configfile, NULL);
     }
+
     sc_array_t* filenames  = sc_array_new(sizeof(char*));
+
     sc_keyvalue_foreach(filenames_kv, get_keys, filenames);
+
     sc_keyvalue_destroy(filenames_kv);
+    return filenames;
+}
+
+static fclaw_exit_type_t
+check_sections_in_files(fclaw_app_t* a, sc_array_t* filenames, fclaw_exit_type_t vexit){
+
+    // section to filename
+    sc_keyvalue_t * section_to_file = sc_keyvalue_new();
+    for (size_t zz = 0; zz < a->opt_pkg->elem_count; ++zz)
+    {
+        fclaw_app_options_t* ao = (fclaw_app_options_t *) sc_array_index (a->opt_pkg, zz);
+        sc_keyvalue_set_pointer(section_to_file, (ao->section == NULL) ? "Options" : ao->section, ao->configfile);
+    }
 
     // read ini files
     sc_array_t* ini_files  = sc_array_new(sizeof(dictionary*));
@@ -644,14 +652,13 @@ check_sections_in_files(fclaw_app_t* a, fclaw_exit_type_t* vexit_ptr){
     }
     sc_array_destroy(ini_files);
     sc_keyvalue_destroy(section_to_file);
-    return filenames;
+    return vexit;
 }
 
 fclaw_exit_type_t
 fclaw_app_options_parse (fclaw_app_t * a, int *first_arg,
                          const char *savefile)
 {
-    int retval;
     size_t zz;
     fclaw_exit_type_t vexit;
     fclaw_app_options_t *ao;
@@ -660,31 +667,27 @@ fclaw_app_options_parse (fclaw_app_t * a, int *first_arg,
 
     vexit = FCLAW_NOEXIT;
 
-    sc_array_t* filenames = check_sections_in_files(a,&vexit);
+    sc_array_t* filenames = get_config_filenames(a);
+
+    vexit = check_sections_in_files(a, filenames, vexit);
 
     for(size_t i = 0; i < filenames->elem_count; i++)
     {
         const char* filename = *(const char**) sc_array_index(filenames, i);
-        retval = sc_options_load (fclaw_package_id, FCLAW_VERBOSITY_ESSENTIAL, a->opt,
-                                  filename);
-
+        int retval = sc_options_load (fclaw_package_id, FCLAW_VERBOSITY_ESSENTIAL, 
+                                      a->opt, filename);
+        if (retval > 0)
+        {
+            fclaw_global_essentialf("Problem reading fclaw_options.ini.\n");
+            vexit = FCLAW_EXIT_ERROR;
+        }
+        else
+        {
+            fclaw_global_infof ("Reading file fclaw_options.ini.\n");
+        }
     }
 
     sc_array_destroy(filenames);
-
-    if (retval < 0)
-    {
-        fclaw_global_essentialf("Problem reading fclaw_options.ini.\n");
-    }
-    else
-    {
-        fclaw_global_infof ("Reading file fclaw_options.ini.\n");
-    }
-
-    if(retval > 0)
-    {
-        vexit = FCLAW_EXIT_ERROR;
-    }
 
     /* parse command line options with given priority for errors */
     a->first_arg =
@@ -768,8 +771,8 @@ fclaw_app_options_parse (fclaw_app_t * a, int *first_arg,
     /* print configuration if so desired */
     if (vexit != FCLAW_EXIT_ERROR && sc_is_root () && savefile != NULL)
     {
-        retval = sc_options_save (fclaw_get_package_id (),
-                                  FCLAW_VERBOSITY_ERROR, a->opt, savefile);
+        int retval = sc_options_save (fclaw_get_package_id (),
+                                      FCLAW_VERBOSITY_ERROR, a->opt, savefile);
         if (retval)
         {
             vexit = FCLAW_EXIT_ERROR;
