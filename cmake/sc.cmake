@@ -33,6 +33,7 @@ set(cmake_sc_args
 -DBUILD_TESTING:BOOL=false
 -Dmpi:BOOL=${mpi}
 -Dopenmp:BOOL=${openmp}
+-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
 )
 
 ExternalProject_Add(SC

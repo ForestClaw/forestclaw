@@ -28,6 +28,7 @@ CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=${P4EST_ROOT}
            -Dmpi:BOOL=${mpi} 
            -Dopenmp:BOOL=${openmp}
            -DSC_ROOT:PATH=${SC_ROOT}
+           -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
 BUILD_BYPRODUCTS ${P4EST_LIBRARIES}
 DEPENDS SC-install
 )
