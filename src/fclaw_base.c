@@ -607,16 +607,8 @@ get_config_filenames(fclaw_app_t* a)
     return filenames;
 }
 
-static fclaw_exit_type_t
-check_sections_in_files(fclaw_app_t* a, sc_array_t* filenames, fclaw_exit_type_t vexit){
-
-    // section to filename
-    sc_keyvalue_t * section_to_file = sc_keyvalue_new();
-    for (size_t zz = 0; zz < a->opt_pkg->elem_count; ++zz)
-    {
-        fclaw_app_options_t* ao = (fclaw_app_options_t *) sc_array_index (a->opt_pkg, zz);
-        sc_keyvalue_set_pointer(section_to_file, (ao->section == NULL) ? "Options" : ao->section, ao->configfile);
-    }
+static void
+check_sections_in_files(fclaw_app_t* a, sc_array_t* filenames){
 
     // read ini files
     sc_array_t* ini_files  = sc_array_new(sizeof(dictionary*));
@@ -634,13 +626,15 @@ check_sections_in_files(fclaw_app_t* a, sc_array_t* filenames, fclaw_exit_type_t
         for(size_t i = 0; i < filenames->elem_count; i++)
         {
             const char* filename = *(const char**) sc_array_index(filenames, i);
-            dictionary* ini = (dictionary*) sc_array_index(ini_files, i);
+            dictionary* ini = *(dictionary**) sc_array_index(ini_files, i);
+            const char* section = ao->section == NULL ? "Options" : ao->section;
+
 
             // if there are keys in an unexpected file, print a warning
-            if(strcmp(filename, ao->configfile) != 0 && iniparser_getsecnkeys(ini, ao->section) > 0)
+            if(strcmp(filename, ao->configfile) != 0 && iniparser_find_entry(ini, section))
             {
-                //
-                fclaw_global_productionf("Warning: section [%s] in file %s \n", ao->section, filename);
+                fclaw_global_productionf("Warning: Unexpected section [%s] was found in file %s.\n", 
+                                         section, filename);
             }
         }
     }
@@ -651,8 +645,6 @@ check_sections_in_files(fclaw_app_t* a, sc_array_t* filenames, fclaw_exit_type_t
         iniparser_freedict(ini);
     }
     sc_array_destroy(ini_files);
-    sc_keyvalue_destroy(section_to_file);
-    return vexit;
 }
 
 fclaw_exit_type_t
@@ -669,7 +661,6 @@ fclaw_app_options_parse (fclaw_app_t * a, int *first_arg,
 
     sc_array_t* filenames = get_config_filenames(a);
 
-    vexit = check_sections_in_files(a, filenames, vexit);
 
     for(size_t i = 0; i < filenames->elem_count; i++)
     {
@@ -686,8 +677,6 @@ fclaw_app_options_parse (fclaw_app_t * a, int *first_arg,
             fclaw_global_infof ("Reading file fclaw_options.ini.\n");
         }
     }
-
-    sc_array_destroy(filenames);
 
     /* parse command line options with given priority for errors */
     a->first_arg =
@@ -780,6 +769,17 @@ fclaw_app_options_parse (fclaw_app_t * a, int *first_arg,
                                 savefile);
         }
     }
+
+    // run checks on options
+
+    if(sc_is_root())
+    {
+        fclaw_global_productionf("\n");
+        check_sections_in_files(a, filenames);
+        fclaw_global_productionf("\n");
+    }
+
+    sc_array_destroy(filenames);
 
     /* we are done */
     if (first_arg != NULL)

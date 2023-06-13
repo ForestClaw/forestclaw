@@ -457,17 +457,19 @@ main (int argc, char **argv)
     app = fclaw_app_new (&argc, &argv, NULL);
 
     /* Register packages */
-    filament_fclaw_opt                    = fclaw_options_register(app,  "filament",           "fclaw_options.ini");
-    filament_clawpatch_opt    = fclaw2d_clawpatch_options_register(app, "filament-clawpatch",  "fclaw_options.ini");
-    filament_claw46_opt         = fc2d_clawpack46_options_register(app, "filament-clawpack46", "fclaw_options.ini");
-    filament_claw5_opt           = fc2d_clawpack5_options_register(app, "filament-clawpack5",  "fclaw_options.ini");
-    filament_user_opt =                  filament_options_register(app, "filament-user",       "fclaw_options.ini");  
+    fclaw_app_options_register_core(app, "filament_options.ini"); //Global options like verbosity, etc
 
-    swirl_fclaw_opt =                   fclaw_options_register(app, "swirl",            "fclaw_options.ini");
-    swirl_clawpatch_opt =   fclaw2d_clawpatch_options_register(app, "swirl-clawpatch",  "fclaw_options.ini");
-    swirl_claw46_opt =        fc2d_clawpack46_options_register(app, "swirl-clawpack46", "fclaw_options.ini");
-    swirl_claw5_opt =          fc2d_clawpack5_options_register(app, "swirl-clawpack5",  "fclaw_options.ini");
-    swirl_user_opt =                    swirl_options_register(app, "swirl-user",       "fclaw_options.ini");  
+    filament_fclaw_opt                    = fclaw_options_register(app, "filament",            "filament_options.ini");
+    filament_clawpatch_opt    = fclaw2d_clawpatch_options_register(app, "filament-clawpatch",  "filament_options.ini");
+    filament_claw46_opt         = fc2d_clawpack46_options_register(app, "filament-clawpack46", "filament_options.ini");
+    filament_claw5_opt           = fc2d_clawpack5_options_register(app, "filament-clawpack5",  "filament_options.ini");
+    filament_user_opt =                  filament_options_register(app, "filament-user",       "filament_options.ini");  
+
+    swirl_fclaw_opt =                   fclaw_options_register(app, "swirl",            "swirl_options.ini");
+    swirl_clawpatch_opt =   fclaw2d_clawpatch_options_register(app, "swirl-clawpatch",  "swirl_options.ini");
+    swirl_claw46_opt =        fc2d_clawpack46_options_register(app, "swirl-clawpack46", "swirl_options.ini");
+    swirl_claw5_opt =          fc2d_clawpack5_options_register(app, "swirl-clawpack5",  "swirl_options.ini");
+    swirl_user_opt =                    swirl_options_register(app, "swirl-user",       "swirl_options.ini");  
 
     /* Read configuration file(s) */
     vexit =  fclaw_app_options_parse (app, &first_arg,"fclaw_options.ini.used");
