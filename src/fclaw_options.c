@@ -335,11 +335,11 @@ fclaw_register (fclaw_options_t* fclaw_opt, sc_options_t * opt)
 
     sc_options_add_string (opt, 0, "logging-prefix",
                            &fclaw_opt->logging_prefix, 
-                           0,"prefixed used for logging [NULL]");    
+                           "","prefixed used for logging [NULL]");    
 
     sc_options_add_string (opt, 0, "regression-check",
                            &fclaw_opt->regression_check, 
-                           0,"filename of expected regresssion values [NULL]");    
+                           "","filename of expected regresssion values [NULL]");    
 
     fclaw_opt->is_registered = 1;
 

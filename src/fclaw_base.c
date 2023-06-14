@@ -173,7 +173,14 @@ static const char* logging_prefix = NULL;
 void 
 fclaw_set_logging_prefix(const char* new_name)
 {
-    logging_prefix=new_name;
+    if(new_name == NULL || strcmp(new_name, "") == 0)
+    {
+        logging_prefix=NULL;
+    } 
+    else 
+    {
+        logging_prefix=new_name;
+    }
 }
 
 static void
@@ -647,6 +654,54 @@ check_sections_in_files(fclaw_app_t* a, sc_array_t* filenames){
     sc_array_destroy(ini_files);
 }
 
+static void
+check_for_unused_options(fclaw_app_t* a, const char* savefile, sc_array_t* filenames){
+
+    dictionary* save_ini = iniparser_load(savefile);
+
+    // read ini files
+    sc_array_t* ini_files  = sc_array_new(sizeof(dictionary*));
+    sc_array_resize(ini_files, filenames->elem_count);
+    for(size_t i = 0; i < filenames->elem_count; i++)
+    {
+        const char* filename = *(const char**) sc_array_index(filenames, i);
+        *(dictionary**) sc_array_index(ini_files, i) = iniparser_load(filename);
+    }
+
+    // go though all sections and check if they are in the correct files
+    for(size_t i = 0; i < filenames->elem_count; i++)
+    {
+        const char* filename = *(const char**) sc_array_index(filenames, i);
+        dictionary* ini = *(dictionary**) sc_array_index(ini_files, i);
+        int nsec = iniparser_getnsec(ini);
+        for (int i_sec = 0; i_sec < nsec; i_sec++)
+        {
+            char* section = iniparser_getsecname(ini, i_sec);
+            if(strcmp(section, "arguments") != 0)
+            {
+                int nkey = iniparser_getsecnkeys(ini, section);
+                char** keys = iniparser_getseckeys(ini, section);
+
+                for (int i_key = 0; i_key < nkey; i_key++)
+                {
+                    char* key = keys[i_key];
+                    if(!iniparser_find_entry(save_ini, key))
+                    {
+                        fclaw_global_productionf("WARNING: %s has an unused option %s.\n", filename, keys[i_key]);
+                    }
+                }
+            }
+        }
+    }
+
+    for(size_t i = 0; i < ini_files->elem_count; i++)
+    {
+        dictionary* ini = *(dictionary**) sc_array_index(ini_files, i);
+        iniparser_freedict(ini);
+    }
+    sc_array_destroy(ini_files);
+}
+
 fclaw_exit_type_t
 fclaw_app_options_parse (fclaw_app_t * a, int *first_arg,
                          const char *savefile)
@@ -775,6 +830,7 @@ fclaw_app_options_parse (fclaw_app_t * a, int *first_arg,
     if(sc_is_root())
     {
         check_sections_in_files(a, filenames);
+        check_for_unused_options(a, savefile, filenames);
     }
 
     sc_array_destroy(filenames);
