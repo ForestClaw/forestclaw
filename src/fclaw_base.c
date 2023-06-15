@@ -679,16 +679,24 @@ check_for_unused_options(fclaw_app_t* a, const char* savefile, sc_array_t* filen
             char* section = iniparser_getsecname(ini, i_sec);
             if(strcmp(section, "arguments") != 0)
             {
-                int nkey = iniparser_getsecnkeys(ini, section);
-                char** keys = iniparser_getseckeys(ini, section);
-
-                for (int i_key = 0; i_key < nkey; i_key++)
+                if(iniparser_find_entry(save_ini,section))
                 {
-                    char* key = keys[i_key];
-                    if(!iniparser_find_entry(save_ini, key))
+                    int nkey = iniparser_getsecnkeys(ini, section);
+                    char** keys = iniparser_getseckeys(ini, section);
+
+                    for (int i_key = 0; i_key < nkey; i_key++)
                     {
-                        fclaw_global_productionf("WARNING: %s has an unused option %s.\n", filename, keys[i_key]);
+                        char* key = keys[i_key];
+                        if(!iniparser_find_entry(save_ini, key))
+                        {
+                            fclaw_global_productionf("WARNING: %s has unused option %s.\n", filename, keys[i_key]);
+                        }
                     }
+                }
+                else
+                {
+                    fclaw_global_productionf("WARNING: %s has unused section [%s].\n", filename, section);
+
                 }
             }
         }
