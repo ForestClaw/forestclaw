@@ -5,15 +5,15 @@ bin_PROGRAMS += applications/clawpack/advection/p8/swirl/swirl
 #TESTS += applications/clawpack/advection/p8/swirl/regressions.sh
 
 applications_clawpack_advection_p8_swirl_swirl_SOURCES = \
-	applications/clawpack/advection/p8/swirl/swirl.cpp
+        applications/clawpack/advection/p8/swirl/swirl.cpp \
+        applications/clawpack/advection/p8/swirl/swirl_options.c \
+        applications/clawpack/advection/p8/swirl/swirl_user.h
 
 ## 	applications/clawpack/advection/p8/swirl/swirl_user.cpp \
-## 	applications/clawpack/advection/p8/swirl/swirl_user.h \
 ## 	applications/clawpack/advection/p8/swirl/swirl_map_extrude.c \
 ## 	applications/clawpack/advection/2d/all/fclaw2d_map_cart.c \
 ## 	applications/clawpack/advection/2d/all/fclaw2d_map_fivepatch.c \
 ## 	applications/clawpack/advection/2d/all/fclaw2d_map_bilinear.c \
-## 	applications/clawpack/advection/p8/swirl/swirl_options.c \
 ## 	applications/clawpack/advection/p8/swirl/setprob.f90 \
 ## 	applications/clawpack/advection/p8/swirl/fdisc.f \
 ## 	applications/clawpack/advection/p8/swirl/user_exceeds_th.f90 \
@@ -42,7 +42,6 @@ EXTRA_DIST += \
 ##         $(AM_CPPFLAGS) \
 ##         $(FCLAW_CLAWPACK3_46_CPPFLAGS) \
 ##         $(FCLAW_CLAWPATCH_CPPFLAGS)
-## 
 ## 
 ## applications_clawpack_advection_p8_swirl_swirl_LDADD = \
 ##         $(LDADD) \

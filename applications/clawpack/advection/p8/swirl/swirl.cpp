@@ -40,39 +40,53 @@ fclaw3d_domain_t* create_domain(sc_MPI_Comm mpicomm,
 
 #ifdef P8HACK
     fclaw2d_map_context_t    *cont = NULL, *brick = NULL;
+#endif
 
     int mi = fclaw_opt->mi;
     int mj = fclaw_opt->mj;
+    int mk = 1;
     int a = fclaw_opt->periodic_x;
     int b = fclaw_opt->periodic_y;
+    int c = 0;
 
-    int mx = clawpatch_opt->mx;
     int minlevel = fclaw_opt->minlevel;
+
+#ifdef P8HACK
+    int mx = clawpatch_opt->mx;
     int check = mi*mx*pow_int(2,minlevel);
+#endif
 
     switch (user->example)
     {
     case 0:
+#ifdef P8HACK
         FCLAW_ASSERT(claw3_opt->mcapa == 0);
         FCLAW_ASSERT(fclaw_opt->manifold == 0);
+#endif
         /* Size is set by [ax,bx] x [ay, by], set in .ini file */
-        conn = p4est_connectivity_new_unitsquare();
+        conn = p8est_connectivity_new_unitcube();
+#ifdef P8HACK
         cont = fclaw2d_map_new_nomap();
+#endif
         break;
 
     case 1:
         /* Square brick domain */
+#ifdef P8HACK
         FCLAW_ASSERT(claw3_opt->mcapa != 0);
         FCLAW_ASSERT(fclaw_opt->manifold != 0);
         FCLAW_ASSERT(clawpatch_opt->maux == 4);
-        conn = p4est_connectivity_new_brick(mi,mj,a,b);
+#endif
+        conn = p8est_connectivity_new_brick(mi,mj,mk,a,b,c);
+#ifdef P8HACK
         brick = fclaw2d_map_new_brick_conn (conn,mi,mj);
         /* Square in [-1,1]x[-1,1], scaled/shifted to [0,1]x[0,1] */
         cont = fclaw2d_map_new_cart(brick,
                                     fclaw_opt->scale,
                                     fclaw_opt->shift);
-
+#endif
         break;
+#ifdef P8HACK
     case 2:
         FCLAW_ASSERT(fclaw_opt->manifold != 0);
         FCLAW_ASSERT(claw3_opt->mcapa != 0);
@@ -105,10 +119,12 @@ fclaw3d_domain_t* create_domain(sc_MPI_Comm mpicomm,
                                          fclaw_opt->shift,
                                          user->center);
         break;
-
+#endif /* P8HACK */
     default:
         SC_ABORT_NOT_REACHED ();
     }
+
+#ifdef P8HACk
 
     if (user->example > 0)
     {
@@ -168,7 +184,7 @@ main (int argc, char **argv)
     fclaw_app_t *app;
 
     /* Options */
-    user_options_t               *user_opt = NULL;
+    user_options_t               *user_opt;
 #if 0
     fclaw3dx_clawpatch_options_t *clawpatch_opt = NULL;
     fc3d_clawpack46_options_t    *claw46_opt = NULL;
@@ -198,8 +214,9 @@ main (int argc, char **argv)
 #ifdef P8HACK
     clawpatch_opt =  fclaw3dx_clawpatch_options_register(app, "clawpatch", "fclaw_options.ini");
     claw46_opt =        fc3d_clawpack46_options_register(app, "claw3",     "fclaw_options.ini");
-    user_opt =                    swirl_options_register(app,              "fclaw_options.ini");
 #endif /* P8HACK */
+
+    user_opt =                    swirl_options_register(app,              "fclaw_options.ini");
 
     /* Read configuration file(s) and command line, and process options */
     options = fclaw_app_get_options (app);

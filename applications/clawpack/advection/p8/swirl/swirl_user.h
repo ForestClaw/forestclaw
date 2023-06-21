@@ -54,15 +54,18 @@ typedef struct user_options
 
 void swirl_link_solvers(fclaw2d_global_t *glob);
 
+#endif /* P8HACK */
+
 /* ------------------------------------- Options ---------------------------------------*/
 
 user_options_t* swirl_options_register (fclaw_app_t * app,
                                         const char *configfile);
 
-void swirl_options_store (fclaw2d_global_t* glob, user_options_t* user);
+void swirl_options_store (fclaw3d_global_t* glob, user_options_t* user);
 
-const user_options_t* swirl_get_options(fclaw2d_global_t* glob);
+const user_options_t* swirl_get_options(fclaw3d_global_t* glob);
 
+#ifdef P8HACK
 
 #define SWIRL_SETAUX_MANIFOLD FCLAW_F77_FUNC(swirl_setaux_manifold, \
                                                SWIRL_SETAUX_MANIFOLD)
