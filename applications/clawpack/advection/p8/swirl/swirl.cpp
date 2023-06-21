@@ -196,9 +196,7 @@ main (int argc, char **argv)
     int first_arg;
     fclaw_exit_type_t vexit;
 
-#ifdef P8HACK
     fclaw3d_global_t            *glob;
-#endif
     fclaw3d_domain_t            *domain;
 
     int retval;
@@ -230,23 +228,24 @@ main (int argc, char **argv)
         domain = create_domain(mpicomm, fclaw_opt, user_opt, clawpatch_opt,
                                claw46_opt);
 
-#ifdef P8HACK
-
         /* Create global structure which stores the domain, timers, etc */
-        glob = fclaw2d_global_new();
-        fclaw2d_global_store_domain(glob, domain);
+        glob = fclaw3d_global_new();
+        fclaw3d_global_store_domain(glob, domain);
 
+#ifdef P8HACK
         /* Store option packages in glob */
-        fclaw2d_options_store           (glob, fclaw_opt);
+        fclaw3d_options_store           (glob, fclaw_opt);
+
         fclaw3dx_clawpatch_options_store(glob, clawpatch_opt);
         fc3d_clawpack46_options_store   (glob, claw46_opt);
+#endif /* P8HACK */
         swirl_options_store             (glob, user_opt);
 
+#ifdef P8HACK
         run_program(glob);
+#endif /* P8HACk */
 
-        fclaw2d_global_destroy(glob);
-
-#endif
+        fclaw3d_global_destroy(glob);
     }
 
     fclaw_app_destroy (app);
