@@ -27,22 +27,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef P4_TO_P8
 #include <fclaw2d_domain.h>
 #include <fclaw2d_convenience.h>  /* Contains domain_destroy and others */
-
 #include <fclaw2d_patch.h>
 #include <fclaw2d_exchange.h>
 #include <fclaw2d_global.h>
 #else
 #include <fclaw3d_domain.h>
 #include <fclaw3d_convenience.h>  /* Contains domain_destroy and others */
-#include <fclaw3d_global.h>
+#include <fclaw3d_patch.h>
 #include <fclaw3d_exchange.h>
-
-/* when ready include <fclaw3d_patch.h> */
-typedef struct fclaw3d_patch_data
-{
-    const fclaw3d_patch_t *real_patch;
-}
-fclaw3d_patch_data_t;
+#include <fclaw3d_global.h>
 #endif
 
 /* dimension-independent helper functions first */
@@ -237,13 +230,10 @@ void fclaw2d_domain_reset(fclaw2d_global_t* glob)
 
         for(j = 0; j < block->num_patches; j++)
         {
-#ifndef P4_TO_P8
-            /* TO DO: translate fclaw2d_patch files */
             /* This is here to delete any patches created during
                initialization, and not through regridding */
             fclaw2d_patch_t *patch = block->patches + j;
             fclaw2d_patch_data_delete(glob,patch);
-#endif
         }
         block->user = NULL;
     }
