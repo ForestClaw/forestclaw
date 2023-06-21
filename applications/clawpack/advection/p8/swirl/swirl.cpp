@@ -23,11 +23,9 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifdef P8HACK
 #include "swirl_user.h"
-#endif
 
-#include <fclaw2d_defs.h>
+#include <fclaw3d_defs.h>
 
 #ifdef P8HACK
 
@@ -163,8 +161,8 @@ void run_program(fclaw2d_global_t* glob)
 int
 main (int argc, char **argv)
 {
-#ifdef P8HACK
     fclaw_app_t *app;
+#ifdef P8HACK
     int first_arg;
     fclaw_exit_type_t vexit;
 
@@ -180,10 +178,12 @@ main (int argc, char **argv)
     sc_MPI_Comm mpicomm;
 
     int retval;
+#endif
 
     /* Initialize application */
     app = fclaw_app_new (&argc, &argv, NULL);
 
+#ifdef P8HACK
     /* Create new options packages */
     fclaw_opt =                   fclaw_options_register(app,  NULL,       "fclaw_options.ini");
     clawpatch_opt =  fclaw3dx_clawpatch_options_register(app, "clawpatch", "fclaw_options.ini");
@@ -219,8 +219,8 @@ main (int argc, char **argv)
         fclaw2d_global_destroy(glob);        
     }
     
+#endif
     fclaw_app_destroy (app);
 
-#endif
     return 0;
 }

@@ -23,30 +23,64 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FCLAW3D_DEFS_H
-#define FCLAW3D_DEFS_H
+#ifndef ADVECTION_USER_P8_H
+#define ADVECTION_USER_P8_H
+
+#include <fclaw3d_include_all.h>
+
+#ifdef P8HACK
+
+#include <fclaw3dx_clawpatch_pillow.h>
+
+/* Headers for both Clawpack 4.6 and  Clawpack 5.0 */
+#include <fclaw3dx_clawpatch.h>
+#include <fclaw3dx_clawpatch_options.h>
+#include <fclaw3dx_clawpatch_fort.h>
+
+
+/* Clawpack 4.6 headers */  
+#include <fc3d_clawpack46.h>  
+#include <fc3d_clawpack46_options.h>
+#include <fc3d_clawpack46_fort.h>  
+#include <fc3d_clawpack46_user_fort.h>  
+#include <fclaw3dx_clawpatch46_fort.h>
+
+#if 0
+/* Clawpack 5.0 headers */
+#include <fc2d_clawpack5.h>
+#include <fc2d_clawpack5_options.h>
+#include <fc2d_clawpack5_fort.h>
+#include <clawpack5_user_fort.h>
+#include <fclaw3dx_clawpatch5_fort.h>
+#endif
+
+
+/* Headers for common FORTRAN files */
+#include "advection_user_fort3.h"
+
+#endif /* P8HACK */
 
 #ifdef __cplusplus
 extern "C"
 {
-#if 0
-}                               /* need this because indent is dumb */
-#endif
 #endif
 
-#define FCLAW3D_SPACEDIM     3          /**< mesh dimension */
-#define FCLAW3D_NUMFACES     6          /**< faces per cell */
-#define FCLAW3D_NUMEDGES     12         /**< edges per cell */
-#define FCLAW3D_NUMCORNERS   8          /**< corners per cell */
-#define FCLAW3D_NUMSIBLINGS  8          /**< children per cell */
-#define FCLAW3D_NUMFACENEIGHBORS 4      /**< half-size neighbors per face */
-/* not redefining REFINEFACTOR, which should be dimension-independent */
+#if 0
+/* Fix syntax */
+#endif
+
+#ifdef P8HACK
+
+void claw3_advection_patch_setup_manifold(fclaw2d_global_t *glob,
+                                          fclaw2d_patch_t *patch,
+                                          int block,
+                                          int patchno,
+                                          int claw_version);
+
+#endif
 
 #ifdef __cplusplus
-#if 0
-{                               /* need this because indent is dumb */
-#endif
 }
 #endif
 
-#endif /* !FCLAW3D_DEFS_H */
+#endif /* !ADVECTION_USER_P8_H */
