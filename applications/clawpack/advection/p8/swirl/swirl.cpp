@@ -124,18 +124,17 @@ fclaw3d_domain_t* create_domain(sc_MPI_Comm mpicomm,
         SC_ABORT_NOT_REACHED ();
     }
 
-#ifdef P8HACk
-
+#ifdef P8HACK
     if (user->example > 0)
     {
         swirl_map_extrude(cont,user->maxelev);
     }
-
-    domain = fclaw2d_domain_new_conn_map (mpicomm, fclaw_opt->minlevel, conn, cont);
-    fclaw2d_domain_list_levels(domain, FCLAW_VERBOSITY_ESSENTIAL);
-    fclaw2d_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);
-
 #endif /* P8HACK */
+
+    domain = fclaw3d_domain_new_conn (mpicomm, fclaw_opt->minlevel, conn);
+    fclaw3d_domain_list_levels(domain, FCLAW_VERBOSITY_ESSENTIAL);
+    fclaw3d_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);
+
     return domain;
 }
 

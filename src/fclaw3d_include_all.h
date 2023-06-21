@@ -38,10 +38,10 @@
 
 #include <fclaw3d_forestclaw.h>
 #include <fclaw3d_diagnostics.h>
-#include <fclaw3d_domain.h>
 
 #endif /* P8HACK */
 
+#include <fclaw3d_domain.h>
 #include <fclaw3d_global.h>
 #include <fclaw3d_convenience.h>
 
