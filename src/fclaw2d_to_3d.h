@@ -45,6 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define fclaw2d_patch_t                 fclaw3d_patch_t
 #define fclaw2d_block_t                 fclaw3d_block_t
 #define fclaw2d_domain_t                fclaw3d_domain_t
+#define fclaw2d_domain_data_t           fclaw3d_domain_data_t
 #define fclaw2d_domain_persist_t        fclaw3d_domain_persist_t
 #define fclaw2d_patch_callback_t        fclaw3d_patch_callback_t
 #define fclaw2d_patch_relation_t        fclaw3d_patch_relation_t
@@ -113,6 +114,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define fclaw2d_domain_set_refinement   fclaw3d_domain_set_refinement
 #define fclaw2d_patch_mark_refine       fclaw3d_patch_mark_refine
 #define fclaw2d_patch_mark_coarsen      fclaw3d_patch_mark_coarsen
+#define fclaw2d_domain_data_new         fclaw3d_domain_data_new
+#define fclaw2d_domain_data_delete      fclaw3d_domain_data_delete
+#define fclaw2d_domain_get_data         fclaw3d_domain_get_data
+#define fclaw2d_domain_setup            fclaw3d_domain_setup
+#define fclaw2d_domain_reset            fclaw3d_domain_reset
 #define fclaw2d_domain_iterate_adapted  fclaw3d_domain_iterate_adapted
 #define fclaw2d_domain_assign_for_partition fclaw3d_domain_assign_for_partition
 #define fclaw2d_domain_allocate_before_partition    fclaw3d_domain_allocate_before_partition
