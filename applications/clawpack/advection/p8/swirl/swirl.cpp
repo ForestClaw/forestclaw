@@ -27,18 +27,18 @@
 
 #include <fclaw3d_defs.h>
 
-#ifdef P8HACK
-
 static
-fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, 
-                                fclaw_options_t* fclaw_opt, 
-                                user_options_t* user,
-                                fclaw3dx_clawpatch_options_t* clawpatch_opt,
-                                fc3d_clawpack46_options_t *claw3_opt)
+fclaw3d_domain_t* create_domain(sc_MPI_Comm mpicomm,
+                                fclaw_options_t* fclaw_opt,
+                                user_options_t *user,
+                                void *clawpatch_opt,
+                                void *claw3_opt)
 {
     /* Mapped, multi-block domain */
-    p4est_connectivity_t     *conn = NULL;
-    fclaw2d_domain_t         *domain;
+    p8est_connectivity_t     *conn = NULL;
+    fclaw3d_domain_t         *domain = NULL;
+
+#ifdef P8HACK
     fclaw2d_map_context_t    *cont = NULL, *brick = NULL;
 
     int mi = fclaw_opt->mi;
@@ -50,7 +50,7 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm,
     int minlevel = fclaw_opt->minlevel;
     int check = mi*mx*pow_int(2,minlevel);
 
-    switch (user->example) 
+    switch (user->example)
     {
     case 0:
         FCLAW_ASSERT(claw3_opt->mcapa == 0);
@@ -100,9 +100,9 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm,
         FCLAW_ASSERT(mi == 2 && mj == 2);
         conn = p4est_connectivity_new_brick(mi,mj,a,b);
         brick = fclaw2d_map_new_brick_conn (conn,mi,mj);
-        cont = fclaw2d_map_new_bilinear (brick, 
+        cont = fclaw2d_map_new_bilinear (brick,
                                          fclaw_opt->scale,
-                                         fclaw_opt->shift, 
+                                         fclaw_opt->shift,
                                          user->center);
         break;
 
@@ -112,14 +112,18 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm,
 
     if (user->example > 0)
     {
-        swirl_map_extrude(cont,user->maxelev);        
+        swirl_map_extrude(cont,user->maxelev);
     }
 
     domain = fclaw2d_domain_new_conn_map (mpicomm, fclaw_opt->minlevel, conn, cont);
     fclaw2d_domain_list_levels(domain, FCLAW_VERBOSITY_ESSENTIAL);
-    fclaw2d_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);  
+    fclaw2d_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);
+
+#endif /* P8HACK */
     return domain;
 }
+
+#ifdef P8HACK
 
 static
 void run_program(fclaw2d_global_t* glob)
@@ -163,6 +167,14 @@ main (int argc, char **argv)
 {
     fclaw_app_t *app;
 
+    /* Options */
+    user_options_t               *user_opt = NULL;
+#if 0
+    fclaw3dx_clawpatch_options_t *clawpatch_opt = NULL;
+    fc3d_clawpack46_options_t    *claw46_opt = NULL;
+#endif
+    void                         *clawpatch_opt = NULL;
+    void                         *claw46_opt = NULL;
     fclaw_options_t              *fclaw_opt;
     sc_options_t                 *options;
 
@@ -170,18 +182,12 @@ main (int argc, char **argv)
     fclaw_exit_type_t vexit;
 
 #ifdef P8HACK
-
-    /* Options */
-    user_options_t               *user_opt;
-    fclaw3dx_clawpatch_options_t *clawpatch_opt;
-    fc3d_clawpack46_options_t    *claw46_opt;
-
-    fclaw2d_global_t            *glob;
-    fclaw2d_domain_t            *domain;
-    sc_MPI_Comm mpicomm;
-
+    fclaw3d_global_t            *glob;
 #endif
+    fclaw3d_domain_t            *domain;
+
     int retval;
+    sc_MPI_Comm mpicomm;
 
     /* Initialize application */
     app = fclaw_app_new (&argc, &argv, NULL);
@@ -192,7 +198,7 @@ main (int argc, char **argv)
 #ifdef P8HACK
     clawpatch_opt =  fclaw3dx_clawpatch_options_register(app, "clawpatch", "fclaw_options.ini");
     claw46_opt =        fc3d_clawpack46_options_register(app, "claw3",     "fclaw_options.ini");
-    user_opt =                    swirl_options_register(app,              "fclaw_options.ini");  
+    user_opt =                    swirl_options_register(app,              "fclaw_options.ini");
 #endif /* P8HACK */
 
     /* Read configuration file(s) and command line, and process options */
@@ -204,13 +210,12 @@ main (int argc, char **argv)
     if (!retval & !vexit)
     {
         /* Options have been checked and are valid */
-
-#ifdef P8HACK
-
         mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
         domain = create_domain(mpicomm, fclaw_opt, user_opt, clawpatch_opt,
                                claw46_opt);
-    
+
+#ifdef P8HACK
+
         /* Create global structure which stores the domain, timers, etc */
         glob = fclaw2d_global_new();
         fclaw2d_global_store_domain(glob, domain);
@@ -223,11 +228,11 @@ main (int argc, char **argv)
 
         run_program(glob);
 
-        fclaw2d_global_destroy(glob);        
+        fclaw2d_global_destroy(glob);
 
 #endif
     }
-    
+
     fclaw_app_destroy (app);
 
     return 0;

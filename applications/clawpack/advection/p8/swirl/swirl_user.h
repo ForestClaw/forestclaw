@@ -33,8 +33,6 @@ extern "C"
 {
 #endif
 
-#ifdef P8HACK
-
 typedef struct user_options
 {
     int example;
@@ -51,6 +49,8 @@ typedef struct user_options
     int is_registered;
 
 } user_options_t;
+
+#ifdef P8HACK
 
 void swirl_link_solvers(fclaw2d_global_t *glob);
 
