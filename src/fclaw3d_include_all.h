@@ -28,6 +28,8 @@
 
 #include <fclaw_base.h>
 #include <fclaw_package.h>
+#include <fclaw_options.h>
+
 #include <fclaw3d_defs.h>
 
 #ifdef P8HACK
@@ -35,7 +37,6 @@
 #include <fclaw3d_patch.h>
 
 #include <fclaw3d_forestclaw.h>
-#include <fclaw3d_options.h>
 #include <fclaw3d_diagnostics.h>
 #include <fclaw3d_global.h>
 #include <fclaw3d_domain.h>

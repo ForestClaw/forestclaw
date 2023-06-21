@@ -162,14 +162,17 @@ int
 main (int argc, char **argv)
 {
     fclaw_app_t *app;
-#ifdef P8HACK
+
+    fclaw_options_t              *fclaw_opt;
+    sc_options_t                 *options;
+
     int first_arg;
     fclaw_exit_type_t vexit;
 
+#ifdef P8HACK
+
     /* Options */
-    sc_options_t                 *options;
     user_options_t               *user_opt;
-    fclaw_options_t              *fclaw_opt;
     fclaw3dx_clawpatch_options_t *clawpatch_opt;
     fc3d_clawpack46_options_t    *claw46_opt;
 
@@ -177,18 +180,20 @@ main (int argc, char **argv)
     fclaw2d_domain_t            *domain;
     sc_MPI_Comm mpicomm;
 
-    int retval;
 #endif
+    int retval;
 
     /* Initialize application */
     app = fclaw_app_new (&argc, &argv, NULL);
 
-#ifdef P8HACK
     /* Create new options packages */
     fclaw_opt =                   fclaw_options_register(app,  NULL,       "fclaw_options.ini");
+
+#ifdef P8HACK
     clawpatch_opt =  fclaw3dx_clawpatch_options_register(app, "clawpatch", "fclaw_options.ini");
     claw46_opt =        fc3d_clawpack46_options_register(app, "claw3",     "fclaw_options.ini");
     user_opt =                    swirl_options_register(app,              "fclaw_options.ini");  
+#endif /* P8HACK */
 
     /* Read configuration file(s) and command line, and process options */
     options = fclaw_app_get_options (app);
@@ -199,6 +204,8 @@ main (int argc, char **argv)
     if (!retval & !vexit)
     {
         /* Options have been checked and are valid */
+
+#ifdef P8HACK
 
         mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
         domain = create_domain(mpicomm, fclaw_opt, user_opt, clawpatch_opt,
@@ -217,9 +224,10 @@ main (int argc, char **argv)
         run_program(glob);
 
         fclaw2d_global_destroy(glob);        
+
+#endif
     }
     
-#endif
     fclaw_app_destroy (app);
 
     return 0;
