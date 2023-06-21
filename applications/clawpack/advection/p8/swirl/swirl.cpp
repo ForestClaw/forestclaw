@@ -232,10 +232,10 @@ main (int argc, char **argv)
         glob = fclaw3d_global_new();
         fclaw3d_global_store_domain(glob, domain);
 
-#ifdef P8HACK
         /* Store option packages in glob */
         fclaw3d_options_store           (glob, fclaw_opt);
 
+#ifdef P8HACK
         fclaw3dx_clawpatch_options_store(glob, clawpatch_opt);
         fc3d_clawpack46_options_store   (glob, claw46_opt);
 #endif /* P8HACK */

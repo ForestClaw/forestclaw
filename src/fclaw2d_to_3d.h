@@ -176,6 +176,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define fclaw2d_set_global_context      fclaw3d_set_global_context
 #define fclaw2d_clear_global_context    fclaw3d_clear_global_context
 
+/* translations for the options */
+#define fclaw2d_options_store           fclaw3d_options_store
+#define fclaw2d_get_options            fclaw3d_get_options
+
 /* translations not found in p4est */
 #ifndef p4est_wrap_new_unitsquare
 #define p4est_wrap_new_unitsquare       p8est_wrap_new_unitcube

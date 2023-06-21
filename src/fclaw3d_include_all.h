@@ -41,6 +41,7 @@
 
 #endif /* P8HACK */
 
+#include <fclaw3d_options.h>
 #include <fclaw3d_domain.h>
 #include <fclaw3d_global.h>
 #include <fclaw3d_convenience.h>

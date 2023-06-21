@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2023 Carsten Burstedde, Donna Calhoun, Scott Aiton
+Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -23,25 +23,47 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+/** \file
+ *
+ * Routines for handling general ForestClaw input options.
+ *
+ */
+
+#ifndef FCLAW3D_OPTIONS_H
+#define FCLAW3D_OPTIONS_H
+
+#include <fclaw_options.h>
 #include <fclaw_base.h>
-#ifndef P4_TO_P8
-#include <fclaw2d_options.h>
-#include <fclaw2d_global.h>
-#else
-#include <fclaw3d_options.h>
-#include <fclaw3d_global.h>
+
+#ifdef __cplusplus
+extern "C"
+{
+#if 0
+}                               /* need this because indent is dumb */
+#endif
 #endif
 
-/* ---------------------------------------------------------
-   Public interface to ForestClaw options
-   --------------------------------------------------------- */
+struct fclaw3d_global;
+struct fclaw_options;
 
-void fclaw2d_options_store (fclaw2d_global_t *glob, fclaw_options_t* gparms)
-{
-    fclaw2d_global_options_store(glob, "fclaw2d", gparms);
-}
+void fclaw3d_options_store (struct fclaw3d_global *glob, struct fclaw_options* fclaw_opt);
 
-fclaw_options_t* fclaw2d_get_options(fclaw2d_global_t* glob)
-{
-    return (fclaw_options_t*) fclaw2d_global_get_options(glob, "fclaw2d");
+fclaw_options_t* fclaw3d_get_options(struct fclaw3d_global *glob);
+
+
+#ifndef FCLAW_PATCH_DIM
+#define FCLAW_PATCH_DIM  3
+#endif
+
+#ifndef FCLAW_REFINE_DIM
+#define FCLAW_REFINE_DIM 3
+#endif
+
+#ifdef __cplusplus
+#if 0
+{                               /* need this because indent is dumb */
+#endif
 }
+#endif
+
+#endif /* !FCLAW3D_OPTIONS_H */

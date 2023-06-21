@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2023 Carsten Burstedde, Donna Calhoun, Scott Aiton
+Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -23,25 +23,5 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <fclaw_base.h>
-#ifndef P4_TO_P8
-#include <fclaw2d_options.h>
-#include <fclaw2d_global.h>
-#else
-#include <fclaw3d_options.h>
-#include <fclaw3d_global.h>
-#endif
-
-/* ---------------------------------------------------------
-   Public interface to ForestClaw options
-   --------------------------------------------------------- */
-
-void fclaw2d_options_store (fclaw2d_global_t *glob, fclaw_options_t* gparms)
-{
-    fclaw2d_global_options_store(glob, "fclaw2d", gparms);
-}
-
-fclaw_options_t* fclaw2d_get_options(fclaw2d_global_t* glob)
-{
-    return (fclaw_options_t*) fclaw2d_global_get_options(glob, "fclaw2d");
-}
+#include <fclaw2d_to_3d.h>
+#include "fclaw2d_options.c"
