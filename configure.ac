@@ -101,10 +101,10 @@ echo "o---------------------------------------"
 
 AM_COND_IF([FCLAW_ENABLE_CUDACLAW],
 [
-        # Check for CUDA
-        AX_CHECK_CUDA()
-        AX_GET_CUDA_VERSION()
-
+dnl        # Check for CUDA
+dnl        AX_CHECK_CUDA()
+dnl        AX_GET_CUDA_VERSION()
+        CUDA_MAJOR_VERSION="0"
 ],
 [
         # Set version to 0 to avoid errors
