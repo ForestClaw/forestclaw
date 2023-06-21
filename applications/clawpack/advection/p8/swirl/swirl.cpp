@@ -138,20 +138,19 @@ fclaw3d_domain_t* create_domain(sc_MPI_Comm mpicomm,
     return domain;
 }
 
-#ifdef P8HACK
-
 static
-void run_program(fclaw2d_global_t* glob)
+void run_program(fclaw3d_global_t* glob)
 {
     const user_options_t           *user_opt;
 
     /* ---------------------------------------------------------------
        Set domain data.
        --------------------------------------------------------------- */
-    fclaw2d_domain_data_new(glob->domain);
+    fclaw3d_domain_data_new(glob->domain);
 
     user_opt = swirl_get_options(glob);
 
+#ifdef P8HACK
     /* Initialize virtual table for ForestClaw */
     fclaw2d_vtables_initialize(glob);
 
@@ -173,9 +172,9 @@ void run_program(fclaw2d_global_t* glob)
     fclaw2d_initialize(glob);
     fclaw2d_run(glob);
     fclaw2d_finalize(glob);
-}
 
-#endif
+#endif /* P8HACK */
+}
 
 int
 main (int argc, char **argv)
@@ -241,9 +240,7 @@ main (int argc, char **argv)
 #endif /* P8HACK */
         swirl_options_store             (glob, user_opt);
 
-#ifdef P8HACK
         run_program(glob);
-#endif /* P8HACk */
 
         fclaw3d_global_destroy(glob);
     }
