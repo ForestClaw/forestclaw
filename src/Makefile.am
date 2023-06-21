@@ -50,6 +50,7 @@ libforestclaw_installed_headers = \
 	src/forestclaw3d.h \
 	src/fclaw3d_include_all.h \
 	src/fclaw3d_defs.h \
+	src/fclaw3d_exchange.h \
 	src/fclaw3d_options.h \
 	src/fclaw3d_domain.h \
 	src/fclaw3d_global.h \
@@ -110,6 +111,7 @@ libforestclaw_compiled_sources = \
 	src/forestclaw3d.c \
 	src/fclaw3d_convenience.c \
 	src/fclaw3d_domain.c \
+	src/fclaw3d_exchange.c \
 	src/fclaw3d_options.c \
 	src/fclaw3d_global.c \
 	src/fclaw3d_map.c \

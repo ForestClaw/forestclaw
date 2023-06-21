@@ -35,6 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw3d_domain.h>
 #include <fclaw3d_convenience.h>  /* Contains domain_destroy and others */
 #include <fclaw3d_global.h>
+#include <fclaw3d_exchange.h>
 
 /* when ready include <fclaw3d_patch.h> */
 typedef struct fclaw3d_patch_data
@@ -249,10 +250,8 @@ void fclaw2d_domain_reset(fclaw2d_global_t* glob)
 
     if (ddata->domain_exchange != NULL)
     {
-#ifndef P4_TO_P8
         /* TO DO: translate fclaw2d_exchange files */
         fclaw2d_exchange_delete(glob);
-#endif
     }
 
     /* Output memory discrepancy for the ClawPatch */
