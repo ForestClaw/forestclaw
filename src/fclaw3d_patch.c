@@ -26,18 +26,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_to_3d.h>
 #include "fclaw2d_patch.c"
 
-void fclaw3d_patch_set_edge_type(fclaw3d_patch_t *patch,int iedge,
-								   fclaw3d_patch_relation_t edge_type)
+void fclaw3d_patch_set_edge_type(fclaw2d_patch_t *patch,int iedge,
+								   fclaw2d_patch_relation_t edge_type)
 {
-	fclaw3d_patch_data_t *pdata = get_patch_data(patch);
+	fclaw2d_patch_data_t *pdata = get_patch_data(patch);
 	pdata->edge_neighbors[iedge] = edge_type;
 }
 
-fclaw3d_patch_relation_t fclaw2d_patch_get_edge_type(fclaw3d_patch_t* patch,
+fclaw2d_patch_relation_t fclaw3d_patch_get_edge_type(fclaw2d_patch_t* patch,
 													   int iedge)
 {
-	fclaw3d_patch_data_t *pdata = get_patch_data(patch);
+	fclaw2d_patch_data_t *pdata = get_patch_data(patch);
 	FCLAW_ASSERT(pdata->neighbors_set != 0);
-	FCLAW_ASSERT(0 <= iedge && iedge < 12);
+	FCLAW_ASSERT(0 <= iedge && iedge < FCLAW3D_NUMEDGES);
 	return pdata->edge_neighbors[iedge];
 }

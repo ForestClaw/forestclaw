@@ -82,6 +82,7 @@ struct fclaw3d_patch_data
     fclaw3d_patch_relation_t edge_neighbors[12];
     /** Neighbor relation on each corner */
     fclaw3d_patch_relation_t corner_neighbors[8];
+    /** Edge variables required or not? Feel free to add */
     /** True if corner has neighbor */
     int corners[8];
     /** The number of patches that meet at each corner */
