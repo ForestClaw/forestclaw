@@ -29,10 +29,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_patch.h>
 #include <fclaw2d_global.h>
 #include <fclaw2d_domain.h>
+#include <fclaw2d_defs.h>
 #else
 #include <fclaw3d_patch.h>
 #include <fclaw3d_global.h>
 #include <fclaw3d_domain.h>
+#include <fclaw3d_defs.h>
 #endif
 
 struct fclaw2d_patch_transform_data;
@@ -950,11 +952,7 @@ fclaw2d_patch_relation_t fclaw2d_patch_get_face_type(fclaw2d_patch_t* patch,
 {
 	fclaw2d_patch_data_t *pdata = get_patch_data(patch);
 	FCLAW_ASSERT(pdata->neighbors_set != 0);
-#ifdef P4_TO_P8
-	FCLAW_ASSERT(0 <= iface && iface < 6);
-#else
-	FCLAW_ASSERT(0 <= iface && iface < 4);
-#endif
+	FCLAW_ASSERT(0 <= iface && iface < FCLAW2D_NUMFACES);
 	return pdata->face_neighbors[iface];
 }
 
@@ -977,21 +975,15 @@ int fclaw2d_patch_corner_is_missing(fclaw2d_patch_t* patch,
 void fclaw2d_patch_neighbors_set(fclaw2d_patch_t* patch)
 {
 	int iface, icorner;
-	int nfaces, ncorners;
 #ifdef P4_TO_P8
-	int iedge, nedges;
+	int iedge;
 #endif
 	fclaw2d_patch_data_t *pdata = get_patch_data(patch);
 	FCLAW_ASSERT(pdata->neighbors_set == 0);
 
 	pdata->has_finegrid_neighbors = 0;
 	pdata->on_coarsefine_interface = 0;
-#ifdef P4_TO_P8
-	nfaces = 6;
-#else
-  nfaces = 4;
-#endif
-	for (iface = 0; iface < nfaces; iface++)
+	for (iface = 0; iface < FCLAW2D_NUMFACES; iface++)
 	{
 		fclaw2d_patch_relation_t nt;
 		nt = pdata->face_neighbors[iface];
@@ -1006,8 +998,7 @@ void fclaw2d_patch_neighbors_set(fclaw2d_patch_t* patch)
 	}
 
 #ifdef P4_TO_P8
-	nedges = 12;
-	for (iedge = 0; iedge < nedges; iedge++)
+	for (iedge = 0; iedge < FCLAW3D_NUMEDGES; iedge++)
 	{
 		fclaw2d_patch_relation_t nt;
 		nt = pdata->edge_neighbors[iedge];
@@ -1020,12 +1011,9 @@ void fclaw2d_patch_neighbors_set(fclaw2d_patch_t* patch)
 			}
 		}
 	}
-
-	ncorners = 8;
-#else
-  ncorners = 4;
 #endif
-	for (icorner = 0; icorner < ncorners; icorner++)
+
+	for (icorner = 0; icorner < FCLAW2D_NUMCORNERS; icorner++)
 	{
 		fclaw2d_patch_relation_t nt;
 		int has_corner = pdata->corners[icorner];
