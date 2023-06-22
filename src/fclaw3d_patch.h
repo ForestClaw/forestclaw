@@ -399,6 +399,9 @@ void fclaw3d_patch_interpolate_face(struct fclaw3d_global* glob,
                                     int igrid,
                                     struct fclaw3d_patch_transform_data* transform_data);
 
+/* Do we want fclaw3d_patch_copy/average/interpolate_edge as well?
+ * Feel free to add. */
+
 /**
  * @brief Copies values from a corner-neighboring grid
  * 
@@ -1055,6 +1058,9 @@ typedef void (*fclaw3d_patch_interpolate_face_t)(struct fclaw3d_global* glob,
                                                  struct fclaw3d_patch_transform_data
                                                  *transform_data);
 
+/* Do we want a fclaw3d_patch_copy/average/interpolate_edge_t as well?
+ * Feel free to add. */
+
 /**
  * @brief Copies values from a corner-neighboring grid
  * 
@@ -1496,6 +1502,9 @@ struct fclaw3d_patch_vtable
     fclaw3d_patch_interpolate_face_t      interpolate_face;
 
     /** @} */
+
+    /* Do we want to include a fclaw3d_patch_copy/average/interpolate_edge_t?
+     * Feel free to add. */
 
     /** @{ @name Block Face and Interior Corner Ghost Filling Functions */
 
