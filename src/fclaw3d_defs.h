@@ -36,6 +36,7 @@ extern "C"
 
 #define FCLAW3D_SPACEDIM     3          /**< mesh dimension */
 #define FCLAW3D_NUMFACES     6          /**< faces per cell */
+#define FCLAW3D_NUMEDGES     12         /**< edges per cell */
 #define FCLAW3D_NUMCORNERS   8          /**< corners per cell */
 #define FCLAW3D_NUMSIBLINGS  8          /**< children per cell */
 #define FCLAW3D_NUMFACENEIGHBORS 4      /**< half-size neighbors per face */

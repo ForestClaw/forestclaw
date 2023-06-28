@@ -265,6 +265,9 @@ int fclaw3d_domain_dimension (const fclaw3d_domain_t * domain);
 /** Return the number of faces of a cube: 4 in 2D, 6 in 3D. */
 int fclaw3d_domain_num_faces (const fclaw3d_domain_t * domain);
 
+/** Return the number of edges of a cube: 12 in 3D. */
+int fclaw3d_domain_num_edges (const fclaw3d_domain_t * domain);
+
 /** Return the number of corners of a cube: 4 in 2D, 8 in 3D.
  * This is the same as the number of siblings in a refined tree. */
 int fclaw3d_domain_num_corners (const fclaw3d_domain_t * domain);

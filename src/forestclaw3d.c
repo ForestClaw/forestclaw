@@ -34,3 +34,9 @@ const fclaw3d_patch_flags_t fclaw3d_patch_block_face_flags[6] = {
     FCLAW3D_PATCH_ON_BLOCK_FACE_4,
     FCLAW3D_PATCH_ON_BLOCK_FACE_5
 };
+
+int
+fclaw3d_domain_num_edges (const fclaw3d_domain_t * domain)
+{
+    return 12;
+}
