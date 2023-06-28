@@ -590,6 +590,17 @@ int fclaw3d_patch_edge_neighbors (fclaw3d_domain_t * domain,
                                   int *redge,
                                   fclaw3d_patch_relation_t * neighbor_size);
 
+/** Change perspective across an edge neighbor situation.
+ * \param [in,out] edgeno       On input, valid edge number for a patch.
+ *                              On output, edge number seen from
+ *                              the edge neighbor patch.
+ * \param [in,out] redgeno      On input, valid edge number as returned
+ *                              by fclaw3d_patch_edge_neighbors.
+ *                              On output, edge number seen from
+ *                              the edge neighbor patch.
+ */
+void fclaw3d_patch_edge_swap (int *edgeno, int *redgeno);
+
 /** Determine neighbor patch(es) and orientation across a given corner.
  * The current version only supports one neighbor, i.e., no true multi-block.
  * A query across a corner in the middle of a longer face returns the boundary.
@@ -622,7 +633,7 @@ int fclaw3d_patch_corner_neighbors (fclaw3d_domain_t * domain,
  *                              On output, corner number seen from
  *                              the corner neighbor patch.
  * \param [in,out] rcornerno    On input, valid corner number as returned
- *                              by fclaw3d_patch_face_neighbors.
+ *                              by fclaw3d_patch_corner_neighbors.
  *                              On output, corner number seen from
  *                              the corner neighbor patch.
  */

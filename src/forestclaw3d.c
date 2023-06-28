@@ -170,3 +170,13 @@ fclaw3d_patch_edge_neighbors (fclaw2d_domain_t * domain,
 
     return *neighbor_size != FCLAW2D_PATCH_BOUNDARY;
 }
+
+void
+fclaw2d_patch_edge_swap (int *edgeno, int *redgeno)
+{
+    int swap;
+
+    swap = *edgeno;
+    *edgeno = *redgeno;
+    *redgeno = swap;
+}
