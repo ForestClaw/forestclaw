@@ -40,3 +40,137 @@ fclaw3d_domain_num_edges (const fclaw3d_domain_t * domain)
 {
     return 12;
 }
+
+int
+fclaw3d_patch_edge_neighbors (fclaw2d_domain_t * domain,
+                              int blockno, int patchno, int edgeno,
+                              int *rproc, int *rblockno, int *rpatchno,
+                              int *redge,
+                              fclaw2d_patch_relation_t * neighbor_size)
+{
+#if 0
+    p4est_wrap_t *wrap = (p4est_wrap_t *) domain->pp;
+    p4est_t *p4est = wrap->p4est;
+    p4est_ghost_t *ghost = wrap->match_aux ? wrap->ghost_aux : wrap->ghost;
+    p4est_mesh_t *mesh = wrap->match_aux ? wrap->mesh_aux : wrap->mesh;
+    p4est_locidx_t local_num, qid;
+    p4est_locidx_t cornerid, cstart, cend;
+    const p4est_quadrant_t *q;
+    p4est_tree_t *rtree;
+    fclaw2d_block_t *block;
+
+    FCLAW_ASSERT (domain->num_ghost_patches ==
+                  (int) mesh->ghost_num_quadrants);
+
+    FCLAW_ASSERT (domain->pp_owned);
+
+    FCLAW_ASSERT (0 <= blockno && blockno < domain->num_blocks);
+    FCLAW_ASSERT (p4est->first_local_tree <= (p4est_topidx_t) blockno);
+    FCLAW_ASSERT ((p4est_topidx_t) blockno <= p4est->last_local_tree);
+
+    block = domain->blocks + blockno;
+    FCLAW_ASSERT (0 <= patchno && patchno < block->num_patches);
+    FCLAW_ASSERT (0 <= cornerno && cornerno < P4EST_CHILDREN);
+
+    local_num = block->num_patches_before + patchno;
+    qid = mesh->quad_to_corner[P4EST_CHILDREN * local_num + cornerno];
+
+    /* We are not yet ready for general multiblock connectivities where more
+     * than four (2D) or eight (3D) blocks meet at a corner */
+    if (qid >= 0)
+    {
+        FCLAW_ASSERT (0 <= qid);
+        if (qid >= mesh->local_num_quadrants + mesh->ghost_num_quadrants)
+        {
+            /* This is an inter-tree (face or corner) corner neighbor */
+            cornerid =
+                qid - (mesh->local_num_quadrants + mesh->ghost_num_quadrants);
+            FCLAW_ASSERT (cornerid < mesh->local_num_corners);
+            cstart =
+                fclaw2d_array_index_locidx (mesh->corner_offset, cornerid);
+            cend =
+                fclaw2d_array_index_locidx (mesh->corner_offset,
+                                            cornerid + 1);
+            if (cstart + 1 < cend)
+            {
+                /* At least a five/nine-corner, which is currently not supported */
+                qid = -1;
+            }
+            else
+            {
+                FCLAW_ASSERT (cstart + 1 == cend);
+                qid = fclaw2d_array_index_locidx (mesh->corner_quad, cstart);
+                *rcorner = (int)
+                    *(int8_t *) sc_array_index_int (mesh->corner_corner,
+                                                    (int) cstart);
+                FCLAW_ASSERT (0 <= *rcorner && *rcorner < P4EST_CHILDREN);
+            }
+        }
+        else
+        {
+            /* for intra-tree corners we take the corner is opposite */
+            *rcorner = cornerno ^ (P4EST_CHILDREN - 1);
+        }
+    }
+
+    if (qid < 0)
+    {
+        /* The value -1 is expected for a corner on the physical boundary */
+        /* Currently we also return this for five- and more-corners */
+        *neighbor_size = FCLAW2D_PATCH_BOUNDARY;
+        *rcorner = -1;
+    }
+    else
+    {
+        if (qid < mesh->local_num_quadrants)
+        {
+            /* local quadrant may be in a different tree */
+            *rproc = domain->mpirank;
+            *rblockno = (int) mesh->quad_to_tree[qid];
+            rtree = p4est_tree_array_index (p4est->trees,
+                                            (p4est_topidx_t) * rblockno);
+            FCLAW_ASSERT (rtree->quadrants_offset <= qid);
+            qid -= rtree->quadrants_offset;     /* relative to tree */
+            q = p4est_quadrant_array_index (&rtree->quadrants, qid);
+        }
+        else
+        {
+            qid -= mesh->local_num_quadrants;   /* relative to ghosts */
+            FCLAW_ASSERT (qid < mesh->ghost_num_quadrants);
+            *rproc = mesh->ghost_to_proc[qid];
+            FCLAW_ASSERT (*rproc != domain->mpirank);
+            q = p4est_quadrant_array_index (&ghost->ghosts, qid);
+            *rblockno = (int) q->p.piggy3.which_tree;
+        }
+        *rpatchno = (int) qid;
+        switch (q->level - block->patches[patchno].level)
+        {
+        case -1:
+            *neighbor_size = FCLAW2D_PATCH_DOUBLESIZE;
+            break;
+        case 0:
+            *neighbor_size = FCLAW2D_PATCH_SAMESIZE;
+            break;
+        case 1:
+            *neighbor_size = FCLAW2D_PATCH_HALFSIZE;
+            break;
+        default:
+            SC_ABORT_NOT_REACHED ();
+        }
+
+        /* *INDENT-OFF* */
+        FCLAW_ASSERT (*rproc == domain->mpirank
+                      || (*rpatchno >= 0
+                          && *rpatchno < mesh->ghost_num_quadrants));
+        FCLAW_ASSERT (*rproc != domain->mpirank
+                      || (*rblockno >= 0 && *rblockno < domain->num_blocks
+                          && *rpatchno >= 0
+                          && *rpatchno <
+                             domain->blocks[*rblockno].num_patches));
+        /* *INDENT-ON* */
+    }
+
+    return *neighbor_size != FCLAW2D_PATCH_BOUNDARY;
+#endif
+    return 0;
+}
