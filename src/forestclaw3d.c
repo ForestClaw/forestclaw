@@ -38,7 +38,7 @@ const fclaw3d_patch_flags_t fclaw3d_patch_block_face_flags[6] = {
 int
 fclaw3d_domain_num_edges (const fclaw3d_domain_t * domain)
 {
-    return 12;
+    return P8EST_EDGES;
 }
 
 int
@@ -48,13 +48,12 @@ fclaw3d_patch_edge_neighbors (fclaw2d_domain_t * domain,
                               int *redge,
                               fclaw2d_patch_relation_t * neighbor_size)
 {
-#if 0
     p4est_wrap_t *wrap = (p4est_wrap_t *) domain->pp;
     p4est_t *p4est = wrap->p4est;
     p4est_ghost_t *ghost = wrap->match_aux ? wrap->ghost_aux : wrap->ghost;
     p4est_mesh_t *mesh = wrap->match_aux ? wrap->mesh_aux : wrap->mesh;
     p4est_locidx_t local_num, qid;
-    p4est_locidx_t cornerid, cstart, cend;
+    p4est_locidx_t edgeid, cstart, cend;
     const p4est_quadrant_t *q;
     p4est_tree_t *rtree;
     fclaw2d_block_t *block;
@@ -70,55 +69,54 @@ fclaw3d_patch_edge_neighbors (fclaw2d_domain_t * domain,
 
     block = domain->blocks + blockno;
     FCLAW_ASSERT (0 <= patchno && patchno < block->num_patches);
-    FCLAW_ASSERT (0 <= cornerno && cornerno < P4EST_CHILDREN);
+    FCLAW_ASSERT (0 <= edgeno && edgeno < P8EST_EDGES);
 
     local_num = block->num_patches_before + patchno;
-    qid = mesh->quad_to_corner[P4EST_CHILDREN * local_num + cornerno];
+    qid = mesh->quad_to_edge[P8EST_EDGES * local_num + edgeno];
 
     /* We are not yet ready for general multiblock connectivities where more
-     * than four (2D) or eight (3D) blocks meet at a corner */
+     * than four blocks meet at an edge */
     if (qid >= 0)
     {
         FCLAW_ASSERT (0 <= qid);
         if (qid >= mesh->local_num_quadrants + mesh->ghost_num_quadrants)
         {
-            /* This is an inter-tree (face or corner) corner neighbor */
-            cornerid =
+            /* This is an inter-tree (face or edge) edge neighbor */
+            edgeid =
                 qid - (mesh->local_num_quadrants + mesh->ghost_num_quadrants);
-            FCLAW_ASSERT (cornerid < mesh->local_num_corners);
+            FCLAW_ASSERT (edgeid < mesh->local_num_edges);
             cstart =
-                fclaw2d_array_index_locidx (mesh->corner_offset, cornerid);
+                fclaw2d_array_index_locidx (mesh->edge_offset, edgeid);
             cend =
-                fclaw2d_array_index_locidx (mesh->corner_offset,
-                                            cornerid + 1);
+                fclaw2d_array_index_locidx (mesh->edge_offset, edgeid + 1);
             if (cstart + 1 < cend)
             {
-                /* At least a five/nine-corner, which is currently not supported */
+                /* At least a five-edge, which is currently not supported */
                 qid = -1;
             }
             else
             {
                 FCLAW_ASSERT (cstart + 1 == cend);
-                qid = fclaw2d_array_index_locidx (mesh->corner_quad, cstart);
-                *rcorner = (int)
-                    *(int8_t *) sc_array_index_int (mesh->corner_corner,
+                qid = fclaw2d_array_index_locidx (mesh->edge_quad, cstart);
+                *redge = (int)
+                    *(int8_t *) sc_array_index_int (mesh->edge_edge,
                                                     (int) cstart);
-                FCLAW_ASSERT (0 <= *rcorner && *rcorner < P4EST_CHILDREN);
+                FCLAW_ASSERT (0 <= *redge && *redge < P8EST_EDGES);
             }
         }
         else
         {
-            /* for intra-tree corners we take the corner is opposite */
-            *rcorner = cornerno ^ (P4EST_CHILDREN - 1);
+            /* for intra-tree edges we take the edge is opposite */
+            *redge = edgeno ^ 3;
         }
     }
 
     if (qid < 0)
     {
-        /* The value -1 is expected for a corner on the physical boundary */
-        /* Currently we also return this for five- and more-corners */
+        /* The value -1 is expected for an edge on the physical boundary */
+        /* Currently we also return this for five- and more-edges */
         *neighbor_size = FCLAW2D_PATCH_BOUNDARY;
-        *rcorner = -1;
+        *redge = -1;
     }
     else
     {
@@ -171,6 +169,4 @@ fclaw3d_patch_edge_neighbors (fclaw2d_domain_t * domain,
     }
 
     return *neighbor_size != FCLAW2D_PATCH_BOUNDARY;
-#endif
-    return 0;
 }

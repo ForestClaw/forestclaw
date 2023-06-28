@@ -969,7 +969,7 @@ fclaw2d_patch_corner_neighbors (fclaw2d_domain_t * domain,
         FCLAW_ASSERT (0 <= qid);
         if (qid >= mesh->local_num_quadrants + mesh->ghost_num_quadrants)
         {
-            /* This is an inter-tree (face or corner) corner neighbor */
+            /* This is an inter-tree (face, edge or corner) corner neighbor */
             cornerid =
                 qid - (mesh->local_num_quadrants + mesh->ghost_num_quadrants);
             FCLAW_ASSERT (cornerid < mesh->local_num_corners);
