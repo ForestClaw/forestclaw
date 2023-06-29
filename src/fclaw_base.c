@@ -594,6 +594,16 @@ int get_keys(const char *key,
     return 1;
 }
 
+/**
+ * @brief Returns an array of unique configuration file names from the given fclaw_app_t object.
+ *
+ * This function loops through the options packages in the fclaw_app_t object and retrieves the unique configuration file names.
+ * It then returns an array of these unique file names.
+ *
+ * @param a The fclaw_app_t object to retrieve the configuration file names from.
+ *
+ * @return An array of unique configuration file names.
+ */
 static sc_array_t*
 get_config_filenames(fclaw_app_t* a)
 {
@@ -614,6 +624,20 @@ get_config_filenames(fclaw_app_t* a)
     return filenames;
 }
 
+/**
+ * @brief Checks if sections are in the correct files.
+ *
+ * This function reads the ini files and goes through all sections to check if they are in the correct files.
+ * If there are keys in an unexpected file, it prints a message.
+ *
+ * @param a The fclaw_app_t object to retrieve the configuration file names from.
+ * @param filenames An array of unique configuration file names.
+ *
+ * @return void
+ *
+ * @pre The fclaw_app_t object and the array of unique configuration file names must be initialized.
+ * @post The function will print a warning if there are keys in an unexpected file.
+ */
 static void
 check_sections_in_files(fclaw_app_t* a, sc_array_t* filenames){
 
@@ -654,6 +678,21 @@ check_sections_in_files(fclaw_app_t* a, sc_array_t* filenames){
     sc_array_destroy(ini_files);
 }
 
+/**
+ * @brief Checks for unused options in configuration files.
+ *
+ * This function reads the ini files and the savefile to check for unused options in the configuration files.
+ * If there are unused options, it prints a message.
+ *
+ * @param a The fclaw_app_t object to retrieve the configuration file names from.
+ * @param savefile The name of the savefile where to used options are stored
+ * @param filenames An array of unique configuration file names.
+ *
+ * @return void
+ *
+ * @pre The fclaw_app_t object, the savefile, and the array of unique configuration file names must be initialized.
+ * @post The function will print a warning if there are unused options in the configuration files.
+ */
 static void
 check_for_unused_options(fclaw_app_t* a, const char* savefile, sc_array_t* filenames){
 
