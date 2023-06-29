@@ -640,7 +640,7 @@ check_sections_in_files(fclaw_app_t* a, sc_array_t* filenames){
             // if there are keys in an unexpected file, print a warning
             if(strcmp(filename, ao->configfile) != 0 && iniparser_find_entry(ini, section))
             {
-                fclaw_global_productionf("Warning: Unexpected section [%s] was found in file %s.\n", 
+                fclaw_global_productionf("Unexpected section [%s] was found in file %s.\n", 
                                          section, filename);
             }
         }
@@ -689,13 +689,13 @@ check_for_unused_options(fclaw_app_t* a, const char* savefile, sc_array_t* filen
                         char* key = keys[i_key];
                         if(!iniparser_find_entry(save_ini, key))
                         {
-                            fclaw_global_productionf("WARNING: %s has unused option %s.\n", filename, keys[i_key]);
+                            fclaw_global_productionf("%s has unused option %s.\n", filename, keys[i_key]);
                         }
                     }
                 }
                 else
                 {
-                    fclaw_global_productionf("WARNING: %s has unused section [%s].\n", filename, section);
+                    fclaw_global_productionf("%s has unused section [%s].\n", filename, section);
 
                 }
             }
