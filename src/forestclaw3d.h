@@ -512,9 +512,9 @@ int fclaw3d_patch_face_transformation_valid (const int ftransform[]);
  *                          we require \a ftransform[8] |= 4.
  * \param [in] mx           Number of cells along x direction of patch.
  * \param [in] my           Number of cells along y direction of patch.
- *                          This function assumes \a mx == \a my.
  * \param [in] mz           Number of cells along z direction of patch.
- *                          This function assumes \a mx == \a mz.
+ *                          The number of cells must match according to the face
+ *                          transformation.
  * \param [in] based        Indices are 0-based for corners and 1-based for cells.
  * \param [in,out] i        Integer coordinate along x-axis in \a based .. \a mx.
  * \param [in,out] j        Integer coordinate along y-axis in \a based .. \a my.

@@ -619,7 +619,7 @@ fclaw2d_patch_transform_face (fclaw2d_patch_t * ipatch,
 #endif
                              )
 {
-    double Rmx;
+    double iwidth;
 
     FCLAW_ASSERT (ipatch->level == opatch->level);
     FCLAW_ASSERT (0 <= ipatch->level && ipatch->level < P4EST_MAXLEVEL);
@@ -632,9 +632,9 @@ fclaw2d_patch_transform_face (fclaw2d_patch_t * ipatch,
     FCLAW_ASSERT (opatch->zlower >= 0. && opatch->zlower < 1.);
 #endif
 
-    FCLAW_ASSERT (mx >= 1 && mx == my);
+    FCLAW_ASSERT (mx >= 1 && my >= 1);
 #ifdef P4_TO_P8
-    FCLAW_ASSERT (mx == mz);
+    FCLAW_ASSERT (mz >= 1);
 #endif
     FCLAW_ASSERT (based == 0 || based == 1);
 
@@ -650,15 +650,15 @@ fclaw2d_patch_transform_face (fclaw2d_patch_t * ipatch,
 #endif
 
     /* work with doubles -- exact for integers up to 52 bits of precision */
-    Rmx = (double) mx * (double) (1 << ipatch->level);
+    iwidth = (double) (1 << ipatch->level);
 
     if (ftransform[8] & 4)
     {
         /* The two patches are in the same block.  ftransform is not used */
-        *i += (int) ((ipatch->xlower - opatch->xlower) * Rmx);
-        *j += (int) ((ipatch->ylower - opatch->ylower) * Rmx);
+        *i += (int) ((ipatch->xlower - opatch->xlower) * iwidth * (double) mx);
+        *j += (int) ((ipatch->ylower - opatch->ylower) * iwidth * (double) my);
 #ifdef P4_TO_P8
-        *k += (int) ((ipatch->zlower - opatch->zlower) * Rmx);
+        *k += (int) ((ipatch->zlower - opatch->zlower) * iwidth * (double) mz);
 #endif
     }
     else
@@ -666,47 +666,67 @@ fclaw2d_patch_transform_face (fclaw2d_patch_t * ipatch,
         const int *my_axis = &ftransform[0];
         const int *target_axis = &ftransform[3];
         const int *edge_reverse = &ftransform[6];
+        int mxmymz[P4EST_DIM];
+        double Rmxmymz[P4EST_DIM];
         double my_xyz[P4EST_DIM], target_xyz[P4EST_DIM];
 
-        /* the reference cube is stretched to mx times my units */
-        my_xyz[0] = ipatch->xlower * Rmx + *i - .5 * based;
-        my_xyz[1] = ipatch->ylower * Rmx + *j - .5 * based;
+        /* make mx, my and mz indexable */
+        mxmymz[0] = mx;
+        mxmymz[1] = my;
+        Rmxmymz[0] = iwidth * (double) mx;
+        Rmxmymz[1] = iwidth * (double) my;
 #ifdef P4_TO_P8
-        my_xyz[2] = ipatch->zlower * Rmx + *k - .5 * based;
+        mxmymz[2] = mz;
+        Rmxmymz[2] = iwidth * (double) mz;
+#endif
+
+        /* the reference cube is stretched to mx times my units */
+        my_xyz[0] = ipatch->xlower * Rmxmymz[0] + *i - .5 * based;
+        my_xyz[1] = ipatch->ylower * Rmxmymz[1] + *j - .5 * based;
+#ifdef P4_TO_P8
+        my_xyz[2] = ipatch->zlower * Rmxmymz[2] + *k - .5 * based;
 #endif
 
         /* transform transversal directions */
+        FCLAW_ASSERT (mxmymz[my_axis[0]] == mxmymz[target_axis[0]]);
         target_xyz[target_axis[0]] =
-            !edge_reverse[0] ? my_xyz[my_axis[0]] : Rmx - my_xyz[my_axis[0]];
+            !edge_reverse[0] ? my_xyz[my_axis[0]] : Rmxmymz[my_axis[0]] -
+            my_xyz[my_axis[0]];
 #ifdef P4_TO_P8
+        FCLAW_ASSERT (mxmymz[my_axis[1]] == mxmymz[target_axis[1]]);
         target_xyz[target_axis[1]] =
-            !edge_reverse[1] ? my_xyz[my_axis[1]] : Rmx - my_xyz[my_axis[1]];
+            !edge_reverse[1] ? my_xyz[my_axis[1]] : Rmxmymz[my_axis[1]] -
+            my_xyz[my_axis[1]];
 #endif
 
         /* transform normal direction */
+        FCLAW_ASSERT (mxmymz[my_axis[2]] == mxmymz[target_axis[2]]);
         switch (edge_reverse[2])
         {
         case 0:
             target_xyz[target_axis[2]] = -my_xyz[my_axis[2]];
             break;
         case 1:
-            target_xyz[target_axis[2]] = my_xyz[my_axis[2]] + Rmx;
+            target_xyz[target_axis[2]] =
+                my_xyz[my_axis[2]] + Rmxmymz[my_axis[2]];
             break;
         case 2:
-            target_xyz[target_axis[2]] = my_xyz[my_axis[2]] - Rmx;
+            target_xyz[target_axis[2]] =
+                my_xyz[my_axis[2]] - Rmxmymz[my_axis[2]];
             break;
         case 3:
-            target_xyz[target_axis[2]] = 2. * Rmx - my_xyz[my_axis[2]];
+            target_xyz[target_axis[2]] =
+                2. * Rmxmymz[my_axis[2]] - my_xyz[my_axis[2]];
             break;
         default:
             SC_ABORT_NOT_REACHED ();
         }
 
         /* transform back to integer coordinates: this is exact */
-        *i = (int) (target_xyz[0] - opatch->xlower * Rmx + .5 * based);
-        *j = (int) (target_xyz[1] - opatch->ylower * Rmx + .5 * based);
+        *i = (int) (target_xyz[0] - opatch->xlower * Rmxmymz[0] + .5 * based);
+        *j = (int) (target_xyz[1] - opatch->ylower * Rmxmymz[1] + .5 * based);
 #ifdef P4_TO_P8
-        *k = (int) (target_xyz[2] - opatch->zlower * Rmx + .5 * based);
+        *k = (int) (target_xyz[2] - opatch->zlower * Rmxmymz[2] + .5 * based);
 #endif
     }
 
