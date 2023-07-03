@@ -762,7 +762,7 @@ fclaw2d_patch_transform_face2 (fclaw2d_patch_t * ipatch,
 #ifdef P4_TO_P8
     int dk;
 #endif
-    double Rmx;
+    double owidth;
 
     FCLAW_ASSERT (ipatch->level + 1 == opatch->level);
     FCLAW_ASSERT (0 <= ipatch->level && opatch->level < P4EST_MAXLEVEL);
@@ -775,9 +775,9 @@ fclaw2d_patch_transform_face2 (fclaw2d_patch_t * ipatch,
     FCLAW_ASSERT (opatch->zlower >= 0. && opatch->zlower < 1.);
 #endif
 
-    FCLAW_ASSERT (mx >= 1 && mx == my);
+    FCLAW_ASSERT (mx >= 1 && my >= 1);
 #ifdef P4_TO_P8
-    FCLAW_ASSERT (mx == mz);
+    FCLAW_ASSERT (mz >= 1);
 #endif
     FCLAW_ASSERT (based == 0 || based == 1);
 
@@ -793,7 +793,7 @@ fclaw2d_patch_transform_face2 (fclaw2d_patch_t * ipatch,
 #endif
 
     /* work with doubles -- exact for integers up to 52 bits of precision */
-    Rmx = (double) mx * (double) (1 << opatch->level);
+    owidth = (double) (1 << opatch->level);
 
     if (ftransform[8] & 4)
     {
@@ -801,12 +801,15 @@ fclaw2d_patch_transform_face2 (fclaw2d_patch_t * ipatch,
 
         /* The two patches are in the same block.  ftransform is undefined */
         di = based + (int)
-            ((ipatch->xlower - opatch->xlower) * Rmx + 2. * (*i - based));
-        dj = based + (int)
-            ((ipatch->ylower - opatch->ylower) * Rmx + 2. * (*j - based));
+            ((ipatch->xlower - opatch->xlower) * owidth * (double) mx +
+             2. * (*i - based));
+        dj = based +
+            (int) ((ipatch->ylower - opatch->ylower) * owidth * (double) my +
+                   2. * (*j - based));
 #ifdef P4_TO_P8
         dk = based + (int)
-            ((ipatch->zlower - opatch->zlower) * Rmx + 2. * (*k - based));
+            ((ipatch->zlower - opatch->zlower) * owidth * (double) mz +
+             2. * (*k - based));
 #else
         kz = 0;
 #endif
@@ -843,22 +846,43 @@ fclaw2d_patch_transform_face2 (fclaw2d_patch_t * ipatch,
         const int *target_axis = &ftransform[3];
         const int *edge_reverse = &ftransform[6];
         double my_xyz[P4EST_DIM], target_xyz[P4EST_DIM];
+        double Rmxmymz[P4EST_DIM];
+#ifdef FCLAW_ENABLE_DEBUG
+        int mxmymz[P4EST_DIM];
+
+        /* make mx, my and mz indexable */
+        mxmymz[0] = mx;
+        mxmymz[1] = my;
+#ifdef P4_TO_P8
+        mxmymz[2] = mz;
+#endif
+#endif
+        /* make gridsize indexable */
+        Rmxmymz[0] = owidth * (double) mx;
+        Rmxmymz[1] = owidth * (double) my;
+#ifdef P4_TO_P8
+        Rmxmymz[2] = owidth * (double) mz;
+#endif
 
         /* the reference cube is stretched to mx times my units */
-        my_xyz[0] = ipatch->xlower * Rmx + 2. * (*i + .5 - based);
-        my_xyz[1] = ipatch->ylower * Rmx + 2. * (*j + .5 - based);
+        my_xyz[0] = ipatch->xlower * Rmxmymz[0] + 2. * (*i + .5 - based);
+        my_xyz[1] = ipatch->ylower * Rmxmymz[1] + 2. * (*j + .5 - based);
 #ifdef P4_TO_P8
-        my_xyz[2] = ipatch->zlower * Rmx + 2. * (*k + .5 - based);
+        my_xyz[2] = ipatch->zlower * Rmxmymz[2] + 2. * (*k + .5 - based);
 #else
         is[2] = ik[1] = ib[1] = in[2] = 0;
 #endif
 
         /* transform transversal directions */
+        FCLAW_ASSERT (mxmymz[target_axis[0]] == mxmymz[my_axis[0]]);
         target_xyz[target_axis[0]] =
-            !edge_reverse[0] ? my_xyz[my_axis[0]] : Rmx - my_xyz[my_axis[0]];
+            !edge_reverse[0] ? my_xyz[my_axis[0]] : Rmxmymz[my_axis[0]] -
+            my_xyz[my_axis[0]];
 #ifdef P4_TO_P8
+        FCLAW_ASSERT (mxmymz[target_axis[1]] == mxmymz[my_axis[1]]);
         target_xyz[target_axis[1]] =
-            !edge_reverse[1] ? my_xyz[my_axis[1]] : Rmx - my_xyz[my_axis[1]];
+            !edge_reverse[1] ? my_xyz[my_axis[1]] : Rmxmymz[my_axis[1]] -
+            my_xyz[my_axis[1]];
 #endif
 
         /* transform normal direction */
@@ -868,23 +892,26 @@ fclaw2d_patch_transform_face2 (fclaw2d_patch_t * ipatch,
             target_xyz[target_axis[2]] = -my_xyz[my_axis[2]];
             break;
         case 1:
-            target_xyz[target_axis[2]] = my_xyz[my_axis[2]] + Rmx;
+            target_xyz[target_axis[2]] =
+                my_xyz[my_axis[2]] + Rmxmymz[my_axis[2]];
             break;
         case 2:
-            target_xyz[target_axis[2]] = my_xyz[my_axis[2]] - Rmx;
+            target_xyz[target_axis[2]] =
+                my_xyz[my_axis[2]] - Rmxmymz[my_axis[2]];
             break;
         case 3:
-            target_xyz[target_axis[2]] = 2. * Rmx - my_xyz[my_axis[2]];
+            target_xyz[target_axis[2]] =
+                2. * Rmxmymz[my_axis[2]] - my_xyz[my_axis[2]];
             break;
         default:
             SC_ABORT_NOT_REACHED ();
         }
 
         /* move back into integer coordinates: this is exact */
-        di = (int) (target_xyz[0] - opatch->xlower * Rmx) + based - 1;
-        dj = (int) (target_xyz[1] - opatch->ylower * Rmx) + based - 1;
+        di = (int) (target_xyz[0] - opatch->xlower * Rmxmymz[0]) + based - 1;
+        dj = (int) (target_xyz[1] - opatch->ylower * Rmxmymz[1]) + based - 1;
 #ifdef P4_TO_P8
-        dk = (int) (target_xyz[2] - opatch->zlower * Rmx) + based - 1;
+        dk = (int) (target_xyz[2] - opatch->zlower * Rmxmymz[2]) + based - 1;
 #endif
 
         /* Run through the child cells in order of the small patch */
