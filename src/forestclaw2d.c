@@ -666,17 +666,23 @@ fclaw2d_patch_transform_face (fclaw2d_patch_t * ipatch,
         const int *my_axis = &ftransform[0];
         const int *target_axis = &ftransform[3];
         const int *edge_reverse = &ftransform[6];
-        int mxmymz[P4EST_DIM];
-        double Rmxmymz[P4EST_DIM];
         double my_xyz[P4EST_DIM], target_xyz[P4EST_DIM];
+        double Rmxmymz[P4EST_DIM];
+#ifdef FCLAW_ENABLE_DEBUG
+        int mxmymz[P4EST_DIM];
 
         /* make mx, my and mz indexable */
         mxmymz[0] = mx;
         mxmymz[1] = my;
+#ifdef P4_TO_P8
+        mxmymz[2] = mz;
+#endif
+#endif
+
+        /* make gridsize indexable */
         Rmxmymz[0] = iwidth * (double) mx;
         Rmxmymz[1] = iwidth * (double) my;
 #ifdef P4_TO_P8
-        mxmymz[2] = mz;
         Rmxmymz[2] = iwidth * (double) mz;
 #endif
 
