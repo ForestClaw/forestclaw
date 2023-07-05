@@ -103,7 +103,10 @@ AM_COND_IF([FCLAW_ENABLE_CUDACLAW],
 [
 	AC_SUBST([CUDA_CFLAGS])
 	AC_SUBST([CUDA_LDFLAGS])
-        AC_SUBST([NVCC],[nvcc])
+        AC_PATH_PROG([NVCC], [nvcc], [no])
+        if test "x$NVCC" = "xno"; then
+                AC_MSG_ERROR([nvcc not found.])
+        fi
         AX_GET_CUDA_VERSION()
 ],
 [
