@@ -27,20 +27,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef P4_TO_P8
 #include <fclaw2d_domain.h>
 #include <fclaw2d_convenience.h>  /* Contains domain_destroy and others */
-
 #include <fclaw2d_patch.h>
 #include <fclaw2d_exchange.h>
 #include <fclaw2d_global.h>
 #else
 #include <fclaw3d_domain.h>
 #include <fclaw3d_convenience.h>  /* Contains domain_destroy and others */
-
-/* when ready include <fclaw3d_patch.h> */
-typedef struct fclaw3d_patch_data
-{
-    const fclaw3d_patch_t *real_patch;
-}
-fclaw3d_patch_data_t;
+#include <fclaw3d_patch.h>
+#include <fclaw3d_exchange.h>
+#include <fclaw3d_global.h>
 #endif
 
 /* dimension-independent helper functions first */
@@ -173,11 +168,10 @@ fclaw_domain_destroy2d (fclaw_domain_t * d,
     FCLAW_FREE (d);
 }
 
-#ifndef P4_TO_P8
-
 /* we're holding back with 3d counterparts
    since much of this will move into fclaw_domain.c */
 /* below follows the previous code unchanged */
+/* edit: do it anyway for now to support p8/swirl */
 
 void fclaw2d_domain_data_new(fclaw2d_domain_t *domain)
 {
@@ -204,7 +198,6 @@ fclaw2d_domain_data_t *fclaw2d_domain_get_data(fclaw2d_domain_t *domain)
     return (fclaw2d_domain_data_t *) domain->user;
 }
 
-
 void fclaw2d_domain_setup(fclaw2d_global_t* glob,
                           fclaw2d_domain_t* new_domain)
 {
@@ -225,7 +218,6 @@ void fclaw2d_domain_setup(fclaw2d_global_t* glob,
     fclaw_global_infof("Done\n");
 }
 
-
 void fclaw2d_domain_reset(fclaw2d_global_t* glob)
 {
     fclaw2d_domain_t** domain = &glob->domain;
@@ -244,11 +236,11 @@ void fclaw2d_domain_reset(fclaw2d_global_t* glob)
             fclaw2d_patch_data_delete(glob,patch);
         }
         block->user = NULL;
-
     }
 
     if (ddata->domain_exchange != NULL)
     {
+        /* TO DO: translate fclaw2d_exchange files */
         fclaw2d_exchange_delete(glob);
     }
 
@@ -265,8 +257,6 @@ void fclaw2d_domain_reset(fclaw2d_global_t* glob)
     fclaw2d_domain_destroy(*domain);
     *domain = NULL;
 }
-
-#endif /* !P4_TO_P8 */
 
 void fclaw2d_domain_iterate_level_mthread (fclaw2d_domain_t * domain, int level,
                                            fclaw2d_patch_callback_t pcb, void *user)

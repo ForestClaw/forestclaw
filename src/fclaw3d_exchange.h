@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -23,30 +23,44 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FCLAW3D_DEFS_H
-#define FCLAW3D_DEFS_H
+#ifndef FCLAW3D_EXCHANGE_H
+#define FCLAW3D_EXCHANGE_H
+
+#include <fclaw_timer.h>
 
 #ifdef __cplusplus
 extern "C"
 {
 #if 0
-}                               /* need this because indent is dumb */
+}
 #endif
 #endif
 
-#define FCLAW3D_SPACEDIM     3          /**< mesh dimension */
-#define FCLAW3D_NUMFACES     6          /**< faces per cell */
-#define FCLAW3D_NUMEDGES     12         /**< edges per cell */
-#define FCLAW3D_NUMCORNERS   8          /**< corners per cell */
-#define FCLAW3D_NUMSIBLINGS  8          /**< children per cell */
-#define FCLAW3D_NUMFACENEIGHBORS 4      /**< half-size neighbors per face */
-/* not redefining REFINEFACTOR, which should be dimension-independent */
+struct fclaw3d_global;
+
+void fclaw3d_exchange_setup(struct fclaw3d_global* glob,
+                            fclaw3d_timer_names_t running);
+
+void fclaw3d_exchange_delete(struct fclaw3d_global* glob);
+
+void fclaw3d_exchange_ghost_patches_begin(struct fclaw3d_global* glob,
+                                          int minlevel,
+                                          int maxlevel,
+                                          int time_interp,
+                                          fclaw3d_timer_names_t running);
+
+void fclaw3d_exchange_ghost_patches_end(struct fclaw3d_global* glob,
+                                        int minlevel,
+                                        int maxlevel,
+                                        int time_interp,
+                                        fclaw3d_timer_names_t running);
+
 
 #ifdef __cplusplus
 #if 0
-{                               /* need this because indent is dumb */
+{
 #endif
 }
 #endif
 
-#endif /* !FCLAW3D_DEFS_H */
+#endif

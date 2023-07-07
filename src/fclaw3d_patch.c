@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -23,30 +23,21 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FCLAW3D_DEFS_H
-#define FCLAW3D_DEFS_H
+#include <fclaw2d_to_3d.h>
+#include "fclaw2d_patch.c"
 
-#ifdef __cplusplus
-extern "C"
+void fclaw3d_patch_set_edge_type(fclaw2d_patch_t *patch,int iedge,
+								   fclaw2d_patch_relation_t edge_type)
 {
-#if 0
-}                               /* need this because indent is dumb */
-#endif
-#endif
-
-#define FCLAW3D_SPACEDIM     3          /**< mesh dimension */
-#define FCLAW3D_NUMFACES     6          /**< faces per cell */
-#define FCLAW3D_NUMEDGES     12         /**< edges per cell */
-#define FCLAW3D_NUMCORNERS   8          /**< corners per cell */
-#define FCLAW3D_NUMSIBLINGS  8          /**< children per cell */
-#define FCLAW3D_NUMFACENEIGHBORS 4      /**< half-size neighbors per face */
-/* not redefining REFINEFACTOR, which should be dimension-independent */
-
-#ifdef __cplusplus
-#if 0
-{                               /* need this because indent is dumb */
-#endif
+	fclaw2d_patch_data_t *pdata = get_patch_data(patch);
+	pdata->edge_neighbors[iedge] = edge_type;
 }
-#endif
 
-#endif /* !FCLAW3D_DEFS_H */
+fclaw2d_patch_relation_t fclaw3d_patch_get_edge_type(fclaw2d_patch_t* patch,
+													   int iedge)
+{
+	fclaw2d_patch_data_t *pdata = get_patch_data(patch);
+	FCLAW_ASSERT(pdata->neighbors_set != 0);
+	FCLAW_ASSERT(0 <= iedge && iedge < FCLAW3D_NUMEDGES);
+	return pdata->edge_neighbors[iedge];
+}

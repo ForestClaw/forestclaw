@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_options.h>
 
 /* Also needed in fclaw2d_domain_reset */
+/* edit: right now this is not the case, switching to static */
+static
 fclaw2d_domain_exchange_t*
     get_exchange_data(fclaw2d_global_t* glob)
 {

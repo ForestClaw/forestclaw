@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -23,8 +23,17 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FCLAW3D_DEFS_H
-#define FCLAW3D_DEFS_H
+/** \file
+ *
+ * Routines for handling general ForestClaw input options.
+ *
+ */
+
+#ifndef FCLAW3D_OPTIONS_H
+#define FCLAW3D_OPTIONS_H
+
+#include <fclaw_options.h>
+#include <fclaw_base.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -34,13 +43,21 @@ extern "C"
 #endif
 #endif
 
-#define FCLAW3D_SPACEDIM     3          /**< mesh dimension */
-#define FCLAW3D_NUMFACES     6          /**< faces per cell */
-#define FCLAW3D_NUMEDGES     12         /**< edges per cell */
-#define FCLAW3D_NUMCORNERS   8          /**< corners per cell */
-#define FCLAW3D_NUMSIBLINGS  8          /**< children per cell */
-#define FCLAW3D_NUMFACENEIGHBORS 4      /**< half-size neighbors per face */
-/* not redefining REFINEFACTOR, which should be dimension-independent */
+struct fclaw3d_global;
+struct fclaw_options;
+
+void fclaw3d_options_store (struct fclaw3d_global *glob, struct fclaw_options* fclaw_opt);
+
+fclaw_options_t* fclaw3d_get_options(struct fclaw3d_global *glob);
+
+
+#ifndef FCLAW_PATCH_DIM
+#define FCLAW_PATCH_DIM  3
+#endif
+
+#ifndef FCLAW_REFINE_DIM
+#define FCLAW_REFINE_DIM 3
+#endif
 
 #ifdef __cplusplus
 #if 0
@@ -49,4 +66,4 @@ extern "C"
 }
 #endif
 
-#endif /* !FCLAW3D_DEFS_H */
+#endif /* !FCLAW3D_OPTIONS_H */
