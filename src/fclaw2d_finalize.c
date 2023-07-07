@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2023 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -191,7 +191,7 @@ void fclaw2d_finalize(fclaw2d_global_t* glob)
             fclaw_global_essentialf("Timing reports not generated for outstyle=0\n");
         }
     }
-    if (gparms->regression_check)
+    if (strcmp(gparms->regression_check, "") != 0)
     {
         fclaw_global_essentialf("Checking regression values.\n");
         output_expected_values(glob, gparms->regression_check);

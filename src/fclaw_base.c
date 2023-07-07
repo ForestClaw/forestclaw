@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
+Copyright (c) 2012-2023 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -25,6 +25,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw_base.h>
 #include <fclaw_mpi.h>
+#include <iniparser.h>
 
 static const char *fclaw_configdir = ".forestclaw";
 static const char *fclaw_env_configdir = "FCLAW_INI_DIR";
@@ -172,7 +173,14 @@ static const char* logging_prefix = NULL;
 void 
 fclaw_set_logging_prefix(const char* new_name)
 {
-    logging_prefix=new_name;
+    if(new_name == NULL || strcmp(new_name, "") == 0)
+    {
+        logging_prefix=NULL;
+    } 
+    else 
+    {
+        logging_prefix=new_name;
+    }
 }
 
 static void
@@ -406,7 +414,7 @@ fclaw_app_options_register (fclaw_app_t * a,
 
     ao = (fclaw_app_options_t *) sc_array_push (a->opt_pkg);
     ao->section = section == NULL ? NULL : FCLAW_STRDUP (section);
-    ao->configfile = configfile == NULL ? NULL : FCLAW_STRDUP (section);
+    ao->configfile = configfile == NULL ? NULL : FCLAW_STRDUP (configfile);
     ao->vt = *vt;
     ao->package = package;
 
@@ -574,18 +582,203 @@ void fclaw_app_print_options(fclaw_app_t *app)
                                   FCLAW_VERBOSITY_ESSENTIAL, app->opt);    
 }
 
+int get_keys(const char *key,
+            const sc_keyvalue_entry_type_t type, 
+            void *entry,
+            const void *u)
+{
+    sc_array_t* filenames = (sc_array_t*) u;
+    sc_array_push(filenames);
+    const char** last = (const char**) sc_array_index(filenames, filenames->elem_count-1);
+    *last = key;
+    return 1;
+}
+
+/**
+ * @brief Returns an array of unique configuration file names from the given fclaw_app_t object.
+ *
+ * This function loops through the options packages in the fclaw_app_t object and retrieves the unique configuration file names.
+ * It then returns an array of these unique file names.
+ *
+ * @param a The fclaw_app_t object to retrieve the configuration file names from.
+ *
+ * @return An array of unique configuration file names.
+ */
+static sc_array_t*
+get_config_filenames(fclaw_app_t* a)
+{
+    // get an array of files
+    // key value just to get a set of unique filenames (the keys)
+    sc_keyvalue_t* filenames_kv = sc_keyvalue_new();
+    for (size_t zz = 0; zz < a->opt_pkg->elem_count; ++zz)
+    {
+        fclaw_app_options_t* ao = (fclaw_app_options_t *) sc_array_index (a->opt_pkg, zz);
+        sc_keyvalue_set_pointer(filenames_kv, ao->configfile, NULL);
+    }
+
+    sc_array_t* filenames  = sc_array_new(sizeof(char*));
+
+    sc_keyvalue_foreach(filenames_kv, get_keys, filenames);
+
+    sc_keyvalue_destroy(filenames_kv);
+    return filenames;
+}
+
+/**
+ * @brief Checks if sections are in the correct files.
+ *
+ * This function reads the ini files and goes through all sections to check if they are in the correct files.
+ * If there are keys in an unexpected file, it prints a message.
+ *
+ * @param a The fclaw_app_t object to retrieve the configuration file names from.
+ * @param filenames An array of unique configuration file names.
+ *
+ * @return void
+ *
+ * @pre The fclaw_app_t object and the array of unique configuration file names must be initialized.
+ * @post The function will print a warning if there are keys in an unexpected file.
+ */
+static void
+check_sections_in_files(fclaw_app_t* a, sc_array_t* filenames){
+
+    // read ini files
+    sc_array_t* ini_files  = sc_array_new(sizeof(dictionary*));
+    sc_array_resize(ini_files, filenames->elem_count);
+    for(size_t i = 0; i < filenames->elem_count; i++)
+    {
+        const char* filename = *(const char**) sc_array_index(filenames, i);
+        *(dictionary**) sc_array_index(ini_files, i) = iniparser_load(filename);
+    }
+
+    // go though all sections and check if they are in the correct files
+    for (size_t zz = 0; zz < a->opt_pkg->elem_count; ++zz)
+    {
+        fclaw_app_options_t* ao = (fclaw_app_options_t *) sc_array_index (a->opt_pkg, zz);
+        for(size_t i = 0; i < filenames->elem_count; i++)
+        {
+            const char* filename = *(const char**) sc_array_index(filenames, i);
+            dictionary* ini = *(dictionary**) sc_array_index(ini_files, i);
+            const char* section = ao->section == NULL ? "Options" : ao->section;
+
+
+            // if there are keys in an unexpected file, print a warning
+            if(strcmp(filename, ao->configfile) != 0 && iniparser_find_entry(ini, section))
+            {
+                fclaw_global_productionf("Unexpected section [%s] was found in file %s.\n", 
+                                         section, filename);
+            }
+        }
+    }
+
+    for(size_t i = 0; i < ini_files->elem_count; i++)
+    {
+        dictionary* ini = *(dictionary**) sc_array_index(ini_files, i);
+        iniparser_freedict(ini);
+    }
+    sc_array_destroy(ini_files);
+}
+
+/**
+ * @brief Checks for unused options in configuration files.
+ *
+ * This function reads the ini files and the savefile to check for unused options in the configuration files.
+ * If there are unused options, it prints a message.
+ *
+ * @param a The fclaw_app_t object to retrieve the configuration file names from.
+ * @param savefile The name of the savefile where to used options are stored
+ * @param filenames An array of unique configuration file names.
+ *
+ * @return void
+ *
+ * @pre The fclaw_app_t object, the savefile, and the array of unique configuration file names must be initialized.
+ * @post The function will print a warning if there are unused options in the configuration files.
+ */
+static void
+check_for_unused_options(fclaw_app_t* a, const char* savefile, sc_array_t* filenames){
+
+    dictionary* save_ini = iniparser_load(savefile);
+
+    // read ini files
+    sc_array_t* ini_files  = sc_array_new(sizeof(dictionary*));
+    sc_array_resize(ini_files, filenames->elem_count);
+    for(size_t i = 0; i < filenames->elem_count; i++)
+    {
+        const char* filename = *(const char**) sc_array_index(filenames, i);
+        *(dictionary**) sc_array_index(ini_files, i) = iniparser_load(filename);
+    }
+
+    // go though all sections and check if they are in the correct files
+    for(size_t i = 0; i < filenames->elem_count; i++)
+    {
+        const char* filename = *(const char**) sc_array_index(filenames, i);
+        dictionary* ini = *(dictionary**) sc_array_index(ini_files, i);
+        int nsec = iniparser_getnsec(ini);
+        for (int i_sec = 0; i_sec < nsec; i_sec++)
+        {
+            char* section = iniparser_getsecname(ini, i_sec);
+            if(strcmp(section, "arguments") != 0)
+            {
+                if(iniparser_find_entry(save_ini,section))
+                {
+                    int nkey = iniparser_getsecnkeys(ini, section);
+                    char** keys = iniparser_getseckeys(ini, section);
+
+                    for (int i_key = 0; i_key < nkey; i_key++)
+                    {
+                        char* key = keys[i_key];
+                        if(!iniparser_find_entry(save_ini, key))
+                        {
+                            fclaw_global_productionf("%s has unused option %s.\n", filename, keys[i_key]);
+                        }
+                    }
+                }
+                else
+                {
+                    fclaw_global_productionf("%s has unused section [%s].\n", filename, section);
+
+                }
+            }
+        }
+    }
+
+    for(size_t i = 0; i < ini_files->elem_count; i++)
+    {
+        dictionary* ini = *(dictionary**) sc_array_index(ini_files, i);
+        iniparser_freedict(ini);
+    }
+    sc_array_destroy(ini_files);
+}
+
 fclaw_exit_type_t
 fclaw_app_options_parse (fclaw_app_t * a, int *first_arg,
                          const char *savefile)
 {
-    int retval;
     size_t zz;
     fclaw_exit_type_t vexit;
     fclaw_app_options_t *ao;
 
     FCLAW_ASSERT (a != NULL);
 
-    /* TODO: read configuration files */
+    vexit = FCLAW_NOEXIT;
+
+    sc_array_t* filenames = get_config_filenames(a);
+
+
+    for(size_t i = 0; i < filenames->elem_count; i++)
+    {
+        const char* filename = *(const char**) sc_array_index(filenames, i);
+        int retval = sc_options_load (fclaw_package_id, FCLAW_VERBOSITY_ESSENTIAL, 
+                                      a->opt, filename);
+        if (retval > 0)
+        {
+            fclaw_global_essentialf("ERROR: Problem reading %s\n", filename);
+            vexit = FCLAW_EXIT_ERROR;
+        }
+        else
+        {
+            fclaw_global_infof ("Reading file %s\n", filename);
+        }
+    }
 
     /* parse command line options with given priority for errors */
     a->first_arg =
@@ -601,7 +794,6 @@ fclaw_app_options_parse (fclaw_app_t * a, int *first_arg,
     else
     {
         /* go through options packages for further processing and verification */
-        vexit = FCLAW_NOEXIT;
         for (zz = 0; zz < a->opt_pkg->elem_count; ++zz)
         {
             fclaw_exit_type_t aoexit;
@@ -670,8 +862,8 @@ fclaw_app_options_parse (fclaw_app_t * a, int *first_arg,
     /* print configuration if so desired */
     if (vexit != FCLAW_EXIT_ERROR && sc_is_root () && savefile != NULL)
     {
-        retval = sc_options_save (fclaw_get_package_id (),
-                                  FCLAW_VERBOSITY_ERROR, a->opt, savefile);
+        int retval = sc_options_save (fclaw_get_package_id (),
+                                      FCLAW_VERBOSITY_ERROR, a->opt, savefile);
         if (retval)
         {
             vexit = FCLAW_EXIT_ERROR;
@@ -679,6 +871,16 @@ fclaw_app_options_parse (fclaw_app_t * a, int *first_arg,
                                 savefile);
         }
     }
+
+    // run checks on options
+
+    if(sc_is_root())
+    {
+        check_sections_in_files(a, filenames);
+        check_for_unused_options(a, savefile, filenames);
+    }
+
+    sc_array_destroy(filenames);
 
     /* we are done */
     if (first_arg != NULL)
