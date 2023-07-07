@@ -163,6 +163,7 @@ install(FILES
   fclaw3d_patch.h
   fclaw3d_exchange.h
   fclaw3d_options.h
+  fclaw3d_include_all.h 
   fclaw_patch.h
   fclaw_domain.h
   fclaw_global.h
