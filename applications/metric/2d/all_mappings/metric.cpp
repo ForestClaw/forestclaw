@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2023 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -206,14 +206,10 @@ main (int argc, char **argv)
   fclaw_exit_type_t vexit;
 
   /* Options */
-  sc_options_t *options;
   user_options_t suser_options, *user = &suser_options;
-
-  int retval;
 
   /* Initialize application */
   app = fclaw_app_new (&argc, &argv, user);
-  options = fclaw_app_get_options (app);
 
   fclaw_forestclaw_register(app,"fclaw_options.ini");
 
@@ -223,14 +219,13 @@ main (int argc, char **argv)
 
 
   /* Read configuration file(s) */
-  retval = fclaw_options_read_from_file(options);
   vexit =  fclaw_app_options_parse (app, &first_arg,"fclaw_options.ini.used");
 
   /* No packages to register */
   fclaw2d_clawpatch_link_app(app);
 
 
-  if (!retval & !vexit)
+  if (!vexit)
   {
       run_program(app);
   }

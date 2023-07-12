@@ -7,7 +7,7 @@ add_library(forestclaw_c OBJECT
   fclaw_filesystem.cpp
   fclaw_gauges.c 
   fclaw_package.c 
-  fclaw_pointer_map.cpp
+  fclaw_pointer_map.c
   fclaw_math.c
   fclaw_timer.c
   fclaw_mpi.c
@@ -48,6 +48,9 @@ add_library(forestclaw_c OBJECT
   fclaw3d_domain.c
   fclaw3d_global.c
   fclaw3d_map.c
+  fclaw3d_patch.c
+  fclaw3d_exchange.c
+  fclaw3d_options.c
   fclaw_domain.c
   fclaw_global.c
   fp_exception_glibc_extension.c
@@ -157,6 +160,10 @@ install(FILES
   fclaw3d_domain.h
   fclaw3d_global.h
   fclaw3d_map.h
+  fclaw3d_patch.h
+  fclaw3d_exchange.h
+  fclaw3d_options.h
+  fclaw3d_include_all.h 
   fclaw_patch.h
   fclaw_domain.h
   fclaw_global.h

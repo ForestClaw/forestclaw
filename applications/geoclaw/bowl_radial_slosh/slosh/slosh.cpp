@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
+  Copyright (c) 2012-2023 Carsten Burstedde, Donna Calhoun, Scott Aiton
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -35,11 +35,8 @@ main (int argc, char **argv)
     fclaw_exit_type_t vexit;
 
     /* Options */
-    sc_options_t                *options;
 
     sc_MPI_Comm mpicomm;
-
-    int retval;
 
     /* Initialize application */
     app = fclaw_app_new (&argc, &argv, NULL);
@@ -47,12 +44,10 @@ main (int argc, char **argv)
     /* Create new options packages */
 
     /* Read configuration file(s) and command line, and process options */
-    options = fclaw_app_get_options (app);
-    retval = fclaw_options_read_from_file(options);
     vexit =  fclaw_app_options_parse (app, &first_arg,"fclaw_options.ini.used");
 
     /* Run the program */
-    if (!retval & !vexit)
+    if (!vexit)
     {
         mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
         }

@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
+Copyright (c) 2012-2023 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -335,11 +335,11 @@ fclaw_register (fclaw_options_t* fclaw_opt, sc_options_t * opt)
 
     sc_options_add_string (opt, 0, "logging-prefix",
                            &fclaw_opt->logging_prefix, 
-                           0,"prefixed used for logging [NULL]");    
+                           "","prefixed used for logging [NULL]");    
 
     sc_options_add_string (opt, 0, "regression-check",
                            &fclaw_opt->regression_check, 
-                           0,"filename of expected regresssion values [NULL]");    
+                           "","filename of expected regresssion values [NULL]");    
 
     fclaw_opt->is_registered = 1;
 
@@ -524,24 +524,9 @@ fclaw_options_t* fclaw_options_register (fclaw_app_t * a,
 }
 
 
-/* This is still needed as long as the config file option in app isn't yet implemented */
 int fclaw_options_read_from_file(sc_options_t* opt)
 {
-    int retval;
-
-    int fclaw_package_id;
-    fclaw_package_id = fclaw_get_package_id ();
-    retval = sc_options_load (fclaw_package_id, FCLAW_VERBOSITY_ESSENTIAL, opt,
-                              "fclaw_options.ini");
-    if (retval < 0)
-    {
-        fclaw_global_essentialf("Problem reading fclaw_options.ini.\n");
-    }
-    else
-    {
-        fclaw_global_infof ("Reading file fclaw_options.ini.\n");
-    }
-    return retval;
+    return 0;
 }
 
 /* ------------------------------------------------------------------------
