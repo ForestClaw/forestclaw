@@ -1137,7 +1137,7 @@ fclaw2d_patch_transform_corner (fclaw2d_patch_t * ipatch,
 #endif
                                )
 {
-    double Rmx, xshift, yshift;
+    double Rmxmymz[P4EST_DIM], xshift, yshift;
 #ifdef P4_TO_P8
     double zshift;
 #endif
@@ -1153,9 +1153,9 @@ fclaw2d_patch_transform_corner (fclaw2d_patch_t * ipatch,
     FCLAW_ASSERT (opatch->zlower >= 0. && opatch->zlower < 1.);
 #endif
 
-    FCLAW_ASSERT (mx >= 1 && mx == my);
+    FCLAW_ASSERT (mx >= 1 && my >= 1);
 #ifdef P4_TO_P8
-    FCLAW_ASSERT (mx == mz);
+    FCLAW_ASSERT (mz >= 1);
 #endif
     FCLAW_ASSERT (based == 0 || based == 1);
 
@@ -1168,7 +1168,11 @@ fclaw2d_patch_transform_corner (fclaw2d_patch_t * ipatch,
 #endif
 
     /* Work with doubles -- exact for integers up to 52 bits of precision */
-    Rmx = (double) mx * (double) (1 << ipatch->level);
+    Rmxmymz[0] = (double) (1 << ipatch->level) * (double) mx;
+    Rmxmymz[1] = (double) (1 << ipatch->level) * (double) my;
+#ifdef P4_TO_P8
+    Rmxmymz[2] = (double) (1 << ipatch->level) * (double) mz;
+#endif
     if (!is_block_boundary)
     {
         /* The lower left coordinates are with respect to the same origin */
@@ -1216,10 +1220,10 @@ fclaw2d_patch_transform_corner (fclaw2d_patch_t * ipatch,
 
     /* The two patches are in the same block, or in a different block
      * that has a coordinate system with the same orientation */
-    *i += (int) ((ipatch->xlower - opatch->xlower + xshift) * Rmx);
-    *j += (int) ((ipatch->ylower - opatch->ylower + yshift) * Rmx);
+    *i += (int) ((ipatch->xlower - opatch->xlower + xshift) * Rmxmymz[0]);
+    *j += (int) ((ipatch->ylower - opatch->ylower + yshift) * Rmxmymz[1]);
 #ifdef P4_TO_P8
-    *k += (int) ((ipatch->zlower - opatch->zlower + zshift) * Rmx);
+    *k += (int) ((ipatch->zlower - opatch->zlower + zshift) * Rmxmymz[2]);
 #endif
 }
 
@@ -1243,7 +1247,7 @@ fclaw2d_patch_transform_corner2 (fclaw2d_patch_t * ipatch,
     int dk;
     double zshift;
 #endif
-    double Rmx, xshift, yshift;
+    double Rmxmymz[P4EST_DIM], xshift, yshift;
 
     FCLAW_ASSERT (ipatch->level + 1 == opatch->level);
     FCLAW_ASSERT (0 <= ipatch->level && opatch->level < P4EST_MAXLEVEL);
@@ -1256,9 +1260,9 @@ fclaw2d_patch_transform_corner2 (fclaw2d_patch_t * ipatch,
     FCLAW_ASSERT (opatch->zlower >= 0. && opatch->zlower < 1.);
 #endif
 
-    FCLAW_ASSERT (mx >= 1 && mx == my);
+    FCLAW_ASSERT (mx >= 1 && my >= 1);
 #ifdef P4_TO_P8
-    FCLAW_ASSERT (mx == mz);
+    FCLAW_ASSERT (mz >= 1);
 #endif
     FCLAW_ASSERT (based == 0 || based == 1);
 
@@ -1271,7 +1275,11 @@ fclaw2d_patch_transform_corner2 (fclaw2d_patch_t * ipatch,
 #endif
 
     /* work with doubles -- exact for integers up to 52 bits of precision */
-    Rmx = (double) mx * (double) (1 << opatch->level);
+    Rmxmymz[0] = (double) (1 << opatch->level) * (double) mx;
+    Rmxmymz[1] = (double) (1 << opatch->level) * (double) my;
+#ifdef P4_TO_P8
+    Rmxmymz[2] = (double) (1 << opatch->level) * (double) mz;
+#endif
     if (!is_block_boundary)
     {
         /* The lower left coordinates are with respect to the same origin */
@@ -1320,14 +1328,14 @@ fclaw2d_patch_transform_corner2 (fclaw2d_patch_t * ipatch,
     /* The two patches are in the same block, or in a different block
      * that has a coordinate system with the same orientation */
     di = based
-        + (int) ((ipatch->xlower - opatch->xlower + xshift) * Rmx +
+        + (int) ((ipatch->xlower - opatch->xlower + xshift) * Rmxmymz[0] +
                  2. * (*i - based));
     dj = based
-        + (int) ((ipatch->ylower - opatch->ylower + yshift) * Rmx +
+        + (int) ((ipatch->ylower - opatch->ylower + yshift) * Rmxmymz[1] +
                  2. * (*j - based));
 #ifdef P4_TO_P8
     dk = based
-        + (int) ((ipatch->zlower - opatch->zlower + zshift) * Rmx +
+        + (int) ((ipatch->zlower - opatch->zlower + zshift) * Rmxmymz[2] +
                  2. * (*k - based));
 #else
     ks = 0;
