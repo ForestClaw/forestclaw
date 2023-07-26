@@ -46,6 +46,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 const double fclaw2d_smallest_h = 1. / (double) P4EST_ROOT_LEN;
 
+typedef struct fclaw2d_file_context
+{
+    fclaw2d_domain_t *domain;
+    p4est_file_context_t *fc;
+}
+fclaw2d_file_context_t;
+
 static void
 fclaw2d_patch_set_boundary_xylower (fclaw2d_patch_t * patch,
                                     p4est_quadrant_t * quad)
@@ -327,13 +334,6 @@ fclaw2d_check_initial_level (sc_MPI_Comm mpicomm, int initial_level)
     SC_CHECK_ABORTF (rank != 0 || initial_level <= P4EST_QMAXLEVEL,
                      "Initial level %d too fine for p4est", initial_level);
 }
-
-typedef struct fclaw2d_file_context
-{
-    fclaw2d_domain_t *domain;
-    p4est_file_context_t *fc;
-}
-fclaw2d_file_context_t;
 
 fclaw2d_domain_t *
 fclaw2d_domain_new_unitsquare (sc_MPI_Comm mpicomm, int initial_level)
