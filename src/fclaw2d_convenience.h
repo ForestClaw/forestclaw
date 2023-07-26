@@ -126,7 +126,7 @@ fclaw2d_file_context_t *fclaw2d_file_open_read (sc_MPI_Comm mpicomm,
 /** Write a domain to an opened parallel file.
  *
  * This function writes a domain without the patch data to an opened parallel
- * file. One can only write the domain that was used by openeing the file using
+ * file. One can only write the domain that was used by opening the file using
  * \ref fclaw2d_file_open_create.
  *
  * This is a collective function.
@@ -260,15 +260,15 @@ fclaw2d_file_context_t *fclaw2d_file_write_block (fclaw2d_file_context_t *
                                                   sc_array_t *block_data,
                                                   int *errcode);
 
-/** Write patch data to an opened parallel file.
+/** Write per-patch data to a parallel output file.
  *
  * This is a collective function.
- * This function writes the patch data of a given domain to the opened file.
- * \b domain must coincide with the domain that was passed in for opening the
- * file by \ref fclaw2d_file_open_create.
+ * This function writes the per-patch data with respect the domain that was passed
+ * to the \ref fclaw2d_file_open_create for opening the file.
  *
- * The patch data is written in parallel according to the partition of the
+ * The per-patch data is written in parallel according to the partition of the
  * domain and the underlying p4est, respectively.
+ * The data size per patch must be fixed.
  *
  * This function does not abort on MPI I/O errors but returns NULL.
  * Without MPI I/O the function may abort on file system dependent
@@ -283,9 +283,17 @@ fclaw2d_file_context_t *fclaw2d_file_write_block (fclaw2d_file_context_t *
  *                              written to the file. If the user gives less
  *                              bytes the user_string in the file header is padded
  *                              by spaces.
- * \param [in]      domain      The domain that points to the patch data that
- *                              is written to the opened parallel file.
- * \param [in] patch_data_size  The patch data size in number of bytes.
+ * \param [in]      patch_size  The number of bytes per patch. This number
+ *                              must coincide with \b patch_data->elem_size.
+ * \param [in]      patch_data  An array of the length number of local patches
+ *                              with the element size equal to number of bytes
+ *                              written per patch. The patch data is expected
+ *                              to be stored according to the Morton order of
+ *                              the patches. For \b patch_data->elem_size == 0
+ *                              the function writes an empty field. The section
+ *                              header and the padding is still written.
+ *                              In this case errcode is set to \ref
+ *                              FCLAW2D_FILE_ERR_SUCCESS.
  * \param [out]     errcode     An errcode that can be interpreted by
  *                              \ref fclaw2d_file_error_string.
  * \return                      Return a pointer to input context or NULL in case
@@ -293,16 +301,24 @@ fclaw2d_file_context_t *fclaw2d_file_write_block (fclaw2d_file_context_t *
  *                              In case of error the file is tried to close
  *                              and \b fc is freed.
  */
-fclaw2d_file_context_t *fclaw2d_file_write_patch_data (fclaw2d_file_context_t *
-                                                     fc, char *user_string,
-                                                     fclaw2d_domain_t *
-                                                     domain,
-                                                     size_t patch_data_size,
-                                                     int *errcode);
+fclaw2d_file_context_t *fclaw2d_file_write_field (fclaw2d_file_context_t *
+                                                  fc, char *user_string,
+                                                  size_t patch_size,
+                                                  sc_array_t *patch_data,
+                                                  int *errcode);
 
-/** Read a patch data from an opened file using the MPI communicator of \b fc.
+/** Read per-patch data from a parallel output file.
  *
  * This is a collective function.
+ * The function closes and deallocates the file context and returns NULL
+ * if the bytes the user wants to read exceed the given file and/or
+ * the element size of the filed given by patch_data->elem_size does not
+ * coincide with the element size according to the field metadata given in
+ * the file.
+ *
+ * The data is read in parallel using the partition of the domain (and the
+ * underlying p4est) that is associated with the passed file context in the
+ * sense that the file context was created using the respective domain.
  *
  * This function does not abort on MPI I/O errors but returns NULL.
  * Without MPI I/O the function may abort on file system dependent
@@ -315,35 +331,33 @@ fclaw2d_file_context_t *fclaw2d_file_write_patch_data (fclaw2d_file_context_t *
  *                            bytes. The user string is written
  *                            to the passed array including padding spaces
  *                            and a trailing NUL-termination.
- * \param [in, out] domain    The domain for that the patch data is read.
- *                            The patch data will be assigned to the domain
- *                            after a successful call of this function.
- * \param [in] patch_data_size The patch data size in number of bytes.
- * \return                    Return a pointer to input context or NULL in case
- *                            of errors that does not abort the program.
- *                            In case of error the file is tried to close
- *                            and fc is freed.
+ * \param [in] patch_size     The number of bytes per patch. This number
+ *                            must coincide with \b patch_data->elem_size.
+ * \param [in,out] patch_data An array of the length number of local patches
+ *                            with the element size equal to number of bytes
+ *                            read per patch. The patch data is read
+ *                            according to the Morton order of the patches.
+ *                            \b quadrant_data->elem_size must coincide with
+ *                            the section data size in the file.
+ *                            \b quadrant_data == NULL means that the data is
+ *                            skipped and the internal file pointer is incremented.
+ *                            In the case of skipping \b quadrant_size is still
+ *                            checked using the corresponding value read from
+ *                            the file. The data is read using the partition of
+ *                            patches given by the domain that is associated
+ *                            to \b fc.
  * \param [out]     errcode   An errcode that can be interpreted by
  *                            \ref fclaw2d_file_error_string.
  * \return                    Return a pointer to input context or NULL in case
  *                            of errors that does not abort the program.
  *                            In case of error the file is tried to close
  *                            and \b fc is freed.
- * \note                      The patch data size can not be read from
- *                            the file since it is not written by \ref
- *                            fclaw2d_file_write_patch_data. In practice
- *                            one can use \ref
- *                            fclaw2d_file_write_global_opt and then
- *                            retrieve from this information the patch
- *                            data size and call this function. See also
- *                            the implementation of \ref
- *                            fclaw2d_file_read_global.
  */
-fclaw2d_file_context_t *fclaw2d_file_read_patch_data (fclaw2d_file_context_t *
-                                                    fc, char *user_string,
-                                                    fclaw2d_domain_t * domain,
-                                                    size_t patch_data_size,
-                                                    int *errcode);
+fclaw2d_file_context_t *fclaw2d_file_read_field (fclaw2d_file_context_t *
+                                                 fc, char *user_string,
+                                                 fclaw2d_domain_t * domain,
+                                                 size_t patch_data_size,
+                                                 int *errcode);
 
 /** Read a serial data block from an opened file.
  *
