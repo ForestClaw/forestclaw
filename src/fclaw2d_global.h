@@ -28,6 +28,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <forestclaw2d.h>  /* Needed to declare callbacks (below) */
 #include <fclaw2d_map.h>   /* Needed to store the map context */
+#include <fclaw2d_convenience.h> /* Needed for the file context */
 
 #include <fclaw_timer.h>   /* Needed to create statically allocated array of timers */
 
