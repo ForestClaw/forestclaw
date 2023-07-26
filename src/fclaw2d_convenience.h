@@ -60,7 +60,7 @@ typedef struct fclaw2d_file_context fclaw2d_file_context_t;
  *
  * The opened file can be used to write to the file using the functions
  * \ref fclaw2d_file_write_global_opt, \ref fclaw2d_file_write_domain,
- * \ref fclaw2d_file_write_patch_data and \ref fclaw2d_file_write_global. 
+ * \ref fclaw2d_file_write_patch_data and \ref fclaw2d_file_write_global.
  *
  * This function does not abort on MPI I/O errors but returns NULL.
  * Without MPI I/O the function may abort on file system dependent
@@ -100,7 +100,7 @@ fclaw2d_file_context_t *fclaw2d_file_open_create (fclaw2d_domain_t * domain,
  *
  * After calling this function the user can continue reading the opened file
  * by calling \ref fclaw2d_file_read_domain, \ref fclaw2d_file_read_patch_data,
- * \ref fclaw2d_file_read_global_opt or \ref fclaw2d_file_read_global. 
+ * \ref fclaw2d_file_read_global_opt or \ref fclaw2d_file_read_global.
  *
  * This function does not abort on MPI I/O errors but returns NULL.
  * Without MPI I/O the function may abort on file system dependent
