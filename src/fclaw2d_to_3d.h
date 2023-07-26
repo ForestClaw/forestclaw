@@ -43,10 +43,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /* redefine typedefs */
 #define fclaw2d_patch_flags_t           fclaw3d_patch_flags_t
 #define fclaw2d_patch_t                 fclaw3d_patch_t
+#define fclaw2d_patch_vtable_t          fclaw3d_patch_vtable_t
+#define fclaw2d_patch_transform_data_t  fclaw3d_patch_transform_data_t
+#define fclaw2d_patch_data_t            fclaw3d_patch_data_t
 #define fclaw2d_block_t                 fclaw3d_block_t
 #define fclaw2d_domain_t                fclaw3d_domain_t
 #define fclaw2d_file_context_t          fclaw3d_file_context_t
+#define fclaw2d_domain_data_t           fclaw3d_domain_data_t
 #define fclaw2d_domain_persist_t        fclaw3d_domain_persist_t
+#define fclaw2d_timer_names_t           fclaw3d_timer_names_t
 #define fclaw2d_patch_callback_t        fclaw3d_patch_callback_t
 #define fclaw2d_patch_relation_t        fclaw3d_patch_relation_t
 #define fclaw2d_match_callback_t        fclaw3d_match_callback_t
@@ -54,6 +59,49 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define fclaw2d_domain_exchange_t       fclaw3d_domain_exchange_t
 #define fclaw2d_integrate_ray_t         fclaw3d_integrate_ray_t
 #define fclaw2d_interpolate_point_t     fclaw3d_interpolate_point_t
+#define fclaw2d_build_mode_t            fclaw3d_build_mode_t
+#define fclaw2d_patch_new_t             fclaw3d_patch_new_t
+#define fclaw2d_patch_delete_t          fclaw3d_patch_delete_t
+#define fclaw2d_patch_build_t           fclaw3d_patch_build_t
+#define fclaw2d_patch_build_from_fine_t fclaw3d_patch_build_from_fine_t
+#define fclaw2d_patch_setup_t           fclaw3d_patch_setup_t
+#define fclaw2d_patch_initialize_t      fclaw3d_patch_initialize_t
+#define fclaw2d_patch_physical_bc_t     fclaw3d_patch_physical_bc_t
+#define fclaw2d_patch_single_step_update_t fclaw3d_patch_single_step_update_t
+#define fclaw2d_patch_rhs_t             fclaw3d_patch_rhs_t
+#define fclaw2d_patch_setup_timeinterp_t fclaw3d_patch_setup_timeinterp_t
+#define fclaw2d_patch_restore_step_t    fclaw3d_patch_restore_step_t
+#define fclaw2d_patch_save_step_t       fclaw3d_patch_save_step_t
+#define fclaw2d_patch_copy_face_t       fclaw3d_patch_copy_face_t
+#define fclaw2d_patch_average_face_t    fclaw3d_patch_average_face_t
+#define fclaw2d_patch_interpolate_face_t fclaw3d_patch_interpolate_face_t
+#define fclaw2d_patch_copy_corner_t     fclaw3d_patch_copy_corner_t
+#define fclaw2d_patch_average_corner_t  fclaw3d_patch_average_corner_t
+#define fclaw2d_patch_interpolate_corner_t fclaw3d_patch_interpolate_corner_t
+#define fclaw2d_patch_transform_init_data_t fclaw3d_patch_transform_init_data_t
+#define fclaw2d_patch_transform_blockface_t fclaw3d_patch_transform_blockface_t
+#define fclaw2d_patch_transform_blockface_intra_t fclaw3d_patch_transform_blockface_intra_t
+#define fclaw2d_patch_tag4refinement_t  fclaw3d_patch_tag4refinement_t
+#define fclaw2d_patch_tag4coarsening_t  fclaw3d_patch_tag4coarsening_t
+#define fclaw2d_patch_interpolate2fine_t fclaw3d_patch_interpolate2fine_t
+#define fclaw2d_patch_average2coarse_t  fclaw3d_patch_average2coarse_t
+#define fclaw2d_patch_ghost_packsize_t  fclaw3d_patch_ghost_packsize_t
+#define fclaw2d_patch_local_ghost_pack_t fclaw3d_patch_local_ghost_pack_t
+#define fclaw2d_patch_local_ghost_alloc_t fclaw3d_patch_local_ghost_alloc_t
+#define fclaw2d_patch_local_ghost_free_t fclaw3d_patch_local_ghost_free_t
+#define fclaw2d_patch_remote_ghost_build_t fclaw3d_patch_remote_ghost_build_t
+#define fclaw2d_patch_remote_ghost_setup_t fclaw3d_patch_remote_ghost_setup_t
+#define fclaw2d_patch_remote_ghost_unpack_t fclaw3d_patch_remote_ghost_unpack_t
+#define fclaw2d_patch_remote_ghost_delete_t fclaw3d_patch_remote_ghost_delete_t
+#define fclaw2d_patch_partition_packsize_t fclaw3d_patch_partition_packsize_t
+#define fclaw2d_patch_partition_pack_t  fclaw3d_patch_partition_pack_t
+#define fclaw2d_patch_partition_unpack_t fclaw3d_patch_partition_unpack_t
+#define fclaw2d_patch_time_sync_f2c_t   fclaw3d_patch_time_sync_f2c_t
+#define fclaw2d_patch_time_sync_samesize_t fclaw3d_patch_time_sync_samesize_t
+#define fclaw2d_patch_time_sync_reset_t fclaw3d_patch_time_sync_reset_t
+#define fclaw2d_patch_create_user_data_t fclaw3d_patch_create_user_data_t
+#define fclaw2d_patch_destroy_user_data_t fclaw3d_patch_destroy_user_data_t
+#define fclaw2d_patch_metric_patch_t    fclaw3d_patch_metric_patch_t
 
 /* redefine enums */
 #define FCLAW2D_PATCH_CHILDID           FCLAW3D_PATCH_CHILDID
@@ -68,6 +116,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define FCLAW2D_PATCH_HALFSIZE          FCLAW3D_PATCH_HALFSIZE
 #define FCLAW2D_PATCH_SAMESIZE          FCLAW3D_PATCH_SAMESIZE
 #define FCLAW2D_PATCH_DOUBLESIZE        FCLAW3D_PATCH_DOUBLESIZE
+#define FCLAW2D_BUILD_FOR_GHOST_AREA_COMPUTED FCLAW3D_BUILD_FOR_GHOST_AREA_COMPUTED
+#define FCLAW2D_BUILD_FOR_GHOST_AREA_PACKED FCLAW3D_BUILD_FOR_GHOST_AREA_PACKED
+#define FCLAW2D_BUILD_FOR_UPDATE        FCLAW3D_BUILD_FOR_UPDATE
+#define FCLAW2D_BUILD_CUSTOM            FCLAW3D_BUILD_CUSTOM
 
 /* redefine variables */
 #define fclaw2d_patch_block_face_flags  fclaw3d_patch_block_face_flags
@@ -96,6 +148,71 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define fclaw2d_patch_childid           fclaw3d_patch_childid
 #define fclaw2d_patch_is_first_sibling  fclaw3d_patch_is_first_sibling
 #define fclaw2d_patch_is_ghost          fclaw3d_patch_is_ghost
+#define fclaw2d_patch_reset_data        fclaw3d_patch_reset_data
+#define fclaw2d_patch_data_delete       fclaw3d_patch_data_delete
+#define fclaw2d_patch_build             fclaw3d_patch_build
+#define fclaw2d_patch_build_from_fine   fclaw3d_patch_build_from_fine
+#define fclaw2d_patch_initialize        fclaw3d_patch_initialize
+#define fclaw2d_patch_physical_bc       fclaw3d_patch_physical_bc
+#define fclaw2d_patch_single_step_update fclaw3d_patch_single_step_update
+#define fclaw2d_patch_set_rhs           fclaw3d_patch_set_rhs
+#define fclaw2d_patch_restore_step      fclaw3d_patch_restore_step
+#define fclaw2d_patch_save_step         fclaw3d_patch_save_step
+#define fclaw2d_patch_setup_timeinterp  fclaw3d_patch_setup_timeinterp
+#define fclaw2d_patch_copy_face         fclaw3d_patch_copy_face
+#define fclaw2d_patch_average_face      fclaw3d_patch_average_face
+#define fclaw2d_patch_interpolate_face  fclaw3d_patch_interpolate_face
+#define fclaw2d_patch_copy_corner       fclaw3d_patch_copy_corner
+#define fclaw2d_patch_average_corner    fclaw3d_patch_average_corner
+#define fclaw2d_patch_interpolate_corner fclaw3d_patch_interpolate_corner
+#define fclaw2d_patch_create_user_data  fclaw3d_patch_create_user_data
+#define fclaw2d_patch_destroy_user_data fclaw3d_patch_destroy_user_data
+#define fclaw2d_patch_transform_init_data fclaw3d_patch_transform_init_data
+#define fclaw2d_patch_transform_blockface fclaw3d_patch_transform_blockface
+#define fclaw2d_patch_transform_blockface_intra fclaw3d_patch_transform_blockface_intra
+#define fclaw2d_patch_tag4refinement    fclaw3d_patch_tag4refinement
+#define fclaw2d_patch_tag4coarsening    fclaw3d_patch_tag4coarsening
+#define fclaw2d_patch_interpolate2fine  fclaw3d_patch_interpolate2fine
+#define fclaw2d_patch_average2coarse    fclaw3d_patch_average2coarse
+#define fclaw2d_patch_ghost_packsize    fclaw3d_patch_ghost_packsize
+#define fclaw2d_patch_local_ghost_alloc fclaw3d_patch_local_ghost_alloc
+#define fclaw2d_patch_local_ghost_free  fclaw3d_patch_local_ghost_free
+#define fclaw2d_patch_local_ghost_pack  fclaw3d_patch_local_ghost_pack
+#define fclaw2d_patch_remote_ghost_build fclaw3d_patch_remote_ghost_build
+#define fclaw2d_patch_remote_ghost_unpack fclaw3d_patch_remote_ghost_unpack
+#define fclaw2d_patch_remote_ghost_delete fclaw3d_patch_remote_ghost_delete
+#define fclaw2d_patch_partition_pack    fclaw3d_patch_partition_pack
+#define fclaw2d_patch_partition_unpack  fclaw3d_patch_partition_unpack
+#define fclaw2d_patch_partition_packsize fclaw3d_patch_partition_packsize
+#define fclaw2d_patch_time_sync_f2c     fclaw3d_patch_time_sync_f2c
+#define fclaw2d_patch_time_sync_samesize fclaw3d_patch_time_sync_samesize
+#define fclaw2d_patch_time_sync_reset   fclaw3d_patch_time_sync_reset
+#define fclaw2d_patch_vt                fclaw3d_patch_vt
+#define fclaw2d_patch_vtable_initialize fclaw3d_patch_vtable_initialize
+#define fclaw2d_patch_get_info          fclaw3d_patch_get_info
+#define fclaw2d_patch_get_info2         fclaw3d_patch_get_info2
+#define fclaw2d_patch_get_user_patch    fclaw3d_patch_get_user_patch
+#define fclaw2d_patch_get_patch_data    fclaw3d_patch_get_patch_data
+#define fclaw2d_patch_get_user_data     fclaw3d_patch_get_user_data
+#define fclaw2d_patch_metric_patch      fclaw3d_patch_metric_patch
+#define fclaw2d_patch_get_blockno       fclaw3d_patch_get_blockno
+#define fclaw2d_patch_get_patchno       fclaw3d_patch_get_patchno
+#define fclaw2d_patch_user_data         fclaw3d_patch_user_data
+#define fclaw2d_patch_set_user_data     fclaw3d_patch_set_user_data
+#define fclaw2d_patch_on_parallel_boundary fclaw3d_patch_on_parallel_boundary
+#define fclaw2d_patch_set_face_type     fclaw3d_patch_set_face_type
+#define fclaw2d_patch_set_corner_type   fclaw3d_patch_set_corner_type
+#define fclaw2d_patch_set_missing_corner fclaw3d_patch_set_missing_corner
+#define fclaw2d_patch_get_face_type     fclaw3d_patch_get_face_type
+#define fclaw2d_patch_get_corner_type   fclaw3d_patch_get_corner_type
+#define fclaw2d_patch_corner_is_missing fclaw3d_patch_corner_is_missing
+#define fclaw2d_patch_neighbors_set   fclaw3d_patch_neighbors_set
+#define fclaw2d_patch_neighbors_reset   fclaw3d_patch_neighbors_reset
+#define fclaw2d_patch_neighbor_type_set fclaw3d_patch_neighbor_type_set
+#define fclaw2d_patch_has_finegrid_neighbors fclaw3d_patch_has_finegrid_neighbors
+#define fclaw2d_patch_on_coarsefine_interface fclaw3d_patch_on_coarsefine_interface
+#define fclaw2d_patch_block_corner_count fclaw3d_patch_block_corner_count
+#define fclaw2d_patch_set_block_corner_count fclaw3d_patch_set_block_corner_count
 #define fclaw2d_domain_attribute_add    fclaw3d_domain_attribute_add
 #define fclaw2d_domain_attribute_access fclaw3d_domain_attribute_access
 #define fclaw2d_domain_attribute_remove fclaw3d_domain_attribute_remove
@@ -119,6 +236,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define fclaw2d_domain_set_refinement   fclaw3d_domain_set_refinement
 #define fclaw2d_patch_mark_refine       fclaw3d_patch_mark_refine
 #define fclaw2d_patch_mark_coarsen      fclaw3d_patch_mark_coarsen
+#define fclaw2d_domain_data_new         fclaw3d_domain_data_new
+#define fclaw2d_domain_data_delete      fclaw3d_domain_data_delete
+#define fclaw2d_domain_get_data         fclaw3d_domain_get_data
+#define fclaw2d_domain_setup            fclaw3d_domain_setup
+#define fclaw2d_domain_reset            fclaw3d_domain_reset
 #define fclaw2d_domain_iterate_adapted  fclaw3d_domain_iterate_adapted
 #define fclaw2d_domain_assign_for_partition fclaw3d_domain_assign_for_partition
 #define fclaw2d_domain_allocate_before_partition    fclaw3d_domain_allocate_before_partition
@@ -131,6 +253,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define fclaw2d_domain_ghost_exchange_begin fclaw3d_domain_ghost_exchange_begin
 #define fclaw2d_domain_ghost_exchange_end   fclaw3d_domain_ghost_exchange_end
 #define fclaw2d_domain_free_after_exchange  fclaw3d_domain_free_after_exchange
+
+#define fclaw2d_exchange_setup          fclaw3d_exchange_setup
+#define fclaw2d_exchange_delete         fclaw3d_exchange_delete
+#define fclaw2d_exchange_ghost_patches_begin fclaw3d_exchange_ghost_patches_begin
+#define fclaw2d_exchange_ghost_patches_end fclaw3d_exchange_ghost_patches_end
 #define fclaw2d_domain_serialization_enter  fclaw3d_domain_serialization_enter
 #define fclaw2d_domain_serialization_leave  fclaw3d_domain_serialization_leave
 #define fclaw2d_domain_is_meta          fclaw3d_domain_is_meta
@@ -184,6 +311,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define fclaw2d_global_get_global       fclaw3d_global_get_global
 #define fclaw2d_set_global_context      fclaw3d_set_global_context
 #define fclaw2d_clear_global_context    fclaw3d_clear_global_context
+
+/* translations for the options */
+#define fclaw2d_options_store           fclaw3d_options_store
+#define fclaw2d_get_options            fclaw3d_get_options
 
 /* translations not found in p4est */
 #ifndef p4est_wrap_new_unitsquare

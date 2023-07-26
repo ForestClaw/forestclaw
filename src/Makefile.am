@@ -49,10 +49,14 @@ libforestclaw_installed_headers = \
 	src/fclaw2d_diagnostics.h \
         src/fclaw2d_to_3d.h \
 	src/forestclaw3d.h \
-	src/fclaw3d_convenience.h \
+	src/fclaw3d_include_all.h \
 	src/fclaw3d_defs.h \
+	src/fclaw3d_exchange.h \
+	src/fclaw3d_options.h \
+	src/fclaw3d_patch.h \
 	src/fclaw3d_domain.h \
 	src/fclaw3d_global.h \
+	src/fclaw3d_convenience.h \
 	src/fclaw3d_map.h \
         src/fclaw_patch.h \
 	src/fclaw_domain.h \
@@ -110,6 +114,9 @@ libforestclaw_compiled_sources = \
 	src/forestclaw3d.c \
 	src/fclaw3d_convenience.c \
 	src/fclaw3d_domain.c \
+	src/fclaw3d_exchange.c \
+	src/fclaw3d_options.c \
+	src/fclaw3d_patch.c \
 	src/fclaw3d_global.c \
 	src/fclaw3d_map.c \
 	src/fclaw_domain.c \

@@ -104,10 +104,13 @@ echo "o---------------------------------------"
 
 AM_COND_IF([FCLAW_ENABLE_CUDACLAW],
 [
-        # Check for CUDA
-        AX_CHECK_CUDA()
+	AC_SUBST([CUDA_CFLAGS])
+	AC_SUBST([CUDA_LDFLAGS])
+        AC_PATH_PROG([NVCC], [nvcc], [no])
+        if test "x$NVCC" = "xno"; then
+                AC_MSG_ERROR([nvcc not found.])
+        fi
         AX_GET_CUDA_VERSION()
-
 ],
 [
         # Set version to 0 to avoid errors

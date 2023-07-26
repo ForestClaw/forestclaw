@@ -265,6 +265,9 @@ int fclaw3d_domain_dimension (const fclaw3d_domain_t * domain);
 /** Return the number of faces of a cube: 4 in 2D, 6 in 3D. */
 int fclaw3d_domain_num_faces (const fclaw3d_domain_t * domain);
 
+/** Return the number of edges of a cube: 12 in 3D. */
+int fclaw3d_domain_num_edges (const fclaw3d_domain_t * domain);
+
 /** Return the number of corners of a cube: 4 in 2D, 8 in 3D.
  * This is the same as the number of siblings in a refined tree. */
 int fclaw3d_domain_num_corners (const fclaw3d_domain_t * domain);
@@ -509,9 +512,9 @@ int fclaw3d_patch_face_transformation_valid (const int ftransform[]);
  *                          we require \a ftransform[8] |= 4.
  * \param [in] mx           Number of cells along x direction of patch.
  * \param [in] my           Number of cells along y direction of patch.
- *                          This function assumes \a mx == \a my.
  * \param [in] mz           Number of cells along z direction of patch.
- *                          This function assumes \a mx == \a mz.
+ *                          The number of cells must match according to the face
+ *                          transformation.
  * \param [in] based        Indices are 0-based for corners and 1-based for cells.
  * \param [in,out] i        Integer coordinate along x-axis in \a based .. \a mx.
  * \param [in,out] j        Integer coordinate along y-axis in \a based .. \a my.
@@ -536,9 +539,9 @@ void fclaw3d_patch_transform_face (fclaw3d_patch_t * ipatch,
  *                          we require \a ftransform[8] |= 4.
  * \param [in] mx           Number of cells along x direction of patch.
  * \param [in] my           Number of cells along y direction of patch.
- *                          This function assumes \a mx == \a my.
  * \param [in] mz           Number of cells along z direction of patch.
- *                          This function assumes \a mx == \a mz.
+ *                          The number of cells must match according to the face
+ *                          transformation.
  * \param [in] based        Indices are 0-based for corners and 1-based for cells.
  * \param [in,out] i        EIGHT (8) integer coordinates along x-axis in
  *                          \a based .. \a mx.  On input, only the first is used.
@@ -559,10 +562,49 @@ void fclaw3d_patch_transform_face2 (fclaw3d_patch_t * ipatch,
                                     int mx, int my, int mz, int based,
                                     int i[], int j[], int k[]);
 
+/** Determine neighbor patch(es) and orientation across a given edge.
+ * The current version only supports one neighbor, i.e., no true multi-block.
+ * A query across an edge in the middle of a longer face returns the boundary.
+ * We only return edge neighbors that are not already face neighbors.
+ * Inter-tree edges are only returned if the number of meeting edges is
+ * exactly four.  Five or more are currently not supported.
+ * This must ONLY be called for local patches.
+ * \param [in] domain   Valid domain structure.
+ * \param [in] blockno  Number of the block within the domain.
+ * \param [in] patchno  Number of the patch within the block.
+ * \param [in] edgeno	Number of the patch edge: 4 parallel to x axis,
+                        then 4 parallel to y axis, then 4 parallel to z.
+ * \param [out] rproc   Processor number of neighbor patch.
+ * \param [out] rblockno        Neighbor block number.
+ * \param [out] rpatchno        Neighbor patch number relative to the block.
+ *                              If the neighbor is off-processor, this is not
+ *                              a patch number but in [0, num_ghosts_patches[.
+ * \param [out] redge           Number of the edge from the other neighbor.
+ * \param [out] neighbor_size   The relative patch size of the neighbor.
+ * \return                      True if at least one edge neighbor exists
+ *                              that is not already a face neighbor.
+ */
+int fclaw3d_patch_edge_neighbors (fclaw3d_domain_t * domain,
+                                  int blockno, int patchno, int edgeno,
+                                  int *rproc, int *rblockno, int *rpatchno,
+                                  int *redge,
+                                  fclaw3d_patch_relation_t * neighbor_size);
+
+/** Change perspective across an edge neighbor situation.
+ * \param [in,out] edgeno       On input, valid edge number for a patch.
+ *                              On output, edge number seen from
+ *                              the edge neighbor patch.
+ * \param [in,out] redgeno      On input, valid edge number as returned
+ *                              by fclaw3d_patch_edge_neighbors.
+ *                              On output, edge number seen from
+ *                              the edge neighbor patch.
+ */
+void fclaw3d_patch_edge_swap (int *edgeno, int *redgeno);
+
 /** Determine neighbor patch(es) and orientation across a given corner.
  * The current version only supports one neighbor, i.e., no true multi-block.
  * A query across a corner in the middle of a longer face returns the boundary.
- * We only return corner neighbors that are not already face neighbors.
+ * We only return corner neighbors that are not already face or edge neighbors.
  * Inter-tree corners are only returned if the number of meeting corners is
  * exactly eight.  Nine or more are currently not supported.
  * This must ONLY be called for local patches.
@@ -575,7 +617,7 @@ void fclaw3d_patch_transform_face2 (fclaw3d_patch_t * ipatch,
  * \param [out] rpatchno        Neighbor patch number relative to the block.
  *                              If the neighbor is off-processor, this is not
  *                              a patch number but in [0, num_ghosts_patches[.
- * \param [out] rcorner         Number of the corner from the other neigbor.
+ * \param [out] rcorner         Number of the corner from the other neighbor.
  * \param [out] neighbor_size   The relative patch size of the neighbor.
  * \return                      True if at least one corner neighbor exists
  *                              that is not already a face neighbor.
@@ -591,7 +633,7 @@ int fclaw3d_patch_corner_neighbors (fclaw3d_domain_t * domain,
  *                              On output, corner number seen from
  *                              the corner neighbor patch.
  * \param [in,out] rcornerno    On input, valid corner number as returned
- *                              by fclaw3d_patch_face_neighbors.
+ *                              by fclaw3d_patch_corner_neighbors.
  *                              On output, corner number seen from
  *                              the corner neighbor patch.
  */
