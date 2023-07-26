@@ -154,6 +154,8 @@ size_t fclaw2d_global_packsize(const fclaw2d_global_t * glob);
  */
 size_t fclaw2d_global_unpack(char* buffer, fclaw2d_global_t** glob);
 
+/** Question: Do we want to fix the glob for each writing workflow */
+
 /** Write the options of global to the opened file.
  *
  * This is a collective function.
@@ -247,7 +249,7 @@ fclaw2d_file_context_t * fclaw2d_file_read_global_opt (fclaw2d_file_context_t *f
  * \return                      Return a pointer to input context or NULL in case
  *                              of errors that does not abort the program.
  *                              In case of error the file is tried to close
- *                              and \b fc is freed. 
+ *                              and \b fc is freed.
  */
 fclaw2d_file_context_t * fclaw2d_file_write_global (fclaw2d_file_context_t *fc,
                                                     fclaw2d_global_t *global,

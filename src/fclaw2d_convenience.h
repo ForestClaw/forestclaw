@@ -47,9 +47,8 @@ extern "C"
 /** Opaque context used for writing a fclaw2d data file. */
 typedef struct fclaw2d_file_context fclaw2d_file_context_t;
 
-/** Questions: Do we want to fix the glob for each writing workflow?
- * Do we want to store the user pointer of the p4est and/or the p4est_wrap
- * structure?
+/** Question: Do we want to store the user pointer of the p4est and/or the
+ * p4est_wrap structure?
  */
 
 /** Create and open a file that is associated with the given domain structure.
@@ -59,8 +58,8 @@ typedef struct fclaw2d_file_context fclaw2d_file_context_t;
  * p4est of the passed \b domain to the file.
  *
  * The opened file can be used to write to the file using the functions
- * \ref fclaw2d_file_write_global_opt, \ref fclaw2d_file_write_domain,
- * \ref fclaw2d_file_write_patch_data and \ref fclaw2d_file_write_global.
+ * \ref fclaw2d_file_write_domain, \ref fclaw2d_file_write_block and
+ * \ref fclaw2d_file_write_field.
  *
  * This function does not abort on MPI I/O errors but returns NULL.
  * Without MPI I/O the function may abort on file system dependent
@@ -99,8 +98,8 @@ fclaw2d_file_context_t *fclaw2d_file_open_create (fclaw2d_domain_t * domain,
  * as errcode.
  *
  * After calling this function the user can continue reading the opened file
- * by calling \ref fclaw2d_file_read_domain, \ref fclaw2d_file_read_patch_data,
- * \ref fclaw2d_file_read_global_opt or \ref fclaw2d_file_read_global.
+ * by calling \ref fclaw2d_file_read_domain, \ref fclaw2d_file_read_block and
+ * \ref fclaw2d_file_read_field.
  *
  * This function does not abort on MPI I/O errors but returns NULL.
  * Without MPI I/O the function may abort on file system dependent
@@ -108,7 +107,8 @@ fclaw2d_file_context_t *fclaw2d_file_open_create (fclaw2d_domain_t * domain,
  *
  * \param [in]  mpicomm       MPI communicator that is used to read the file and
  *                            must be used for potentially later read domain
- *                            and glob.
+ *                            and potential other IO operations of MPI
+ *                            communicator dependent objects.
  * \param [in]  filename      The path to the file that is opened.
  * \param [out] user_string   At least \ref FCLAW2D_FILE_USER_STRING_BYTES
  *                            bytes. The user string is written
