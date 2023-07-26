@@ -58,8 +58,9 @@ typedef struct fclaw2d_file_context fclaw2d_file_context_t;
  * p4est of the passed \b domain to the file.
  *
  * The opened file can be used to write to the file using the functions
- * \ref fclaw2d_file_write_domain, \ref fclaw2d_file_write_block and
- * \ref fclaw2d_file_write_field.
+ * \ref fclaw2d_file_write_domain, \ref fclaw2d_file_write_block,
+ * \ref fclaw2d_file_write_field and functions in other files operating
+ * on \ref fclaw2d_file_context_t.
  *
  * This function does not abort on MPI I/O errors but returns NULL.
  * Without MPI I/O the function may abort on file system dependent
@@ -98,8 +99,9 @@ fclaw2d_file_context_t *fclaw2d_file_open_create (fclaw2d_domain_t * domain,
  * as errcode.
  *
  * After calling this function the user can continue reading the opened file
- * by calling \ref fclaw2d_file_read_domain, \ref fclaw2d_file_read_block and
- * \ref fclaw2d_file_read_field.
+ * by calling \ref fclaw2d_file_read_domain, \ref fclaw2d_file_read_block,
+ * \ref fclaw2d_file_read_field and functions in other files operating
+ * on \ref fclaw2d_file_context_t.
  *
  * This function does not abort on MPI I/O errors but returns NULL.
  * Without MPI I/O the function may abort on file system dependent
@@ -133,8 +135,6 @@ fclaw2d_file_context_t *fclaw2d_file_open_read (sc_MPI_Comm mpicomm,
  * The mesh data is written in parallel using the partition of the mesh, i.e.
  * the domain and the underlying p4est, repectivley.
  *
- * See \ref fclaw2d_file_write_patch_data to write the patch data of \b domain.
- *
  * This function does not abort on MPI I/O errors but returns NULL.
  * Without MPI I/O the function may abort on file system dependent
  * errors.
@@ -144,10 +144,8 @@ fclaw2d_file_context_t *fclaw2d_file_open_read (sc_MPI_Comm mpicomm,
  *                              of the data sets written one after another.
  * \param [in]      domain      The domain that is written to the file. This
  *                              function does not write the patch data of
- *                              \b domain. See \ref
- *                              fclaw2d_file_write_patch_data to write the patch
- *                              data. \b domain must coincide with the domain
- *                              that was passed for opening the file.
+ *                              \b domain. \b domain must coincide with the
+ *                              domain that was passed for opening the file.
  * \param [in]      user_string A user string that is written to the file.
  *                              Only \ref FCLAW2D_FILE_USER_STRING_BYTES
  *                              bytes without NUL-termination are
@@ -170,8 +168,6 @@ fclaw2d_file_context_t *fclaw2d_file_write_domain (fclaw2d_file_context_t *
 /** Read a domain from an opened file using the MPI communicator of \b fc.
  *
  * This is a collective function.
- * The read domain does not have patch data, which can be read by
- * \ref fclaw2d_file_read_patch_data.
  *
  * This function does not abort on MPI I/O errors but returns NULL.
  * Without MPI I/O the function may abort on file system dependent
@@ -198,7 +194,7 @@ fclaw2d_file_context_t *fclaw2d_file_write_domain (fclaw2d_file_context_t *
  *                            the p4est_wrap structure that is used as element
  *                            of the read domain.
  * \param [out] domain        Newly allocated domain that is read from the file.
- * \param [out]     errcode   An errcode that can be interpreted by
+ * \param [out] errcode       An errcode that can be interpreted by
  *                            \ref fclaw2d_file_error_string.
  * \return                    Return a pointer to input context or NULL in case
  *                            of errors that does not abort the program.
@@ -312,7 +308,7 @@ fclaw2d_file_context_t *fclaw2d_file_write_field (fclaw2d_file_context_t *
  * This is a collective function.
  * The function closes and deallocates the file context and returns NULL
  * if the bytes the user wants to read exceed the given file and/or
- * the element size of the filed given by patch_data->elem_size does not
+ * the element size of the filed given by \b patch_data->elem_size does not
  * coincide with the element size according to the field metadata given in
  * the file.
  *
@@ -435,7 +431,7 @@ int fclaw2d_file_close (fclaw2d_file_context_t * fc, int *errcode);
  *                          fclaw_file function.
  * \param [in,out] string   At least sc_MPI_MAX_ERROR_STRING bytes.
  * \param [out] resultlen   Length of string on return.
- * \return                  \ref 1 on success or
+ * \return                  0 on success or
  *                          something else on invalid arguments.
  */
 int fclaw2d_file_error_string (int errcode, char *string, int *resultlen);
