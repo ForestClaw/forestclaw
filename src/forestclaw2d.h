@@ -588,15 +588,17 @@ int fclaw2d_patch_corner_neighbors (fclaw2d_domain_t * domain,
 void fclaw2d_patch_corner_swap (int *cornerno, int *rcornerno);
 
 /** Transform a patch coordinate into a neighbor patch's coordinate system.
- * This function assumes that the two patches are of the SAME size.
+ * This function assumes that the two patches are of the SAME size and that the
+ * patches lie in coordinate systems with the same orientation.
  * It is LEGAL to call this function for both local and ghost patches.
  * \param [in] ipatch       The patch that the input coordinates are relative to.
  * \param [in] opatch       The patch that the output coordinates are relative to.
  * \param [in] icorner      Corner number of this patch to transform across.
+ *                          This function assumes ocorner == icorner ^ 3, so
+ *                          ocorner is the opposite corner of icorner.
  * \param [in] is_block_boundary      Set to true for a block corner.
  * \param [in] mx           Number of cells along x direction of patch.
  * \param [in] my           Number of cells along y direction of patch.
- *                          This function assumes \a mx == \a my.
  * \param [in] based        Indices are 0-based for corners and 1-based for cells.
  * \param [in,out] i        Integer coordinate along x-axis in \a based .. \a mx.
  * \param [in,out] j        Integer coordinate along y-axis in \a based .. \a my.
@@ -608,15 +610,17 @@ void fclaw2d_patch_transform_corner (fclaw2d_patch_t * ipatch,
                                      int based, int *i, int *j);
 
 /** Transform a patch coordinate into a neighbor patch's coordinate system.
- * This function assumes that the neighbor patch is smaller (HALF size).
+ * This function assumes that the neighbor patch is smaller (HALF size) and that
+ * the patches lie in coordinate systems with the same orientation.
  * It is LEGAL to call this function for both local and ghost patches.
  * \param [in] ipatch       The patch that the input coordinates are relative to.
  * \param [in] opatch       The patch that the output coordinates are relative to.
  * \param [in] icorner      Corner number of this patch to transform across.
+ *                          This function assumes ocorner == icorner ^ 3, so
+ *                          ocorner is the opposite corner of icorner.
  * \param [in] is_block_boundary      Set to true for a block corner.
  * \param [in] mx           Number of cells along x direction of patch.
  * \param [in] my           Number of cells along y direction of patch.
- *                          This function assumes \a mx == \a my.
  * \param [in] based        Indices are 0-based for corners and 1-based for cells.
  * \param [in,out] i        FOUR (4) integer coordinates along x-axis in
  *                          \a based .. \a mx.  On input, only the first is used.
