@@ -447,17 +447,6 @@ fclaw2d_domain_t *fclaw2d_domain_new_torus (sc_MPI_Comm mpicomm,
                                             int initial_level);
 
 fclaw2d_domain_t *fclaw2d_domain_new_twosphere (sc_MPI_Comm mpicomm,
-#if 0
-     int fclaw2d_domain_write (const char *filename,
-                               fclaw2d_domain_t * domain);
-
-     fclaw2d_domain_t *fclaw2d_domain_read (sc_MPI_Comm mpicomm,
-                                            const char *filename,
-                                            p4est_replace_t replace_fn,
-                                            sc_keyvalue_t * attributes,
-                                            void *wrap_user_pointer);
-#endif
-
                                                 int initial_level);
 fclaw2d_domain_t *fclaw2d_domain_new_cubedsphere (sc_MPI_Comm mpicomm,
                                                   int initial_level);
