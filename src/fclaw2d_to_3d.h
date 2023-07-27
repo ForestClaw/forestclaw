@@ -132,10 +132,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define fclaw2d_domain_dimension        fclaw3d_domain_dimension
 #define fclaw2d_check_initial_level     fclaw3d_check_initial_level
 #define fclaw2d_file_open_create        fclaw3d_file_open_create
+#define fclaw2d_file_open_read          fclaw3d_file_open_read
+#define fclaw2d_file_write_domain       fclaw3d_file_write_domain
+#define fclaw2d_file_read_domain        fclaw3d_file_read_domain
+#define fclaw2d_file_write_block        fclaw3d_file_write_block
+#define fclaw2d_file_read_block         fclaw3d_file_read_block
+#define fclaw2d_file_write_field        fclaw3d_file_write_field
+#define fclaw2d_file_read_field         fclaw3d_file_read_field
 #define fclaw2d_file_write_glob         fclaw3d_file_write_glob
 #define fclaw2d_file_close              fclaw3d_file_close
-#define fclaw2d_domain_write            fclaw3d_domain_write
-#define fclaw2d_domain_read             fclaw3d_domain_read
 #define fclaw2d_domain_new_unitsquare   fclaw3d_domain_new_unitcube
 #define fclaw2d_domain_new_brick        fclaw3d_domain_new_brick
 #define fclaw2d_domain_new_conn         fclaw3d_domain_new_conn
