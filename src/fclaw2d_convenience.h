@@ -127,9 +127,9 @@ fclaw2d_file_context_t *fclaw2d_file_open_read (sc_MPI_Comm mpicomm,
 
 /** Write a domain to an opened parallel file.
  *
- * This function writes a domain without the patch data to an opened parallel
- * file. One can only write the domain that was used by opening the file using
- * \ref fclaw2d_file_open_create.
+ * This function writes a domain without any kind of potentially existing
+ * patch data to an opened parallel file. One can only write the domain that was
+ * used by opening the file using \ref fclaw2d_file_open_create.
  *
  * This is a collective function.
  * The mesh data is written in parallel using the partition of the mesh, i.e.
@@ -360,13 +360,14 @@ fclaw2d_file_context_t *fclaw2d_file_write_field (fclaw2d_file_context_t *
  * This is a collective function.
  * The function closes and deallocates the file context and returns NULL
  * if the bytes the user wants to read exceed the given file and/or
- * the element size of the filed given by \b patch_data->elem_size does not
+ * the element size of the field given by \b patch_data->elem_size does not
  * coincide with the element size according to the field metadata given in
  * the file.
  *
  * The data is read in parallel using the partition of the domain (and the
  * underlying p4est) that is associated with the passed file context in the
  * sense that the file context was created using the respective domain.
+ * The data size per patch must be fixed.
  *
  * This function does not abort on MPI I/O errors but returns NULL.
  * Without MPI I/O the function may abort on file system dependent
