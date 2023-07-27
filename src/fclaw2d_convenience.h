@@ -256,6 +256,58 @@ fclaw2d_file_context_t *fclaw2d_file_write_block (fclaw2d_file_context_t *
                                                   sc_array_t *block_data,
                                                   int *errcode);
 
+/** Read a serial data block from an opened file.
+ *
+ * This is a collective function.
+ *
+ * This function requires an opened file context.
+ * The data block and its metadata is read on rank 0.
+ *
+ * The passed \b block_size is compared to the block size stored in the file.
+ * If the values do not equal each other, the function reports details closes
+ * and deallocate the file context. The return value in this case is NULL.
+ * If the data block section header information is not matching the passed
+ * parameters the function sets \ref FCLAW2D_FILE_ERR_FORMAT for errcode.
+ *
+ * This function does not abort on MPI I/O errors but returns NULL.
+ * Without MPI I/O the function may abort on file system dependent
+ * errors.
+ *
+ * \param [in]  fc            Context previously created by \ref
+ *                            fclaw2d_file_open_read.  It keeps track
+ *                            of the data sets read one after another.
+ * \param [out] user_string   At least \ref FCLAW2D_FILE_USER_STRING_BYTES
+ *                            bytes. The user string is written
+ *                            to the passed array including padding spaces
+ *                            and a trailing NUL-termination.
+ * \param [in]  block_size    The size of the header that is read.
+ * \param [in, out] block_data \b block_size allocated bytes in an sc_array
+ *                            with one element and \b block_size as element
+ *                            size. This data will be filled with the block
+ *                            data from the file. If this is NULL it means that
+ *                            the current header block is skipped and the
+ *                            internal file pointer of the file context is
+ *                            set to the next data section. If the current data
+ *                            section is not a data block, the file is closed
+ *                            and the file context is deallocated. Furthermore,
+ *                            in this case the function returns NULL and sets
+ *                            errcode to \ref FCLAW2D_FILE_ERR_FORMAT. In case
+ *                            of skipping the data block section \b block_size
+ *                            needs also to coincide with the data block size
+ *                            given in the file.
+ * \param [out]     errcode   An errcode that can be interpreted by
+ *                            \ref fclaw2d_file_error_string.
+ * \return                    Return a pointer to input context or NULL in case
+ *                            of errors that does not abort the program.
+ *                            In case of error the file is tried to close
+ *                            and \b fc is freed.
+ */
+fclaw2d_file_context_t *fclaw2d_file_read_block (fclaw2d_file_context_t *
+                                                  fc, char *user_string,
+                                                  size_t block_size,
+                                                  sc_array_t *block_data,
+                                                  int *errcode);
+
 /** Write per-patch data to a parallel output file.
  *
  * This is a collective function.
@@ -354,58 +406,6 @@ fclaw2d_file_context_t *fclaw2d_file_read_field (fclaw2d_file_context_t *
                                                  fclaw2d_domain_t * domain,
                                                  size_t patch_data_size,
                                                  int *errcode);
-
-/** Read a serial data block from an opened file.
- *
- * This is a collective function.
- *
- * This function requires an opened file context.
- * The data block and its metadata is read on rank 0.
- *
- * The passed \b block_size is compared to the block size stored in the file.
- * If the values do not equal each other, the function reports details closes
- * and deallocate the file context. The return value in this case is NULL.
- * If the data block section header information is not matching the passed
- * parameters the function sets \ref FCLAW2D_FILE_ERR_FORMAT for errcode.
- *
- * This function does not abort on MPI I/O errors but returns NULL.
- * Without MPI I/O the function may abort on file system dependent
- * errors.
- *
- * \param [in]  fc            Context previously created by \ref
- *                            fclaw2d_file_open_read.  It keeps track
- *                            of the data sets read one after another.
- * \param [out] user_string   At least \ref FCLAW2D_FILE_USER_STRING_BYTES
- *                            bytes. The user string is written
- *                            to the passed array including padding spaces
- *                            and a trailing NUL-termination.
- * \param [in]  block_size    The size of the header that is read.
- * \param [in, out] block_data \b block_size allocated bytes in an sc_array
- *                            with one element and \b block_size as element
- *                            size. This data will be filled with the block
- *                            data from the file. If this is NULL it means that
- *                            the current header block is skipped and the
- *                            internal file pointer of the file context is
- *                            set to the next data section. If the current data
- *                            section is not a data block, the file is closed
- *                            and the file context is deallocated. Furthermore,
- *                            in this case the function returns NULL and sets
- *                            errcode to \ref FCLAW2D_FILE_ERR_FORMAT. In case
- *                            of skipping the data block section \b block_size
- *                            needs also to coincide with the data block size
- *                            given in the file.
- * \param [out]     errcode   An errcode that can be interpreted by
- *                            \ref fclaw2d_file_error_string.
- * \return                    Return a pointer to input context or NULL in case
- *                            of errors that does not abort the program.
- *                            In case of error the file is tried to close
- *                            and \b fc is freed.
- */
-fclaw2d_file_context_t *fclaw2d_file_read_block (fclaw2d_file_context_t *
-                                                  fc, char *user_string,
-                                                  size_t block_size,
-                                                  sc_array_t *block_data,
-                                                  int *errcode);
 
 /** Close a file opened for parallel write/read and free the context.
  *
