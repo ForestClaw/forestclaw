@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_gauges.h>
 #include "fc2d_geoclaw_gauges_default.h"
 
-#include <fclaw2d_clawpatch.hpp>
+#include <fclaw_clawpatch.hpp>
 #include <fclaw2d_clawpatch.h>
 #include <fclaw_clawpatch_options.h>
 

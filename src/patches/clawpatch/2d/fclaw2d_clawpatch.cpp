@@ -36,7 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CLAWPATCH_VTABLE_NAME "fclaw2d_clawpatch"
 
 #include <fclaw2d_clawpatch.h>
-#include <fclaw2d_clawpatch.hpp>
+#include <fclaw_clawpatch.hpp>
 
 #include <fclaw2d_clawpatch_diagnostics.h>
 #include <fclaw_clawpatch_options.h>

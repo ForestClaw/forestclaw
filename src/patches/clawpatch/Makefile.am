@@ -5,7 +5,7 @@ libclawpatch_installed_headers = \
 	src/patches/clawpatch/fclaw_clawpatch_enums.h \
 	\
 	src/patches/clawpatch/fclaw2d_clawpatch.h \
-	src/patches/clawpatch/fclaw2d_clawpatch.hpp \
+	src/patches/clawpatch/fclaw_clawpatch.hpp \
 	src/patches/clawpatch/fclaw_clawpatch_options.h \
 	src/patches/clawpatch/fclaw2d_clawpatch_transform.h \
 	src/patches/clawpatch/fclaw2d_clawpatch_diagnostics.h \

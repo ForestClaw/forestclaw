@@ -27,7 +27,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_forestclaw.h>
 #include <fclaw_clawpatch3.hpp>
-#include <fclaw2d_clawpatch.hpp>
+#include <fclaw_clawpatch.hpp>
 
 #include "fc3d_clawpack5.h"
 #include "fc3d_clawpack5_options.h"

@@ -26,7 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "metric_user.h"
 
 #include <fclaw2d_diagnostics.h>
-#include <fclaw2d_clawpatch.hpp>
+#include <fclaw_clawpatch.hpp>
 
 static
 double metric_surface_area(fclaw2d_map_context_t* cont)

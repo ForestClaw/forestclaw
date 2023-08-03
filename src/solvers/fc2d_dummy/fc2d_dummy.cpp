@@ -25,7 +25,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "fc2d_dummy.h"
 #include <fclaw2d_forestclaw.h>
-#include <fclaw2d_clawpatch.hpp>
+#include <fclaw_clawpatch.hpp>
 #include <fclaw2d_neighbors_fort.h>
 
 static int s_dummy_package_id = -1;

@@ -143,7 +143,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define fclaw2d_clawpatch_get_q_timesync fclaw3dx_clawpatch_get_q_timesync
 #define fclaw2d_clawpatch_get_registers fclaw3dx_clawpatch_get_registers
 
-//fclaw2d_clawpatch.hpp
+//fclaw_clawpatch.hpp
 #define fclaw2d_clawpatch_t fclaw3dx_clawpatch_t
 #define fclaw2d_clawpatch_get_clawpatch fclaw3dx_clawpatch_get_clawpatch
 

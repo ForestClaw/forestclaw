@@ -105,10 +105,10 @@ target_link_libraries(clawpatch PUBLIC forestclaw)
 install(FILES
   fclaw_clawpatch_enums.h
 
+	fclaw_clawpatch.hpp
 	fclaw_clawpatch_options.h
 
   fclaw2d_clawpatch.h
-	fclaw2d_clawpatch.hpp
 	fclaw2d_clawpatch_conservation.h
 	fclaw2d_clawpatch_transform.h
 	fclaw2d_clawpatch_diagnostics.h
