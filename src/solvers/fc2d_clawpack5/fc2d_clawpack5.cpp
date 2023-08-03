@@ -59,7 +59,7 @@ void clawpack5_setprob(fclaw2d_global_t *glob)
     }
 }
 
-/* This should only be called when a new fclaw2d_clawpatch_t is created. */
+/* This should only be called when a new fclaw_clawpatch_t is created. */
 static
 void clawpack5_setaux(fclaw2d_global_t *glob,
                       fclaw2d_patch_t *this_patch,
@@ -527,7 +527,7 @@ void fc2d_clawpack5_setaux(fclaw2d_global_t *glob,
 }
 
 
-/* This should only be called when a new fclaw2d_clawpatch_t is created. */
+/* This should only be called when a new fclaw_clawpatch_t is created. */
 void fc2d_clawpack5_set_capacity(fclaw2d_global_t *glob,
                                   fclaw2d_patch_t *this_patch,
                                   int this_block_idx,

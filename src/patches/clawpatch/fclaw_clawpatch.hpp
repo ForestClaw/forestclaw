@@ -39,7 +39,7 @@ struct fclaw2d_metric_patch_t;
 /**
  * @brief Stores data for each patch
  */
-struct fclaw2d_clawpatch_t
+struct fclaw_clawpatch_t
 {
     /* Solution data */
     int meqn; /**< number of equations */                   
@@ -96,9 +96,9 @@ struct fclaw2d_clawpatch_t
  * @brief Get the clawpatch structure for a patch
  * 
  * @param this_patch the patch context
- * @return fclaw2d_clawpatch_t* the clawpatch structure
+ * @return fclaw_clawpatch_t* the clawpatch structure
  */
-fclaw2d_clawpatch_t* 
+fclaw_clawpatch_t* 
 fclaw2d_clawpatch_get_clawpatch(struct fclaw2d_patch* this_patch);
 
 /**

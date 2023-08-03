@@ -479,7 +479,7 @@ fc2d_cudaclaw_vtable_t* fc2d_cudaclaw_vt(fclaw2d_global_t *glob)
 	return cudaclaw_vt;
 }
 
-/* This should only be called when a new fclaw2d_clawpatch_t is created. */
+/* This should only be called when a new fclaw_clawpatch_t is created. */
 void fc2d_cudaclaw_set_capacity(fclaw2d_global_t *glob,
                                   fclaw2d_patch_t *this_patch,
                                   int this_block_idx,
