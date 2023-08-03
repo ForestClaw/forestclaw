@@ -34,14 +34,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 struct fclaw2d_patch;
 struct fclaw2d_global;
-struct  fclaw2d_metric_patch_t;
+struct fclaw2d_metric_patch_t;
 
 /**
  * @brief Stores data for each patch
  */
-class fclaw2d_clawpatch_t
+struct fclaw2d_clawpatch_t
 {
-public :
     /* Solution data */
     int meqn; /**< number of equations */                   
     FArrayBox griddata; /**< the current solution */
