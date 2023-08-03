@@ -184,7 +184,7 @@ main (int argc, char **argv)
     /* Options */
     user_options_t               *user_opt;
 #if 0
-    fclaw3dx_clawpatch_options_t *clawpatch_opt = NULL;
+   fclaw_clawpatch_options_t *clawpatch_opt = NULL;
     fc3d_clawpack46_options_t    *claw46_opt = NULL;
 #endif
     void                         *clawpatch_opt = NULL;
@@ -208,7 +208,7 @@ main (int argc, char **argv)
     fclaw_opt =                   fclaw_options_register(app,  NULL,       "fclaw_options.ini");
 
 #ifdef P8HACK
-    clawpatch_opt =  fclaw3dx_clawpatch_options_register(app, "clawpatch", "fclaw_options.ini");
+    clawpatch_opt =  fclaw_clawpatch_options_register_3d(app, "clawpatch", "fclaw_options.ini");
     claw46_opt =        fc3d_clawpack46_options_register(app, "claw3",     "fclaw_options.ini");
 #endif /* P8HACK */
 
@@ -235,7 +235,7 @@ main (int argc, char **argv)
         fclaw3d_options_store           (glob, fclaw_opt);
 
 #ifdef P8HACK
-        fclaw3dx_clawpatch_options_store(glob, clawpatch_opt);
+        fclaw_clawpatch_options_store(glob, clawpatch_opt);
         fc3d_clawpack46_options_store   (glob, claw46_opt);
 #endif /* P8HACK */
         swirl_options_store             (glob, user_opt);

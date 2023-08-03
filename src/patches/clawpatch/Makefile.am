@@ -6,7 +6,7 @@ libclawpatch_installed_headers = \
 	\
 	src/patches/clawpatch/fclaw2d_clawpatch.h \
 	src/patches/clawpatch/fclaw2d_clawpatch.hpp \
-	src/patches/clawpatch/fclaw2d_clawpatch_options.h \
+	src/patches/clawpatch/fclaw_clawpatch_options.h \
 	src/patches/clawpatch/fclaw2d_clawpatch_transform.h \
 	src/patches/clawpatch/fclaw2d_clawpatch_diagnostics.h \
 	src/patches/clawpatch/fclaw2d_clawpatch_pillow.h \
@@ -18,7 +18,7 @@ libclawpatch_installed_headers = \
 	\
 	src/patches/clawpatch/fclaw3dx_clawpatch.h \
 	src/patches/clawpatch/fclaw3dx_clawpatch.hpp \
-	src/patches/clawpatch/fclaw3dx_clawpatch_options.h \
+	src/patches/clawpatch/fclaw_clawpatch_options.h \
 	src/patches/clawpatch/fclaw3dx_clawpatch_transform.h \
 	src/patches/clawpatch/fclaw3dx_clawpatch_diagnostics.h \
 	src/patches/clawpatch/fclaw3dx_clawpatch_pillow.h \
@@ -36,7 +36,7 @@ libclawpatch_installed_headers = \
 
 libclawpatch_compiled_sources = \
 	src/patches/clawpatch/fclaw2d_clawpatch.cpp \
-	src/patches/clawpatch/fclaw2d_clawpatch_options.c \
+	src/patches/clawpatch/fclaw_clawpatch_options.c \
 	src/patches/clawpatch/fclaw2d_clawpatch_conservation.c \
 	src/patches/clawpatch/fclaw2d_clawpatch_diagnostics.c \
 	src/patches/clawpatch/fclaw2d_clawpatch_diagnostics_default.c \
@@ -47,7 +47,7 @@ libclawpatch_compiled_sources = \
 	src/patches/clawpatch/fclaw2d_clawpatch_utils.f \
 	\
 	src/patches/clawpatch/fclaw3dx_clawpatch.cpp \
-	src/patches/clawpatch/fclaw3dx_clawpatch_options.c \
+	src/patches/clawpatch/fclaw_clawpatch_options.c \
 	src/patches/clawpatch/fclaw3dx_clawpatch_conservation.c \
 	src/patches/clawpatch/fclaw3dx_clawpatch_diagnostics.c \
 	src/patches/clawpatch/fclaw3dx_clawpatch_diagnostics_default.c \
@@ -146,7 +146,7 @@ src_patches_clawpatch_clawpatch_TEST_SOURCES = \
     src/patches/clawpatch/fclaw2d_clawpatch.h.TEST.cpp \
     src/patches/clawpatch/fclaw2d_clawpatch_diagnostics.h.TEST.cpp \
     src/patches/clawpatch/fclaw2d_clawpatch_fort.h.TEST.cpp \
-    src/patches/clawpatch/fclaw2d_clawpatch_options.h.TEST.cpp \
+    src/patches/clawpatch/fclaw_clawpatch_options.h.TEST.cpp \
 	src/patches/clawpatch/fclaw3dx_clawpatch.h.TEST.cpp \
 	src/patches/metric/fclaw2d_metric.h.TEST.cpp
 

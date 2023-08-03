@@ -28,7 +28,7 @@
 
 #include <fclaw2d_include_all.h>
 
-#include <fclaw3dx_clawpatch_options.h>
+#include <fclaw_clawpatch_options.h>
 #include <fclaw3dx_clawpatch.h>
 
 #include <fc3d_clawpack46.h>

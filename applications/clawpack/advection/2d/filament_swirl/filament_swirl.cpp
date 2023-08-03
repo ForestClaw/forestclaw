@@ -435,13 +435,13 @@ main (int argc, char **argv)
 
     filament_options_t          *filament_user_opt;
     fclaw_options_t             *filament_fclaw_opt;
-    fclaw2d_clawpatch_options_t *filament_clawpatch_opt;
+    fclaw_clawpatch_options_t *filament_clawpatch_opt;
     fc2d_clawpack46_options_t   *filament_claw46_opt;
     fc2d_clawpack5_options_t    *filament_claw5_opt;
 
     swirl_options_t             *swirl_user_opt;
     fclaw_options_t             *swirl_fclaw_opt;
-    fclaw2d_clawpatch_options_t *swirl_clawpatch_opt;
+    fclaw_clawpatch_options_t *swirl_clawpatch_opt;
     fc2d_clawpack46_options_t   *swirl_claw46_opt;
     fc2d_clawpack5_options_t    *swirl_claw5_opt;
 
@@ -460,13 +460,13 @@ main (int argc, char **argv)
     fclaw_app_options_register_core(app, "filament_options.ini"); //Global options like verbosity, etc
 
     filament_fclaw_opt                    = fclaw_options_register(app, "filament",            "filament_options.ini");
-    filament_clawpatch_opt    = fclaw2d_clawpatch_options_register(app, "filament-clawpatch",  "filament_options.ini");
+    filament_clawpatch_opt    = fclaw_clawpatch_options_register_2d(app, "filament-clawpatch",  "filament_options.ini");
     filament_claw46_opt         = fc2d_clawpack46_options_register(app, "filament-clawpack46", "filament_options.ini");
     filament_claw5_opt           = fc2d_clawpack5_options_register(app, "filament-clawpack5",  "filament_options.ini");
     filament_user_opt =                  filament_options_register(app, "filament-user",       "filament_options.ini");  
 
     swirl_fclaw_opt =                   fclaw_options_register(app, "swirl",            "swirl_options.ini");
-    swirl_clawpatch_opt =   fclaw2d_clawpatch_options_register(app, "swirl-clawpatch",  "swirl_options.ini");
+    swirl_clawpatch_opt =   fclaw_clawpatch_options_register_2d(app, "swirl-clawpatch",  "swirl_options.ini");
     swirl_claw46_opt =        fc2d_clawpack46_options_register(app, "swirl-clawpack46", "swirl_options.ini");
     swirl_claw5_opt =          fc2d_clawpack5_options_register(app, "swirl-clawpack5",  "swirl_options.ini");
     swirl_user_opt =                    swirl_options_register(app, "swirl-user",       "swirl_options.ini");  
@@ -490,7 +490,7 @@ main (int argc, char **argv)
         fclaw2d_global_store_domain(filament_glob, filament_domain);
 
         fclaw2d_options_store            (filament_glob, filament_fclaw_opt);
-        fclaw2d_clawpatch_options_store  (filament_glob, filament_clawpatch_opt);
+        fclaw_clawpatch_options_store  (filament_glob, filament_clawpatch_opt);
         fc2d_clawpack46_options_store    (filament_glob, filament_claw46_opt);
         fc2d_clawpack5_options_store     (filament_glob, filament_claw5_opt);
         filament_options_store           (filament_glob, filament_user_opt);
@@ -499,7 +499,7 @@ main (int argc, char **argv)
         fclaw2d_global_store_domain(swirl_glob, swirl_domain);
 
         fclaw2d_options_store           (swirl_glob, swirl_fclaw_opt);
-        fclaw2d_clawpatch_options_store (swirl_glob, swirl_clawpatch_opt);
+        fclaw_clawpatch_options_store (swirl_glob, swirl_clawpatch_opt);
         fc2d_clawpack46_options_store   (swirl_glob, swirl_claw46_opt);
         fc2d_clawpack5_options_store    (swirl_glob, swirl_claw5_opt);
         swirl_options_store             (swirl_glob, swirl_user_opt);
@@ -512,7 +512,7 @@ main (int argc, char **argv)
         c->glob = swirl_glob;
         c->domain = swirl_glob->domain;
         c->num_cells_in_patch =
-            swirl_clawpatch_opt->mx * swirl_clawpatch_opt->my;
+            swirl_clawpatch_opt->d2->mx * swirl_clawpatch_opt->d2->my;
         create_query_points (c);
 
         /* initialize the filament geometry information that is needed for

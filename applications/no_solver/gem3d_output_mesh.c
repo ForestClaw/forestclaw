@@ -26,7 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "gem3d_output_mesh.h"
 
 #include <fclaw2d_clawpatch.h>
-#include <fclaw2d_clawpatch_options.h>
+#include <fclaw_clawpatch_options.h>
 
 #include <fclaw2d_patch.h>
 #include <fclaw2d_global.h>

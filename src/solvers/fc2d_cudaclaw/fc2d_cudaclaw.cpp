@@ -41,7 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_clawpatch.hpp>
 #include <fclaw2d_clawpatch.h>
 
-#include <fclaw2d_clawpatch_options.h>
+#include <fclaw_clawpatch_options.h>
 #include <fclaw2d_clawpatch_diagnostics.h>
 #include <fclaw2d_clawpatch_output_ascii.h> 
 #include <fclaw2d_clawpatch_output_vtk.h>
@@ -404,7 +404,7 @@ void cudaclaw_vt_destroy(void* vt)
 
 void fc2d_cudaclaw_solver_initialize(fclaw2d_global_t* glob)
 {
-	fclaw2d_clawpatch_options_t* clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
+	fclaw_clawpatch_options_t* clawpatch_opt = fclaw_clawpatch_get_options(glob);
 	fc2d_cudaclaw_options_t* clawopt = fc2d_cudaclaw_get_options(glob);
 
     clawopt->method[6] = clawpatch_opt->maux;

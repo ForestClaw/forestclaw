@@ -36,14 +36,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_clawpatch_output_ascii.h>
 
 #include <fclaw2d_clawpatch.h>
-#include <fclaw2d_clawpatch_options.h>
+#include <fclaw_clawpatch_options.h>
 
 #elif REFINE_DIM ==2 && PATCH_DIM == 3
 
 #include <fclaw3dx_clawpatch_output_ascii.h>
 
 #include <fclaw3dx_clawpatch.h>
-#include <fclaw3dx_clawpatch_options.h>
+#include <fclaw_clawpatch_options.h>
 
 #include <_fclaw2d_to_fclaw3dx.h>
 
@@ -111,7 +111,7 @@ void cb_clawpatch_output_ascii (fclaw2d_domain_t * domain,
 /* This function isn't virtualized;  should it be? */
 void fclaw2d_clawpatch_time_header_ascii(fclaw2d_global_t* glob, int iframe)
 {
-    const fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
+    const fclaw_clawpatch_options_t *clawpatch_opt = fclaw_clawpatch_get_options(glob);
     fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt(glob);
     char matname1[11];
     char matname2[11];

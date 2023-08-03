@@ -35,14 +35,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_clawpatch_diagnostics.h>
 
 #include <fclaw2d_clawpatch.h>
-#include <fclaw2d_clawpatch_options.h>
+#include <fclaw_clawpatch_options.h>
 
 #elif REFINE_DIM == 2 && PATCH_DIM == 3
 
 #include <fclaw3dx_clawpatch_diagnostics.h>
 
 #include <fclaw3dx_clawpatch.h>
-#include <fclaw3dx_clawpatch_options.h>
+#include <fclaw_clawpatch_options.h>
 
 #include <_fclaw2d_to_fclaw3dx.h>
 #include <_fclaw2d_to_fclaw3d.h>

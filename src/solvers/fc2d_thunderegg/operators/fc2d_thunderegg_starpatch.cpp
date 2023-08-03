@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_elliptic_solver.h>
 
 #include <fclaw2d_clawpatch.h>
-#include <fclaw2d_clawpatch_options.h>
+#include <fclaw_clawpatch_options.h>
 #include <fclaw2d_clawpatch_output_ascii.h>
 #include <fclaw2d_clawpatch_output_vtk.h>
 
@@ -71,8 +71,8 @@ Vector<2> restrict_beta_vec(const Vector<2>& prev_beta_vec,
 void fc2d_thunderegg_starpatch_solve(fclaw2d_global_t *glob) 
 {
     // get needed options
-    fclaw2d_clawpatch_options_t *clawpatch_opt =
-    fclaw2d_clawpatch_get_options(glob);
+    fclaw_clawpatch_options_t *clawpatch_opt =
+    fclaw_clawpatch_get_options(glob);
     fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
     fc2d_thunderegg_options_t *mg_opt = fc2d_thunderegg_get_options(glob);
 
@@ -87,7 +87,7 @@ void fc2d_thunderegg_starpatch_solve(fclaw2d_global_t *glob)
     Vector<2> f = fc2d_thunderegg_get_vector(glob,RHS);
 
     // get patch size
-    array<int, 2> ns = {clawpatch_opt->mx, clawpatch_opt->my};
+    array<int, 2> ns = {clawpatch_opt->d2->mx, clawpatch_opt->d2->my};
     int mbc = clawpatch_opt->mbc;
 
     // get p4est structure

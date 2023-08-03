@@ -31,7 +31,7 @@ static
 fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, 
                                 fclaw_options_t* fclaw_opt, 
                                 user_options_t* user,
-                                fclaw3dx_clawpatch_options_t* clawpatch_opt,
+                               fclaw_clawpatch_options_t* clawpatch_opt,
                                 fc3d_clawpack46_options_t *claw3_opt)
 {
     /* Mapped, multi-block domain */
@@ -44,7 +44,7 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm,
     int a = fclaw_opt->periodic_x;
     int b = fclaw_opt->periodic_y;
 
-    int mx = clawpatch_opt->mx;
+    int mx = clawpatch_opt->d3->mx;
     int minlevel = fclaw_opt->minlevel;
     int check = mi*mx*pow_int(2,minlevel);
 
@@ -164,7 +164,7 @@ main (int argc, char **argv)
     /* Options */
     user_options_t               *user_opt;
     fclaw_options_t              *fclaw_opt;
-    fclaw3dx_clawpatch_options_t *clawpatch_opt;
+   fclaw_clawpatch_options_t *clawpatch_opt;
     fc3d_clawpack46_options_t    *claw46_opt;
 
     fclaw2d_global_t            *glob;
@@ -176,7 +176,7 @@ main (int argc, char **argv)
 
     /* Create new options packages */
     fclaw_opt =                   fclaw_options_register(app,  NULL,       "fclaw_options.ini");
-    clawpatch_opt =  fclaw3dx_clawpatch_options_register(app, "clawpatch", "fclaw_options.ini");
+    clawpatch_opt =  fclaw_clawpatch_options_register_3d(app, "clawpatch", "fclaw_options.ini");
     claw46_opt =        fc3d_clawpack46_options_register(app, "claw3",     "fclaw_options.ini");
     user_opt =                    swirl_options_register(app,              "fclaw_options.ini");  
 
@@ -198,7 +198,7 @@ main (int argc, char **argv)
 
         /* Store option packages in glob */
         fclaw2d_options_store           (glob, fclaw_opt);
-        fclaw3dx_clawpatch_options_store(glob, clawpatch_opt);
+        fclaw_clawpatch_options_store(glob, clawpatch_opt);
         fc3d_clawpack46_options_store   (glob, claw46_opt);
         swirl_options_store             (glob, user_opt);
 

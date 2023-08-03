@@ -170,11 +170,11 @@ user_options_t* radial_get_options(fclaw2d_global_t* glob)
 }
 
 void radial_global_post_process(fclaw_options_t *fclaw_opt,
-                                fclaw2d_clawpatch_options_t *clawpatch_opt,
+                                fclaw_clawpatch_options_t *clawpatch_opt,
                                 user_options_t *user_opt)
 {
     if (user_opt->example == 1)
-        if (clawpatch_opt->mx*pow_int(2,fclaw_opt->minlevel) < 32)
+        if (clawpatch_opt->d2->mx*pow_int(2,fclaw_opt->minlevel) < 32)
         {
             fclaw_global_essentialf("The five patch mapping requires mx*2^minlevel >= 32\n");
             exit(0);

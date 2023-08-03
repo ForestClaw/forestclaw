@@ -46,7 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "fclaw2d_clawpatch_conservation_fort.h"
 
 #include "fclaw2d_clawpatch.h"
-#include "fclaw2d_clawpatch_options.h"
+#include "fclaw_clawpatch_options.h"
 
 #elif REFINE_DIM == 2 && PATCH_DIM == 3
 
@@ -54,7 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "fclaw3dx_clawpatch_conservation_fort.h"
 
 #include "fclaw3dx_clawpatch.h"
-#include "fclaw3dx_clawpatch_options.h"
+#include "fclaw_clawpatch_options.h"
 
 #include <_fclaw2d_to_fclaw3dx.h>
 
@@ -76,12 +76,24 @@ void fclaw2d_clawpatch_time_sync_new (fclaw2d_global_t* glob,
                                       int blockno,int patchno,
                                       fclaw2d_clawpatch_registers_t **registers)
 {
-	fclaw2d_clawpatch_options_t* clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
+	fclaw_clawpatch_options_t* clawpatch_opt = fclaw_clawpatch_get_options(glob);
 
 	int k;
 
-	int mx = clawpatch_opt->mx;
-	int my = clawpatch_opt->my;
+	int mx;
+	int my;
+
+	if (clawpatch_opt->dim == 2)
+	{
+		mx = clawpatch_opt->d2->mx;
+		my = clawpatch_opt->d2->my;
+	}
+	else
+	{
+		mx = clawpatch_opt->d3->mx;
+		my = clawpatch_opt->d3->my;
+	}
+
 	int meqn = clawpatch_opt->meqn;
 
 	fclaw2d_clawpatch_registers_t *cr = *registers;  /* cr = clawpatch registers */
@@ -116,10 +128,22 @@ void fclaw2d_clawpatch_time_sync_pack_registers(fclaw2d_global_t *glob,
                                                 fclaw_clawpatch_packmode_t packmode, 
                                                 int *ierror)
 {
-	fclaw2d_clawpatch_options_t* clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
+	fclaw_clawpatch_options_t* clawpatch_opt = fclaw_clawpatch_get_options(glob);
 
-	int mx = clawpatch_opt->mx;
-	int my = clawpatch_opt->my;
+	int mx;
+	int my;
+
+	if (clawpatch_opt->dim == 2)
+	{
+		mx = clawpatch_opt->d2->mx;
+		my = clawpatch_opt->d2->my;
+	}
+	else
+	{
+		mx = clawpatch_opt->d3->mx;
+		my = clawpatch_opt->d3->my;
+	}
+
 	int meqn = clawpatch_opt->meqn;
 
 	fclaw2d_clawpatch_registers_t* cr = fclaw2d_clawpatch_get_registers(glob,this_patch);
@@ -209,14 +233,27 @@ void fclaw2d_clawpatch_time_sync_reset(fclaw2d_global_t *glob,
                                        int coarse_level,
                                        int reset_mode)
 {
-	int mx,my,meqn;
+	int meqn;
 	int i,j,k,idir;
 
-	fclaw2d_clawpatch_options_t* clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
+	fclaw_clawpatch_options_t* clawpatch_opt = fclaw_clawpatch_get_options(glob);
 
 	fclaw2d_clawpatch_registers_t* cr = fclaw2d_clawpatch_get_registers(glob,this_patch);
-	mx = clawpatch_opt->mx;
-	my = clawpatch_opt->my;
+
+	int mx;
+	int my;
+
+	if (clawpatch_opt->dim == 2)
+	{
+		mx = clawpatch_opt->d2->mx;
+		my = clawpatch_opt->d2->my;
+	}
+	else
+	{
+		mx = clawpatch_opt->d3->mx;
+		my = clawpatch_opt->d3->my;
+	}
+	
 	meqn = clawpatch_opt->meqn;
 
 	fclaw2d_patch_data_t* pdata = fclaw2d_patch_get_patch_data(this_patch);

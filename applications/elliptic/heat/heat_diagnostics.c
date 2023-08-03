@@ -26,7 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "heat_diagnostics.h"
 
 #include <fclaw2d_clawpatch.h>
-#include <fclaw2d_clawpatch_options.h>
+#include <fclaw_clawpatch_options.h>
 
 
 #include <fclaw2d_global.h>
@@ -37,8 +37,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 void heat_diagnostics_initialize(fclaw2d_global_t *glob,
                                    void **acc_patch)
 {
-    const fclaw2d_clawpatch_options_t *clawpatch_opt = 
-              fclaw2d_clawpatch_get_options(glob);
+    const fclaw_clawpatch_options_t *clawpatch_opt = 
+              fclaw_clawpatch_get_options(glob);
 
     heat_error_info_t *error_data;
 
@@ -64,7 +64,7 @@ void heat_diagnostics_reset(fclaw2d_global_t *glob,
                               void* patch_acc)
 {
     heat_error_info_t *error_data = (heat_error_info_t*) patch_acc;
-    const fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
+    const fclaw_clawpatch_options_t *clawpatch_opt = fclaw_clawpatch_get_options(glob);
 
     int mfields = clawpatch_opt->rhs_fields;
 
@@ -139,7 +139,7 @@ void heat_diagnostics_gather(fclaw2d_global_t *glob,
     
     heat_error_info_t *error_data = (heat_error_info_t*) patch_acc;
     const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
-    const fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
+    const fclaw_clawpatch_options_t *clawpatch_opt = fclaw_clawpatch_get_options(glob);
     
     int mfields = clawpatch_opt->rhs_fields;  /* clawpatch->meqn */
 

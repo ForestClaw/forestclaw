@@ -29,11 +29,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_global.h>
 
 #include <fclaw2d_clawpatch.h>
-#include <fclaw2d_clawpatch_options.h>
+#include <fclaw_clawpatch_options.h>
 #include <fclaw2d_clawpatch_fort.h>
 
 #include <fclaw3dx_clawpatch.h>
-#include <fclaw3dx_clawpatch_options.h>
+#include <fclaw_clawpatch_options.h>
 #include <fclaw3dx_clawpatch_fort.h>
 
 namespace{
@@ -104,9 +104,9 @@ TEST_CASE("FCLAW2D_CLAWPATCH_EXCEEDS_THRESHOLD calls user function")
             return params.return_value;
         };
 
-	fclaw2d_clawpatch_options_t opts;
+	fclaw_clawpatch_options_t opts;
     opts.refinement_criteria = FCLAW_REFINE_CRITERIA_USER;
-    fclaw2d_clawpatch_options_store(glob, &opts);
+    fclaw_clawpatch_options_store(glob, &opts);
 
     fclaw2d_global_set_global(glob);
     int ret = FCLAW2D_CLAWPATCH_TAG_CRITERIA(params.blockno,
@@ -175,9 +175,9 @@ TEST_CASE("FCLAW3DX_CLAWPATCH_EXCEEDS_THRESHOLD calls user function")
             return params.return_value;
         };
 
-	fclaw3dx_clawpatch_options_t opts;
+	fclaw_clawpatch_options_t opts;
     opts.refinement_criteria = FCLAW_REFINE_CRITERIA_USER;
-    fclaw3dx_clawpatch_options_store(glob, &opts);
+    fclaw_clawpatch_options_store(glob, &opts);
 
     fclaw2d_global_set_global(glob);
     int ret = FCLAW3DX_CLAWPATCH_TAG_CRITERIA(params.blockno,

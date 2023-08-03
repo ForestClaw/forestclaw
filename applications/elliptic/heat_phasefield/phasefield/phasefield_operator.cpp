@@ -35,7 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_elliptic_solver.h>
 
 #include <fclaw2d_clawpatch.h>
-#include <fclaw2d_clawpatch_options.h>
+#include <fclaw_clawpatch_options.h>
 #include <fclaw2d_clawpatch_output_ascii.h>
 #include <fclaw2d_clawpatch_output_vtk.h>
 
@@ -77,7 +77,7 @@ void phasefield_solve(fclaw2d_global_t *glob)
     // get needed options
     const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
     const fc2d_thunderegg_options_t *mg_opt = fc2d_thunderegg_get_options(glob);
-    const fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
+    const fclaw_clawpatch_options_t *clawpatch_opt = fclaw_clawpatch_get_options(glob);
   
     GhostFillingType fill_type = GhostFillingType::Faces;
 #if 0  
@@ -88,7 +88,7 @@ void phasefield_solve(fclaw2d_global_t *glob)
     Vector<2> f = fc2d_thunderegg_get_vector(glob,RHS);
 
     // get patch size
-    array<int, 2> ns = {clawpatch_opt->mx, clawpatch_opt->my};
+    array<int, 2> ns = {clawpatch_opt->d2->mx, clawpatch_opt->d2->my};
 
     // get p4est structure
     fclaw2d_domain_t *domain = glob->domain;

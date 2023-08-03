@@ -15,14 +15,14 @@
 
 #include "../fclaw2d_clawpatch.h"
 
-#include "../fclaw2d_clawpatch_options.h"
+#include "../fclaw_clawpatch_options.h"
 #include "../fclaw2d_clawpatch_fort.h"
 
 #elif REFINE_DIM == 2 && PATCH_DIM == 3
 
 #include "../fclaw3dx_clawpatch.h"
 
-#include "../fclaw3dx_clawpatch_options.h"
+#include "../fclaw_clawpatch_options.h"
 #include "../fclaw2d_clawpatch_fort.h"
 #include "../fclaw3dx_clawpatch_fort.h"
 
@@ -57,12 +57,12 @@ int FCLAW2D_CLAWPATCH_TAG_CRITERIA(const int* blockno,
     clawpatch_fort_exceeds_threshold_t user_exceeds_threshold = 
                                 clawpatch_vt->fort_user_exceeds_threshold;
 
-    fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
+    fclaw_clawpatch_options_t *clawpatch_opt = fclaw_clawpatch_get_options(glob);
     int meqn_val = clawpatch_opt->meqn, *meqn = &meqn_val;
     int ivar_val = clawpatch_opt->threshold_variable, *ivar_threshold=&ivar_val;
 
     int exceeds_th = 1;
-    int refinement_criteria = fclaw2d_clawpatch_get_options(glob)->refinement_criteria;
+    int refinement_criteria = fclaw_clawpatch_get_options(glob)->refinement_criteria;
     switch(refinement_criteria)
     {
         case FCLAW_REFINE_CRITERIA_VALUE:

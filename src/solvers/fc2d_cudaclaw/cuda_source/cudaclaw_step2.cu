@@ -10,7 +10,7 @@
 #include <fclaw2d_vtable.h>
 
 #include <fclaw2d_clawpatch.h>
-#include <fclaw2d_clawpatch_options.h>
+#include <fclaw_clawpatch_options.h>
 #include <fc2d_cudaclaw_options.h>
 
 #include "../fc2d_cudaclaw_check.h"  /* CHECK defined here */
@@ -69,7 +69,7 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
 
     /* To get patch-independent parameters */
     fc2d_cudaclaw_options_t *clawopt;
-    fclaw2d_clawpatch_options_t *clawpatch_opt;
+    fclaw_clawpatch_options_t *clawpatch_opt;
 
     /* ---------------------------------- start code ---------------------------------- */
     FCLAW_ASSERT(batch_size > 0);
@@ -84,7 +84,7 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
         FCLAW_ASSERT(cuclaw_vt->cuda_rpt2 != NULL);        
     }
 
-    clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
+    clawpatch_opt = fclaw_clawpatch_get_options(glob);
     mx = clawpatch_opt->mx;
     my = clawpatch_opt->my;
     mbc = clawpatch_opt->mbc;

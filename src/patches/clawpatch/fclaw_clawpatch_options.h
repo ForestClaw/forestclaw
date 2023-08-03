@@ -23,8 +23,8 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FCLAW2D_CLAWPATCH_OPTIONS_H
-#define FCLAW2D_CLAWPATCH_OPTIONS_H
+#ifndef FCLAW_CLAWPATCH_OPTIONS_H
+#define FCLAW_CLAWPATCH_OPTIONS_H
 
 /** 
  * @file
@@ -58,18 +58,30 @@ extern "C"
 
 struct fclaw2d_global;
 
-/** Typedef for fclaw2d_clwaptch_opitons structure */
-typedef struct fclaw2d_clawpatch_options fclaw2d_clawpatch_options_t;
+/** Typedef for fclaw_clawpatch_options structure */
+typedef struct fclaw_clawpatch_options fclaw_clawpatch_options_t;
 
 
+struct fclaw_clawpatch_options_3d
+{
+    int mx; /**< number of cells in the x direction */
+    int my; /**< number of cells in the y direction */
+    int mz; /**< number of cells in the z direction */
+};
+struct fclaw_clawpatch_options_2d
+{
+    int mx; /**< number of cells in the x direction */
+    int my; /**< number of cells in the y direction */
+};
 /**
  * @brief Clawpatch options
  */
-struct fclaw2d_clawpatch_options
+struct fclaw_clawpatch_options
 {
     /* These are constant for all clawpatch's */
-    int mx; /**< number of cells in the x direction */
-    int my; /**< number of cells in the y direction */
+    int dim; /**< dimension of clawpatch */
+    struct fclaw_clawpatch_options_2d* d2;
+    struct fclaw_clawpatch_options_3d* d3;
     int maux; /**< number of aux equations */
     int mbc; /**< the number of ghost cells */
 
@@ -91,15 +103,45 @@ struct fclaw2d_clawpatch_options
 };
 
 /**
- * @brief Register options in SC
+ * @brief Allocate a new fclaw_clawpatch_options_t structure with the given dimension.
+ *
+ * This shouldn't have be called by the user
+ * 
+ * @param dim The dimension of the clawpatch.
+ * @return fclaw_clawpatch_options_t* A newly allocated fclaw_clawpatch_options_t structure.
+ */
+fclaw_clawpatch_options_t* fclaw_clawpatch_options_new (int dim);
+
+/**
+ * @brief Deallocate the given fclaw_clawpatch_options_t structure.
+ * 
+ * This shouldn't have be called by the user
+ *
+ * @param clawpatch_opt The fclaw_clawpatch_options_t structure to deallocate.
+ */
+void fclaw_clawpatch_options_destroy (fclaw_clawpatch_options_t *clawpatch_opt);
+
+/**
+ * @brief Register 2d options in SC
  * 
  * @param app the app context
  * @param name the name of the options group
  * @param configfile the config file
- * @return fclaw2d_clawpatch_options_t* a newly allocated options struct
+ * @return fclaw_clawpatch_options_t* a newly allocated options struct
  */
-fclaw2d_clawpatch_options_t *
-fclaw2d_clawpatch_options_register(fclaw_app_t* app, const char* name, const char* configfile);
+fclaw_clawpatch_options_t *
+fclaw_clawpatch_options_register_2d(fclaw_app_t* app, const char* name, const char* configfile);
+
+/**
+ * @brief Register 3d options in SC
+ * 
+ * @param app the app context
+ * @param name the name of the options group
+ * @param configfile the config file
+ * @return fclaw_clawpatch_options_t* a newly allocated options struct
+ */
+fclaw_clawpatch_options_t *
+fclaw_clawpatch_options_register_3d(fclaw_app_t* app, const char* name, const char* configfile);
 
 
 /**
@@ -108,16 +150,16 @@ fclaw2d_clawpatch_options_register(fclaw_app_t* app, const char* name, const cha
  * @param glob the global context
  * @param clawpatch_options the options
  */
-void fclaw2d_clawpatch_options_store (struct fclaw2d_global *glob, 
-                                      fclaw2d_clawpatch_options_t* clawpatch_options);
+void fclaw_clawpatch_options_store (struct fclaw2d_global *glob, 
+                                    fclaw_clawpatch_options_t* clawpatch_options);
 
 /**
  * @brief Get the options from the global context
  * 
  * @param glob the global context
- * @return fclaw2d_clawpatch_options_t* the options
+ * @return fclaw_clawpatch_options_t* the options
  */
-fclaw2d_clawpatch_options_t* fclaw2d_clawpatch_get_options(struct fclaw2d_global* glob);
+fclaw_clawpatch_options_t* fclaw_clawpatch_get_options(struct fclaw2d_global* glob);
 
 
 #ifdef __cplusplus

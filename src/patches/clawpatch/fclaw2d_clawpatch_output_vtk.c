@@ -36,7 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_clawpatch_output_vtk.h>
 
 #include <fclaw2d_clawpatch.h>
-#include <fclaw2d_clawpatch_options.h>
+#include <fclaw_clawpatch_options.h>
 
 #define PATCH_CHILDREN 4
 
@@ -45,7 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw3dx_clawpatch_output_vtk.h>
 
 #include <fclaw3dx_clawpatch.h>
-#include <fclaw3dx_clawpatch_options.h>
+#include <fclaw_clawpatch_options.h>
 
 #include <_fclaw2d_to_fclaw3dx.h>
 
@@ -858,12 +858,12 @@ static void
 fclaw2d_output_write_vtk_debug (fclaw2d_global_t * glob, const char *basename)
 {
     const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
-    const fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
+    const fclaw_clawpatch_options_t *clawpatch_opt = fclaw_clawpatch_get_options(glob);
 
     (void) fclaw2d_vtk_write_file (glob, basename,
                                    clawpatch_opt->mx, clawpatch_opt->my,
 #if PATCH_DIM == 3
-                                   clawpatch_opt->mz,
+                                   clawpatch_opt->d3->mz,
 #endif
                                    clawpatch_opt->meqn,
                                    fclaw_opt->vtkspace, 0,
@@ -880,16 +880,19 @@ fclaw2d_output_write_vtk_debug (fclaw2d_global_t * glob, const char *basename)
 void fclaw2d_clawpatch_output_vtk (fclaw2d_global_t * glob, int iframe)
 {
     const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
-    const fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
+    const fclaw_clawpatch_options_t *clawpatch_opt = fclaw_clawpatch_get_options(glob);
 
 
     char basename[BUFSIZ];
     snprintf (basename, BUFSIZ, "%s_frame_%04d", fclaw_opt->prefix, iframe);
 
+    int mx = (clawpatch_opt->dim == 2) ? clawpatch_opt->d2->mx : clawpatch_opt->d3->mx;
+    int my = (clawpatch_opt->dim == 2) ? clawpatch_opt->d2->my : clawpatch_opt->d3->my;
+
     (void) fclaw2d_vtk_write_file (glob, basename,
-                                   clawpatch_opt->mx, clawpatch_opt->my,
+                                   mx, my,
 #if PATCH_DIM == 3
-                                   clawpatch_opt->mz,
+                                   clawpatch_opt->d3->mz,
 #endif
                                    clawpatch_opt->meqn,
                                    fclaw_opt->vtkspace, 0,

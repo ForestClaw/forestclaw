@@ -35,7 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_clawpatch.hpp>
 #include <fclaw2d_clawpatch.h>
-#include <fclaw2d_clawpatch_options.h>
+#include <fclaw_clawpatch_options.h>
 
 /* Basic forestclaw functions */
 #include <fclaw2d_patch.h>
@@ -749,8 +749,8 @@ void geoclaw_remote_ghost_setup(fclaw2d_global_t *glob,
                                 int blockno,
                                 int patchno)
 {
-    fclaw2d_clawpatch_options_t* clawpatch_options;
-    clawpatch_options = fclaw2d_clawpatch_get_options(glob);
+    fclaw_clawpatch_options_t* clawpatch_options;
+    clawpatch_options = fclaw_clawpatch_get_options(glob);
 
     if (!clawpatch_options->ghost_patch_pack_aux)
     {
@@ -789,7 +789,7 @@ void geoclaw_local_ghost_pack_aux(fclaw2d_global_t *glob,
 void fc2d_geoclaw_module_setup(fclaw2d_global_t *glob)
 {
     const fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
-    const fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
+    const fclaw_clawpatch_options_t *clawpatch_opt = fclaw_clawpatch_get_options(glob);
     const fc2d_geoclaw_options_t *geo_opt = fc2d_geoclaw_get_options(glob);
 
     FC2D_GEOCLAW_SET_MODULES(&geo_opt->mwaves, 
@@ -830,7 +830,7 @@ fc2d_geoclaw_vtable_t* fc2d_geoclaw_vt(fclaw2d_global_t* glob)
 void fc2d_geoclaw_solver_initialize(fclaw2d_global_t* glob)
 {
 	fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
-	fclaw2d_clawpatch_options_t* clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
+	fclaw_clawpatch_options_t* clawpatch_opt = fclaw_clawpatch_get_options(glob);
 	fc2d_geoclaw_options_t* geo_opt = fc2d_geoclaw_get_options(glob);
 
     geo_opt->method[6] = clawpatch_opt->maux;

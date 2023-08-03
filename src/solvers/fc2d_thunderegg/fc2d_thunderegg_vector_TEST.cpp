@@ -26,7 +26,7 @@
 #include "fc2d_thunderegg_vector.hpp"
 #include <fclaw2d_clawpatch.h>
 #include <fclaw2d_clawpatch.hpp>
-#include <fclaw2d_clawpatch_options.h>
+#include <fclaw_clawpatch_options.h>
 #include <fclaw2d_clawpatch46_fort.h>
 #include <fclaw2d_clawpatch_output_ascii.h>
 #include <fclaw2d_diagnostics.h>
@@ -47,10 +47,11 @@ struct QuadDomain {
     fclaw2d_global_t* glob;
     fclaw_options_t fopts;
     fclaw2d_domain_t *domain;
-    fclaw2d_clawpatch_options_t opts;
+    fclaw_clawpatch_options_t* opts;
 
     QuadDomain(){
         glob = fclaw2d_global_new();
+        opts = fclaw_clawpatch_options_new(2);
 
         fclaw2d_vtables_initialize(glob);
         fclaw2d_clawpatch_vtable_initialize(glob, 4);
@@ -71,14 +72,13 @@ struct QuadDomain {
         fclaw2d_global_store_domain(glob, domain);
         fclaw2d_options_store(glob, &fopts);
 
-        memset(&opts, 0, sizeof(opts));
-        opts.mx   = 5;
-        opts.my   = 6;
-        opts.mbc  = 2;
-        opts.meqn = 1;
-        opts.maux = 1;
-        opts.rhs_fields = 1;
-        fclaw2d_clawpatch_options_store(glob, &opts);
+        opts->d2->mx     = 5;
+        opts->d2->my     = 6;
+        opts->mbc        = 2;
+        opts->meqn       = 1;
+        opts->maux       = 1;
+        opts->rhs_fields = 1;
+        fclaw_clawpatch_options_store(glob, opts);
 
         fclaw2d_domain_data_new(glob->domain);
 
@@ -95,6 +95,7 @@ struct QuadDomain {
         fclaw2d_patch_data_delete(glob, &domain->blocks[0].patches[1]);
         fclaw2d_patch_data_delete(glob, &domain->blocks[0].patches[2]);
         fclaw2d_patch_data_delete(glob, &domain->blocks[0].patches[3]);
+        fclaw_clawpatch_options_destroy(opts);
         fclaw2d_global_destroy(glob);
     }
 };
@@ -102,10 +103,11 @@ struct QuadDomainBrick {
     fclaw2d_global_t* glob;
     fclaw_options_t fopts;
     fclaw2d_domain_t *domain;
-    fclaw2d_clawpatch_options_t opts;
+    fclaw_clawpatch_options_t* opts;
 
     QuadDomainBrick(){
         glob = fclaw2d_global_new();
+        opts = fclaw_clawpatch_options_new(2);
 
         fclaw2d_vtables_initialize(glob);
         fclaw2d_clawpatch_vtable_initialize(glob, 4);
@@ -126,14 +128,13 @@ struct QuadDomainBrick {
         fclaw2d_global_store_domain(glob, domain);
         fclaw2d_options_store(glob, &fopts);
 
-        memset(&opts, 0, sizeof(opts));
-        opts.mx   = 5;
-        opts.my   = 6;
-        opts.mbc  = 2;
-        opts.meqn = 1;
-        opts.maux = 1;
-        opts.rhs_fields = 1;
-        fclaw2d_clawpatch_options_store(glob, &opts);
+        opts->d2->mx     = 5;
+        opts->d2->my     = 6;
+        opts->mbc        = 2;
+        opts->meqn       = 1;
+        opts->maux       = 1;
+        opts->rhs_fields = 1;
+        fclaw_clawpatch_options_store(glob, opts);
 
         fclaw2d_domain_data_new(glob->domain);
     }
@@ -149,6 +150,7 @@ struct QuadDomainBrick {
         fclaw2d_patch_data_delete(glob, &domain->blocks[1].patches[0]);
         fclaw2d_patch_data_delete(glob, &domain->blocks[2].patches[0]);
         fclaw2d_patch_data_delete(glob, &domain->blocks[3].patches[0]);
+        fclaw_clawpatch_options_destroy(opts);
         fclaw2d_global_destroy(glob);
     }
 };
@@ -162,13 +164,13 @@ TEST_CASE("fclaw2d_thunderegg_get_vector")
     for(int meqn : {1,2})
     {
         QuadDomain test_data;
-        test_data.opts.mx   = mx;
-        test_data.opts.my   = my;
-        test_data.opts.mbc  = mbc;
+        test_data.opts->d2->mx = mx;
+        test_data.opts->d2->my = my;
+        test_data.opts->mbc    = mbc;
         if(data_choice == RHS){
-            test_data.opts.rhs_fields = meqn;
+            test_data.opts->rhs_fields = meqn;
         }else{
-            test_data.opts.meqn = meqn;
+            test_data.opts->meqn = meqn;
         }
         test_data.setup();
 
@@ -234,13 +236,13 @@ TEST_CASE("fclaw2d_thunderegg_store_vector")
     for(int meqn : {1,2})
     {
         QuadDomain test_data;
-        test_data.opts.mx   = mx;
-        test_data.opts.my   = my;
-        test_data.opts.mbc  = mbc;
+        test_data.opts->d2->mx   = mx;
+        test_data.opts->d2->my   = my;
+        test_data.opts->mbc  = mbc;
         if(data_choice == RHS){
-            test_data.opts.rhs_fields = meqn;
+            test_data.opts->rhs_fields = meqn;
         }else{
-            test_data.opts.meqn = meqn;
+            test_data.opts->meqn = meqn;
         }
         test_data.setup();
 
@@ -292,19 +294,19 @@ TEST_CASE("fclaw2d_thunderegg_get_vector multiblock")
     for(int meqn : {1,2})
     {
         QuadDomainBrick test_data;
-        test_data.opts.mx   = mx;
-        test_data.opts.my   = my;
-        test_data.opts.mbc  = mbc;
+        test_data.opts->d2->mx   = mx;
+        test_data.opts->d2->my   = my;
+        test_data.opts->mbc  = mbc;
         if(data_choice == RHS){
-            test_data.opts.rhs_fields = meqn;
+            test_data.opts->rhs_fields = meqn;
         }else{
-            test_data.opts.meqn = meqn;
+            test_data.opts->meqn = meqn;
         }
         test_data.setup();
 
-        int mx = test_data.opts.mx;
-        int my = test_data.opts.my;
-        int mbc = test_data.opts.mbc;
+        int mx = test_data.opts->d2->mx;
+        int my = test_data.opts->d2->my;
+        int mbc = test_data.opts->mbc;
 
         //set data
         for(int i=0; i < 4; i++){
@@ -368,13 +370,13 @@ TEST_CASE("fclaw2d_thunderegg_store_vector multiblock")
     for(int meqn : {1,2})
     {
         QuadDomainBrick test_data;
-        test_data.opts.mx   = mx;
-        test_data.opts.my   = my;
-        test_data.opts.mbc  = mbc;
+        test_data.opts->d2->mx = mx;
+        test_data.opts->d2->my = my;
+        test_data.opts->mbc    = mbc;
         if(data_choice == RHS){
-            test_data.opts.rhs_fields = meqn;
+            test_data.opts->rhs_fields = meqn;
         }else{
-            test_data.opts.meqn = meqn;
+            test_data.opts->meqn = meqn;
         }
         test_data.setup();
 

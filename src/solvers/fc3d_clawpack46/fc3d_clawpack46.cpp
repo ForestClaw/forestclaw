@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw3dx_clawpatch.hpp>
 #include <fclaw3dx_clawpatch.h>
 
-#include <fclaw3dx_clawpatch_options.h>
+#include <fclaw_clawpatch_options.h>
 #include <fclaw3dx_clawpatch_output_ascii.h> 
 #include <fclaw3dx_clawpatch_output_vtk.h>
 #include <fclaw3dx_clawpatch_fort.h>
@@ -482,7 +482,7 @@ void clawpack46_vt_destroy(void* vt)
 
 void fc3d_clawpack46_solver_initialize(fclaw2d_global_t* glob)
 {
-	fclaw3dx_clawpatch_options_t* clawpatch_opt = fclaw3dx_clawpatch_get_options(glob);
+	fclaw_clawpatch_options_t* clawpatch_opt = fclaw_clawpatch_get_options(glob);
 	fc3d_clawpack46_options_t* clawopt = fc3d_clawpack46_get_options(glob);
 
     clawopt->method[6] = clawpatch_opt->maux;

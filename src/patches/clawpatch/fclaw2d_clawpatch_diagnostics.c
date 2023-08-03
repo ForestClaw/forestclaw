@@ -41,14 +41,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_clawpatch_diagnostics.h>
 
 #include <fclaw2d_clawpatch.h>
-#include <fclaw2d_clawpatch_options.h>
+#include <fclaw_clawpatch_options.h>
 
 #elif REFINE_DIM == 2 && PATCH_DIM == 3
 
 #include <fclaw3dx_clawpatch_diagnostics.h>
 
 #include <fclaw3dx_clawpatch.h>
-#include <fclaw3dx_clawpatch_options.h>
+#include <fclaw_clawpatch_options.h>
 
 #include <_fclaw2d_to_fclaw3dx.h>
 #include <_fclaw2d_to_fclaw3d.h>
@@ -61,7 +61,7 @@ void fclaw2d_clawpatch_diagnostics_initialize(fclaw2d_global_t *glob,
 {
 
     fclaw_debugf("Initializing diagnostics\n");
-    const fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
+    const fclaw_clawpatch_options_t *clawpatch_opt = fclaw_clawpatch_get_options(glob);
 
     int meqn = clawpatch_opt->meqn;  /* Clawpatch */
 
@@ -84,7 +84,7 @@ void fclaw2d_clawpatch_diagnostics_reset(fclaw2d_global_t *glob,
 {
     fclaw_debugf("Resetting diagnostics\n");
     error_info_t *error_data = (error_info_t*) patch_acc;
-    const fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
+    const fclaw_clawpatch_options_t *clawpatch_opt = fclaw_clawpatch_get_options(glob);
 
     int meqn = clawpatch_opt->meqn;
 
@@ -165,7 +165,7 @@ void fclaw2d_clawpatch_diagnostics_gather(fclaw2d_global_t *glob,
     
     error_info_t *error_data = (error_info_t*) patch_acc;
     const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
-    const fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
+    const fclaw_clawpatch_options_t *clawpatch_opt = fclaw_clawpatch_get_options(glob);
     
     int meqn = clawpatch_opt->meqn;  /* clawpatch->meqn */
 

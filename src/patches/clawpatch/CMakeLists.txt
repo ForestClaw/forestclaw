@@ -61,8 +61,9 @@ target_include_directories(clawpatch_f INTERFACE
 
 add_library(clawpatch
   $<TARGET_OBJECTS:clawpatch_f>
+  fclaw_clawpatch_options.c
+
   fclaw2d_clawpatch.cpp
-  fclaw2d_clawpatch_options.c
   fclaw2d_clawpatch_diagnostics.c
   fclaw2d_clawpatch_diagnostics_default.c
   fclaw2d_clawpatch_pillow.c
@@ -72,7 +73,6 @@ add_library(clawpatch
   fclaw2d_clawpatch_conservation.c
 
   fclaw3dx_clawpatch.cpp
-  fclaw3dx_clawpatch_options.c
   fclaw3dx_clawpatch_diagnostics.c
   fclaw3dx_clawpatch_diagnostics_default.c
   fclaw3dx_clawpatch_pillow.c
@@ -105,9 +105,10 @@ target_link_libraries(clawpatch PUBLIC forestclaw)
 install(FILES
   fclaw_clawpatch_enums.h
 
+	fclaw_clawpatch_options.h
+
   fclaw2d_clawpatch.h
 	fclaw2d_clawpatch.hpp
-	fclaw2d_clawpatch_options.h
 	fclaw2d_clawpatch_conservation.h
 	fclaw2d_clawpatch_transform.h
 	fclaw2d_clawpatch_diagnostics.h
@@ -120,7 +121,6 @@ install(FILES
 
   fclaw3dx_clawpatch.h
 	fclaw3dx_clawpatch.hpp
-	fclaw3dx_clawpatch_options.h
 	fclaw3dx_clawpatch_conservation.h
 	fclaw3dx_clawpatch_transform.h
 	fclaw3dx_clawpatch_diagnostics.h
@@ -156,10 +156,10 @@ target_link_libraries(FORESTCLAW::CLAWPATCH INTERFACE clawpatch)
 
 if(BUILD_TESTING)
   add_executable(clawpatch.TEST
+      fclaw_clawpatch_options.h.TEST.cpp
       fclaw2d_clawpatch.h.TEST.cpp
       fclaw2d_clawpatch_diagnostics.h.TEST.cpp
       fclaw2d_clawpatch_fort.h.TEST.cpp
-      fclaw2d_clawpatch_options.h.TEST.cpp
       fclaw3dx_clawpatch.h.TEST.cpp
       ${metric}/fclaw2d_metric.h.TEST.cpp
   )

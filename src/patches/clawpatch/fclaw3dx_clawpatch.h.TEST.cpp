@@ -25,7 +25,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw3dx_clawpatch.h>
 #include <fclaw3dx_clawpatch.hpp>
-#include <fclaw3dx_clawpatch_options.h>
+#include <fclaw_clawpatch_options.h>
 #include <fclaw3dx_clawpatch46_fort.h>
 #include <fclaw3dx_clawpatch_output_ascii.h>
 #include <fclaw2d_global.h>
@@ -64,10 +64,11 @@ struct SinglePatchDomain {
     fclaw2d_global_t* glob;
     fclaw_options_t fopts;
     fclaw2d_domain_t *domain;
-    fclaw3dx_clawpatch_options_t opts;
+    fclaw_clawpatch_options_t* opts;
 
     SinglePatchDomain(){
         glob = fclaw2d_global_new();
+        opts = fclaw_clawpatch_options_new(3);
         fclaw2d_vtables_initialize(glob);
         fclaw3dx_clawpatch_vtable_initialize(glob, 4);
         memset(&fopts, 0, sizeof(fopts));
@@ -85,15 +86,14 @@ struct SinglePatchDomain {
         fclaw2d_global_store_domain(glob, domain);
         fclaw2d_options_store(glob, &fopts);
 
-        memset(&opts, 0, sizeof(opts));
-        opts.mx   = 5;
-        opts.my   = 6;
-        opts.mz   = 7;
-        opts.mbc  = 2;
-        opts.meqn = 1;
-        opts.maux = 1;
-        opts.rhs_fields = 1;
-        fclaw3dx_clawpatch_options_store(glob, &opts);
+        opts->d3->mx   = 5;
+        opts->d3->my   = 6;
+        opts->d3->mz   = 7;
+        opts->mbc  = 2;
+        opts->meqn = 1;
+        opts->maux = 1;
+        opts->rhs_fields = 1;
+        fclaw_clawpatch_options_store(glob, opts);
 
         fclaw2d_domain_data_new(glob->domain);
     }
@@ -103,6 +103,7 @@ struct SinglePatchDomain {
     }
     ~SinglePatchDomain(){
         fclaw2d_patch_data_delete(glob, &domain->blocks[0].patches[0]);
+        fclaw_clawpatch_options_destroy(opts);
         fclaw2d_global_destroy(glob);
     }
 };
@@ -110,10 +111,11 @@ struct QuadDomain {
     fclaw2d_global_t* glob;
     fclaw_options_t fopts;
     fclaw2d_domain_t *domain;
-    fclaw3dx_clawpatch_options_t opts;
+    fclaw_clawpatch_options_t* opts;
 
     QuadDomain(){
         glob = fclaw2d_global_new();
+        opts = fclaw_clawpatch_options_new(3);
         fclaw2d_vtables_initialize(glob);
         fclaw3dx_clawpatch_vtable_initialize(glob, 4);
         memset(&fopts, 0, sizeof(fopts));
@@ -132,15 +134,14 @@ struct QuadDomain {
         fclaw2d_global_store_domain(glob, domain);
         fclaw2d_options_store(glob, &fopts);
 
-        memset(&opts, 0, sizeof(opts));
-        opts.mx   = 5;
-        opts.my   = 6;
-        opts.mz   = 7;
-        opts.mbc  = 2;
-        opts.meqn = 1;
-        opts.maux = 1;
-        opts.rhs_fields = 1;
-        fclaw3dx_clawpatch_options_store(glob, &opts);
+        opts->d3->mx   = 5;
+        opts->d3->my   = 6;
+        opts->d3->mz   = 7;
+        opts->mbc  = 2;
+        opts->meqn = 1;
+        opts->maux = 1;
+        opts->rhs_fields = 1;
+        fclaw_clawpatch_options_store(glob, opts);
 
         fclaw2d_domain_data_new(glob->domain);
     }
@@ -156,6 +157,7 @@ struct QuadDomain {
         fclaw2d_patch_data_delete(glob, &domain->blocks[0].patches[1]);
         fclaw2d_patch_data_delete(glob, &domain->blocks[0].patches[2]);
         fclaw2d_patch_data_delete(glob, &domain->blocks[0].patches[3]);
+        fclaw_clawpatch_options_destroy(opts);
         fclaw2d_global_destroy(glob);
     }
 };
@@ -253,16 +255,15 @@ TEST_CASE("fclaw3dx_clawpatch patch_build")
         fclaw2d_global_store_domain(glob, domain);
         fclaw2d_options_store(glob, &fopts);
 
-        fclaw3dx_clawpatch_options_t opts;
-        memset(&opts, 0, sizeof(opts));
-        opts.mx   = mx;
-        opts.my   = my;
-        opts.mz   = mz;
-        opts.mbc  = mbc;
-        opts.meqn = meqn;
-        opts.maux = maux;
-        opts.rhs_fields = rhs_fields;
-        fclaw3dx_clawpatch_options_store(glob, &opts);
+        fclaw_clawpatch_options_t* opts = fclaw_clawpatch_options_new(3);
+        opts->d3->mx     = mx;
+        opts->d3->my     = my;
+        opts->d3->mz     = mz;
+        opts->mbc        = mbc;
+        opts->meqn       = meqn;
+        opts->maux       = maux;
+        opts->rhs_fields = rhs_fields;
+        fclaw_clawpatch_options_store(glob, opts);
 
         fclaw2d_domain_data_new(glob->domain);
         CHECK(domain->blocks[0].patches[0].user == nullptr);
@@ -271,11 +272,11 @@ TEST_CASE("fclaw3dx_clawpatch patch_build")
 
         fclaw3dx_clawpatch_t* cp = fclaw3dx_clawpatch_get_clawpatch(&domain->blocks[0].patches[0]);
 
-        CHECK(cp->meqn == opts.meqn);
-        CHECK(cp->mx == opts.mx);
-        CHECK(cp->my == opts.my);
-        CHECK(cp->mz == opts.mz);
-        CHECK(cp->mbc == opts.mbc);
+        CHECK(cp->meqn == opts->meqn);
+        CHECK(cp->mx == opts->d3->mx);
+        CHECK(cp->my == opts->d3->my);
+        CHECK(cp->mz == opts->d3->mz);
+        CHECK(cp->mbc == opts->mbc);
         CHECK(cp->manifold == fopts.manifold);
         CHECK(cp->mp != nullptr);
         CHECK(cp->registers != nullptr);
@@ -286,43 +287,43 @@ TEST_CASE("fclaw3dx_clawpatch patch_build")
         CHECK(cp->xupper == fopts.bx);
         CHECK(cp->yupper == fopts.by);
         CHECK(cp->zupper == fopts.bz);
-        CHECK(cp->dx == doctest::Approx((cp->xupper-cp->xlower)/opts.mx));
-        CHECK(cp->dy == doctest::Approx((cp->yupper-cp->ylower)/opts.my));
-        CHECK(cp->dz == doctest::Approx((cp->zupper-cp->zlower)/opts.mz));
+        CHECK(cp->dx == doctest::Approx((cp->xupper-cp->xlower)/opts->d3->mx));
+        CHECK(cp->dy == doctest::Approx((cp->yupper-cp->ylower)/opts->d3->my));
+        CHECK(cp->dz == doctest::Approx((cp->zupper-cp->zlower)/opts->d3->mz));
 
         //BOX DIEMSIONS
 
-        CHECK_BOX_DIMENSIONS(cp->griddata, opts.mbc, opts.mx, opts.my, opts.mz, opts.meqn);
+        CHECK_BOX_DIMENSIONS(cp->griddata, opts->mbc, opts->d3->mx, opts->d3->my, opts->d3->mz, opts->meqn);
         if(build_mode == FCLAW2D_BUILD_FOR_UPDATE){
-            CHECK_BOX_DIMENSIONS(cp->griddata_last, opts.mbc, opts.mx, opts.my, opts.mz, opts.meqn);
-            CHECK_BOX_DIMENSIONS(cp->griddata_save, opts.mbc, opts.mx, opts.my, opts.mz, opts.meqn);
+            CHECK_BOX_DIMENSIONS(cp->griddata_last, opts->mbc, opts->d3->mx, opts->d3->my, opts->d3->mz, opts->meqn);
+            CHECK_BOX_DIMENSIONS(cp->griddata_save, opts->mbc, opts->d3->mx, opts->d3->my, opts->d3->mz, opts->meqn);
         }else{
             CHECK_BOX_EMPTY(cp->griddata_last);
             CHECK_BOX_EMPTY(cp->griddata_save);
         }
         if(fopts.subcycle){
-            CHECK_BOX_DIMENSIONS(cp->griddata_time_interpolated, opts.mbc, opts.mx, opts.my, opts.mz, opts.meqn);
+            CHECK_BOX_DIMENSIONS(cp->griddata_time_interpolated, opts->mbc, opts->d3->mx, opts->d3->my, opts->d3->mz, opts->meqn);
         }else{
             CHECK_BOX_EMPTY(cp->griddata_time_interpolated);
         }
         if(fopts.compute_error) {
-            CHECK_BOX_DIMENSIONS(cp->griderror, opts.mbc, opts.mx, opts.my, opts.mz, opts.meqn);
-            CHECK_BOX_DIMENSIONS(cp->exactsolution, opts.mbc, opts.mx, opts.my, opts.mz, opts.meqn);
+            CHECK_BOX_DIMENSIONS(cp->griderror, opts->mbc, opts->d3->mx, opts->d3->my, opts->d3->mz, opts->meqn);
+            CHECK_BOX_DIMENSIONS(cp->exactsolution, opts->mbc, opts->d3->mx, opts->d3->my, opts->d3->mz, opts->meqn);
         }else{
             CHECK_BOX_EMPTY(cp->griderror);
             CHECK_BOX_EMPTY(cp->exactsolution);
         }
-        if(opts.rhs_fields == 0){
+        if(opts->rhs_fields == 0){
             CHECK_BOX_EMPTY(cp->rhs);
         }else{
-            CHECK_BOX_DIMENSIONS(cp->rhs, opts.mbc, opts.mx, opts.my, opts.mz, opts.rhs_fields);
+            CHECK_BOX_DIMENSIONS(cp->rhs, opts->mbc, opts->d3->mx, opts->d3->my, opts->d3->mz, opts->rhs_fields);
         }
-        if(opts.rhs_fields == 0 || !fopts.compute_error) {
+        if(opts->rhs_fields == 0 || !fopts.compute_error) {
             CHECK_BOX_EMPTY(cp->elliptic_error);
             CHECK_BOX_EMPTY(cp->elliptic_soln);
         }else{
-            CHECK_BOX_DIMENSIONS(cp->elliptic_error, opts.mbc, opts.mx, opts.my, opts.mz, opts.rhs_fields);
-            CHECK_BOX_DIMENSIONS(cp->elliptic_soln, opts.mbc, opts.mx, opts.my, opts.mz, opts.rhs_fields);
+            CHECK_BOX_DIMENSIONS(cp->elliptic_error, opts->mbc, opts->d3->mx, opts->d3->my, opts->d3->mz, opts->rhs_fields);
+            CHECK_BOX_DIMENSIONS(cp->elliptic_soln, opts->mbc, opts->d3->mx, opts->d3->my, opts->d3->mz, opts->rhs_fields);
         }
 
         fclaw2d_patch_data_delete(glob, &domain->blocks[0].patches[0]);
@@ -413,10 +414,10 @@ TEST_CASE("fclaw3dx_clawpatch_grid_data")
     {
 
         SinglePatchDomain test_data;
-        test_data.opts.mx   = mx;
-        test_data.opts.my   = my;
-        test_data.opts.mz   = mz;
-        test_data.opts.mbc  = mbc;
+        test_data.opts->d3->mx   = mx;
+        test_data.opts->d3->my   = my;
+        test_data.opts->d3->mz   = mz;
+        test_data.opts->mbc  = mbc;
         test_data.setup();
 
         //CHECK
@@ -426,10 +427,10 @@ TEST_CASE("fclaw3dx_clawpatch_grid_data")
         fclaw3dx_clawpatch_grid_data(test_data.glob, &test_data.domain->blocks[0].patches[0],
                                      &mx_out, &my_out, &mz_out, &mbc_out, &xlower, &ylower, &zlower, &dx, &dy, &dz);
 
-        CHECK(mx_out == test_data.opts.mx);
-        CHECK(my_out == test_data.opts.my);
-        CHECK(mz_out == test_data.opts.mz);
-        CHECK(mbc_out == test_data.opts.mbc);
+        CHECK(mx_out == test_data.opts->d3->mx);
+        CHECK(my_out == test_data.opts->d3->my);
+        CHECK(mz_out == test_data.opts->d3->mz);
+        CHECK(mbc_out == test_data.opts->mbc);
         CHECK(xlower == cp->xlower);
         CHECK(ylower == cp->ylower);
         CHECK(zlower == cp->zlower);
@@ -452,7 +453,7 @@ TEST_CASE("fclaw3dx_clawpatch_aux_data")
     fclaw3dx_clawpatch_aux_data(test_data.glob, &test_data.domain->blocks[0].patches[0], &aux, &maux);
 
     CHECK(aux == cp->aux.dataPtr());
-    CHECK(maux == test_data.opts.maux);
+    CHECK(maux == test_data.opts->maux);
 }
 
 TEST_CASE("fclaw3dx_clawpatch_soln_data")
@@ -467,7 +468,7 @@ TEST_CASE("fclaw3dx_clawpatch_soln_data")
     fclaw3dx_clawpatch_soln_data(test_data.glob, &test_data.domain->blocks[0].patches[0], &q, &meqn);
 
     CHECK(q == cp->griddata.dataPtr());
-    CHECK(meqn == test_data.opts.meqn);
+    CHECK(meqn == test_data.opts->meqn);
 }
 
 TEST_CASE("fclaw3dx_clawpatch_rhs_data")
@@ -482,7 +483,7 @@ TEST_CASE("fclaw3dx_clawpatch_rhs_data")
     fclaw3dx_clawpatch_rhs_data(test_data.glob, &test_data.domain->blocks[0].patches[0], &rhs, &mfields);
 
     CHECK(rhs == cp->rhs.dataPtr());
-    CHECK(mfields == test_data.opts.rhs_fields);
+    CHECK(mfields == test_data.opts->rhs_fields);
 }
 
 TEST_CASE("fclaw3dx_clawpatch_elliptic_error_data")
@@ -497,7 +498,7 @@ TEST_CASE("fclaw3dx_clawpatch_elliptic_error_data")
     fclaw3dx_clawpatch_elliptic_error_data(test_data.glob, &test_data.domain->blocks[0].patches[0], &rhs, &mfields);
 
     CHECK(rhs == cp->elliptic_error.dataPtr());
-    CHECK(mfields == test_data.opts.rhs_fields);
+    CHECK(mfields == test_data.opts->rhs_fields);
 }
 
 TEST_CASE("fclaw3dx_clawpatch_elliptic_soln_data")
@@ -512,7 +513,7 @@ TEST_CASE("fclaw3dx_clawpatch_elliptic_soln_data")
     fclaw3dx_clawpatch_elliptic_soln_data(test_data.glob, &test_data.domain->blocks[0].patches[0], &rhs, &mfields);
 
     CHECK(rhs == cp->elliptic_soln.dataPtr());
-    CHECK(mfields == test_data.opts.rhs_fields);
+    CHECK(mfields == test_data.opts->rhs_fields);
 }
 
 TEST_CASE("fclaw3dx_clawpatch_get_q")
@@ -576,7 +577,7 @@ TEST_CASE("fclaw3dx_clawpatch_timesync_data")
         } else {
             CHECK(q == cp->griddata.dataPtr());
         }
-        CHECK(meqn == test_data.opts.meqn);
+        CHECK(meqn == test_data.opts->meqn);
     }
 }
 TEST_CASE("fclaw3dx_clawpatch_get_q_timesync")
@@ -626,11 +627,11 @@ TEST_CASE("fclaw3dx_clawpatch_size")
     for(int meqn : {1,2})
     {
         SinglePatchDomain test_data;
-        test_data.opts.mx   = mx;
-        test_data.opts.my   = my;
-        test_data.opts.mz   = mz;
-        test_data.opts.mbc  = mbc;
-        test_data.opts.meqn = meqn;
+        test_data.opts->d3->mx   = mx;
+        test_data.opts->d3->my   = my;
+        test_data.opts->d3->mz   = mz;
+        test_data.opts->mbc  = mbc;
+        test_data.opts->meqn = meqn;
         test_data.setup();
 
         //CHECK
@@ -762,7 +763,7 @@ namespace{
 TEST_CASE("fclaw3dx_clawpatch setup_timeinterp")
 {
     SinglePatchDomain test_data;
-    test_data.opts.interp_stencil_width=2;
+    test_data.opts->interp_stencil_width=2;
     timeinterp_mint = 2;
     test_data.setup();
 

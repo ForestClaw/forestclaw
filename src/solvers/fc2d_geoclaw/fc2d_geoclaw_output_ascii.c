@@ -30,7 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "fc2d_geoclaw_options.h"
 
 #include <fclaw2d_clawpatch.h>  /* Include patch, domain declarations */
-#include <fclaw2d_clawpatch_options.h>  /* Include patch, domain declarations */
+#include <fclaw_clawpatch_options.h>  /* Include patch, domain declarations */
 
 #include <fclaw2d_patch.h>
 #include <fclaw2d_global.h>
@@ -77,7 +77,7 @@ void geoclaw_header_ascii(fclaw2d_global_t* glob,int iframe)
     double time = glob->curr_time;
     int ngrids = glob->domain->global_num_patches;
 
-    const fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
+    const fclaw_clawpatch_options_t *clawpatch_opt = fclaw_clawpatch_get_options(glob);
     int meqn = clawpatch_opt->meqn;
     int maux = clawpatch_opt->maux;
 

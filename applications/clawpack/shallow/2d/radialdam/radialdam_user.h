@@ -30,7 +30,7 @@
 
 #include <fclaw2d_include_all.h>
 
-#include <fclaw2d_clawpatch_options.h>
+#include <fclaw_clawpatch_options.h>
 #include <fclaw2d_clawpatch.h>
 
 #include <fc2d_clawpack46_options.h>
@@ -77,7 +77,7 @@ user_options_t* radialdam_get_options(fclaw2d_global_t* glob);
 
 
 void radialdam_global_post_process(fclaw_options_t *fclaw_opt,
-                                   fclaw2d_clawpatch_options_t *clawpatch_opt,
+                                   fclaw_clawpatch_options_t *clawpatch_opt,
                                    user_options_t *user_opt);
 
 

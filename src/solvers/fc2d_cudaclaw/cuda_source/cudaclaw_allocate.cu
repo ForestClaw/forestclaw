@@ -6,7 +6,7 @@
 #include <fclaw2d_global.h>
 #include <fclaw2d_patch.h>
 #include <fclaw2d_clawpatch.h>
-#include <fclaw2d_clawpatch_options.h>
+#include <fclaw_clawpatch_options.h>
 
 #include <fc2d_cuda_profiler.h>
 
@@ -28,7 +28,7 @@ void cudaclaw_allocate_fluxes(fclaw2d_global_t *glob,
 
     cudaclaw_fluxes_t *fluxes = FCLAW_ALLOC(cudaclaw_fluxes,1);
 
-    const fclaw2d_clawpatch_options_t *claw_opt = fclaw2d_clawpatch_get_options(glob);
+    const fclaw_clawpatch_options_t *claw_opt = fclaw_clawpatch_get_options(glob);
     int meqn = claw_opt->meqn;
     int maux = claw_opt->maux;
 
@@ -111,7 +111,7 @@ void cudaclaw_deallocate_fluxes(fclaw2d_global_t *glob,
 
 void fc2d_cudaclaw_allocate_buffers(fclaw2d_global_t *glob)
 {
-    fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
+    fclaw_clawpatch_options_t *clawpatch_opt = fclaw_clawpatch_get_options(glob);
     int mx = clawpatch_opt->mx;
     int my = clawpatch_opt->my;
     int mbc = clawpatch_opt->mbc;

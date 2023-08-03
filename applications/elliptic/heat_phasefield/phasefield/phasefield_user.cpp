@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_include_all.h>
 
 #include <fclaw2d_clawpatch.h>
-#include <fclaw2d_clawpatch_options.h>
+#include <fclaw_clawpatch_options.h>
 #include <fclaw2d_clawpatch_fort.h>
 
 #include <fc2d_thunderegg.h>
@@ -142,8 +142,8 @@ void phasefield_rhs(fclaw2d_global_t *glob,
 static
 void phasefield_time_header_ascii(fclaw2d_global_t* glob, int iframe)
 {
-    const fclaw2d_clawpatch_options_t *clawpatch_opt = 
-                fclaw2d_clawpatch_get_options(glob);
+    const fclaw_clawpatch_options_t *clawpatch_opt = 
+                fclaw_clawpatch_get_options(glob);
     char matname1[20];
     sprintf(matname1,"fort.q%04d",iframe);
 

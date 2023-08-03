@@ -67,7 +67,7 @@ void latlong_link_solvers(fclaw2d_global_t *glob)
     fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt(glob);
     patch_vt->setup = &latlong_patch_setup;
 
-    fclaw3dx_clawpatch_options_t *clawpatch_opt = fclaw3dx_clawpatch_get_options(glob);
+   fclaw_clawpatch_options_t *clawpatch_opt = fclaw_clawpatch_get_options(glob);
     FCLAW_ASSERT(clawpatch_opt->maux == 4);
 
     const user_options_t   *user = latlong_get_options(glob);

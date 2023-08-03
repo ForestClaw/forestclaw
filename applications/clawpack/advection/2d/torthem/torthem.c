@@ -50,7 +50,7 @@ typedef struct torthem
 
 #if 0
     fc2d_clawpack46_options_t claw_opt;
-    fclaw2d_clawpatch_options_t clawpatch_opt;
+    fclaw_clawpatch_options_t clawpatch_opt;
     user_options_t user;
 #endif
 
@@ -62,7 +62,7 @@ static void
 torthem_init (torthem_t * torthem)
 {
 #if 0
-    fclaw2d_clawpatch_options_t *clawpatch_opt;    
+    fclaw_clawpatch_options_t *clawpatch_opt;    
     fc2d_clawpack46_options_t *claw_opt;
     user_options_t *user;
 #endif

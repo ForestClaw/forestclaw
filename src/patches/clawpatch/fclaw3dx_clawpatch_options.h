@@ -59,7 +59,7 @@ extern "C"
 struct fclaw2d_global;
 
 /** Typedef for ::fclaw3dx_clawpatch_options structure */
-typedef struct fclaw3dx_clawpatch_options fclaw3dx_clawpatch_options_t;
+typedef struct fclaw3dx_clawpatch_optionsfclaw_clawpatch_options_t;
 
 
 /**
@@ -96,10 +96,10 @@ struct fclaw3dx_clawpatch_options
  * @param app the app context
  * @param name the name of the options group
  * @param configfile the config file
- * @return fclaw3dx_clawpatch_options_t* a newly allocated options struct
+ * @returnfclaw_clawpatch_options_t* a newly allocated options struct
  */
 fclaw3dx_clawpatch_options_t *
-fclaw3dx_clawpatch_options_register(fclaw_app_t* app, const char* name, const char* configfile);
+fclaw_clawpatch_options_register_3d(fclaw_app_t* app, const char* name, const char* configfile);
 
 /**
  * @brief Store the options in the global context
@@ -107,16 +107,16 @@ fclaw3dx_clawpatch_options_register(fclaw_app_t* app, const char* name, const ch
  * @param glob the global context
  * @param clawpatch_options the options
  */
-void fclaw3dx_clawpatch_options_store (struct fclaw2d_global *glob, 
-                                      fclaw3dx_clawpatch_options_t* clawpatch_options);
+void fclaw_clawpatch_options_store (struct fclaw2d_global *glob, 
+                                     fclaw_clawpatch_options_t* clawpatch_options);
 
 /**
  * @brief Get the options from the global context
  * 
  * @param glob the global context
- * @return fclaw3dx_clawpatch_options_t* the options
+ * @returnfclaw_clawpatch_options_t* the options
  */
-fclaw3dx_clawpatch_options_t* fclaw3dx_clawpatch_get_options(struct fclaw2d_global* glob);
+fclaw3dx_clawpatch_options_t* fclaw_clawpatch_get_options(struct fclaw2d_global* glob);
 
 
 #ifdef __cplusplus

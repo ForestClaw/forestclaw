@@ -28,7 +28,7 @@
 #include <fclaw2d_include_all.h>
 
 #include <fclaw2d_clawpatch.h>
-#include <fclaw2d_clawpatch_options.h>
+#include <fclaw_clawpatch_options.h>
 
 #include <fc2d_geoclaw.h>
 #include <fc2d_geoclaw_options.h>
@@ -99,7 +99,7 @@ main (int argc, char **argv)
 
     /* Options */
     fclaw_options_t             *fclaw_opt;
-    fclaw2d_clawpatch_options_t *clawpatch_opt;
+    fclaw_clawpatch_options_t *clawpatch_opt;
     fc2d_geoclaw_options_t      *geoclaw_opt;
 
     fclaw2d_global_t            *glob;
@@ -110,7 +110,7 @@ main (int argc, char **argv)
     app = fclaw_app_new (&argc, &argv, NULL);
 
     fclaw_opt       =             fclaw_options_register(app,  NULL,       "fclaw_options.ini");
-    clawpatch_opt   = fclaw2d_clawpatch_options_register(app, "clawpatch", "fclaw_options.ini");
+    clawpatch_opt   = fclaw_clawpatch_options_register_2d(app, "clawpatch", "fclaw_options.ini");
     geoclaw_opt     =      fc2d_geoclaw_options_register(app, "geoclaw",   "fclaw_options.ini");
 
     /* Read configuration file(s) and command line, and process options */
@@ -128,7 +128,7 @@ main (int argc, char **argv)
 
         /* Store option packages in glob */
         fclaw2d_options_store           (glob, fclaw_opt);
-        fclaw2d_clawpatch_options_store (glob, clawpatch_opt);
+        fclaw_clawpatch_options_store (glob, clawpatch_opt);
         fc2d_geoclaw_options_store      (glob, geoclaw_opt);
 
         run_program(glob);

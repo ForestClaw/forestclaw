@@ -5,7 +5,7 @@
 #include <fclaw2d_global.h>
 #include <fclaw2d_patch.h>
 #include <fclaw2d_clawpatch.h>
-#include <fclaw2d_clawpatch_options.h>
+#include <fclaw_clawpatch_options.h>
 #include <fclaw_timer.h>
 
 
@@ -13,7 +13,7 @@
 void cudaclaw5_allocate_fluxes(struct fclaw2d_global *glob,
                                struct fclaw2d_patch *patch)
 {
-    const fclaw2d_clawpatch_options_t *claw_opt = fclaw2d_clawpatch_get_options(glob);
+    const fclaw_clawpatch_options_t *claw_opt = fclaw_clawpatch_get_options(glob);
     int mx = claw_opt->mx;
     int my = claw_opt->my;
     int mbc = claw_opt->mbc;

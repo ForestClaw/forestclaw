@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 fclaw2d_domain_t* filament_create_domain(sc_MPI_Comm mpicomm, 
                                          fclaw_options_t* fclaw_opt, 
                                          filament_options_t* user,
-                                         fclaw2d_clawpatch_options_t* clawpatch_opt)
+                                         fclaw_clawpatch_options_t* clawpatch_opt)
 {
     /* Mapped, multi-block domain */
     p4est_connectivity_t     *conn = NULL;
@@ -44,7 +44,7 @@ fclaw2d_domain_t* filament_create_domain(sc_MPI_Comm mpicomm,
     int a = 0; /* non-periodic */
     int b = 0;
 
-    int mx = clawpatch_opt->mx;
+    int mx = clawpatch_opt->d2->mx;
     int minlevel = fclaw_opt->minlevel;
     
     switch (user->example) {
