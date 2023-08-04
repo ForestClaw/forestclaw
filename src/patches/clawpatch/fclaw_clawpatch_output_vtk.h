@@ -23,8 +23,8 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FCLAW2D_CLAWPATCH_OUTPUT_VTK_H
-#define FCLAW2D_CLAWPATCH_OUTPUT_VTK_H
+#ifndef FCLAW_CLAWPATCH_OUTPUT_VTK_H
+#define FCLAW_CLAWPATCH_OUTPUT_VTK_H
 
 /** 
  * @file
@@ -55,10 +55,10 @@ struct fclaw2d_patch;
  *                     The vector index changes fastest, then mx, then my
  *                     slowest.
  */
-typedef void (*fclaw2d_vtk_patch_data_t) (struct fclaw2d_global * glob,
-                                          struct fclaw2d_patch * this_patch,
-                                          int this_block_idx, int this_patch_idx,
-                                          char *a);
+typedef void (*fclaw_vtk_patch_data_t) (struct fclaw2d_global * glob,
+                                        struct fclaw2d_patch * this_patch,
+                                        int this_block_idx, int this_patch_idx,
+                                        char *a);
 	
 /** 
  * Write a file in VTK format for the whole domain in parallel.
@@ -79,13 +79,35 @@ typedef void (*fclaw2d_vtk_patch_data_t) (struct fclaw2d_global * glob,
 int
 fclaw2d_vtk_write_file (struct fclaw2d_global * glob, const char *basename,
                         int mx, int my,
-#if FCLAW2D_PATCHDIM == 3
-                        int mz,
-#endif
                         int meqn,
                         double vtkspace, int vtkwrite,
-                        fclaw2d_vtk_patch_data_t coordinate_cb,
-                        fclaw2d_vtk_patch_data_t value_cb);
+                        fclaw_vtk_patch_data_t coordinate_cb,
+                        fclaw_vtk_patch_data_t value_cb);
+
+/** 
+ * Write a file in VTK format for the whole domain in parallel.
+ * @param[in] glob the global context
+ * @param[in] basename the base filename
+ * @param[in] mx, my, mz th enumber of cells in the x, y, and z directions
+ * @param[in] meqn th enumber of equations
+ * @param[in] vtkspace     Relative width of visual separation of patches.
+ *                         Between 0. (none) and 1. (patch width becomes 0).
+ * @param[in] vtkwrite     Mode of writing:  (unused; uses 1 by default)
+ *                         0 for MPI_File_write_all (faster),
+ *                         1 for MPI_File_write (less memory usage).
+ * @param[in] coordniate_cb the callback to write a patch's coordinate binary data
+ * @param[in] value_cb the callback to write a patch's value binary data
+ * @return          0 if successful, negative otherwise.
+ *                  Collective with identical value on all ranks.
+ */
+int
+fclaw3d_vtk_write_file (struct fclaw2d_global * glob, const char *basename,
+                        int mx, int my, int mz,
+                        int meqn,
+                        double vtkspace, int vtkwrite,
+                        fclaw_vtk_patch_data_t coordinate_cb,
+                        fclaw_vtk_patch_data_t value_cb);
+
 
 /**
  * @brief Output vtu file
@@ -93,7 +115,7 @@ fclaw2d_vtk_write_file (struct fclaw2d_global * glob, const char *basename,
  * @param glob the global context
  * @param iframe the the frame index
  */
-void fclaw2d_clawpatch_output_vtk (struct fclaw2d_global* glob, int iframe);
+void fclaw_clawpatch_output_vtk (struct fclaw2d_global* glob, int iframe);
 
 
 #ifdef __cplusplus
