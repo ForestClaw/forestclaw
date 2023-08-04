@@ -9,17 +9,16 @@ libclawpatch_installed_headers = \
 	src/patches/clawpatch/fclaw_clawpatch_options.h \
 	src/patches/clawpatch/fclaw_clawpatch_output_ascii.h \
 	src/patches/clawpatch/fclaw_clawpatch_output_vtk.h \
+	src/patches/clawpatch/fclaw_clawpatch_pillow.h \
 	\
 	src/patches/clawpatch/fclaw2d_clawpatch.h \
 	src/patches/clawpatch/fclaw2d_clawpatch_transform.h \
-	src/patches/clawpatch/fclaw2d_clawpatch_pillow.h \
 	src/patches/clawpatch/fclaw2d_clawpatch_fort.h \
 	src/patches/clawpatch/fclaw2d_clawpatch46_fort.h \
 	src/patches/clawpatch/fclaw2d_clawpatch5_fort.h \
 	\
 	src/patches/clawpatch/fclaw3dx_clawpatch.h \
 	src/patches/clawpatch/fclaw3dx_clawpatch_transform.h \
-	src/patches/clawpatch/fclaw3dx_clawpatch_pillow.h \
 	src/patches/clawpatch/fclaw3dx_clawpatch_fort.h \
 	src/patches/clawpatch/fclaw3dx_clawpatch46_fort.h \
 	\
@@ -36,15 +35,14 @@ libclawpatch_compiled_sources = \
 	src/patches/clawpatch/fclaw_clawpatch_options.c \
 	src/patches/clawpatch/fclaw_clawpatch_output_ascii.c \
 	src/patches/clawpatch/fclaw_clawpatch_output_vtk.c \
+	src/patches/clawpatch/fclaw_clawpatch_pillow.c \
 	\
 	src/patches/clawpatch/fclaw2d_clawpatch.cpp \
 	src/patches/clawpatch/fclaw2d_clawpatch_conservation.c \
-	src/patches/clawpatch/fclaw2d_clawpatch_pillow.c \
 	src/patches/clawpatch/fclaw2d_clawpatch_transform.c \
 	src/patches/clawpatch/fclaw2d_clawpatch_utils.f \
 	\
 	src/patches/clawpatch/fclaw3dx_clawpatch.cpp \
-	src/patches/clawpatch/fclaw3dx_clawpatch_pillow.c \
 	src/patches/clawpatch/fclaw3dx_clawpatch_transform.c \
 	src/patches/clawpatch/fclaw3dx_clawpatch_utils.f \
 	\

@@ -64,7 +64,7 @@ void slotted_disk_link_solvers(fclaw2d_global_t *glob)
 
     const user_options_t* user = slotted_disk_get_options(glob);
     if (user->mapping == 1)
-        fclaw2d_clawpatch_use_pillowsphere(glob);
+        fclaw_clawpatch_use_pillowsphere(glob);
 
     fclaw_clawpatch_vtable_t *clawpatch_vt = fclaw_clawpatch_vt(glob);
     clawpatch_vt->d2->fort_user_exceeds_threshold = &USER_EXCEEDS_THRESHOLD;

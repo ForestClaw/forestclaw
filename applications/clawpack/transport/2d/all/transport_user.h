@@ -28,7 +28,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_include_all.h>
 
-#include <fclaw2d_clawpatch_pillow.h>
+#include <fclaw_clawpatch_pillow.h>
 
 /* Headers for both Clawpack 4.6 and  Clawpack 5.0 */
 #include <fclaw2d_clawpatch.h>

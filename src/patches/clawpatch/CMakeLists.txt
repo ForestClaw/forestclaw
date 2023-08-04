@@ -66,14 +66,13 @@ add_library(clawpatch
   fclaw_clawpatch_options.c
   fclaw_clawpatch_output_ascii.c
   fclaw_clawpatch_output_vtk.c
+  fclaw_clawpatch_pillow.c
 
   fclaw2d_clawpatch.cpp
-  fclaw2d_clawpatch_pillow.c
   fclaw2d_clawpatch_transform.c
   fclaw2d_clawpatch_conservation.c
 
   fclaw3dx_clawpatch.cpp
-  fclaw3dx_clawpatch_pillow.c
   fclaw3dx_clawpatch_transform.c
 
   fort_user/fclaw2d_clawpatch_tag_criteria.c
@@ -105,11 +104,11 @@ install(FILES
 	fclaw_clawpatch_options.h
 	fclaw_clawpatch_output_ascii.h
 	fclaw_clawpatch_output_vtk.h
+	fclaw_clawpatch_pillow.h
 
   fclaw2d_clawpatch.h
 	fclaw2d_clawpatch_conservation.h
 	fclaw2d_clawpatch_transform.h
-	fclaw2d_clawpatch_pillow.h
 	fclaw2d_clawpatch_fort.h
 	fclaw2d_clawpatch46_fort.h
 	fclaw2d_clawpatch5_fort.h
@@ -117,7 +116,6 @@ install(FILES
   fclaw3dx_clawpatch.h
 	fclaw3dx_clawpatch_transform.h
 	fclaw3dx_clawpatch_diagnostics.h
-	fclaw3dx_clawpatch_pillow.h
 	fclaw3dx_clawpatch_fort.h
 	fclaw3dx_clawpatch46_fort.h
 

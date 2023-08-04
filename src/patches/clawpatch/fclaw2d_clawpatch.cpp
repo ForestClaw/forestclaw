@@ -44,7 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_clawpatch_conservation.h>
 #include <fclaw2d_clawpatch_conservation_fort.h>
 #include <fclaw2d_clawpatch_transform.h>
-#include <fclaw2d_clawpatch_pillow.h>  
+#include <fclaw_clawpatch_pillow.h>  
 
 #include <fclaw2d_clawpatch46_fort.h>
 #include <fclaw2d_clawpatch5_fort.h>
@@ -63,7 +63,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_clawpatch_output_vtk.h>
 #include <fclaw3dx_clawpatch_fort.h>
 #include <fclaw3dx_clawpatch_transform.h>
-#include <fclaw3dx_clawpatch_pillow.h>  
+#include <fclaw_clawpatch_pillow.h>  
 
 #include <fclaw3dx_clawpatch46_fort.h>
 
@@ -1576,7 +1576,11 @@ void fclaw2d_clawpatch_vtable_initialize(fclaw2d_global_t* glob,
 	fclaw_clawpatch_diagnostics_vtable_initialize(glob);
 
 	/* Set the virtual table, even if it isn't used */
+#if PATCH_DIM == 2
 	fclaw2d_clawpatch_pillow_vtable_initialize(glob, claw_version);
+#else
+	fclaw3d_clawpatch_pillow_vtable_initialize(glob, claw_version);
+#endif
 
 	clawpatch_vt->is_set = 1;
 

@@ -25,7 +25,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "sphere_user.h"
 
-#include <fclaw3dx_clawpatch_pillow.h>
+#include <fclaw_clawpatch_pillow.h>
 
 static
 void sphere_problem_setup(fclaw2d_global_t* glob)
@@ -71,7 +71,7 @@ void sphere_link_solvers(fclaw2d_global_t *glob)
     if (user->example == 2)
     {
         /* Needed to get correct handling of block corners */
-        fclaw3dx_clawpatch_use_pillowsphere(glob);
+        fclaw_clawpatch_use_pillowsphere(glob);
     }
 
 
