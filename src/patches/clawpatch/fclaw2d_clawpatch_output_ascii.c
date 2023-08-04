@@ -81,11 +81,12 @@ void cb_clawpatch_output_ascii (fclaw2d_domain_t * domain,
     /* The fort routine is defined by a clawpack solver and handles 
        the layout of q in memory (i,j,m) or (m,i,j), etc */
     fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt(glob);
-    FCLAW_ASSERT(clawpatch_vt->fort_output_ascii);
 
     int mx,my,mbc;
     double xlower,ylower,dx,dy;
 #if PATCH_DIM == 2
+    FCLAW_ASSERT(clawpatch_vt->fort_output_ascii);
+
     fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
     clawpatch_vt->fort_output_ascii(fname,&mx,&my,&meqn,&mbc,
@@ -93,16 +94,18 @@ void cb_clawpatch_output_ascii (fclaw2d_domain_t * domain,
                                     &global_num,&level,&blockno,
                                     &glob->mpirank);
 #else
+    FCLAW_ASSERT(clawpatch_vt->d3->fort_output_ascii);
+
     int mz;
     double zlower, dz;
     fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mz,&mbc,
                                  &xlower,&ylower,&zlower,
                                  &dx,&dy,&dz);
-    clawpatch_vt->fort_output_ascii(fname,&mx,&my,&mz,&meqn,&mbc,
-                                    &xlower,&ylower,&zlower,
-                                    &dx,&dy,&dz,q,
-                                    &global_num,&level,&blockno,
-                                    &glob->mpirank);
+    clawpatch_vt->d3->fort_output_ascii(fname,&mx,&my,&mz,&meqn,&mbc,
+                                        &xlower,&ylower,&zlower,
+                                        &dx,&dy,&dz,q,
+                                        &global_num,&level,&blockno,
+                                        &glob->mpirank);
 #endif
 
 }

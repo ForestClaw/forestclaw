@@ -137,7 +137,7 @@ TEST_CASE("FCLAW3DX_CLAWPATCH_EXCEEDS_THRESHOLD calls user function")
     fclaw2d_vtables_initialize(glob);
     fclaw3dx_clawpatch_vtable_initialize(glob, 4);
 
-    fclaw3dx_clawpatch_vt(glob)->fort_user_exceeds_threshold = 
+    fclaw3dx_clawpatch_vt(glob)->d3->fort_user_exceeds_threshold = 
         [](const int *blockno,
            const int* meqn,
            const double *qval, 

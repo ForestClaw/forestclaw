@@ -56,7 +56,6 @@ extern "C"
  */
 typedef struct fclaw3dx_clawpatch_vtable fclaw3dx_clawpatch_vtable_t;
 
-
 /* --------------------------------- Typedefs ----------------------------------------- */
 /**
  * @brief Sets a pointer to user data for a specific patch
@@ -65,7 +64,7 @@ typedef struct fclaw3dx_clawpatch_vtable fclaw3dx_clawpatch_vtable_t;
  * @param[in] patch the patch context
  * @param[in] user the pointer to the user data
  */
-typedef void (*fclaw3dx_clawpatch_set_user_data_t)(struct fclaw2d_global *glob, 
+typedef void (*fclaw_clawpatch_set_user_data_t)(struct fclaw2d_global *glob, 
                                                    struct fclaw2d_patch *patch,
                                                    void* user);
 
@@ -184,15 +183,10 @@ void fclaw3dx_clawpatch_vtable_initialize(struct fclaw2d_global *glob, int claw_
 fclaw3dx_clawpatch_vtable_t* fclaw3dx_clawpatch_vt(struct fclaw2d_global *glob);
 
 /**
- * @brief vtable for clawpatch related functions
+ * @brief Vtable for 3d clawpatch related functions
  */
-struct fclaw3dx_clawpatch_vtable
+struct fclaw_clawpatch_vtable_3d
 {
-    /**
-     * @brief Function that allows the user to set a user data pointer
-     */
-    fclaw3dx_clawpatch_set_user_data_t              set_user_data;
-
     /** @{ @name Ghost Filling Functions */
 
     /** Copies ghost data from a face neighboring grid on the same level */
@@ -226,22 +220,8 @@ struct fclaw3dx_clawpatch_vtable
 
     /** @} */
 
-    /** @{ @name Conservation Update */
-
-    /** Packs/Unpacks the fclaw3dx_clawpatch_registers struct for ghost patches */
-    fclaw3dx_clawpatch_time_sync_pack_registers_t   time_sync_pack_registers;
-
-    /** @} */
-
     /** @{ @name Output Functions (ascii) */
 
-    /** Outputs a time header */
-    fclaw3dx_clawpatch_time_header_t                time_header_ascii;
-    /** Outputs a time header */
-    fclaw3dx_clawpatch_fort_header_ascii_t          fort_header_ascii;
-
-    /** Called for every patch when outputing ascii */
-    fclaw2d_patch_callback_t                        cb_output_ascii;    
     /** Outputs patch data in ascii */
     fclaw3dx_clawpatch_fort_output_ascii_t          fort_output_ascii;
 
@@ -258,6 +238,59 @@ struct fclaw3dx_clawpatch_vtable
     
     /** Packs/Unpacks ghost cell data */
     fclaw3dx_clawpatch_fort_local_ghost_pack_t      fort_local_ghost_pack;
+
+    /** @} */
+
+    /** @{ @name Diagnostic Functions */
+
+    /** Calculates the error for cells in a patch */
+    fclaw3dx_clawpatch_fort_error_t                 fort_compute_patch_error;
+    /** Calculates a sum for each equation */
+    fclaw3dx_clawpatch_fort_conscheck_t             fort_conservation_check;
+    /** Calculates the error norms for a patch */
+    fclaw3dx_clawpatch_fort_norm_t                  fort_compute_error_norm;
+    /** Calculates the area of a patch */
+    fclaw3dx_clawpatch_fort_area_t                  fort_compute_patch_area;
+
+    /** @} */
+};
+
+
+/**
+ * @brief vtable for clawpatch related functions
+ */
+struct fclaw3dx_clawpatch_vtable
+{
+    int dim;
+    struct fclaw_clawpatch_vtable_3d* d3;
+
+    /**
+     * @brief Function that allows the user to set a user data pointer
+     */
+    fclaw_clawpatch_set_user_data_t              set_user_data;
+
+    /** @{ @name Conservation Update */
+
+    /** Packs/Unpacks the fclaw3dx_clawpatch_registers struct for ghost patches */
+    fclaw3dx_clawpatch_time_sync_pack_registers_t   time_sync_pack_registers;
+
+    /** @} */
+
+    /** @{ @name Output Functions (ascii) */
+
+    /** Outputs a time header */
+    fclaw3dx_clawpatch_fort_header_ascii_t          fort_header_ascii;
+
+    /** Outputs a time header */
+    fclaw3dx_clawpatch_time_header_t                time_header_ascii;
+
+    /** Called for every patch when outputing ascii */
+    fclaw2d_patch_callback_t                        cb_output_ascii;    
+
+    /** @} */
+
+    /** @{ @name Ghost Patch Functions */
+    
     /** Packs/Unpacks ghost cell data for an aux array */
     fclaw3dx_clawpatch_local_ghost_pack_aux_t       local_ghost_pack_aux;
 
@@ -269,15 +302,6 @@ struct fclaw3dx_clawpatch_vtable
     fclaw3dx_clawpatch_diagnostics_cons_t           conservation_check;
     /** Fills in a user defined error_data structure for a specific patch. */
     fclaw3dx_clawpatch_diagnostics_error_t          compute_error;
-
-    /** Calculates the error for cells in a patch */
-    fclaw3dx_clawpatch_fort_error_t                 fort_compute_patch_error;
-    /** Calculates a sum for each equation */
-    fclaw3dx_clawpatch_fort_conscheck_t             fort_conservation_check;
-    /** Calculates the error norms for a patch */
-    fclaw3dx_clawpatch_fort_norm_t                  fort_compute_error_norm;
-    /** Calculates the area of a patch */
-    fclaw3dx_clawpatch_fort_area_t                  fort_compute_patch_area;
 
     /** @} */
 

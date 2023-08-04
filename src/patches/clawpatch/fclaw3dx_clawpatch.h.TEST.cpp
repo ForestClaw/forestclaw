@@ -174,40 +174,40 @@ TEST_CASE("fclaw3dx_clawpatch_vtable_initialize")
     CHECK(clawpatch_vt->set_user_data             == NULL);
 
     //ghost filling
-    CHECK(clawpatch_vt->fort_copy_face              == &FCLAW3DX_CLAWPATCH46_FORT_COPY_FACE);
-    CHECK(clawpatch_vt->fort_average_face           == &FCLAW3DX_CLAWPATCH46_FORT_AVERAGE_FACE);
-    CHECK(clawpatch_vt->fort_interpolate_face       == &FCLAW3DX_CLAWPATCH46_FORT_INTERPOLATE_FACE);
-    CHECK(clawpatch_vt->fort_copy_corner            == &FCLAW3DX_CLAWPATCH46_FORT_COPY_CORNER);
-    CHECK(clawpatch_vt->fort_average_corner         == &FCLAW3DX_CLAWPATCH46_FORT_AVERAGE_CORNER);
-    CHECK(clawpatch_vt->fort_interpolate_corner     == &FCLAW3DX_CLAWPATCH46_FORT_INTERPOLATE_CORNER);
+    CHECK(clawpatch_vt->d3->fort_copy_face              == &FCLAW3DX_CLAWPATCH46_FORT_COPY_FACE);
+    CHECK(clawpatch_vt->d3->fort_average_face           == &FCLAW3DX_CLAWPATCH46_FORT_AVERAGE_FACE);
+    CHECK(clawpatch_vt->d3->fort_interpolate_face       == &FCLAW3DX_CLAWPATCH46_FORT_INTERPOLATE_FACE);
+    CHECK(clawpatch_vt->d3->fort_copy_corner            == &FCLAW3DX_CLAWPATCH46_FORT_COPY_CORNER);
+    CHECK(clawpatch_vt->d3->fort_average_corner         == &FCLAW3DX_CLAWPATCH46_FORT_AVERAGE_CORNER);
+    CHECK(clawpatch_vt->d3->fort_interpolate_corner     == &FCLAW3DX_CLAWPATCH46_FORT_INTERPOLATE_CORNER);
 
     //regridding
-    CHECK(clawpatch_vt->fort_tag4refinement         == &FCLAW3DX_CLAWPATCH46_FORT_TAG4REFINEMENT);
-    CHECK(clawpatch_vt->fort_tag4coarsening         == &FCLAW3DX_CLAWPATCH46_FORT_TAG4COARSENING);
-    CHECK(clawpatch_vt->fort_user_exceeds_threshold == NULL);
-    CHECK(clawpatch_vt->fort_interpolate2fine       == &FCLAW3DX_CLAWPATCH46_FORT_INTERPOLATE2FINE);
-    CHECK(clawpatch_vt->fort_average2coarse         == &FCLAW3DX_CLAWPATCH46_FORT_AVERAGE2COARSE);
+    CHECK(clawpatch_vt->d3->fort_tag4refinement         == &FCLAW3DX_CLAWPATCH46_FORT_TAG4REFINEMENT);
+    CHECK(clawpatch_vt->d3->fort_tag4coarsening         == &FCLAW3DX_CLAWPATCH46_FORT_TAG4COARSENING);
+    CHECK(clawpatch_vt->d3->fort_user_exceeds_threshold == NULL);
+    CHECK(clawpatch_vt->d3->fort_interpolate2fine       == &FCLAW3DX_CLAWPATCH46_FORT_INTERPOLATE2FINE);
+    CHECK(clawpatch_vt->d3->fort_average2coarse         == &FCLAW3DX_CLAWPATCH46_FORT_AVERAGE2COARSE);
 
     //ascii output
-    CHECK(clawpatch_vt->time_header_ascii           == &fclaw3dx_clawpatch_time_header_ascii);
-    CHECK(clawpatch_vt->fort_header_ascii           == &FCLAW3DX_CLAWPATCH46_FORT_HEADER_ASCII);
-    CHECK(clawpatch_vt->cb_output_ascii             == &fclaw3dx_clawpatch_output_ascii_cb);
-    CHECK(clawpatch_vt->fort_output_ascii           == &FCLAW3DX_CLAWPATCH46_FORT_OUTPUT_ASCII);
+    CHECK(clawpatch_vt->time_header_ascii               == &fclaw3dx_clawpatch_time_header_ascii);
+    CHECK(clawpatch_vt->fort_header_ascii               == &FCLAW3DX_CLAWPATCH46_FORT_HEADER_ASCII);
+    CHECK(clawpatch_vt->cb_output_ascii                 == &fclaw3dx_clawpatch_output_ascii_cb);
+    CHECK(clawpatch_vt->d3->fort_output_ascii           == &FCLAW3DX_CLAWPATCH46_FORT_OUTPUT_ASCII);
 
     //time interpolation
-    CHECK(clawpatch_vt->fort_timeinterp             == &FCLAW3DX_CLAWPATCH46_FORT_TIMEINTERP);
+    CHECK(clawpatch_vt->d3->fort_timeinterp             == &FCLAW3DX_CLAWPATCH46_FORT_TIMEINTERP);
 
     //ghot packing
-    CHECK(clawpatch_vt->fort_local_ghost_pack       == &FCLAW3DX_CLAWPATCH46_FORT_LOCAL_GHOST_PACK);
-    CHECK(clawpatch_vt->local_ghost_pack_aux        == NULL);
+    CHECK(clawpatch_vt->d3->fort_local_ghost_pack       == &FCLAW3DX_CLAWPATCH46_FORT_LOCAL_GHOST_PACK);
+    CHECK(clawpatch_vt->local_ghost_pack_aux            == NULL);
 
     //diagnostics
-    CHECK(clawpatch_vt->conservation_check          == NULL);
-    CHECK(clawpatch_vt->compute_error               == NULL);
-    CHECK(clawpatch_vt->fort_compute_patch_error    == NULL);
-    CHECK(clawpatch_vt->fort_conservation_check     == NULL);
-    CHECK(clawpatch_vt->fort_compute_error_norm     == NULL);
-    CHECK(clawpatch_vt->fort_compute_patch_area     == NULL);
+    CHECK(clawpatch_vt->conservation_check              == NULL);
+    CHECK(clawpatch_vt->compute_error                   == NULL);
+    CHECK(clawpatch_vt->d3->fort_compute_patch_error    == NULL);
+    CHECK(clawpatch_vt->d3->fort_conservation_check     == NULL);
+    CHECK(clawpatch_vt->d3->fort_compute_error_norm     == NULL);
+    CHECK(clawpatch_vt->d3->fort_compute_patch_area     == NULL);
 
     CHECK(clawpatch_vt->is_set                      == 1);
 
@@ -761,10 +761,10 @@ TEST_CASE("fclaw3dx_clawpatch setup_timeinterp")
 
 
     fclaw3dx_clawpatch_vtable_t * clawpatch_vt = fclaw3dx_clawpatch_vt(test_data.glob);
-    clawpatch_vt->fort_timeinterp = [] (const int *mx, const int *my, const int *mz, 
-                                        const int *mbc, const int *meqn, const int *psize, 
-                                        double qcurr[], double qlast[], double qinterp[], 
-                                        const double *alpha, const int *ierror)
+    clawpatch_vt->d3->fort_timeinterp = [] (const int *mx, const int *my, const int *mz, 
+                                           const int *mbc, const int *meqn, const int *psize, 
+                                           double qcurr[], double qlast[], double qinterp[], 
+                                           const double *alpha, const int *ierror)
     {
         CHECK(*mx == timeinterp_cp->d3->mx);
         CHECK(*my == timeinterp_cp->d3->my);
@@ -803,13 +803,13 @@ TEST_CASE("fclaw3dx_clawpatch tag4refinement")
 
         t4r_tag_patch = tag_patch;
         t4r_init_flag = init_flag;
-        clawpatch_vt->fort_tag4refinement = [](const int *mx, const int *my, const int *mz, 
-                                               const int *mbc, const int *meqn, 
-                                               const double *xlower, const double *ylower, const double *zlower, 
-                                               const double *dx, const double *dy, const double *dz, 
-                                               const int *blockno, 
-                                               double q[], const double *tag_threshold, const int *init_flag, 
-                                               int *tag_patch)
+        clawpatch_vt->d3->fort_tag4refinement = [](const int *mx, const int *my, const int *mz, 
+                                                   const int *mbc, const int *meqn, 
+                                                   const double *xlower, const double *ylower, const double *zlower, 
+                                                   const double *dx, const double *dy, const double *dz, 
+                                                   const int *blockno, 
+                                                   double q[], const double *tag_threshold, const int *init_flag, 
+                                                   int *tag_patch)
         {
             CHECK(*mx == t4r_cp->d3->mx);
             CHECK(*my == t4r_cp->d3->my);
@@ -874,13 +874,13 @@ TEST_CASE("fclaw3dx_clawpatch tag4coarsening")
 
             fclaw3dx_clawpatch_vtable_t * clawpatch_vt = fclaw3dx_clawpatch_vt(test_data.glob);
 
-            clawpatch_vt->fort_tag4coarsening = [](const int *mx, const int *my, const int *mz, 
-                                                   const int *mbc, const int *meqn, 
-                                                   double xlower[], double ylower[], double zlower[], 
-                                                   const double *dx, const double *dy, const double *dz, 
-                                                   const int *blockno, 
-                                                   double q0[], double q1[], double q2[], double q3[], 
-                                                   const double *tag_threshold, const int *init_flag, int *tag_patch)
+            clawpatch_vt->d3->fort_tag4coarsening = [](const int *mx, const int *my, const int *mz, 
+                                                       const int *mbc, const int *meqn, 
+                                                       double xlower[], double ylower[], double zlower[], 
+                                                       const double *dx, const double *dy, const double *dz, 
+                                                       const int *blockno, 
+                                                       double q0[], double q1[], double q2[], double q3[], 
+                                                       const double *tag_threshold, const int *init_flag, int *tag_patch)
             {
                 CHECK(*mx == t4c_cp->d3->mx);
                 CHECK(*my == t4c_cp->d3->my);
@@ -949,10 +949,10 @@ TEST_CASE("fclaw3dx_clawpatch interpolate2fine")
 
     fclaw3dx_clawpatch_vtable_t * clawpatch_vt = fclaw3dx_clawpatch_vt(coarse_test_data.glob);
 
-    clawpatch_vt->fort_interpolate2fine = [](const int *mx, const int *my, const int *mz, 
-                                             const int *mbc, const int *meqn, 
-                                             double qcoarse[], double qfine[], double areacoarse[], double areafine[], 
-                                             const int *igrid, const int *manifold)
+    clawpatch_vt->d3->fort_interpolate2fine = [](const int *mx, const int *my, const int *mz, 
+                                                 const int *mbc, const int *meqn, 
+                                                 double qcoarse[], double qfine[], double areacoarse[], double areafine[], 
+                                                 const int *igrid, const int *manifold)
     {
         CHECK(*mx == i2f_cp->d3->mx);
         CHECK(*my == i2f_cp->d3->my);
