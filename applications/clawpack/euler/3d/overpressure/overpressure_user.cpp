@@ -141,7 +141,7 @@ void overpressure_link_solvers(fclaw2d_global_t *glob)
         claw46_vt->fort_qinit  = &CLAWPACK46_QINIT;
 
         /* Refine based on pressure */
-        fclaw3dx_clawpatch_vtable_t *clawpatch_vt = fclaw3dx_clawpatch_vt(glob);
+        fclaw_clawpatch_vtable_t *clawpatch_vt = fclaw_clawpatch_vt(glob);
         clawpatch_vt->d3->fort_user_exceeds_threshold = &EULER3D_PRESSURE_EXCEEDS_TH;
 
         fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);

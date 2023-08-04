@@ -115,9 +115,9 @@ void poisson_compute_error(fclaw2d_global_t *glob,
     poisson_error_info_t* error_data = (poisson_error_info_t*) user;
     //const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
 
-    fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt(glob);
+    fclaw_clawpatch_vtable_t *clawpatch_vt = fclaw_clawpatch_vt(glob);
 
-    if (clawpatch_vt->fort_compute_patch_error != NULL)
+    if (clawpatch_vt->d2->fort_compute_patch_error != NULL)
     {
         int mx, my, mbc;
         double xlower,ylower,dx,dy;
@@ -135,16 +135,16 @@ void poisson_compute_error(fclaw2d_global_t *glob,
 
         double t = glob->curr_time;
 
-        clawpatch_vt->fort_compute_patch_error(&blockno, &mx,&my,&mbc,
-                                               &mfields,&dx,&dy,
-                                               &xlower,&ylower, &t, rhs, err, soln);
+        clawpatch_vt->d2->fort_compute_patch_error(&blockno, &mx,&my,&mbc,
+                                                   &mfields,&dx,&dy,
+                                                   &xlower,&ylower, &t, rhs, err, soln);
 
         /* Accumulate sums and maximums needed to compute error norms */
 
-        FCLAW_ASSERT(clawpatch_vt->fort_compute_error_norm != NULL);
-        clawpatch_vt->fort_compute_error_norm(&blockno, &mx, &my, &mbc, &mfields, 
-                                              &dx,&dy, area, err,
-                                              error_data->local_error);
+        FCLAW_ASSERT(clawpatch_vt->d2->fort_compute_error_norm != NULL);
+        clawpatch_vt->d2->fort_compute_error_norm(&blockno, &mx, &my, &mbc, &mfields, 
+                                                  &dx,&dy, area, err,
+                                                  error_data->local_error);
 
     }
 }
@@ -167,15 +167,15 @@ void poisson_conservation_check(fclaw2d_global_t *glob,
     double *rhs;  /* Solution is stored in the right hand side */ 
     fclaw2d_clawpatch_rhs_data(glob,patch,&rhs,&mfields);
 
-    fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt(glob);
-    FCLAW_ASSERT(clawpatch_vt->fort_conservation_check != NULL);
+    fclaw_clawpatch_vtable_t *clawpatch_vt = fclaw_clawpatch_vt(glob);
+    FCLAW_ASSERT(clawpatch_vt->d2->fort_conservation_check != NULL);
 
 
     /* Need a better way to determine which diagnostic to do */
     double* area = fclaw2d_clawpatch_get_area(glob,patch);  
-    clawpatch_vt->fort_conservation_check(&mx, &my, &mbc, &mfields, &dx,&dy,
-                                          area, rhs, error_data->rhs,
-                                          error_data->c_kahan);
+    clawpatch_vt->d2->fort_conservation_check(&mx, &my, &mbc, &mfields, &dx,&dy,
+                                              area, rhs, error_data->rhs,
+                                              error_data->c_kahan);
     fc2d_thunderegg_options_t *mg_opt = fc2d_thunderegg_get_options(glob);
 
     fc2d_thunderegg_vtable_t*  mg_vt = fc2d_thunderegg_vt(glob);
@@ -225,7 +225,7 @@ void poisson_time_header_ascii(fclaw2d_global_t* glob, int iframe)
     fclose(f2);
 
 #if 0
-    fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt(glob);
+    fclaw_clawpatch_vtable_t *clawpatch_vt = fclaw_clawpatch_vt(glob);
     /* header writes out mfields+2 fields (computed soln, true soln, error); */
     clawpatch_vt->fort_header_ascii(matname1,matname2,&time,&mfields,&maux,&ngrids);
 #endif    
@@ -271,7 +271,7 @@ void cb_poisson_output_ascii(fclaw2d_domain_t * domain,
 
     /* The fort routine is defined by a clawpack solver and handles 
        the layout of q in memory (i,j,m) or (m,i,j), etc */
-    //fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt(glob);
+    //fclaw_clawpatch_vtable_t *clawpatch_vt = fclaw_clawpatch_vt(glob);
     //FCLAW_ASSERT(clawpatch_vt->fort_output_ascii);
 
     POISSON_FORT_OUTPUT_ASCII(fname,&mx,&my,&mfields,&mbc,
@@ -287,7 +287,7 @@ int poisson_tag4refinement(fclaw2d_global_t *glob,
                              int blockno, int patchno,
                              int initflag)
 {
-    fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt(glob);
+    fclaw_clawpatch_vtable_t* clawpatch_vt = fclaw_clawpatch_vt(glob);
 
     const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
 
@@ -307,9 +307,9 @@ int poisson_tag4refinement(fclaw2d_global_t *glob,
 
     tag_patch = 0;
     fclaw2d_global_set_global(glob);
-    clawpatch_vt->fort_tag4refinement(&mx,&my,&mbc,&mfields,&xlower,&ylower,&dx,&dy,
-                                      &blockno, rhs,&refine_threshold,
-                                      &initflag,&tag_patch);
+    clawpatch_vt->d2->fort_tag4refinement(&mx,&my,&mbc,&mfields,&xlower,&ylower,&dx,&dy,
+                                          &blockno, rhs,&refine_threshold,
+                                          &initflag,&tag_patch);
     fclaw2d_global_unset_global();
     return tag_patch;
 }
@@ -338,11 +338,11 @@ int poisson_tag4coarsening(fclaw2d_global_t *glob,
         fclaw2d_clawpatch_rhs_data(glob,&fine_patches[igrid],&rhs[igrid],&mfields);
     }
 
-    fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt(glob);
+    fclaw_clawpatch_vtable_t* clawpatch_vt = fclaw_clawpatch_vt(glob);
 
     int tag_patch = 0;
     fclaw2d_global_set_global(glob);
-    clawpatch_vt->fort_tag4coarsening(&mx,&my,&mbc,&mfields,&xlower,&ylower,&dx,&dy,
+    clawpatch_vt->d2->fort_tag4coarsening(&mx,&my,&mbc,&mfields,&xlower,&ylower,&dx,&dy,
                                       &blockno, rhs[0],rhs[1],rhs[2],rhs[3],
                                       &coarsen_threshold,&initflag,&tag_patch);
     fclaw2d_global_unset_global();
@@ -371,9 +371,9 @@ void poisson_link_solvers(fclaw2d_global_t *glob)
     mg_vt->fort_eval_bc  = &POISSON_FORT_EVAL_BC;   // For non-homogeneous BCs
 
     /* Clawpatch : Compute the error */
-    fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt(glob);
+    fclaw_clawpatch_vtable_t *clawpatch_vt = fclaw_clawpatch_vt(glob);
     clawpatch_vt->compute_error = poisson_compute_error;
-    clawpatch_vt->fort_compute_patch_error = &POISSON_COMPUTE_ERROR;
+    clawpatch_vt->d2->fort_compute_patch_error = &POISSON_COMPUTE_ERROR;
 
     // tagging routines
     patch_vt->tag4refinement       = poisson_tag4refinement;

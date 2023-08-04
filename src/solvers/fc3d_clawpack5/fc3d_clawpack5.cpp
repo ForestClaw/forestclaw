@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "fc3d_clawpack5_options.h"
 
 static fc3d_clawpack5_vtable_t classic_vt;
-// static fclaw2d_clawpatch_vtable_t clawpatch_vt;
+// static fclaw_clawpatch_vtable_t clawpatch_vt;
 
 fc3d_clawpack5_vtable_t* fc3d_clawpack5_vt()
 {

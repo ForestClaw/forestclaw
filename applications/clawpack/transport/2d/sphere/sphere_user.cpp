@@ -80,7 +80,7 @@ void cb_sphere_output_ascii (fclaw2d_domain_t * domain,
     fclaw2d_global_iterate_t* s = (fclaw2d_global_iterate_t*) user;
     fclaw2d_global_t      *glob = (fclaw2d_global_t*) s->glob;
 
-    //fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt(glob);
+    //fclaw_clawpatch_vtable_t *clawpatch_vt = fclaw_clawpatch_vt(glob);
 
     int iframe = *((int *) s->user);
 
@@ -155,13 +155,13 @@ void sphere_link_solvers(fclaw2d_global_t *glob)
         clawpack46_vt->fort_rpn2_cons = &RPN2CONS_UPDATE_MANIFOLD;
 
         /* Clawpatch functions */    
-        fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt(glob);
+        fclaw_clawpatch_vtable_t *clawpatch_vt = fclaw_clawpatch_vt(glob);
 
         /* Include error in output files */
         const fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
         if (fclaw_opt->compute_error)
         {
-            clawpatch_vt->fort_compute_patch_error = &SPHERE46_COMPUTE_ERROR;
+            clawpatch_vt->d2->fort_compute_patch_error = &SPHERE46_COMPUTE_ERROR;
             clawpatch_vt->fort_header_ascii   = &SPHERE46_FORT_HEADER_ASCII;
             clawpatch_vt->cb_output_ascii     = &cb_sphere_output_ascii;                
         }
@@ -176,13 +176,13 @@ void sphere_link_solvers(fclaw2d_global_t *glob)
         clawpack5_vt->fort_rpn2_cons = &RPN2CONS_UPDATE_MANIFOLD;
 
         /* Clawpatch functions */    
-        fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt(glob);
+        fclaw_clawpatch_vtable_t *clawpatch_vt = fclaw_clawpatch_vt(glob);
 
         /* Include error in output files */
         const fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
         if (fclaw_opt->compute_error)
         {
-            clawpatch_vt->fort_compute_patch_error = &SPHERE5_COMPUTE_ERROR;
+            clawpatch_vt->d2->fort_compute_patch_error = &SPHERE5_COMPUTE_ERROR;
             clawpatch_vt->fort_header_ascii   = &SPHERE5_FORT_HEADER_ASCII;
             clawpatch_vt->cb_output_ascii     = &cb_sphere_output_ascii;                
         }

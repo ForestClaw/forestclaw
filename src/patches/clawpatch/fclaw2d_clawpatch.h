@@ -31,6 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <forestclaw2d.h>       /* Need patch callback def */
 
 #include <fclaw2d_clawpatch_fort.h>
+#include <fclaw3dx_clawpatch_fort.h>
 #include <fclaw2d_clawpatch_conservation.h>
 #include <fclaw2d_clawpatch_diagnostics.h>
 
@@ -51,9 +52,9 @@ extern "C"
 
 
 /**
- * @brief fclaw2d_clawpatch_vtable type
+ * @brief fclaw_clawpatch_vtable type
  */
-typedef struct fclaw2d_clawpatch_vtable fclaw2d_clawpatch_vtable_t;
+typedef struct fclaw_clawpatch_vtable fclaw_clawpatch_vtable_t;
 
 /* --------------------------------- Typedefs ----------------------------------------- */
 /**
@@ -175,20 +176,15 @@ void fclaw2d_clawpatch_vtable_initialize(struct fclaw2d_global *global,
 /**
  * @brief Get a pointer to a clawpatch vtable global variable
  * 
- * @return fclaw2d_clawpatch_vtable_t* the vtable
+ * @return fclaw_clawpatch_vtable_t* the vtable
  */
-fclaw2d_clawpatch_vtable_t* fclaw2d_clawpatch_vt(struct fclaw2d_global* glob);
+fclaw_clawpatch_vtable_t* fclaw_clawpatch_vt(struct fclaw2d_global* glob);
 
 /**
- * @brief vtable for clawpatch related functions
+ * @brief vtable for 2d clawpatch related functions
  */
-struct fclaw2d_clawpatch_vtable
+struct fclaw_clawpatch_vtable_2d
 {
-    /**
-     * @brief Function that allows the user to set a user data pointer
-     */
-    clawpatch_set_user_data_t              set_user_data;
-
     /** @{ @name Ghost Filling Functions */
 
     /** Copies ghost data from a face neighboring grid on the same level */
@@ -236,12 +232,8 @@ struct fclaw2d_clawpatch_vtable
     /** @{ @name Output Functions (ascii) */
 
     /** Outputs a time header */
-    clawpatch_time_header_t                time_header_ascii;
-    /** Outputs a time header */
     clawpatch_fort_header_ascii_t          fort_header_ascii;
 
-    /** Called for every patch when outputing ascii */
-    fclaw2d_patch_callback_t               cb_output_ascii;    
     /** Outputs patch data in ascii */
     clawpatch_fort_output_ascii_t          fort_output_ascii;
 
@@ -258,6 +250,131 @@ struct fclaw2d_clawpatch_vtable
     
     /** Packs/Unpacks ghost cell data */
     clawpatch_fort_local_ghost_pack_t      fort_local_ghost_pack;
+
+    /** @} */
+
+    /** @{ @name Diagnostic Functions */
+
+    /** Calculates the error for cells in a patch */
+    clawpatch_fort_error_t                 fort_compute_patch_error;
+    /** Calculates a sum for each equation */
+    clawpatch_fort_conscheck_t             fort_conservation_check;
+    /** Calculates the error norms for a patch */
+    clawpatch_fort_norm_t                  fort_compute_error_norm;
+    /** Calculates the area of a patch */
+    clawpatch_fort_area_t                  fort_compute_patch_area;
+
+    /** @} */
+
+};
+
+/**
+ * @brief Vtable for 3d clawpatch related functions
+ */
+struct fclaw_clawpatch_vtable_3d
+{
+    /** @{ @name Ghost Filling Functions */
+
+    /** Copies ghost data from a face neighboring grid on the same level */
+    fclaw3dx_clawpatch_fort_copy_face_t             fort_copy_face;
+    /** Averages values from a face neighboring fine grid */
+    fclaw3dx_clawpatch_fort_average_face_t          fort_average_face;
+    /** Interpolates values form a face neighboring coarse grid */
+    fclaw3dx_clawpatch_fort_interpolate_face_t      fort_interpolate_face;
+    /** Copies ghost data from a corner neighboring grid on the same level */
+    fclaw3dx_clawpatch_fort_copy_corner_t           fort_copy_corner;
+    /** Averages values from a corner neighboring fine grid */
+    fclaw3dx_clawpatch_fort_average_corner_t        fort_average_corner;
+    /** Interpolates values form a corner neighboring coarse grid */
+    fclaw3dx_clawpatch_fort_interpolate_corner_t    fort_interpolate_corner;
+
+    /** @} */
+
+    /** @{ @name Regridding Functions */
+
+    /** Tags a patch for refinement. */
+    fclaw3dx_clawpatch_fort_tag4refinement_t        fort_tag4refinement;
+    /** Tags a quad of patches for coarsening. */
+    fclaw3dx_clawpatch_fort_tag4coarsening_t        fort_tag4coarsening;
+    /** @deprecated Checks if solution exceeds a threshold */
+    fclaw3dx_clawpatch_fort_exceeds_threshold_t     fort_user_exceeds_threshold;
+
+    /** Averages a fine patches to a coarse patch */
+    fclaw3dx_clawpatch_fort_average2coarse_t        fort_average2coarse;
+    /** Interpolates from a coarse patch to a fine patche */
+    fclaw3dx_clawpatch_fort_interpolate2fine_t      fort_interpolate2fine;
+
+    /** @} */
+
+    /** @{ @name Output Functions (ascii) */
+
+    /** Outputs patch data in ascii */
+    fclaw3dx_clawpatch_fort_output_ascii_t          fort_output_ascii;
+
+    /** @} */
+
+    /** @{ @name Time interpolation functions */
+
+    /** Interpolates q between timesteps */
+    fclaw3dx_clawpatch_fort_timeinterp_t            fort_timeinterp;
+
+    /** @} */
+
+    /** @{ @name Ghost Patch Functions */
+    
+    /** Packs/Unpacks ghost cell data */
+    fclaw3dx_clawpatch_fort_local_ghost_pack_t      fort_local_ghost_pack;
+
+    /** @} */
+
+    /** @{ @name Diagnostic Functions */
+
+    /** Calculates the error for cells in a patch */
+    fclaw3dx_clawpatch_fort_error_t                 fort_compute_patch_error;
+    /** Calculates a sum for each equation */
+    fclaw3dx_clawpatch_fort_conscheck_t             fort_conservation_check;
+    /** Calculates the error norms for a patch */
+    fclaw3dx_clawpatch_fort_norm_t                  fort_compute_error_norm;
+    /** Calculates the area of a patch */
+    fclaw3dx_clawpatch_fort_area_t                  fort_compute_patch_area;
+
+    /** @} */
+};
+/**
+ * @brief vtable for clawpatch related functions
+ */
+struct fclaw_clawpatch_vtable
+{
+    int dim;
+    struct fclaw_clawpatch_vtable_2d* d2;
+    struct fclaw_clawpatch_vtable_3d* d3;
+
+    /**
+     * @brief Function that allows the user to set a user data pointer
+     */
+    clawpatch_set_user_data_t              set_user_data;
+
+    /** @{ @name Conservation Update */
+
+    /** Packs/Unpacks the fclaw2d_clawpatch_registers struct for ghost patches */
+    clawpatch_time_sync_pack_registers_t   time_sync_pack_registers;
+
+    /** @} */
+
+    /** @{ @name Output Functions (ascii) */
+
+    /** Outputs a time header */
+    clawpatch_time_header_t                time_header_ascii;
+    /** Outputs a time header */
+    clawpatch_fort_header_ascii_t          fort_header_ascii;
+
+    /** Called for every patch when outputing ascii */
+    fclaw2d_patch_callback_t               cb_output_ascii;    
+
+    /** @} */
+
+    /** @{ @name Ghost Patch Functions */
+    
     /** Packs/Unpacks ghost cell data for an aux array */
     clawpatch_local_ghost_pack_aux_t       local_ghost_pack_aux;
 
@@ -269,15 +386,6 @@ struct fclaw2d_clawpatch_vtable
     clawpatch_diagnostics_cons_t           conservation_check;
     /** Fills in a user defined error_data structure for a specific patch. */
     clawpatch_diagnostics_error_t          compute_error;
-
-    /** Calculates the error for cells in a patch */
-    clawpatch_fort_error_t                 fort_compute_patch_error;
-    /** Calculates a sum for each equation */
-    clawpatch_fort_conscheck_t             fort_conservation_check;
-    /** Calculates the error norms for a patch */
-    clawpatch_fort_norm_t                  fort_compute_error_norm;
-    /** Calculates the area of a patch */
-    clawpatch_fort_area_t                  fort_compute_patch_area;
 
     /** @} */
 

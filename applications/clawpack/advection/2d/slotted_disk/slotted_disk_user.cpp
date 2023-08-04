@@ -66,8 +66,8 @@ void slotted_disk_link_solvers(fclaw2d_global_t *glob)
     if (user->mapping == 1)
         fclaw2d_clawpatch_use_pillowsphere(glob);
 
-    fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt(glob);
-    clawpatch_vt->fort_user_exceeds_threshold = &USER_EXCEEDS_THRESHOLD;
+    fclaw_clawpatch_vtable_t *clawpatch_vt = fclaw_clawpatch_vt(glob);
+    clawpatch_vt->d2->fort_user_exceeds_threshold = &USER_EXCEEDS_THRESHOLD;
 
     if (user->claw_version == 4)
     {

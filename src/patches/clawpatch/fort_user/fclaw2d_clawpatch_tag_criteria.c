@@ -52,10 +52,10 @@ int FCLAW2D_CLAWPATCH_TAG_CRITERIA(const int* blockno,
                                         const int* is_ghost)
 {
     struct fclaw2d_global* glob = fclaw2d_global_get_global();
-    fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt(glob);
+    fclaw_clawpatch_vtable_t* clawpatch_vt = fclaw_clawpatch_vt(glob);
 
     clawpatch_fort_exceeds_threshold_t user_exceeds_threshold = 
-                                clawpatch_vt->fort_user_exceeds_threshold;
+                                clawpatch_vt->d2->fort_user_exceeds_threshold;
 
     fclaw_clawpatch_options_t *clawpatch_opt = fclaw_clawpatch_get_options(glob);
     int meqn_val = clawpatch_opt->meqn, *meqn = &meqn_val;

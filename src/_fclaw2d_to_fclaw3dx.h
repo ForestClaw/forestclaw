@@ -103,7 +103,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define FCLAW2D_CLAWPATCH_TRANSFORM_CORNER_HALF FCLAW3DX_CLAWPATCH_TRANSFORM_CORNER_HALF
 
 //fclaw2d_clawpatch.h
-#define fclaw2d_clawpatch_vtable_t fclaw3dx_clawpatch_vtable_t
+#define fclaw_clawpatch_vtable_t fclaw_clawpatch_vtable_t
 #define fclaw2d_clawpatch_set_user_data_t fclaw3dx_clawpatch_set_user_data_t
 #define fclaw2d_clawpatch_time_sync_pack_registers_t fclaw3dx_clawpatch_time_sync_pack_registers_t
 #define fclaw2d_clawpatch_local_ghost_pack_aux_t fclaw3dx_clawpatch_local_ghost_pack_aux_t
@@ -112,8 +112,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define fclaw2d_clawpatch_diagnostics_cons_t fclaw3dx_clawpatch_diagnostics_cons_t
 #define fclaw2d_clawpatch_diagnostics_error_t fclaw3dx_clawpatch_diagnostics_error_t
 #define fclaw2d_clawpatch_vtable_initialize fclaw3dx_clawpatch_vtable_initialize
-#define fclaw2d_clawpatch_vt fclaw3dx_clawpatch_vt
-#define fclaw2d_clawpatch_vtable fclaw3dx_clawpatch_vtable
+#define fclaw_clawpatch_vt fclaw_clawpatch_vt
+#define fclaw_clawpatch_vtable fclaw_clawpatch_vtable
 #define fclaw2d_clawpatch_save_current_step fclaw3dx_clawpatch_save_current_step
 #define fclaw2d_clawpatch_grid_data fclaw3dx_clawpatch_grid_data
 

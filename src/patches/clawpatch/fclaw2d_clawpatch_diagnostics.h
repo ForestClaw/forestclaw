@@ -114,7 +114,7 @@ void fclaw2d_clawpatch_diagnostics_finalize(struct fclaw2d_global *glob,
 void fclaw2d_clawpatch_diagnostics_vtable_initialize(struct fclaw2d_global* glob);
 
 /**
- * @brief Calls the function in fclaw2d_clawpatch_vtable.fort_conservation_check
+ * @brief Calls the function in fclaw_clawpatch_vtable.fort_conservation_check
  * 
  * @param glob the global context
  * @param patch the patch context
@@ -129,7 +129,7 @@ void fclaw2d_clawpatch_diagnostics_cons_default(struct fclaw2d_global *glob,
                                                 void *error_data);
 
 /**
- * @brief Calls the function in fclaw2d_clawpatch_vtable.fort_compute_patch_error
+ * @brief Calls the function in fclaw_clawpatch_vtable.fort_compute_patch_error
  * 
  * @param glob the global context
  * @param patch the patch context

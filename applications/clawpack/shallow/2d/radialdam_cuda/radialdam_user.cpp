@@ -77,7 +77,7 @@ void radialdam_link_solvers(fclaw2d_global_t *glob)
 			}
 			else if (user->example == 1)
 			{
-				fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt(glob);
+				fclaw_clawpatch_vtable_t *clawpatch_vt = fclaw_clawpatch_vt(glob);
 				fclaw2d_patch_vtable_t         *patch_vt = fclaw2d_patch_vt(glob);
 
 				patch_vt->setup = &radialdam_patch_setup;

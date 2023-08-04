@@ -51,20 +51,20 @@ Test project /home/scott/repos/forestclaw/out/build/ubuntu_debug
  25/123 Test  #25: unit_test:fclaw_pointer_map set twice and get ...................................................................................   Passed    0.03 sec
         Start  26: unit_test:fclaw_pointer_map set twice and get with null destory
  26/123 Test  #26: unit_test:fclaw_pointer_map set twice and get with null destory .................................................................   Passed    0.03 sec
-        Start  27: unit_test:fclaw2d_clawpatch_vtable_initialize stores two seperate vtables in two seperate globs
- 27/123 Test  #27: unit_test:fclaw2d_clawpatch_vtable_initialize stores two seperate vtables in two seperate globs .................................   Passed    0.03 sec
-        Start  28: unit_test:fclaw3dx_clawpatch_vtable_initialize stores two seperate vtables in two seperate globs
- 28/123 Test  #28: unit_test:fclaw3dx_clawpatch_vtable_initialize stores two seperate vtables in two seperate globs ................................   Passed    0.04 sec
-        Start  29: unit_test:fclaw2d_clawpatch_vtable_initialize sets is_set flag
- 29/123 Test  #29: unit_test:fclaw2d_clawpatch_vtable_initialize sets is_set flag ..................................................................   Passed    0.03 sec
-        Start  30: unit_test:fclaw3dx_clawpatch_vtable_initialize sets is_set flag
- 30/123 Test  #30: unit_test:fclaw3dx_clawpatch_vtable_initialize sets is_set flag .................................................................   Passed    0.04 sec
-        Start  31: unit_test:fclaw2d_clawpatch_vtable_initialize fails if called twice on a glob
- 31/123 Test  #31: unit_test:fclaw2d_clawpatch_vtable_initialize fails if called twice on a glob ...................................................   Passed    0.04 sec
-        Start  32: unit_test:fclaw3dx_clawpatch_vtable_initialize fails if called twice on a glob
- 32/123 Test  #32: unit_test:fclaw3dx_clawpatch_vtable_initialize fails if called twice on a glob ..................................................   Passed    0.04 sec
-        Start  33: unit_test:fclaw3dx_clawpatch_vt fails is fclaw2d_clawpatch_vt is set
- 33/123 Test  #33: unit_test:fclaw3dx_clawpatch_vt fails is fclaw2d_clawpatch_vt is set ............................................................   Passed    0.04 sec
+        Start  27: unit_test:fclaw_clawpatch_vtable_initialize stores two seperate vtables in two seperate globs
+ 27/123 Test  #27: unit_test:fclaw_clawpatch_vtable_initialize stores two seperate vtables in two seperate globs .................................   Passed    0.03 sec
+        Start  28: unit_test:fclaw_clawpatch_vtable_initialize stores two seperate vtables in two seperate globs
+ 28/123 Test  #28: unit_test:fclaw_clawpatch_vtable_initialize stores two seperate vtables in two seperate globs ................................   Passed    0.04 sec
+        Start  29: unit_test:fclaw_clawpatch_vtable_initialize sets is_set flag
+ 29/123 Test  #29: unit_test:fclaw_clawpatch_vtable_initialize sets is_set flag ..................................................................   Passed    0.03 sec
+        Start  30: unit_test:fclaw_clawpatch_vtable_initialize sets is_set flag
+ 30/123 Test  #30: unit_test:fclaw_clawpatch_vtable_initialize sets is_set flag .................................................................   Passed    0.04 sec
+        Start  31: unit_test:fclaw_clawpatch_vtable_initialize fails if called twice on a glob
+ 31/123 Test  #31: unit_test:fclaw_clawpatch_vtable_initialize fails if called twice on a glob ...................................................   Passed    0.04 sec
+        Start  32: unit_test:fclaw_clawpatch_vtable_initialize fails if called twice on a glob
+ 32/123 Test  #32: unit_test:fclaw_clawpatch_vtable_initialize fails if called twice on a glob ..................................................   Passed    0.04 sec
+        Start  33: unit_test:fclaw_clawpatch_vt fails is fclaw_clawpatch_vt is set
+ 33/123 Test  #33: unit_test:fclaw_clawpatch_vt fails is fclaw_clawpatch_vt is set ............................................................   Passed    0.04 sec
         Start  34: unit_test:fclaw2d_clawpatch_diagnostics_vtable_initialize fails if fclaw2d_diagnostics_vtable_initialize is not called first
  34/123 Test  #34: unit_test:fclaw2d_clawpatch_diagnostics_vtable_initialize fails if fclaw2d_diagnostics_vtable_initialize is not called first ....   Passed    0.04 sec
         Start  35: unit_test:fclaw3dx_clawpatch_diagnostics_vtable_initialize fails if fclaw2d_diagnostics_vtable_initialize is not called first
@@ -73,6 +73,6 @@ Test project /home/scott/repos/forestclaw/out/build/ubuntu_debug
  36/123 Test  #36: unit_test:FCLAW2D_CLAWPATCH_EXCEEDS_THRESHOLD calls user function ...............................................................   Passed    0.04 sec
         Start  37: unit_test:FCLAW3DX_CLAWPATCH_EXCEEDS_THRESHOLD calls user function
  37/123 Test  #37: unit_test:FCLAW3DX_CLAWPATCH_EXCEEDS_THRESHOLD calls user function ..............................................................   Passed    0.04 sec
-        Start  38: unit_test:fclaw3dx_clawpatch_vtable_initialize
- 38/123 Test  #38: unit_test:fclaw3dx_clawpatch_vtable_initialize ..................................................................................   Passed    0.03 sec
+        Start  38: unit_test:fclaw_clawpatch_vtable_initialize
+ 38/123 Test  #38: unit_test:fclaw_clawpatch_vtable_initialize ..................................................................................   Passed    0.03 sec
         Start  39: unit_test:fclaw3dx_clawpatch patch_build

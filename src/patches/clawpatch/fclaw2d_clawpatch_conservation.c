@@ -429,29 +429,29 @@ void fclaw2d_clawpatch_time_sync_f2c(fclaw2d_global_t* glob,
 	int normal_match = fclaw2d_patch_normal_match(glob->domain, coarse_blockno, 
 	                                              coarse_patchno, iface_coarse);
 
-    fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt(glob);
+    fclaw_clawpatch_vtable_t *clawpatch_vt = fclaw_clawpatch_vt(glob);
 
 	/* This function is defined in fc2d_clawpack4.6 and fc2d_clawpack5 */
-	clawpatch_vt->fort_time_sync_f2c(&mx,&my,&mbc,&meqn,&idir,&iface_coarse,
-	                                 &coarse_blockno, &fine_blockno,
-	                                 &normal_match,
-									 crcoarse->area[0], crcoarse->area[1], 
-									 crcoarse->area[2], crcoarse->area[3],
-									 qcoarse,
-									 crcoarse->fp[0],crcoarse->fm[1],
-									 crcoarse->gp[0],crcoarse->gm[1],
-									 crfine->fm[0],crfine->fp[1],
-									 crfine->gm[0],crfine->gp[1],
-									 crcoarse->edge_fluxes[0],
-									 crcoarse->edge_fluxes[1],
-									 crcoarse->edge_fluxes[2],
-									 crcoarse->edge_fluxes[3],
-									 crfine->edge_fluxes[0],
-									 crfine->edge_fluxes[1],
-									 crfine->edge_fluxes[2],
-									 crfine->edge_fluxes[3],
-									 qneighbor_dummy,
-									 &transform_data);
+	clawpatch_vt->d2->fort_time_sync_f2c(&mx,&my,&mbc,&meqn,&idir,&iface_coarse,
+	                                     &coarse_blockno, &fine_blockno,
+	                                     &normal_match,
+										 crcoarse->area[0], crcoarse->area[1], 
+										 crcoarse->area[2], crcoarse->area[3],
+										 qcoarse,
+										 crcoarse->fp[0],crcoarse->fm[1],
+										 crcoarse->gp[0],crcoarse->gm[1],
+										 crfine->fm[0],crfine->fp[1],
+										 crfine->gm[0],crfine->gp[1],
+										 crcoarse->edge_fluxes[0],
+										 crcoarse->edge_fluxes[1],
+										 crcoarse->edge_fluxes[2],
+										 crcoarse->edge_fluxes[3],
+										 crfine->edge_fluxes[0],
+										 crfine->edge_fluxes[1],
+										 crfine->edge_fluxes[2],
+										 crfine->edge_fluxes[3],
+										 qneighbor_dummy,
+										 &transform_data);
 
 	FCLAW_FREE(qneighbor_dummy);
 #elif PATCH_DIM == 3
@@ -474,7 +474,7 @@ void fclaw2d_clawpatch_time_sync_samesize (struct fclaw2d_global* glob,
 	needed for copying and interpolation.  */
 
 #if PATCH_DIM == 2
-	fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt(glob);
+	fclaw_clawpatch_vtable_t *clawpatch_vt = fclaw_clawpatch_vt(glob);
 
 	double *qthis;
 	int meqn;
@@ -506,25 +506,25 @@ void fclaw2d_clawpatch_time_sync_samesize (struct fclaw2d_global* glob,
     /* This function is defined in fc2d_clawpack4.6 and fc2d_clawpack5  */
 
     /* Distribute 0.5 of each correction from each side */
-	clawpatch_vt->fort_time_sync_samesize(&mx,&my,&mbc,&meqn,&idir,&this_iface,
-	                                      &this_blockno, &neighbor_blockno,
-	                                      crthis->area[0], crthis->area[1], 
-	                                      crthis->area[2], crthis->area[3],
-	                                      qthis,
-	                                      crthis->fp[0],crthis->fm[1],
-	                                      crthis->gp[0],crthis->gm[1],
-	                                      crneighbor->fm[0],crneighbor->fp[1],
-	                                      crneighbor->gm[0],crneighbor->gp[1],
-	                                      crthis->edge_fluxes[0],
-	                                      crthis->edge_fluxes[1],
-	                                      crthis->edge_fluxes[2],
-	                                      crthis->edge_fluxes[3],
-	                                      crneighbor->edge_fluxes[0],
-	                                      crneighbor->edge_fluxes[1],
-	                                      crneighbor->edge_fluxes[2],
-	                                      crneighbor->edge_fluxes[3],
-	                                      qneighbor_dummy,
-	                                      &transform_data);    
+	clawpatch_vt->d2->fort_time_sync_samesize(&mx,&my,&mbc,&meqn,&idir,&this_iface,
+	                                          &this_blockno, &neighbor_blockno,
+	                                          crthis->area[0], crthis->area[1], 
+	                                          crthis->area[2], crthis->area[3],
+	                                          qthis,
+	                                          crthis->fp[0],crthis->fm[1],
+	                                          crthis->gp[0],crthis->gm[1],
+	                                          crneighbor->fm[0],crneighbor->fp[1],
+	                                          crneighbor->gm[0],crneighbor->gp[1],
+	                                          crthis->edge_fluxes[0],
+	                                          crthis->edge_fluxes[1],
+	                                          crthis->edge_fluxes[2],
+	                                          crthis->edge_fluxes[3],
+	                                          crneighbor->edge_fluxes[0],
+	                                          crneighbor->edge_fluxes[1],
+	                                          crneighbor->edge_fluxes[2],
+	                                          crneighbor->edge_fluxes[3],
+	                                          qneighbor_dummy,
+	                                          &transform_data);    
 	FCLAW_FREE(qneighbor_dummy);
 #elif PATCH_DIM == 3
     fclaw_global_essentialf("Conservation not yet implemented for 3d patches\n");

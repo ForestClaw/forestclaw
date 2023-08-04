@@ -425,12 +425,12 @@ typedef void (*fclaw3dx_clawpatch_fort_local_ghost_pack_t)(const int *mx,
  * @param[in] maux the number of aux equations
  * @param[in] ngrids the number of grids (patches)
  */
-typedef void  (*fclaw3dx_clawpatch_fort_header_ascii_t)(const char* matname1, 
-                                                        const char* matname2,
-                                                        const double* time, 
-                                                        const int* meqn, 
-                                                        const int* maux, 
-                                                        const int* ngrids);
+typedef void  (*fclaw_clawpatch_fort_header_ascii_t)(const char* matname1, 
+                                                     const char* matname2,
+                                                     const double* time, 
+                                                     const int* meqn, 
+                                                     const int* maux, 
+                                                     const int* ngrids);
 
 /**
  * @brief Writes out patch data in ascii format.

@@ -80,19 +80,19 @@ void cb_clawpatch_output_ascii (fclaw2d_domain_t * domain,
 
     /* The fort routine is defined by a clawpack solver and handles 
        the layout of q in memory (i,j,m) or (m,i,j), etc */
-    fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt(glob);
+    fclaw_clawpatch_vtable_t *clawpatch_vt = fclaw_clawpatch_vt(glob);
 
     int mx,my,mbc;
     double xlower,ylower,dx,dy;
 #if PATCH_DIM == 2
-    FCLAW_ASSERT(clawpatch_vt->fort_output_ascii);
+    FCLAW_ASSERT(clawpatch_vt->d2->fort_output_ascii);
 
     fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
-    clawpatch_vt->fort_output_ascii(fname,&mx,&my,&meqn,&mbc,
-                                    &xlower,&ylower,&dx,&dy,q,
-                                    &global_num,&level,&blockno,
-                                    &glob->mpirank);
+    clawpatch_vt->d2->fort_output_ascii(fname,&mx,&my,&meqn,&mbc,
+                                        &xlower,&ylower,&dx,&dy,q,
+                                        &global_num,&level,&blockno,
+                                        &glob->mpirank);
 #else
     FCLAW_ASSERT(clawpatch_vt->d3->fort_output_ascii);
 
@@ -115,7 +115,7 @@ void cb_clawpatch_output_ascii (fclaw2d_domain_t * domain,
 void fclaw2d_clawpatch_time_header_ascii(fclaw2d_global_t* glob, int iframe)
 {
     const fclaw_clawpatch_options_t *clawpatch_opt = fclaw_clawpatch_get_options(glob);
-    fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt(glob);
+    fclaw_clawpatch_vtable_t *clawpatch_vt = fclaw_clawpatch_vt(glob);
     char matname1[11];
     char matname2[11];
 
@@ -142,7 +142,7 @@ void fclaw2d_clawpatch_time_header_ascii(fclaw2d_global_t* glob, int iframe)
 void fclaw2d_clawpatch_output_ascii(fclaw2d_global_t* glob,int iframe)
 {
     fclaw2d_domain_t *domain = glob->domain;
-    fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt(glob);
+    fclaw_clawpatch_vtable_t *clawpatch_vt = fclaw_clawpatch_vt(glob);
 
     /* BEGIN NON-SCALABLE CODE */
     /* Write the file contents in serial.

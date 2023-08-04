@@ -128,7 +128,7 @@ void square_link_solvers(fclaw2d_global_t *glob)
     fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt(glob);
     patch_vt->setup = &square_patch_setup_manifold;
 
-    fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt(glob);
+    fclaw_clawpatch_vtable_t *clawpatch_vt = fclaw_clawpatch_vt(glob);
 
     const user_options_t* user = square_get_options(glob);
     if (user->claw_version == 4) 
@@ -159,12 +159,12 @@ void square_link_solvers(fclaw2d_global_t *glob)
     {
         if (user->claw_version == 4)
         {
-            clawpatch_vt->fort_compute_patch_error = &SQUARE46_COMPUTE_ERROR;
+            clawpatch_vt->d2->fort_compute_patch_error = &SQUARE46_COMPUTE_ERROR;
             clawpatch_vt->fort_header_ascii        = &SQUARE46_FORT_HEADER_ASCII;            
         }
         else if (user->claw_version == 5)
         {
-            clawpatch_vt->fort_compute_patch_error = &SQUARE5_COMPUTE_ERROR;
+            clawpatch_vt->d2->fort_compute_patch_error = &SQUARE5_COMPUTE_ERROR;
             clawpatch_vt->fort_header_ascii        = &SQUARE5_FORT_HEADER_ASCII;                
         }
         clawpatch_vt->cb_output_ascii     = &cb_square_output_ascii;                

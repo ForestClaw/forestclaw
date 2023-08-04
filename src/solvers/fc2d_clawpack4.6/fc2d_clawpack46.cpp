@@ -497,7 +497,7 @@ void fc2d_clawpack46_solver_initialize(fclaw2d_global_t* glob)
 
 	fclaw2d_vtable_t*                fclaw_vt = fclaw2d_vt(glob);
 	fclaw2d_patch_vtable_t*          patch_vt = fclaw2d_patch_vt(glob);  
-    fclaw2d_clawpatch_vtable_t*      clawpatch_vt = fclaw2d_clawpatch_vt(glob);
+    fclaw_clawpatch_vtable_t*      clawpatch_vt = fclaw_clawpatch_vt(glob);
 
 	fc2d_clawpack46_vtable_t*  claw46_vt = clawpack46_vt_new();
 
@@ -512,8 +512,8 @@ void fc2d_clawpack46_solver_initialize(fclaw2d_global_t* glob)
 	patch_vt->single_step_update             = clawpack46_update;
 
 	/* Conservation updates (based on Clawpack updates) */
-	clawpatch_vt->fort_time_sync_f2c         = CLAWPACK46_FORT_TIME_SYNC_F2C;
-	clawpatch_vt->fort_time_sync_samesize    = CLAWPACK46_FORT_TIME_SYNC_SAMESIZE;
+	clawpatch_vt->d2->fort_time_sync_f2c       = CLAWPACK46_FORT_TIME_SYNC_F2C;
+	clawpatch_vt->d2->fort_time_sync_samesize  = CLAWPACK46_FORT_TIME_SYNC_SAMESIZE;
 
 	/* Wrappers so that user can change argument list */
 	claw46_vt->b4step2                       = clawpack46_b4step2;

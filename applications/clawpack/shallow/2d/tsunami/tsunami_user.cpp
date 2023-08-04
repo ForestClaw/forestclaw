@@ -36,7 +36,7 @@ void tsunami_link_solvers(fclaw2d_global_t *glob)
     fclaw2d_vtable_t *vt = fclaw2d_vt(glob);
     vt->problem_setup = &tsunami_problem_setup;  /* Version-independent */
 
-    //fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt(glob);
+    //fclaw_clawpatch_vtable_t *clawpatch_vt = fclaw_clawpatch_vt(glob);
     fc2d_clawpack46_vtable_t *claw46_vt = fc2d_clawpack46_vt(glob);
 
     claw46_vt->fort_qinit  = &CLAWPACK46_QINIT;

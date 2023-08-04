@@ -118,12 +118,12 @@ void cb_compute_diagnostics(fclaw2d_domain_t *domain,
     /* Accumulate area for final computation of error */
     int mx, my, mbc;
     double xlower,ylower,dx,dy;
-    fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt(s->glob);
+    fclaw_clawpatch_vtable_t *clawpatch_vt = fclaw_clawpatch_vt(s->glob);
 #if PATCH_DIM == 2
     double *area = fclaw2d_clawpatch_get_area(s->glob,patch);  
-    FCLAW_ASSERT(clawpatch_vt->fort_compute_patch_area != NULL);
+    FCLAW_ASSERT(clawpatch_vt->d2->fort_compute_patch_area != NULL);
     fclaw2d_clawpatch_grid_data(s->glob,patch,&mx,&my,&mbc,&xlower,&ylower,&dx,&dy);
-    error_data->area += clawpatch_vt->fort_compute_patch_area(&mx,&my,&mbc,&dx,&dy,area);
+    error_data->area += clawpatch_vt->d2->fort_compute_patch_area(&mx,&my,&mbc,&dx,&dy,area);
 #else
     int mz; 
     double zlower, dz;

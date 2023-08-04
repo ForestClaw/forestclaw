@@ -77,7 +77,7 @@ void shockbubble_problem_setup(fclaw2d_global_t* glob)
 void shockbubble_link_solvers(fclaw2d_global_t *glob)
 {
     // const user_options_t* user = shockbubble_get_options(glob);
-    // fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt(glob);
+    // fclaw_clawpatch_vtable_t *clawpatch_vt = fclaw_clawpatch_vt(glob);
 
     // fc2d_clawpack46_options_t *clawopt = fc2d_clawpack46_get_options(glob);
 

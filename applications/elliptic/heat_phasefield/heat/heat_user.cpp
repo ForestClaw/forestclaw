@@ -161,9 +161,9 @@ void heat_compute_error(fclaw2d_global_t *glob,
     heat_error_info_t* error_data = (heat_error_info_t*) user;
     //const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
 
-    fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt(glob);
+    fclaw_clawpatch_vtable_t *clawpatch_vt = fclaw_clawpatch_vt(glob);
 
-    if (clawpatch_vt->fort_compute_patch_error != NULL)
+    if (clawpatch_vt->d2->fort_compute_patch_error != NULL)
     {
         int mx, my, mbc;
         double xlower,ylower,dx,dy;
@@ -187,14 +187,14 @@ void heat_compute_error(fclaw2d_global_t *glob,
 
         double t = glob->curr_time;
 
-        clawpatch_vt->fort_compute_patch_error(&blockno, &mx,&my,&mbc,
-                                               &meqn,&dx,&dy,
-                                               &xlower,&ylower, &t, q, err, soln);
+        clawpatch_vt->d2->fort_compute_patch_error(&blockno, &mx,&my,&mbc,
+                                                   &meqn,&dx,&dy,
+                                                   &xlower,&ylower, &t, q, err, soln);
 
         /* Accumulate sums and maximums needed to compute error norms */
 
-        FCLAW_ASSERT(clawpatch_vt->fort_compute_error_norm != NULL);
-        clawpatch_vt->fort_compute_error_norm(&blockno, &mx, &my, &mbc, &meqn, 
+        FCLAW_ASSERT(clawpatch_vt->d2->fort_compute_error_norm != NULL);
+        clawpatch_vt->d2->fort_compute_error_norm(&blockno, &mx, &my, &mbc, &meqn, 
                                               &dx,&dy, area, err,
                                               error_data->local_error);
 
@@ -235,7 +235,7 @@ void heat_time_header_ascii(fclaw2d_global_t* glob, int iframe)
     fclose(f2);
 
 #if 0
-    fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt(glob);
+    fclaw_clawpatch_vtable_t *clawpatch_vt = fclaw_clawpatch_vt(glob);
     /* header writes out mfields+2 fields (computed soln, true soln, error); */
     clawpatch_vt->fort_header_ascii(matname1,matname2,&time,&mfields,&maux,&ngrids);
 #endif    
@@ -278,7 +278,7 @@ void cb_heat_output_ascii(fclaw2d_domain_t * domain,
 
     /* The fort routine is defined by a clawpack solver and handles 
        the layout of q in memory (i,j,m) or (m,i,j), etc */
-    //fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt(glob);
+    //fclaw_clawpatch_vtable_t *clawpatch_vt = fclaw_clawpatch_vt(glob);
     //FCLAW_ASSERT(clawpatch_vt->fort_output_ascii);
 
     HEAT_FORT_OUTPUT_ASCII(fname,&mx,&my,&meqn,&mbc,
@@ -294,7 +294,7 @@ int heat_tag4refinement(fclaw2d_global_t *glob,
                         int blockno, int patchno,
                         int initflag)
 {
-    fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt(glob);
+    fclaw_clawpatch_vtable_t* clawpatch_vt = fclaw_clawpatch_vt(glob);
 
     const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
 
@@ -313,10 +313,10 @@ int heat_tag4refinement(fclaw2d_global_t *glob,
     fclaw2d_clawpatch_soln_data(glob,this_patch,&q,&meqn);
 
     tag_patch = 0;
-    clawpatch_vt->fort_tag4refinement(&mx,&my,&mbc,&meqn,
-                                      &xlower,&ylower,&dx,&dy,
-                                      &blockno, q,&refine_threshold,
-                                      &initflag,&tag_patch);
+    clawpatch_vt->d2->fort_tag4refinement(&mx,&my,&mbc,&meqn,
+                                          &xlower,&ylower,&dx,&dy,
+                                          &blockno, q,&refine_threshold,
+                                          &initflag,&tag_patch);
     return tag_patch;
 }
 
@@ -344,12 +344,12 @@ int heat_tag4coarsening(fclaw2d_global_t *glob,
         fclaw2d_clawpatch_soln_data(glob,&fine_patches[igrid],&q[igrid],&meqn);
     }
 
-    fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt(glob);
+    fclaw_clawpatch_vtable_t* clawpatch_vt = fclaw_clawpatch_vt(glob);
 
     int tag_patch = 0;
-    clawpatch_vt->fort_tag4coarsening(&mx,&my,&mbc,&meqn,&xlower,&ylower,&dx,&dy,
-                                      &blockno, q[0],q[1],q[2],q[3],
-                                      &coarsen_threshold,&initflag,&tag_patch);
+    clawpatch_vt->d2->fort_tag4coarsening(&mx,&my,&mbc,&meqn,&xlower,&ylower,&dx,&dy,
+                                          &blockno, q[0],q[1],q[2],q[3],
+                                          &coarsen_threshold,&initflag,&tag_patch);
     return tag_patch == 1;
 }
 
@@ -406,15 +406,15 @@ void heat_link_solvers(fclaw2d_global_t *glob)
     mg_vt->fort_eval_bc  = &HEAT_NEUMANN;   // For non-homogeneous BCs
 
     /* Clawpatch : Compute the error */
-    fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt(glob);
+    fclaw_clawpatch_vtable_t *clawpatch_vt = fclaw_clawpatch_vt(glob);
     clawpatch_vt->compute_error = heat_compute_error;
-    clawpatch_vt->fort_compute_patch_error = &HEAT_COMPUTE_ERROR;
+    clawpatch_vt->d2->fort_compute_patch_error = &HEAT_COMPUTE_ERROR;
 
     // tagging routines
     patch_vt->tag4refinement       = heat_tag4refinement;
     patch_vt->tag4coarsening       = heat_tag4coarsening;
-    clawpatch_vt->fort_tag4refinement = &HEAT_TAG4REFINEMENT;
-    clawpatch_vt->fort_tag4coarsening = &HEAT_TAG4COARSENING;
+    clawpatch_vt->d2->fort_tag4refinement = &HEAT_TAG4REFINEMENT;
+    clawpatch_vt->d2->fort_tag4coarsening = &HEAT_TAG4COARSENING;
 
     // Output routines
     clawpatch_vt->time_header_ascii = heat_time_header_ascii;

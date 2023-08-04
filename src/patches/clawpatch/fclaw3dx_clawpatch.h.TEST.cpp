@@ -169,7 +169,7 @@ TEST_CASE("fclaw3dx_clawpatch_vtable_initialize")
 
     fclaw3dx_clawpatch_vtable_initialize(glob, 4);
 
-    fclaw3dx_clawpatch_vtable_t * clawpatch_vt = fclaw3dx_clawpatch_vt(glob);
+    fclaw_clawpatch_vtable_t * clawpatch_vt = fclaw_clawpatch_vt(glob);
 
     CHECK(clawpatch_vt->set_user_data             == NULL);
 
@@ -760,7 +760,7 @@ TEST_CASE("fclaw3dx_clawpatch setup_timeinterp")
     timeinterp_alpha = 0.90210;
 
 
-    fclaw3dx_clawpatch_vtable_t * clawpatch_vt = fclaw3dx_clawpatch_vt(test_data.glob);
+    fclaw_clawpatch_vtable_t * clawpatch_vt = fclaw_clawpatch_vt(test_data.glob);
     clawpatch_vt->d3->fort_timeinterp = [] (const int *mx, const int *my, const int *mz, 
                                            const int *mbc, const int *meqn, const int *psize, 
                                            double qcurr[], double qlast[], double qinterp[], 
@@ -799,7 +799,7 @@ TEST_CASE("fclaw3dx_clawpatch tag4refinement")
 
         t4r_cp = fclaw2d_clawpatch_get_clawpatch(&test_data.domain->blocks[0].patches[0]);
 
-        fclaw3dx_clawpatch_vtable_t * clawpatch_vt = fclaw3dx_clawpatch_vt(test_data.glob);
+        fclaw_clawpatch_vtable_t * clawpatch_vt = fclaw_clawpatch_vt(test_data.glob);
 
         t4r_tag_patch = tag_patch;
         t4r_init_flag = init_flag;
@@ -872,7 +872,7 @@ TEST_CASE("fclaw3dx_clawpatch tag4coarsening")
             t4c_cp2 = fclaw2d_clawpatch_get_clawpatch(&test_data.domain->blocks[0].patches[2]);
             t4c_cp3 = fclaw2d_clawpatch_get_clawpatch(&test_data.domain->blocks[0].patches[3]);
 
-            fclaw3dx_clawpatch_vtable_t * clawpatch_vt = fclaw3dx_clawpatch_vt(test_data.glob);
+            fclaw_clawpatch_vtable_t * clawpatch_vt = fclaw_clawpatch_vt(test_data.glob);
 
             clawpatch_vt->d3->fort_tag4coarsening = [](const int *mx, const int *my, const int *mz, 
                                                        const int *mbc, const int *meqn, 
@@ -947,7 +947,7 @@ TEST_CASE("fclaw3dx_clawpatch interpolate2fine")
     i2f_cp2 = fclaw2d_clawpatch_get_clawpatch(&fine_test_data.domain->blocks[0].patches[2]);
     i2f_cp3 = fclaw2d_clawpatch_get_clawpatch(&fine_test_data.domain->blocks[0].patches[3]);
 
-    fclaw3dx_clawpatch_vtable_t * clawpatch_vt = fclaw3dx_clawpatch_vt(coarse_test_data.glob);
+    fclaw_clawpatch_vtable_t * clawpatch_vt = fclaw_clawpatch_vt(coarse_test_data.glob);
 
     clawpatch_vt->d3->fort_interpolate2fine = [](const int *mx, const int *my, const int *mz, 
                                                  const int *mbc, const int *meqn, 
