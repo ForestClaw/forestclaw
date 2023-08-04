@@ -26,8 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_diagnostics.h>
 #include <fclaw2d_global.h>
 #include <fclaw2d_forestclaw.h>
-#include <fclaw2d_clawpatch_diagnostics.h>
-#include <fclaw3dx_clawpatch_diagnostics.h>
+#include <fclaw_clawpatch_diagnostics.h>
 #include <test.hpp>
 
 #ifdef FCLAW_ENABLE_DEBUG
@@ -35,14 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 TEST_CASE("fclaw2d_clawpatch_diagnostics_vtable_initialize fails if fclaw2d_diagnostics_vtable_initialize is not called first")
 {
 	fclaw2d_global_t* glob = fclaw2d_global_new();
-	CHECK_SC_ABORTED(fclaw2d_clawpatch_diagnostics_vtable_initialize(glob));
-	fclaw2d_global_destroy(glob);
-}
-
-TEST_CASE("fclaw3dx_clawpatch_diagnostics_vtable_initialize fails if fclaw2d_diagnostics_vtable_initialize is not called first")
-{
-	fclaw2d_global_t* glob = fclaw2d_global_new();
-	CHECK_SC_ABORTED(fclaw3dx_clawpatch_diagnostics_vtable_initialize(glob));
+	CHECK_SC_ABORTED(fclaw_clawpatch_diagnostics_vtable_initialize(glob));
 	fclaw2d_global_destroy(glob);
 }
 

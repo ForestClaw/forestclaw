@@ -23,41 +23,19 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef REFINE_DIM
-#define REFINE_DIM 2
-#endif
-
-#ifndef PATCH_DIM
-#define PATCH_DIM 2
-#endif
-
 #include <fclaw2d_global.h>
 #include <fclaw2d_options.h>
 #include <fclaw2d_domain.h>
 #include <fclaw2d_diagnostics.h>
 
-#if REFINE_DIM == 2 && PATCH_DIM == 2
-
-#include <fclaw2d_clawpatch_diagnostics.h>
+#include <fclaw_clawpatch_diagnostics.h>
 
 #include <fclaw2d_clawpatch.h>
-#include <fclaw_clawpatch_options.h>
-
-#elif REFINE_DIM == 2 && PATCH_DIM == 3
-
-#include <fclaw3dx_clawpatch_diagnostics.h>
-
 #include <fclaw3dx_clawpatch.h>
 #include <fclaw_clawpatch_options.h>
 
-#include <_fclaw2d_to_fclaw3dx.h>
-#include <_fclaw2d_to_fclaw3d.h>
-
-#endif
-
-
-void fclaw2d_clawpatch_diagnostics_initialize(fclaw2d_global_t *glob,
-                                              void **acc_patch)
+void fclaw_clawpatch_diagnostics_initialize(fclaw2d_global_t *glob,
+                                            void **acc_patch)
 {
 
     fclaw_debugf("Initializing diagnostics\n");
@@ -79,8 +57,8 @@ void fclaw2d_clawpatch_diagnostics_initialize(fclaw2d_global_t *glob,
 
 }
 
-void fclaw2d_clawpatch_diagnostics_reset(fclaw2d_global_t *glob,
-                                         void* patch_acc)
+void fclaw_clawpatch_diagnostics_reset(fclaw2d_global_t *glob,
+                                       void* patch_acc)
 {
     fclaw_debugf("Resetting diagnostics\n");
     error_info_t *error_data = (error_info_t*) patch_acc;
@@ -116,23 +94,24 @@ void cb_compute_diagnostics(fclaw2d_domain_t *domain,
     error_info_t *error_data = (error_info_t*) s->user; 
 
     /* Accumulate area for final computation of error */
-    int mx, my, mbc;
-    double xlower,ylower,dx,dy;
+    int mx, my, mz, mbc;
+    double xlower,ylower,zlower,dx,dy,dz;
     fclaw_clawpatch_vtable_t *clawpatch_vt = fclaw_clawpatch_vt(s->glob);
-#if PATCH_DIM == 2
-    double *area = fclaw2d_clawpatch_get_area(s->glob,patch);  
-    FCLAW_ASSERT(clawpatch_vt->d2->fort_compute_patch_area != NULL);
-    fclaw2d_clawpatch_grid_data(s->glob,patch,&mx,&my,&mbc,&xlower,&ylower,&dx,&dy);
-    error_data->area += clawpatch_vt->d2->fort_compute_patch_area(&mx,&my,&mbc,&dx,&dy,area);
-#else
-    int mz; 
-    double zlower, dz;
-    fclaw2d_clawpatch_grid_data(s->glob,patch,&mx,&my,&mz, 
-                                &mbc,&xlower,&ylower,&zlower, &dx,&dy,&dz);
+    if(clawpatch_vt->dim == 2)
+    {
+        double *area = fclaw2d_clawpatch_get_area(s->glob,patch);  
+        FCLAW_ASSERT(clawpatch_vt->d2->fort_compute_patch_area != NULL);
+        fclaw2d_clawpatch_grid_data(s->glob,patch,&mx,&my,&mbc,&xlower,&ylower,&dx,&dy);
+        error_data->area += clawpatch_vt->d2->fort_compute_patch_area(&mx,&my,&mbc,&dx,&dy,area);
+    }
+    else 
+    {
+        fclaw3dx_clawpatch_grid_data(s->glob,patch,&mx,&my,&mz, 
+                                    &mbc,&xlower,&ylower,&zlower, &dx,&dy,&dz);
 
-    // double *volume = fclaw3dx_clawpatch_get_area(s->glob,patch);
-    // error_data->area += clawpatch_vt->fort_compute_patch_area(&mx,&my,&mz, &mbc,&dx,&dy,&dz,volume);
-#endif
+        // double *volume = fclaw3dx_clawpatch_get_area(s->glob,patch);
+        // error_data->area += clawpatch_vt->fort_compute_patch_area(&mx,&my,&mz, &mbc,&dx,&dy,&dz,volume);
+    }
 
     /* Compute error */
     const fclaw_options_t *fclaw_opt = fclaw2d_get_options(s->glob);
@@ -143,8 +122,8 @@ void cb_compute_diagnostics(fclaw2d_domain_t *domain,
         clawpatch_vt->conservation_check(s->glob, patch, blockno, patchno, error_data);
 }
 
-void fclaw2d_clawpatch_diagnostics_compute(fclaw2d_global_t* glob,
-                                           void* patch_acc)
+void fclaw_clawpatch_diagnostics_compute(fclaw2d_global_t* glob,
+                                         void* patch_acc)
 {
     fclaw_debugf("Computing diagnostics\n");
     const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
@@ -156,9 +135,9 @@ void fclaw2d_clawpatch_diagnostics_compute(fclaw2d_global_t* glob,
 
 
 /* Accumulate the errors computed above */
-void fclaw2d_clawpatch_diagnostics_gather(fclaw2d_global_t *glob,
-                                          void* patch_acc,
-                                          int init_flag)
+void fclaw_clawpatch_diagnostics_gather(fclaw2d_global_t *glob,
+                                        void* patch_acc,
+                                        int init_flag)
 {
     fclaw_debugf("Gathering diagnostics\n");
     fclaw2d_domain_t *domain = glob->domain;
@@ -223,8 +202,8 @@ void fclaw2d_clawpatch_diagnostics_gather(fclaw2d_global_t *glob,
     }
 }
 
-void fclaw2d_clawpatch_diagnostics_finalize(fclaw2d_global_t *glob,
-                                            void** patch_acc)
+void fclaw_clawpatch_diagnostics_finalize(fclaw2d_global_t *glob,
+                                          void** patch_acc)
 {
     error_info_t *error_data = *((error_info_t**) patch_acc);
     FCLAW_FREE(error_data->mass);
@@ -236,15 +215,15 @@ void fclaw2d_clawpatch_diagnostics_finalize(fclaw2d_global_t *glob,
     *patch_acc = NULL;
 }
 
-void fclaw2d_clawpatch_diagnostics_vtable_initialize(fclaw2d_global_t* glob)
+void fclaw_clawpatch_diagnostics_vtable_initialize(fclaw2d_global_t* glob)
 {
     /* diagnostic functions that apply to patches (error, conservation) */
     fclaw2d_diagnostics_vtable_t *diag_vt = fclaw2d_diagnostics_vt(glob);
     
-    diag_vt->patch_init_diagnostics      = fclaw2d_clawpatch_diagnostics_initialize;
-    diag_vt->patch_compute_diagnostics   = fclaw2d_clawpatch_diagnostics_compute;
-    diag_vt->patch_gather_diagnostics    = fclaw2d_clawpatch_diagnostics_gather;
-    diag_vt->patch_reset_diagnostics     = fclaw2d_clawpatch_diagnostics_reset;
-    diag_vt->patch_finalize_diagnostics  = fclaw2d_clawpatch_diagnostics_finalize;
+    diag_vt->patch_init_diagnostics      = fclaw_clawpatch_diagnostics_initialize;
+    diag_vt->patch_compute_diagnostics   = fclaw_clawpatch_diagnostics_compute;
+    diag_vt->patch_gather_diagnostics    = fclaw_clawpatch_diagnostics_gather;
+    diag_vt->patch_reset_diagnostics     = fclaw_clawpatch_diagnostics_reset;
+    diag_vt->patch_finalize_diagnostics  = fclaw_clawpatch_diagnostics_finalize;
 
 }

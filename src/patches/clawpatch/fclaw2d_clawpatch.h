@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_clawpatch_fort.h>
 #include <fclaw3dx_clawpatch_fort.h>
 #include <fclaw2d_clawpatch_conservation.h>
-#include <fclaw2d_clawpatch_diagnostics.h>
+#include <fclaw_clawpatch_diagnostics.h>
 
 
 #ifdef __cplusplus

@@ -36,7 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_clawpatch.h>
 #include <fclaw_clawpatch.hpp>
 
-#include <fclaw2d_clawpatch_diagnostics.h>
+#include <fclaw_clawpatch_diagnostics.h>
 #include <fclaw_clawpatch_options.h>
 #include <fclaw2d_clawpatch_output_ascii.h> 
 #include <fclaw2d_clawpatch_output_vtk.h>
@@ -57,7 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw3dx_clawpatch.h>
 #include <fclaw_clawpatch.hpp>
 
-#include <fclaw3dx_clawpatch_diagnostics.h>
+#include <fclaw_clawpatch_diagnostics.h>
 #include <fclaw_clawpatch_options.h>
 #include <fclaw3dx_clawpatch_output_ascii.h> 
 #include <fclaw3dx_clawpatch_output_vtk.h>
@@ -1477,8 +1477,8 @@ void fclaw2d_clawpatch_vtable_initialize(fclaw2d_global_t* glob,
 		clawpatch_vt->d2->fort_output_ascii          = FCLAW2D_CLAWPATCH46_FORT_OUTPUT_ASCII;
 
 		/* Diagnostic functions */
-		clawpatch_vt->conservation_check             = fclaw2d_clawpatch_diagnostics_cons_default;
-		clawpatch_vt->compute_error                  = fclaw2d_clawpatch_diagnostics_error_default;
+		clawpatch_vt->conservation_check             = fclaw_clawpatch_diagnostics_cons_default;
+		clawpatch_vt->compute_error                  = fclaw_clawpatch_diagnostics_error_default;
 		clawpatch_vt->d2->fort_compute_patch_error   = NULL;   /* User defined */
 		clawpatch_vt->d2->fort_compute_error_norm    = FCLAW2D_CLAWPATCH46_FORT_COMPUTE_ERROR_NORM;
 		clawpatch_vt->d2->fort_compute_patch_area    = FCLAW2D_CLAWPATCH46_FORT_COMPUTE_PATCH_AREA;
@@ -1512,8 +1512,8 @@ void fclaw2d_clawpatch_vtable_initialize(fclaw2d_global_t* glob,
 		clawpatch_vt->d2->fort_output_ascii       = FCLAW2D_CLAWPATCH5_FORT_OUTPUT_ASCII;
 
 		/* Diagnostic functions */
-		clawpatch_vt->conservation_check          = fclaw2d_clawpatch_diagnostics_cons_default;
-		clawpatch_vt->compute_error               = fclaw2d_clawpatch_diagnostics_error_default;
+		clawpatch_vt->conservation_check          = fclaw_clawpatch_diagnostics_cons_default;
+		clawpatch_vt->compute_error               = fclaw_clawpatch_diagnostics_error_default;
 		clawpatch_vt->d2->fort_compute_patch_error  = NULL;   /* User defined */
 		clawpatch_vt->d2->fort_compute_error_norm = FCLAW2D_CLAWPATCH5_FORT_COMPUTE_ERROR_NORM;
 		clawpatch_vt->d2->fort_compute_patch_area = FCLAW2D_CLAWPATCH5_FORT_COMPUTE_PATCH_AREA;
@@ -1573,7 +1573,7 @@ void fclaw2d_clawpatch_vtable_initialize(fclaw2d_global_t* glob,
 #endif
 
 
-	fclaw2d_clawpatch_diagnostics_vtable_initialize(glob);
+	fclaw_clawpatch_diagnostics_vtable_initialize(glob);
 
 	/* Set the virtual table, even if it isn't used */
 	fclaw2d_clawpatch_pillow_vtable_initialize(glob, claw_version);
