@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_global.h>
 #include <fclaw2d_domain.h>
 #include <fclaw2d_patch.h>
-#include <fclaw2d_clawpatch.h>
+#include <fclaw_clawpatch.h>
 #include <fclaw2d_physical_bc.h>
 
 void cb_fc2d_thunderegg_physical_bc(fclaw2d_domain_t *domain,
@@ -62,7 +62,7 @@ void cb_fc2d_thunderegg_physical_bc(fclaw2d_domain_t *domain,
     const fc2d_thunderegg_options_t* mg_opt = fc2d_thunderegg_get_options(s->glob);
     int mfields;
     double *rhs;
-    fclaw2d_clawpatch_rhs_data(s->glob,patch,&rhs,&mfields);
+    fclaw_clawpatch_rhs_data(s->glob,patch,&rhs,&mfields);
 
     fc2d_thunderegg_vtable_t*  mg_vt = fc2d_thunderegg_vt(s->glob);
 

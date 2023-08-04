@@ -25,7 +25,7 @@
 
 #include "radialdam_user.h"
 
-#include <fclaw2d_clawpatch.h>
+#include <fclaw_clawpatch.h>
 
 #include <fc2d_clawpack46.h>
 #include <fc2d_clawpack5.h>

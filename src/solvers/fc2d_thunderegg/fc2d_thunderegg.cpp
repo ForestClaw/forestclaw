@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_elliptic_solver.h>
 
-#include <fclaw2d_clawpatch.h>
+#include <fclaw_clawpatch.h>
 #include <fclaw_clawpatch_output_ascii.h> 
 #include <fclaw_clawpatch_output_vtk.h>
 
@@ -76,7 +76,7 @@ void thunderegg_rhs(fclaw2d_global_t *glob,
 
     int mfields;
     double *rhs;
-	fclaw2d_clawpatch_rhs_data(glob,patch,&rhs,&mfields);
+	fclaw_clawpatch_rhs_data(glob,patch,&rhs,&mfields);
 	FCLAW_ASSERT(mfields == 1);
 
 	/* Compute right hand side */

@@ -29,7 +29,7 @@
 #include <fclaw2d_include_all.h>
 
 #include <fclaw_clawpatch_options.h>
-#include <fclaw3dx_clawpatch.h>
+#include <fclaw_clawpatch.h>
 
 #include <fc3d_clawpack46.h>
 #include <fc3d_clawpack46_options.h>

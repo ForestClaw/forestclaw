@@ -29,7 +29,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_include_all.h>
 
-#include <fclaw3dx_clawpatch.h>
+#include <fclaw_clawpatch.h>
 #include <fclaw3dx_clawpatch_fort.h>
 
 #include <fc3d_clawpack46.h>
@@ -95,7 +95,7 @@ void overpressure_patch_setup(fclaw2d_global_t *glob,
 {
     int mx,my,mz, mbc;
     double xlower,ylower,zlower, dx,dy, dz;
-    fclaw3dx_clawpatch_grid_data(glob,patch,&mx,&my,&mz, &mbc,
+    fclaw3d_clawpatch_grid_data(glob,patch,&mx,&my,&mz, &mbc,
                                 &xlower,&ylower,&zlower, &dx,&dy, &dz);
 
     double *xd,*yd,*zd,*volume,*faceareas;
@@ -108,7 +108,7 @@ void overpressure_patch_setup(fclaw2d_global_t *glob,
 
     int maux;
     double *aux;
-    fclaw3dx_clawpatch_aux_data(glob,patch,&aux,&maux);
+    fclaw_clawpatch_aux_data(glob,patch,&aux,&maux);
 
     fc3d_clawpack46_options_t *clawopt = fc3d_clawpack46_get_options(glob);
 

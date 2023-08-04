@@ -39,7 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_patch.h>
 #include <fclaw_clawpatch.hpp>
-#include <fclaw2d_clawpatch.h>
+#include <fclaw_clawpatch.h>
 
 #include <fclaw_clawpatch_options.h>
 #include <fclaw2d_clawpatch_diagnostics.h>

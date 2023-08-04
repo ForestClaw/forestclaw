@@ -26,7 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef SPHERE_USER_H
 #define SPHERE_USER_H
 
-#include <fclaw2d_clawpatch.h>
+#include <fclaw_clawpatch.h>
 
 #ifdef __cplusplus
 extern "C"

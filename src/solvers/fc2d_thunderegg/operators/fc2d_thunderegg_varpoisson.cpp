@@ -31,7 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_elliptic_solver.h>
 
-#include <fclaw2d_clawpatch.h>
+#include <fclaw_clawpatch.h>
 #include <fclaw_clawpatch_options.h>
 #include <fclaw_clawpatch_output_ascii.h>
 #include <fclaw_clawpatch_output_vtk.h>

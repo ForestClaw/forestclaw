@@ -30,7 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_include_all.h>
 
-#include <fclaw2d_clawpatch.h>
+#include <fclaw_clawpatch.h>
 #include <fclaw_clawpatch_options.h>
 #include <fclaw2d_clawpatch_fort.h>
 
@@ -106,7 +106,7 @@ void heat_initialize(fclaw2d_global_t *glob,
 
     int meqn;
     double *q;
-    fclaw2d_clawpatch_soln_data(glob,patch,&q,&meqn);
+    fclaw_clawpatch_soln_data(glob,patch,&q,&meqn);
 
     /* This function supplies an analytic right hand side. */
     HEAT_INIT(&blockno, &mbc, &mx, &my, &meqn, 
@@ -129,11 +129,11 @@ void heat_rhs(fclaw2d_global_t *glob,
 
     int mfields;
     double *rhs;
-    fclaw2d_clawpatch_rhs_data(glob,patch,&rhs,&mfields);
+    fclaw_clawpatch_rhs_data(glob,patch,&rhs,&mfields);
 
     int meqn;
     double *q;
-    fclaw2d_clawpatch_soln_data(glob,patch,&q,&meqn);
+    fclaw_clawpatch_soln_data(glob,patch,&q,&meqn);
 
     /* This function supplies an analytic right hand side. */
     int method = 1;
@@ -175,10 +175,10 @@ void heat_compute_error(fclaw2d_global_t *glob,
         /* Solution is stored in the RHS */
         double *q;
         int meqn;
-        fclaw2d_clawpatch_soln_data(glob,patch,&q,&meqn);
+        fclaw_clawpatch_soln_data(glob,patch,&q,&meqn);
 
-        double *err = fclaw2d_clawpatch_get_error(glob,patch);
-        double *soln  = fclaw2d_clawpatch_get_exactsoln(glob,patch);
+        double *err = fclaw_clawpatch_get_error(glob,patch);
+        double *soln  = fclaw_clawpatch_get_exactsoln(glob,patch);
 
 #if 0
         fclaw2d_clawpatch_elliptic_error_data(glob,patch,&err,&mfields);
@@ -267,10 +267,10 @@ void cb_heat_output_ascii(fclaw2d_domain_t * domain,
 
     double *q;
     int meqn;
-    fclaw2d_clawpatch_soln_data(glob,patch,&q,&meqn);
+    fclaw_clawpatch_soln_data(glob,patch,&q,&meqn);
 
-    double *error = fclaw2d_clawpatch_get_error(glob,patch);
-    double *soln  = fclaw2d_clawpatch_get_exactsoln(glob,patch);
+    double *error = fclaw_clawpatch_get_error(glob,patch);
+    double *soln  = fclaw_clawpatch_get_exactsoln(glob,patch);
 
     char fname[BUFSIZ];
     const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
@@ -310,7 +310,7 @@ int heat_tag4refinement(fclaw2d_global_t *glob,
 
     double *q;
     int meqn;
-    fclaw2d_clawpatch_soln_data(glob,this_patch,&q,&meqn);
+    fclaw_clawpatch_soln_data(glob,this_patch,&q,&meqn);
 
     tag_patch = 0;
     clawpatch_vt->d2->fort_tag4refinement(&mx,&my,&mbc,&meqn,
@@ -341,7 +341,7 @@ int heat_tag4coarsening(fclaw2d_global_t *glob,
     int meqn;
     for (int igrid = 0; igrid < 4; igrid++)
     {
-        fclaw2d_clawpatch_soln_data(glob,&fine_patches[igrid],&q[igrid],&meqn);
+        fclaw_clawpatch_soln_data(glob,&fine_patches[igrid],&q[igrid],&meqn);
     }
 
     fclaw_clawpatch_vtable_t* clawpatch_vt = fclaw_clawpatch_vt(glob);
@@ -372,7 +372,7 @@ void heat_bc2(fclaw2d_global_t *glob,
 
     double *q;
     int meqn;
-    fclaw2d_clawpatch_soln_data(glob,patch,&q,&meqn);
+    fclaw_clawpatch_soln_data(glob,patch,&q,&meqn);
 
     HEAT_FORT_BC2(&meqn,&mbc,&mx,&my,&xlower,&ylower,
                   &dx,&dy,q,&t,&dt,intersects_bc);

@@ -24,7 +24,7 @@
 */
 
 #include "fc2d_thunderegg_vector.hpp"
-#include <fclaw2d_clawpatch.h>
+#include <fclaw_clawpatch.h>
 #include <fclaw_clawpatch_options.h>
 #include <fclaw2d_domain.h>
 #include <fclaw2d_global.h>
@@ -39,13 +39,13 @@ static void get_data(struct fclaw2d_global* glob, fclaw2d_patch_t* patch, fc2d_t
 {
     switch(data_choice){
         case RHS:
-          fclaw2d_clawpatch_rhs_data(glob, patch, q, meqn);
+          fclaw_clawpatch_rhs_data(glob, patch, q, meqn);
         break;
         case SOLN:
-          fclaw2d_clawpatch_soln_data(glob, patch, q, meqn);
+          fclaw_clawpatch_soln_data(glob, patch, q, meqn);
         break;
         case STORE_STATE:
-          fclaw2d_clawpatch_soln_data(glob, patch, q, meqn);
+          fclaw_clawpatch_soln_data(glob, patch, q, meqn);
         break;
     }
 }

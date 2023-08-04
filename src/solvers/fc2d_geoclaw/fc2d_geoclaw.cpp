@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "fc2d_geoclaw_gauges_default.h"
 
 #include <fclaw_clawpatch.hpp>
-#include <fclaw2d_clawpatch.h>
+#include <fclaw_clawpatch.h>
 #include <fclaw_clawpatch_options.h>
 
 /* Basic forestclaw functions */
@@ -105,11 +105,11 @@ void geoclaw_qinit(fclaw2d_global_t *glob,
 
     int meqn;
     double* q;
-    fclaw2d_clawpatch_soln_data(glob,patch,&q,&meqn);
+    fclaw_clawpatch_soln_data(glob,patch,&q,&meqn);
 
     int maux;
     double *aux;
-    fclaw2d_clawpatch_aux_data(glob,patch,&aux,&maux);
+    fclaw_clawpatch_aux_data(glob,patch,&aux,&maux);
 
     /* Call to classic Clawpack 'qinit' routine.  This must be user defined */
     FC2D_GEOCLAW_SET_BLOCK(&blockno);
@@ -140,7 +140,7 @@ void geoclaw_bc2(fclaw2d_global_t *glob,
 
     int maux;
     double *aux;
-    fclaw2d_clawpatch_aux_data(glob,patch,&aux,&maux);
+    fclaw_clawpatch_aux_data(glob,patch,&aux,&maux);
 
     int *block_mthbc = geo_opt->mthbc;
 
@@ -166,7 +166,7 @@ void geoclaw_bc2(fclaw2d_global_t *glob,
     */
     int meqn;
     double *q;
-    fclaw2d_clawpatch_timesync_data(glob,patch,time_interp,&q,&meqn);
+    fclaw_clawpatch_timesync_data(glob,patch,time_interp,&q,&meqn);
 
     FC2D_GEOCLAW_SET_BLOCK(&blockno);
     geoclaw_vt->bc2(&meqn,&mbc,&mx,&my,&xlower,&ylower,
@@ -191,7 +191,7 @@ void geoclaw_setaux(fclaw2d_global_t *glob,
 
     int maux;
     double *aux;
-    fclaw2d_clawpatch_aux_data(glob,patch,&aux,&maux);
+    fclaw_clawpatch_aux_data(glob,patch,&aux,&maux);
 
     /* If this is a ghost patch, we only set aux values in ghost cells */
     int is_ghost = fclaw2d_patch_is_ghost(patch);
@@ -225,11 +225,11 @@ void geoclaw_b4step2(fclaw2d_global_t *glob,
 
         int meqn;
         double *q;
-        fclaw2d_clawpatch_soln_data(glob,patch,&q,&meqn);
+        fclaw_clawpatch_soln_data(glob,patch,&q,&meqn);
 
         int maux;
         double *aux;
-        fclaw2d_clawpatch_aux_data(glob,patch,&aux,&maux);
+        fclaw_clawpatch_aux_data(glob,patch,&aux,&maux);
 
         FC2D_GEOCLAW_SET_BLOCK(&blockno);
         geoclaw_vt->b4step2(&mbc,&mx,&my,&meqn,q,&xlower,&ylower,
@@ -256,11 +256,11 @@ void geoclaw_src2(fclaw2d_global_t *glob,
 
     int meqn;
     double *q;
-    fclaw2d_clawpatch_soln_data(glob,patch,&q,&meqn);
+    fclaw_clawpatch_soln_data(glob,patch,&q,&meqn);
 
     int maux;
     double *aux;
-    fclaw2d_clawpatch_aux_data(glob,patch,&aux,&maux);
+    fclaw_clawpatch_aux_data(glob,patch,&aux,&maux);
 
     FC2D_GEOCLAW_SET_BLOCK(&blockno);
     geoclaw_vt->src2(&meqn,&mbc,&mx,&my,&xlower,&ylower,
@@ -288,10 +288,10 @@ double geoclaw_step2(fclaw2d_global_t *glob,
 
     int maux;
     double *aux;
-    fclaw2d_clawpatch_aux_data(glob,patch,&aux,&maux);
+    fclaw_clawpatch_aux_data(glob,patch,&aux,&maux);
 
     /* In case we need to re-take this step */
-    fclaw2d_clawpatch_save_current_step(glob, patch);
+    fclaw_clawpatch_save_current_step(glob, patch);
 
     int mx, my, mbc; 
     double xlower, ylower, dx,dy;
@@ -300,7 +300,7 @@ double geoclaw_step2(fclaw2d_global_t *glob,
 
     int meqn;
     double *qold;
-    fclaw2d_clawpatch_soln_data(glob,patch,&qold,&meqn);
+    fclaw_clawpatch_soln_data(glob,patch,&qold,&meqn);
 
     /* Allocate work arrays */
     int mwaves = geoclaw_options->mwaves;
@@ -409,11 +409,11 @@ int geoclaw_patch_tag4refinement(fclaw2d_global_t *glob,
 
     int meqn;
     double *q;
-    fclaw2d_clawpatch_soln_data(glob,patch,&q,&meqn);
+    fclaw_clawpatch_soln_data(glob,patch,&q,&meqn);
 
     int maux;
     double *aux;
-    fclaw2d_clawpatch_aux_data(glob,patch,&aux,&maux);
+    fclaw_clawpatch_aux_data(glob,patch,&aux,&maux);
 
     int level = patch->level;
     double t = glob->curr_time;
@@ -464,8 +464,8 @@ int geoclaw_patch_tag4coarsening(fclaw2d_global_t *glob,
     double *q[4], *aux[4];
     for (int igrid = 0; igrid < 4; igrid++)
     {
-        fclaw2d_clawpatch_soln_data(glob,&fine_patches[igrid],&q[igrid],&meqn);
-        fclaw2d_clawpatch_aux_data(glob,&fine_patches[igrid],&aux[igrid],&maux);
+        fclaw_clawpatch_soln_data(glob,&fine_patches[igrid],&q[igrid],&meqn);
+        fclaw_clawpatch_aux_data(glob,&fine_patches[igrid],&aux[igrid],&maux);
 
         fclaw2d_clawpatch_grid_data(glob,&fine_patches[igrid],&mx,&my,&mbc,
                                     &xlower[igrid],&ylower[igrid],&dx,&dy);
@@ -515,11 +515,11 @@ void geoclaw_interpolate2fine(fclaw2d_global_t *glob,
 
     int meqn;
     double *qcoarse;
-    fclaw2d_clawpatch_soln_data(glob,coarse_patch,&qcoarse,&meqn);
+    fclaw_clawpatch_soln_data(glob,coarse_patch,&qcoarse,&meqn);
 
     int maux;
     double *auxcoarse;
-    fclaw2d_clawpatch_aux_data(glob,coarse_patch,&auxcoarse,&maux);
+    fclaw_clawpatch_aux_data(glob,coarse_patch,&auxcoarse,&maux);
 
     /* Loop over four siblings (z-ordering) */
     for (int igrid = 0; igrid < 4; igrid++)
@@ -527,10 +527,10 @@ void geoclaw_interpolate2fine(fclaw2d_global_t *glob,
         fclaw2d_patch_t* fine_patch = &fine_patches[igrid];
 
         double *qfine;
-        fclaw2d_clawpatch_soln_data(glob,fine_patch,&qfine,&meqn);
+        fclaw_clawpatch_soln_data(glob,fine_patch,&qfine,&meqn);
 
         double *auxfine;
-        fclaw2d_clawpatch_aux_data(glob,fine_patch,&auxfine,&maux);
+        fclaw_clawpatch_aux_data(glob,fine_patch,&auxfine,&maux);
 
         FC2D_GEOCLAW_FORT_INTERPOLATE2FINE(&mx,&my,&mbc,&meqn,qcoarse,qfine,
                                            &maux,auxcoarse,auxfine, &igrid);
@@ -554,11 +554,11 @@ void geoclaw_average2coarse(fclaw2d_global_t *glob,
 
     int meqn;
     double *qcoarse;
-    fclaw2d_clawpatch_soln_data(glob,coarse_patch,&qcoarse,&meqn);
+    fclaw_clawpatch_soln_data(glob,coarse_patch,&qcoarse,&meqn);
 
     int maux;
     double *auxcoarse;
-    fclaw2d_clawpatch_aux_data(glob,coarse_patch,&auxcoarse,&maux);
+    fclaw_clawpatch_aux_data(glob,coarse_patch,&auxcoarse,&maux);
 
     /* Loop over four siblings (z-ordering) */
     for (int igrid = 0; igrid < 4; igrid++)
@@ -566,10 +566,10 @@ void geoclaw_average2coarse(fclaw2d_global_t *glob,
         fclaw2d_patch_t *fine_patch = &fine_patches[igrid];
 
         double *qfine;
-        fclaw2d_clawpatch_soln_data(glob,fine_patch,&qfine,&meqn);
+        fclaw_clawpatch_soln_data(glob,fine_patch,&qfine,&meqn);
 
         double *auxfine;
-        fclaw2d_clawpatch_aux_data(glob,fine_patch,&auxfine,&maux);
+        fclaw_clawpatch_aux_data(glob,fine_patch,&auxfine,&maux);
 
         const fc2d_geoclaw_options_t* geo_opt = fc2d_geoclaw_get_options(glob);
         int mcapa = geo_opt->mcapa;
@@ -599,17 +599,17 @@ void geoclaw_average_face(fclaw2d_global_t *glob,
 
     int meqn;
     double *qcoarse;
-    fclaw2d_clawpatch_timesync_data(glob,coarse_patch,time_interp,&qcoarse,&meqn);
+    fclaw_clawpatch_timesync_data(glob,coarse_patch,time_interp,&qcoarse,&meqn);
 
-    double* qfine = fclaw2d_clawpatch_get_q(glob,fine_patch);
+    double* qfine = fclaw_clawpatch_get_q(glob,fine_patch);
 
     /* These will be empty for non-manifolds cases */
     int maux;
     double *auxcoarse;
-    fclaw2d_clawpatch_aux_data(glob,coarse_patch,&auxcoarse,&maux);
+    fclaw_clawpatch_aux_data(glob,coarse_patch,&auxcoarse,&maux);
 
     double *auxfine;
-    fclaw2d_clawpatch_aux_data(glob,fine_patch,&auxfine,&maux);
+    fclaw_clawpatch_aux_data(glob,fine_patch,&auxfine,&maux);
 
     const fc2d_geoclaw_options_t *geo_opt = fc2d_geoclaw_get_options(glob);
     int mcapa = geo_opt->mcapa;
@@ -647,15 +647,15 @@ void geoclaw_interpolate_face(fclaw2d_global_t *glob,
     
     int meqn;
     double *qcoarse;
-    fclaw2d_clawpatch_timesync_data(glob,coarse_patch,time_interp,&qcoarse,&meqn);
-    double *qfine = fclaw2d_clawpatch_get_q(glob,fine_patch);
+    fclaw_clawpatch_timesync_data(glob,coarse_patch,time_interp,&qcoarse,&meqn);
+    double *qfine = fclaw_clawpatch_get_q(glob,fine_patch);
 
     int maux;
     double *auxcoarse;
-    fclaw2d_clawpatch_aux_data(glob,coarse_patch,&auxcoarse,&maux);
+    fclaw_clawpatch_aux_data(glob,coarse_patch,&auxcoarse,&maux);
 
     double *auxfine;
-    fclaw2d_clawpatch_aux_data(glob,fine_patch,&auxfine,&maux);
+    fclaw_clawpatch_aux_data(glob,fine_patch,&auxfine,&maux);
 
     FC2D_GEOCLAW_FORT_INTERPOLATE_FACE(&mx,&my,&mbc,&meqn,qcoarse,qfine,&maux,
                                        auxcoarse,auxfine, &idir, &iside,
@@ -677,16 +677,16 @@ void geoclaw_average_corner(fclaw2d_global_t *glob,
                                 &xlower,&ylower,&dx,&dy);
     int meqn;
     double *qcoarse;
-    fclaw2d_clawpatch_timesync_data(glob,coarse_patch,time_interp,&qcoarse,&meqn);
+    fclaw_clawpatch_timesync_data(glob,coarse_patch,time_interp,&qcoarse,&meqn);
 
-    double *qfine = fclaw2d_clawpatch_get_q(glob,fine_patch);
+    double *qfine = fclaw_clawpatch_get_q(glob,fine_patch);
 
     int maux;
     double *auxcoarse;
-    fclaw2d_clawpatch_aux_data(glob,coarse_patch,&auxcoarse,&maux);
+    fclaw_clawpatch_aux_data(glob,coarse_patch,&auxcoarse,&maux);
 
     double *auxfine;
-    fclaw2d_clawpatch_aux_data(glob,fine_patch,&auxfine,&maux);
+    fclaw_clawpatch_aux_data(glob,fine_patch,&auxfine,&maux);
 
     const fc2d_geoclaw_options_t *geo_opt = fc2d_geoclaw_get_options(glob);
     int mcapa = geo_opt->mcapa;
@@ -724,16 +724,16 @@ void geoclaw_interpolate_corner(fclaw2d_global_t* glob,
 
     int meqn;
     double *qcoarse;
-    fclaw2d_clawpatch_timesync_data(glob,coarse_patch,time_interp,&qcoarse,&meqn);
+    fclaw_clawpatch_timesync_data(glob,coarse_patch,time_interp,&qcoarse,&meqn);
 
-    double* qfine = fclaw2d_clawpatch_get_q(glob,fine_patch);
+    double* qfine = fclaw_clawpatch_get_q(glob,fine_patch);
 
     int maux;
     double *auxcoarse;
-    fclaw2d_clawpatch_aux_data(glob,coarse_patch,&auxcoarse,&maux);
+    fclaw_clawpatch_aux_data(glob,coarse_patch,&auxcoarse,&maux);
 
     double *auxfine;
-    fclaw2d_clawpatch_aux_data(glob,fine_patch,&auxfine,&maux);
+    fclaw_clawpatch_aux_data(glob,fine_patch,&auxfine,&maux);
 
     FC2D_GEOCLAW_FORT_INTERPOLATE_CORNER(&mx,&my,&mbc,&meqn,
                                          qcoarse,qfine,&maux,
@@ -777,7 +777,7 @@ void geoclaw_local_ghost_pack_aux(fclaw2d_global_t *glob,
 
         int maux;
         double *aux;
-        fclaw2d_clawpatch_aux_data(glob,patch,&aux,&maux);
+        fclaw_clawpatch_aux_data(glob,patch,&aux,&maux);
         FC2D_GEOCLAW_LOCAL_GHOST_PACK_AUX(&mx,&my,&mbc,&maux,
                                           &mint,aux,auxpack,&auxsize,
                                           &packmode,ierror);

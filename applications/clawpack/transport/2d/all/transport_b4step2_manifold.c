@@ -50,7 +50,7 @@ void transport_b4step2_manifold(fclaw2d_global_t *glob,
 
     double *aux;
     int maux;
-    fclaw2d_clawpatch_aux_data(glob,patch,&aux,&maux);
+    fclaw_clawpatch_aux_data(glob,patch,&aux,&maux);
 
     // const user_options_t* user_opt = sphere_get_options(glob);
     if (claw_version == 4)

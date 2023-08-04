@@ -61,6 +61,8 @@ target_include_directories(clawpatch_f INTERFACE
 
 add_library(clawpatch
   $<TARGET_OBJECTS:clawpatch_f>
+
+  fclaw_clawpatch.cpp
   fclaw_clawpatch_diagnostics.c
   fclaw_clawpatch_diagnostics_default.c
   fclaw_clawpatch_options.c
@@ -68,11 +70,9 @@ add_library(clawpatch
   fclaw_clawpatch_output_vtk.c
   fclaw_clawpatch_pillow.c
 
-  fclaw2d_clawpatch.cpp
   fclaw2d_clawpatch_transform.c
   fclaw2d_clawpatch_conservation.c
 
-  fclaw3dx_clawpatch.cpp
   fclaw3dx_clawpatch_transform.c
 
   fort_user/fclaw2d_clawpatch_tag_criteria.c
@@ -99,6 +99,7 @@ target_link_libraries(clawpatch PUBLIC forestclaw)
 install(FILES
   fclaw_clawpatch_enums.h
 
+  fclaw_clawpatch.h
 	fclaw_clawpatch.hpp
 	fclaw_clawpatch_diagnostics.h
 	fclaw_clawpatch_options.h
@@ -106,14 +107,12 @@ install(FILES
 	fclaw_clawpatch_output_vtk.h
 	fclaw_clawpatch_pillow.h
 
-  fclaw2d_clawpatch.h
 	fclaw2d_clawpatch_conservation.h
 	fclaw2d_clawpatch_transform.h
 	fclaw2d_clawpatch_fort.h
 	fclaw2d_clawpatch46_fort.h
 	fclaw2d_clawpatch5_fort.h
 
-  fclaw3dx_clawpatch.h
 	fclaw3dx_clawpatch_transform.h
 	fclaw3dx_clawpatch_diagnostics.h
 	fclaw3dx_clawpatch_fort.h

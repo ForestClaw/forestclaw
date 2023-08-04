@@ -87,7 +87,7 @@ void poisson_rhs(fclaw2d_global_t *glob,
 
     int mfields;
     double *rhs;
-    fclaw2d_clawpatch_rhs_data(glob,patch,&rhs,&mfields);
+    fclaw_clawpatch_rhs_data(glob,patch,&rhs,&mfields);
 
     /* Compute right hand side */
     fc2d_thunderegg_vtable_t*  mg_vt = fc2d_thunderegg_vt(glob);
@@ -129,9 +129,9 @@ void poisson_compute_error(fclaw2d_global_t *glob,
         /* Solution is stored in the RHS */
         double *rhs, *err, *soln;  
         int mfields;
-        fclaw2d_clawpatch_rhs_data(glob,patch,&rhs,&mfields);
-        fclaw2d_clawpatch_elliptic_error_data(glob,patch,&err,&mfields);
-        fclaw2d_clawpatch_elliptic_soln_data(glob,patch,&soln,&mfields);
+        fclaw_clawpatch_rhs_data(glob,patch,&rhs,&mfields);
+        fclaw_clawpatch_elliptic_error_data(glob,patch,&err,&mfields);
+        fclaw_clawpatch_elliptic_soln_data(glob,patch,&soln,&mfields);
 
         double t = glob->curr_time;
 
@@ -165,7 +165,7 @@ void poisson_conservation_check(fclaw2d_global_t *glob,
 
     int mfields;
     double *rhs;  /* Solution is stored in the right hand side */ 
-    fclaw2d_clawpatch_rhs_data(glob,patch,&rhs,&mfields);
+    fclaw_clawpatch_rhs_data(glob,patch,&rhs,&mfields);
 
     fclaw_clawpatch_vtable_t *clawpatch_vt = fclaw_clawpatch_vt(glob);
     FCLAW_ASSERT(clawpatch_vt->d2->fort_conservation_check != NULL);
@@ -257,13 +257,13 @@ void cb_poisson_output_ascii(fclaw2d_domain_t * domain,
 
     double *rhs;
     int mfields;
-    fclaw2d_clawpatch_rhs_data(glob,patch,&rhs,&mfields);
+    fclaw_clawpatch_rhs_data(glob,patch,&rhs,&mfields);
 
     double *err;
-    fclaw2d_clawpatch_elliptic_error_data(glob,patch,&err,&mfields);
+    fclaw_clawpatch_elliptic_error_data(glob,patch,&err,&mfields);
 
     double *soln;
-    fclaw2d_clawpatch_elliptic_soln_data(glob,patch,&soln,&mfields);
+    fclaw_clawpatch_elliptic_soln_data(glob,patch,&soln,&mfields);
 
     char fname[BUFSIZ];
     const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
@@ -303,7 +303,7 @@ int poisson_tag4refinement(fclaw2d_global_t *glob,
 
     double *rhs;
     int mfields;
-    fclaw2d_clawpatch_rhs_data(glob,this_patch,&rhs,&mfields);
+    fclaw_clawpatch_rhs_data(glob,this_patch,&rhs,&mfields);
 
     tag_patch = 0;
     fclaw2d_global_set_global(glob);
@@ -335,7 +335,7 @@ int poisson_tag4coarsening(fclaw2d_global_t *glob,
     int mfields;
     for (int igrid = 0; igrid < 4; igrid++)
     {
-        fclaw2d_clawpatch_rhs_data(glob,&fine_patches[igrid],&rhs[igrid],&mfields);
+        fclaw_clawpatch_rhs_data(glob,&fine_patches[igrid],&rhs[igrid],&mfields);
     }
 
     fclaw_clawpatch_vtable_t* clawpatch_vt = fclaw_clawpatch_vt(glob);

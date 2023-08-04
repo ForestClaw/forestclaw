@@ -27,7 +27,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_include_all.h>
 
-#include "fclaw2d_clawpatch.h"
+#include "fclaw_clawpatch.h"
 
 #include <fc2d_clawpack46.h>
 

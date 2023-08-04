@@ -35,7 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "fclaw2d_clawpatch_conservation.h"
 #include "fclaw2d_clawpatch_conservation_fort.h"
 
-#include "fclaw2d_clawpatch.h"
+#include "fclaw_clawpatch.h"
 #include "fclaw_clawpatch_options.h"
 
 /* -------------------------------------------------------------
@@ -379,10 +379,10 @@ void fclaw2d_clawpatch_time_sync_f2c(fclaw2d_global_t* glob,
 
     int meqn;
 	double *qcoarse;
-	fclaw2d_clawpatch_soln_data(glob,coarse_patch,&qcoarse,&meqn);
+	fclaw_clawpatch_soln_data(glob,coarse_patch,&qcoarse,&meqn);
 
 	double *qfine;
-	fclaw2d_clawpatch_soln_data(glob,fine_patch,&qfine,&meqn);
+	fclaw_clawpatch_soln_data(glob,fine_patch,&qfine,&meqn);
 
 	int mx,my,mbc;
 	double dx,dy,xlower,ylower;
@@ -446,7 +446,7 @@ void fclaw2d_clawpatch_time_sync_samesize (struct fclaw2d_global* glob,
 
 	double *qthis;
 	int meqn;
-	fclaw2d_clawpatch_soln_data(glob,this_patch,&qthis,&meqn);
+	fclaw_clawpatch_soln_data(glob,this_patch,&qthis,&meqn);
 
 	int mx,my,mbc;
 	double dx,dy,xlower,ylower;

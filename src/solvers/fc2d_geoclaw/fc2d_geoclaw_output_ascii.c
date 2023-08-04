@@ -29,7 +29,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "fc2d_geoclaw_fort.h"
 #include "fc2d_geoclaw_options.h"
 
-#include <fclaw2d_clawpatch.h>  /* Include patch, domain declarations */
+#include <fclaw_clawpatch.h>  /* Include patch, domain declarations */
 #include <fclaw_clawpatch_options.h>  /* Include patch, domain declarations */
 
 #include <fclaw2d_patch.h>
@@ -60,11 +60,11 @@ void cb_geoclaw_output_ascii(fclaw2d_domain_t *domain,
 
     double *q;
     int meqn;
-    fclaw2d_clawpatch_soln_data(glob,patch,&q,&meqn);
+    fclaw_clawpatch_soln_data(glob,patch,&q,&meqn);
 
     double *aux;
     int maux;
-    fclaw2d_clawpatch_aux_data(glob,patch,&aux,&maux);
+    fclaw_clawpatch_aux_data(glob,patch,&aux,&maux);
 
     FC2D_GEOCLAW_FORT_WRITE_FILE(&mx,&my,&meqn, &maux,&mbc,&xlower,&ylower,
                                  &dx,&dy,q,aux,&iframe,&global_num,&level,

@@ -24,7 +24,7 @@
 */
 
 #include "fc2d_thunderegg_vector.hpp"
-#include <fclaw2d_clawpatch.h>
+#include <fclaw_clawpatch.h>
 #include <fclaw_clawpatch.hpp>
 #include <fclaw_clawpatch_options.h>
 #include <fclaw2d_clawpatch46_fort.h>
@@ -179,13 +179,13 @@ TEST_CASE("fclaw2d_thunderegg_get_vector")
             double * data = nullptr;
             switch(data_choice){
                 case RHS:
-                  fclaw2d_clawpatch_rhs_data(test_data.glob, &test_data.domain->blocks[0].patches[i], &data, &meqn);
+                  fclaw_clawpatch_rhs_data(test_data.glob, &test_data.domain->blocks[0].patches[i], &data, &meqn);
                 break;
                 case SOLN:
-                  fclaw2d_clawpatch_soln_data(test_data.glob, &test_data.domain->blocks[0].patches[i], &data, &meqn);
+                  fclaw_clawpatch_soln_data(test_data.glob, &test_data.domain->blocks[0].patches[i], &data, &meqn);
                 break;
                 case STORE_STATE:
-                  fclaw2d_clawpatch_soln_data(test_data.glob, &test_data.domain->blocks[0].patches[i], &data, &meqn);
+                  fclaw_clawpatch_soln_data(test_data.glob, &test_data.domain->blocks[0].patches[i], &data, &meqn);
                 break;
             }
             for(int j=0; j<(mx+2*mbc)*(my+2*mbc)*meqn; j++){
@@ -269,13 +269,13 @@ TEST_CASE("fclaw2d_thunderegg_store_vector")
             double * data = nullptr;
             switch(data_choice){
                 case RHS:
-                  fclaw2d_clawpatch_rhs_data(test_data.glob, &test_data.domain->blocks[0].patches[i], &data, &meqn);
+                  fclaw_clawpatch_rhs_data(test_data.glob, &test_data.domain->blocks[0].patches[i], &data, &meqn);
                 break;
                 case SOLN:
-                  fclaw2d_clawpatch_soln_data(test_data.glob, &test_data.domain->blocks[0].patches[i], &data, &meqn);
+                  fclaw_clawpatch_soln_data(test_data.glob, &test_data.domain->blocks[0].patches[i], &data, &meqn);
                 break;
                 case STORE_STATE:
-                  fclaw2d_clawpatch_soln_data(test_data.glob, &test_data.domain->blocks[0].patches[i], &data, &meqn);
+                  fclaw_clawpatch_soln_data(test_data.glob, &test_data.domain->blocks[0].patches[i], &data, &meqn);
                 break;
             }
             for(int j=0; j<(mx+2*mbc)*(my+2*mbc)*meqn; j++){
@@ -313,13 +313,13 @@ TEST_CASE("fclaw2d_thunderegg_get_vector multiblock")
             double * data = nullptr;
             switch(data_choice){
                 case RHS:
-                  fclaw2d_clawpatch_rhs_data(test_data.glob, &test_data.domain->blocks[i].patches[0], &data, &meqn);
+                  fclaw_clawpatch_rhs_data(test_data.glob, &test_data.domain->blocks[i].patches[0], &data, &meqn);
                 break;
                 case SOLN:
-                  fclaw2d_clawpatch_soln_data(test_data.glob, &test_data.domain->blocks[i].patches[0], &data, &meqn);
+                  fclaw_clawpatch_soln_data(test_data.glob, &test_data.domain->blocks[i].patches[0], &data, &meqn);
                 break;
                 case STORE_STATE:
-                  fclaw2d_clawpatch_soln_data(test_data.glob, &test_data.domain->blocks[i].patches[0], &data, &meqn);
+                  fclaw_clawpatch_soln_data(test_data.glob, &test_data.domain->blocks[i].patches[0], &data, &meqn);
                 break;
             }
             for(int j=0; j<(mx+2*mbc)*(my+2*mbc)*meqn; j++){
@@ -403,13 +403,13 @@ TEST_CASE("fclaw2d_thunderegg_store_vector multiblock")
             double * data = nullptr;
             switch(data_choice){
                 case RHS:
-                  fclaw2d_clawpatch_rhs_data(test_data.glob, &test_data.domain->blocks[i].patches[0], &data, &meqn);
+                  fclaw_clawpatch_rhs_data(test_data.glob, &test_data.domain->blocks[i].patches[0], &data, &meqn);
                 break;
                 case SOLN:
-                  fclaw2d_clawpatch_soln_data(test_data.glob, &test_data.domain->blocks[i].patches[0], &data, &meqn);
+                  fclaw_clawpatch_soln_data(test_data.glob, &test_data.domain->blocks[i].patches[0], &data, &meqn);
                 break;
                 case STORE_STATE:
-                  fclaw2d_clawpatch_soln_data(test_data.glob, &test_data.domain->blocks[i].patches[0], &data, &meqn);
+                  fclaw_clawpatch_soln_data(test_data.glob, &test_data.domain->blocks[i].patches[0], &data, &meqn);
                 break;
             }
             for(int j=0; j<(mx+2*mbc)*(my+2*mbc)*meqn; j++){

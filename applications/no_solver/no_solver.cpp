@@ -28,7 +28,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_include_all.h>
 
 #include <fclaw_clawpatch_options.h>
-#include <fclaw2d_clawpatch.h>
+#include <fclaw_clawpatch.h>
 
 static
 void create_domain_map (fclaw2d_global_t *glob,

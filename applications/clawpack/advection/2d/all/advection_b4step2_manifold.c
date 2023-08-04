@@ -44,7 +44,7 @@ void advection_b4step2_manifold(fclaw2d_global_t *glob,
 
     int maux;
     double *aux;
-    fclaw2d_clawpatch_aux_data(glob,patch,&aux,&maux);
+    fclaw_clawpatch_aux_data(glob,patch,&aux,&maux);
 
     if (claw_version == 4)
         USER46_B4STEP2_MANIFOLD(&mx,&my,&mbc,&dx,&dy,&t,&maux,aux,&blockno,xd,yd,zd);

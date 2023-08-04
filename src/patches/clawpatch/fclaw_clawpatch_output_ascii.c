@@ -25,8 +25,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw_clawpatch_output_ascii.h>
 
-#include <fclaw2d_clawpatch.h>
-#include <fclaw3dx_clawpatch.h>
+#include <fclaw_clawpatch.h>
 #include <fclaw_clawpatch_options.h>
 
 
@@ -52,7 +51,7 @@ void cb_clawpatch_output_ascii (fclaw2d_domain_t * domain,
     
     int meqn;
     double *q;
-    fclaw2d_clawpatch_soln_data(glob,patch,&q,&meqn);
+    fclaw_clawpatch_soln_data(glob,patch,&q,&meqn);
 
     const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
     int iframe = *((int *) s->user);

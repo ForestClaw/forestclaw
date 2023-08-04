@@ -5,7 +5,7 @@
 
 #include <fclaw2d_global.h>
 #include <fclaw2d_patch.h>
-#include <fclaw2d_clawpatch.h>
+#include <fclaw_clawpatch.h>
 #include <fclaw_clawpatch_options.h>
 
 #include <fc2d_cuda_profiler.h>

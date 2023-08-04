@@ -78,7 +78,7 @@ void radial_patch_setup(fclaw2d_global_t *glob,
 
     int maux;
     double* aux;
-    fclaw2d_clawpatch_aux_data(glob,patch,&aux,&maux);
+    fclaw_clawpatch_aux_data(glob,patch,&aux,&maux);
 
     const user_options_t* user = radial_get_options(glob);
     

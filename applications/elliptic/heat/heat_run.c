@@ -25,7 +25,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "heat_user.h"
 
-#include <fclaw2d_clawpatch.h>
+#include <fclaw_clawpatch.h>
 #include <fclaw2d_patch.h>
 
 #include <fclaw2d_forestclaw.h>
@@ -104,11 +104,11 @@ void update_q(fclaw2d_domain_t *domain,
 
     double* rhs;
     int mfields;
-    fclaw2d_clawpatch_rhs_data(g->glob, patch, &rhs, &mfields);
+    fclaw_clawpatch_rhs_data(g->glob, patch, &rhs, &mfields);
 
     double* q;
     int meqn;
-    fclaw2d_clawpatch_soln_data(g->glob, patch, &q, &meqn);
+    fclaw_clawpatch_soln_data(g->glob, patch, &q, &meqn);
 
     FCLAW_ASSERT(mfields==meqn);
 

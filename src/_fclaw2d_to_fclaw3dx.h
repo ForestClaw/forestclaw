@@ -97,7 +97,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define FCLAW2D_CLAWPATCH_TRANSFORM_CORNER FCLAW3DX_CLAWPATCH_TRANSFORM_CORNER
 #define FCLAW2D_CLAWPATCH_TRANSFORM_CORNER_HALF FCLAW3DX_CLAWPATCH_TRANSFORM_CORNER_HALF
 
-//fclaw2d_clawpatch.h
+//fclaw_clawpatch.h
 #define fclaw_clawpatch_vtable_t fclaw_clawpatch_vtable_t
 #define fclaw2d_clawpatch_set_user_data_t fclaw3dx_clawpatch_set_user_data_t
 #define fclaw2d_clawpatch_time_sync_pack_registers_t fclaw3dx_clawpatch_time_sync_pack_registers_t

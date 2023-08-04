@@ -24,7 +24,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include <fclaw_clawpatch.hpp>
-#include <fclaw3dx_clawpatch.h>
+#include <fclaw_clawpatch.h>
 #include <fclaw_clawpatch_options.h>
 #include <fclaw3dx_clawpatch46_fort.h>
 #include <fclaw_clawpatch_output_ascii.h>
@@ -70,7 +70,7 @@ struct SinglePatchDomain {
         glob = fclaw2d_global_new();
         opts = fclaw_clawpatch_options_new(3);
         fclaw2d_vtables_initialize(glob);
-        fclaw3dx_clawpatch_vtable_initialize(glob, 4);
+        fclaw3d_clawpatch_vtable_initialize(glob, 4);
         memset(&fopts, 0, sizeof(fopts));
         fopts.mi=1;
         fopts.mj=1;
@@ -117,7 +117,7 @@ struct QuadDomain {
         glob = fclaw2d_global_new();
         opts = fclaw_clawpatch_options_new(3);
         fclaw2d_vtables_initialize(glob);
-        fclaw3dx_clawpatch_vtable_initialize(glob, 4);
+        fclaw3d_clawpatch_vtable_initialize(glob, 4);
         memset(&fopts, 0, sizeof(fopts));
         fopts.mi=1;
         fopts.mj=1;
@@ -167,7 +167,7 @@ TEST_CASE("fclaw3dx_clawpatch_vtable_initialize")
     fclaw2d_global_t* glob = fclaw2d_global_new();
     fclaw2d_vtables_initialize(glob);
 
-    fclaw3dx_clawpatch_vtable_initialize(glob, 4);
+    fclaw3d_clawpatch_vtable_initialize(glob, 4);
 
     fclaw_clawpatch_vtable_t * clawpatch_vt = fclaw_clawpatch_vt(glob);
 
@@ -237,7 +237,7 @@ TEST_CASE("fclaw3dx_clawpatch patch_build")
         fclaw2d_global_t* glob = fclaw2d_global_new(); 
         fclaw2d_vtables_initialize(glob);
 
-        fclaw3dx_clawpatch_vtable_initialize(glob, 4);
+        fclaw3d_clawpatch_vtable_initialize(glob, 4);
 
         fclaw_options_t fopts;
         memset(&fopts, 0, sizeof(fopts));
@@ -349,7 +349,7 @@ TEST_CASE("fclaw3dx_clawpatch_save_current_step")
     //CHECK
     fclaw_clawpatch_t* cp = fclaw2d_clawpatch_get_clawpatch(&test_data.domain->blocks[0].patches[0]);
     cp->griddata.dataPtr()[0] = 1234;
-    fclaw3dx_clawpatch_save_current_step(test_data.glob,&test_data.domain->blocks[0].patches[0]);
+    fclaw_clawpatch_save_current_step(test_data.glob,&test_data.domain->blocks[0].patches[0]);
     CHECK(cp->griddata_last.dataPtr()[0] == 1234);
 }
 
@@ -423,7 +423,7 @@ TEST_CASE("fclaw3dx_clawpatch_grid_data")
         fclaw_clawpatch_t* cp = fclaw2d_clawpatch_get_clawpatch(&test_data.domain->blocks[0].patches[0]);
         int mx_out,my_out,mz_out,mbc_out;
         double xlower,ylower,zlower,dx,dy,dz;
-        fclaw3dx_clawpatch_grid_data(test_data.glob, &test_data.domain->blocks[0].patches[0],
+        fclaw3d_clawpatch_grid_data(test_data.glob, &test_data.domain->blocks[0].patches[0],
                                      &mx_out, &my_out, &mz_out, &mbc_out, &xlower, &ylower, &zlower, &dx, &dy, &dz);
 
         CHECK(mx_out == test_data.opts->d3->mx);
@@ -449,7 +449,7 @@ TEST_CASE("fclaw3dx_clawpatch_aux_data")
     fclaw_clawpatch_t* cp = fclaw2d_clawpatch_get_clawpatch(&test_data.domain->blocks[0].patches[0]);
     double* aux;
     int maux;
-    fclaw3dx_clawpatch_aux_data(test_data.glob, &test_data.domain->blocks[0].patches[0], &aux, &maux);
+    fclaw_clawpatch_aux_data(test_data.glob, &test_data.domain->blocks[0].patches[0], &aux, &maux);
 
     CHECK(aux == cp->aux.dataPtr());
     CHECK(maux == test_data.opts->maux);
@@ -464,7 +464,7 @@ TEST_CASE("fclaw3dx_clawpatch_soln_data")
     fclaw_clawpatch_t* cp = fclaw2d_clawpatch_get_clawpatch(&test_data.domain->blocks[0].patches[0]);
     double* q;
     int meqn;
-    fclaw3dx_clawpatch_soln_data(test_data.glob, &test_data.domain->blocks[0].patches[0], &q, &meqn);
+    fclaw_clawpatch_soln_data(test_data.glob, &test_data.domain->blocks[0].patches[0], &q, &meqn);
 
     CHECK(q == cp->griddata.dataPtr());
     CHECK(meqn == test_data.opts->meqn);
@@ -479,7 +479,7 @@ TEST_CASE("fclaw3dx_clawpatch_rhs_data")
     fclaw_clawpatch_t* cp = fclaw2d_clawpatch_get_clawpatch(&test_data.domain->blocks[0].patches[0]);
     double* rhs;
     int mfields;
-    fclaw3dx_clawpatch_rhs_data(test_data.glob, &test_data.domain->blocks[0].patches[0], &rhs, &mfields);
+    fclaw_clawpatch_rhs_data(test_data.glob, &test_data.domain->blocks[0].patches[0], &rhs, &mfields);
 
     CHECK(rhs == cp->rhs.dataPtr());
     CHECK(mfields == test_data.opts->rhs_fields);
@@ -494,7 +494,7 @@ TEST_CASE("fclaw3dx_clawpatch_elliptic_error_data")
     fclaw_clawpatch_t* cp = fclaw2d_clawpatch_get_clawpatch(&test_data.domain->blocks[0].patches[0]);
     double* rhs;
     int mfields;
-    fclaw3dx_clawpatch_elliptic_error_data(test_data.glob, &test_data.domain->blocks[0].patches[0], &rhs, &mfields);
+    fclaw_clawpatch_elliptic_error_data(test_data.glob, &test_data.domain->blocks[0].patches[0], &rhs, &mfields);
 
     CHECK(rhs == cp->elliptic_error.dataPtr());
     CHECK(mfields == test_data.opts->rhs_fields);
@@ -509,7 +509,7 @@ TEST_CASE("fclaw3dx_clawpatch_elliptic_soln_data")
     fclaw_clawpatch_t* cp = fclaw2d_clawpatch_get_clawpatch(&test_data.domain->blocks[0].patches[0]);
     double* rhs;
     int mfields;
-    fclaw3dx_clawpatch_elliptic_soln_data(test_data.glob, &test_data.domain->blocks[0].patches[0], &rhs, &mfields);
+    fclaw_clawpatch_elliptic_soln_data(test_data.glob, &test_data.domain->blocks[0].patches[0], &rhs, &mfields);
 
     CHECK(rhs == cp->elliptic_soln.dataPtr());
     CHECK(mfields == test_data.opts->rhs_fields);
@@ -523,7 +523,7 @@ TEST_CASE("fclaw3dx_clawpatch_get_q")
     //CHECK
     fclaw_clawpatch_t* cp = fclaw2d_clawpatch_get_clawpatch(&test_data.domain->blocks[0].patches[0]);
 
-    CHECK(fclaw3dx_clawpatch_get_q(test_data.glob,&test_data.domain->blocks[0].patches[0]) == cp->griddata.dataPtr());
+    CHECK(fclaw_clawpatch_get_q(test_data.glob,&test_data.domain->blocks[0].patches[0]) == cp->griddata.dataPtr());
 }
 
 TEST_CASE("fclaw3dx_clawpatch_get_error")
@@ -534,7 +534,7 @@ TEST_CASE("fclaw3dx_clawpatch_get_error")
     //CHECK
     fclaw_clawpatch_t* cp = fclaw2d_clawpatch_get_clawpatch(&test_data.domain->blocks[0].patches[0]);
 
-    CHECK(fclaw3dx_clawpatch_get_error(test_data.glob,&test_data.domain->blocks[0].patches[0]) == cp->griderror.dataPtr());
+    CHECK(fclaw_clawpatch_get_error(test_data.glob,&test_data.domain->blocks[0].patches[0]) == cp->griderror.dataPtr());
 }
 
 TEST_CASE("fclaw3dx_clawpatch_get_exact_soln")
@@ -545,7 +545,7 @@ TEST_CASE("fclaw3dx_clawpatch_get_exact_soln")
     //CHECK
     fclaw_clawpatch_t* cp = fclaw2d_clawpatch_get_clawpatch(&test_data.domain->blocks[0].patches[0]);
 
-    CHECK(fclaw3dx_clawpatch_get_exactsoln(test_data.glob,&test_data.domain->blocks[0].patches[0]) == cp->exactsolution.dataPtr());
+    CHECK(fclaw_clawpatch_get_exactsoln(test_data.glob,&test_data.domain->blocks[0].patches[0]) == cp->exactsolution.dataPtr());
 }
 TEST_CASE("fclaw3dx_clawpatch_timesync_data")
 {
@@ -558,7 +558,7 @@ TEST_CASE("fclaw3dx_clawpatch_timesync_data")
         fclaw_clawpatch_t* cp = fclaw2d_clawpatch_get_clawpatch(&test_data.domain->blocks[0].patches[0]);
         double* q;
         int meqn;
-        fclaw3dx_clawpatch_timesync_data(test_data.glob, &test_data.domain->blocks[0].patches[0], time_interp, &q, &meqn);
+        fclaw_clawpatch_timesync_data(test_data.glob, &test_data.domain->blocks[0].patches[0], time_interp, &q, &meqn);
 
         if(time_interp){
             CHECK(q == cp->griddata_time_interpolated.dataPtr());
@@ -579,9 +579,9 @@ TEST_CASE("fclaw3dx_clawpatch_get_q_timesync")
         fclaw_clawpatch_t* cp = fclaw2d_clawpatch_get_clawpatch(&test_data.domain->blocks[0].patches[0]);
 
         if(time_interp){
-            CHECK(fclaw3dx_clawpatch_get_q_timesync(test_data.glob,&test_data.domain->blocks[0].patches[0],time_interp) == cp->griddata_time_interpolated.dataPtr());
+            CHECK(fclaw_clawpatch_get_q_timesync(test_data.glob,&test_data.domain->blocks[0].patches[0],time_interp) == cp->griddata_time_interpolated.dataPtr());
         } else {
-            CHECK(fclaw3dx_clawpatch_get_q_timesync(test_data.glob,&test_data.domain->blocks[0].patches[0],time_interp) == cp->griddata.dataPtr());
+            CHECK(fclaw_clawpatch_get_q_timesync(test_data.glob,&test_data.domain->blocks[0].patches[0],time_interp) == cp->griddata.dataPtr());
         }
     }
 }
@@ -592,8 +592,8 @@ TEST_CASE("fclaw3dx_clawpatch user_data")
 
     //CHECK
     void* user_data = (void *) 1234;
-    fclaw3dx_clawpatch_set_user_data(test_data.glob, &test_data.domain->blocks[0].patches[0],user_data);
-    CHECK(fclaw3dx_clawpatch_get_user_data(test_data.glob,&test_data.domain->blocks[0].patches[0]) == user_data);
+    fclaw_clawpatch_set_user_data(test_data.glob, &test_data.domain->blocks[0].patches[0],user_data);
+    CHECK(fclaw_clawpatch_get_user_data(test_data.glob,&test_data.domain->blocks[0].patches[0]) == user_data);
 }
 TEST_CASE("fclaw3dx_clawpatch solver_data")
 {
@@ -602,8 +602,8 @@ TEST_CASE("fclaw3dx_clawpatch solver_data")
 
     //CHECK
     void* user_data = (void *) 1234;
-    fclaw3dx_clawpatch_set_solver_data(test_data.glob, &test_data.domain->blocks[0].patches[0],user_data);
-    CHECK(fclaw3dx_clawpatch_get_solver_data(test_data.glob,&test_data.domain->blocks[0].patches[0]) == user_data);
+    fclaw_clawpatch_set_solver_data(test_data.glob, &test_data.domain->blocks[0].patches[0],user_data);
+    CHECK(fclaw_clawpatch_get_solver_data(test_data.glob,&test_data.domain->blocks[0].patches[0]) == user_data);
 }
 
 TEST_CASE("fclaw3dx_clawpatch_size")
@@ -623,7 +623,7 @@ TEST_CASE("fclaw3dx_clawpatch_size")
         test_data.setup();
 
         //CHECK
-        CHECK(fclaw3dx_clawpatch_size(test_data.glob) == (size_t) (mx+2*mbc)*(my+2*mbc)*(mz+2*mbc)*meqn);
+        CHECK(fclaw_clawpatch_size(test_data.glob) == (size_t) (mx+2*mbc)*(my+2*mbc)*(mz+2*mbc)*meqn);
     }
 }
 

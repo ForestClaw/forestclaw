@@ -13,7 +13,7 @@
 
 #if REFINE_DIM == 2 && PATCH_DIM == 2
 
-#include "../fclaw2d_clawpatch.h"
+#include "../fclaw_clawpatch.h"
 
 #include "../fclaw_clawpatch_options.h"
 #include "../fclaw2d_clawpatch_fort.h"

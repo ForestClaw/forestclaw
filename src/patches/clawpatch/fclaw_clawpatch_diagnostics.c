@@ -30,8 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw_clawpatch_diagnostics.h>
 
-#include <fclaw2d_clawpatch.h>
-#include <fclaw3dx_clawpatch.h>
+#include <fclaw_clawpatch.h>
 #include <fclaw_clawpatch_options.h>
 
 void fclaw_clawpatch_diagnostics_initialize(fclaw2d_global_t *glob,
@@ -106,7 +105,7 @@ void cb_compute_diagnostics(fclaw2d_domain_t *domain,
     }
     else 
     {
-        fclaw3dx_clawpatch_grid_data(s->glob,patch,&mx,&my,&mz, 
+        fclaw3d_clawpatch_grid_data(s->glob,patch,&mx,&my,&mz, 
                                     &mbc,&xlower,&ylower,&zlower, &dx,&dy,&dz);
 
         // double *volume = fclaw3dx_clawpatch_get_area(s->glob,patch);

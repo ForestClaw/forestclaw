@@ -33,7 +33,7 @@ void claw3_advection_patch_setup_manifold(fclaw2d_global_t *glob,
 {
     int mx,my,mz, mbc;
     double xlower,ylower,zlower, dx,dy, dz;
-    fclaw3dx_clawpatch_grid_data(glob,patch,&mx,&my,&mz, &mbc,
+    fclaw3d_clawpatch_grid_data(glob,patch,&mx,&my,&mz, &mbc,
                                 &xlower,&ylower,&zlower, &dx,&dy, &dz);
 
     double *xd,*yd,*zd,*volume,*faceareas;
@@ -43,7 +43,7 @@ void claw3_advection_patch_setup_manifold(fclaw2d_global_t *glob,
 
     int maux;
     double *aux;
-    fclaw3dx_clawpatch_aux_data(glob,patch,&aux,&maux);
+    fclaw_clawpatch_aux_data(glob,patch,&aux,&maux);
 
     if (claw_version == 4)
         CLAW3_SETAUX_MANIFOLD(&mbc,&mx,&my,&mz, &xlower,&ylower,&zlower,

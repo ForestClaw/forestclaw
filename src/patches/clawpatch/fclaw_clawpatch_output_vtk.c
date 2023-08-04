@@ -25,8 +25,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw_clawpatch_output_vtk.h>
 
-#include <fclaw2d_clawpatch.h>
-#include <fclaw3dx_clawpatch.h>
+#include <fclaw_clawpatch.h>
 #include <fclaw_clawpatch_options.h>
 
 #include <fclaw2d_global.h>
@@ -808,7 +807,7 @@ fclaw2d_output_vtk_value_cb (fclaw2d_global_t * glob,
 {
     int meqn;
     double *q;
-    fclaw2d_clawpatch_soln_data(glob,patch,&q,&meqn);
+    fclaw_clawpatch_soln_data(glob,patch,&q,&meqn);
 
     int mx,my,mbc;
     double xlower,ylower,dx,dy;
@@ -847,12 +846,12 @@ fclaw3d_output_vtk_value_cb (fclaw2d_global_t * glob,
 
     int meqn;
     double *q;
-    fclaw3dx_clawpatch_soln_data(glob,patch,&q,&meqn);
+    fclaw_clawpatch_soln_data(glob,patch,&q,&meqn);
 
     int mx,my,mz,mbc;
     double xlower,ylower,zlower,dx,dy,dz;
-    fclaw3dx_clawpatch_grid_data(glob,patch,&mx,&my,&mz, &mbc,
-                                &xlower,&ylower,&zlower, &dx,&dy, &dz);
+    fclaw3d_clawpatch_grid_data(glob,patch,&mx,&my,&mz, &mbc,
+                               &xlower,&ylower,&zlower, &dx,&dy, &dz);
 
     const int xlane = mx + 2 * mbc;
     const int ylane = my + 2 * mbc;

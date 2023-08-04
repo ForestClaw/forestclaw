@@ -43,7 +43,7 @@ void advection_patch_setup_manifold(fclaw2d_global_t *glob,
 
     int maux;
     double *aux;
-    fclaw2d_clawpatch_aux_data(glob,patch,&aux,&maux);
+    fclaw_clawpatch_aux_data(glob,patch,&aux,&maux);
 
     if (claw_version == 4)
         USER46_SETAUX_MANIFOLD(&mbc,&mx,&my,&xlower,&ylower,

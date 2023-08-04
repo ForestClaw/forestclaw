@@ -29,8 +29,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw_clawpatch_pillow.h>
 
-#include <fclaw2d_clawpatch.h>
-#include <fclaw3dx_clawpatch.h>
+#include <fclaw_clawpatch.h>
 #include <fclaw2d_clawpatch46_fort.h>
 #include <fclaw2d_clawpatch5_fort.h>
 #include <fclaw3dx_clawpatch46_fort.h>
@@ -54,9 +53,9 @@ void pillow_copy_block_corner(fclaw2d_global_t* glob,
 {
     int meqn;
     double *qthis;    
-    fclaw2d_clawpatch_timesync_data(glob,patch,time_interp,&qthis,&meqn);
+    fclaw_clawpatch_timesync_data(glob,patch,time_interp,&qthis,&meqn);
 
-    double *qcorner = fclaw2d_clawpatch_get_q(glob,corner_patch);
+    double *qcorner = fclaw_clawpatch_get_q(glob,corner_patch);
 
     fclaw_clawpatch_pillow_vtable_t* pillow_vt = fclaw_clawpatch_pillow_vt(glob);
     FCLAW_ASSERT(pillow_vt != NULL);
@@ -102,9 +101,9 @@ void pillow_average_block_corner(fclaw2d_global_t *glob,
 
     int meqn;
     double *qcoarse;
-    fclaw2d_clawpatch_timesync_data(glob,coarse_patch,time_interp,
+    fclaw_clawpatch_timesync_data(glob,coarse_patch,time_interp,
                                     &qcoarse,&meqn);
-    double* qfine = fclaw2d_clawpatch_get_q(glob,fine_patch);
+    double* qfine = fclaw_clawpatch_get_q(glob,fine_patch);
 
     double *areacoarse = fclaw2d_clawpatch_get_area(glob,coarse_patch);
     double *areafine = fclaw2d_clawpatch_get_area(glob,fine_patch);
@@ -152,10 +151,10 @@ void pillow_interpolate_block_corner(fclaw2d_global_t* glob,
 {
     int meqn;
     double *qcoarse;
-    fclaw2d_clawpatch_timesync_data(glob,coarse_patch,time_interp,
+    fclaw_clawpatch_timesync_data(glob,coarse_patch,time_interp,
                                     &qcoarse,&meqn);
 
-    double* qfine = fclaw2d_clawpatch_get_q(glob,fine_patch);
+    double* qfine = fclaw_clawpatch_get_q(glob,fine_patch);
 
     fclaw_clawpatch_pillow_vtable_t* pillow_vt = fclaw_clawpatch_pillow_vt(glob);
     int refratio = 2;

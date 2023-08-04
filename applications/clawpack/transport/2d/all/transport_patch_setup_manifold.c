@@ -42,7 +42,7 @@ void transport_patch_setup_manifold(fclaw2d_global_t *glob,
                                     &curvature);
     int maux;
     double *aux;
-    fclaw2d_clawpatch_aux_data(glob,patch,&aux,&maux);
+    fclaw_clawpatch_aux_data(glob,patch,&aux,&maux);
 
     //const user_options_t* user_opt = sphere_get_options(glob);
     FCLAW_ASSERT(maux == 7);

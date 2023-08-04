@@ -23,8 +23,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <fclaw2d_clawpatch.h>
-#include <fclaw3dx_clawpatch.h>
+#include <fclaw_clawpatch.h>
 #include <fclaw_clawpatch_options.h>
 
 #include <fclaw2d_global.h>
@@ -43,7 +42,7 @@ void fclaw_clawpatch_diagnostics_cons_default(fclaw2d_global_t *glob,
 
     int meqn;
     double *q; 
-    fclaw2d_clawpatch_soln_data(glob,patch,&q,&meqn);
+    fclaw_clawpatch_soln_data(glob,patch,&q,&meqn);
 
     fclaw_clawpatch_vtable_t *clawpatch_vt = fclaw_clawpatch_vt(glob);
 
@@ -63,7 +62,7 @@ void fclaw_clawpatch_diagnostics_cons_default(fclaw2d_global_t *glob,
         FCLAW_ASSERT(clawpatch_vt->d3->fort_conservation_check != NULL);
         int mz;
         double zlower, dz;
-        fclaw3dx_clawpatch_grid_data(glob,patch,&mx,&my,&mz, &mbc,
+        fclaw3d_clawpatch_grid_data(glob,patch,&mx,&my,&mz, &mbc,
                                     &xlower,&ylower,&zlower, &dx,&dy, &dz);    
         clawpatch_vt->d3->fort_conservation_check(&mx, &my, &mz, &mbc, &meqn, 
                                                   &dx,&dy,&dz,
@@ -86,13 +85,13 @@ void fclaw_clawpatch_diagnostics_error_default(fclaw2d_global_t *glob,
     double *area = fclaw2d_clawpatch_get_area(glob,patch);  /* Might be null */
     double *q;
     int meqn;
-    fclaw2d_clawpatch_soln_data(glob,patch,&q,&meqn);
+    fclaw_clawpatch_soln_data(glob,patch,&q,&meqn);
 
     if (clawpatch_vt->dim == 2 && clawpatch_vt->d2->fort_compute_patch_error != NULL)
     {
         double t = glob->curr_time;
-        double* error = fclaw2d_clawpatch_get_error(glob,patch);
-        double* soln = fclaw2d_clawpatch_get_exactsoln(glob,patch);
+        double* error = fclaw_clawpatch_get_error(glob,patch);
+        double* soln = fclaw_clawpatch_get_exactsoln(glob,patch);
 
         int mx, my, mbc;
         double xlower,ylower,dx,dy;
@@ -111,8 +110,8 @@ void fclaw_clawpatch_diagnostics_error_default(fclaw2d_global_t *glob,
     else if (clawpatch_vt->dim == 3 && clawpatch_vt->d3->fort_compute_patch_error != NULL)
     {
         double t = glob->curr_time;
-        double* error = fclaw2d_clawpatch_get_error(glob,patch);
-        double* soln = fclaw2d_clawpatch_get_exactsoln(glob,patch);
+        double* error = fclaw_clawpatch_get_error(glob,patch);
+        double* soln = fclaw_clawpatch_get_exactsoln(glob,patch);
 
         int mx, my, mz, mbc;
         double xlower,ylower,zlower,dx,dy,dz;

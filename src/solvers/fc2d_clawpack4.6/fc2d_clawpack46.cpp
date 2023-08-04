@@ -28,7 +28,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "fc2d_clawpack46_fort.h"
 
 #include <fclaw_clawpatch.hpp>
-#include <fclaw2d_clawpatch.h>
+#include <fclaw_clawpatch.h>
 
 #include <fclaw_clawpatch_options.h>
 #include <fclaw_clawpatch_output_ascii.h> 
@@ -74,11 +74,11 @@ void clawpack46_qinit(fclaw2d_global_t *glob,
 								&xlower,&ylower,&dx,&dy);
 	int meqn;
 	double *q;
-	fclaw2d_clawpatch_soln_data(glob,patch,&q,&meqn);
+	fclaw_clawpatch_soln_data(glob,patch,&q,&meqn);
 
 	int maux;
 	double *aux;
-	fclaw2d_clawpatch_aux_data(glob,patch,&aux,&maux);
+	fclaw_clawpatch_aux_data(glob,patch,&aux,&maux);
 
 	int maxmx = mx;
 	int maxmy = my;
@@ -111,7 +111,7 @@ void clawpack46_bc2(fclaw2d_global_t *glob,
 
 	int maux;
 	double* aux;
-	fclaw2d_clawpatch_aux_data(glob,patch,&aux,&maux);
+	fclaw_clawpatch_aux_data(glob,patch,&aux,&maux);
 
 	int maxmx = mx;
 	int maxmy = my;
@@ -137,7 +137,7 @@ void clawpack46_bc2(fclaw2d_global_t *glob,
 	*/
 	int meqn;
 	double *q;
-	fclaw2d_clawpatch_timesync_data(glob,patch,time_interp,&q,&meqn);
+	fclaw_clawpatch_timesync_data(glob,patch,time_interp,&q,&meqn);
 
 	CLAWPACK46_SET_BLOCK(&blockno);
 	claw46_vt->fort_bc2(&maxmx,&maxmy,&meqn,&mbc,&mx,&my,&xlower,&ylower,
@@ -165,11 +165,11 @@ void clawpack46_b4step2(fclaw2d_global_t *glob,
 
 	int meqn;
 	double *q;
-	fclaw2d_clawpatch_soln_data(glob,patch,&q,&meqn);
+	fclaw_clawpatch_soln_data(glob,patch,&q,&meqn);
 
 	int maux;
 	double *aux;
-	fclaw2d_clawpatch_aux_data(glob,patch,&aux,&maux);
+	fclaw_clawpatch_aux_data(glob,patch,&aux,&maux);
 
 	int maxmx = mx;
 	int maxmy = my;
@@ -203,11 +203,11 @@ void clawpack46_src2(fclaw2d_global_t *glob,
 
 	int meqn;
 	double *q;
-	fclaw2d_clawpatch_soln_data(glob,patch,&q,&meqn);
+	fclaw_clawpatch_soln_data(glob,patch,&q,&meqn);
 
 	int maux;
 	double *aux;
-	fclaw2d_clawpatch_aux_data(glob,patch,&aux,&maux);
+	fclaw_clawpatch_aux_data(glob,patch,&aux,&maux);
 
 	int maxmx = mx;
 	int maxmy = my;
@@ -244,7 +244,7 @@ void clawpack46_setaux(fclaw2d_global_t *glob,
 
 	int maux;
 	double *aux;
-	fclaw2d_clawpatch_aux_data(glob,patch,&aux,&maux);
+	fclaw_clawpatch_aux_data(glob,patch,&aux,&maux);
 
 	int maxmx = mx;
 	int maxmy = my;
@@ -290,9 +290,9 @@ double clawpack46_step2(fclaw2d_global_t *glob,
 
 	int maux;
 	double *aux; 
-	fclaw2d_clawpatch_aux_data(glob,patch,&aux,&maux);
+	fclaw_clawpatch_aux_data(glob,patch,&aux,&maux);
 
-	fclaw2d_clawpatch_save_current_step(glob, patch);
+	fclaw_clawpatch_save_current_step(glob, patch);
 
 	int mx, my, mbc;
 	double xlower, ylower, dx,dy;
@@ -301,7 +301,7 @@ double clawpack46_step2(fclaw2d_global_t *glob,
 
 	int meqn;
 	double *qold;
-	fclaw2d_clawpatch_soln_data(glob,patch,&qold,&meqn);
+	fclaw_clawpatch_soln_data(glob,patch,&qold,&meqn);
 
 	int mwaves = clawpack_options->mwaves;
 	int maxm = fmax(mx,my);
@@ -567,7 +567,7 @@ void fc2d_clawpack46_set_capacity(fclaw2d_global_t *glob,
 
 	int maux;
 	double *aux;
-	fclaw2d_clawpatch_aux_data(glob,patch,&aux,&maux);
+	fclaw_clawpatch_aux_data(glob,patch,&aux,&maux);
 
 	fc2d_clawpack46_options_t *clawopt = fc2d_clawpack46_get_options(glob);
 	int mcapa = clawopt->mcapa;

@@ -25,7 +25,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "mesh_user.h"
 #include <fclaw2d_forestclaw.h>
-#include <fclaw2d_clawpatch.h>
+#include <fclaw_clawpatch.h>
 
 
 /* Two versions of Clawpack */

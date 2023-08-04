@@ -93,9 +93,9 @@ void cb_square_output_ascii (fclaw2d_domain_t * domain,
 
     double *q;
     int meqn;
-    fclaw2d_clawpatch_soln_data(glob,patch,&q,&meqn);
-    double* error = fclaw2d_clawpatch_get_error(glob,patch);
-    double* soln = fclaw2d_clawpatch_get_exactsoln(glob,patch);
+    fclaw_clawpatch_soln_data(glob,patch,&q,&meqn);
+    double* error = fclaw_clawpatch_get_error(glob,patch);
+    double* soln = fclaw_clawpatch_get_exactsoln(glob,patch);
 
     char fname[BUFSIZ];
     snprintf (fname, BUFSIZ, "%s.q%04d", fclaw_opt->prefix, iframe);

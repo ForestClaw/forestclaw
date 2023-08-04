@@ -97,10 +97,10 @@ void cb_sphere_output_ascii (fclaw2d_domain_t * domain,
 
     int meqn;
     double *q;
-    fclaw2d_clawpatch_soln_data(glob,patch,&q,&meqn);
+    fclaw_clawpatch_soln_data(glob,patch,&q,&meqn);
 
-    double* error = fclaw2d_clawpatch_get_error(glob,patch);
-    double* soln = fclaw2d_clawpatch_get_exactsoln(glob,patch);
+    double* error = fclaw_clawpatch_get_error(glob,patch);
+    double* soln = fclaw_clawpatch_get_exactsoln(glob,patch);
 
     const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
     char fname[BUFSIZ];

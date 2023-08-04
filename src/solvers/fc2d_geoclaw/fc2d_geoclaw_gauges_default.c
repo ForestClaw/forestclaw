@@ -30,7 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "fc2d_geoclaw_options.h"
 
-#include <fclaw2d_clawpatch.h>
+#include <fclaw_clawpatch.h>
 #include <fclaw_clawpatch_options.h>
 
 #include <fclaw2d_options.h>
@@ -250,8 +250,8 @@ void geoclaw_gauge_update_default(fclaw2d_global_t*
     FCLAW_ASSERT(xc >= xlower && xc <= xlower + mx*dx);
     FCLAW_ASSERT(yc >= ylower && yc <= ylower + my*dy);
 
-    fclaw2d_clawpatch_soln_data(glob,patch,&q,&meqn);
-    fclaw2d_clawpatch_aux_data(glob,patch,&aux,&maux);
+    fclaw_clawpatch_soln_data(glob,patch,&q,&meqn);
+    fclaw_clawpatch_aux_data(glob,patch,&aux,&maux);
 
     /* Interpolate q variables and aux variables (bathy only for now)
        to gauge location */

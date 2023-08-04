@@ -28,12 +28,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_forestclaw.h>
 #include <fclaw2d_global.h>
 
-#include <fclaw2d_clawpatch.h>
+#include <fclaw_clawpatch.h>
 #include <fclaw_clawpatch_options.h>
 #include <fclaw2d_clawpatch_fort.h>
-
-#include <fclaw3dx_clawpatch.h>
-#include <fclaw_clawpatch_options.h>
 #include <fclaw3dx_clawpatch_fort.h>
 
 namespace{
@@ -135,7 +132,7 @@ TEST_CASE("FCLAW3DX_CLAWPATCH_EXCEEDS_THRESHOLD calls user function")
 	fclaw2d_global_t* glob = fclaw2d_global_new();
 
     fclaw2d_vtables_initialize(glob);
-    fclaw3dx_clawpatch_vtable_initialize(glob, 4);
+    fclaw3d_clawpatch_vtable_initialize(glob, 4);
 
     fclaw_clawpatch_vt(glob)->d3->fort_user_exceeds_threshold = 
         [](const int *blockno,
