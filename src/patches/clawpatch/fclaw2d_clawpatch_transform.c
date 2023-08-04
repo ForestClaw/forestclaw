@@ -86,8 +86,13 @@ FCLAW2D_CLAWPATCH_TRANSFORM_FACE (const int *i1, const int *j1,
     const fclaw_clawpatch_options_t *clawpatch_opt = 
         (fclaw_clawpatch_options_t*) tdata->user;
 
-    int mx = (clawpatch_opt->dim == 2) ? clawpatch_opt->d2->mx : clawpatch_opt->d3->mx;
-    int my = (clawpatch_opt->dim == 2) ? clawpatch_opt->d2->my : clawpatch_opt->d3->my;
+#if PATCH_DIM == 2
+    int mx = clawpatch_opt->d2->mx;
+    int my = clawpatch_opt->d2->my;
+#else
+    int mx = clawpatch_opt->d3->mx;
+    int my = clawpatch_opt->d3->my;
+#endif
 
     *i2 = *i1;
     *j2 = *j1;
@@ -109,8 +114,13 @@ FCLAW2D_CLAWPATCH_TRANSFORM_FACE_HALF (const int *i1, const int *j1,
     const fclaw_clawpatch_options_t *clawpatch_opt = 
         (fclaw_clawpatch_options_t*) tdata->user;
 
-    int mx = (clawpatch_opt->dim == 2) ? clawpatch_opt->d2->mx : clawpatch_opt->d3->mx;
-    int my = (clawpatch_opt->dim == 2) ? clawpatch_opt->d2->my : clawpatch_opt->d3->my;
+#if PATCH_DIM == 2
+    int mx = clawpatch_opt->d2->mx;
+    int my = clawpatch_opt->d2->my;
+#else
+    int mx = clawpatch_opt->d3->mx;
+    int my = clawpatch_opt->d3->my;
+#endif
 
     i2[0] = *i1;
     j2[0] = *j1;
@@ -131,8 +141,13 @@ FCLAW2D_CLAWPATCH_TRANSFORM_CORNER (const int *i1, const int *j1,
     const fclaw_clawpatch_options_t *clawpatch_opt = 
         (fclaw_clawpatch_options_t*) tdata->user;
 
-    int mx = (clawpatch_opt->dim == 2) ? clawpatch_opt->d2->mx : clawpatch_opt->d3->mx;
-    int my = (clawpatch_opt->dim == 2) ? clawpatch_opt->d2->my : clawpatch_opt->d3->my;
+#if PATCH_DIM == 2
+    int mx = clawpatch_opt->d2->mx;
+    int my = clawpatch_opt->d2->my;
+#else
+    int mx = clawpatch_opt->d3->mx;
+    int my = clawpatch_opt->d3->my;
+#endif
 
     *i2 = *i1;
     *j2 = *j1;
@@ -170,8 +185,13 @@ FCLAW2D_CLAWPATCH_TRANSFORM_CORNER_HALF (const int *i1, const int *j1,
     const fclaw_clawpatch_options_t *clawpatch_opt = 
         (fclaw_clawpatch_options_t*) tdata->user;
 
-    int mx = (clawpatch_opt->dim == 2) ? clawpatch_opt->d2->mx : clawpatch_opt->d3->mx;
-    int my = (clawpatch_opt->dim == 2) ? clawpatch_opt->d2->my : clawpatch_opt->d3->my;
+#if PATCH_DIM == 2
+    int mx = clawpatch_opt->d2->mx;
+    int my = clawpatch_opt->d2->my;
+#else
+    int mx = clawpatch_opt->d3->mx;
+    int my = clawpatch_opt->d3->my;
+#endif
 
     i2[0] = *i1;
     j2[0] = *j1;
