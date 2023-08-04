@@ -29,7 +29,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw_pointer_map.h>
 
-#include <fclaw3dx_clawpatch.hpp>
+#include <fclaw_clawpatch.hpp>
 #include <fclaw3dx_clawpatch.h>
 
 #include <fclaw_clawpatch_options.h>

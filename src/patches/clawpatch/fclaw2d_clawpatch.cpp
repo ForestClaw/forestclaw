@@ -59,7 +59,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CLAWPATCH_VTABLE_NAME "fclaw3dx_clawpatch"
 
 #include <fclaw3dx_clawpatch.h>
-#include <fclaw3dx_clawpatch.hpp>
+#include <fclaw_clawpatch.hpp>
 
 #include <fclaw3dx_clawpatch_diagnostics.h>
 #include <fclaw_clawpatch_options.h>
@@ -132,7 +132,11 @@ static
 void* clawpatch_get_metric_patch(fclaw2d_patch_t* patch)
 {
 	fclaw_clawpatch_t *cp = get_clawpatch(patch);
-	return cp->mp;
+#   if PATCH_DIM == 2
+		return cp->d2->mp;
+#   else
+		return cp->d3->mp;
+#   endif
 }
 
 
@@ -167,9 +171,17 @@ static
 void* clawpatch_new()
 {
 	fclaw_clawpatch_t *cp = new fclaw_clawpatch_t;    
-
+#if PATCH_DIM == 2
+	cp->dim = 2;
+	cp->d2 = new fclaw_clawpatch_2d_t;
 	/* This patch will only be defined if we are on a manifold. */
-	cp->mp = fclaw2d_metric_patch_new();
+	cp->d2->mp = fclaw2d_metric_patch_new();
+#else
+	cp->dim = 3;
+	cp->d3 = new fclaw_clawpatch_3d_t;
+	/* This patch will only be defined if we are on a manifold. */
+	cp->d3->mp = fclaw2d_metric_patch_new();
+#endif
 
 	return (void*) cp;
 }
@@ -179,10 +191,20 @@ void clawpatch_delete(void *patchcp)
 {
 	FCLAW_ASSERT(patchcp != NULL);
 	fclaw_clawpatch_t* cp = (fclaw_clawpatch_t*) patchcp;
-	fclaw2d_clawpatch_time_sync_delete(&cp->registers);
 
-	FCLAW_ASSERT(cp->mp != NULL);
-	fclaw2d_metric_patch_delete(&cp->mp);
+#if PATCH_DIM == 2
+	fclaw2d_clawpatch_time_sync_delete(&cp->d2->registers);
+
+	FCLAW_ASSERT(cp->d2->mp != NULL);
+	fclaw2d_metric_patch_delete(&cp->d2->mp);
+
+	delete cp->d2;
+#else
+	FCLAW_ASSERT(cp->d3->mp != NULL);
+	fclaw2d_metric_patch_delete(&cp->d3->mp);
+
+	delete cp->d3;
+#endif
 
 	delete cp;
 	patchcp = NULL;
@@ -202,16 +224,15 @@ void clawpatch_define(fclaw2d_global_t* glob,
 	const fclaw_clawpatch_options_t *clawpatch_opt = 
 	                     fclaw_clawpatch_get_options(glob);
 
-	if(clawpatch_opt->dim == 2)
-	{
-    	cp->mx = clawpatch_opt->d2->mx;
-    	cp->my = clawpatch_opt->d2->my;
-	}
-	else
-	{
-    	cp->mx = clawpatch_opt->d3->mx;
-    	cp->my = clawpatch_opt->d3->my;
-	}
+#   if PATCH_DIM == 2
+    	cp->d2->mx = clawpatch_opt->d2->mx;
+    	cp->d2->my = clawpatch_opt->d2->my;
+#   else
+    	cp->d3->mx = clawpatch_opt->d3->mx;
+    	cp->d3->my = clawpatch_opt->d3->my;
+		cp->d3->mz = clawpatch_opt->d3->mz;
+#   endif
+
 	cp->mbc = clawpatch_opt->mbc;
 	cp->blockno = blockno;
 	cp->meqn = clawpatch_opt->meqn;
@@ -230,19 +251,25 @@ void clawpatch_define(fclaw2d_global_t* glob,
 	cp->manifold = fclaw_opt->manifold;
 	if (cp->manifold)
 	{
-		cp->xlower = patch->xlower;
-		cp->ylower = patch->ylower;
-		cp->xupper = patch->xupper;
-		cp->yupper = patch->yupper;
+#       if PATCH_DIM == 2
+			cp->d2->xlower = patch->xlower;
+			cp->d2->ylower = patch->ylower;
+			cp->d2->xupper = patch->xupper;
+			cp->d2->yupper = patch->yupper;
+#       else
+			cp->d3->xlower = patch->xlower;
+			cp->d3->ylower = patch->ylower;
+			cp->d3->xupper = patch->xupper;
+			cp->d3->yupper = patch->yupper;
+#           if REFINE_DIM == 2
+		    	cp->d3->zlower = 0;
+		    	cp->d3->zupper = 1;
+#			else
+				fclaw_global_essentialf("clawpatch::define : Octrees not yet implemented.\n");
+				exit(1);
+#      		endif
+#      endif
 
-#if PATCH_DIM == 3 
-#if REFINE_DIM == 2
-		cp->zlower = 0;
-		cp->zupper = 1;
-#else
-#error "clawpatch::define : Octrees not yet implemented."
-#endif
-#endif
 	}
 	else
 	{
@@ -272,42 +299,41 @@ void clawpatch_define(fclaw2d_global_t* glob,
 			xupper = xu;
 			yupper = yu;
 		}
-		cp->xlower = ax + (bx - ax)*xlower;
-		cp->xupper = ax + (bx - ax)*xupper;
-		cp->ylower = ay + (by - ay)*ylower;
-		cp->yupper = ay + (by - ay)*yupper;
+#		if PATCH_DIM == 2
+			cp->d2->xlower = ax + (bx - ax)*xlower;
+			cp->d2->xupper = ax + (bx - ax)*xupper;
+			cp->d2->ylower = ay + (by - ay)*ylower;
+			cp->d2->yupper = ay + (by - ay)*yupper;
+#		else
+			cp->d3->xlower = ax + (bx - ax)*xlower;
+			cp->d3->xupper = ax + (bx - ax)*xupper;
+			cp->d3->ylower = ay + (by - ay)*ylower;
+			cp->d3->yupper = ay + (by - ay)*yupper;
+			/* Use [az,bz] to scale in z direction.  This should work for 
+		    both extruded mesh and octree mesh. */
+		    double az = fclaw_opt->az;
+		    double bz = fclaw_opt->bz;
+			double zlower = 0;		
+			double zupper = 1;
+			cp->d3->zlower = az + (bz - az)*zlower;
+			cp->d3->zupper = az + (bz - az)*zupper;
+#		endif
 
-#if PATCH_DIM == 3
-		/* Use [az,bz] to scale in z direction.  This should work for 
-		   both extruded mesh and octree mesh. */
-		double az = fclaw_opt->az;
-		double bz = fclaw_opt->bz;
-
-#if REFINE_DIM == 2
-		double zlower = 0;		
-		double zupper = 1;
-#else
+#if REFINE_DIM == 3
 #error "clawpatch::define : Octrees not yet implemented."
-#endif		
-		cp->zlower = az + (bz - az)*zlower;
-		cp->zupper = az + (bz - az)*zupper;
 #endif		
 
 	}
 
-	cp->dx = (cp->xupper - cp->xlower)/cp->mx;
-	cp->dy = (cp->yupper - cp->ylower)/cp->my;
+#	if PATCH_DIM == 2
+		cp->d2->dx = (cp->d2->xupper - cp->d2->xlower)/cp->d2->mx;
+		cp->d2->dy = (cp->d2->yupper - cp->d2->ylower)/cp->d2->my;
+# 	else
+		cp->d3->dx = (cp->d3->xupper - cp->d3->xlower)/cp->d3->mx;
+		cp->d3->dy = (cp->d3->yupper - cp->d3->ylower)/cp->d3->my;
+		cp->d3->dz = (cp->d3->zupper - cp->d3->zlower)/cp->d3->mz;
+#	endif
 
-#if PATCH_DIM == 3	
-#if REFINE_DIM == 2
-	/* For extruded mesh, we don't have any refinement in z */
-	cp->mz = clawpatch_opt->d3->mz;
-	cp->dz = (cp->zupper - cp->zlower)/cp->mz;
-
-#else
-#error "clawpatch::define : Octrees not yet implemented."
-#endif  /* REFINE_DIM == 2 */
-#endif  /* PATCH_DIM == 3 */
 
 
 	int ll[PATCH_DIM];
@@ -316,11 +342,14 @@ void clawpatch_define(fclaw2d_global_t* glob,
 	{
 		ll[idir] = 1-cp->mbc;
 	}
-	ur[0] = cp->mx + cp->mbc;
-	ur[1] = cp->my + cp->mbc;
-#if PATCH_DIM == 3
-	ur[2] = cp->mz + cp->mbc;
-#endif
+#	if PATCH_DIM == 2
+		ur[0] = cp->d2->mx + cp->mbc;
+		ur[1] = cp->d2->my + cp->mbc;
+#	else
+		ur[0] = cp->d3->mx + cp->mbc;
+		ur[1] = cp->d3->my + cp->mbc;
+		ur[2] = cp->d3->mz + cp->mbc;
+#   endif
 
 	Box box(ll,ur,PATCH_DIM);	
 
@@ -363,23 +392,25 @@ void clawpatch_define(fclaw2d_global_t* glob,
 
 #if PATCH_DIM == 2
 		fclaw2d_metric_patch_define(glob,patch, 
-		                            cp->mx, cp->my, cp->mbc, 
-		                            cp->dx, cp->dy,
-		                            cp->xlower,cp->ylower, cp->xupper, cp->yupper, 
+		                            cp->d2->mx, cp->d2->my, cp->mbc, 
+		                            cp->d2->dx, cp->d2->dy,
+		                            cp->d2->xlower,cp->d2->ylower, cp->d2->xupper, cp->d2->yupper, 
 		                            blockno, patchno, build_mode);
 #elif PATCH_DIM == 3
 		fclaw3d_metric_patch_define(glob,patch, 
-		                            cp->mx, cp->my, cp->mz, cp->mbc, 
-		                            cp->dx, cp->dy, cp->dz,
-		                            cp->xlower,cp->ylower, cp->zlower, 
-		                            cp->xupper, cp->yupper, cp->zupper,
+		                            cp->d3->mx, cp->d3->my, cp->d3->mz, cp->mbc, 
+		                            cp->d3->dx, cp->d3->dy, cp->d3->dz,
+		                            cp->d3->xlower,cp->d3->ylower, cp->d3->zlower, 
+		                            cp->d3->xupper, cp->d3->yupper, cp->d3->zupper,
 		                            blockno, patchno, build_mode);
 #endif
 	}
 	
 	/* Build interface registers needed for conservation */
-	fclaw2d_clawpatch_time_sync_new(glob,patch,
-									  blockno,patchno,&cp->registers);
+#	if PATCH_DIM == 2
+		fclaw2d_clawpatch_time_sync_new(glob,patch,
+									  blockno,patchno,&cp->d2->registers);
+#	endif
 
 	if (build_mode != FCLAW2D_BUILD_FOR_UPDATE)
 		/* If we are building ghost patches, we don't need all the patch memory */
@@ -1559,11 +1590,13 @@ void fclaw2d_clawpatch_save_current_step(fclaw2d_global_t* glob,
 }
 
 
+#if PATCH_DIM == 2
 fclaw_clawpatch_t* 
 fclaw2d_clawpatch_get_clawpatch(fclaw2d_patch_t* patch)
 {
 	return get_clawpatch(patch);
 }
+#endif
 
 
 fclaw2d_metric_patch_t* 
@@ -1580,13 +1613,13 @@ void fclaw2d_clawpatch_grid_data(fclaw2d_global_t* glob,
 								 double* dx, double* dy)
 {
 	fclaw_clawpatch_t *cp = get_clawpatch(patch);
-	*mx = cp->mx;
-	*my = cp->my;
+	*mx = cp->d2->mx;
+	*my = cp->d2->my;
 	*mbc = cp->mbc;
-	*xlower = cp->xlower;
-	*ylower = cp->ylower;
-	*dx = cp->dx;
-	*dy = cp->dy;
+	*xlower = cp->d2->xlower;
+	*ylower = cp->d2->ylower;
+	*dx = cp->d2->dx;
+	*dy = cp->d2->dy;
 }
 #elif PATCH_DIM == 3
 void fclaw3dx_clawpatch_grid_data(fclaw2d_global_t* glob,
@@ -1596,17 +1629,17 @@ void fclaw3dx_clawpatch_grid_data(fclaw2d_global_t* glob,
 								 double* zlower, 
 								 double* dx, double* dy, double* dz)
 {
-	fclaw3dx_clawpatch_t *cp = get_clawpatch(patch);
-	*mx = cp->mx;
-	*my = cp->my;
-	*mz = cp->mz;
+	fclaw_clawpatch_t *cp = get_clawpatch(patch);
+	*mx = cp->d3->mx;
+	*my = cp->d3->my;
+	*mz = cp->d3->mz;
 	*mbc = cp->mbc;
-	*xlower = cp->xlower;
-	*ylower = cp->ylower;
-	*zlower = cp->zlower;
-	*dx = cp->dx;
-	*dy = cp->dy;
-	*dz = cp->dz;
+	*xlower = cp->d3->xlower;
+	*ylower = cp->d3->ylower;
+	*zlower = cp->d3->zlower;
+	*dx = cp->d3->dx;
+	*dy = cp->d3->dy;
+	*dz = cp->d3->dz;
 }
 
 /* The metric terms only know about fclaw3d routines;  not 3dx routines */
@@ -1684,8 +1717,12 @@ fclaw2d_clawpatch_registers_t*
 fclaw2d_clawpatch_get_registers(fclaw2d_global_t* glob,
                                   fclaw2d_patch_t* patch)
 {
+#   if PATCH_DIM == 2
 	fclaw_clawpatch_t *cp = get_clawpatch(patch);
-	return cp->registers;
+	return cp->d2->registers;
+#   else
+	return NULL;
+#   endif
 }
 
 

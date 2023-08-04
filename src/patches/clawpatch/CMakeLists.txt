@@ -120,7 +120,6 @@ install(FILES
 	fclaw2d_clawpatch_output_vtk.h
 
   fclaw3dx_clawpatch.h
-	fclaw3dx_clawpatch.hpp
 	fclaw3dx_clawpatch_conservation.h
 	fclaw3dx_clawpatch_transform.h
 	fclaw3dx_clawpatch_diagnostics.h
