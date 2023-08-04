@@ -79,7 +79,6 @@ add_library(clawpatch
   fclaw3dx_clawpatch_transform.c
   fclaw3dx_clawpatch_output_ascii.c
   fclaw3dx_clawpatch_output_vtk.c
-  fclaw3dx_clawpatch_conservation.c
 
   fort_user/fclaw2d_clawpatch_tag_criteria.c
   fort3_user/fclaw3dx_clawpatch_tag_criteria.c

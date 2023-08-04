@@ -30,8 +30,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <forestclaw2d.h>       /* Need patch callback def */
 
+#include <fclaw_clawpatch_enums.h>
+
 #include <fclaw3dx_clawpatch_fort.h>
-#include <fclaw3dx_clawpatch_conservation.h>
 #include <fclaw3dx_clawpatch_diagnostics.h>
 
 
@@ -227,10 +228,6 @@ struct fclaw3dx_clawpatch_vtable
 
     /** @{ @name Conservation Update */
 
-    /** Adds fine grid corrections to coarse grid. */
-    fclaw3dx_clawpatch_fort_time_sync_f2c_t         fort_time_sync_f2c;
-    /** Adds wave corrections at same level interfaces. */
-    fclaw3dx_clawpatch_fort_time_sync_samesize_t    fort_time_sync_samesize;
     /** Packs/Unpacks the fclaw3dx_clawpatch_registers struct for ghost patches */
     fclaw3dx_clawpatch_time_sync_pack_registers_t   time_sync_pack_registers;
 

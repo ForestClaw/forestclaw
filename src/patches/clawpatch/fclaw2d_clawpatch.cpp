@@ -66,8 +66,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw3dx_clawpatch_output_ascii.h> 
 #include <fclaw3dx_clawpatch_output_vtk.h>
 #include <fclaw3dx_clawpatch_fort.h>
-#include <fclaw3dx_clawpatch_conservation.h>
-#include <fclaw3dx_clawpatch_conservation_fort.h>
 #include <fclaw3dx_clawpatch_transform.h>
 #include <fclaw3dx_clawpatch_pillow.h>  
 
@@ -448,8 +446,10 @@ void clawpatch_build(fclaw2d_global_t *glob,
 		fclaw2d_metric_patch_build(glob,patch,blockno,patchno);
 	}
 
+#if PATCH_DIM == 2
 	/* Setup for conservation correction */
 	fclaw2d_clawpatch_time_sync_setup(glob,patch,blockno,patchno);
+#endif
 }
 
 static
@@ -474,8 +474,10 @@ void clawpatch_build_from_fine(fclaw2d_global_t *glob,
 											 fine0_patchno);
 	}
 
+#if PATCH_DIM == 2
 	/* Setup for conservation correction */
 	fclaw2d_clawpatch_time_sync_setup(glob,coarse_patch,blockno,coarse_patchno);
+#endif
 }
 
 
@@ -1398,10 +1400,12 @@ void fclaw2d_clawpatch_vtable_initialize(fclaw2d_global_t* glob,
 	patch_vt->average_block_corner       = clawpatch_average_corner;
 	patch_vt->interpolate_block_corner   = clawpatch_interpolate_corner;
 
+#if PATCH_DIM == 2
 	/* Timing syncing module for conservation */
 	patch_vt->time_sync_f2c       = fclaw2d_clawpatch_time_sync_f2c;
 	patch_vt->time_sync_samesize  = fclaw2d_clawpatch_time_sync_samesize;
 	patch_vt->time_sync_reset     = fclaw2d_clawpatch_time_sync_reset;
+#endif
 
 	/* Transform functions (defined in forestclaw2d */
 	patch_vt->transform_init_data  = fclaw2d_clawpatch_transform_init_data;
@@ -1435,8 +1439,10 @@ void fclaw2d_clawpatch_vtable_initialize(fclaw2d_global_t* glob,
 	/* Metric access */
 	patch_vt->metric_patch         = clawpatch_get_metric_patch;
 
+#if PATCH_DIM == 2
 	/* Ghost pack for registers (doesn't depend on clawpack version) */
 	clawpatch_vt->time_sync_pack_registers = fclaw2d_clawpatch_time_sync_pack_registers;
+#endif
 
 	/* Tagging functions.  The default uses option 'refinement_criteria'. */
 	clawpatch_vt->fort_user_exceeds_threshold = NULL;
@@ -1713,17 +1719,15 @@ double *fclaw2d_clawpatch_get_q(fclaw2d_global_t* glob,
 	return cp->griddata.dataPtr();
 }
 
+#if PATCH_DIM == 2
 fclaw2d_clawpatch_registers_t* 
 fclaw2d_clawpatch_get_registers(fclaw2d_global_t* glob,
                                   fclaw2d_patch_t* patch)
 {
-#   if PATCH_DIM == 2
 	fclaw_clawpatch_t *cp = get_clawpatch(patch);
 	return cp->d2->registers;
-#   else
-	return NULL;
-#   endif
 }
+#endif
 
 
 double* fclaw2d_clawpatch_get_error(fclaw2d_global_t* glob,

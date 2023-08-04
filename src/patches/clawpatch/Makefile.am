@@ -47,7 +47,6 @@ libclawpatch_compiled_sources = \
 	src/patches/clawpatch/fclaw2d_clawpatch_utils.f \
 	\
 	src/patches/clawpatch/fclaw3dx_clawpatch.cpp \
-	src/patches/clawpatch/fclaw3dx_clawpatch_conservation.c \
 	src/patches/clawpatch/fclaw3dx_clawpatch_diagnostics.c \
 	src/patches/clawpatch/fclaw3dx_clawpatch_diagnostics_default.c \
 	src/patches/clawpatch/fclaw3dx_clawpatch_pillow.c \
