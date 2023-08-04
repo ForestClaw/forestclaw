@@ -31,7 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_clawpatch.h>
 
 #include <fclaw_clawpatch_options.h>
-#include <fclaw2d_clawpatch_output_ascii.h> 
+#include <fclaw_clawpatch_output_ascii.h> 
 #include <fclaw2d_clawpatch_output_vtk.h>
 #include <fclaw2d_clawpatch_fort.h>
 
@@ -454,7 +454,7 @@ void clawpack46_output(fclaw2d_global_t *glob, int iframe)
 
 	if (clawpack_options->ascii_out != 0)
 	{
-		fclaw2d_clawpatch_output_ascii(glob,iframe);
+		fclaw_clawpatch_output_ascii(glob,iframe);
 	}
 
 	if (clawpack_options->vtk_out != 0)

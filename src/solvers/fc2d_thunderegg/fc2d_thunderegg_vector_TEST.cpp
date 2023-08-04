@@ -28,7 +28,7 @@
 #include <fclaw_clawpatch.hpp>
 #include <fclaw_clawpatch_options.h>
 #include <fclaw2d_clawpatch46_fort.h>
-#include <fclaw2d_clawpatch_output_ascii.h>
+#include <fclaw_clawpatch_output_ascii.h>
 #include <fclaw2d_diagnostics.h>
 #include <fclaw2d_forestclaw.h>
 #include <fclaw2d_global.h>

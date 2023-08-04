@@ -61,21 +61,20 @@ target_include_directories(clawpatch_f INTERFACE
 
 add_library(clawpatch
   $<TARGET_OBJECTS:clawpatch_f>
-  fclaw_clawpatch_options.c
   fclaw_clawpatch_diagnostics.c
   fclaw_clawpatch_diagnostics_default.c
+  fclaw_clawpatch_options.c
+  fclaw_clawpatch_output_ascii.c
 
   fclaw2d_clawpatch.cpp
   fclaw2d_clawpatch_pillow.c
   fclaw2d_clawpatch_transform.c
-  fclaw2d_clawpatch_output_ascii.c
   fclaw2d_clawpatch_output_vtk.c
   fclaw2d_clawpatch_conservation.c
 
   fclaw3dx_clawpatch.cpp
   fclaw3dx_clawpatch_pillow.c
   fclaw3dx_clawpatch_transform.c
-  fclaw3dx_clawpatch_output_ascii.c
   fclaw3dx_clawpatch_output_vtk.c
 
   fort_user/fclaw2d_clawpatch_tag_criteria.c
@@ -105,6 +104,7 @@ install(FILES
 	fclaw_clawpatch.hpp
 	fclaw_clawpatch_diagnostics.h
 	fclaw_clawpatch_options.h
+	fclaw_clawpatch_output_ascii.h
 
   fclaw2d_clawpatch.h
 	fclaw2d_clawpatch_conservation.h
@@ -113,7 +113,6 @@ install(FILES
 	fclaw2d_clawpatch_fort.h
 	fclaw2d_clawpatch46_fort.h
 	fclaw2d_clawpatch5_fort.h
-	fclaw2d_clawpatch_output_ascii.h
 	fclaw2d_clawpatch_output_vtk.h
 
   fclaw3dx_clawpatch.h
@@ -122,7 +121,6 @@ install(FILES
 	fclaw3dx_clawpatch_pillow.h
 	fclaw3dx_clawpatch_fort.h
 	fclaw3dx_clawpatch46_fort.h
-	fclaw3dx_clawpatch_output_ascii.h
 	fclaw3dx_clawpatch_output_vtk.h
 
 	${metric}/fclaw2d_metric.h

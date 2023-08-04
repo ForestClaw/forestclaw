@@ -23,8 +23,8 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FCLAW2D_CLAWPATCH_OUTPUT_ASCII_H
-#define FCLAW2D_CLAWPATCH_OUTPUT_ASCII_H
+#ifndef FCLAW_CLAWPATCH_OUTPUT_ASCII_H
+#define FCLAW_CLAWPATCH_OUTPUT_ASCII_H
 
 #ifdef __cplusplus
 extern "C"
@@ -60,7 +60,7 @@ void cb_clawpatch_output_ascii (struct fclaw2d_domain * domain,
  * @param glob the global context
  * @param iframe the frame index
  */
-void fclaw2d_clawpatch_output_ascii(struct fclaw2d_global* glob,int iframe);
+void fclaw_clawpatch_output_ascii(struct fclaw2d_global* glob,int iframe);
 
 /**
  * @brief output ascii time header
@@ -68,7 +68,7 @@ void fclaw2d_clawpatch_output_ascii(struct fclaw2d_global* glob,int iframe);
  * @param glob the global context
  * @param iframe the frame index
  */
-void fclaw2d_clawpatch_time_header_ascii(struct fclaw2d_global* glob, int iframe);
+void fclaw_clawpatch_time_header_ascii(struct fclaw2d_global* glob, int iframe);
 
 
 #ifdef __cplusplus

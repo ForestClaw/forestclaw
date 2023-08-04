@@ -71,11 +71,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define FCLAW2D_CLAWPATCH_GET_REFINEMENT_CRITERIA FCLAW3DX_CLAWPATCH_GET_REFINEMENT_CRITERIA
 #define FCLAW2D_CLAWPATCH_EXCEEDS_THRESHOLD FCLAW3DX_CLAWPATCH_EXCEEDS_THRESHOLD
 
-//fclaw2d_clawpatch_output_ascii.h
-#define cb_clawpatch_output_ascii fclaw3dx_clawpatch_output_ascii_cb
-#define fclaw2d_clawpatch_output_ascii fclaw3dx_clawpatch_output_ascii
-#define fclaw2d_clawpatch_time_header_ascii fclaw3dx_clawpatch_time_header_ascii
-
 //fclaw2d_clawpatch_output_vtk.h
 #define fclaw2d_vtk_patch_data_t fclaw3dx_vtk_patch_data_t
 #define fclaw2d_vtk_write_file fclaw3dx_vtk_write_file

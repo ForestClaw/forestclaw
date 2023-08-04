@@ -38,7 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw_clawpatch_diagnostics.h>
 #include <fclaw_clawpatch_options.h>
-#include <fclaw2d_clawpatch_output_ascii.h> 
+#include <fclaw_clawpatch_output_ascii.h> 
 #include <fclaw2d_clawpatch_output_vtk.h>
 #include <fclaw2d_clawpatch_fort.h>
 #include <fclaw2d_clawpatch_conservation.h>
@@ -59,7 +59,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw_clawpatch_diagnostics.h>
 #include <fclaw_clawpatch_options.h>
-#include <fclaw3dx_clawpatch_output_ascii.h> 
+#include <fclaw_clawpatch_output_ascii.h> 
 #include <fclaw3dx_clawpatch_output_vtk.h>
 #include <fclaw3dx_clawpatch_fort.h>
 #include <fclaw3dx_clawpatch_transform.h>
@@ -1442,7 +1442,7 @@ void fclaw2d_clawpatch_vtable_initialize(fclaw2d_global_t* glob,
 	patch_vt->partition_unpack     = clawpatch_partition_unpack;
 
 	/* output functions */
-	clawpatch_vt->time_header_ascii  = fclaw2d_clawpatch_time_header_ascii;
+	clawpatch_vt->time_header_ascii  = fclaw_clawpatch_time_header_ascii;
 	clawpatch_vt->cb_output_ascii    = cb_clawpatch_output_ascii; 
 
 	/* Metric access */
