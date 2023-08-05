@@ -132,7 +132,7 @@ TESTS += src/patches/clawpatch/clawpatch.TEST
 src_patches_clawpatch_clawpatch_TEST_SOURCES = \
     src/patches/clawpatch/fclaw_clawpatch_options.h.TEST.cpp \
     src/patches/clawpatch/fclaw_clawpatch_diagnostics.h.TEST.cpp \
-    src/patches/clawpatch/fclaw_clawpatch.h.TEST.cpp \
+    src/patches/clawpatch/fclaw2d_clawpatch.h.TEST.cpp \
     src/patches/clawpatch/fclaw2d_clawpatch_fort.h.TEST.cpp \
 	src/patches/clawpatch/fclaw3dx_clawpatch.h.TEST.cpp \
 	src/patches/metric/fclaw2d_metric.h.TEST.cpp
