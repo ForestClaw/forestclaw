@@ -40,11 +40,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_patch.h>
 #include <fclaw_clawpatch.hpp>
 #include <fclaw_clawpatch.h>
+#include <fclaw_global.h>
 
 #include <fclaw_clawpatch_options.h>
-#include <fclaw2d_clawpatch_diagnostics.h>
-#include <fclaw2d_clawpatch_output_ascii.h> 
-#include <fclaw2d_clawpatch_output_vtk.h>
+#include <fclaw_clawpatch_diagnostics.h>
+#include <fclaw_clawpatch_output_ascii.h> 
+#include <fclaw_clawpatch_output_vtk.h>
 #include <fclaw2d_clawpatch_fort.h>
 
 #include "fc2d_cudaclaw_cuda.h"  
@@ -83,8 +84,8 @@ void cudaclaw_qinit(fclaw2d_global_t *glob,
     fclaw2d_clawpatch_grid_data(glob,this_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
-    fclaw2d_clawpatch_soln_data(glob,this_patch,&q,&meqn);
-    fclaw2d_clawpatch_aux_data(glob,this_patch,&aux,&maux);
+    fclaw_clawpatch_soln_data(glob,this_patch,&q,&meqn);
+    fclaw_clawpatch_aux_data(glob,this_patch,&aux,&maux);
 
     maxmx = mx;
     maxmy = my;
@@ -121,7 +122,7 @@ void cudaclaw_bc2(fclaw2d_global_t *glob,
     fclaw2d_clawpatch_grid_data(glob,this_patch, &mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
-    fclaw2d_clawpatch_aux_data(glob,this_patch,&aux,&maux);
+    fclaw_clawpatch_aux_data(glob,this_patch,&aux,&maux);
 
     maxmx = mx;
     maxmy = my;
@@ -148,7 +149,7 @@ void cudaclaw_bc2(fclaw2d_global_t *glob,
       In this case, this boundary condition won't be used to update
       anything
     */
-    fclaw2d_clawpatch_timesync_data(glob,this_patch,time_interp,&q,&meqn);
+    fclaw_clawpatch_timesync_data(glob,this_patch,time_interp,&q,&meqn);
 
     CUDACLAW_SET_BLOCK(&this_block_idx);
     cudaclaw_vt->fort_bc2(&maxmx,&maxmy,&meqn,&mbc,&mx,&my,&xlower,&ylower,
@@ -180,8 +181,8 @@ void cudaclaw_b4step2(fclaw2d_global_t *glob,
     fclaw2d_clawpatch_grid_data(glob,this_patch, &mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
-    fclaw2d_clawpatch_soln_data(glob,this_patch,&q,&meqn);
-    fclaw2d_clawpatch_aux_data(glob,this_patch,&aux,&maux);
+    fclaw_clawpatch_soln_data(glob,this_patch,&q,&meqn);
+    fclaw_clawpatch_aux_data(glob,this_patch,&aux,&maux);
 
     maxmx = mx;
     maxmy = my;
@@ -216,8 +217,8 @@ void cudaclaw_src2(fclaw2d_global_t *glob,
     fclaw2d_clawpatch_grid_data(glob,this_patch, &mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
-    fclaw2d_clawpatch_soln_data(glob,this_patch,&q,&meqn);
-    fclaw2d_clawpatch_aux_data(glob,this_patch,&aux,&maux);
+    fclaw_clawpatch_soln_data(glob,this_patch,&q,&meqn);
+    fclaw_clawpatch_aux_data(glob,this_patch,&aux,&maux);
 
     maxmx = mx;
     maxmy = my;
@@ -258,7 +259,7 @@ void cudaclaw_setaux(fclaw2d_global_t *glob,
     fclaw2d_clawpatch_grid_data(glob,this_patch, &mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
-    fclaw2d_clawpatch_aux_data(glob,this_patch,&aux,&maux);
+    fclaw_clawpatch_aux_data(glob,this_patch,&aux,&maux);
 
     maxmx = mx;
     maxmy = my;
@@ -314,7 +315,7 @@ double cudaclaw_update(fclaw2d_global_t *glob,
     total = buffer_data->total_count; 
     
     /* Be sure to save current step! */
-    fclaw2d_clawpatch_save_current_step(glob, this_patch);
+    fclaw_clawpatch_save_current_step(glob, this_patch);
 
 
     maxcfl = 0;
@@ -378,12 +379,12 @@ void cudaclaw_output(fclaw2d_global_t *glob, int iframe)
 
     if (clawpack_options->ascii_out != 0)
     {
-        fclaw2d_clawpatch_output_ascii(glob,iframe);
+        fclaw_clawpatch_output_ascii(glob,iframe);
     }
 
     if (clawpack_options->vtk_out != 0)
     {
-        fclaw2d_clawpatch_output_vtk(glob,iframe);
+        fclaw_clawpatch_output_vtk(glob,iframe);
     }
 
 }
@@ -498,7 +499,7 @@ void fc2d_cudaclaw_set_capacity(fclaw2d_global_t *glob,
 
     area = fclaw2d_clawpatch_get_area(glob,this_patch);
 
-    fclaw2d_clawpatch_aux_data(glob,this_patch,&aux,&maux);
+    fclaw_clawpatch_aux_data(glob,this_patch,&aux,&maux);
     FCLAW_ASSERT(maux >= mcapa && mcapa > 0);
 
     CUDACLAW_SET_CAPACITY(&mx,&my,&mbc,&dx,&dy,area,&mcapa,
