@@ -114,7 +114,6 @@ install(FILES
 	fclaw2d_clawpatch5_fort.h
 
 	fclaw3dx_clawpatch_transform.h
-	fclaw3dx_clawpatch_diagnostics.h
 	fclaw3dx_clawpatch_fort.h
 	fclaw3dx_clawpatch46_fort.h
 
