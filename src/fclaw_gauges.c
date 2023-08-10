@@ -60,11 +60,6 @@ typedef struct fclaw_gauge_info
     sc_array_t *coordinates;
 } fclaw_gauge_info_t;
 
-static void gauge_info_destroy(void* gauge_info)
-{
-    FCLAW_FREE(gauge_info);
-}
-
 static
 void gauge_initialize(fclaw2d_global_t* glob, void** acc)
 {
@@ -98,7 +93,7 @@ void gauge_initialize(fclaw2d_global_t* glob, void** acc)
 
 
     fclaw_gauge_info_t* gauge_info = FCLAW_ALLOC_ZERO(fclaw_gauge_info_t,1);
-    fclaw2d_global_attribute_store(glob, "gauge_info", gauge_info, gauge_info_destroy);
+    fclaw2d_global_attribute_store(glob, "gauge_info", gauge_info, NULL);
 
     if (num_gauges > 0)
     {
