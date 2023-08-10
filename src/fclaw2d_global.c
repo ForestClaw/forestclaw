@@ -106,8 +106,8 @@ fclaw2d_global_t* fclaw2d_global_new (void)
     glob->cont = NULL;
 
 #ifndef P4_TO_P8
+    glob->attributes = fclaw_pointer_map_new ();
     /* think about how this can work independent of dimension */
-    glob->acc = FCLAW_ALLOC (fclaw2d_diagnostics_accumulator_t, 1);
 #endif /* P4_TO_P8 */
 
     return glob;
@@ -171,7 +171,7 @@ fclaw2d_global_destroy (fclaw2d_global_t * glob)
     fclaw_pointer_map_destroy (glob->options);
 
 #ifndef P4_TO_P8
-    FCLAW_FREE (glob->acc);
+    fclaw_pointer_map_destroy (glob->attributes);
 #endif
     FCLAW_FREE (glob);
 }
@@ -246,6 +246,26 @@ void* fclaw2d_global_get_options (fclaw2d_global_t* glob, const char* key)
     FCLAW_ASSERT(options != NULL);
     return options;   
 }
+
+#ifndef P4_TO_P8
+void fclaw2d_global_attribute_store (fclaw2d_global_t* glob, 
+                                     const char* key, 
+                                     void* options,
+                                     fclaw_pointer_map_value_destroy_t destroy)
+{
+    
+    FCLAW_ASSERT(fclaw_pointer_map_get(glob->attributes,key) == NULL);
+    fclaw_pointer_map_insert(glob->attributes, key, options, destroy);
+}
+
+void* fclaw2d_global_get_attribute (fclaw2d_global_t* glob, const char* key)
+{
+    
+    void* options = fclaw_pointer_map_get(glob->attributes, key);
+    FCLAW_ASSERT(options != NULL);
+    return options;   
+}
+#endif
 
 static fclaw2d_global_t* fclaw2d_global_glob = NULL;
 

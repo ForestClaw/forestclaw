@@ -61,6 +61,52 @@ TEST_CASE("fclaw2d_global_options_store and fclaw2d_global_get_options test") {
     fclaw2d_global_destroy(glob);
 }
 
+static bool destroyed;
+static bool destroyed_2;
+TEST_CASE("fclaw2d_global_attribute_store and fclaw2d_global_get_attribute test") {
+    destroyed = false;
+    destroyed_2 = false;
+    fclaw2d_global_t* glob = fclaw2d_global_new();
+
+    // Test with an integer
+    int option1 = 10;
+    const char* key1 = "option1";
+
+    fclaw2d_global_attribute_store(glob, key1, &option1, [](void* data) {
+        destroyed = true;
+    });
+
+    int* retrieved_option1 = static_cast<int*>(fclaw2d_global_get_attribute(glob, key1));
+    CHECK_EQ(*retrieved_option1, option1);
+
+    // Test with a string
+    const char* option2 = "Test string";
+    const char* key2 = "option2";
+    fclaw2d_global_attribute_store(glob, key2, &option2, [](void* data) {
+        destroyed_2 = true;
+    });
+
+    const char** retrieved_option2 = static_cast<const char**>(fclaw2d_global_get_attribute(glob, key2));
+    CHECK_EQ(retrieved_option2, &option2);
+
+#ifdef FCLAW_ENABLE_DEBUG
+    // TEST inserting twice
+    CHECK_SC_ABORTED(fclaw2d_global_attribute_store(glob, key2, &option2,nullptr));
+#endif
+    // Test with a non-existing key
+    const char* key3 = "non-existing key";
+#ifdef FCLAW_ENABLE_DEBUG
+    CHECK_SC_ABORTED(fclaw2d_global_get_attribute(glob, key3));
+#else
+    void* retrieved_option3 = fclaw2d_global_get_attribute(glob, key3);
+    CHECK_EQ(retrieved_option3, nullptr);
+#endif
+
+    fclaw2d_global_destroy(glob);
+    CHECK_UNARY(destroyed);
+    CHECK_UNARY(destroyed_2);
+}
+
 TEST_CASE("fclaw2d_global_set_global")
 {
     fclaw2d_global_t* glob = (fclaw2d_global_t*)123;
