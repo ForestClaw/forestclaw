@@ -82,7 +82,6 @@ struct fclaw2d_global
 
     struct fclaw_pointer_map *vtables;    /**< Vtables */
     struct fclaw_pointer_map *options;    /**< options */
-
     struct fclaw_pointer_map *attributes;    /**< attributes, things that are not vtables, or options */
 
     struct fclaw2d_map_context* cont;
@@ -161,11 +160,12 @@ void fclaw2d_global_options_store (fclaw2d_global_t* glob, const char* key, void
 void* fclaw2d_global_get_options (fclaw2d_global_t* glob, const char* key);
 
 /**
- * @brief Store an options structure in the glob
+ * @brief Store an attribute in the glob
  * 
  * @param glob the global context
- * @param key the key to store the options under
- * @param attrubute the structure to store
+ * @param key the key to store the attribute under
+ * @param attrubute the attribute to store
+ * @param destory callback to destroy the attribute. Optional, can be set to NULL
  */
 void fclaw2d_global_attribute_store (fclaw2d_global_t* glob, 
                                      const char* key, 
@@ -173,10 +173,10 @@ void fclaw2d_global_attribute_store (fclaw2d_global_t* glob,
                                      fclaw_pointer_map_value_destroy_t destroy);
 
 /**
- * @brief Get an options structure from the glob
+ * @brief Get an attribute structure from the glob
  * 
  * @param glob the global context
- * @param key the key to retrieve the options from
+ * @param key the key to retrieve the attribute from
  * @return void* the options
  */
 void* fclaw2d_global_get_attribute (fclaw2d_global_t* glob, const char* key);

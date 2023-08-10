@@ -91,6 +91,7 @@ fclaw2d_global_t* fclaw2d_global_new (void)
     glob->pkg_container = fclaw_package_container_new ();
     glob->vtables = fclaw_pointer_map_new ();
     glob->options = fclaw_pointer_map_new ();
+    glob->attributes = fclaw_pointer_map_new ();
 
     glob->count_amr_advance = 0;
     glob->count_ghost_exchange = 0;
@@ -104,11 +105,6 @@ fclaw2d_global_t* fclaw2d_global_new (void)
     glob->count_elliptic_grids = 0;
     glob->curr_time = 0;
     glob->cont = NULL;
-
-#ifndef P4_TO_P8
-    glob->attributes = fclaw_pointer_map_new ();
-    /* think about how this can work independent of dimension */
-#endif /* P4_TO_P8 */
 
     return glob;
 }
@@ -169,10 +165,8 @@ fclaw2d_global_destroy (fclaw2d_global_t * glob)
     fclaw_package_container_destroy ((fclaw_package_container_t *)glob->pkg_container);
     fclaw_pointer_map_destroy (glob->vtables);
     fclaw_pointer_map_destroy (glob->options);
-
-#ifndef P4_TO_P8
     fclaw_pointer_map_destroy (glob->attributes);
-#endif
+
     FCLAW_FREE (glob);
 }
 
@@ -247,7 +241,6 @@ void* fclaw2d_global_get_options (fclaw2d_global_t* glob, const char* key)
     return options;   
 }
 
-#ifndef P4_TO_P8
 void fclaw2d_global_attribute_store (fclaw2d_global_t* glob, 
                                      const char* key, 
                                      void* options,
@@ -265,7 +258,6 @@ void* fclaw2d_global_get_attribute (fclaw2d_global_t* glob, const char* key)
     FCLAW_ASSERT(options != NULL);
     return options;   
 }
-#endif
 
 static fclaw2d_global_t* fclaw2d_global_glob = NULL;
 

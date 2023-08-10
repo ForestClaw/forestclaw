@@ -30,6 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw3d_map.h>   /* Needed to store the map context */
 
 #include <fclaw_timer.h>   /* Needed to create statically allocated array of timers */
+#include <fclaw_pointer_map.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -81,17 +82,10 @@ struct fclaw3d_global
 
     struct fclaw_pointer_map *vtables;    /**< Vtables */
     struct fclaw_pointer_map *options;    /**< options */
+    struct fclaw_pointer_map *attributes;    /**< attributes, things that are not vtables, or options */
 
     struct fclaw3d_map_context* cont;
     struct fclaw3d_domain *domain;
-
-#if 0
-    /* CB: is this a good place for the accumulator?
-           Would it be possible to add and retrieve it as an anonymous
-           object that does not need to be known to this file? */
-
-    struct fclaw3d_diagnostics_accumulator *acc;
-#endif
 
     void *user;
 };
@@ -153,6 +147,29 @@ void fclaw3d_global_options_store (fclaw3d_global_t* glob, const char* key, void
  * @return void* the options
  */
 void* fclaw3d_global_get_options (fclaw3d_global_t* glob, const char* key);
+
+/**
+ * @brief Store an attribute in the glob
+ * 
+ * @param glob the global context
+ * @param key the key to store the attribute under
+ * @param attrubute the attribute to store
+ * @param destory callback to destroy the attribute. Optional, can be set to NULL
+ */
+void fclaw3d_global_attribute_store (fclaw3d_global_t* glob, 
+                                     const char* key, 
+                                     void* attribute,
+                                     fclaw_pointer_map_value_destroy_t destroy);
+
+/**
+ * @brief Get an attribute structure from the glob
+ * 
+ * @param glob the global context
+ * @param key the key to retrieve the attribute from
+ * @return void* the options
+ */
+void* fclaw3d_global_get_attribute (fclaw3d_global_t* glob, const char* key);
+
 
 /**
  * @brief Store a glob variable in static memory
