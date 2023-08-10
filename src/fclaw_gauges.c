@@ -50,6 +50,7 @@ typedef struct fclaw_gauge_acc
     int num_gauges;
     int is_latest_domain;
     struct fclaw_gauge *gauges;
+    struct fclaw_gauge_info* info;
 } fclaw_gauge_acc_t;
 
 
@@ -92,8 +93,8 @@ void gauge_initialize(fclaw2d_global_t* glob, void** acc)
     gauge_acc->num_gauges = num_gauges;
 
 
-    fclaw_gauge_info_t* gauge_info = FCLAW_ALLOC_ZERO(fclaw_gauge_info_t,1);
-    fclaw2d_global_attribute_store(glob, "gauge_info", gauge_info, NULL);
+    gauge_acc->info = FCLAW_ALLOC_ZERO(fclaw_gauge_info_t,1);
+    fclaw_gauge_info_t* gauge_info = gauge_acc->info;
 
     if (num_gauges > 0)
     {
@@ -283,8 +284,7 @@ void fclaw_locate_gauges(fclaw2d_global_t *glob)
     fclaw2d_diagnostics_accumulator_t* acc = fclaw2d_global_get_attribute(glob, "acc");
     fclaw_gauge_acc_t* gauge_acc = 
               (fclaw_gauge_acc_t*) acc->gauge_accumulator;
-    fclaw_gauge_info_t* gauge_info = (fclaw_gauge_info_t*) 
-              fclaw2d_global_get_attribute(glob, "gauge_info");
+    fclaw_gauge_info_t* gauge_info = gauge_acc->info;
 
     /* Locate each gauge in the new mesh */
     num = gauge_acc->num_gauges;
@@ -331,8 +331,7 @@ void gauge_finalize(fclaw2d_global_t *glob, void** acc)
     /* Clean up gauges and print anything left over in buffers */
     fclaw_gauge_acc_t* gauge_acc = *((fclaw_gauge_acc_t**) acc);
     fclaw_gauge_t *gauges = gauge_acc->gauges;
-    fclaw_gauge_info_t* gauge_info = (fclaw_gauge_info_t*) 
-              fclaw2d_global_get_attribute(glob, "gauge_info");
+    fclaw_gauge_info_t* gauge_info = gauge_acc->info;
 
     for(int i = 0; i < gauge_acc->num_gauges; i++)
     {
