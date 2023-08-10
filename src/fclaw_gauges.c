@@ -23,6 +23,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include "fclaw_base.h"
 #include <fclaw_gauges.h>
 
 #include <fclaw_pointer_map.h>
@@ -59,6 +60,10 @@ typedef struct fclaw_gauge_info
     sc_array_t *coordinates;
 } fclaw_gauge_info_t;
 
+static void gauge_info_destroy(void* gauge_info)
+{
+    FCLAW_FREE(gauge_info);
+}
 
 static
 void gauge_initialize(fclaw2d_global_t* glob, void** acc)
@@ -92,7 +97,8 @@ void gauge_initialize(fclaw2d_global_t* glob, void** acc)
     gauge_acc->num_gauges = num_gauges;
 
 
-    glob->gauge_info = FCLAW_ALLOC_ZERO(fclaw_gauge_info_t,1);
+    fclaw_gauge_info_t* gauge_info = FCLAW_ALLOC_ZERO(fclaw_gauge_info_t,1);
+    fclaw2d_global_attribute_store(glob, "gauge_info", gauge_info, gauge_info_destroy);
 
     if (num_gauges > 0)
     {
@@ -131,9 +137,9 @@ void gauge_initialize(fclaw2d_global_t* glob, void** acc)
 
         int num_blocks = glob->domain->num_blocks;
 
-        glob->gauge_info->block_offsets = sc_array_new_count(sizeof(int), 
+        gauge_info->block_offsets = sc_array_new_count(sizeof(int), 
                                                       num_blocks+1);
-        glob->gauge_info->coordinates = sc_array_new_count(2*sizeof(double), num_gauges);
+        gauge_info->coordinates = sc_array_new_count(2*sizeof(double), num_gauges);
 
         /* We don't know how the blocks are arranged in the brick domain
            so we reverse engineer this information */
@@ -149,7 +155,7 @@ void gauge_initialize(fclaw2d_global_t* glob, void** acc)
         fclaw2d_block_t *blocks = glob->domain->blocks;
 
         int number_of_gauges_set = 0;
-        int *bo = (int*) sc_array_index_int(glob->gauge_info->block_offsets,0);
+        int *bo = (int*) sc_array_index_int(gauge_info->block_offsets,0);
         bo[0] = 0;
 
         double xll,yll, xur, yur;
@@ -200,7 +206,7 @@ void gauge_initialize(fclaw2d_global_t* glob, void** acc)
                        domain in [0,mi]x[0,mj].  This may not work for the 
                        cubed sphere case */
 
-                    double *c = (double*) sc_array_index_int(glob->gauge_info->coordinates, ng);
+                    double *c = (double*) sc_array_index_int(gauge_info->coordinates, ng);
                     c[0] = mi*(x - xll);
                     c[1] = mj*(y - yll);
 
@@ -209,7 +215,7 @@ void gauge_initialize(fclaw2d_global_t* glob, void** acc)
                     number_of_gauges_set++;
                 }
             }
-            bo = (int*) sc_array_index_int(glob->gauge_info->block_offsets, nb+1);
+            bo = (int*) sc_array_index_int(gauge_info->block_offsets, nb+1);
             bo[0] = number_of_gauges_set;        
         }
     }
@@ -282,7 +288,8 @@ void fclaw_locate_gauges(fclaw2d_global_t *glob)
     fclaw2d_diagnostics_accumulator_t* acc = fclaw2d_global_get_attribute(glob, "acc");
     fclaw_gauge_acc_t* gauge_acc = 
               (fclaw_gauge_acc_t*) acc->gauge_accumulator;
-    //fclaw_gauge_info_t* gauge_info = glob->gauge_info;
+    fclaw_gauge_info_t* gauge_info = (fclaw_gauge_info_t*) 
+              fclaw2d_global_get_attribute(glob, "gauge_info");
 
     /* Locate each gauge in the new mesh */
     num = gauge_acc->num_gauges;
@@ -295,8 +302,8 @@ void fclaw_locate_gauges(fclaw2d_global_t *glob)
     sc_array_t *results = sc_array_new_size(sizeof(int), num);
 
     fclaw2d_domain_search_points(glob->domain, 
-                                 glob->gauge_info->block_offsets,
-                                 glob->gauge_info->coordinates, results);
+                                 gauge_info->block_offsets,
+                                 gauge_info->coordinates, results);
 
     for (i = 0; i < gauge_acc->num_gauges; ++i)
     {
@@ -329,7 +336,8 @@ void gauge_finalize(fclaw2d_global_t *glob, void** acc)
     /* Clean up gauges and print anything left over in buffers */
     fclaw_gauge_acc_t* gauge_acc = *((fclaw_gauge_acc_t**) acc);
     fclaw_gauge_t *gauges = gauge_acc->gauges;
-    fclaw_gauge_info_t* gauge_info = glob->gauge_info;
+    fclaw_gauge_info_t* gauge_info = (fclaw_gauge_info_t*) 
+              fclaw2d_global_get_attribute(glob, "gauge_info");
 
     for(int i = 0; i < gauge_acc->num_gauges; i++)
     {
@@ -350,14 +358,14 @@ void gauge_finalize(fclaw2d_global_t *glob, void** acc)
         FCLAW_FREE(gauge_acc->gauges); 
     }       
 
-    if (glob->gauge_info->block_offsets != NULL)
+    if (gauge_info->block_offsets != NULL)
     {
-        sc_array_destroy(glob->gauge_info->block_offsets);
+        sc_array_destroy(gauge_info->block_offsets);
     }
 
-    if (glob->gauge_info->coordinates != NULL)
+    if (gauge_info->coordinates != NULL)
     {
-        sc_array_destroy(glob->gauge_info->coordinates);
+        sc_array_destroy(gauge_info->coordinates);
     }
     
     FCLAW_FREE(gauge_acc);

@@ -88,15 +88,6 @@ struct fclaw2d_global
     struct fclaw2d_map_context* cont;
     struct fclaw2d_domain *domain;
 
-    /* CB: is this a good place for the accumulator?
-           Would it be possible to add and retrieve it as an anonymous
-           object that does not need to be known to this file? */
-
-    /* CB: this is application specific.
-           Would it not be cleaner to add the gauges in a way to global
-           that this file does not need to know about gauges at all? */
-    struct fclaw_gauge_info* gauge_info;
-
     void *user;
 };
 
