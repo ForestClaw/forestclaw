@@ -132,7 +132,7 @@ fclaw2d_global_get_map(fclaw_global_t* glob)
 }
 
 void
-fclaw2d_global_destroy (fclaw_global_t * glob)
+fclaw_global_destroy (fclaw_global_t * glob)
 {
     FCLAW_ASSERT (glob != NULL);
 

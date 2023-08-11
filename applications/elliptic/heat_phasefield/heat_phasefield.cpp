@@ -104,7 +104,7 @@ main (int argc, char **argv)
 
         heat_run_program(heat_glob);
 
-        fclaw2d_global_destroy(heat_glob);        
+        fclaw_global_destroy(heat_glob);        
         phasefield_domain = phasefield_create_domain(mpicomm, phasefield_fclaw_opt);
     
         /* Create global structure which stores the domain, timers, etc */
@@ -119,7 +119,7 @@ main (int argc, char **argv)
 
         phasefield_run_program(phasefield_glob);
 
-        fclaw2d_global_destroy(phasefield_glob); 
+        fclaw_global_destroy(phasefield_glob); 
     }
     
     fclaw_app_destroy (app);

@@ -123,7 +123,7 @@ main (int argc, char **argv)
         swirl_options_store             (glob, user_opt);
 
         run_program(glob);
-        fclaw2d_global_destroy(glob);
+        fclaw_global_destroy(glob);
     }
 
     fclaw_app_destroy (app);

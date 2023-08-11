@@ -285,7 +285,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define fclaw2d_global_iterate_t        fclaw3d_global_iterate_t
 #define fclaw_global_new              fclaw_global_new
 #define fclaw_global_new_comm         fclaw_global_new_comm
-#define fclaw2d_global_destroy          fclaw3d_global_destroy
+#define fclaw_global_destroy          fclaw_global_destroy
 #define fclaw2d_global_store_domain     fclaw3d_global_store_domain
 #define fclaw2d_global_store_map        fclaw3d_global_store_map
 #define fclaw2d_global_iterate_level    fclaw3d_global_iterate_level

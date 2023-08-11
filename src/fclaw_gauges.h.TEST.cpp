@@ -41,8 +41,8 @@ TEST_CASE("fclaw_gauges_vtable_initialize stores two seperate vtables in two sep
 
 	CHECK_NE(fclaw_gauges_vt(glob1), fclaw_gauges_vt(glob2));
 
-	fclaw2d_global_destroy(glob1);
-	fclaw2d_global_destroy(glob2);
+	fclaw_global_destroy(glob1);
+	fclaw_global_destroy(glob2);
 }
 
 TEST_CASE("fclaw_gauges_vtable_initialize sets is_set flag")
@@ -54,7 +54,7 @@ TEST_CASE("fclaw_gauges_vtable_initialize sets is_set flag")
 
 	CHECK_UNARY(fclaw_gauges_vt(glob)->is_set);
 
-	fclaw2d_global_destroy(glob);
+	fclaw_global_destroy(glob);
 }
 
 #ifdef FCLAW_ENABLE_DEBUG
@@ -72,8 +72,8 @@ TEST_CASE("fclaw_guages_vtable_initialize fails if called twice on a glob")
 	fclaw_gauges_vtable_initialize(glob2);
 	CHECK_SC_ABORTED(fclaw_gauges_vtable_initialize(glob2));
 
-	fclaw2d_global_destroy(glob1);
-	fclaw2d_global_destroy(glob2);
+	fclaw_global_destroy(glob1);
+	fclaw_global_destroy(glob2);
 }
 
 #endif

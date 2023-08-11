@@ -81,6 +81,14 @@ struct fclaw_global_iterate
     void* user;
 };
 
+/** Allocate a new global structure. */
+fclaw_global_t* fclaw_global_new (void);
+
+fclaw_global_t* fclaw_global_new_comm (sc_MPI_Comm mpicomm,
+                                           int mpisize, int mpirank);
+
+void fclaw_global_destroy (fclaw_global_t * glob);
+
 #ifdef __cplusplus
 #if 0
 {                               /* need this because indent is dumb */

@@ -96,7 +96,7 @@ struct QuadDomain {
         fclaw2d_patch_data_delete(glob, &domain->blocks[0].patches[2]);
         fclaw2d_patch_data_delete(glob, &domain->blocks[0].patches[3]);
         fclaw_clawpatch_options_destroy(opts);
-        fclaw2d_global_destroy(glob);
+        fclaw_global_destroy(glob);
     }
 };
 struct QuadDomainBrick {
@@ -151,7 +151,7 @@ struct QuadDomainBrick {
         fclaw2d_patch_data_delete(glob, &domain->blocks[2].patches[0]);
         fclaw2d_patch_data_delete(glob, &domain->blocks[3].patches[0]);
         fclaw_clawpatch_options_destroy(opts);
-        fclaw2d_global_destroy(glob);
+        fclaw_global_destroy(glob);
     }
 };
 }

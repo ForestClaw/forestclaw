@@ -165,14 +165,14 @@ torthem_destroy (torthem_t * torthem)
 #if 0
     torus_options_destroy (&torthem->user);
     fc2d_clawpack46_options_destroy (&torthem->claw_opt);
-    fclaw2d_global_destroy (torthem->global);
+    fclaw_global_destroy (torthem->global);
 #endif
 
     fclaw_options_destroy (&torthem->fclaw_opt);
 
 #if 1
     fclaw2d_finalize (torthem->global);
-    fclaw2d_global_destroy (torthem->global);
+    fclaw_global_destroy (torthem->global);
 #endif
 }
 

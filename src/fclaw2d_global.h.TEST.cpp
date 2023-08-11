@@ -58,7 +58,7 @@ TEST_CASE("fclaw2d_global_options_store and fclaw2d_global_get_options test") {
     CHECK_EQ(retrieved_option3, nullptr);
 #endif
 
-    fclaw2d_global_destroy(glob);
+    fclaw_global_destroy(glob);
 }
 
 static bool destroyed;
@@ -102,7 +102,7 @@ TEST_CASE("fclaw2d_global_attribute_store and fclaw2d_global_get_attribute test"
     CHECK_EQ(retrieved_option3, nullptr);
 #endif
 
-    fclaw2d_global_destroy(glob);
+    fclaw_global_destroy(glob);
     CHECK_UNARY(destroyed);
     CHECK_UNARY(destroyed_2);
 }

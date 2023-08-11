@@ -35,7 +35,7 @@ TEST_CASE("fclaw2d_clawpatch_diagnostics_vtable_initialize fails if fclaw2d_diag
 {
 	fclaw_global_t* glob = fclaw_global_new();
 	CHECK_SC_ABORTED(fclaw_clawpatch_diagnostics_vtable_initialize(glob));
-	fclaw2d_global_destroy(glob);
+	fclaw_global_destroy(glob);
 }
 
 #endif

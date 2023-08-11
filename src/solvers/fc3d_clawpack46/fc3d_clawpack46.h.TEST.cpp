@@ -55,8 +55,8 @@ TEST_CASE("fc3d_clawpack46_solver_initialize stores two seperate vtables in two 
 
 	fclaw_clawpatch_options_destroy(opts1);
 	fclaw_clawpatch_options_destroy(opts2);
-	fclaw2d_global_destroy(glob1);
-	fclaw2d_global_destroy(glob2);
+	fclaw_global_destroy(glob1);
+	fclaw_global_destroy(glob2);
 }
 
 TEST_CASE("fc3d_clawpack46_solver_initialize sets is_set flag")
@@ -76,7 +76,7 @@ TEST_CASE("fc3d_clawpack46_solver_initialize sets is_set flag")
 	CHECK_UNARY(fc3d_clawpack46_vt(glob)->is_set);
 
 	fclaw_clawpatch_options_destroy(opts);
-	fclaw2d_global_destroy(glob);
+	fclaw_global_destroy(glob);
 }
 
 #ifdef FCLAW_ENABLE_DEBUG
@@ -90,8 +90,8 @@ TEST_CASE("fc3d_clawpack46_vt fails if not intialized")
 
 	CHECK_SC_ABORTED(fc3d_clawpack46_vt(glob2));
 
-	fclaw2d_global_destroy(glob1);
-	fclaw2d_global_destroy(glob2);
+	fclaw_global_destroy(glob1);
+	fclaw_global_destroy(glob2);
 }
 
 TEST_CASE("fc3d_clawpack46_vtable_initialize fails if called twice on a glob")
@@ -119,8 +119,8 @@ TEST_CASE("fc3d_clawpack46_vtable_initialize fails if called twice on a glob")
 
 	fclaw_clawpatch_options_destroy(opts1);
 	fclaw_clawpatch_options_destroy(opts2);
-	fclaw2d_global_destroy(glob1);
-	fclaw2d_global_destroy(glob2);
+	fclaw_global_destroy(glob1);
+	fclaw_global_destroy(glob2);
 }
 
 #endif

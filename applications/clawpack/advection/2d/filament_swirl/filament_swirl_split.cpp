@@ -294,8 +294,8 @@ main (int argc, char **argv)
         }
 
         /* destroy */
-        fclaw2d_global_destroy(filament_glob);        
-        fclaw2d_global_destroy(swirl_glob);
+        fclaw_global_destroy(filament_glob);        
+        fclaw_global_destroy(swirl_glob);
     }
 
     fclaw_app_destroy (app);

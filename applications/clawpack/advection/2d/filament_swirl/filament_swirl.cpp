@@ -540,8 +540,8 @@ main (int argc, char **argv)
 
         /* destroy */
         sc_array_destroy (c->query_points);
-        fclaw2d_global_destroy (filament_glob);
-        fclaw2d_global_destroy (swirl_glob);
+        fclaw_global_destroy (filament_glob);
+        fclaw_global_destroy (swirl_glob);
 
     }
 

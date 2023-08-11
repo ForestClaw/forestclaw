@@ -91,7 +91,7 @@ main (int argc, char **argv)
         /* Run the program */
         radial_run_program(radial_glob);
 
-        fclaw2d_global_destroy(radial_glob);
+        fclaw_global_destroy(radial_glob);
 
         slosh_domain = slosh_create_domain(mpicomm, slosh_fclaw_opt);
     
@@ -107,7 +107,7 @@ main (int argc, char **argv)
 
         slosh_run_program(slosh_glob);
         
-        fclaw2d_global_destroy(slosh_glob);
+        fclaw_global_destroy(slosh_glob);
     
     }
 

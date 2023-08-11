@@ -122,7 +122,7 @@ TEST_CASE("FCLAW2D_CLAWPATCH_EXCEEDS_THRESHOLD calls user function")
 
     CHECK_EQ(ret, params.return_value);
 
-    fclaw2d_global_destroy(glob);
+    fclaw_global_destroy(glob);
 }
 TEST_CASE("FCLAW3DX_CLAWPATCH_EXCEEDS_THRESHOLD calls user function")
 {
@@ -195,5 +195,5 @@ TEST_CASE("FCLAW3DX_CLAWPATCH_EXCEEDS_THRESHOLD calls user function")
 
     CHECK_EQ(ret, params.return_value);
 
-    fclaw2d_global_destroy(glob);
+    fclaw_global_destroy(glob);
 }

@@ -65,14 +65,6 @@ struct fclaw2d_map_context;
 struct fclaw_package_container;
 struct fclaw2d_diagnostics_accumulator;
 
-/** Allocate a new global structure. */
-fclaw_global_t* fclaw_global_new (void);
-
-fclaw_global_t* fclaw_global_new_comm (sc_MPI_Comm mpicomm,
-                                           int mpisize, int mpirank);
-
-void fclaw2d_global_destroy (fclaw_global_t * glob);
-
 void fclaw2d_global_store_domain (fclaw_global_t* glob,
                                   struct fclaw_domain* domain);
 

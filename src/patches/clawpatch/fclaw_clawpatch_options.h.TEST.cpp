@@ -70,8 +70,8 @@ TEST_CASE("fclaw_clawpatch_options can store options in two seperate globs")
 
 	fclaw_clawpatch_options_destroy(opts1);
 	fclaw_clawpatch_options_destroy(opts2);
-	fclaw2d_global_destroy(glob1);
-	fclaw2d_global_destroy(glob2);
+	fclaw_global_destroy(glob1);
+	fclaw_global_destroy(glob2);
 }
 
 #ifdef FCLAW_ENABLE_DEBUG
@@ -85,8 +85,8 @@ TEST_CASE("fclaw_clawpatch_get_options fails if not intialized")
 
 	CHECK_SC_ABORTED(fclaw_clawpatch_get_options(glob2));
 
-	fclaw2d_global_destroy(glob1);
-	fclaw2d_global_destroy(glob2);
+	fclaw_global_destroy(glob1);
+	fclaw_global_destroy(glob2);
 }
 
 TEST_CASE("fclaw_clawpatch_options_store fails if called twice on a glob")
@@ -105,8 +105,8 @@ TEST_CASE("fclaw_clawpatch_options_store fails if called twice on a glob")
 
 	fclaw_clawpatch_options_destroy(opts1);
 	fclaw_clawpatch_options_destroy(opts2);
-	fclaw2d_global_destroy(glob1);
-	fclaw2d_global_destroy(glob2);
+	fclaw_global_destroy(glob1);
+	fclaw_global_destroy(glob2);
 }
 
 #endif

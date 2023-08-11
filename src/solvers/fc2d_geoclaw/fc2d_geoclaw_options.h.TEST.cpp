@@ -44,8 +44,8 @@ TEST_CASE("fc2d_geoclaw_options can store options in two seperate globs")
 	CHECK_EQ(fc2d_geoclaw_get_options(glob1), opts1);
 	CHECK_EQ(fc2d_geoclaw_get_options(glob2), opts2);
 
-	fclaw2d_global_destroy(glob1);
-	fclaw2d_global_destroy(glob2);
+	fclaw_global_destroy(glob1);
+	fclaw_global_destroy(glob2);
 }
 
 #ifdef FCLAW_ENABLE_DEBUG
@@ -59,8 +59,8 @@ TEST_CASE("fc2d_geoclaw_get_options fails if not intialized")
 
 	CHECK_SC_ABORTED(fc2d_geoclaw_get_options(glob2));
 
-	fclaw2d_global_destroy(glob1);
-	fclaw2d_global_destroy(glob2);
+	fclaw_global_destroy(glob1);
+	fclaw_global_destroy(glob2);
 }
 
 TEST_CASE("fc2d_geoclaw_options_store fails if called twice on a glob")
@@ -74,8 +74,8 @@ TEST_CASE("fc2d_geoclaw_options_store fails if called twice on a glob")
 	fc2d_geoclaw_options_store(glob2, FCLAW_ALLOC_ZERO(fc2d_geoclaw_options_t,1));
 	CHECK_SC_ABORTED(fc2d_geoclaw_options_store(glob2, FCLAW_ALLOC_ZERO(fc2d_geoclaw_options_t,1)));
 
-	fclaw2d_global_destroy(glob1);
-	fclaw2d_global_destroy(glob2);
+	fclaw_global_destroy(glob1);
+	fclaw_global_destroy(glob2);
 }
 
 #endif
