@@ -48,7 +48,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define fclaw2d_domain_exchange_t       fclaw3d_domain_exchange_t
 #define fclaw2d_integrate_ray_t         fclaw3d_integrate_ray_t
 #define fclaw2d_interpolate_point_t     fclaw3d_interpolate_point_t
-#define fclaw2d_build_mode_t            fclaw3d_build_mode_t
 #define fclaw2d_patch_new_t             fclaw3d_patch_new_t
 #define fclaw2d_patch_delete_t          fclaw3d_patch_delete_t
 #define fclaw2d_patch_build_t           fclaw3d_patch_build_t
@@ -102,10 +101,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define FCLAW2D_PATCH_ON_BLOCK_FACE_1   FCLAW3D_PATCH_ON_BLOCK_FACE_1
 #define FCLAW2D_PATCH_ON_BLOCK_FACE_2   FCLAW3D_PATCH_ON_BLOCK_FACE_2
 #define FCLAW2D_PATCH_ON_BLOCK_FACE_3   FCLAW3D_PATCH_ON_BLOCK_FACE_3
-#define FCLAW2D_BUILD_FOR_GHOST_AREA_COMPUTED FCLAW3D_BUILD_FOR_GHOST_AREA_COMPUTED
-#define FCLAW2D_BUILD_FOR_GHOST_AREA_PACKED FCLAW3D_BUILD_FOR_GHOST_AREA_PACKED
-#define FCLAW2D_BUILD_FOR_UPDATE        FCLAW3D_BUILD_FOR_UPDATE
-#define FCLAW2D_BUILD_CUSTOM            FCLAW3D_BUILD_CUSTOM
 
 /* redefine variables */
 #define fclaw2d_patch_block_face_flags  fclaw3d_patch_block_face_flags

@@ -98,7 +98,7 @@ struct SinglePatchDomain {
         fclaw_domain_data_new(glob->domain);
     }
     void setup(){
-        fclaw2d_build_mode_t build_mode = FCLAW2D_BUILD_FOR_UPDATE;
+        fclaw_build_mode_t build_mode = FCLAW_BUILD_FOR_UPDATE;
         fclaw2d_patch_build(glob, &domain->blocks[0].patches[0], 0, 0, &build_mode);
     }
     ~SinglePatchDomain(){
@@ -146,7 +146,7 @@ struct QuadDomain {
         fclaw_domain_data_new(glob->domain);
     }
     void setup(){
-        fclaw2d_build_mode_t build_mode = FCLAW2D_BUILD_FOR_UPDATE;
+        fclaw_build_mode_t build_mode = FCLAW_BUILD_FOR_UPDATE;
         fclaw2d_patch_build(glob, &domain->blocks[0].patches[0], 0, 0, &build_mode);
         fclaw2d_patch_build(glob, &domain->blocks[0].patches[1], 0, 1, &build_mode);
         fclaw2d_patch_build(glob, &domain->blocks[0].patches[2], 0, 2, &build_mode);
@@ -232,7 +232,7 @@ TEST_CASE("fclaw3dx_clawpatch patch_build")
     for(const int& meqn : {1,2})
     for(const int& maux : {0,2})
     for(const int& rhs_fields : {0,2})
-    for(fclaw2d_build_mode_t build_mode : {FCLAW2D_BUILD_FOR_GHOST_AREA_COMPUTED, FCLAW2D_BUILD_FOR_UPDATE})
+    for(fclaw_build_mode_t build_mode : {FCLAW_BUILD_FOR_GHOST_AREA_COMPUTED, FCLAW_BUILD_FOR_UPDATE})
     {
         fclaw_global_t* glob = fclaw_global_new(); 
         fclaw2d_vtables_initialize(glob);
@@ -293,7 +293,7 @@ TEST_CASE("fclaw3dx_clawpatch patch_build")
         //BOX DIEMSIONS
 
         CHECK_BOX_DIMENSIONS(cp->griddata, opts->mbc, opts->d3->mx, opts->d3->my, opts->d3->mz, opts->meqn);
-        if(build_mode == FCLAW2D_BUILD_FOR_UPDATE){
+        if(build_mode == FCLAW_BUILD_FOR_UPDATE){
             CHECK_BOX_DIMENSIONS(cp->griddata_last, opts->mbc, opts->d3->mx, opts->d3->my, opts->d3->mz, opts->meqn);
             CHECK_BOX_DIMENSIONS(cp->griddata_save, opts->mbc, opts->d3->mx, opts->d3->my, opts->d3->mz, opts->meqn);
         }else{

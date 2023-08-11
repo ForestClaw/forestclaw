@@ -182,7 +182,7 @@ void fclaw2d_patch_build_from_fine(fclaw_global_t *glob,
                                    int blockno,
                                    int coarse_patchno,
                                    int fine0_patchno,
-                                   fclaw2d_build_mode_t build_mode)
+                                   fclaw_build_mode_t build_mode)
 {
     fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt(glob);
     FCLAW_ASSERT(patch_vt->build_from_fine != NULL);
@@ -205,7 +205,7 @@ void fclaw2d_patch_build_from_fine(fclaw_global_t *glob,
         patch_vt->create_user_data(glob,coarse_patch);
     }    
 
-    if (patch_vt->setup != NULL && build_mode == FCLAW2D_BUILD_FOR_UPDATE)
+    if (patch_vt->setup != NULL && build_mode == FCLAW_BUILD_FOR_UPDATE)
     {
         patch_vt->setup(glob,coarse_patch,blockno,coarse_patchno);
     }
@@ -627,7 +627,7 @@ void fclaw2d_patch_remote_ghost_build(fclaw_global_t *glob,
 									  fclaw_patch_t *this_patch,
 									  int blockno,
 									  int patchno,
-									  fclaw2d_build_mode_t build_mode)
+									  fclaw_build_mode_t build_mode)
 {
 	fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt(glob);
 
@@ -714,7 +714,7 @@ void fclaw2d_patch_partition_unpack(fclaw_global_t *glob,
 {
 	fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt(glob);
 
-	fclaw2d_build_mode_t build_mode = FCLAW2D_BUILD_FOR_UPDATE;
+	fclaw_build_mode_t build_mode = FCLAW_BUILD_FOR_UPDATE;
 
 	fclaw2d_patch_build(glob,this_patch,this_block_idx,
 						this_patch_idx,(void*) &build_mode);

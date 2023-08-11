@@ -124,7 +124,7 @@ void fclaw2d_metric_patch_define(struct fclaw_global* glob,
 								 double xlower, double ylower,
 								 double xupper, double yupper,
 								 int blockno, int patchno,
-								 fclaw2d_build_mode_t build_mode);
+								 fclaw_build_mode_t build_mode);
 
 
 /**

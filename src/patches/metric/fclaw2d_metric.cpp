@@ -95,7 +95,7 @@ void fclaw2d_metric_patch_define(fclaw_global_t* glob,
                                  double xlower, double ylower, 
                                  double xupper, double yupper,
                                  int blockno, int patchno, 
-                                 fclaw2d_build_mode_t build_mode)
+                                 fclaw_build_mode_t build_mode)
 #elif PATCH_DIM == 3
 void fclaw3d_metric_patch_define(fclaw_global_t* glob,
                                  fclaw_patch_t* patch, 
@@ -104,7 +104,7 @@ void fclaw3d_metric_patch_define(fclaw_global_t* glob,
                                  double xlower, double ylower, double zlower,
                                  double xupper, double yupper, double zupper,
                                  int blockno, int patchno, 
-                                 fclaw2d_build_mode_t build_mode)
+                                 fclaw_build_mode_t build_mode)
 #endif
     
 {
@@ -195,8 +195,8 @@ void fclaw3d_metric_patch_define(fclaw_global_t* glob,
 
 
     /* Only allocate memory that is needed */
-    if (build_mode != FCLAW2D_BUILD_FOR_GHOST_AREA_PACKED
-       && build_mode == FCLAW2D_BUILD_FOR_UPDATE)    
+    if (build_mode != FCLAW_BUILD_FOR_GHOST_AREA_PACKED
+       && build_mode == FCLAW_BUILD_FOR_UPDATE)    
     {
         /* 
         From here on out, we build for patches that get updated 

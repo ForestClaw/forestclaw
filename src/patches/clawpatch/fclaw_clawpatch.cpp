@@ -218,7 +218,7 @@ static
 void clawpatch_define(fclaw_global_t* glob,
                       fclaw_patch_t *patch,
                       int blockno, int patchno,
-                      fclaw2d_build_mode_t build_mode)
+                      fclaw_build_mode_t build_mode)
 {
     /* We are getting closer to getting rid the class fclaw_clawpatch_t */
     fclaw_clawpatch_t *cp = get_clawpatch(patch);
@@ -430,7 +430,7 @@ void clawpatch_define(fclaw_global_t* glob,
                                       blockno,patchno,&cp->d2->registers);
     }
 
-    if (build_mode != FCLAW2D_BUILD_FOR_UPDATE)
+    if (build_mode != FCLAW_BUILD_FOR_UPDATE)
         /* If we are building ghost patches, we don't need all the patch memory */
         return;
 
@@ -446,7 +446,7 @@ void clawpatch_build(fclaw_global_t *glob,
                      int patchno,
                      void *user)
 {
-    fclaw2d_build_mode_t build_mode =  *((fclaw2d_build_mode_t*) user);
+    fclaw_build_mode_t build_mode =  *((fclaw_build_mode_t*) user);
     const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
     const fclaw_clawpatch_options_t* clawpatch_opt = 
                          fclaw_clawpatch_get_options(glob);
@@ -489,7 +489,7 @@ void clawpatch_build_from_fine(fclaw_global_t *glob,
                                int blockno,
                                int coarse_patchno,
                                int fine0_patchno,
-                               fclaw2d_build_mode_t build_mode)
+                               fclaw_build_mode_t build_mode)
 {
     const fclaw_clawpatch_options_t* clawpatch_opt = 
                          fclaw_clawpatch_get_options(glob);
@@ -1382,7 +1382,7 @@ void clawpatch_remote_ghost_build(fclaw_global_t *glob,
                                   fclaw_patch_t *patch,
                                   int blockno,
                                   int patchno,
-                                  fclaw2d_build_mode_t build_mode)
+                                  fclaw_build_mode_t build_mode)
 {
     const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
     const fclaw_clawpatch_options_t* clawpatch_opt = 
@@ -1392,7 +1392,7 @@ void clawpatch_remote_ghost_build(fclaw_global_t *glob,
 
     if (fclaw_opt->manifold)
     {
-        if (build_mode != FCLAW2D_BUILD_FOR_GHOST_AREA_PACKED)
+        if (build_mode != FCLAW_BUILD_FOR_GHOST_AREA_PACKED)
         {
             /* Cell areas/volumes are not sent as MPI messages and so must
                be recomputed

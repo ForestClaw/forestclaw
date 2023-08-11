@@ -91,14 +91,14 @@ void build_remote_ghost_patches(fclaw_global_t* glob)
                             domain->mpirank,domain->num_ghost_patches);
     int blockno, patchno;
     fclaw_patch_t *ghost_patch;
-    fclaw2d_build_mode_t build_mode;
+    fclaw_build_mode_t build_mode;
     if (gparms->ghost_patch_pack_area)
     {
-        build_mode = FCLAW2D_BUILD_FOR_GHOST_AREA_PACKED;
+        build_mode = FCLAW_BUILD_FOR_GHOST_AREA_PACKED;
     }
     else
     {
-        build_mode = FCLAW2D_BUILD_FOR_GHOST_AREA_COMPUTED;
+        build_mode = FCLAW_BUILD_FOR_GHOST_AREA_COMPUTED;
     }
 
     int i;

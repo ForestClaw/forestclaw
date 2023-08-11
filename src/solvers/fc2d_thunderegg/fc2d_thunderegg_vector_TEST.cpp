@@ -84,7 +84,7 @@ struct QuadDomain {
 
     }
     void setup(){
-        fclaw2d_build_mode_t build_mode = FCLAW2D_BUILD_FOR_UPDATE;
+        fclaw_build_mode_t build_mode = FCLAW_BUILD_FOR_UPDATE;
         fclaw2d_patch_build(glob, &domain->blocks[0].patches[0], 0, 0, &build_mode);
         fclaw2d_patch_build(glob, &domain->blocks[0].patches[1], 0, 1, &build_mode);
         fclaw2d_patch_build(glob, &domain->blocks[0].patches[2], 0, 2, &build_mode);
@@ -139,7 +139,7 @@ struct QuadDomainBrick {
         fclaw_domain_data_new(glob->domain);
     }
     void setup(){
-        fclaw2d_build_mode_t build_mode = FCLAW2D_BUILD_FOR_UPDATE;
+        fclaw_build_mode_t build_mode = FCLAW_BUILD_FOR_UPDATE;
         fclaw2d_patch_build(glob, &domain->blocks[0].patches[0], 0, 0, &build_mode);
         fclaw2d_patch_build(glob, &domain->blocks[1].patches[0], 1, 0, &build_mode);
         fclaw2d_patch_build(glob, &domain->blocks[2].patches[0], 2, 0, &build_mode);

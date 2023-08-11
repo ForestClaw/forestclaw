@@ -126,7 +126,7 @@ void cb_fclaw2d_regrid_repopulate(fclaw_domain_t * old_domain,
 
     fclaw2d_domain_data_t *ddata_old = old_domain->d2;
     fclaw2d_domain_data_t *ddata_new = old_domain->d2;
-    fclaw2d_build_mode_t build_mode = FCLAW2D_BUILD_FOR_UPDATE;
+    fclaw_build_mode_t build_mode = FCLAW_BUILD_FOR_UPDATE;
 
     if (newsize == FCLAW_PATCH_SAMESIZE)
     {

@@ -51,23 +51,6 @@ typedef struct fclaw3d_patch_data            fclaw3d_patch_data_t;
 typedef struct fclaw3d_patch_transform_data  fclaw3d_patch_transform_data_t;
 
 /**
- * @brief The build mode
- */
-typedef enum
-{
-    /** Expect the patch's area array to be computed when unpacked */
-    FCLAW3D_BUILD_FOR_GHOST_AREA_COMPUTED = 0,
-    /** Pack a patch's area array */
-    FCLAW3D_BUILD_FOR_GHOST_AREA_PACKED,
-    /** Build for an updated grid */
-    FCLAW3D_BUILD_FOR_UPDATE,
-    /** Use a user defined build mode */
-    FCLAW3D_BUILD_CUSTOM
-} fclaw3d_build_mode_t;
-
-
-
-/**
  * @brief Structure for user patch data
  * 
  * The user patch (clawpatch, for example) is stored in fclaw3d_patch_data.user_patch
@@ -214,7 +197,7 @@ void fclaw3d_patch_build_from_fine(struct fclaw_global *glob,
                                    int blockno,
                                    int coarse_patchno,
                                    int fine0_patchno,
-                                   fclaw3d_build_mode_t build_mode);
+                                   fclaw_build_mode_t build_mode);
 
 
 ///@}
@@ -678,7 +661,7 @@ void fclaw3d_patch_remote_ghost_build(struct fclaw_global *glob,
                                       struct fclaw_patch *this_patch,
                                       int blockno,
                                       int patchno,
-                                      fclaw3d_build_mode_t build_mode);
+                                      fclaw_build_mode_t build_mode);
 
 /**
  * @brief Unpacks a ghost patch from a buffer
@@ -869,7 +852,7 @@ typedef void (*fclaw_patch_build_from_fine_t)(struct fclaw_global *glob,
                                                 int blockno,
                                                 int coarse_patchno,
                                                 int fine0_patchno,
-                                                fclaw3d_build_mode_t build_mode);
+                                                fclaw_build_mode_t build_mode);
 
 /**
  * @brief Performs additional setup for a patch
@@ -1286,7 +1269,7 @@ typedef void (*fclaw3d_patch_remote_ghost_build_t)(struct fclaw_global *glob,
                                                    struct fclaw_patch *this_patch,
                                                    int blockno,
                                                    int patchno,
-                                                   fclaw3d_build_mode_t build_mode);
+                                                   fclaw_build_mode_t build_mode);
 
 /**
  * @brief Performs additional setup step after build
@@ -1345,7 +1328,7 @@ typedef void (*fclaw_patch_partition_unpack_t)(struct fclaw_global *glob,
 
 
 /** @copydoc fclaw2d_patch_time_sync_f2c() */
-typedef void (*fclaw_patch_time_sync_f2c_t)(struct fclaw_global* glob,
+typedef void (*fclaw3d_patch_time_sync_f2c_t)(struct fclaw_global* glob,
                                               struct fclaw_patch *coarse_patch,
                                               struct fclaw_patch *fine_patch,
                                               int coarse_blockno, int fine_blockno,
@@ -1358,7 +1341,7 @@ typedef void (*fclaw_patch_time_sync_f2c_t)(struct fclaw_global* glob,
                                               *transform_data);
 
 /** @copydoc fclaw2d_patch_time_sync_samesize() */
-typedef void (*fclaw_patch_time_sync_samesize_t)(struct fclaw_global* glob,
+typedef void (*fclaw3d_patch_time_sync_samesize_t)(struct fclaw_global* glob,
                                                    struct fclaw_patch* this_patch,
                                                    struct fclaw_patch* neighbor_patch,
                                                    int this_iface, int idir,
@@ -1366,7 +1349,7 @@ typedef void (*fclaw_patch_time_sync_samesize_t)(struct fclaw_global* glob,
                                                    *transform_data);
 
 /** @copydoc fclaw2d_patch_time_sync_reset() */
-typedef void (*fclaw_patch_time_sync_reset_t)(struct fclaw_global *glob, 
+typedef void (*fclaw3d_patch_time_sync_reset_t)(struct fclaw_global *glob, 
                                                 struct fclaw_patch *this_patch,
                                                 int coarse_level,
                                                 int reset_mode);
@@ -1478,17 +1461,6 @@ struct fclaw3d_patch_vtable
 
     /** @} */
 
-    /** @{ @name Time Syncing Functions for Conservation */
-
-    /** @copybrief ::fclaw2d_patch_time_sync_f2c_t */
-    fclaw_patch_time_sync_f2c_t         time_sync_f2c;
-    /** @copybrief ::fclaw2d_patch_time_sync_samesize_t */
-    fclaw_patch_time_sync_samesize_t    time_sync_samesize;
-    /** @copybrief ::fclaw2d_patch_time_sync_reset_t */
-    fclaw_patch_time_sync_reset_t       time_sync_reset;
-
-    /** @} */
-
     /** @{ @name Parallel Load Balancing (partitioning) */
 
     /** @copybrief ::fclaw2d_patch_partition_pack_t */
@@ -1570,6 +1542,17 @@ struct fclaw3d_patch_vtable
     fclaw3d_patch_remote_ghost_unpack_t   remote_ghost_unpack;
     /** @copybrief ::fclaw2d_patch_remote_ghost_delete_t */
     fclaw3d_patch_remote_ghost_delete_t   remote_ghost_delete;
+
+    /** @} */
+
+    /** @{ @name Time Syncing Functions for Conservation */
+
+    /** @copybrief ::fclaw2d_patch_time_sync_f2c_t */
+    fclaw3d_patch_time_sync_f2c_t         time_sync_f2c;
+    /** @copybrief ::fclaw2d_patch_time_sync_samesize_t */
+    fclaw3d_patch_time_sync_samesize_t    time_sync_samesize;
+    /** @copybrief ::fclaw2d_patch_time_sync_reset_t */
+    fclaw3d_patch_time_sync_reset_t     time_sync_reset;
 
     /** @} */
 
