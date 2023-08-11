@@ -60,7 +60,7 @@ void correlatedcb_link_solvers(fclaw_global_t *glob)
     fclaw_vtable_t *vt = fclaw_vt(glob);
     vt->problem_setup  = &correlatedcb_problem_setup;  /* Version-independent */
 
-    fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt(glob);
+    fclaw_patch_vtable_t *patch_vt = fclaw2d_patch_vt(glob);
     patch_vt->setup = &correlatedcb_patch_setup_manifold;  
 
     const user_options_t* user = correlatedcb_get_options(glob);

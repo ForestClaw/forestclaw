@@ -211,7 +211,7 @@ TEST_CASE("fclaw3dx_clawpatch_vtable_initialize")
 
     CHECK(clawpatch_vt->is_set                      == 1);
 
-    fclaw2d_patch_vtable_t * patch_vt = fclaw2d_patch_vt(glob);
+    fclaw_patch_vtable_t * patch_vt = fclaw2d_patch_vt(glob);
     //create delete build
     //TODO document patch_vt and expose these as part to public api
     CHECK(patch_vt->patch_new                      != NULL);

@@ -86,7 +86,7 @@ void filament_link_solvers(fclaw_global_t *glob)
             {
                 /* This calls a manifold version of setaux */
                 FCLAW_ASSERT(clawopt->mcapa != 0);
-                fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt(glob);
+                fclaw_patch_vtable_t *patch_vt = fclaw2d_patch_vt(glob);
                 patch_vt->setup = filament_patch_setup;
             }
             else

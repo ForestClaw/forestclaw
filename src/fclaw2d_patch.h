@@ -43,7 +43,7 @@ extern "C"
 
 
 /** vtable type */
-typedef struct fclaw2d_patch_vtable          fclaw2d_patch_vtable_t;
+typedef struct fclaw_patch_vtable          fclaw_patch_vtable_t;
 /** patch data type */
 typedef struct fclaw2d_patch_data            fclaw2d_patch_data_t;
 /** transform data type */
@@ -1512,11 +1512,76 @@ typedef struct fclaw_patch_vtable_d2
 
 } fclaw_patch_vtable_d2_t;
 
+typedef struct fclaw_patch_vtable_d3
+{
+
+    /** @{ @name Face Ghost Filling Functions */
+
+    /** @copybrief ::fclaw2d_patch_copy_face_t */
+    fclaw2d_patch_copy_face_t             copy_face;
+    /** @copybrief ::fclaw2d_patch_average_face_t */
+    fclaw2d_patch_average_face_t          average_face;
+    /** @copybrief ::fclaw2d_patch_interpolate_face_t */
+    fclaw2d_patch_interpolate_face_t      interpolate_face;
+
+    /** @} */
+
+    /* Do we want to include a fclaw3d_patch_copy/average/interpolate_edge_t?
+     * Feel free to add. */
+
+    /** @{ @name Block Face and Interior Corner Ghost Filling Functions */
+
+    /** @copybrief ::fclaw2d_patch_copy_corner_t */
+    fclaw2d_patch_copy_corner_t           copy_corner;
+    /** @copybrief ::fclaw2d_patch_average_corner_t */
+    fclaw2d_patch_average_corner_t        average_corner;
+    /** @copybrief ::fclaw2d_patch_interpolate_corner_t */
+    fclaw2d_patch_interpolate_corner_t    interpolate_corner;
+
+    /** @} */
+
+    /** @{ @name Block Corner Ghost Filling Functions */
+
+    /** @copybrief ::fclaw2d_patch_copy_corner_t */
+    fclaw2d_patch_copy_corner_t           copy_block_corner;
+    /** @copybrief ::fclaw2d_patch_average_corner_t */
+    fclaw2d_patch_average_corner_t        average_block_corner;
+    /** @copybrief ::fclaw2d_patch_interpolate_corner_t */
+    fclaw2d_patch_interpolate_corner_t    interpolate_block_corner;
+
+    /** @} */
+
+    /** @{ @name Transform Functions */
+
+    /** @copybrief ::fclaw2d_patch_transform_init_data_t */
+    fclaw2d_patch_transform_init_data_t        transform_init_data;
+    /** @copybrief ::fclaw2d_patch_transform_blockface_t */
+    fclaw2d_patch_transform_blockface_t        transform_face;
+    /** @copybrief ::fclaw2d_patch_transform_blockface_intra_t */
+    fclaw2d_patch_transform_blockface_intra_t  transform_face_intra;
+
+    /** @} */
+
+    /** @{ @name Time Syncing Functions for Conservation */
+
+    /** @copybrief ::fclaw2d_patch_time_sync_f2c_t */
+    fclaw2d_patch_time_sync_f2c_t         time_sync_f2c;
+    /** @copybrief ::fclaw2d_patch_time_sync_samesize_t */
+    fclaw2d_patch_time_sync_samesize_t    time_sync_samesize;
+    /** @copybrief ::fclaw2d_patch_time_sync_reset_t */
+    fclaw2d_patch_time_sync_reset_t     time_sync_reset;
+
+    /** @} */
+
+} fclaw_patch_vtable_d3_t;
+
+
 /** vtable for patch level routines */
-struct fclaw2d_patch_vtable
+struct fclaw_patch_vtable
 {
     int dim;
     fclaw_patch_vtable_d2_t* d2;
+    fclaw_patch_vtable_d3_t* d3;
 
     /** @{ @name Creating/Deleting/Building */
 
@@ -1627,7 +1692,7 @@ struct fclaw2d_patch_vtable
  * @param glob the global context
  * @return fclaw2d_patch_vtable_t* the vtable
  */
-fclaw2d_patch_vtable_t* fclaw2d_patch_vt(struct fclaw_global* glob);
+fclaw_patch_vtable_t* fclaw2d_patch_vt(struct fclaw_global* glob);
 
 /**
  * @brief Initialize the patch vtable

@@ -64,7 +64,7 @@ void latlong_link_solvers(fclaw_global_t *glob)
 
     fc_vt->problem_setup = latlong_problem_setup;
 
-    fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt(glob);
+    fclaw_patch_vtable_t *patch_vt = fclaw2d_patch_vt(glob);
     patch_vt->setup = &latlong_patch_setup;
 
    fclaw_clawpatch_options_t *clawpatch_opt = fclaw_clawpatch_get_options(glob);
@@ -80,7 +80,7 @@ void latlong_link_solvers(fclaw_global_t *glob)
         FCLAW_ASSERT(clawopt->mcapa != 0);
 
         /* This calls a manifold version of setaux */
-        fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt(glob);
+        fclaw_patch_vtable_t *patch_vt = fclaw2d_patch_vt(glob);
         patch_vt->setup = latlong_patch_setup;
         clawpack46_vt->fort_qinit     = &CLAWPACK46_QINIT;
 

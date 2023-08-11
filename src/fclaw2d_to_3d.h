@@ -37,7 +37,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /* redefine typedefs */
 #define fclaw2d_patch_flags_t           fclaw3d_patch_flags_t
-#define fclaw2d_patch_vtable_t          fclaw3d_patch_vtable_t
 #define fclaw2d_patch_data_t            fclaw3d_patch_data_t
 #define fclaw2d_domain_data_t           fclaw3d_domain_data_t
 #define fclaw2d_domain_persist_t        fclaw3d_domain_persist_t
@@ -162,7 +161,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define fclaw2d_patch_time_sync_f2c     fclaw3d_patch_time_sync_f2c
 #define fclaw2d_patch_time_sync_samesize fclaw3d_patch_time_sync_samesize
 #define fclaw2d_patch_time_sync_reset   fclaw3d_patch_time_sync_reset
-#define fclaw2d_patch_vt                fclaw3d_patch_vt
 #define fclaw2d_patch_vtable_initialize fclaw3d_patch_vtable_initialize
 #define fclaw2d_patch_get_info          fclaw3d_patch_get_info
 #define fclaw2d_patch_get_info2         fclaw3d_patch_get_info2
