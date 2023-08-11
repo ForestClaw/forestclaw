@@ -41,30 +41,6 @@ extern "C"
 #endif
 #endif
 
-/* these are dimension-specific functions */
-
-void fclaw2d_iterate_patch_cb
-  (fclaw_domain_t *domain, fclaw_patch_t *patch,
-   int blockno, int patchno, void *user);
-
-void fclaw2d_iterate_family_cb
-  (fclaw_domain_t *domain, fclaw_patch_t *patch,
-   int blockno, int patchno, void *user);
-
-/* much of the following will move into fclaw_global.h */
-
-
-
-/* Use forward references here, since this file gets included everywhere */
-/* CB: is there a way not to need the forward references?
-       Depending on fclaw2d_domain, _map, package seems entirely acceptable.
-       For those, including the respective headers might not be so bad.
-       About the diagnostics accumulator see remark above. */
-struct fclaw_domain;
-struct fclaw2d_map_context;
-struct fclaw_package_container;
-struct fclaw2d_diagnostics_accumulator;
-
 void fclaw2d_global_store_map (fclaw_global_t* glob,
                                struct fclaw2d_map_context * map);
 

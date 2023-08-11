@@ -41,18 +41,6 @@ extern "C"
 #endif
 #endif
 
-/* these are dimension-specific functions */
-
-void fclaw3d_iterate_patch_cb
-    (fclaw_domain_t * domain, fclaw_patch_t * patch,
-     int blockno, int patchno, void *user);
-
-void fclaw3d_iterate_family_cb
-    (fclaw_domain_t * domain, fclaw_patch_t * patch,
-     int blockno, int patchno, void *user);
-
-/* much of the following will move into fclaw_global.h */
-
 void fclaw3d_global_store_map (fclaw_global_t* glob,
                                fclaw_map_context_t * map);
 
