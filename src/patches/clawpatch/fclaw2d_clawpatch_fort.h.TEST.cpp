@@ -105,7 +105,7 @@ TEST_CASE("FCLAW2D_CLAWPATCH_EXCEEDS_THRESHOLD calls user function")
     opts.refinement_criteria = FCLAW_REFINE_CRITERIA_USER;
     fclaw_clawpatch_options_store(glob, &opts);
 
-    fclaw2d_global_set_global(glob);
+    fclaw_global_set_static(glob);
     int ret = FCLAW2D_CLAWPATCH_TAG_CRITERIA(params.blockno,
                                                   params.qval,
                                                   params.qmin,
@@ -176,7 +176,7 @@ TEST_CASE("FCLAW3DX_CLAWPATCH_EXCEEDS_THRESHOLD calls user function")
     opts.refinement_criteria = FCLAW_REFINE_CRITERIA_USER;
     fclaw_clawpatch_options_store(glob, &opts);
 
-    fclaw2d_global_set_global(glob);
+    fclaw_global_set_static(glob);
     int ret = FCLAW3DX_CLAWPATCH_TAG_CRITERIA(params.blockno,
                                                    params.qval,
                                                    params.qmin,

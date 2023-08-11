@@ -941,7 +941,7 @@ int clawpatch_tag4refinement(fclaw_global_t *glob,
         /* This allows the user to specify a "exceeds_th" */
         fclaw_clawpatch_vtable_t* clawpatch_vt = fclaw_clawpatch_vt(glob);
 
-        fclaw2d_global_set_global(glob);
+        fclaw_global_set_static(glob);
         if(clawpatch_vt->dim == 2)
         {
 
@@ -1006,7 +1006,7 @@ int clawpatch_tag4coarsening(fclaw_global_t *glob,
     int tag_patch = 0;
     if (coarsen_threshold > 0) 
     {        
-        fclaw2d_global_set_global(glob);
+        fclaw_global_set_static(glob);
         if(clawpatch_vt->dim == 2)
         {
             /* Get xlower,ylower for each grid. */

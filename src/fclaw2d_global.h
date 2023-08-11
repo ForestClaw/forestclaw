@@ -71,13 +71,6 @@ void fclaw2d_global_store_map (fclaw_global_t* glob,
 fclaw2d_map_context_t* fclaw2d_global_get_map(fclaw_global_t* glob);
 
 /**
- * @brief Store a glob variable in static memory
- *
- * @param glob the glob variable
- */
-void fclaw2d_global_set_global (fclaw_global_t* glob);
-
-/**
  * @brief Set the static glob variable to NULL
  */
 void fclaw2d_global_unset_global (void);

@@ -154,6 +154,13 @@ void fclaw_global_attribute_store (fclaw_global_t* glob,
  */
 void* fclaw_global_get_attribute (fclaw_global_t* glob, const char* key);
 
+/**
+ * @brief Store a glob variable in static memory
+ *
+ * @param glob the glob variable
+ */
+void fclaw_global_set_static (fclaw_global_t* glob);
+
 #ifdef __cplusplus
 #if 0
 {                               /* need this because indent is dumb */
