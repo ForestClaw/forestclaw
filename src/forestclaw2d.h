@@ -136,7 +136,6 @@ struct fclaw2d_domain
     fclaw_patch_t **exchange_patches; /**< explicitly store exchange patches */
     int num_ghost_patches;      /**< number of off-proc patches relevant to this proc */
     fclaw_patch_t *ghost_patches;     /**< array of off-proc patches */
-    fclaw_patch_bounds_2d_t *ghost_patch_bounds; /**< ghost patch bounds */
 
     void **mirror_target_levels;  /**< Points to target level of each mirror. */
     int *ghost_target_levels;   /**< Contains target level for each ghost. */

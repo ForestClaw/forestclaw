@@ -2260,7 +2260,6 @@ fclaw2d_domain_init_meta (fclaw2d_domain_t * domain, int mpirank)
     domain->blocks = NULL;
     domain->exchange_patches = NULL;
     domain->ghost_patches = NULL;
-    domain->ghost_patch_bounds = NULL;
     domain->mirror_target_levels = NULL;
     domain->ghost_target_levels = NULL;
     domain->pp = NULL;

@@ -294,13 +294,10 @@ fclaw2d_domain_new (p4est_wrap_t * wrap, sc_keyvalue_t * attributes)
     /* allocate ghost patches */
     domain->ghost_patches =
         FCLAW_ALLOC_ZERO (fclaw_patch_t, domain->num_ghost_patches);
-    domain->ghost_patch_bounds =
-        FCLAW_ALLOC_ZERO (fclaw_patch_bounds_2d_t,
-                          domain->num_ghost_patches);
     for (i = 0; i < domain->num_ghost_patches; ++i)
     {
         patch = domain->ghost_patches + i;
-        patch->d2 = domain->ghost_patch_bounds + i;
+        patch->d2 = FCLAW_ALLOC_ZERO(fclaw_patch_bounds_2d_t,1);
         quad = p4est_quadrant_array_index (&ghost->ghosts, (size_t) i);
         patch->target_level = patch->level = level = (int) quad->level;
         patch->flags =
@@ -473,8 +470,11 @@ fclaw2d_domain_destroy (fclaw2d_domain_t * domain)
     }
     FCLAW_FREE (domain->blocks);
 
+    for (i = 0; i < domain->num_ghost_patches; ++i)
+    {
+        FCLAW_FREE (domain->ghost_patches[i].d2);
+    }
     FCLAW_FREE (domain->ghost_patches);
-    FCLAW_FREE (domain->ghost_patch_bounds);
     FCLAW_FREE (domain->ghost_target_levels);
     FCLAW_FREE (domain->mirror_target_levels);
     FCLAW_FREE (domain->exchange_patches);
