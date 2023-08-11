@@ -173,8 +173,9 @@ void fclaw2d_finalize(fclaw2d_global_t* glob)
 
     fclaw_global_essentialf("Finalizing run\n");
     fclaw2d_diagnostics_finalize(glob);
-    if (glob->cont != NULL) {
-        fclaw2d_map_destroy(glob->cont);
+    fclaw2d_map_context_t* map = fclaw2d_global_get_map(glob);
+    if (map != NULL) {
+        fclaw2d_map_destroy(map);
     }
     fclaw2d_domain_barrier (glob->domain);
 

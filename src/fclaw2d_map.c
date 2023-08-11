@@ -491,7 +491,7 @@ fclaw2d_options_postprocess_map_data(fclaw2d_map_data_t * map_data)
 
 int fclaw2d_map_pillowsphere(fclaw2d_global_t* glob)
 {
-    fclaw2d_map_context_t *cont = glob->cont;
+    fclaw2d_map_context_t *cont = fclaw2d_global_get_map(glob);
     return FCLAW2D_MAP_IS_PILLOWSPHERE(&cont) != 0;    
 }
 

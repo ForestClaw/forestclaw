@@ -84,7 +84,6 @@ struct fclaw2d_global
     struct fclaw_pointer_map *options;    /**< options */
     struct fclaw_pointer_map *attributes;    /**< attributes, things that are not vtables, or options */
 
-    struct fclaw2d_map_context* cont;
     struct fclaw2d_domain *domain;
 
     void *user;
@@ -119,6 +118,8 @@ void fclaw2d_global_store_domain (fclaw2d_global_t* glob,
 
 void fclaw2d_global_store_map (fclaw2d_global_t* glob,
                                struct fclaw2d_map_context * map);
+
+fclaw2d_map_context_t* fclaw2d_global_get_map(fclaw2d_global_t* glob);
 
 void fclaw2d_global_iterate_level (fclaw2d_global_t * glob, int level,
                                    fclaw2d_patch_callback_t pcb, void *user);

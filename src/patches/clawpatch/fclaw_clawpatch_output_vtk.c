@@ -725,6 +725,7 @@ fclaw2d_output_vtk_coordinate_cb (fclaw2d_global_t * glob,
                                 &xlower,&ylower,&dx,&dy);
 
     const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+    fclaw2d_map_context_t* cont = fclaw2d_global_get_map(glob);
 
     /* Enumerate point coordinates in the patch */
     double *d = (double *) a;
@@ -738,7 +739,6 @@ fclaw2d_output_vtk_coordinate_cb (fclaw2d_global_t * glob,
             const double x = xlower + i * dx;
             if (fclaw_opt->manifold)
             {
-                fclaw2d_map_context_t *cont = glob->cont;
                 FCLAW2D_MAP_C2M(&cont,&blockno,&x,&y,&xpp,&ypp,&zpp);
                 *d++ = xpp;
                 *d++ = ypp;
@@ -766,6 +766,7 @@ fclaw3d_output_vtk_coordinate_cb (fclaw2d_global_t * glob,
                                 &xlower,&ylower,&zlower, &dx,&dy, &dz);
 
     const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+    fclaw2d_map_context_t* cont = fclaw2d_global_get_map(glob);
     /* Enumerate point coordinates in the patch */
     double *d = (double *) a;
     int i, j, k;
@@ -781,7 +782,6 @@ fclaw3d_output_vtk_coordinate_cb (fclaw2d_global_t * glob,
                 const double x = xlower + i * dx;
                 if (fclaw_opt->manifold)
                 {
-                    fclaw2d_map_context_t *cont = glob->cont;
                     FCLAW3D_MAP_C2M(&cont,&blockno,&x,&y,&z,&xpp,&ypp,&zpp);
                     *d++ = xpp;
                     *d++ = ypp;

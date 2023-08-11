@@ -304,6 +304,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define fclaw2d_global_get_global       fclaw3d_global_get_global
 #define fclaw2d_set_global_context      fclaw3d_set_global_context
 #define fclaw2d_clear_global_context    fclaw3d_clear_global_context
+#define fclaw2d_global_get_map          fclaw3d_global_get_map
 
 /* translations for the options */
 #define fclaw2d_options_store           fclaw3d_options_store

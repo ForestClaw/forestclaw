@@ -84,7 +84,6 @@ struct fclaw3d_global
     struct fclaw_pointer_map *options;    /**< options */
     struct fclaw_pointer_map *attributes;    /**< attributes, things that are not vtables, or options */
 
-    struct fclaw3d_map_context* cont;
     struct fclaw3d_domain *domain;
 
     void *user;
@@ -109,6 +108,8 @@ void fclaw3d_global_store_domain (fclaw3d_global_t* glob,
 
 void fclaw3d_global_store_map (fclaw3d_global_t* glob,
                                fclaw3d_map_context_t * map);
+
+fclaw3d_map_context_t* fclaw3d_global_get_map(fclaw3d_global_t* glob);
 
 void fclaw3d_global_iterate_level (fclaw3d_global_t * glob, int level,
                                    fclaw3d_patch_callback_t pcb, void *user);

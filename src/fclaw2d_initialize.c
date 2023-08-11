@@ -80,7 +80,7 @@ void fclaw2d_initialize(fclaw2d_global_t *glob)
     const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
 
 	/* This mapping context is needed by fortran mapping functions */
-	fclaw2d_map_context_t *cont = glob->cont;
+	fclaw2d_map_context_t *cont = fclaw2d_global_get_map(glob);
 	FCLAW_MAP_SET_CONTEXT(&cont);
 
 	int maxthreads = 0;

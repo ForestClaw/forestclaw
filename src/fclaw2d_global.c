@@ -104,7 +104,6 @@ fclaw2d_global_t* fclaw2d_global_new (void)
     glob->count_single_step = 0;
     glob->count_elliptic_grids = 0;
     glob->curr_time = 0;
-    glob->cont = NULL;
 
     return glob;
 }
@@ -141,20 +140,24 @@ fclaw2d_global_store_domain (fclaw2d_global_t* glob, fclaw2d_domain_t* domain)
     glob->mpisize = domain->mpisize;
     glob->mpirank = domain->mpirank;
 
-    /*
-     * This is an assignment that might get removed in the future.
-     * There is a separate function, fclow2d_global_store_map (see below),
-     * wich accomplishes this without accessing the domain attributes.
-     */
-    glob->cont = (fclaw2d_map_context_t*)
+    /* done for backwards compatibility */
+    fclaw2d_map_context_t* map = (fclaw2d_map_context_t*)
            fclaw2d_domain_attribute_access (glob->domain, "fclaw_map_context", NULL);
+
+    fclaw2d_global_store_map(glob, map);
 }
 
 void
 fclaw2d_global_store_map (fclaw2d_global_t* glob,
                           fclaw2d_map_context_t * map)
 {
-    glob->cont = map;
+    fclaw2d_global_attribute_store(glob, "map", map, NULL);
+}
+
+fclaw2d_map_context_t*
+fclaw2d_global_get_map(fclaw2d_global_t* glob)
+{
+    return (fclaw2d_map_context_t*) fclaw2d_global_get_attribute(glob,"map");
 }
 
 void
@@ -247,16 +250,13 @@ void fclaw2d_global_attribute_store (fclaw2d_global_t* glob,
                                      fclaw_pointer_map_value_destroy_t destroy)
 {
     
-    FCLAW_ASSERT(fclaw_pointer_map_get(glob->attributes,key) == NULL);
     fclaw_pointer_map_insert(glob->attributes, key, options, destroy);
 }
 
 void* fclaw2d_global_get_attribute (fclaw2d_global_t* glob, const char* key)
 {
     
-    void* options = fclaw_pointer_map_get(glob->attributes, key);
-    FCLAW_ASSERT(options != NULL);
-    return options;   
+    return fclaw_pointer_map_get(glob->attributes, key);
 }
 
 static fclaw2d_global_t* fclaw2d_global_glob = NULL;

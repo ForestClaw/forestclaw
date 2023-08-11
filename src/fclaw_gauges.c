@@ -129,7 +129,7 @@ void gauge_initialize(fclaw2d_global_t* glob, void** acc)
 
           ----------------------------------------------------- */
 
-        fclaw2d_map_context_t* cont = glob->cont;
+        fclaw2d_map_context_t* cont = fclaw2d_global_get_map(glob);
 
         int num_blocks = glob->domain->num_blocks;
 

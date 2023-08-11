@@ -57,6 +57,7 @@ typedef struct fclaw_domain
             struct fclaw2d_domain *domain2;
             struct fclaw2d_domain_exchange *exchange2;
             struct fclaw2d_domain_indirect *indirect2;
+            struct fclaw2d_map_context *map2;
 
         }
         d2;
@@ -68,11 +69,14 @@ typedef struct fclaw_domain
             struct fclaw3d_domain_exchange *exchange3;
             struct fclaw3d_domain_indirect *indirect3;
 #endif
+            struct fclaw3d_map_context *map3;
         }
         d3;
     }
     d;
     sc_mstamp_t pstamp;     /**< internal: quickly allocate same-size patches */
+
+    
 
     fclaw_domain_user_t du;
 }
