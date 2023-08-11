@@ -84,17 +84,6 @@ fclaw3d_patch_flags_t;
 /** For each of the six faces, the corresponding block boundary flag. */
 extern const fclaw3d_patch_flags_t fclaw3d_patch_block_face_flags[6];
 
-/** This structure identify parameters that are copied from a domain
- * to a new domain derived by adaptation or partitioning. */
-typedef struct fclaw3d_domain_persist
-{
-    int smooth_refine;          /**< Boolean tells us whether to communicate
-                                     the desired refinement level to neighbors. */
-    int smooth_level;           /**< The minimum level that refinement smoothing
-                                     is enabled on.  Use 0 for al levels. */
-}
-fclaw3d_domain_persist_t;
-
 /**
  * @brief The domain structure is a collection of blocks
  * 
@@ -111,7 +100,7 @@ struct fclaw3d_domain
     int mpirank;                /**< MPI rank */
     int possible_maxlevel;      /**< theoretical maximum that can be reached */
 
-    fclaw3d_domain_persist_t p;         /**< Parameters that carry over from
+    fclaw_domain_persist_t p;         /**< Parameters that carry over from
                                              one domain to a derived one. */
 
     int local_num_patches;      /**< sum of patches over all blocks on this proc */

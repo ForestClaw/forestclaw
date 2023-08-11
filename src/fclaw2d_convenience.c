@@ -493,7 +493,7 @@ fclaw2d_domain_copy_parameters (fclaw2d_domain_t * domain_dest,
                                 fclaw2d_domain_t * domain_src)
 {
     memcpy (&domain_dest->p, &domain_src->p,
-            sizeof (fclaw2d_domain_persist_t));
+            sizeof (fclaw_domain_persist_t));
 }
 
 static fclaw_patch_t *

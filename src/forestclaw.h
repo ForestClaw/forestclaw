@@ -131,4 +131,15 @@ typedef struct fclaw_block
     void *user;                         /**< User pointer */
 } fclaw_block_t;
 
+/** This structure identify parameters that are copied from a domain
+ * to a new domain derived by adaptation or partitioning. */
+typedef struct fclaw_domain_persist
+{
+    int smooth_refine;          /**< Boolean tells us whether to communicate
+                                     the desired refinement level to neighbors. */
+    int smooth_level;           /**< The minimum level that refinement smoothing
+                                     is enabled on.  Use 0 for al levels. */
+}
+fclaw_domain_persist_t;
+
 #endif /* !FCLAW_PATCH_H */
