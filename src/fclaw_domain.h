@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * Domain-independent header file should not include domain-specific headers.
  * The corresponding source file include the 2d and 3d domain-specific headers.
  */
-#include <fclaw_patch.h>
+#include <forestclaw.h>
 
 typedef struct fclaw_domain_user
 {

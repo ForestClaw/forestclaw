@@ -27,7 +27,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define FORESTCLAW2D_H
 
 #include <fclaw_base.h>
-#include <fclaw_patch.h>
+#include <forestclaw.h>
 #include <sc_keyvalue.h>
 
 #ifdef __cplusplus
@@ -50,8 +50,6 @@ extern "C"
 
 /** Typedef for fclaw2d_domain */
 typedef struct fclaw2d_domain fclaw2d_domain_t;
-/** Typedef for fclaw2d_block */
-typedef struct fclaw2d_block fclaw2d_block_t;
 
 /**
  * @brief Enum for encoding patch information

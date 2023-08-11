@@ -27,7 +27,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define FORESTCLAW3D_H
 
 #include <fclaw_base.h>
-#include <fclaw_patch.h>
+#include <forestclaw.h>
 #include <sc_keyvalue.h>
 
 #ifdef __cplusplus
