@@ -86,6 +86,8 @@ fclaw3d_patch_flags_t;
 /** For each of the six faces, the corresponding block boundary flag. */
 extern const fclaw3d_patch_flags_t fclaw3d_patch_block_face_flags[6];
 
+typedef struct fclaw_block_d2 fclaw_block_d2_t;
+
 typedef struct fclaw_block_d3
 {
     /** @{ @brief left/right coordinate */
@@ -108,7 +110,8 @@ typedef struct fclaw_block_d3
 struct fclaw3d_block
 {
     int dim;
-    struct fclaw_block_d3* d3;
+    fclaw_block_d2_t* d2;
+    fclaw_block_d3_t* d3;
     
     int num_patches;            /**< local patches in this block */
     int num_patches_before;     /**< in all previous blocks */

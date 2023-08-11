@@ -51,6 +51,9 @@ extern "C"
 /** Typedef for fclaw2d_domain */
 typedef struct fclaw2d_domain fclaw2d_domain_t;
 
+/** Typedef for fclaw2d_block */
+typedef struct fclaw2d_block fclaw2d_block_t;
+
 /**
  * @brief Enum for encoding patch information
  */
@@ -101,13 +104,16 @@ typedef struct fclaw_block_d2
     int is_boundary[4];         /**< physical boundary flag */
 } fclaw_block_d2_t;
 
+typedef struct fclaw_block_d3 fclaw_block_d3_t;
+
 /**
  * @brief Data Structure for a block
  */
 struct fclaw2d_block
 {
     int dim;
-    struct fclaw_block_d2* d2;
+    fclaw_block_d2_t* d2;
+    fclaw_block_d3_t* d3;
     int num_patches;            /**< local patches in this block */
     int num_patches_before;     /**< in all previous blocks */
     int num_exchange_patches;   /**< exchange patches in this block */
