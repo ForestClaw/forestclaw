@@ -98,7 +98,7 @@ void fclaw2d_diagnostics_initialize(fclaw_global_t *glob)
     fclaw2d_diagnostics_vtable_t *diag_vt = fclaw2d_diagnostics_vt(glob);
 
     fclaw2d_diagnostics_accumulator_t *acc = FCLAW_ALLOC (fclaw2d_diagnostics_accumulator_t, 1);
-    fclaw2d_global_attribute_store(glob, "acc", acc, acc_destroy);
+    fclaw_global_attribute_store(glob, "acc", acc, acc_destroy);
     const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
 
     /* Return an error accumulator */

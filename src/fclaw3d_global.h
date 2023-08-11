@@ -59,19 +59,6 @@ void fclaw3d_global_store_map (fclaw_global_t* glob,
 fclaw_map_context_t* fclaw3d_global_get_map(fclaw_global_t* glob);
 
 /**
- * @brief Store an attribute in the glob
- * 
- * @param glob the global context
- * @param key the key to store the attribute under
- * @param attrubute the attribute to store
- * @param destory callback to destroy the attribute. Optional, can be set to NULL
- */
-void fclaw3d_global_attribute_store (fclaw_global_t* glob, 
-                                     const char* key, 
-                                     void* attribute,
-                                     fclaw_pointer_map_value_destroy_t destroy);
-
-/**
  * @brief Get an attribute structure from the glob
  * 
  * @param glob the global context
