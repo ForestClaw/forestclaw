@@ -32,7 +32,7 @@ extern "C"
 #endif
 
 struct fclaw2d_global;
-struct fclaw2d_domain;
+struct fclaw_domain;
 
 typedef struct fclaw2d_diagnostics_vtable  fclaw2d_diagnostics_vtable_t;
 
@@ -108,7 +108,7 @@ fclaw2d_diagnostics_vtable_t* fclaw2d_diagnostics_vt(struct fclaw2d_global* glob
 
 void fclaw2d_diagnostics_vtable_initialize(struct fclaw2d_global* glob);
 
-double fclaw2d_domain_global_minimum (struct fclaw2d_domain* domain, double d);
+double fclaw2d_domain_global_minimum (struct fclaw_domain* domain, double d);
 
 void fclaw2d_diagnostics_initialize(struct fclaw2d_global *glob);
 

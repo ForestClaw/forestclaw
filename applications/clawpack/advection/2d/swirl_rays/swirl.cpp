@@ -233,7 +233,7 @@ intersect_patch (fclaw_patch_t *patch, swirl_ray_t *swirl_ray,
 }
 
 static int
-swirl_intersect_ray (fclaw2d_domain_t *domain, fclaw_patch_t *patch,
+swirl_intersect_ray (fclaw_domain_t *domain, fclaw_patch_t *patch,
                      int blockno, int patchno, void *ray, double *integral,
                      void *user)
 {
@@ -373,11 +373,11 @@ void swirl_initialize_rays(fclaw2d_global_t* glob)
 }
 
 static
-fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, fclaw_options_t* gparms)
+fclaw_domain_t* create_domain(sc_MPI_Comm mpicomm, fclaw_options_t* gparms)
 {
     /* Mapped, multi-block domain */
     p4est_connectivity_t     *conn = NULL;
-    fclaw2d_domain_t         *domain;
+    fclaw_domain_t         *domain;
     fclaw2d_map_context_t    *cont = NULL;
 
     /* Map unit square to disk using mapc2m_disk.f */
@@ -443,7 +443,7 @@ main (int argc, char **argv)
     fc2d_clawpack5_options_t    *claw5_opt;
 
     fclaw2d_global_t            *glob;
-    fclaw2d_domain_t            *domain;
+    fclaw_domain_t            *domain;
     sc_MPI_Comm mpicomm;
 
     /* Initialize application */

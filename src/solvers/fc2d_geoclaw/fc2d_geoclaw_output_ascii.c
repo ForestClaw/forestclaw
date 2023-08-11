@@ -36,7 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_global.h>
 
 static
-void cb_geoclaw_output_ascii(fclaw2d_domain_t *domain,
+void cb_geoclaw_output_ascii(fclaw_domain_t *domain,
                              fclaw_patch_t *patch,
                              int blockno, int patchno,
                              void *user)
@@ -90,7 +90,7 @@ void geoclaw_header_ascii(fclaw2d_global_t* glob,int iframe)
 
 void fc2d_geoclaw_output_ascii(fclaw2d_global_t* glob,int iframe)
 {
-    fclaw2d_domain_t *domain = glob->domain;
+    fclaw_domain_t *domain = glob->domain;
 
     /* BEGIN NON-SCALABLE CODE */
     /* Write the file contents in serial.

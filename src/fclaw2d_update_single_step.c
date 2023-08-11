@@ -30,7 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_patch.h>
 
 static
-void cb_single_step_count(fclaw2d_domain_t *domain,
+void cb_single_step_count(fclaw_domain_t *domain,
                           fclaw_patch_t *this_patch,
                           int this_block_idx,
                           int this_patch_idx,
@@ -42,7 +42,7 @@ void cb_single_step_count(fclaw2d_domain_t *domain,
 }
 
 static
-void cb_single_step(fclaw2d_domain_t *domain,
+void cb_single_step(fclaw_domain_t *domain,
                     fclaw_patch_t *this_patch,
                     int this_block_idx,
                     int this_patch_idx,

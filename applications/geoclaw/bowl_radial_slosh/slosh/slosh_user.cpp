@@ -33,11 +33,11 @@ void slosh_link_solvers(fclaw2d_global_t *glob)
     geoclaw_vt->qinit       = &FC2D_GEOCLAW_QINIT;
 }
 
-fclaw2d_domain_t* slosh_create_domain(sc_MPI_Comm mpicomm, fclaw_options_t* gparms)
+fclaw_domain_t* slosh_create_domain(sc_MPI_Comm mpicomm, fclaw_options_t* gparms)
 {
     /* Mapped, multi-block domain */
     p4est_connectivity_t     *conn = NULL;
-    fclaw2d_domain_t         *domain;
+    fclaw_domain_t         *domain;
     fclaw2d_map_context_t    *cont = NULL;
 
     conn = p4est_connectivity_new_unitsquare();

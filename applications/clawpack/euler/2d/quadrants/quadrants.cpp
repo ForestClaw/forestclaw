@@ -40,7 +40,7 @@ static
 void create_domain_map (fclaw2d_global_t *glob,
                         fclaw_options_t* fclaw_opt)
 {
-    fclaw2d_domain_t         *domain;
+    fclaw_domain_t         *domain;
     domain = fclaw2d_domain_new_unitsquare (glob->mpicomm, fclaw_opt->minlevel);
     fclaw2d_domain_list_levels(domain, FCLAW_VERBOSITY_ESSENTIAL);
     fclaw2d_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);
@@ -98,7 +98,7 @@ main (int argc, char **argv)
     fc2d_clawpack5_options_t    *claw5_opt;
 
     fclaw2d_global_t            *glob;
-    fclaw2d_domain_t            *domain;
+    fclaw_domain_t            *domain;
     sc_MPI_Comm mpicomm;
 
     /* Initialize application */

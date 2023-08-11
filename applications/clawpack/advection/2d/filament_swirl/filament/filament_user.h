@@ -62,7 +62,7 @@ const filament_options_t* filament_get_options(fclaw2d_global_t* glob);
 
 void filament_link_solvers(fclaw2d_global_t *glob);
 
-fclaw2d_domain_t* filament_create_domain(sc_MPI_Comm mpicomm, 
+fclaw_domain_t* filament_create_domain(sc_MPI_Comm mpicomm, 
                                          fclaw_options_t* fclaw_opt, 
                                          filament_options_t* user,
                                          fclaw_clawpatch_options_t* clawpatch_opt);

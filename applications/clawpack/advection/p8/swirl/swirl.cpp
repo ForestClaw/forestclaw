@@ -28,7 +28,7 @@
 #include <fclaw3d_defs.h>
 
 static
-fclaw3d_domain_t* create_domain(sc_MPI_Comm mpicomm,
+fclaw_domain_t* create_domain(sc_MPI_Comm mpicomm,
                                 fclaw_options_t* fclaw_opt,
                                 user_options_t *user,
                                 void *clawpatch_opt,
@@ -36,7 +36,7 @@ fclaw3d_domain_t* create_domain(sc_MPI_Comm mpicomm,
 {
     /* Mapped, multi-block domain */
     p8est_connectivity_t     *conn = NULL;
-    fclaw3d_domain_t         *domain = NULL;
+    fclaw_domain_t         *domain = NULL;
 
 #ifdef P8HACK
     fclaw2d_map_context_t    *cont = NULL, *brick = NULL;
@@ -196,7 +196,7 @@ main (int argc, char **argv)
     fclaw_exit_type_t vexit;
 
     fclaw3d_global_t            *glob;
-    fclaw3d_domain_t            *domain;
+    fclaw_domain_t            *domain;
 
     int retval;
     sc_MPI_Comm mpicomm;

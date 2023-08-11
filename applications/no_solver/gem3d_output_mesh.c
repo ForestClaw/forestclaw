@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_options.h>
 
 
-void cb_gem3d_output_mesh (fclaw2d_domain_t * domain,
+void cb_gem3d_output_mesh (fclaw_domain_t * domain,
                            fclaw_patch_t * this_patch,
                            int this_block_idx, int this_patch_idx,
                            void *user)
@@ -134,7 +134,7 @@ void gem3d_output_header_mesh(fclaw2d_global_t* glob, int iframe)
 void gem3d_output_mesh(fclaw2d_global_t* glob,int iframe)
 {
 
-    fclaw2d_domain_t *domain = glob->domain;
+    fclaw_domain_t *domain = glob->domain;
 
     fclaw2d_domain_serialization_enter (domain);
 

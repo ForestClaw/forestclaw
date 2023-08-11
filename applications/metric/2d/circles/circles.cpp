@@ -33,7 +33,7 @@ main (int argc, char **argv)
 {
   int			lp;
   MPI_Comm		mpicomm;
-  fclaw2d_domain_t	*domain;
+  fclaw_domain_t	*domain;
   fclaw_options_t         samr_options, *gparms = &samr_options;
 
   lp = SC_LP_PRODUCTION;

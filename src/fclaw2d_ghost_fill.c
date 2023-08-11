@@ -91,14 +91,14 @@ typedef struct fclaw2d_ghost_fill_wrap_info
 	void *user;
 } fclaw2d_ghost_fill_wrap_info_t;
 
-static void cb_parallel_wrap(fclaw2d_domain_t* domain,
+static void cb_parallel_wrap(fclaw_domain_t* domain,
 							 fclaw_patch_t* this_patch,
 							 int this_block_idx,
 							 int this_patch_idx,
 							 void *user);
 
 
-static void cb_interface_wrap(fclaw2d_domain_t* domain,
+static void cb_interface_wrap(fclaw_domain_t* domain,
 							  fclaw_patch_t* this_patch,
 							  int this_block_idx,
 							  int this_patch_idx,
@@ -118,7 +118,7 @@ static void cb_interface_wrap(fclaw2d_domain_t* domain,
    patches on the parallel boundary only, or on interior patches.
 */
 /* Passing in a function pointer is somehow slower ... */
-static void cb_parallel_wrap(fclaw2d_domain_t* domain,
+static void cb_parallel_wrap(fclaw_domain_t* domain,
 							 fclaw_patch_t* this_patch,
 							 int this_block_idx,
 							 int this_patch_idx,

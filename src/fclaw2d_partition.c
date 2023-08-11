@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_options.h>
 
 static
-void cb_partition_pack(fclaw2d_domain_t *domain,
+void cb_partition_pack(fclaw_domain_t *domain,
                        fclaw_patch_t *patch,
                        int blockno,
                        int patchno,
@@ -55,9 +55,9 @@ void cb_partition_pack(fclaw2d_domain_t *domain,
 
 
 static
-void  cb_partition_transfer(fclaw2d_domain_t * old_domain,
+void  cb_partition_transfer(fclaw_domain_t * old_domain,
                             fclaw_patch_t * old_patch,
-                            fclaw2d_domain_t * new_domain,
+                            fclaw_domain_t * new_domain,
                             fclaw_patch_t * new_patch,
                             int blockno,
                             int old_patchno, int new_patchno,
@@ -84,7 +84,7 @@ void  cb_partition_transfer(fclaw2d_domain_t * old_domain,
     {
         /* We need to rebuild the patch from scratch. 'user' contains
            the packed data received from remote processor. */   
-        fclaw2d_domain_t *domain = new_domain;  /* get patch id in new domain */
+        fclaw_domain_t *domain = new_domain;  /* get patch id in new domain */
 
         fclaw_block_t *this_block = &domain->blocks[blockno];
         int patch_num = this_block->num_patches_before + new_patchno;
@@ -113,7 +113,7 @@ void  cb_partition_transfer(fclaw2d_domain_t * old_domain,
 void fclaw2d_partition_domain(fclaw2d_global_t* glob,
                               fclaw2d_timer_names_t running)
 {
-    fclaw2d_domain_t** domain = &glob->domain;
+    fclaw_domain_t** domain = &glob->domain;
     fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_PARTITION]);
 
     /* will need to access the subcyle switch */
@@ -146,7 +146,7 @@ void fclaw2d_partition_domain(fclaw2d_global_t* glob,
         fclaw2d_timer_stop (&glob->timers[running]);
     }
     fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_PARTITION_COMM]);
-    fclaw2d_domain_t *domain_partitioned =
+    fclaw_domain_t *domain_partitioned =
         fclaw2d_domain_partition (*domain, exponent);
     int have_new_partition = domain_partitioned != NULL;
 

@@ -41,13 +41,13 @@
 #include <fc2d_cuda_profiler.h>
 
 static
-fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, 
+fclaw_domain_t* create_domain(sc_MPI_Comm mpicomm, 
 		fclaw_options_t* fclaw_opt,
 		user_options_t* user)
 {
 	/* Mapped, multi-block domain */
 	p4est_connectivity_t     *conn = NULL;
-	fclaw2d_domain_t         *domain;
+	fclaw_domain_t         *domain;
 	fclaw2d_map_context_t    *cont = NULL;
 
 	/* Local variables */
@@ -156,7 +156,7 @@ main (int argc, char **argv)
 	fc2d_cudaclaw_options_t     *cuclaw5_opt;
 
 	fclaw2d_global_t            *glob;
-	fclaw2d_domain_t            *domain;
+	fclaw_domain_t            *domain;
 	sc_MPI_Comm mpicomm;
 
 	/* Initialize application */

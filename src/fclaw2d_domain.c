@@ -41,7 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #if 0
 
-static fclaw2d_domain_t *
+static fclaw_domain_t *
 fclaw_domain_get_domain (fclaw_domain_t *d)
 {
 #ifndef P4_TO_P8
@@ -68,7 +68,7 @@ fcd_allocated_patch_t;
 /* below follows the previous code unchanged */
 /* edit: do it anyway for now to support p8/swirl */
 
-void fclaw2d_domain_data_new(fclaw2d_domain_t *domain)
+void fclaw2d_domain_data_new(fclaw_domain_t *domain)
 {
     fclaw2d_domain_data_t* ddata = (fclaw2d_domain_data_t*) domain->user;
     ddata = FCLAW_ALLOC_ZERO (fclaw2d_domain_data_t, 1);
@@ -80,7 +80,7 @@ void fclaw2d_domain_data_new(fclaw2d_domain_t *domain)
     ddata->domain_indirect = NULL;
 }
 
-void fclaw2d_domain_data_delete(fclaw2d_domain_t* domain)
+void fclaw2d_domain_data_delete(fclaw_domain_t* domain)
 {
     fclaw2d_domain_data_t* ddata = (fclaw2d_domain_data_t*) domain->user;
 
@@ -88,15 +88,15 @@ void fclaw2d_domain_data_delete(fclaw2d_domain_t* domain)
     domain->user = NULL;
 }
 
-fclaw2d_domain_data_t *fclaw2d_domain_get_data(fclaw2d_domain_t *domain)
+fclaw2d_domain_data_t *fclaw2d_domain_get_data(fclaw_domain_t *domain)
 {
     return (fclaw2d_domain_data_t *) domain->user;
 }
 
 void fclaw2d_domain_setup(fclaw2d_global_t* glob,
-                          fclaw2d_domain_t* new_domain)
+                          fclaw_domain_t* new_domain)
 {
-    fclaw2d_domain_t *old_domain = glob->domain;
+    fclaw_domain_t *old_domain = glob->domain;
     double t;
 
     if (old_domain == new_domain)
@@ -115,7 +115,7 @@ void fclaw2d_domain_setup(fclaw2d_global_t* glob,
 
 void fclaw2d_domain_reset(fclaw2d_global_t* glob)
 {
-    fclaw2d_domain_t** domain = &glob->domain;
+    fclaw_domain_t** domain = &glob->domain;
     fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data (*domain);
     int i, j;
 
@@ -153,7 +153,7 @@ void fclaw2d_domain_reset(fclaw2d_global_t* glob)
     *domain = NULL;
 }
 
-void fclaw2d_domain_iterate_level_mthread (fclaw2d_domain_t * domain, int level,
+void fclaw2d_domain_iterate_level_mthread (fclaw_domain_t * domain, int level,
                                            fclaw2d_patch_callback_t pcb, void *user)
 {
 #if (_OPENMP)

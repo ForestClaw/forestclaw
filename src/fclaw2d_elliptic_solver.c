@@ -46,7 +46,7 @@ void elliptic_setup_solver(fclaw2d_global_t *glob)
 /* -------------------------------- RHS functions -------------------------------- */
 
 static
-void cb_elliptic_rhs(fclaw2d_domain_t *domain,
+void cb_elliptic_rhs(fclaw_domain_t *domain,
                      fclaw_patch_t *patch,
                      int blockno,
                      int patchno,
@@ -100,7 +100,7 @@ void elliptic_solve(fclaw2d_global_t *glob)
 
 void fclaw2d_elliptic_solve(fclaw2d_global_t *glob)
 {
-    fclaw2d_domain_t* domain = glob->domain;
+    fclaw_domain_t* domain = glob->domain;
 
     /* Any solver related setup that should happen before each solve */
     elliptic_setup_solver(glob);

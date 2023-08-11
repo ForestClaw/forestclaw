@@ -4,7 +4,7 @@
 #include <fclaw2d_options.h>
 #include <doctest.h>
 #include <csetjmp>
-fclaw2d_domain_t* create_test_domain(sc_MPI_Comm mpicomm, fclaw_options_t* fclaw_opt);
+fclaw_domain_t* create_test_domain(sc_MPI_Comm mpicomm, fclaw_options_t* fclaw_opt);
 
 void fclaw_test_expect_abort();
 void fclaw_test_clear_expect_abort();

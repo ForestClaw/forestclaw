@@ -98,11 +98,11 @@ int main(int argc, char *argv[])
 #include <fclaw2d_p4est.h>
 #include <fclaw2d_convenience.h>
 
-fclaw2d_domain_t* create_test_domain(sc_MPI_Comm mpicomm, fclaw_options_t* fclaw_opt)
+fclaw_domain_t* create_test_domain(sc_MPI_Comm mpicomm, fclaw_options_t* fclaw_opt)
 {
     /* Mapped, multi-block domain */
     p4est_connectivity_t     *conn = NULL;
-    fclaw2d_domain_t         *domain;
+    fclaw_domain_t         *domain;
     fclaw2d_map_context_t    *cont = NULL, *brick = NULL;
     
     int mi = fclaw_opt->mi;

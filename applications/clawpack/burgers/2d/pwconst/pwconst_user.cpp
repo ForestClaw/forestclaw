@@ -58,7 +58,7 @@ void pwconst_link_solvers(fclaw2d_global_t *glob)
 
 
 #if 0
-void pwconst_link_solvers(fclaw2d_domain_t *domain)
+void pwconst_link_solvers(fclaw_domain_t *domain)
 {
     const user_options_t* user = pwconst_user_get_options(domain);
 

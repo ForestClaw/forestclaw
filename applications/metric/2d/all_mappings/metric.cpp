@@ -84,7 +84,7 @@ void register_user_options (fclaw_app_t * app,
                                 user);
 }
 
-const user_options_t* metric_user_get_options(fclaw2d_domain_t* domain)
+const user_options_t* metric_user_get_options(fclaw_domain_t* domain)
 {
     fclaw_app_t* app;
     app = fclaw2d_domain_get_app(domain);
@@ -100,7 +100,7 @@ void run_program(fclaw_app_t* app)
 
     /* Mapped, multi-block domain */
     p4est_connectivity_t     *conn = NULL;
-    fclaw2d_domain_t	     *domain;
+    fclaw_domain_t	     *domain;
     fclaw2d_map_context_t    *cont = NULL;
 
     fclaw_options_t* gparms;

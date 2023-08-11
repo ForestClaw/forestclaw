@@ -64,7 +64,7 @@ void heat_diagnostics_gather(fclaw2d_global_t *glob, void* patch_acc,
 
 void heat_diagnostics_finalize(fclaw2d_global_t *glob, void** patch_acc);
 
-void heat_compute_diagnostics(fclaw2d_domain_t *domain,
+void heat_compute_diagnostics(fclaw_domain_t *domain,
                                 fclaw_patch_t *patch,
                                 int blockno,
                                 int patchno,

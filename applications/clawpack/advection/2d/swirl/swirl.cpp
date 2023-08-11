@@ -32,7 +32,7 @@ static
 void create_domain_map (fclaw2d_global_t *glob, fclaw_options_t* gparms)
 {
     /* Mapped, multi-block domain */
-    fclaw2d_domain_t         *domain = NULL;
+    fclaw_domain_t         *domain = NULL;
     domain = fclaw2d_domain_new_unitsquare (glob->mpicomm, gparms->minlevel);
     fclaw2d_domain_list_levels(domain, FCLAW_VERBOSITY_ESSENTIAL);
     fclaw2d_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);

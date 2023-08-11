@@ -36,7 +36,7 @@ extern "C"
 #endif
 #endif
 
-struct fclaw2d_domain;
+struct fclaw_domain;
 
 void fclaw2d_partition_domain(struct fclaw2d_global* glob, 
                               fclaw2d_timer_names_t running);

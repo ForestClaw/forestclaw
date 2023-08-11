@@ -29,11 +29,11 @@
 
 #include <fclaw_filesystem.h>
 
-fclaw2d_domain_t* swirl_create_domain(sc_MPI_Comm mpicomm, fclaw_options_t* gparms)
+fclaw_domain_t* swirl_create_domain(sc_MPI_Comm mpicomm, fclaw_options_t* gparms)
 {
     /* Mapped, multi-block domain */
     p4est_connectivity_t     *conn = NULL;
-    fclaw2d_domain_t         *domain;
+    fclaw_domain_t         *domain;
     fclaw2d_map_context_t    *cont = NULL;
 
     /* Map unit square to disk using mapc2m_disk.f */

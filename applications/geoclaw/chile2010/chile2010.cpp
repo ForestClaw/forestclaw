@@ -35,12 +35,12 @@
 
 
 static
-fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, 
+fclaw_domain_t* create_domain(sc_MPI_Comm mpicomm, 
                                 fclaw_options_t* fclaw_opt)
 {
     /* Mapped, multi-block domain */
     p4est_connectivity_t     *conn = NULL;
-    fclaw2d_domain_t         *domain;
+    fclaw_domain_t         *domain;
     fclaw2d_map_context_t    *cont = NULL;
 
     /* Size is set by [ax,bx] x [ay, by], set in .ini file */
@@ -57,7 +57,7 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm,
 static
 void run_program(fclaw2d_global_t* glob)
 {
-    fclaw2d_domain_t    **domain = &glob->domain;
+    fclaw_domain_t    **domain = &glob->domain;
 
     fclaw2d_domain_data_new(*domain);
 
@@ -89,7 +89,7 @@ main (int argc, char **argv)
     fc2d_geoclaw_options_t      *geoclawopt;
 
     sc_MPI_Comm mpicomm;
-    fclaw2d_domain_t* domain;
+    fclaw_domain_t* domain;
     fclaw2d_global_t* glob;
 
     /* Initialize application */

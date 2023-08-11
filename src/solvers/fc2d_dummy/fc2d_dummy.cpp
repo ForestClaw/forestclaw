@@ -93,7 +93,7 @@ int fc2d_dummy_package_id()
     return s_dummy_package_id;
 }
 
-void fc2d_dummy_setup_patch(fclaw2d_domain_t *domain,
+void fc2d_dummy_setup_patch(fclaw_domain_t *domain,
                             fclaw_patch_t *this_patch,
                             int this_block_idx,
                             int this_patch_idx)
@@ -102,7 +102,7 @@ void fc2d_dummy_setup_patch(fclaw2d_domain_t *domain,
 }
 
 
-void fc2d_dummy_define_data(fclaw2d_domain_t* domain, fclaw_patch_t* this_patch)
+void fc2d_dummy_define_data(fclaw_domain_t* domain, fclaw_patch_t* this_patch)
 {
     const fclaw_options_t *gparms = get_domain_parms(domain);
     ClawPatch *cp = fclaw2d_clawpatch_get_cp(this_patch);

@@ -48,9 +48,6 @@ extern "C"
 /* ---------------------------------------------------------------------- */
 ///@{
 
-/** Typedef for fclaw2d_domain */
-typedef struct fclaw2d_domain fclaw2d_domain_t;
-
 /**
  * @brief Enum for encoding patch information
  */
@@ -89,63 +86,7 @@ extern const fclaw2d_patch_flags_t fclaw2d_patch_block_face_flags[4];
 
 
 
-/**
- * @brief The domain structure is a collection of blocks
- * 
- * The domain structure gives a processor local view of the grid hierarchy.
- * Unless explicitly noted otherwise, all variables are processor local,
- * i.e., they are generally different on each processor.
- * Variables that are synchronized and shared between processors
- * are denoted *global*.
- */
-struct fclaw2d_domain
-{
-    sc_MPI_Comm mpicomm;        /**< MPI communicator */
-    int mpisize;                /**< MPI size */
-    int mpirank;                /**< MPI rank */
-    int possible_maxlevel;      /**< theoretical maximum that can be reached */
 
-    fclaw_domain_persist_t p;         /**< Parameters that carry over from
-                                             one domain to a derived one. */
-
-    int local_num_patches;      /**< sum of patches over all blocks on this proc */
-    /** @{ */
-    /** Local to proc.  If this proc doesn't
-        store any patches at all, we set
-        local_maxlevel < 0 <= local_minlevel. */
-    int local_minlevel;
-    int local_maxlevel;
-    /** @} */
-    int64_t global_num_patches; /**< sum of local_num_patches over all procs */
-    int64_t global_num_patches_before;  /**< Number of patches on lower procs */
-    int global_minlevel;       /**< global min level */
-    int global_maxlevel;       /**< global max level */
-
-    int just_adapted;           /**< true after non-trivial adaptation */
-    int just_partitioned;       /**< true after non-trivial partition */
-    int partition_unchanged_first;      /**< local index of first unchanged patch */
-    int partition_unchanged_length;     /**< number of unchanged quadrants */
-    int partition_unchanged_old_first;  /**< local index wrt. previous partition */
-
-    int num_blocks;             /**< Total number of blocks. */
-    fclaw_block_t *blocks;    /**< allocated storage */
-    int num_exchange_patches;   /**< number my patches relevant to other procs.
-                                   Identified by this expression to be true:
-                                   (patch->flags &
-                                   FCLAW2D_PATCH_ON_PARALLEL_BOUNDARY) */
-    fclaw_patch_t **exchange_patches; /**< explicitly store exchange patches */
-    int num_ghost_patches;      /**< number of off-proc patches relevant to this proc */
-    fclaw_patch_t *ghost_patches;     /**< array of off-proc patches */
-
-    void **mirror_target_levels;  /**< Points to target level of each mirror. */
-    int *ghost_target_levels;   /**< Contains target level for each ghost. */
-
-    void *pp;                   /**< opaque backend data */
-    int pp_owned;               /**< True if the pp member is owned by this domain */
-    sc_keyvalue_t *attributes;  /**< Reserved to store domain attributes */
-
-    void *user; /**< user data pointer */
-};
 
 ///@}
 /* ---------------------------------------------------------------------- */
@@ -159,7 +100,7 @@ struct fclaw2d_domain
  * \param [in] name     This name must not yet be used for another attribute.
  * \param [in] attribute        Arbitrary data stored under \a name.
  */
-void fclaw2d_domain_attribute_add (fclaw2d_domain_t * domain,
+void fclaw2d_domain_attribute_add (fclaw_domain_t * domain,
                                    const char *name, void *attribute);
 
 /** Access a named attribute of the domain.
@@ -169,7 +110,7 @@ void fclaw2d_domain_attribute_add (fclaw2d_domain_t * domain,
  * \return              The data that was previously stored under \a name,
  *                      or \a default_attr if the attribute does not exist.
  */
-void *fclaw2d_domain_attribute_access (fclaw2d_domain_t * domain,
+void *fclaw2d_domain_attribute_access (fclaw_domain_t * domain,
                                        const char *name, void *default_attr);
 
 /** Remove a named attribute from the domain.
@@ -177,7 +118,7 @@ void *fclaw2d_domain_attribute_access (fclaw2d_domain_t * domain,
  * \param [in] domain   The domain must have the attribute \a name.
  * \param [in] name     An attribute of this name must exist.
  */
-void fclaw2d_domain_attribute_remove (fclaw2d_domain_t * domain,
+void fclaw2d_domain_attribute_remove (fclaw_domain_t * domain,
                                       const char *name);
 
 ///@}
@@ -187,26 +128,26 @@ void fclaw2d_domain_attribute_remove (fclaw2d_domain_t * domain,
 ///@{
 
 /** Return the space dimension. */
-int fclaw2d_domain_dimension (const fclaw2d_domain_t * domain);
+int fclaw2d_domain_dimension (const fclaw_domain_t * domain);
 
 /** Return the number of faces of a cube: 4 in 2D, 6 in 3D. */
-int fclaw2d_domain_num_faces (const fclaw2d_domain_t * domain);
+int fclaw2d_domain_num_faces (const fclaw_domain_t * domain);
 
 /** Return the number of corners of a cube: 4 in 2D, 8 in 3D.
  * This is the same as the number of siblings in a refined tree. */
-int fclaw2d_domain_num_corners (const fclaw2d_domain_t * domain);
+int fclaw2d_domain_num_corners (const fclaw_domain_t * domain);
 
 /** Return the number of corners of a cube face: 2 in 2D, 4 in 3D.
  * This is the same as the number of refined (smaller) face neighbors. */
-int fclaw2d_domain_num_face_corners (const fclaw2d_domain_t * domain);
+int fclaw2d_domain_num_face_corners (const fclaw_domain_t * domain);
 
 /** Return the number of possible orientations of a cube face.
  * This is mostly used for internal encodings.
  */
-int fclaw2d_domain_num_orientations (const fclaw2d_domain_t * domain);
+int fclaw2d_domain_num_orientations (const fclaw_domain_t * domain);
 
 /** Find the numbers of faces adjacent to a cube corner: 2 in 2D, 3 in 3D. */
-void fclaw2d_domain_corner_faces (const fclaw2d_domain_t * domain,
+void fclaw2d_domain_corner_faces (const fclaw_domain_t * domain,
                                   int icorner, int faces[2]);
 
 ///@}
@@ -261,7 +202,7 @@ int fclaw2d_patch_is_ghost (const fclaw_patch_t * patch);
  * \param [in,out] user	Data that was passed into the iterator functions.
  */
 typedef void (*fclaw2d_patch_callback_t)
-    (fclaw2d_domain_t * domain, fclaw_patch_t * patch,
+    (fclaw_domain_t * domain, fclaw_patch_t * patch,
      int blockno, int patchno, void *user);
 
 /** Iterate over all local patches on a given level.
@@ -270,7 +211,7 @@ typedef void (*fclaw2d_patch_callback_t)
  * \param [in] pcb	Function called for each patch of matching level.
  * \param [in,out] user	Data is passed to the pcb callback.
  */
-void fclaw2d_domain_iterate_level (fclaw2d_domain_t * domain, int level,
+void fclaw2d_domain_iterate_level (fclaw_domain_t * domain, int level,
                                    fclaw2d_patch_callback_t pcb, void *user);
 
 /** Iterate over all local patches of all levels.
@@ -278,7 +219,7 @@ void fclaw2d_domain_iterate_level (fclaw2d_domain_t * domain, int level,
  * \param [in] pcb	Function called for each patch in the domain.
  * \param [in,out] user	Data is passed to the pcb callback.
  */
-void fclaw2d_domain_iterate_patches (fclaw2d_domain_t * domain,
+void fclaw2d_domain_iterate_patches (fclaw_domain_t * domain,
                                      fclaw2d_patch_callback_t pcb,
                                      void *user);
 
@@ -290,7 +231,7 @@ void fclaw2d_domain_iterate_patches (fclaw2d_domain_t * domain,
  *                      Their patchnos are consecutive, blockno is the same.
  * \param [in,out] user	Data is passed to the pcb callback.
  */
-void fclaw2d_domain_iterate_families (fclaw2d_domain_t * domain,
+void fclaw2d_domain_iterate_families (fclaw_domain_t * domain,
                                       fclaw2d_patch_callback_t pcb,
                                       void *user);
 
@@ -309,7 +250,7 @@ void fclaw2d_domain_iterate_families (fclaw2d_domain_t * domain,
  *			The order is left, right, bottom, top.
  * \return		True if at least one patch face is on a boundary.
  */
-int fclaw2d_patch_boundary_type (fclaw2d_domain_t * domain,
+int fclaw2d_patch_boundary_type (fclaw_domain_t * domain,
                                  int blockno, int patchno, int boundaries[4]);
 
 /** Determine whether the normal to a face neighbor align.
@@ -319,7 +260,7 @@ int fclaw2d_patch_boundary_type (fclaw2d_domain_t * domain,
  * \param [in] faceno   Number of the face of the patch.
  * \return		True if normals match, false for mismatch.
  */
-int fclaw2d_patch_normal_match (fclaw2d_domain_t * domain,
+int fclaw2d_patch_normal_match (fclaw_domain_t * domain,
                                 int blockno, int patchno, int faceno);
 
 /**
@@ -355,7 +296,7 @@ fclaw2d_patch_relation_t;
  * \param [out] rfaceno Neighbor face number and orientation.
  * \return              The relative patch size of the face neighbor.
  */
-fclaw2d_patch_relation_t fclaw2d_patch_face_neighbors (fclaw2d_domain_t *
+fclaw2d_patch_relation_t fclaw2d_patch_face_neighbors (fclaw_domain_t *
                                                        domain, int blockno,
                                                        int patchno,
                                                        int faceno,
@@ -500,7 +441,7 @@ void fclaw2d_patch_transform_face2 (fclaw_patch_t * ipatch,
  * \return                      True if at least one corner neighbor exists
  *                              that is not already a face neighbor.
  */
-int fclaw2d_patch_corner_neighbors (fclaw2d_domain_t * domain,
+int fclaw2d_patch_corner_neighbors (fclaw_domain_t * domain,
                                     int blockno, int patchno, int cornerno,
                                     int *rproc, int *rblockno, int *rpatchno,
                                     int *rcorner,
@@ -588,7 +529,7 @@ void fclaw2d_patch_transform_corner2 (fclaw_patch_t * ipatch,
  *                              This number is a global threshold that is compared
  *                              against each patch's individual counter.
  */
-void fclaw2d_domain_set_refinement (fclaw2d_domain_t * domain,
+void fclaw2d_domain_set_refinement (fclaw_domain_t * domain,
                                     int smooth_refine, int smooth_level,
                                     int coarsen_delay);
 
@@ -597,7 +538,7 @@ void fclaw2d_domain_set_refinement (fclaw2d_domain_t * domain,
  * It is safe to call this function from an iterator callback except
  * \ref fclaw2d_domain_iterate_adapted.
  */
-void fclaw2d_patch_mark_refine (fclaw2d_domain_t * domain,
+void fclaw2d_patch_mark_refine (fclaw_domain_t * domain,
                                 int blockno, int patchno);
 
 /** Mark a patch for coarsening.
@@ -607,7 +548,7 @@ void fclaw2d_patch_mark_refine (fclaw2d_domain_t * domain,
  * It is safe to call this function from an iterator callback except
  * \ref fclaw2d_domain_iterate_adapted.
  */
-void fclaw2d_patch_mark_coarsen (fclaw2d_domain_t * domain,
+void fclaw2d_patch_mark_coarsen (fclaw_domain_t * domain,
                                  int blockno, int patchno);
 
 /** Callback prototype used in fclaw2d_domain_iterate_adapted.
@@ -619,9 +560,9 @@ void fclaw2d_patch_mark_coarsen (fclaw2d_domain_t * domain,
  * If coarsened (new patch is DOUBLESIZE), situation is the reverse of refine.
  * We iterate over local patches only.
  */
-typedef void (*fclaw2d_match_callback_t) (fclaw2d_domain_t * old_domain,
+typedef void (*fclaw2d_match_callback_t) (fclaw_domain_t * old_domain,
                                           fclaw_patch_t * old_patch,
-                                          fclaw2d_domain_t * new_domain,
+                                          fclaw_domain_t * new_domain,
                                           fclaw_patch_t * new_patch,
                                           fclaw2d_patch_relation_t newsize,
                                           int blockno,
@@ -635,8 +576,8 @@ typedef void (*fclaw2d_match_callback_t) (fclaw2d_domain_t * old_domain,
  * \param [in] mcb              Callback.
  * \param [in,out] user         This pointer is passed to the callback.
  */
-void fclaw2d_domain_iterate_adapted (fclaw2d_domain_t * old_domain,
-                                     fclaw2d_domain_t * new_domain,
+void fclaw2d_domain_iterate_adapted (fclaw_domain_t * old_domain,
+                                     fclaw_domain_t * new_domain,
                                      fclaw2d_match_callback_t mcb,
                                      void *user);
 
@@ -656,7 +597,7 @@ void fclaw2d_domain_iterate_adapted (fclaw2d_domain_t * old_domain,
  *                              memory that can be written to by forestclaw.
  *                              *patch_data must be NULL before the call.
  */
-void fclaw2d_domain_allocate_before_partition (fclaw2d_domain_t * domain,
+void fclaw2d_domain_allocate_before_partition (fclaw_domain_t * domain,
                                                size_t data_size,
                                                void ***patch_data);
 
@@ -668,7 +609,7 @@ void fclaw2d_domain_allocate_before_partition (fclaw2d_domain_t * domain,
  *                              that points to exactly data_size bytes of
  *                              memory that can be read from by forestclaw.
  */
-void fclaw2d_domain_retrieve_after_partition (fclaw2d_domain_t * domain,
+void fclaw2d_domain_retrieve_after_partition (fclaw_domain_t * domain,
                                               void ***patch_data);
 
 /** Callback to iterate through the partitions.
@@ -689,9 +630,9 @@ void fclaw2d_domain_retrieve_after_partition (fclaw2d_domain_t * domain,
  * \param [in,out] user         Pointer passed to \ref
  *                              fclaw2d_domain_iterate_partitioned.
  */
-typedef void (*fclaw2d_transfer_callback_t) (fclaw2d_domain_t * old_domain,
+typedef void (*fclaw2d_transfer_callback_t) (fclaw_domain_t * old_domain,
                                              fclaw_patch_t * old_patch,
-                                             fclaw2d_domain_t * new_domain,
+                                             fclaw_domain_t * new_domain,
                                              fclaw_patch_t * new_patch,
                                              int blockno,
                                              int old_patchno, int new_patchno,
@@ -704,8 +645,8 @@ typedef void (*fclaw2d_transfer_callback_t) (fclaw2d_domain_t * old_domain,
  * \param [in] tcb              Callback.
  * \param [in,out] user         This pointer is passed to the callback.
  */
-void fclaw2d_domain_iterate_partitioned (fclaw2d_domain_t * old_domain,
-                                         fclaw2d_domain_t * new_domain,
+void fclaw2d_domain_iterate_partitioned (fclaw_domain_t * old_domain,
+                                         fclaw_domain_t * new_domain,
                                          fclaw2d_transfer_callback_t tcb,
                                          void *user);
 
@@ -714,7 +655,7 @@ void fclaw2d_domain_iterate_partitioned (fclaw2d_domain_t * old_domain,
  * \param [in,out] patch_data   Address of an array of void pointers to free.
  *                              *patch_data will be NULL after the call.
  */
-void fclaw2d_domain_free_after_partition (fclaw2d_domain_t * domain,
+void fclaw2d_domain_free_after_partition (fclaw_domain_t * domain,
                                           void ***patch_data);
 
 ///@}
@@ -769,7 +710,7 @@ fclaw2d_domain_exchange_t;
  *                              after this call by forestclaw.
  */
 fclaw2d_domain_exchange_t
-    * fclaw2d_domain_allocate_before_exchange (fclaw2d_domain_t * domain,
+    * fclaw2d_domain_allocate_before_exchange (fclaw_domain_t * domain,
                                                size_t data_size);
 
 /** Exchange data for parallel ghost neighbors.
@@ -784,7 +725,7 @@ fclaw2d_domain_exchange_t
  * \param [in] exchange_minlevel The minimum quadrant level that is exchanged.
  * \param [in] exchange_maxlevel The maximum quadrant level that is exchanged.
  */
-void fclaw2d_domain_ghost_exchange (fclaw2d_domain_t * domain,
+void fclaw2d_domain_ghost_exchange (fclaw_domain_t * domain,
                                     fclaw2d_domain_exchange_t * e,
                                     int exchange_minlevel,
                                     int exchange_maxlevel);
@@ -800,7 +741,7 @@ void fclaw2d_domain_ghost_exchange (fclaw2d_domain_t * domain,
  *                              Its patch_data member may already be
  *                              overwritten after this function returns.
  */
-void fclaw2d_domain_ghost_exchange_begin (fclaw2d_domain_t * domain,
+void fclaw2d_domain_ghost_exchange_begin (fclaw_domain_t * domain,
                                           fclaw2d_domain_exchange_t * e,
                                           int exchange_minlevel,
                                           int exchange_maxlevel);
@@ -811,7 +752,7 @@ void fclaw2d_domain_ghost_exchange_begin (fclaw2d_domain_t * domain,
  * and _end must be called.
  * \param [in,out] e            Its ghost_data member must have survived.
  */
-void fclaw2d_domain_ghost_exchange_end (fclaw2d_domain_t * domain,
+void fclaw2d_domain_ghost_exchange_end (fclaw_domain_t * domain,
                                         fclaw2d_domain_exchange_t * e);
 
 /** Free buffers used in exchanging off-processor data during time stepping.
@@ -819,7 +760,7 @@ void fclaw2d_domain_ghost_exchange_end (fclaw2d_domain_t * domain,
  * \param [in] domain           The domain is not modified.
  * \param [in] e                Allocated buffers.
  */
-void fclaw2d_domain_free_after_exchange (fclaw2d_domain_t * domain,
+void fclaw2d_domain_free_after_exchange (fclaw_domain_t * domain,
                                          fclaw2d_domain_exchange_t * e);
 
 ///@}
@@ -839,7 +780,7 @@ typedef struct fclaw2d_domain_indirect fclaw2d_domain_indirect_t;
  *                              the context for indirect ghost neighbors.
  */
 fclaw2d_domain_indirect_t
-    * fclaw2d_domain_indirect_begin (fclaw2d_domain_t * domain);
+    * fclaw2d_domain_indirect_begin (fclaw_domain_t * domain);
 
 /** End sending messages to determine neighbors of ghost patches.
  * This call must not be interleaved with any ghost_exchange calls.
@@ -850,7 +791,7 @@ fclaw2d_domain_indirect_t
  *                              \ref fclaw2d_domain_indirect_begin
  *                              and will be completed with parallel information.
  */
-void fclaw2d_domain_indirect_end (fclaw2d_domain_t * domain,
+void fclaw2d_domain_indirect_end (fclaw_domain_t * domain,
                                   fclaw2d_domain_indirect_t * ind);
 
 /** Call this analogously to \ref fclaw2d_domain_face_neighbors.
@@ -877,7 +818,7 @@ void fclaw2d_domain_indirect_end (fclaw2d_domain_t * domain,
  *                              \ref FCLAW2D_PATCH_BOUNDARY.
  */
 fclaw2d_patch_relation_t
-fclaw2d_domain_indirect_neighbors (fclaw2d_domain_t * domain,
+fclaw2d_domain_indirect_neighbors (fclaw_domain_t * domain,
                                    fclaw2d_domain_indirect_t * ind,
                                    int ghostno, int faceno, int rproc[2],
                                    int *rblockno, int rpatchno[2],
@@ -887,7 +828,7 @@ fclaw2d_domain_indirect_neighbors (fclaw2d_domain_t * domain,
  * \param [in] domain           Must be the same domain used in begin and end.
  * \param [in,out] ind          Memory will be freed.
  */
-void fclaw2d_domain_indirect_destroy (fclaw2d_domain_t * domain,
+void fclaw2d_domain_indirect_destroy (fclaw_domain_t * domain,
                                       fclaw2d_domain_indirect_t * ind);
 
 ///@}
@@ -899,15 +840,15 @@ void fclaw2d_domain_indirect_destroy (fclaw2d_domain_t * domain,
 /** Compute and return the maximum over all processors of a double value.
  * The minimum can be computed by using this function on the negative value.
  */
-double fclaw2d_domain_global_maximum (fclaw2d_domain_t * domain, double d);
+double fclaw2d_domain_global_maximum (fclaw_domain_t * domain, double d);
 
 /** Compute and return the sum over all processors of a double value.
  */
-double fclaw2d_domain_global_sum (fclaw2d_domain_t * domain, double d);
+double fclaw2d_domain_global_sum (fclaw_domain_t * domain, double d);
 
 /** Synchronize all processes.  Avoid using if at all possible.
  */
-void fclaw2d_domain_barrier (fclaw2d_domain_t * domain);
+void fclaw2d_domain_barrier (fclaw_domain_t * domain);
 
 /** Serialize a section of code.
  * THIS IS NOT SCALABLE.
@@ -918,7 +859,7 @@ void fclaw2d_domain_barrier (fclaw2d_domain_t * domain);
  * to this function and fclaw2d_domain_serialization_leave.
  * \param [in] domain           The domain is not modified.
  */
-void fclaw2d_domain_serialization_enter (fclaw2d_domain_t * domain);
+void fclaw2d_domain_serialization_enter (fclaw_domain_t * domain);
 
 /** Serialize a section of code.
  * THIS IS NOT SCALABLE.
@@ -927,7 +868,7 @@ void fclaw2d_domain_serialization_enter (fclaw2d_domain_t * domain);
  * processors to return from fclaw2d_domain_serialization_enter.
  * \param [in] domain           The domain is not modified.
  */
-void fclaw2d_domain_serialization_leave (fclaw2d_domain_t * domain);
+void fclaw2d_domain_serialization_leave (fclaw_domain_t * domain);
 
 ///@}
 /* ---------------------------------------------------------------------- */
@@ -941,7 +882,7 @@ void fclaw2d_domain_serialization_leave (fclaw2d_domain_t * domain);
  * distinguish domains that were created during a partition search (and only
  * contain some meta information) from real domains in a local search.
  */
-int fclaw2d_domain_is_meta (fclaw2d_domain_t * domain);
+int fclaw2d_domain_is_meta (fclaw_domain_t * domain);
 
 /** Initialize a meta domain.
  *
@@ -952,7 +893,7 @@ int fclaw2d_domain_is_meta (fclaw2d_domain_t * domain);
  * in case the domain to interpolate on is not available locally (also see
  * \ref fclaw2d_overlap_exchange for an example).
  */
-void fclaw2d_domain_init_meta (fclaw2d_domain_t *domain, int mpirank);
+void fclaw2d_domain_init_meta (fclaw_domain_t *domain, int mpirank);
 
 ///@}
 #ifdef __cplusplus

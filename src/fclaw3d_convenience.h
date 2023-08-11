@@ -37,7 +37,7 @@ extern "C"
 #endif
 #endif
 
-fclaw3d_domain_t *fclaw3d_domain_new_unitcube (sc_MPI_Comm mpicomm,
+fclaw_domain_t *fclaw3d_domain_new_unitcube (sc_MPI_Comm mpicomm,
                                                int initial_level);
 
 /** Create a brick connectivity, that is, a rectangular grid of blocks.
@@ -52,7 +52,7 @@ fclaw3d_domain_t *fclaw3d_domain_new_unitcube (sc_MPI_Comm mpicomm,
  * \param [in] initial_level    A non-negative integer <= P4EST_QMAXLEVEL.
  * \return                      A fully initialized domain structure.
  */
-fclaw3d_domain_t *fclaw3d_domain_new_brick (sc_MPI_Comm mpicomm,
+fclaw_domain_t *fclaw3d_domain_new_brick (sc_MPI_Comm mpicomm,
                                             int blocks_in_x, int blocks_in_y,
                                             int blocks_in_z,
                                             int periodic_in_x,
@@ -66,11 +66,11 @@ fclaw3d_domain_t *fclaw3d_domain_new_brick (sc_MPI_Comm mpicomm,
  * \param [in] conn             We DO take ownership of the connectivity.
  * \return                      A fully initialized domain structure.
  */
-fclaw3d_domain_t *fclaw3d_domain_new_conn (sc_MPI_Comm mpicomm,
+fclaw_domain_t *fclaw3d_domain_new_conn (sc_MPI_Comm mpicomm,
                                            int initial_level,
                                            p8est_connectivity_t * conn);
 
-void fclaw3d_domain_destroy (fclaw3d_domain_t * domain);
+void fclaw3d_domain_destroy (fclaw_domain_t * domain);
 
 /** Create a new domain based on refine and coarsen marks set previously.
  * All refine and coarsen markers are cancelled when this function is done.
@@ -81,7 +81,7 @@ void fclaw3d_domain_destroy (fclaw3d_domain_t * domain);
  * \return                      Adapted domain if refinement occurred, or NULL.
  *                              The return status is identical across all ranks.
  */
-fclaw3d_domain_t *fclaw3d_domain_adapt (fclaw3d_domain_t * domain);
+fclaw_domain_t *fclaw3d_domain_adapt (fclaw_domain_t * domain);
 
 /** Create a repartitioned domain after fclaw3d_domain_adapt returned non-NULL.
  * All refine and coarsen markers are cancelled when this function is done.
@@ -97,7 +97,7 @@ fclaw3d_domain_t *fclaw3d_domain_adapt (fclaw3d_domain_t * domain);
  * \return                      Partitioned domain if different, or NULL.
  *                              The return status is identical across all ranks.
  */
-fclaw3d_domain_t *fclaw3d_domain_partition (fclaw3d_domain_t * domain,
+fclaw_domain_t *fclaw3d_domain_partition (fclaw_domain_t * domain,
                                             int weight_exponent);
 
 /** Query the window of patches that is not transferred on partition.
@@ -107,7 +107,7 @@ fclaw3d_domain_t *fclaw3d_domain_partition (fclaw3d_domain_t * domain,
  * \param [out] unchanged_length        Number of patches that not changed owners.
  * \param [out] unchanged_old_first     First stayed_local patch in the old partition.
  */
-void fclaw3d_domain_partition_unchanged (fclaw3d_domain_t * domain,
+void fclaw3d_domain_partition_unchanged (fclaw_domain_t * domain,
                                          int *unchanged_first,
                                          int *unchanged_length,
                                          int *unchanged_old_first);
@@ -115,7 +115,7 @@ void fclaw3d_domain_partition_unchanged (fclaw3d_domain_t * domain,
 /** Clean up after fclaw3d_domain_partition returned non-NULL.
  * \param [in,out] domain       Current domain that was partitioned.
  */
-void fclaw3d_domain_complete (fclaw3d_domain_t * domain);
+void fclaw3d_domain_complete (fclaw_domain_t * domain);
 
 /** Write VTK file(s) for a domain structure.
  *  Each patch is drawn as one rectangle.
@@ -125,19 +125,19 @@ void fclaw3d_domain_complete (fclaw3d_domain_t * domain);
  * \param [in] domain           A valid domain structure.  Is not changed.
  * \param [in] basename         Filename prefix passed to p4est_vtk functions.
  */
-void fclaw3d_domain_write_vtk (fclaw3d_domain_t * domain,
+void fclaw3d_domain_write_vtk (fclaw_domain_t * domain,
                                const char *basename);
 
 /** Print patch number by level on all processors */
-void fclaw3d_domain_list_levels (fclaw3d_domain_t * domain, int log_priority);
+void fclaw3d_domain_list_levels (fclaw_domain_t * domain, int log_priority);
 
 /** Print face neighbor status for each face */
-void fclaw3d_domain_list_neighbors (fclaw3d_domain_t * domain,
+void fclaw3d_domain_list_neighbors (fclaw_domain_t * domain,
                                     int log_priority);
 
 /** Print information on adapted patches */
-void fclaw3d_domain_list_adapted (fclaw3d_domain_t * old_domain,
-                                  fclaw3d_domain_t * new_domain,
+void fclaw3d_domain_list_adapted (fclaw_domain_t * old_domain,
+                                  fclaw_domain_t * new_domain,
                                   int log_priority);
 
 /** Search triples of (block number, x, y, z coordinates) in the mesh.
@@ -166,7 +166,7 @@ void fclaw3d_domain_list_adapted (fclaw3d_domain_t * old_domain,
  *                              not been found on this process, or the patch
  *                              number within its block otherwise.
  */
-void fclaw3d_domain_search_points (fclaw3d_domain_t * domain,
+void fclaw3d_domain_search_points (fclaw_domain_t * domain,
                                    sc_array_t * block_offsets,
                                    sc_array_t * coordinates,
                                    sc_array_t * results);
@@ -213,7 +213,7 @@ void fclaw3d_domain_search_points (fclaw3d_domain_t * domain,
  *                              The integral value may well be 0. if the intersection
  *                              is, in fact, none (a false positive).
  */
-typedef int (*fclaw3d_integrate_ray_t) (fclaw3d_domain_t * domain,
+typedef int (*fclaw3d_integrate_ray_t) (fclaw_domain_t * domain,
                                         fclaw_patch_t * patch,
                                         int blockno, int patchno,
                                         void *ray, double *integral,
@@ -235,7 +235,7 @@ typedef int (*fclaw3d_integrate_ray_t) (fclaw3d_domain_t * domain,
  *                              On output, we provide the final integral values.
  * \param [in,out] user         Arbitrary data to be passed to the callback.
  */
-void fclaw3d_domain_integrate_rays (fclaw3d_domain_t * domain,
+void fclaw3d_domain_integrate_rays (fclaw_domain_t * domain,
                                     fclaw3d_integrate_ray_t intersect,
                                     sc_array_t * rays,
                                     sc_array_t * integrals,
@@ -296,7 +296,7 @@ void fclaw3d_domain_integrate_rays (fclaw3d_domain_t * domain,
  *                              Else, the return value may be a false positive,
  *                              we'll be fine.
  */
-typedef int (*fclaw3d_interpolate_point_t) (fclaw3d_domain_t * domain,
+typedef int (*fclaw3d_interpolate_point_t) (fclaw_domain_t * domain,
                                             fclaw_patch_t * patch,
                                             int blockno, int patchno,
                                             void *point, void *user);
@@ -330,7 +330,7 @@ typedef int (*fclaw3d_interpolate_point_t) (fclaw3d_domain_t * domain,
  *                              point structure.
  * \param [in,out] user         Arbitrary data to be passed to the callback.
  */
-void fclaw3d_overlap_exchange (fclaw3d_domain_t * domain,
+void fclaw3d_overlap_exchange (fclaw_domain_t * domain,
                                sc_array_t * query_points,
                                fclaw3d_interpolate_point_t interpolate,
                                void *user);

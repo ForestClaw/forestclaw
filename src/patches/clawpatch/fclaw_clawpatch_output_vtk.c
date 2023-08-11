@@ -67,7 +67,7 @@ typedef struct fclaw2d_vtk_state
 fclaw2d_vtk_state_t;
 
 static int
-fclaw2d_vtk_write_header (fclaw2d_domain_t * domain, fclaw2d_vtk_state_t * s)
+fclaw2d_vtk_write_header (fclaw_domain_t * domain, fclaw2d_vtk_state_t * s)
 {
     int retval;
     FILE *file;
@@ -191,7 +191,7 @@ write_buffer (fclaw2d_vtk_state_t * s, int64_t psize_field)
 }
 
 static void
-write_position_cb (fclaw2d_domain_t * domain, fclaw_patch_t * patch,
+write_position_cb (fclaw_domain_t * domain, fclaw_patch_t * patch,
                    int blockno, int patchno, void *user)
 {
     fclaw2d_global_iterate_t *g = (fclaw2d_global_iterate_t*) user;
@@ -202,7 +202,7 @@ write_position_cb (fclaw2d_domain_t * domain, fclaw_patch_t * patch,
 }
 
 static void
-write_2d_connectivity_cb (fclaw2d_domain_t * domain, fclaw_patch_t * patch,
+write_2d_connectivity_cb (fclaw_domain_t * domain, fclaw_patch_t * patch,
                        int blockno, int patchno, void *user)
 {
     fclaw2d_global_iterate_t *g = (fclaw2d_global_iterate_t*) user;
@@ -248,7 +248,7 @@ write_2d_connectivity_cb (fclaw2d_domain_t * domain, fclaw_patch_t * patch,
     write_buffer (s, s->psize_connectivity);
 }
 static void
-write_3d_connectivity_cb (fclaw2d_domain_t * domain, fclaw_patch_t * patch,
+write_3d_connectivity_cb (fclaw_domain_t * domain, fclaw_patch_t * patch,
                           int blockno, int patchno, void *user)
 {
     fclaw2d_global_iterate_t *g = (fclaw2d_global_iterate_t*) user;
@@ -312,7 +312,7 @@ write_3d_connectivity_cb (fclaw2d_domain_t * domain, fclaw_patch_t * patch,
 }
 
 static void
-write_offsets_cb (fclaw2d_domain_t * domain, fclaw_patch_t * patch,
+write_offsets_cb (fclaw_domain_t * domain, fclaw_patch_t * patch,
                   int blockno, int patchno, void *user)
 {
     fclaw2d_global_iterate_t *g = (fclaw2d_global_iterate_t*) user;
@@ -344,7 +344,7 @@ write_offsets_cb (fclaw2d_domain_t * domain, fclaw_patch_t * patch,
 }
 
 static void
-write_types_cb (fclaw2d_domain_t * domain, fclaw_patch_t * patch,
+write_types_cb (fclaw_domain_t * domain, fclaw_patch_t * patch,
                 int blockno, int patchno, void *user)
 {
     fclaw2d_global_iterate_t *g = (fclaw2d_global_iterate_t*) user;
@@ -370,7 +370,7 @@ write_types_cb (fclaw2d_domain_t * domain, fclaw_patch_t * patch,
 }
 
 static void
-write_mpirank_cb (fclaw2d_domain_t * domain, fclaw_patch_t * patch,
+write_mpirank_cb (fclaw_domain_t * domain, fclaw_patch_t * patch,
                   int blockno, int patchno, void *user)
 {
     fclaw2d_global_iterate_t *g = (fclaw2d_global_iterate_t*) user;
@@ -386,7 +386,7 @@ write_mpirank_cb (fclaw2d_domain_t * domain, fclaw_patch_t * patch,
 }
 
 static void
-write_blockno_cb (fclaw2d_domain_t * domain, fclaw_patch_t * patch,
+write_blockno_cb (fclaw_domain_t * domain, fclaw_patch_t * patch,
                   int blockno, int patchno, void *user)
 {
     fclaw2d_global_iterate_t *g = (fclaw2d_global_iterate_t*) user;
@@ -402,7 +402,7 @@ write_blockno_cb (fclaw2d_domain_t * domain, fclaw_patch_t * patch,
 }
 
 static void
-write_patchno_cb (fclaw2d_domain_t * domain, fclaw_patch_t * patch,
+write_patchno_cb (fclaw_domain_t * domain, fclaw_patch_t * patch,
                   int blockno, int patchno, void *user)
 {
     fclaw2d_global_iterate_t *g = (fclaw2d_global_iterate_t*) user;
@@ -433,7 +433,7 @@ write_patchno_cb (fclaw2d_domain_t * domain, fclaw_patch_t * patch,
 }
 
 static void
-write_meqn_cb (fclaw2d_domain_t * domain, fclaw_patch_t * patch,
+write_meqn_cb (fclaw_domain_t * domain, fclaw_patch_t * patch,
                int blockno, int patchno, void *user)
 {
     fclaw2d_global_iterate_t* g = (fclaw2d_global_iterate_t*) user;
@@ -449,7 +449,7 @@ fclaw2d_vtk_write_field (fclaw2d_global_t * glob, fclaw2d_vtk_state_t * s,
                          int64_t offset_field, int64_t psize_field,
                          fclaw2d_patch_callback_t cb)
 {
-    fclaw2d_domain_t *domain = glob->domain;
+    fclaw_domain_t *domain = glob->domain;
 
     int64_t bcount;
 #ifndef P4EST_ENABLE_MPIIO
@@ -554,7 +554,7 @@ fclaw2d_vtk_write_data (fclaw2d_global_t * glob, fclaw2d_vtk_state_t * s)
 }
 
 static int
-fclaw2d_vtk_write_footer (fclaw2d_domain_t * domain, fclaw2d_vtk_state_t * s)
+fclaw2d_vtk_write_footer (fclaw_domain_t * domain, fclaw2d_vtk_state_t * s)
 {
     int retval;
     FILE *file;
@@ -590,7 +590,7 @@ fclaw_vtk_write_file (int dim, fclaw2d_global_t * glob, const char *basename,
                       fclaw_vtk_patch_data_t coordinate_cb,
                       fclaw_vtk_patch_data_t value_cb)
 {
-    fclaw2d_domain_t *domain = glob->domain;
+    fclaw_domain_t *domain = glob->domain;
 
     int retval, gretval;
     int mpiret;

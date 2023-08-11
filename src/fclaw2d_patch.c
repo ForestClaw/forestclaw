@@ -706,7 +706,7 @@ void fclaw2d_patch_partition_pack(fclaw2d_global_t *glob,
 
 
 void fclaw2d_patch_partition_unpack(fclaw2d_global_t *glob,  
-									fclaw2d_domain_t *new_domain,
+									fclaw_domain_t *new_domain,
 									fclaw_patch_t *this_patch,
 									int this_block_idx,
 									int this_patch_idx,
@@ -820,7 +820,7 @@ fclaw2d_patch_vtable_t* fclaw2d_patch_vt(fclaw2d_global_t* glob)
 
 
 /* Use this one if you have the patch or block number */
-void fclaw2d_patch_get_info(fclaw2d_domain_t * domain,
+void fclaw2d_patch_get_info(fclaw_domain_t * domain,
 							fclaw_patch_t * patch,
 							int blockno, int patchno,
 							int *global_num, int *local_num, 
@@ -843,7 +843,7 @@ void fclaw2d_patch_get_info(fclaw2d_domain_t * domain,
 }
 
 /* Use this one if you don't have the patch or block number */
-void fclaw2d_patch_get_info2(fclaw2d_domain_t * domain,
+void fclaw2d_patch_get_info2(fclaw_domain_t * domain,
 							fclaw_patch_t * this_patch,
 							int *this_block_idx, int *this_patch_idx,
 							int *global_num, int *level)

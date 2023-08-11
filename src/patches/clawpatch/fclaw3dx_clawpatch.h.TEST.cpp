@@ -63,7 +63,7 @@ namespace{
 struct SinglePatchDomain {
     fclaw2d_global_t* glob;
     fclaw_options_t fopts;
-    fclaw2d_domain_t *domain;
+    fclaw_domain_t *domain;
     fclaw_clawpatch_options_t* opts;
 
     SinglePatchDomain(){
@@ -110,7 +110,7 @@ struct SinglePatchDomain {
 struct QuadDomain {
     fclaw2d_global_t* glob;
     fclaw_options_t fopts;
-    fclaw2d_domain_t *domain;
+    fclaw_domain_t *domain;
     fclaw_clawpatch_options_t* opts;
 
     QuadDomain(){
@@ -251,7 +251,7 @@ TEST_CASE("fclaw3dx_clawpatch patch_build")
         fopts.compute_error = compute_error;
         fopts.subcycle = subcycle;
 
-        fclaw2d_domain_t *domain = create_test_domain(sc_MPI_COMM_WORLD,&fopts);
+        fclaw_domain_t *domain = create_test_domain(sc_MPI_COMM_WORLD,&fopts);
         fclaw2d_global_store_domain(glob, domain);
         fclaw2d_options_store(glob, &fopts);
 

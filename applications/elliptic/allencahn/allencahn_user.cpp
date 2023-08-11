@@ -185,7 +185,7 @@ void allencahn_time_header_ascii(fclaw2d_global_t* glob, int iframe)
 
 
 static
-void cb_allencahn_output_ascii(fclaw2d_domain_t * domain,
+void cb_allencahn_output_ascii(fclaw_domain_t * domain,
                             fclaw_patch_t * patch,
                             int blockno, int patchno,
                             void *user)

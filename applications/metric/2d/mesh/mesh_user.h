@@ -52,7 +52,7 @@ void mesh_link_solvers(fclaw2d_global_t *glob);
 
 void mesh_problem_setup(fclaw2d_global_t* glob);
 
-void mesh_patch_setup(fclaw2d_domain_t *domain,
+void mesh_patch_setup(fclaw_domain_t *domain,
                        fclaw_patch_t *this_patch,
                        int this_block_idx,
                        int this_patch_idx);

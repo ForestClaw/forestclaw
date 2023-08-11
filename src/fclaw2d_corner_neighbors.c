@@ -55,7 +55,7 @@ void get_corner_type(fclaw2d_global_t* glob,
                      int *is_block_corner,
                      int *block_iface)
 {
-    fclaw2d_domain_t *domain = glob->domain;
+    fclaw_domain_t *domain = glob->domain;
 
     // p4est has tons of lookup table like this, can be exposed similarly
     int corner_faces[FCLAW2D_SPACEDIM];
@@ -143,7 +143,7 @@ void get_corner_neighbor(fclaw2d_global_t *glob,
                          int ftransform[],
                          fclaw2d_patch_transform_data_t* ftransform_finegrid)
 {
-    fclaw2d_domain_t *domain = glob->domain;
+    fclaw_domain_t *domain = glob->domain;
     /* See what p4est thinks we have for corners, and consider four cases */
     int rproc_corner;
     int corner_patch_idx;
@@ -331,7 +331,7 @@ void get_corner_neighbor(fclaw2d_global_t *glob,
 
 
 
-void cb_corner_fill(fclaw2d_domain_t *domain,
+void cb_corner_fill(fclaw_domain_t *domain,
                     fclaw_patch_t *this_patch,
                     int this_block_idx,
                     int this_patch_idx,

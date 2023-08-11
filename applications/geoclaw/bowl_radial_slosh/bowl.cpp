@@ -54,10 +54,10 @@ main (int argc, char **argv)
     fc2d_geoclaw_options_t      *slosh_geo_opt;
 
     sc_MPI_Comm                 mpicomm;
-    fclaw2d_domain_t            *radial_domain;
+    fclaw_domain_t            *radial_domain;
     fclaw2d_global_t            *radial_glob;
     fclaw2d_global_t            *slosh_glob;
-    fclaw2d_domain_t            *slosh_domain;
+    fclaw_domain_t            *slosh_domain;
 
     /* Initialize application */
     app = fclaw_app_new (&argc, &argv, NULL);

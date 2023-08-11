@@ -58,7 +58,7 @@ fclaw2d_diagnostics_vtable_t* fclaw2d_diagnostics_vt(fclaw2d_global_t* glob)
 }
 
 /* global_maximum is in forestclaw2d.c */
-double fclaw2d_domain_global_minimum (fclaw2d_domain_t* domain, double d)
+double fclaw2d_domain_global_minimum (fclaw_domain_t* domain, double d)
 {
     double neg_d;
     double maxvalue;

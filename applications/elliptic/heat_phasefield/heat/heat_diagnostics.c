@@ -86,7 +86,7 @@ void heat_diagnostics_reset(fclaw2d_global_t *glob,
 }
 
 static
-void heat_compute(fclaw2d_domain_t *domain,
+void heat_compute(fclaw_domain_t *domain,
                     fclaw_patch_t *patch,
                     int blockno,
                     int patchno,
@@ -135,7 +135,7 @@ void heat_diagnostics_gather(fclaw2d_global_t *glob,
                                void* patch_acc,
                                int init_flag)
 {
-    fclaw2d_domain_t *domain = glob->domain;
+    fclaw_domain_t *domain = glob->domain;
     
     heat_error_info_t *error_data = (heat_error_info_t*) patch_acc;
     const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);

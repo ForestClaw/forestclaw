@@ -79,7 +79,7 @@ void get_face_neighbors(fclaw2d_global_t *glob,
 						int ftransform[],
 						fclaw2d_patch_transform_data_t* ftransform_finegrid)
 {
-	fclaw2d_domain_t *domain = glob->domain;
+	fclaw_domain_t *domain = glob->domain;
 	int rproc[FCLAW2D_NUMFACENEIGHBORS];
 	int rblockno;
 	int rpatchno[FCLAW2D_NUMFACENEIGHBORS];
@@ -192,7 +192,7 @@ void get_face_neighbors(fclaw2d_global_t *glob,
 /**
  * \ingroup Averaging
  **/
-void cb_face_fill(fclaw2d_domain_t *domain,
+void cb_face_fill(fclaw_domain_t *domain,
 				  fclaw_patch_t *this_patch,
 				  int this_block_idx,
 				  int this_patch_idx,
@@ -455,7 +455,7 @@ void fclaw2d_face_neighbor_ghost(fclaw2d_global_t* glob,
 								 int maxlevel,
 								 int time_interp)
 {
-	fclaw2d_domain_t *domain = glob->domain;
+	fclaw_domain_t *domain = glob->domain;
 
 	fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data(domain);
 	const fclaw_options_t *gparms = fclaw2d_get_options(glob);

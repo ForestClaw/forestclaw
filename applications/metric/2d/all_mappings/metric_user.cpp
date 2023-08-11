@@ -31,7 +31,7 @@ static fclaw2d_vtable_t fclaw2d_vt;
 /* Want to write this so clawpack isn't needed */
 static fc2d_clawpack46_vtable_t classic_claw46;
 
-void metric_link_patch(fclaw2d_domain_t *domain)
+void metric_link_patch(fclaw_domain_t *domain)
 {
     fclaw2d_init_vtable(&fclaw2d_vt);
     const user_options_t* user = metric_user_get_options(domain);
@@ -55,7 +55,7 @@ void metric_link_patch(fclaw2d_domain_t *domain)
 
 }
 
-void metric_problem_setup(fclaw2d_domain_t* domain)
+void metric_problem_setup(fclaw_domain_t* domain)
 {
     const user_options_t* user = metric_user_get_options(domain);
 
@@ -63,7 +63,7 @@ void metric_problem_setup(fclaw2d_domain_t* domain)
     METRIC_SETPROB(&user->beta);  /* Set value of pi */
 }
 
-void metric_patch_initialize(fclaw2d_domain_t *domain,
+void metric_patch_initialize(fclaw_domain_t *domain,
                              fclaw_patch_t *this_patch,
                              int this_block_idx,
                              int this_patch_idx)

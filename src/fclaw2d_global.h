@@ -43,11 +43,11 @@ extern "C"
 /* these are dimension-specific functions */
 
 void fclaw2d_iterate_patch_cb
-  (fclaw2d_domain_t *domain, fclaw_patch_t *patch,
+  (fclaw_domain_t *domain, fclaw_patch_t *patch,
    int blockno, int patchno, void *user);
 
 void fclaw2d_iterate_family_cb
-  (fclaw2d_domain_t *domain, fclaw_patch_t *patch,
+  (fclaw_domain_t *domain, fclaw_patch_t *patch,
    int blockno, int patchno, void *user);
 
 /* much of the following will move into fclaw_global.h */
@@ -84,7 +84,7 @@ struct fclaw2d_global
     struct fclaw_pointer_map *options;    /**< options */
     struct fclaw_pointer_map *attributes;    /**< attributes, things that are not vtables, or options */
 
-    struct fclaw2d_domain *domain;
+    struct fclaw_domain *domain;
 
     void *user;
 };
@@ -100,7 +100,7 @@ struct fclaw2d_global_iterate
        Depending on fclaw2d_domain, _map, package seems entirely acceptable.
        For those, including the respective headers might not be so bad.
        About the diagnostics accumulator see remark above. */
-struct fclaw2d_domain;
+struct fclaw_domain;
 struct fclaw2d_map_context;
 struct fclaw_package_container;
 struct fclaw2d_diagnostics_accumulator;
@@ -114,7 +114,7 @@ fclaw2d_global_t* fclaw2d_global_new_comm (sc_MPI_Comm mpicomm,
 void fclaw2d_global_destroy (fclaw2d_global_t * glob);
 
 void fclaw2d_global_store_domain (fclaw2d_global_t* glob,
-                                  struct fclaw2d_domain* domain);
+                                  struct fclaw_domain* domain);
 
 void fclaw2d_global_store_map (fclaw2d_global_t* glob,
                                struct fclaw2d_map_context * map);
@@ -131,14 +131,14 @@ void fclaw2d_global_iterate_families (fclaw2d_global_t * glob,
                                       fclaw2d_patch_callback_t pcb, void *user);
 
 void fclaw2d_global_iterate_adapted (fclaw2d_global_t * glob,
-                                     struct fclaw2d_domain* new_domain,
+                                     struct fclaw_domain* new_domain,
                                      fclaw2d_match_callback_t mcb, void *user);
 
 void fclaw2d_global_iterate_level_mthread (fclaw2d_global_t * glob, int level,
                                            fclaw2d_patch_callback_t pcb, void *user);
 
 void fclaw2d_global_iterate_partitioned (fclaw2d_global_t * glob,
-                                         struct fclaw2d_domain * new_domain,
+                                         struct fclaw_domain * new_domain,
                                          fclaw2d_transfer_callback_t tcb,
                                          void *user);
 

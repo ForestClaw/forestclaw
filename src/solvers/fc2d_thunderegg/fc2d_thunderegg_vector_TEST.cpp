@@ -46,7 +46,7 @@ namespace{
 struct QuadDomain {
     fclaw2d_global_t* glob;
     fclaw_options_t fopts;
-    fclaw2d_domain_t *domain;
+    fclaw_domain_t *domain;
     fclaw_clawpatch_options_t* opts;
 
     QuadDomain(){
@@ -102,7 +102,7 @@ struct QuadDomain {
 struct QuadDomainBrick {
     fclaw2d_global_t* glob;
     fclaw_options_t fopts;
-    fclaw2d_domain_t *domain;
+    fclaw_domain_t *domain;
     fclaw_clawpatch_options_t* opts;
 
     QuadDomainBrick(){

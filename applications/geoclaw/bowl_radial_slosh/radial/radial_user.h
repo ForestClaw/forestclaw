@@ -51,7 +51,7 @@ void radial_options_store (fclaw2d_global_t* glob, radial_user_options_t* user);
 
 radial_user_options_t* radial_get_options(fclaw2d_global_t* glob);
 
-fclaw2d_domain_t* radial_create_domain(sc_MPI_Comm mpicomm, 
+fclaw_domain_t* radial_create_domain(sc_MPI_Comm mpicomm, 
                                        fclaw_options_t* gparms);
 
 void radial_run_program(fclaw2d_global_t* glob);

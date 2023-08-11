@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    Initial grid
    ----------------------------------------------------------------- */
 static
-void cb_initialize (fclaw2d_domain_t *domain,
+void cb_initialize (fclaw_domain_t *domain,
 					fclaw_patch_t *this_patch,
 					int this_block_idx,
 					int this_patch_idx,
@@ -74,7 +74,7 @@ void cb_initialize (fclaw2d_domain_t *domain,
    ----------------------------------------------------------------- */
 void fclaw2d_initialize(fclaw2d_global_t *glob)
 {
-	fclaw2d_domain_t** domain = &glob->domain;
+	fclaw_domain_t** domain = &glob->domain;
 
     int time_interp = 0;
     const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
@@ -176,7 +176,7 @@ void fclaw2d_initialize(fclaw2d_global_t *glob)
             // Construct new domain based on tagged patches.
             fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_INIT]);
             fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_ADAPT_COMM]);
-            fclaw2d_domain_t *new_domain = fclaw2d_domain_adapt(*domain);
+            fclaw_domain_t *new_domain = fclaw2d_domain_adapt(*domain);
 
             int have_new_refinement = new_domain != NULL;
 

@@ -46,7 +46,7 @@ typedef struct fclaw_smooth
     char prefix[BUFSIZ];
 
     /* mesh */
-    fclaw2d_domain_t *domain;
+    fclaw_domain_t *domain;
 
     /* numerical data */
     int k;
@@ -59,7 +59,7 @@ fclaw_smooth_t;
 #ifdef FCLAW_ENABLE_DEBUG
 
 static int
-domain_match (fclaw2d_domain_t * d1, fclaw2d_domain_t * d2)
+domain_match (fclaw_domain_t * d1, fclaw_domain_t * d2)
 {
     FCLAW_ASSERT (d1 != NULL && d2 != NULL);
 
@@ -169,7 +169,7 @@ init_refine (fclaw_smooth_t * s)
 {
     int lev;
     char basename[TBUFSIZ];
-    fclaw2d_domain_t *domain;
+    fclaw_domain_t *domain;
 
     /* loop over multiple initial refinements */
     fclaw_global_infof ("Initial position %g %g\n", s->pxy[0], s->pxy[1]);
@@ -222,7 +222,7 @@ run_refine (fclaw_smooth_t * s)
 {
     double nextt, deltat;
     char basename[TBUFSIZ];
-    fclaw2d_domain_t *domain;
+    fclaw_domain_t *domain;
 
     /* initialize time stepping */
     s->k = 0;

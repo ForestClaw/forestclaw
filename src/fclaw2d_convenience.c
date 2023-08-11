@@ -100,7 +100,7 @@ fclaw2d_patch_set_boundary_xylower (fclaw_patch_t * patch,
 
 /** Domain constructor takes ownership of wrap.
  */
-static fclaw2d_domain_t *
+static fclaw_domain_t *
 fclaw2d_domain_new (p4est_wrap_t * wrap, sc_keyvalue_t * attributes)
 {
     int mpiret;
@@ -121,7 +121,7 @@ fclaw2d_domain_new (p4est_wrap_t * wrap, sc_keyvalue_t * attributes)
 #endif
     p4est_tree_t *tree;
     p4est_quadrant_t *quad, *mirror;
-    fclaw2d_domain_t *domain;
+    fclaw_domain_t *domain;
     fclaw_block_t *block;
     fclaw_patch_t *patch;
     fclaw_patch_t *currentbylevel[P4EST_MAXLEVEL + 1];
@@ -130,7 +130,7 @@ fclaw2d_domain_new (p4est_wrap_t * wrap, sc_keyvalue_t * attributes)
     memset (currentbylevel, 0,
             sizeof (fclaw_patch_t *) * (P4EST_MAXLEVEL + 1));
 #endif
-    domain = FCLAW_ALLOC_ZERO (fclaw2d_domain_t, 1);
+    domain = FCLAW_ALLOC_ZERO (fclaw_domain_t, 1);
     domain->mpicomm = wrap->p4est->mpicomm;
     domain->mpisize = wrap->p4est->mpisize;
     domain->mpirank = wrap->p4est->mpirank;
@@ -338,7 +338,7 @@ fclaw2d_check_initial_level (sc_MPI_Comm mpicomm, int initial_level)
                      "Initial level %d too fine for p4est", initial_level);
 }
 
-fclaw2d_domain_t *
+fclaw_domain_t *
 fclaw2d_domain_new_unitsquare (sc_MPI_Comm mpicomm, int initial_level)
 {
     fclaw2d_check_initial_level (mpicomm, initial_level);
@@ -349,7 +349,7 @@ fclaw2d_domain_new_unitsquare (sc_MPI_Comm mpicomm, int initial_level)
 
 #ifndef P4_TO_P8
 
-fclaw2d_domain_t *
+fclaw_domain_t *
 fclaw2d_domain_new_torus (sc_MPI_Comm mpicomm, int initial_level)
 {
     fclaw2d_check_initial_level (mpicomm, initial_level);
@@ -358,7 +358,7 @@ fclaw2d_domain_new_torus (sc_MPI_Comm mpicomm, int initial_level)
                             NULL);
 }
 
-fclaw2d_domain_t *
+fclaw_domain_t *
 fclaw2d_domain_new_twosphere (sc_MPI_Comm mpicomm, int initial_level)
 {
     fclaw2d_check_initial_level (mpicomm, initial_level);
@@ -367,7 +367,7 @@ fclaw2d_domain_new_twosphere (sc_MPI_Comm mpicomm, int initial_level)
                             NULL);
 }
 
-fclaw2d_domain_t *
+fclaw_domain_t *
 fclaw2d_domain_new_cubedsphere (sc_MPI_Comm mpicomm, int initial_level)
 {
     fclaw2d_check_initial_level (mpicomm, initial_level);
@@ -375,7 +375,7 @@ fclaw2d_domain_new_cubedsphere (sc_MPI_Comm mpicomm, int initial_level)
                                NULL);
 }
 
-fclaw2d_domain_t *
+fclaw_domain_t *
 fclaw2d_domain_new_disk (sc_MPI_Comm mpicomm,
                          int periodic_in_x, int periodic_in_y,
                          int initial_level)
@@ -388,7 +388,7 @@ fclaw2d_domain_new_disk (sc_MPI_Comm mpicomm,
 
 #endif /* P4_TO_P8 */
 
-fclaw2d_domain_t *
+fclaw_domain_t *
 fclaw2d_domain_new_brick (sc_MPI_Comm mpicomm,
                           int blocks_in_x, int blocks_in_y,
 #ifdef P4_TO_P8
@@ -415,12 +415,12 @@ fclaw2d_domain_new_brick (sc_MPI_Comm mpicomm,
     return fclaw2d_domain_new (wrap, NULL);
 }
 
-fclaw2d_domain_t *
+fclaw_domain_t *
 fclaw2d_domain_new_conn (sc_MPI_Comm mpicomm, int initial_level,
                          p4est_connectivity_t * conn)
 {
     p4est_wrap_t *wrap;
-    fclaw2d_domain_t *domain;
+    fclaw_domain_t *domain;
 
     fclaw2d_check_initial_level (mpicomm, initial_level);
     wrap = p4est_wrap_new_conn (mpicomm, conn, initial_level);
@@ -433,12 +433,12 @@ fclaw2d_domain_new_conn (sc_MPI_Comm mpicomm, int initial_level,
 
 /* function to be removed once no longer called by applications */
 
-fclaw2d_domain_t *
+fclaw_domain_t *
 fclaw2d_domain_new_conn_map (sc_MPI_Comm mpicomm, int initial_level,
                              p4est_connectivity_t * conn,
                              fclaw2d_map_context_t * cont)
 {
-    fclaw2d_domain_t *domain =
+    fclaw_domain_t *domain =
       fclaw2d_domain_new_conn (mpicomm, initial_level, conn);
 
     fclaw2d_domain_attribute_add (domain, "fclaw_map_context", cont);
@@ -449,7 +449,7 @@ fclaw2d_domain_new_conn_map (sc_MPI_Comm mpicomm, int initial_level,
 #endif
 
 void
-fclaw2d_domain_destroy (fclaw2d_domain_t * domain)
+fclaw2d_domain_destroy (fclaw_domain_t * domain)
 {
     int i;
     fclaw_block_t *block;
@@ -489,15 +489,15 @@ fclaw2d_domain_destroy (fclaw2d_domain_t * domain)
 }
 
 static void
-fclaw2d_domain_copy_parameters (fclaw2d_domain_t * domain_dest,
-                                fclaw2d_domain_t * domain_src)
+fclaw2d_domain_copy_parameters (fclaw_domain_t * domain_dest,
+                                fclaw_domain_t * domain_src)
 {
     memcpy (&domain_dest->p, &domain_src->p,
             sizeof (fclaw_domain_persist_t));
 }
 
 static fclaw_patch_t *
-fclaw2d_domain_get_neighbor_patch (fclaw2d_domain_t * domain,
+fclaw2d_domain_get_neighbor_patch (fclaw_domain_t * domain,
                                    int nproc, int nblockno, int npatchno)
 {
     fclaw_block_t *block;
@@ -519,8 +519,8 @@ fclaw2d_domain_get_neighbor_patch (fclaw2d_domain_t * domain,
     return block->patches + npatchno;
 }
 
-fclaw2d_domain_t *
-fclaw2d_domain_adapt (fclaw2d_domain_t * domain)
+fclaw_domain_t *
+fclaw2d_domain_adapt (fclaw_domain_t * domain)
 {
     p4est_wrap_t *wrap = (p4est_wrap_t *) domain->pp;
 
@@ -673,7 +673,7 @@ fclaw2d_domain_adapt (fclaw2d_domain_t * domain)
     /* do the adaptation */
     if (p4est_wrap_adapt (wrap))
     {
-        fclaw2d_domain_t *newd;
+        fclaw_domain_t *newd;
 
         domain->pp_owned = 0;
         newd = fclaw2d_domain_new (wrap, domain->attributes);
@@ -703,8 +703,8 @@ fclaw2d_domain_adapt (fclaw2d_domain_t * domain)
     }
 }
 
-fclaw2d_domain_t *
-fclaw2d_domain_partition (fclaw2d_domain_t * domain, int weight_exponent)
+fclaw_domain_t *
+fclaw2d_domain_partition (fclaw_domain_t * domain, int weight_exponent)
 {
     p4est_wrap_t *wrap = (p4est_wrap_t *) domain->pp;
     p4est_locidx_t uf, ul, uof;
@@ -716,7 +716,7 @@ fclaw2d_domain_partition (fclaw2d_domain_t * domain, int weight_exponent)
     domain->just_adapted = 0;
     if (p4est_wrap_partition (wrap, weight_exponent, &uf, &ul, &uof))
     {
-        fclaw2d_domain_t *newd;
+        fclaw_domain_t *newd;
 
         domain->pp_owned = 0;
         newd = fclaw2d_domain_new (wrap, domain->attributes);
@@ -735,7 +735,7 @@ fclaw2d_domain_partition (fclaw2d_domain_t * domain, int weight_exponent)
 }
 
 void
-fclaw2d_domain_partition_unchanged (fclaw2d_domain_t * domain,
+fclaw2d_domain_partition_unchanged (fclaw_domain_t * domain,
                                     int *unchanged_first,
                                     int *unchanged_length,
                                     int *unchanged_old_first)
@@ -759,7 +759,7 @@ fclaw2d_domain_partition_unchanged (fclaw2d_domain_t * domain,
 }
 
 void
-fclaw2d_domain_complete (fclaw2d_domain_t * domain)
+fclaw2d_domain_complete (fclaw_domain_t * domain)
 {
     p4est_wrap_t *wrap = (p4est_wrap_t *) domain->pp;
 
@@ -776,7 +776,7 @@ fclaw2d_domain_complete (fclaw2d_domain_t * domain)
 }
 
 void
-fclaw2d_domain_write_vtk (fclaw2d_domain_t * domain, const char *basename)
+fclaw2d_domain_write_vtk (fclaw_domain_t * domain, const char *basename)
 {
     p4est_wrap_t *wrap = (p4est_wrap_t *) domain->pp;
 
@@ -787,7 +787,7 @@ fclaw2d_domain_write_vtk (fclaw2d_domain_t * domain, const char *basename)
 }
 
 static void
-fclaw2d_domain_list_level_callback (fclaw2d_domain_t * domain,
+fclaw2d_domain_list_level_callback (fclaw_domain_t * domain,
                                     fclaw_patch_t * patch, int block_no,
                                     int patch_no, void *user)
 {
@@ -800,7 +800,7 @@ fclaw2d_domain_list_level_callback (fclaw2d_domain_t * domain,
 }
 
 void
-fclaw2d_domain_list_levels (fclaw2d_domain_t * domain, int lp)
+fclaw2d_domain_list_levels (fclaw_domain_t * domain, int lp)
 {
     int level;
     int count, count_all;
@@ -831,7 +831,7 @@ typedef struct fclaw2d_domain_list_neighbors
 fclaw2d_domain_list_neighbors_t;
 
 static void
-fclaw2d_domain_list_neighbors_callback (fclaw2d_domain_t * domain,
+fclaw2d_domain_list_neighbors_callback (fclaw_domain_t * domain,
                                         fclaw_patch_t * patch, int block_no,
                                         int patch_no, void *user)
 {
@@ -870,7 +870,7 @@ fclaw2d_domain_list_neighbors_callback (fclaw2d_domain_t * domain,
 }
 
 void
-fclaw2d_domain_list_neighbors (fclaw2d_domain_t * domain, int lp)
+fclaw2d_domain_list_neighbors (fclaw_domain_t * domain, int lp)
 {
     fclaw2d_domain_list_neighbors_t ln;
 
@@ -883,9 +883,9 @@ fclaw2d_domain_list_neighbors (fclaw2d_domain_t * domain, int lp)
 }
 
 static void
-fclaw2d_domain_list_adapted_callback (fclaw2d_domain_t * old_domain,
+fclaw2d_domain_list_adapted_callback (fclaw_domain_t * old_domain,
                                       fclaw_patch_t * old_patch,
-                                      fclaw2d_domain_t * new_domain,
+                                      fclaw_domain_t * new_domain,
                                       fclaw_patch_t * new_patch,
                                       fclaw2d_patch_relation_t newsize,
                                       int blockno,
@@ -946,8 +946,8 @@ fclaw2d_domain_list_adapted_callback (fclaw2d_domain_t * old_domain,
 }
 
 void
-fclaw2d_domain_list_adapted (fclaw2d_domain_t * old_domain,
-                             fclaw2d_domain_t * new_domain, int log_priority)
+fclaw2d_domain_list_adapted (fclaw_domain_t * old_domain,
+                             fclaw_domain_t * new_domain, int log_priority)
 {
     fclaw2d_domain_iterate_adapted (old_domain, new_domain,
                                     fclaw2d_domain_list_adapted_callback,
@@ -956,7 +956,7 @@ fclaw2d_domain_list_adapted (fclaw2d_domain_t * old_domain,
 
 typedef struct fclaw2d_search_data
 {
-    fclaw2d_domain_t *domain;
+    fclaw_domain_t *domain;
     sc_array_t *coordinates;
     sc_array_t *results;
 }
@@ -1066,7 +1066,7 @@ search_point_fn (p4est_t * p4est, p4est_topidx_t which_tree,
 }
 
 void
-fclaw2d_domain_search_points (fclaw2d_domain_t * domain,
+fclaw2d_domain_search_points (fclaw_domain_t * domain,
                               sc_array_t * block_offsets,
                               sc_array_t * coordinates, sc_array_t * results)
 {
@@ -1184,7 +1184,7 @@ fclaw2d_ray_integral_t;
 
 typedef struct fclaw2d_integrate_ray_data
 {
-    fclaw2d_domain_t *domain;
+    fclaw_domain_t *domain;
     fclaw2d_integrate_ray_t integrate_ray;
     void *user;
 }
@@ -1197,7 +1197,7 @@ integrate_ray_fn (p4est_t * p4est, p4est_topidx_t which_tree,
 {
     double integral;
     int intersects;
-    fclaw2d_domain_t *domain;
+    fclaw_domain_t *domain;
     fclaw_patch_t *patch;
 
 
@@ -1255,7 +1255,7 @@ integrate_ray_fn (p4est_t * p4est, p4est_topidx_t which_tree,
 }
 
 void
-fclaw2d_domain_integrate_rays (fclaw2d_domain_t * domain,
+fclaw2d_domain_integrate_rays (fclaw_domain_t * domain,
                                fclaw2d_integrate_ray_t intersect,
                                sc_array_t * rays, sc_array_t * integrals,
                                void * user)
@@ -1346,7 +1346,7 @@ overlap_point_t;
 
 typedef struct overlap_producer_comm
 {
-    fclaw2d_domain_t *domain;
+    fclaw_domain_t *domain;
     fclaw2d_interpolate_point_t interpolate;
     void *user;
     p4est_t *pro4est;
@@ -1362,7 +1362,7 @@ overlap_producer_comm_t;
 
 typedef struct overlap_consumer_comm
 {
-    fclaw2d_domain_t *domain;
+    fclaw_domain_t *domain;
     fclaw2d_interpolate_point_t interpolate;
     void *user;
     sc_array_t *query_points;
@@ -1430,7 +1430,7 @@ interpolate_partition_fn (p4est_t * p4est, p4est_topidx_t which_tree,
                           p4est_quadrant_t * quadrant, int pfirst, int plast,
                           void *point)
 {
-    fclaw2d_domain_t *domain;
+    fclaw_domain_t *domain;
     fclaw_patch_t *patch;
 
     fclaw_patch_t fclaw2d_patch;
@@ -1458,7 +1458,7 @@ interpolate_partition_fn (p4est_t * p4est, p4est_topidx_t which_tree,
     FCLAW_ASSERT (c->interpolate != NULL);
 
     /* create artifical domain, that only contains mpi and tree structure data */
-    domain = FCLAW_ALLOC (fclaw2d_domain_t, 1);
+    domain = FCLAW_ALLOC (fclaw_domain_t, 1);
     /* Todo: works only for congruent communicators. Do we really need all this
      * information? */
     fclaw2d_domain_init_meta (domain, (pfirst == plast) ? pfirst : -1);
@@ -1500,7 +1500,7 @@ interpolate_local_fn (p4est_t * p4est, p4est_topidx_t which_tree,
                       p4est_quadrant_t * quadrant, p4est_locidx_t local_num,
                       void *point)
 {
-    fclaw2d_domain_t *domain;
+    fclaw_domain_t *domain;
     fclaw_patch_t *patch;
 
     fclaw_patch_t fclaw2d_patch;
@@ -1931,7 +1931,7 @@ consumer_producer_update_local (overlap_global_comm_t * g)
 }
 
 void
-fclaw2d_overlap_exchange (fclaw2d_domain_t * domain,
+fclaw2d_overlap_exchange (fclaw_domain_t * domain,
                           sc_array_t * query_points,
                           fclaw2d_interpolate_point_t interpolate, void *user)
 {

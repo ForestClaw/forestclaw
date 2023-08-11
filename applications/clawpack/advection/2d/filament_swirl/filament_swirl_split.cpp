@@ -195,10 +195,10 @@ main (int argc, char **argv)
     fc2d_clawpack5_options_t    *swirl_claw5_opt;
 
     fclaw2d_global_t         *filament_glob;
-    fclaw2d_domain_t         *filament_domain;
+    fclaw_domain_t         *filament_domain;
 
     fclaw2d_global_t         *swirl_glob;
-    fclaw2d_domain_t         *swirl_domain;
+    fclaw_domain_t         *swirl_domain;
 
     sc_MPI_Comm mpicomm = sc_MPI_COMM_WORLD;
     sc_MPI_Comm subcomm;

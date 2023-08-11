@@ -38,7 +38,7 @@ extern "C"
 #endif    
 
 struct fclaw2d_global;
-struct fclaw2d_domain;
+struct fclaw_domain;
 
 
 

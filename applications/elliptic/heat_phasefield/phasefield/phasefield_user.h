@@ -48,7 +48,7 @@ void phasefield_link_solvers(fclaw2d_global_t *glob);
 
 void phasefield_run(fclaw2d_global_t *glob);
 
-fclaw2d_domain_t* phasefield_create_domain(sc_MPI_Comm mpicomm, fclaw_options_t* fclaw_opt);
+fclaw_domain_t* phasefield_create_domain(sc_MPI_Comm mpicomm, fclaw_options_t* fclaw_opt);
 
 void phasefield_run_program(fclaw2d_global_t* glob);
 

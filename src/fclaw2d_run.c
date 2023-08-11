@@ -44,7 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     ----------------------------------------------------------------- */
 
 static
-void cb_restore_time_step(fclaw2d_domain_t *domain,
+void cb_restore_time_step(fclaw_domain_t *domain,
                           fclaw_patch_t *this_patch,
                           int this_block_idx,
                           int this_patch_idx,
@@ -64,7 +64,7 @@ void restore_time_step(fclaw2d_global_t *glob)
 }
 
 static
-void cb_save_time_step(fclaw2d_domain_t *domain,
+void cb_save_time_step(fclaw_domain_t *domain,
                        fclaw_patch_t *this_patch,
                        int this_block_idx,
                        int this_patch_idx,
@@ -119,7 +119,7 @@ static void outstyle_0(fclaw2d_global_t *glob)
 static
 void outstyle_1(fclaw2d_global_t *glob)
 {
-    fclaw2d_domain_t** domain = &glob->domain;
+    fclaw_domain_t** domain = &glob->domain;
 
     /* Set error to 0 */
     int init_flag = 1;  /* Store anything that needs to be stored */
@@ -299,7 +299,7 @@ void outstyle_1(fclaw2d_global_t *glob)
 #if 0
 static void outstyle_2(fclaw2d_global_t *glob)
 {
-    // fclaw2d_domain_t** domain = &glob->domain;
+    // fclaw_domain_t** domain = &glob->domain;
     // Output time at specific time steps.
 }
 #endif
@@ -307,7 +307,7 @@ static void outstyle_2(fclaw2d_global_t *glob)
 static
 void outstyle_3(fclaw2d_global_t *glob)
 {
-    fclaw2d_domain_t** domain = &glob->domain;
+    fclaw_domain_t** domain = &glob->domain;
 
     int init_flag = 1;
     fclaw2d_diagnostics_gather(glob,init_flag);

@@ -86,7 +86,7 @@ void poisson_diagnostics_reset(fclaw2d_global_t *glob,
 }
 
 static
-void poisson_compute(fclaw2d_domain_t *domain,
+void poisson_compute(fclaw_domain_t *domain,
                     fclaw_patch_t *patch,
                     int blockno,
                     int patchno,
@@ -135,7 +135,7 @@ void poisson_diagnostics_gather(fclaw2d_global_t *glob,
                                void* patch_acc,
                                int init_flag)
 {
-    fclaw2d_domain_t *domain = glob->domain;
+    fclaw_domain_t *domain = glob->domain;
     
     poisson_error_info_t *error_data = (poisson_error_info_t*) patch_acc;
     const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);

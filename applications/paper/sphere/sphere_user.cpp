@@ -201,7 +201,7 @@ int sphere_tag4coarsening(fclaw2d_global_t *glob,
 
 
 static
-void cb_sphere_output_ascii (fclaw2d_domain_t * domain,
+void cb_sphere_output_ascii (fclaw_domain_t * domain,
                             fclaw_patch_t * this_patch,
                             int this_block_idx, int this_patch_idx,
                             void *user)

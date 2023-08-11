@@ -142,4 +142,62 @@ typedef struct fclaw_domain_persist
 }
 fclaw_domain_persist_t;
 
+/**
+ * @brief The domain structure is a collection of blocks
+ * 
+ * The domain structure gives a processor local view of the grid hierarchy.
+ * Unless explicitly noted otherwise, all variables are processor local,
+ * i.e., they are generally different on each processor.
+ * Variables that are synchronized and shared between processors
+ * are denoted *global*.
+ */
+typedef struct fclaw_domain
+{
+    sc_MPI_Comm mpicomm;        /**< MPI communicator */
+    int mpisize;                /**< MPI size */
+    int mpirank;                /**< MPI rank */
+    int possible_maxlevel;      /**< theoretical maximum that can be reached */
+
+    fclaw_domain_persist_t p;         /**< Parameters that carry over from
+                                             one domain to a derived one. */
+
+    int local_num_patches;      /**< sum of patches over all blocks on this proc */
+    /** @{ */
+    /** Local to proc.  If this proc doesn't
+        store any patches at all, we set
+        local_maxlevel < 0 <= local_minlevel. */
+    int local_minlevel;
+    int local_maxlevel;
+    /** @} */
+    int64_t global_num_patches; /**< sum of local_num_patches over all procs */
+    int64_t global_num_patches_before;  /**< Number of patches on lower procs */
+    int global_minlevel;       /**< global min level */
+    int global_maxlevel;       /**< global max level */
+
+    int just_adapted;           /**< true after non-trivial adaptation */
+    int just_partitioned;       /**< true after non-trivial partition */
+    int partition_unchanged_first;      /**< local index of first unchanged patch */
+    int partition_unchanged_length;     /**< number of unchanged quadrants */
+    int partition_unchanged_old_first;  /**< local index wrt. previous partition */
+
+    int num_blocks;             /**< Total number of blocks. */
+    fclaw_block_t *blocks;    /**< allocated storage */
+    int num_exchange_patches;   /**< number my patches relevant to other procs.
+                                   Identified by this expression to be true:
+                                   (patch->flags &
+                                   FCLAW2D_PATCH_ON_PARALLEL_BOUNDARY) */
+    fclaw_patch_t **exchange_patches; /**< explicitly store exchange patches */
+    int num_ghost_patches;      /**< number of off-proc patches relevant to this proc */
+    fclaw_patch_t *ghost_patches;     /**< array of off-proc patches */
+
+    void **mirror_target_levels;  /**< Points to target level of each mirror. */
+    int *ghost_target_levels;   /**< Contains target level for each ghost. */
+
+    void *pp;                   /**< opaque backend data */
+    int pp_owned;               /**< True if the pp member is owned by this domain */
+    sc_keyvalue_t *attributes;  /**< Reserved to store domain attributes */
+
+    void *user; /**< user data pointer */
+} fclaw_domain_t;
+
 #endif /* !FCLAW_PATCH_H */

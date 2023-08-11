@@ -122,7 +122,7 @@ void square_patch_setup_manifold(fclaw2d_global_t *glob,
 }
 
 static
-void cb_square_output_ascii (fclaw2d_domain_t * domain,
+void cb_square_output_ascii (fclaw_domain_t * domain,
                             fclaw_patch_t * patch,
                             int blockno, int patchno,
                             void *user)

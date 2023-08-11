@@ -82,7 +82,7 @@ void fclaw_clawpatch_diagnostics_reset(fclaw2d_global_t *glob,
 /* Gather statistics (error, mass, area) in this callback, called
    from fclaw2d_diagnostics_gather */
 static
-void cb_compute_diagnostics(fclaw2d_domain_t *domain,
+void cb_compute_diagnostics(fclaw_domain_t *domain,
                             fclaw_patch_t *patch,
                             int blockno,
                             int patchno,
@@ -139,7 +139,7 @@ void fclaw_clawpatch_diagnostics_gather(fclaw2d_global_t *glob,
                                         int init_flag)
 {
     fclaw_debugf("Gathering diagnostics\n");
-    fclaw2d_domain_t *domain = glob->domain;
+    fclaw_domain_t *domain = glob->domain;
     
     error_info_t *error_data = (error_info_t*) patch_acc;
     const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);

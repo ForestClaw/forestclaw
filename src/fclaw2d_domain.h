@@ -59,19 +59,19 @@ typedef struct fclaw2d_domain_data
 
 } fclaw2d_domain_data_t;
 
-void fclaw2d_domain_data_new(struct fclaw2d_domain *domain);
+void fclaw2d_domain_data_new(struct fclaw_domain *domain);
 
-void fclaw2d_domain_data_delete(struct fclaw2d_domain* domain);
+void fclaw2d_domain_data_delete(struct fclaw_domain* domain);
 
 void fclaw2d_domain_setup(struct fclaw2d_global* glob,
-                          struct fclaw2d_domain* new_domain);
+                          struct fclaw_domain* new_domain);
 
 void fclaw2d_domain_reset(struct fclaw2d_global* glob);
 
-fclaw2d_domain_data_t* fclaw2d_domain_get_data(struct fclaw2d_domain *domain);
+fclaw2d_domain_data_t* fclaw2d_domain_get_data(struct fclaw_domain *domain);
 
 /* OpenMP iterator (not part of forestclaw2d.h */
-void fclaw2d_domain_iterate_level_mthread (struct fclaw2d_domain * domain, int level,
+void fclaw2d_domain_iterate_level_mthread (struct fclaw_domain * domain, int level,
                                            fclaw2d_patch_callback_t pcb, void *user);
 
 /* below are the functions needed for dimension independence */
@@ -80,7 +80,7 @@ void fclaw2d_domain_iterate_level_mthread (struct fclaw2d_domain * domain, int l
 #define FCLAW2D_DOMAIN_MAGIC 0x56780202
 
 void fclaw2d_domain_iterate_cb
-  (fclaw2d_domain_t * d2, fclaw_patch_t * patch,
+  (fclaw_domain_t * d2, fclaw_patch_t * patch,
    int blockno, int patchno, void *user);
 
 #ifdef __cplusplus

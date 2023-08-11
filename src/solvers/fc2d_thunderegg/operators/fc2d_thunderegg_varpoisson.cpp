@@ -345,7 +345,7 @@ void fc2d_thunderegg_varpoisson_solve(fclaw2d_global_t *glob)
     int mbc = clawpatch_opt->mbc;
 
     // get p4est structure
-    fclaw2d_domain_t *domain = glob->domain;
+    fclaw_domain_t *domain = glob->domain;
     p4est_wrap_t *wrap = (p4est_wrap_t *)domain->pp;
 
     // create map function

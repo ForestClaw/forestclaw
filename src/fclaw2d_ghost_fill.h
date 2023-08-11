@@ -37,7 +37,7 @@ extern "C"
 #endif
 
 struct fclaw2d_global;
-struct fclaw2d_domain;
+struct fclaw_domain;
 struct fclaw_patch;
 
 /** 
@@ -83,13 +83,13 @@ typedef struct fclaw2d_exchange_info
 
 } fclaw2d_exchange_info_t;
 
-void cb_corner_fill(struct fclaw2d_domain *domain,
+void cb_corner_fill(struct fclaw_domain *domain,
 					struct fclaw_patch *this_patch,
 					int this_block_idx,
 					int this_patch_idx,
 					void *user);
 
-void cb_face_fill(struct fclaw2d_domain *domain,
+void cb_face_fill(struct fclaw_domain *domain,
 				  struct fclaw_patch *this_patch,
 				  int this_block_idx,
 				  int this_patch_idx,

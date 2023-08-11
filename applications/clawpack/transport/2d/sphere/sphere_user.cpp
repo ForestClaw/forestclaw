@@ -72,7 +72,7 @@ void sphere_b4step2(fclaw2d_global_t *glob,
 
 
 static
-void cb_sphere_output_ascii (fclaw2d_domain_t * domain,
+void cb_sphere_output_ascii (fclaw_domain_t * domain,
                             fclaw_patch_t * patch,
                             int blockno, int patchno,
                             void *user)

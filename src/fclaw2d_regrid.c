@@ -42,7 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 /* This is also called from fclaw2d_initialize, so is not made static */
-void cb_fclaw2d_regrid_tag4refinement(fclaw2d_domain_t *domain,
+void cb_fclaw2d_regrid_tag4refinement(fclaw_domain_t *domain,
 									  fclaw_patch_t *this_patch,
 									  int this_block_idx,
 									  int this_patch_idx,
@@ -73,7 +73,7 @@ void cb_fclaw2d_regrid_tag4refinement(fclaw2d_domain_t *domain,
 
 /* Tag family for coarsening */
 
-void cb_regrid_tag4coarsening(fclaw2d_domain_t *domain,
+void cb_regrid_tag4coarsening(fclaw_domain_t *domain,
 							  fclaw_patch_t *fine_patches,
 							  int blockno, int fine0_patchno,
 							  void *user)
@@ -111,9 +111,9 @@ void cb_regrid_tag4coarsening(fclaw2d_domain_t *domain,
    Public interface
    -------------------------------------------------------------- */
 
-void cb_fclaw2d_regrid_repopulate(fclaw2d_domain_t * old_domain,
+void cb_fclaw2d_regrid_repopulate(fclaw_domain_t * old_domain,
 								  fclaw_patch_t * old_patch,
-								  fclaw2d_domain_t * new_domain,
+								  fclaw_domain_t * new_domain,
 								  fclaw_patch_t * new_patch,
 								  fclaw2d_patch_relation_t newsize,
 								  int blockno,
@@ -233,7 +233,7 @@ void cb_fclaw2d_regrid_repopulate(fclaw2d_domain_t * old_domain,
    -------------------------------------------------------------- */
 void fclaw2d_regrid(fclaw2d_global_t *glob)
 {
-    fclaw2d_domain_t** domain = &glob->domain;
+    fclaw_domain_t** domain = &glob->domain;
     fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_REGRID]);
 
     fclaw_global_infof("Regridding domain\n");
@@ -254,7 +254,7 @@ void fclaw2d_regrid(fclaw2d_global_t *glob)
 
     fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_REGRID]);
     fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_ADAPT_COMM]);
-    fclaw2d_domain_t *new_domain = fclaw2d_domain_adapt(*domain);
+    fclaw_domain_t *new_domain = fclaw2d_domain_adapt(*domain);
 
     int have_new_refinement = new_domain != NULL;
 
@@ -335,7 +335,7 @@ void fclaw2d_regrid(fclaw2d_global_t *glob)
 }
 
 static
-void cb_set_neighbor_types(fclaw2d_domain_t *domain,
+void cb_set_neighbor_types(fclaw_domain_t *domain,
 						   fclaw_patch_t *this_patch,
 						   int blockno,
 						   int patchno,

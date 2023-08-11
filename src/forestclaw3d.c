@@ -36,13 +36,13 @@ const fclaw3d_patch_flags_t fclaw3d_patch_block_face_flags[6] = {
 };
 
 int
-fclaw3d_domain_num_edges (const fclaw3d_domain_t * domain)
+fclaw3d_domain_num_edges (const fclaw_domain_t * domain)
 {
     return P8EST_EDGES;
 }
 
 int
-fclaw3d_patch_edge_neighbors (fclaw2d_domain_t * domain,
+fclaw3d_patch_edge_neighbors (fclaw_domain_t * domain,
                               int blockno, int patchno, int edgeno,
                               int *rproc, int *rblockno, int *rpatchno,
                               int *redge,

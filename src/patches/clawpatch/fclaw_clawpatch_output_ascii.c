@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_options.h>
 
 
-void cb_clawpatch_output_ascii (fclaw2d_domain_t * domain,
+void cb_clawpatch_output_ascii (fclaw_domain_t * domain,
                                 fclaw_patch_t * patch,
                                 int blockno, int patchno,
                                 void *user)
@@ -125,7 +125,7 @@ void fclaw_clawpatch_time_header_ascii(fclaw2d_global_t* glob, int iframe)
 
 void fclaw_clawpatch_output_ascii(fclaw2d_global_t* glob,int iframe)
 {
-    fclaw2d_domain_t *domain = glob->domain;
+    fclaw_domain_t *domain = glob->domain;
     fclaw_clawpatch_vtable_t *clawpatch_vt = fclaw_clawpatch_vt(glob);
 
     /* BEGIN NON-SCALABLE CODE */

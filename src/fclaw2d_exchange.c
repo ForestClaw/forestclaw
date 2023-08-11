@@ -69,7 +69,7 @@ void set_indirect_data(fclaw2d_global_t* glob,
 static
 void build_remote_ghost_patches(fclaw2d_global_t* glob)
 {
-    fclaw2d_domain_t *domain = glob->domain;
+    fclaw_domain_t *domain = glob->domain;
     const fclaw_options_t *gparms = fclaw2d_get_options(glob);
 
     fclaw_infof("[%d] Number of ghost patches : %d\n",
@@ -108,7 +108,7 @@ void build_remote_ghost_patches(fclaw2d_global_t* glob)
 static
 void delete_remote_ghost_patches(fclaw2d_global_t* glob)
 {
-    fclaw2d_domain_t *domain = glob->domain;
+    fclaw_domain_t *domain = glob->domain;
     int i;
     for(i = 0; i < domain->num_ghost_patches; i++)
     {
@@ -126,7 +126,7 @@ unpack_remote_ghost_patches(fclaw2d_global_t* glob,
                             int maxlevel,
                             int time_interp)
 {
-    fclaw2d_domain_t *domain = glob->domain;
+    fclaw_domain_t *domain = glob->domain;
 
     int i;
     for(i = 0; i < domain->num_ghost_patches; i++)
@@ -161,7 +161,7 @@ unpack_remote_ghost_patches(fclaw2d_global_t* glob,
 void fclaw2d_exchange_setup(fclaw2d_global_t* glob,
                             fclaw2d_timer_names_t running)
 {
-    fclaw2d_domain_t* domain = glob->domain;
+    fclaw_domain_t* domain = glob->domain;
     /* Time spend in build here is negligible and is included in regrid */
     fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_GHOSTPATCH_BUILD]);
 
@@ -251,7 +251,7 @@ void fclaw2d_exchange_setup(fclaw2d_global_t* glob,
 
 void fclaw2d_exchange_delete(fclaw2d_global_t* glob)
 {
-    fclaw2d_domain_t** domain = &glob->domain;
+    fclaw_domain_t** domain = &glob->domain;
     fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_GHOSTPATCH_BUILD]);
 
     /* Free old parallel ghost patch data structure, must exist by construction. */
@@ -301,7 +301,7 @@ void fclaw2d_exchange_ghost_patches_begin(fclaw2d_global_t* glob,
                                           int time_interp,
                                           fclaw2d_timer_names_t running)
 {
-    fclaw2d_domain_t* domain = glob->domain;
+    fclaw_domain_t* domain = glob->domain;
     fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_GHOSTPATCH_BUILD]);
 
     fclaw2d_domain_exchange_t *e = get_exchange_data(glob);
@@ -366,7 +366,7 @@ void fclaw2d_exchange_ghost_patches_end(fclaw2d_global_t* glob,
                                         int time_interp,
                                         fclaw2d_timer_names_t running)
 {
-    fclaw2d_domain_t* domain = glob->domain;
+    fclaw_domain_t* domain = glob->domain;
     if (running != FCLAW2D_TIMER_NONE)
     {
         fclaw2d_timer_stop (&glob->timers[running]);

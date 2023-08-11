@@ -33,7 +33,7 @@
 
 /* Avoid circular dependencies */
 struct fclaw_patch;
-struct fclaw2d_domain;
+struct fclaw_domain;
 struct fclaw2d_global;
 
 /**

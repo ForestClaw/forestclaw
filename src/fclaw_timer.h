@@ -47,7 +47,7 @@ struct fclaw2d_global;
     -- fclaw2d_domain.h needs fclaw_timer.h for the definition
     of fclaw2d_timer_t.
 
-    -- fclaw2d_time.h  references an fclaw2d_domain_t struct.
+    -- fclaw2d_time.h  references an fclaw_domain_t struct.
 */
 
 typedef enum

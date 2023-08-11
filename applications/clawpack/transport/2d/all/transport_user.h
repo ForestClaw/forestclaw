@@ -64,7 +64,7 @@ extern "C"
 struct fclaw_options;
 struct user_options;
 struct fclaw_patch;
-struct fclaw2d_domain;
+struct fclaw_domain;
 
 
 void transport_patch_setup_manifold(fclaw2d_global_t *glob,

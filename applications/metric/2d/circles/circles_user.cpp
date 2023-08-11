@@ -35,11 +35,11 @@ extern "C"
 #endif
 #endif
 
-void sphere_link_patch(fclaw2d_domain_t *domain)
+void sphere_link_patch(fclaw_domain_t *domain)
 {
 }
 
-void sphere_setprob(fclaw2d_domain_t* domain)
+void sphere_setprob(fclaw_domain_t* domain)
 {
     setprob_();
 }
@@ -49,7 +49,7 @@ void sphere_setprob(fclaw2d_domain_t* domain)
 /* -----------------------------------------------------------------
    Default routine for tagging patches for refinement and coarsening
    ----------------------------------------------------------------- */
-int sphere_patch_tag4refinement(fclaw2d_domain_t *domain,
+int sphere_patch_tag4refinement(fclaw_domain_t *domain,
                                        fclaw_patch_t *this_patch,
                                        int blockno, int this_patch_idx,
                                        int initflag)
@@ -81,7 +81,7 @@ int sphere_patch_tag4refinement(fclaw2d_domain_t *domain,
     return tag_patch == 1;
 }
 
-int sphere_patch_tag4coarsening(fclaw2d_domain_t *domain,
+int sphere_patch_tag4coarsening(fclaw_domain_t *domain,
                                        fclaw_patch_t *this_patch,
                                        int blockno,
                                        int patchno)
@@ -111,7 +111,7 @@ int sphere_patch_tag4coarsening(fclaw2d_domain_t *domain,
     return tag_patch == 0;
 }
 
-void metric_write_header(fclaw2d_domain_t* domain, int iframe,int ngrids)
+void metric_write_header(fclaw_domain_t* domain, int iframe,int ngrids)
 {
     const fclaw_options_t *gparms = get_domain_parms(domain);
     double time = get_domain_time(domain);
@@ -129,7 +129,7 @@ void metric_write_header(fclaw2d_domain_t* domain, int iframe,int ngrids)
 }
 
 
-void metric_write_output(fclaw2d_domain_t *domain, fclaw_patch_t *this_patch,
+void metric_write_output(fclaw_domain_t *domain, fclaw_patch_t *this_patch,
                          int this_block_idx, int this_patch_idx,
                          int iframe,int num,int level)
 {

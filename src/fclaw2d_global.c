@@ -97,7 +97,7 @@ fclaw2d_global_t* fclaw2d_global_new_comm (sc_MPI_Comm mpicomm,
 }
 
 void
-fclaw2d_global_store_domain (fclaw2d_global_t* glob, fclaw2d_domain_t* domain)
+fclaw2d_global_store_domain (fclaw2d_global_t* glob, fclaw_domain_t* domain)
 {
     glob->domain = domain;
 
@@ -171,7 +171,7 @@ void fclaw2d_global_iterate_families (fclaw2d_global_t * glob,
     fclaw2d_domain_iterate_families (glob->domain, pcb, &g);
 }
 
-void fclaw2d_global_iterate_adapted (fclaw2d_global_t * glob, fclaw2d_domain_t* new_domain,
+void fclaw2d_global_iterate_adapted (fclaw2d_global_t * glob, fclaw_domain_t* new_domain,
                                      fclaw2d_match_callback_t mcb, void *user)
 {
     fclaw2d_global_iterate_t g;
@@ -190,7 +190,7 @@ void fclaw2d_global_iterate_level_mthread (fclaw2d_global_t * glob, int level,
 }
 
 void fclaw2d_global_iterate_partitioned (fclaw2d_global_t * glob,
-                                         fclaw2d_domain_t * new_domain,
+                                         fclaw_domain_t * new_domain,
                                          fclaw2d_transfer_callback_t tcb,
                                          void *user)
 {

@@ -151,7 +151,7 @@ struct fclaw2d_patch_transform_data
 
 
 struct fclaw2d_global;
-struct fclaw2d_domain;
+struct fclaw_domain;
 struct fclaw_patch;
 
 
@@ -734,7 +734,7 @@ void fclaw2d_patch_partition_pack(struct fclaw2d_global *glob,
  * @param[in] packed_data the buffer
  */
 void fclaw2d_patch_partition_unpack(struct fclaw2d_global *glob,
-                                    struct fclaw2d_domain *new_domain,  
+                                    struct fclaw_domain *new_domain,  
                                     struct fclaw_patch *this_patch,
                                     int blockno,
                                     int patchno,
@@ -1326,7 +1326,7 @@ typedef void (*fclaw2d_patch_partition_pack_t)(struct fclaw2d_global *glob,
 
 /** @copydoc fclaw2d_patch_partition_unpack() */
 typedef void (*fclaw2d_patch_partition_unpack_t)(struct fclaw2d_global *glob,
-                                                 struct fclaw2d_domain *new_domain,
+                                                 struct fclaw_domain *new_domain,
                                                  struct fclaw_patch *this_patch,
                                                  int blockno,
                                                  int patchno,
@@ -1602,7 +1602,7 @@ void fclaw2d_patch_vtable_initialize(struct fclaw2d_global* glob);
  * @param[out] local_num the local patch number
  * @param[out] level the level that the patch is on
  */
-void fclaw2d_patch_get_info(struct fclaw2d_domain * domain,
+void fclaw2d_patch_get_info(struct fclaw_domain * domain,
                             struct fclaw_patch * patch,
                             int blockno, int patchno,
                             int *global_num, int* local_num, 
@@ -1619,7 +1619,7 @@ void fclaw2d_patch_get_info(struct fclaw2d_domain * domain,
  * @param[out] level the level
  */
 /* I don't completely trust this routine */
-void fclaw2d_patch_get_info2(struct fclaw2d_domain * domain,
+void fclaw2d_patch_get_info2(struct fclaw_domain * domain,
                              struct fclaw_patch * this_patch,
                              int *blockno, int *patchno,
                              int *global_num, int *level);

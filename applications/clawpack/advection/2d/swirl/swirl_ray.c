@@ -137,7 +137,7 @@ int segment_intersect(point_t p0, point_t p1,
 }
 
 
-int swirl_intersect_ray (fclaw2d_domain_t *domain, 
+int swirl_intersect_ray (fclaw_domain_t *domain, 
                          fclaw_patch_t * patch,
                          int blockno, 
                          int patchno, 

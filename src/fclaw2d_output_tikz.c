@@ -93,7 +93,7 @@ void convert_brick(fclaw2d_global_t *glob,
 
 
 static void
-cb_tikz_output (fclaw2d_domain_t * domain,
+cb_tikz_output (fclaw_domain_t * domain,
                 fclaw_patch_t * this_patch,
                 int this_block_idx, int this_patch_idx,
                 void *user)
@@ -158,7 +158,7 @@ cb_tikz_output (fclaw2d_domain_t * domain,
 
 void fclaw2d_output_frame_tikz(fclaw2d_global_t* glob, int iframe)
 {
-    fclaw2d_domain_t *domain = glob->domain;
+    fclaw_domain_t *domain = glob->domain;
     fclaw2d_tikz_info_t s_tikz;
 
     char fname[20];

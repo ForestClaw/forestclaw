@@ -150,7 +150,7 @@ overlap_point_t;
 typedef struct overlap_consumer
 {
   fclaw2d_global_t   *glob;
-  fclaw2d_domain_t   *domain;
+  fclaw_domain_t   *domain;
   sc_array_t         *query_points;
   size_t              cell_idx;
   int                 num_cells_in_patch;
@@ -180,7 +180,7 @@ void apply_consumer_mapping (overlap_point_t * op)
 }
 
 static
-void add_cell_centers (fclaw2d_domain_t * domain, fclaw_patch_t * patch,
+void add_cell_centers (fclaw_domain_t * domain, fclaw_patch_t * patch,
                        int blockno, int patchno, void *user)
 {
     overlap_point_t *op;
@@ -294,7 +294,7 @@ int apply_inverse_producer_mapping (overlap_point_t * op, double xy[3],
 }
 
 static
-int overlap_interpolate (fclaw2d_domain_t * domain, fclaw_patch_t * patch,
+int overlap_interpolate (fclaw_domain_t * domain, fclaw_patch_t * patch,
                          int blockno, int patchno, void *point, void *user)
 {
     overlap_point_t *op;
@@ -446,10 +446,10 @@ main (int argc, char **argv)
     fc2d_clawpack5_options_t    *swirl_claw5_opt;
 
     fclaw2d_global_t         *filament_glob;
-    fclaw2d_domain_t         *filament_domain;
+    fclaw_domain_t         *filament_domain;
 
     fclaw2d_global_t         *swirl_glob;
-    fclaw2d_domain_t         *swirl_domain;
+    fclaw_domain_t         *swirl_domain;
 
     sc_MPI_Comm mpicomm;
 

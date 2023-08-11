@@ -134,7 +134,7 @@ fclaw2d_map_context_t* fclaw2d_map_new_brick_conn
 }
 
 fclaw2d_map_context_t*
-fclaw2d_map_new_brick (fclaw2d_domain_t *domain,
+fclaw2d_map_new_brick (fclaw_domain_t *domain,
                        int mi, int mj, int periodic_i, int periodic_j)
 {
     fclaw2d_map_context_t *cont;

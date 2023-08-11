@@ -34,7 +34,7 @@ static
 void create_domain_map (fclaw2d_global_t *glob,
                         fclaw_options_t* fclaw_opt)
 {
-    fclaw2d_domain_t         *domain = NULL;
+    fclaw_domain_t         *domain = NULL;
 
     domain = fclaw2d_domain_new_unitsquare (mpicomm, fclaw_opt->minlevel);
     fclaw2d_domain_list_levels (domain, FCLAW_VERBOSITY_ESSENTIAL);

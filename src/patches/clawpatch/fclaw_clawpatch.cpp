@@ -1464,7 +1464,7 @@ void clawpatch_partition_pack(fclaw2d_global_t *glob,
 
 static
 void clawpatch_partition_unpack(fclaw2d_global_t *glob,  
-                                fclaw2d_domain_t *new_domain,
+                                fclaw_domain_t *new_domain,
                                 fclaw_patch_t *patch,
                                 int blockno,
                                 int patchno,

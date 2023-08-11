@@ -41,7 +41,7 @@ void create_domain_map (fclaw2d_global_t *glob,
                         fclaw_options_t *fclaw_opt, user_options_t *user)
 {
     /* Mapped, multi-block domain */
-    fclaw2d_domain_t         *domain = NULL;
+    fclaw_domain_t         *domain = NULL;
     fclaw2d_map_context_t    *cont = NULL;
 
     switch (user->example)

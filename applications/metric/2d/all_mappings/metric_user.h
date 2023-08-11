@@ -51,10 +51,10 @@ typedef struct user_options
 #define METRIC_SETPROB FCLAW_F77_FUNC(metric_setprob, METRIC_SETPROB)
 void METRIC_SETPROB(const double* beta);
 
-const user_options_t* metric_user_get_options(fclaw2d_domain_t* domain);
+const user_options_t* metric_user_get_options(fclaw_domain_t* domain);
 
 
-void metric_problem_setup(fclaw2d_domain_t* domain);
+void metric_problem_setup(fclaw_domain_t* domain);
 
 
 
@@ -90,14 +90,14 @@ void max_grid_cell_area_(const int& mx, const int& my, const int& mbc,
                          const double& dx, const double& dy,
                          const double area[], double *maxvalue);
 
-void metric_patch_initialize(fclaw2d_domain_t *domain,
+void metric_patch_initialize(fclaw_domain_t *domain,
                              fclaw_patch_t *this_patch,
                              int this_block_idx,
                              int this_patch_idx);
 
-void metric_link_patch(fclaw2d_domain_t *domain);
+void metric_link_patch(fclaw_domain_t *domain);
 
-void metric_diagnostics(fclaw2d_domain_t *domain, const double t);
+void metric_diagnostics(fclaw_domain_t *domain, const double t);
 
 
 fclaw2d_map_context_t* fclaw2d_map_new_nomap();

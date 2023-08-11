@@ -28,7 +28,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_global.h>
 
 static
-void cb_setup_time_interp(fclaw2d_domain_t *domain,
+void cb_setup_time_interp(fclaw_domain_t *domain,
                           fclaw_patch_t *this_patch,
                           int blockno,
                           int patchno,

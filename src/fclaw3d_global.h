@@ -43,11 +43,11 @@ extern "C"
 /* these are dimension-specific functions */
 
 void fclaw3d_iterate_patch_cb
-    (fclaw3d_domain_t * domain, fclaw_patch_t * patch,
+    (fclaw_domain_t * domain, fclaw_patch_t * patch,
      int blockno, int patchno, void *user);
 
 void fclaw3d_iterate_family_cb
-    (fclaw3d_domain_t * domain, fclaw_patch_t * patch,
+    (fclaw_domain_t * domain, fclaw_patch_t * patch,
      int blockno, int patchno, void *user);
 
 /* much of the following will move into fclaw_global.h */
@@ -84,7 +84,7 @@ struct fclaw3d_global
     struct fclaw_pointer_map *options;    /**< options */
     struct fclaw_pointer_map *attributes;    /**< attributes, things that are not vtables, or options */
 
-    struct fclaw3d_domain *domain;
+    struct fclaw_domain *domain;
 
     void *user;
 };
@@ -104,7 +104,7 @@ fclaw3d_global_t* fclaw3d_global_new_comm (sc_MPI_Comm mpicomm,
 void fclaw3d_global_destroy (fclaw3d_global_t * glob);
 
 void fclaw3d_global_store_domain (fclaw3d_global_t* glob,
-                                  struct fclaw3d_domain* domain);
+                                  struct fclaw_domain* domain);
 
 void fclaw3d_global_store_map (fclaw3d_global_t* glob,
                                fclaw3d_map_context_t * map);
@@ -121,14 +121,14 @@ void fclaw3d_global_iterate_families (fclaw3d_global_t * glob,
                                       fclaw3d_patch_callback_t pcb, void *user);
 
 void fclaw3d_global_iterate_adapted (fclaw3d_global_t * glob,
-                                     struct fclaw3d_domain* new_domain,
+                                     struct fclaw_domain* new_domain,
                                      fclaw3d_match_callback_t mcb, void *user);
 
 void fclaw3d_global_iterate_level_mthread (fclaw3d_global_t * glob, int level,
                                            fclaw3d_patch_callback_t pcb, void *user);
 
 void fclaw3d_global_iterate_partitioned (fclaw3d_global_t * glob,
-                                         struct fclaw3d_domain * new_domain,
+                                         struct fclaw_domain * new_domain,
                                          fclaw3d_transfer_callback_t tcb,
                                          void *user);
 /**

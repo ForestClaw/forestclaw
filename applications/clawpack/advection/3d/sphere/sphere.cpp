@@ -26,14 +26,14 @@
 #include "sphere_user.h"
 
 static
-fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, 
+fclaw_domain_t* create_domain(sc_MPI_Comm mpicomm, 
                                 fclaw_options_t* fclaw_opt,
                                 user_options_t* user_opt,
                                fclaw_clawpatch_options_t *claw_opt)
 {
     /* Mapped, multi-block domain */
     p4est_connectivity_t     *conn = NULL;
-    fclaw2d_domain_t         *domain;
+    fclaw_domain_t         *domain;
     fclaw2d_map_context_t    *cont = NULL;
 
     FCLAW_ASSERT(fclaw_opt->manifold != 0);
@@ -120,7 +120,7 @@ main (int argc, char **argv)
     fc3d_clawpack46_options_t   *claw46_opt;
 
     fclaw2d_global_t            *glob;
-    fclaw2d_domain_t            *domain;
+    fclaw_domain_t            *domain;
     sc_MPI_Comm mpicomm;
 
     /* Initialize application */

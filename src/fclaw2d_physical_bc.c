@@ -43,7 +43,7 @@ void fclaw2d_physical_bc_default(fclaw2d_global_t *glob,
     /* This can be used when no BCs are to be called */
 }
 
-void cb_fclaw2d_physical_set_bc(fclaw2d_domain_t *domain,
+void cb_fclaw2d_physical_set_bc(fclaw_domain_t *domain,
                                 fclaw_patch_t *this_patch,
                                 int this_block_idx,
                                 int this_patch_idx,
