@@ -94,7 +94,7 @@ main (int argc, char **argv)
     
         /* Create global structure which stores the domain, timers, etc */
         heat_glob = fclaw_global_new();
-        fclaw2d_global_store_domain(heat_glob, heat_domain);
+        fclaw_global_store_domain(heat_glob, heat_domain);
 
         /* Store option packages in glob */
         fclaw2d_options_store           (heat_glob, heat_fclaw_opt);
@@ -109,7 +109,7 @@ main (int argc, char **argv)
     
         /* Create global structure which stores the domain, timers, etc */
         phasefield_glob = fclaw_global_new();
-        fclaw2d_global_store_domain(phasefield_glob, phasefield_domain);
+        fclaw_global_store_domain(phasefield_glob, phasefield_domain);
 
         /* Store option packages in glob */
         fclaw2d_options_store           (phasefield_glob, phasefield_fclaw_opt);

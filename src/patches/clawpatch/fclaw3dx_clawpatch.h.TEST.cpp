@@ -83,7 +83,7 @@ struct SinglePatchDomain {
         fopts.subcycle = true;
 
         domain = create_test_domain(sc_MPI_COMM_WORLD,&fopts);
-        fclaw2d_global_store_domain(glob, domain);
+        fclaw_global_store_domain(glob, domain);
         fclaw2d_options_store(glob, &fopts);
 
         opts->d3->mx   = 5;
@@ -131,7 +131,7 @@ struct QuadDomain {
         fopts.subcycle = true;
 
         domain = create_test_domain(sc_MPI_COMM_WORLD,&fopts);
-        fclaw2d_global_store_domain(glob, domain);
+        fclaw_global_store_domain(glob, domain);
         fclaw2d_options_store(glob, &fopts);
 
         opts->d3->mx   = 5;
@@ -252,7 +252,7 @@ TEST_CASE("fclaw3dx_clawpatch patch_build")
         fopts.subcycle = subcycle;
 
         fclaw_domain_t *domain = create_test_domain(sc_MPI_COMM_WORLD,&fopts);
-        fclaw2d_global_store_domain(glob, domain);
+        fclaw_global_store_domain(glob, domain);
         fclaw2d_options_store(glob, &fopts);
 
         fclaw_clawpatch_options_t* opts = fclaw_clawpatch_options_new(3);

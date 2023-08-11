@@ -56,7 +56,7 @@ void create_domain_map (fclaw_global_t *glob,
                                       fclaw_opt->minlevel);
     fclaw2d_domain_list_levels (domain, FCLAW_VERBOSITY_ESSENTIAL);
     fclaw2d_domain_list_neighbors (domain, FCLAW_VERBOSITY_DEBUG);
-    fclaw2d_global_store_domain (glob, domain);
+    fclaw_global_store_domain (glob, domain);
 
     /* Construct and store map */
     brick = fclaw2d_map_new_brick (domain, mi, mj, a, b);

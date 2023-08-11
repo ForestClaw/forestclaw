@@ -268,7 +268,7 @@ main (int argc, char **argv)
         {
             /* Domain */
             filament_domain = filament_create_domain(subcomm, filament_fclaw_opt, filament_user_opt,filament_clawpatch_opt);
-            fclaw2d_global_store_domain(filament_glob, filament_domain);
+            fclaw_global_store_domain(filament_glob, filament_domain);
 
             /* initialize */
             filament_initialize(filament_glob);
@@ -281,7 +281,7 @@ main (int argc, char **argv)
         }else{
             /* Domain */
             swirl_domain = swirl_create_domain(subcomm, swirl_fclaw_opt);
-            fclaw2d_global_store_domain(swirl_glob, swirl_domain);
+            fclaw_global_store_domain(swirl_glob, swirl_domain);
             
             /* initialize */
             swirl_initialize(swirl_glob);

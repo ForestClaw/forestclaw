@@ -81,7 +81,7 @@ main (int argc, char **argv)
         radial_domain = radial_create_domain(mpicomm, radial_gparms);
     
         radial_glob = fclaw_global_new();
-        fclaw2d_global_store_domain(radial_glob, radial_domain);
+        fclaw_global_store_domain(radial_glob, radial_domain);
 
         fclaw2d_options_store           (radial_glob, radial_gparms);
         fclaw_clawpatch_options_store (radial_glob, radial_clawpatchopt);
@@ -97,7 +97,7 @@ main (int argc, char **argv)
     
         /* Create global structure which stores the domain, timers, etc */
         slosh_glob = fclaw_global_new();
-        fclaw2d_global_store_domain(slosh_glob, slosh_domain);
+        fclaw_global_store_domain(slosh_glob, slosh_domain);
 
         /* Store option packages in glob */
         fclaw2d_options_store           (slosh_glob, slosh_fclaw_opt);

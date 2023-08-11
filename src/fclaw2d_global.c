@@ -86,7 +86,7 @@ fclaw_global_t* fclaw_global_new_comm (sc_MPI_Comm mpicomm,
 
     /*
      * Set the communicator.
-     * With the current code, overridden by fclaw2d_global_store_domain.
+     * With the current code, overridden by fclaw_global_store_domain.
      * Maybe we should streamline this in the future.
      */
     glob->mpicomm = mpicomm;
@@ -97,7 +97,7 @@ fclaw_global_t* fclaw_global_new_comm (sc_MPI_Comm mpicomm,
 }
 
 void
-fclaw2d_global_store_domain (fclaw_global_t* glob, fclaw_domain_t* domain)
+fclaw_global_store_domain (fclaw_global_t* glob, fclaw_domain_t* domain)
 {
     glob->domain = domain;
 

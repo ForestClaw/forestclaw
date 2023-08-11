@@ -140,7 +140,7 @@ main (int argc, char **argv)
         glob = fclaw_global_new();
 
         /* Create global structure which stores the domain, timers, etc */
-        fclaw2d_global_store_domain(glob, domain);
+        fclaw_global_store_domain(glob, domain);
 
         /* Store option packages in glob */
         fclaw2d_options_store           (glob, fclaw_opt);

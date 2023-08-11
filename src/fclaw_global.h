@@ -89,6 +89,9 @@ fclaw_global_t* fclaw_global_new_comm (sc_MPI_Comm mpicomm,
 
 void fclaw_global_destroy (fclaw_global_t * glob);
 
+void fclaw_global_store_domain (fclaw_global_t* glob,
+                                  struct fclaw_domain* domain);
+
 #ifdef __cplusplus
 #if 0
 {                               /* need this because indent is dumb */

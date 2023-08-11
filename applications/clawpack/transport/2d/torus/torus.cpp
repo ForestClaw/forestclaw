@@ -54,7 +54,7 @@ void create_domain (fclaw_global_t * glob,
                                        fclaw_opt->minlevel);
     fclaw2d_domain_list_levels (domain, FCLAW_VERBOSITY_ESSENTIAL);
     fclaw2d_domain_list_neighbors (domain, FCLAW_VERBOSITY_DEBUG);
-    fclaw2d_global_store_domain (glob, domain);
+    fclaw_global_store_domain (glob, domain);
 
     /* This does both the regular torus and the twisted torus */
     brick = fclaw2d_map_new_brick (domain, mi, mj, a, b);

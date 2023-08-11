@@ -65,9 +65,6 @@ struct fclaw2d_map_context;
 struct fclaw_package_container;
 struct fclaw2d_diagnostics_accumulator;
 
-void fclaw2d_global_store_domain (fclaw_global_t* glob,
-                                  struct fclaw_domain* domain);
-
 void fclaw2d_global_store_map (fclaw_global_t* glob,
                                struct fclaw2d_map_context * map);
 

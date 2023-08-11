@@ -91,7 +91,7 @@ fclaw_domain_t* create_domain(sc_MPI_Comm mpicomm, fclaw_options_t* fclaw_opt,
 
     fclaw2d_domain_list_levels (domain, FCLAW_VERBOSITY_ESSENTIAL);
     fclaw2d_domain_list_neighbors (domain, FCLAW_VERBOSITY_DEBUG);
-    fclaw2d_global_store_domain (glob, domain);
+    fclaw_global_store_domain (glob, domain);
     fclaw2d_global_store_map (glob, cont);
 }
 
@@ -158,7 +158,7 @@ main (int argc, char **argv)
 
         /* Create global structure which stores the domain, timers, etc */
         glob = fclaw_global_new();
-        fclaw2d_global_store_domain(glob, domain);
+        fclaw_global_store_domain(glob, domain);
 
         /* Store option packages in glob */
         fclaw2d_options_store           (glob, fclaw_opt);

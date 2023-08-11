@@ -53,9 +53,6 @@ void fclaw3d_iterate_family_cb
 
 /* much of the following will move into fclaw_global.h */
 
-void fclaw3d_global_store_domain (fclaw_global_t* glob,
-                                  struct fclaw_domain* domain);
-
 void fclaw3d_global_store_map (fclaw_global_t* glob,
                                fclaw3d_map_context_t * map);
 

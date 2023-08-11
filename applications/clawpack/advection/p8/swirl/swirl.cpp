@@ -229,7 +229,7 @@ main (int argc, char **argv)
 
         /* Create global structure which stores the domain, timers, etc */
         glob = fclaw_global_new();
-        fclaw3d_global_store_domain(glob, domain);
+        fclaw_global_store_domain(glob, domain);
 
         /* Store option packages in glob */
         fclaw3d_options_store           (glob, fclaw_opt);
