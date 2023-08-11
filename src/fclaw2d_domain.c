@@ -79,7 +79,7 @@ fclaw_domain_new2d (fclaw2d_domain_t * domain,
                     fclaw_domain_callback_t init, void *user)
 {
     int i, j;
-    fclaw2d_block_t      *block;
+    fclaw_block_t      *block;
     fclaw_patch_t      *patch;
     fclaw_domain_t       *d;
     fclaw_patch_t        *p;
@@ -133,7 +133,7 @@ fclaw_domain_destroy2d (fclaw_domain_t * d,
 {
     int i, j;
     fclaw2d_domain_t     *domain;
-    fclaw2d_block_t      *block;
+    fclaw_block_t      *block;
     fclaw_patch_t      *patch;
     fclaw_patch_t        *p;
 
@@ -224,7 +224,7 @@ void fclaw2d_domain_reset(fclaw2d_global_t* glob)
 
     for(i = 0; i < (*domain)->num_blocks; i++)
     {
-        fclaw2d_block_t *block = (*domain)->blocks + i;
+        fclaw_block_t *block = (*domain)->blocks + i;
 
         for(j = 0; j < block->num_patches; j++)
         {
@@ -261,7 +261,7 @@ void fclaw2d_domain_iterate_level_mthread (fclaw2d_domain_t * domain, int level,
 {
 #if (_OPENMP)
     int i, j;
-    fclaw2d_block_t *block;
+    fclaw_block_t *block;
     fclaw_patch_t *patch;
 
     for (i = 0; i < domain->num_blocks; i++)

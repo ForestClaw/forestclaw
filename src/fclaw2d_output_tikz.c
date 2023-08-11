@@ -109,7 +109,7 @@ cb_tikz_output (fclaw2d_domain_t * domain,
     FILE *fp = s_tikz->fp;
     const fclaw_options_t *fclaw_opt = fclaw2d_get_options(s->glob);
 
-    fclaw2d_block_t *this_block = &domain->blocks[this_block_idx];
+    fclaw_block_t *this_block = &domain->blocks[this_block_idx];
     int64_t patch_num = domain->global_num_patches_before +
         (int64_t) (this_block->num_patches_before + this_patch_idx);
 

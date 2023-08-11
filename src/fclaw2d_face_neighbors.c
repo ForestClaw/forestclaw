@@ -176,7 +176,7 @@ void get_face_neighbors(fclaw2d_global_t *glob,
 			if (rproc[ir] == domain->mpirank)
 			{
 				/* neighbor patch is local */
-				fclaw2d_block_t *neighbor_block = &domain->blocks[rblockno];
+				fclaw_block_t *neighbor_block = &domain->blocks[rblockno];
 				neighbor = &neighbor_block->patches[rpatchno[ir]];
 			}
 			else

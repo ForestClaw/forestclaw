@@ -200,7 +200,7 @@ void geoclaw_create_gauge_files_default(fclaw2d_global_t *glob,
 }
 
 void geoclaw_gauge_normalize_coordinates(fclaw2d_global_t *glob, 
-                                        fclaw2d_block_t *block,
+                                        fclaw_block_t *block,
                                         int blockno, 
                                         fclaw_gauge_t *g,
                                         double *xc, double *yc)
@@ -228,7 +228,7 @@ void geoclaw_gauge_normalize_coordinates(fclaw2d_global_t *glob,
 
 
 void geoclaw_gauge_update_default(fclaw2d_global_t* 
-                                  glob, fclaw2d_block_t* block,
+                                  glob, fclaw_block_t* block,
                                   fclaw_patch_t* patch, 
                                   int blockno, int patchno,
                                   double tcurr, fclaw_gauge_t *g)

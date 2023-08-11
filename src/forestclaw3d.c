@@ -56,7 +56,7 @@ fclaw3d_patch_edge_neighbors (fclaw2d_domain_t * domain,
     p4est_locidx_t edgeid, cstart, cend;
     const p4est_quadrant_t *q;
     p4est_tree_t *rtree;
-    fclaw2d_block_t *block;
+    fclaw_block_t *block;
 
     FCLAW_ASSERT (domain->num_ghost_patches ==
                   (int) mesh->ghost_num_quadrants);

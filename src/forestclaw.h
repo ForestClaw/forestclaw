@@ -75,4 +75,60 @@ struct fclaw_patch
     u;
     void *user;                 /**< User Pointer */
 };
+
+typedef struct fclaw_block_d2
+{
+    /** @{ @brief lower left coordinate */
+    double xlower, xupper;
+    /** @} */
+    /** @{ @brief upper right coordinate */
+    double ylower, yupper;
+    /** @} */
+    double vertices[4 * 3];     /**< for each block corner, the xyz coordinates
+                                     of the p4est_connectivity structure */
+    int is_boundary[4];         /**< physical boundary flag */
+} fclaw_block_d2_t;
+
+typedef struct fclaw_block_d3
+{
+    /** @{ @brief left/right coordinate */
+    double xlower, xupper;
+    /** @} */
+    /** @{ @brief front/back coordinate */
+    double ylower, yupper;
+    /** @} */
+    /** @{ @brief bottom/top coordinate */
+    double zlower, zupper;
+    /** @} */
+    double vertices[8 * 3];     /**< for each block corner, the xyz coordinates
+                                     of the p8est_connectivity structure */
+    int is_boundary[6];         /**< physical boundary flag */
+} fclaw_block_d3_t;
+
+/**
+ * @brief Data Structure for a block
+ */
+typedef struct fclaw_block
+{
+    int dim;
+    fclaw_block_d2_t* d2;
+    fclaw_block_d3_t* d3;
+    int num_patches;            /**< local patches in this block */
+    int num_patches_before;     /**< in all previous blocks */
+    int num_exchange_patches;   /**< exchange patches in this block */
+    /** @{ 
+     * @brief min/max level
+     * local over this block.  If this proc doesn't
+     * store any patches in this block, we set
+     * maxlevel < 0 <= minlevel. 
+     */
+    int minlevel;
+    int maxlevel;
+    /** @} */
+    fclaw_patch_t *patches;           /**< The patches for this block */
+    fclaw_patch_t **patchbylevel;     /**< Pointer to the first patch in each level **/
+    fclaw_patch_t **exchange_patches; /**< Pointer for each exchange patch */
+    void *user;                         /**< User pointer */
+} fclaw_block_t;
+
 #endif /* !FCLAW_PATCH_H */

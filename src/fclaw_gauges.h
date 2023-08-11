@@ -88,7 +88,7 @@ typedef struct fclaw_gauge
 
 struct fclaw2d_global;
 struct fclaw_patch;
-struct fclaw2d_block;
+struct fclaw_block;
 struct fclaw_gauge;
 
 /**
@@ -123,7 +123,7 @@ typedef void (*fclaw_gauge_create_files_t)(struct fclaw2d_global *glob,
  * @param[out] xc,yc the normalized coordinates
  */
 typedef void (*fclaw_gauge_normalize_t)(struct fclaw2d_global *glob, 
-                                       struct fclaw2d_block *block,
+                                       struct fclaw_block *block,
                                        int blockno, 
                                        struct fclaw_gauge *g,
                                        double *xc, double *yc);
@@ -140,7 +140,7 @@ typedef void (*fclaw_gauge_normalize_t)(struct fclaw2d_global *glob,
  * @param[in,out] g the gauge
  */
 typedef void (*fclaw_gauge_update_t)(struct fclaw2d_global* glob, 
-                                     struct fclaw2d_block* block,
+                                     struct fclaw_block* block,
                                      struct fclaw_patch* patch, 
                                      int blockno, int patchno,
                                      double tcurr, struct fclaw_gauge *g);
@@ -233,7 +233,7 @@ void fclaw_create_gauge_files(struct fclaw2d_global* glob,
  * @param[out] xc,yc the normalized coordinates
  */
 void fclaw_gauge_normalize_coordinates(struct fclaw2d_global *glob, 
-                                      struct fclaw2d_block *block,
+                                      struct fclaw_block *block,
                                       int blockno, 
                                       struct fclaw_gauge *g,
                                       double *xc, double *yc);
@@ -250,7 +250,7 @@ void fclaw_gauge_normalize_coordinates(struct fclaw2d_global *glob,
  * @param[in,out] g the gauge
  */
 void  fclaw_update_gauge(struct fclaw2d_global* glob, 
-                         struct fclaw2d_block *block,
+                         struct fclaw_block *block,
                          struct fclaw_patch *patch,
                          int blockno, int patchno,
                          double tcurr, fclaw_gauge_t *g);

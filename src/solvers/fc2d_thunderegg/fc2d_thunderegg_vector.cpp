@@ -75,7 +75,7 @@ ThunderEgg::Vector<2> fc2d_thunderegg_get_vector(struct fclaw2d_global *glob, fc
     strides[2] = strides[1]*(ns[1] + 2 * mbc);
     std::vector<double*> starts(glob->domain->local_num_patches);
     for(int blockno = 0; blockno < glob->domain->num_blocks; blockno++){
-        fclaw2d_block_t* block = &glob->domain->blocks[blockno];
+        fclaw_block_t* block = &glob->domain->blocks[blockno];
         for(int patchno = 0; patchno < block->num_patches; patchno++){
             int meqn;
             get_data(glob, &block->patches[patchno], data_choice, &starts[block->num_patches_before+patchno], &meqn);
@@ -93,7 +93,7 @@ void fc2d_thunderegg_store_vector(struct fclaw2d_global *glob, fc2d_thunderegg_d
     int my = clawpatch_opt->d2->my;
     int mbc = clawpatch_opt->mbc;
     for(int blockno = 0; blockno < glob->domain->num_blocks; blockno++){
-        fclaw2d_block_t* block = &glob->domain->blocks[blockno];
+        fclaw_block_t* block = &glob->domain->blocks[blockno];
         for(int patchno = 0; patchno < block->num_patches; patchno++){
             PatchView<const double, 2> view = vec.getPatchView(block->num_patches_before+patchno);
             int meqn;

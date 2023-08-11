@@ -45,7 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define fclaw2d_patch_vtable_t          fclaw3d_patch_vtable_t
 #define fclaw2d_patch_transform_data_t  fclaw3d_patch_transform_data_t
 #define fclaw2d_patch_data_t            fclaw3d_patch_data_t
-#define fclaw2d_block_t                 fclaw3d_block_t
+#define fclaw_block_t                 fclaw_block_t
 #define fclaw2d_domain_t                fclaw3d_domain_t
 #define fclaw2d_domain_data_t           fclaw3d_domain_data_t
 #define fclaw2d_domain_persist_t        fclaw3d_domain_persist_t

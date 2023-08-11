@@ -160,7 +160,7 @@ overlap_consumer_t;
 typedef struct overlap_geometry
 {
     fclaw_options_t *fclaw_opt;
-    fclaw2d_block_t *blocks;
+    fclaw_block_t *blocks;
 }
 overlap_geometry_t;
 

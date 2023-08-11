@@ -148,7 +148,7 @@ void gauge_initialize(fclaw2d_global_t* glob, void** acc)
         int mi = fclaw_opt->mi;
         int mj = fclaw_opt->mj;
 
-        fclaw2d_block_t *blocks = glob->domain->blocks;
+        fclaw_block_t *blocks = glob->domain->blocks;
 
         int number_of_gauges_set = 0;
         int *bo = (int*) sc_array_index_int(gauge_info->block_offsets,0);
@@ -157,7 +157,7 @@ void gauge_initialize(fclaw2d_global_t* glob, void** acc)
         double xll,yll, xur, yur;
         for (int nb = 0; nb < num_blocks; nb++)
         {
-            fclaw2d_block_t *block = &blocks[nb];
+            fclaw_block_t *block = &blocks[nb];
             if (is_brick)
             {
                 /* Scale local block coordinates to global 
@@ -224,7 +224,7 @@ void gauge_update(fclaw2d_global_t *glob, void* acc)
     double tcurr;
     int i, num_gauges;
 
-    fclaw2d_block_t *block;
+    fclaw_block_t *block;
     fclaw_patch_t *patch;
     fclaw_gauge_t *g;
 
@@ -434,7 +434,7 @@ void fclaw_create_gauge_files(fclaw2d_global_t* glob,
 }
 
 void fclaw_gauge_normalize_coordinates(fclaw2d_global_t *glob, 
-                                      fclaw2d_block_t *block,
+                                      fclaw_block_t *block,
                                       int blockno, 
                                       fclaw_gauge_t *g,
                                       double *xc, double *yc)
@@ -446,7 +446,7 @@ void fclaw_gauge_normalize_coordinates(fclaw2d_global_t *glob,
 
 
 void  fclaw_update_gauge(fclaw2d_global_t* glob, 
-                         fclaw2d_block_t *block,
+                         fclaw_block_t *block,
                          fclaw_patch_t *patch,
                          int blockno, int patchno,
                          double tcurr, fclaw_gauge_t *g)

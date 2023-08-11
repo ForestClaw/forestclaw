@@ -311,7 +311,7 @@ void get_corner_neighbor(fclaw2d_global_t *glob,
     }
     else
     {
-        fclaw2d_block_t *neighbor_block = &domain->blocks[*corner_block_idx];
+        fclaw_block_t *neighbor_block = &domain->blocks[*corner_block_idx];
         *corner_patch = &neighbor_block->patches[corner_patch_idx];
     }
 

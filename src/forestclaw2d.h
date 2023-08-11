@@ -51,9 +51,6 @@ extern "C"
 /** Typedef for fclaw2d_domain */
 typedef struct fclaw2d_domain fclaw2d_domain_t;
 
-/** Typedef for fclaw2d_block */
-typedef struct fclaw2d_block fclaw2d_block_t;
-
 /**
  * @brief Enum for encoding patch information
  */
@@ -89,48 +86,6 @@ fclaw2d_patch_flags_t;
 
 /** For each of the four faces, the corresponding block boundary flag. */
 extern const fclaw2d_patch_flags_t fclaw2d_patch_block_face_flags[4];
-
-
-typedef struct fclaw_block_d2
-{
-    /** @{ @brief lower left coordinate */
-    double xlower, xupper;
-    /** @} */
-    /** @{ @brief upper right coordinate */
-    double ylower, yupper;
-    /** @} */
-    double vertices[4 * 3];     /**< for each block corner, the xyz coordinates
-                                     of the p4est_connectivity structure */
-    int is_boundary[4];         /**< physical boundary flag */
-} fclaw_block_d2_t;
-
-typedef struct fclaw_block_d3 fclaw_block_d3_t;
-
-/**
- * @brief Data Structure for a block
- */
-struct fclaw2d_block
-{
-    int dim;
-    fclaw_block_d2_t* d2;
-    fclaw_block_d3_t* d3;
-    int num_patches;            /**< local patches in this block */
-    int num_patches_before;     /**< in all previous blocks */
-    int num_exchange_patches;   /**< exchange patches in this block */
-    /** @{ 
-     * @brief min/max level
-     * local over this block.  If this proc doesn't
-     * store any patches in this block, we set
-     * maxlevel < 0 <= minlevel. 
-     */
-    int minlevel;
-    int maxlevel;
-    /** @} */
-    fclaw_patch_t *patches;           /**< The patches for this block */
-    fclaw_patch_t **patchbylevel;     /**< Pointer to the first patch in each level **/
-    fclaw_patch_t **exchange_patches; /**< Pointer for each exchange patch */
-    void *user;                         /**< User pointer */
-};
 
 /** This structure identify parameters that are copied from a domain
  * to a new domain derived by adaptation or partitioning. */
@@ -182,7 +137,7 @@ struct fclaw2d_domain
     int partition_unchanged_old_first;  /**< local index wrt. previous partition */
 
     int num_blocks;             /**< Total number of blocks. */
-    fclaw2d_block_t *blocks;    /**< allocated storage */
+    fclaw_block_t *blocks;    /**< allocated storage */
     int num_exchange_patches;   /**< number my patches relevant to other procs.
                                    Identified by this expression to be true:
                                    (patch->flags &

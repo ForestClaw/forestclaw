@@ -37,7 +37,7 @@ extern "C"
 struct fclaw2d_global;
 struct fclaw_gauge;
 struct fclaw_patch;
-struct fclaw2d_block;
+struct fclaw_block;
 
 void geoclaw_read_gauges_data_default(struct fclaw2d_global *glob, 
                                       struct fclaw_gauge **gauges, 
@@ -48,14 +48,14 @@ void geoclaw_create_gauge_files_default(struct fclaw2d_global *glob,
                                         int num_gauges);
 
 void geoclaw_gauge_normalize_coordinates(struct fclaw2d_global *glob, 
-                                         struct fclaw2d_block *block,
+                                         struct fclaw_block *block,
                                          int blockno, 
                                          struct fclaw_gauge *g,
                                          double *xc, double *yc);
 
 
 void geoclaw_gauge_update_default(struct fclaw2d_global* glob, 
-                                  struct fclaw2d_block* block,
+                                  struct fclaw_block* block,
                                   struct fclaw_patch* patch, 
                                   int blockno, int patchno,
                                   double tcurr, struct fclaw_gauge *g);

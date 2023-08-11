@@ -205,7 +205,7 @@ fclaw2d_domain_attribute_remove (fclaw2d_domain_t * domain, const char *name)
 static fclaw_patch_t *
 fclaw2d_domain_get_patch (fclaw2d_domain_t * domain, int blockno, int patchno)
 {
-    fclaw2d_block_t *block;
+    fclaw_block_t *block;
 
 #if 0
     /* remote patch */
@@ -229,7 +229,7 @@ fclaw2d_domain_iterate_level (fclaw2d_domain_t * domain, int level,
                               fclaw2d_patch_callback_t pcb, void *user)
 {
     int i, j;
-    fclaw2d_block_t *block;
+    fclaw_block_t *block;
     fclaw_patch_t *patch;
 
     FCLAW_ASSERT (0 <= level && level <= domain->possible_maxlevel);
@@ -252,7 +252,7 @@ fclaw2d_domain_iterate_patches (fclaw2d_domain_t * domain,
                                 fclaw2d_patch_callback_t pcb, void *user)
 {
     int i, j;
-    fclaw2d_block_t *block;
+    fclaw_block_t *block;
     fclaw_patch_t *patch;
 
     for (i = 0; i < domain->num_blocks; i++)
@@ -271,7 +271,7 @@ fclaw2d_domain_iterate_families (fclaw2d_domain_t * domain,
                                  fclaw2d_patch_callback_t pcb, void *user)
 {
     int i, j;
-    fclaw2d_block_t *block;
+    fclaw_block_t *block;
     fclaw_patch_t *patch;
 
     for (i = 0; i < domain->num_blocks; i++)
@@ -312,7 +312,7 @@ fclaw2d_patch_boundary_type (fclaw2d_domain_t * domain,
     p4est_locidx_t qtq;
     p4est_tree_t *tree;
 #ifdef FCLAW_ENABLE_DEBUG
-    fclaw2d_block_t *block;
+    fclaw_block_t *block;
 #endif
 
     FCLAW_ASSERT (domain->pp_owned);
@@ -370,7 +370,7 @@ fclaw2d_patch_normal_match (fclaw2d_domain_t * domain,
     p4est_locidx_t totalleaf;
     p4est_tree_t *tree;
 #ifdef FCLAW_ENABLE_DEBUG
-    fclaw2d_block_t *block;
+    fclaw_block_t *block;
     int num_orient = fclaw2d_domain_num_orientations (domain);
 #endif
 
@@ -411,7 +411,7 @@ fclaw2d_patch_encode_neighbor (fclaw2d_domain_t * domain, p4est_mesh_t * mesh,
     p4est_wrap_t *wrap = (p4est_wrap_t *) domain->pp;
     p4est_ghost_t *ghost = wrap->match_aux ? wrap->ghost_aux : wrap->ghost;
     p4est_quadrant_t *gq;
-    fclaw2d_block_t *block;
+    fclaw_block_t *block;
 
     FCLAW_ASSERT (domain->pp_owned);
     FCLAW_ASSERT (0 <= qtq);
@@ -460,7 +460,7 @@ fclaw2d_patch_face_neighbors (fclaw2d_domain_t * domain,
     p4est_locidx_t qtq, *qth;
     p4est_tree_t *tree;
 #ifdef FCLAW_ENABLE_DEBUG
-    fclaw2d_block_t *block;
+    fclaw_block_t *block;
 #endif
 
     FCLAW_ASSERT (domain->num_ghost_patches ==
@@ -1001,7 +1001,7 @@ fclaw2d_patch_corner_neighbors (fclaw2d_domain_t * domain,
     p4est_locidx_t cornerid, cstart, cend;
     const p4est_quadrant_t *q;
     p4est_tree_t *rtree;
-    fclaw2d_block_t *block;
+    fclaw_block_t *block;
 
     FCLAW_ASSERT (domain->num_ghost_patches ==
                   (int) mesh->ghost_num_quadrants);
@@ -1445,7 +1445,7 @@ fclaw2d_domain_iterate_adapted (fclaw2d_domain_t * old_domain,
 {
     int i, oj, nj;
     int oskip, nskip;
-    fclaw2d_block_t *old_block, *new_block;
+    fclaw_block_t *old_block, *new_block;
     fclaw_patch_t *old_patch, *new_patch;
     fclaw2d_patch_relation_t newsize;
 
@@ -1500,7 +1500,7 @@ fclaw2d_domain_assign_for_partition (fclaw2d_domain_t * domain,
 {
     int blockno, patchno;
     size_t zz;
-    fclaw2d_block_t *block;
+    fclaw_block_t *block;
     p4est_wrap_t *wrap = (p4est_wrap_t *) domain->pp;
     p4est_tree_t *tree;
     p4est_quadrant_t *q;
@@ -1563,7 +1563,7 @@ fclaw2d_domain_iterate_partitioned (fclaw2d_domain_t * old_domain,
 #ifdef FCLAW_ENABLE_DEBUG
     int odone, ndone;
 #endif
-    fclaw2d_block_t *old_block, *new_block;
+    fclaw_block_t *old_block, *new_block;
     fclaw_patch_t *old_patch, *new_patch;
 
     FCLAW_ASSERT (!old_domain->pp_owned);
@@ -1865,7 +1865,7 @@ fclaw2d_domain_indirect_begin (fclaw2d_domain_t * domain)
     int *pbdata, *pi;
     int *rproc, *rblockno, *rpatchno, *rfaceno;
     size_t data_size;
-    fclaw2d_block_t *block;
+    fclaw_block_t *block;
     fclaw2d_domain_indirect_t *ind;
     fclaw2d_patch_relation_t prel;
     p4est_wrap_t *wrap = (p4est_wrap_t *) domain->pp;

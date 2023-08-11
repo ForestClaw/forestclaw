@@ -133,7 +133,7 @@ static void
 mark_patches (fclaw_smooth_t * s)
 {
     int ib, ip;
-    fclaw2d_block_t *block;
+    fclaw_block_t *block;
     fclaw_patch_t *patch;
 
     for (ib = 0; ib < s->domain->num_blocks; ++ib)

@@ -73,7 +73,7 @@ void patch_data_new(fclaw2d_global_t* glob,
 #if 0   
     /* This check is dubious, since glob->domain is the old domain */
 #ifdef FCLAW_ENABLE_DEBUG
-    fclaw2d_block_t *block = &glob->domain->blocks[this_block_idx];
+    fclaw_block_t *block = &glob->domain->blocks[this_block_idx];
 #endif
     if (!(0 <= this_patch_idx && this_patch_idx < block->num_patches))
     {
@@ -104,7 +104,7 @@ void fclaw2d_patch_reset_data(fclaw2d_global_t* glob,
 #if 0 
     /* This check may be bogus, since glob->domain is the old domain */
 #ifdef FCLAW_ENABLE_DEBUG
-    fclaw2d_block_t *block = glob->domain->blocks + blockno;
+    fclaw_block_t *block = glob->domain->blocks + blockno;
 #endif
     FCLAW_ASSERT (0 <= new_patchno && new_patchno < block->num_patches);    
 #endif    
@@ -827,7 +827,7 @@ void fclaw2d_patch_get_info(fclaw2d_domain_t * domain,
                             int *level)
 
 {
-	fclaw2d_block_t *block = &domain->blocks[blockno];
+	fclaw_block_t *block = &domain->blocks[blockno];
 
     /* For blockno = 0, we have 
                patchno == local_num.
@@ -856,7 +856,7 @@ void fclaw2d_patch_get_info2(fclaw2d_domain_t * domain,
 	*this_patch_idx = pdata->patch_idx;
 	*this_block_idx = pdata->block_idx;
 
-	fclaw2d_block_t *this_block = &domain->blocks[*this_block_idx];
+	fclaw_block_t *this_block = &domain->blocks[*this_block_idx];
 
 	*global_num = domain->global_num_patches_before +
 		(this_block->num_patches_before + *this_patch_idx);
