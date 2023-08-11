@@ -725,7 +725,7 @@ fclaw2d_output_vtk_coordinate_cb (fclaw_global_t * glob,
                                 &xlower,&ylower,&dx,&dy);
 
     const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
-    fclaw2d_map_context_t* cont = fclaw2d_global_get_map(glob);
+    fclaw2d_map_context_t* cont = fclaw_global_get_map_2d(glob);
 
     /* Enumerate point coordinates in the patch */
     double *d = (double *) a;
@@ -766,7 +766,7 @@ fclaw3d_output_vtk_coordinate_cb (fclaw_global_t * glob,
                                 &xlower,&ylower,&zlower, &dx,&dy, &dz);
 
     const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
-    fclaw2d_map_context_t* cont = fclaw2d_global_get_map(glob);
+    fclaw2d_map_context_t* cont = fclaw_global_get_map_2d(glob);
     /* Enumerate point coordinates in the patch */
     double *d = (double *) a;
     int i, j, k;

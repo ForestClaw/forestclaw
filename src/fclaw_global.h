@@ -96,15 +96,15 @@ void fclaw_global_destroy (fclaw_global_t * glob);
 void fclaw_global_store_domain (fclaw_global_t* glob,
                                   struct fclaw_domain* domain);
 
-void fclaw2d_global_store_map (fclaw_global_t* glob,
+void fclaw_global_store_map_2d (fclaw_global_t* glob,
                                struct fclaw2d_map_context * map);
 
-fclaw2d_map_context_t* fclaw2d_global_get_map(fclaw_global_t* glob);
+fclaw2d_map_context_t* fclaw_global_get_map_2d(fclaw_global_t* glob);
 
-void fclaw3d_global_store_map (fclaw_global_t* glob,
+void fclaw_global_store_map_3d (fclaw_global_t* glob,
                                fclaw3d_map_context_t * map);
 
-fclaw3d_map_context_t* fclaw3d_global_get_map(fclaw_global_t* glob);
+fclaw3d_map_context_t* fclaw_global_get_map_3d(fclaw_global_t* glob);
 
 void fclaw_global_iterate_level (fclaw_global_t * glob, int level,
                                    fclaw_patch_callback_t pcb, void *user);

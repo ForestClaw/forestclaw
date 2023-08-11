@@ -70,7 +70,7 @@ void create_domain_map (fclaw_global_t *glob,
     fclaw2d_domain_list_levels (domain, FCLAW_VERBOSITY_ESSENTIAL);
     fclaw2d_domain_list_neighbors (domain, FCLAW_VERBOSITY_DEBUG);
     fclaw_global_store_domain (glob, domain);
-    fclaw2d_global_store_map (glob, cont);
+    fclaw_global_store_map_2d (glob, cont);
 }
 
 static
