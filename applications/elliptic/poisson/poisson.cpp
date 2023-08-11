@@ -27,7 +27,7 @@
     
 #include <fclaw2d_include_all.h>
 
-#include <fclaw2d_output.h>
+#include <fclaw_output.h>
 #include <fclaw2d_diagnostics.h>
 
 #include <fclaw2d_elliptic_solver.h>
@@ -100,7 +100,7 @@ void run_program(fclaw_global_t* glob)
 
     /* Output rhs */
     int Frame = 0;
-    fclaw2d_output_frame(glob,Frame);
+    fclaw_output_frame(glob,Frame);
  
     /* Solve the elliptic problem */
     fclaw2d_elliptic_solve(glob);
@@ -110,7 +110,7 @@ void run_program(fclaw_global_t* glob)
 
     /* Output solution */
     Frame = 1;
-    fclaw2d_output_frame(glob,Frame);
+    fclaw_output_frame(glob,Frame);
 
     /* ---------------------------------------------------------------
        Finalize

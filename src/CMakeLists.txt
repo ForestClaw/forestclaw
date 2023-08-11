@@ -6,6 +6,7 @@ add_library(forestclaw_c OBJECT
   fclaw_base.c 
   fclaw_domain.c
   fclaw_options.c 
+  fclaw_output.c
   fclaw_filesystem.cpp
   fclaw_gauges.c 
   fclaw_global.c
@@ -26,7 +27,6 @@ add_library(forestclaw_c OBJECT
   fclaw2d_elliptic_solver.c
   fclaw2d_physical_bc.c
   fclaw2d_ghost_fill.c
-  fclaw2d_output.c
   fclaw2d_run.c
   fclaw2d_diagnostics.c
   fclaw2d_rays.c
@@ -109,29 +109,34 @@ add_library(FORESTCLAW::FORESTCLAW INTERFACE IMPORTED GLOBAL)
 target_link_libraries(FORESTCLAW::FORESTCLAW INTERFACE forestclaw)
 
 install(FILES
+  forestclaw.h
+
+	fclaw_advance.h 
   fclaw_base.h 
 	fclaw_domain.h
 	fclaw_gauges.h 
 	fclaw_global.h 
 	fclaw_filesystem.h 
 	fclaw_options.h 
+	fclaw_output.h
 	fclaw_package.h 
 	fclaw_pointer_map.h 
 	fclaw_timer.h 
 	fclaw_mpi.h 
 	fclaw_math.h 
 	fclaw_vtable.h
+
 	forestclaw2d.h 
+
 	fp_exception_glibc_extension.h 
+
   fclaw2d_include_all.h 
 	fclaw2d_defs.h 
-	fclaw_advance.h 
 	fclaw2d_elliptic_solver.h 
 	fclaw2d_farraybox.hpp 
 	fclaw2d_forestclaw.h
 	fclaw2d_block.h
 	fclaw2d_patch.h
-	fclaw2d_output.h
 	fclaw2d_time_sync.h
 	fclaw2d_update_single_step.h
 	fclaw2d_physical_bc.h
@@ -149,15 +154,16 @@ install(FILES
 	fclaw2d_map_query.h
 	fclaw2d_map_query_defs.h
 	fclaw2d_diagnostics.h
+
   fclaw2d_to_3d.h
   forestclaw3d.h
+
   fclaw3d_convenience.h
   fclaw3d_defs.h
   fclaw3d_map.h
   fclaw3d_patch.h
   fclaw3d_exchange.h
   fclaw3d_include_all.h 
-  forestclaw.h
   DESTINATION include
 )
 

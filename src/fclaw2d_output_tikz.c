@@ -23,7 +23,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <fclaw2d_output.h>
+#include <fclaw_output.h>
 #include <fclaw_base.h>   /* Needed for MPI declarations */
 
 #include <fclaw2d_map_brick.h>
@@ -158,6 +158,12 @@ cb_tikz_output (fclaw_domain_t * domain,
 
 void fclaw2d_output_frame_tikz(fclaw_global_t* glob, int iframe)
 {
+    if(glob->domain->dim == 3)
+    {
+        fclaw_global_essentialf("Tikz output not supported in 3d\n");
+        exit(1);
+    }
+
     fclaw_domain_t *domain = glob->domain;
     fclaw2d_tikz_info_t s_tikz;
 

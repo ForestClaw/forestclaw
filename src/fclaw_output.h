@@ -36,7 +36,7 @@ extern "C"
 
 struct fclaw_global;  /* This is a hack !! */
 
-void fclaw2d_output_frame(struct fclaw_global * glob, int iframe);
+void fclaw_output_frame(struct fclaw_global * glob, int iframe);
 
 void fclaw2d_output_frame_tikz(struct fclaw_global* glob, int iframe);
 

@@ -29,7 +29,7 @@
 
 #include <fclaw2d_include_all.h>
 
-#include <fclaw2d_output.h>
+#include <fclaw_output.h>
 #include <fclaw_global.h>
 #include <fclaw2d_diagnostics.h>
 

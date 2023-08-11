@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_options.h>
 #include <fclaw_advance.h>
 #include <fclaw2d_regrid.h>
-#include <fclaw2d_output.h>
+#include <fclaw_output.h>
 #include <fclaw2d_diagnostics.h>
 #include <fclaw_vtable.h>
 
@@ -135,7 +135,7 @@ void outstyle_1(fclaw_global_t *glob)
 
     int iframe = 0;
 
-    fclaw2d_output_frame(glob,iframe);
+    fclaw_output_frame(glob,iframe);
 
     const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
 
@@ -228,7 +228,7 @@ void outstyle_1(fclaw_global_t *glob)
         fclaw2d_diagnostics_gather(glob, init_flag);
         glob->curr_time = t_curr;
         iframe++;
-        fclaw2d_output_frame(glob,iframe);
+        fclaw_output_frame(glob,iframe);
     }
 }
 
@@ -250,7 +250,7 @@ void outstyle_3(fclaw_global_t *glob)
     init_flag = 0;
 
     int iframe = 0;
-    fclaw2d_output_frame(glob,iframe);
+    fclaw_output_frame(glob,iframe);
 
 
     const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
@@ -347,7 +347,7 @@ void outstyle_3(fclaw_global_t *glob)
         {
             iframe++;
             //fclaw2d_diagnostics_gather(glob,init_flag);
-            fclaw2d_output_frame(glob,iframe);
+            fclaw_output_frame(glob,iframe);
         }
     }
 }
@@ -359,7 +359,7 @@ void outstyle_4(fclaw_global_t *glob)
 
     /* Write out an initial time file */
     int iframe = 0;
-    fclaw2d_output_frame(glob,iframe);
+    fclaw_output_frame(glob,iframe);
 
     int init_flag = 1;
     fclaw2d_diagnostics_gather(glob,init_flag);
@@ -410,7 +410,7 @@ void outstyle_4(fclaw_global_t *glob)
         {
             fclaw2d_diagnostics_gather(glob,init_flag);
             iframe++;
-            fclaw2d_output_frame(glob,iframe);
+            fclaw_output_frame(glob,iframe);
         }
     }
 }

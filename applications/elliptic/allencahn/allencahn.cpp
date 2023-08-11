@@ -27,7 +27,7 @@
     
 #include <fclaw2d_include_all.h>
 
-#include <fclaw2d_output.h>
+#include <fclaw_output.h>
 #include <fclaw2d_diagnostics.h>
 
 #include <fclaw2d_elliptic_solver.h>

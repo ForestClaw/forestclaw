@@ -23,7 +23,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <fclaw2d_output.h>
+#include <fclaw_output.h>
 #include <fclaw_global.h>
 #include <fclaw_options.h>
 #include <fclaw_vtable.h>
@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     -------------------------------------------------------------------- */
 
 void
-fclaw2d_output_frame (fclaw_global_t * glob, int iframe)
+fclaw_output_frame (fclaw_global_t * glob, int iframe)
 {
     const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
 
