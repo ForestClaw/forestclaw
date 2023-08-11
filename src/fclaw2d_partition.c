@@ -48,7 +48,7 @@ void cb_partition_pack(fclaw_domain_t *domain,
     int patch_num = this_block->num_patches_before + patchno;
     void* pack_data_here = (void*) ((void**)g->user)[patch_num];
 
-    fclaw2d_patch_partition_pack(g->glob,patch,
+    fclaw_patch_partition_pack(g->glob,patch,
                                  blockno,patchno,
                                  pack_data_here);
 }
@@ -92,7 +92,7 @@ void  cb_partition_transfer(fclaw_domain_t * old_domain,
 
         /* pass in new_domain, since glob only contains old domain at this point
         and the both domains are needed to increment/decrement patches */
-        fclaw2d_patch_partition_unpack(g->glob,new_domain,new_patch,
+        fclaw_patch_partition_unpack(g->glob,new_domain,new_patch,
                                        blockno,new_patchno,unpack_data_from_here);
 
         /* Reason for the following two lines: the glob contains the old domain 
@@ -122,7 +122,7 @@ void fclaw2d_partition_domain(fclaw_global_t* glob,
     /* allocate memory for parallel transfor of patches
        use data size (in bytes per patch) below. */
     fclaw_timer_start (&glob->timers[FCLAW_TIMER_PARTITION_BUILD]);
-    size_t psize = fclaw2d_patch_partition_packsize(glob);
+    size_t psize = fclaw_patch_partition_packsize(glob);
     size_t data_size = psize;  /* Includes sizeof(data_type) */
     void ** patch_data = NULL;
 

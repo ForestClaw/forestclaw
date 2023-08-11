@@ -104,7 +104,7 @@ static void cb_interface_wrap(fclaw_domain_t* domain,
 							  int this_patch_idx,
 							  void *user)
 {
-	if (fclaw2d_patch_on_coarsefine_interface(this_patch))
+	if (fclaw_patch_on_coarsefine_interface(this_patch))
 	{
 		cb_parallel_wrap(domain,
 						 this_patch,
@@ -127,7 +127,7 @@ static void cb_parallel_wrap(fclaw_domain_t* domain,
 	fclaw_global_iterate_t* s = (fclaw_global_iterate_t*) user;  
 	
 	fclaw2d_ghost_fill_wrap_info_t w = *((fclaw2d_ghost_fill_wrap_info_t*) s->user);
-	int on_boundary = fclaw2d_patch_on_parallel_boundary(this_patch);
+	int on_boundary = fclaw_patch_on_parallel_boundary(this_patch);
 	if (((w.ghost_mode == FCLAW2D_BOUNDARY_GHOST_ONLY) && on_boundary) ||
 		((w.ghost_mode == FCLAW2D_BOUNDARY_INTERIOR_ONLY) && !on_boundary) ||
 		w.ghost_mode == FCLAW2D_BOUNDARY_ALL)

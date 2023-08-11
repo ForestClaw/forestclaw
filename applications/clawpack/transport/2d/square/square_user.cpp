@@ -82,7 +82,7 @@ void cb_square_output_ascii (fclaw_domain_t * domain,
 
     /* Get info not readily available to user */
     int level, patch_num, global_num;
-    fclaw2d_patch_get_info(glob->domain,patch,
+    fclaw_patch_get_info(glob->domain,patch,
                            blockno,patchno,
                            &global_num, &patch_num,&level);
     

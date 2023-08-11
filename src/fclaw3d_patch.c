@@ -23,21 +23,3 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#define P4_TO_P8
-#include "fclaw2d_patch.c"
-
-void fclaw3d_patch_set_edge_type(fclaw_patch_t *patch,int iedge,
-								   fclaw_patch_relation_t edge_type)
-{
-	fclaw_patch_data_t *pdata = get_patch_data(patch);
-	pdata->d3->edge_neighbors[iedge] = edge_type;
-}
-
-fclaw_patch_relation_t fclaw3d_patch_get_edge_type(fclaw_patch_t* patch,
-													   int iedge)
-{
-	fclaw_patch_data_t *pdata = get_patch_data(patch);
-	FCLAW_ASSERT(pdata->neighbors_set != 0);
-	FCLAW_ASSERT(0 <= iedge && iedge < FCLAW3D_NUMEDGES);
-	return pdata->d3->edge_neighbors[iedge];
-}

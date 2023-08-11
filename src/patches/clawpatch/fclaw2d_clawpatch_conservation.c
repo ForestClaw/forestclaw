@@ -234,7 +234,7 @@ void fclaw2d_clawpatch_time_sync_reset(fclaw_global_t *glob,
 	
 	meqn = clawpatch_opt->meqn;
 
-	fclaw_patch_data_t* pdata = fclaw2d_patch_get_patch_data(this_patch);
+	fclaw_patch_data_t* pdata = fclaw_patch_get_patch_data(this_patch);
 
 	int fine_level = coarse_level+1;
 	int reset_flux;
@@ -465,10 +465,10 @@ void fclaw2d_clawpatch_time_sync_samesize (struct fclaw_global* glob,
 	/* Include this for debugging */
 	int this_blockno, this_patchno,globnum,level;
 	int neighbor_blockno, neighbor_patchno;
-	fclaw2d_patch_get_info2(glob->domain,this_patch,&this_blockno, &this_patchno,
+	fclaw_patch_get_info2(glob->domain,this_patch,&this_blockno, &this_patchno,
 							&globnum,&level);
 
-	fclaw2d_patch_get_info2(glob->domain,neighbor_patch,&neighbor_blockno, 
+	fclaw_patch_get_info2(glob->domain,neighbor_patch,&neighbor_blockno, 
 							&neighbor_patchno,&globnum,&level);
 
     /* This function is defined in fc2d_clawpack4.6 and fc2d_clawpack5  */

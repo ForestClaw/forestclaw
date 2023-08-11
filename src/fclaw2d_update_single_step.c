@@ -56,7 +56,7 @@ void cb_single_step(fclaw_domain_t *domain,
     double dt = ss_data->dt;
     double t = ss_data->t;
     
-    maxcfl = fclaw2d_patch_single_step_update(g->glob,this_patch,
+    maxcfl = fclaw_patch_single_step_update(g->glob,this_patch,
                                               this_block_idx,
                                               this_patch_idx,t,dt,
                                               &ss_data->buffer_data);

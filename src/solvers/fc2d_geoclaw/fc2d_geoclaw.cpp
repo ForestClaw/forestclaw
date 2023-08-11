@@ -314,7 +314,7 @@ double geoclaw_step2(fclaw_global_t *glob,
     double* gp = new double[size];
     double* gm = new double[size];
 
-    int* block_corner_count = fclaw2d_patch_block_corner_count(glob,patch);
+    int* block_corner_count = fclaw_patch_block_corner_count(glob,patch);
 
     /* Still need conservation fix */
 

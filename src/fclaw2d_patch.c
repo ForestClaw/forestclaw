@@ -27,17 +27,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_global.h>
 #include <fclaw_domain.h>
 
-#ifndef P4_TO_P8
 #include <fclaw2d_patch.h>
 #include <fclaw2d_defs.h>
-#else
-#include <fclaw3d_patch.h>
 #include <fclaw3d_defs.h>
-#include <fclaw2d_to_3d.h>
-#define d2 d3
-#define fclaw_patch_vtable_d2_t fclaw_patch_vtable_d3_t
-#define fclaw_patch_data_d2_t fclaw_patch_data_d3_t
-#endif
 
 struct fclaw_patch_transform_data;
 
@@ -89,12 +81,20 @@ void patch_data_new(fclaw_global_t* glob,
 	FCLAW_ASSERT(patch_vt->patch_new != NULL);
 	pdata->user_patch = patch_vt->patch_new();
 
-	fclaw2d_domain_data_t *ddata = glob->domain->d2;
-	++ddata->count_set_patch; //this is now in cb_fclaw2d_regrid_repopulate 
+	if(glob->domain->dim == 2)
+	{
+		fclaw2d_domain_data_t *ddata = glob->domain->d2;
+		++ddata->count_set_patch; //this is now in cb_fclaw_regrid_repopulate 
+	}
+	else 
+	{
+		fclaw3d_domain_data_t *ddata = glob->domain->d3;
+		++ddata->count_set_patch; //this is now in cb_fclaw_regrid_repopulate 
+	}
 	pdata->neighbors_set = 0;
 }
 
-void fclaw2d_patch_reset_data(fclaw_global_t* glob,
+void fclaw_patch_reset_data(fclaw_global_t* glob,
 							  fclaw_patch_t* old_patch,
 							  fclaw_patch_t* new_patch,
 							  int blockno,int old_patchno, int new_patchno)
@@ -107,7 +107,7 @@ void fclaw2d_patch_reset_data(fclaw_global_t* glob,
 	/* Everything else will hopefully sort itself out ... */
 }
 
-void fclaw2d_patch_data_delete(fclaw_global_t *glob,
+void fclaw_patch_data_delete(fclaw_global_t *glob,
 							   fclaw_patch_t *this_patch)
 {
 	fclaw_patch_vtable_t *patch_vt = fclaw_patch_vt(glob);
@@ -121,9 +121,17 @@ void fclaw2d_patch_data_delete(fclaw_global_t *glob,
             patch_vt->destroy_user_data(glob,this_patch);
         }
 
-        fclaw2d_domain_data_t *ddata = glob->domain->d2;
         patch_vt->patch_delete(pdata->user_patch);
-        ++ddata->count_delete_patch;
+		if(glob->domain->dim == 2)
+		{
+        	fclaw2d_domain_data_t *ddata = glob->domain->d2;
+        	++ddata->count_delete_patch;
+		}
+		else 
+		{
+        	fclaw3d_domain_data_t *ddata = glob->domain->d3;
+        	++ddata->count_delete_patch;
+		}
 
 		if(pdata->dim == 2)
 		{
@@ -138,7 +146,7 @@ void fclaw2d_patch_data_delete(fclaw_global_t *glob,
 	}
 }
 
-void fclaw2d_patch_build(fclaw_global_t *glob,
+void fclaw_patch_build(fclaw_global_t *glob,
 						 fclaw_patch_t *this_patch,
 						 int blockno,
 						 int patchno,
@@ -157,7 +165,7 @@ void fclaw2d_patch_build(fclaw_global_t *glob,
 					user);
 
 #if 0
-	fclaw2d_patch_data_t *pdata = get_patch_data(this_patch);
+	fclaw_patch_data_t *pdata = get_patch_data(this_patch);
 	pdata->blockno = blockno;
 #endif    
 
@@ -177,7 +185,7 @@ void fclaw2d_patch_build(fclaw_global_t *glob,
 
 
 
-void fclaw2d_patch_build_from_fine(fclaw_global_t *glob,
+void fclaw_patch_build_from_fine(fclaw_global_t *glob,
                                    fclaw_patch_t *fine_patches,
                                    fclaw_patch_t *coarse_patch,
                                    int blockno,
@@ -214,7 +222,7 @@ void fclaw2d_patch_build_from_fine(fclaw_global_t *glob,
 
 /* --------------------------- Solver specific functions ------------------------------ */
 
-void fclaw2d_patch_initialize(fclaw_global_t *glob,
+void fclaw_patch_initialize(fclaw_global_t *glob,
 							  fclaw_patch_t *this_patch,
 							  int this_block_idx,
 							  int this_patch_idx)
@@ -228,7 +236,7 @@ void fclaw2d_patch_initialize(fclaw_global_t *glob,
 
 
 
-void fclaw2d_patch_physical_bc(fclaw_global_t *glob,
+void fclaw_patch_physical_bc(fclaw_global_t *glob,
 							   fclaw_patch_t *this_patch,
 							   int this_block_idx,
 							   int this_patch_idx,
@@ -243,7 +251,7 @@ void fclaw2d_patch_physical_bc(fclaw_global_t *glob,
 							t,dt,intersects_bc,time_interp);
 }
 
-double fclaw2d_patch_single_step_update(fclaw_global_t *glob,
+double fclaw_patch_single_step_update(fclaw_global_t *glob,
                                         fclaw_patch_t *this_patch,
                                         int this_block_idx,
                                         int this_patch_idx,
@@ -260,7 +268,7 @@ double fclaw2d_patch_single_step_update(fclaw_global_t *glob,
 }
 
 
-void fclaw2d_patch_set_rhs(fclaw_global_t *glob,
+void fclaw_patch_set_rhs(fclaw_global_t *glob,
                            fclaw_patch_t *patch,
                            int blockno,
                            int patchno)
@@ -275,7 +283,7 @@ void fclaw2d_patch_set_rhs(fclaw_global_t *glob,
 
 /* ------------------------------------ time stepping --------------------------------- */
 
-void fclaw2d_patch_restore_step(fclaw_global_t* glob,
+void fclaw_patch_restore_step(fclaw_global_t* glob,
 								fclaw_patch_t* this_patch)
 {
 	fclaw_patch_vtable_t *patch_vt = fclaw_patch_vt(glob);
@@ -285,7 +293,7 @@ void fclaw2d_patch_restore_step(fclaw_global_t* glob,
 }
 
 /* This is called from libraries routines (clawpack4.6, clawpack5, etc) */
-void fclaw2d_patch_save_step(fclaw_global_t* glob,
+void fclaw_patch_save_step(fclaw_global_t* glob,
 							 fclaw_patch_t* this_patch)
 {
 	fclaw_patch_vtable_t *patch_vt = fclaw_patch_vt(glob);
@@ -293,7 +301,7 @@ void fclaw2d_patch_save_step(fclaw_global_t* glob,
 	patch_vt->save_step(glob, this_patch);
 }
 
-void fclaw2d_patch_setup_timeinterp(fclaw_global_t *glob,
+void fclaw_patch_setup_timeinterp(fclaw_global_t *glob,
 									fclaw_patch_t *this_patch,
 									double alpha)
 {
@@ -305,7 +313,7 @@ void fclaw2d_patch_setup_timeinterp(fclaw_global_t *glob,
 	
 /* ---------------------------------- Ghost filling  ---------------------------------- */
 
-void fclaw2d_patch_copy_face(fclaw_global_t* glob,
+void fclaw_patch_copy_face(fclaw_global_t* glob,
 							 fclaw_patch_t *this_patch,
 							 fclaw_patch_t *neighbor_patch,
 							 int iface,
@@ -319,7 +327,7 @@ void fclaw2d_patch_copy_face(fclaw_global_t* glob,
 					        time_interp,transform_data);
 }
 
-void fclaw2d_patch_average_face(fclaw_global_t* glob,
+void fclaw_patch_average_face(fclaw_global_t* glob,
 								fclaw_patch_t *coarse_patch,
 								fclaw_patch_t *fine_patch,
 								int idir,
@@ -339,7 +347,7 @@ void fclaw2d_patch_average_face(fclaw_global_t* glob,
 						       transform_data);
 }
 
-void fclaw2d_patch_interpolate_face(fclaw_global_t* glob,
+void fclaw_patch_interpolate_face(fclaw_global_t* glob,
 									fclaw_patch_t *coarse_patch,
 									fclaw_patch_t *fine_patch,
 									int idir,
@@ -358,7 +366,7 @@ void fclaw2d_patch_interpolate_face(fclaw_global_t* glob,
 }
 
 
-void fclaw2d_patch_copy_corner(fclaw_global_t* glob,
+void fclaw_patch_copy_corner(fclaw_global_t* glob,
 							   fclaw_patch_t *this_patch,
 							   fclaw_patch_t *corner_patch,
 							   int coarse_blockno,
@@ -385,7 +393,7 @@ void fclaw2d_patch_copy_corner(fclaw_global_t* glob,
 	}
 }
 
-void fclaw2d_patch_average_corner(fclaw_global_t* glob,
+void fclaw_patch_average_corner(fclaw_global_t* glob,
 								  fclaw_patch_t *coarse_patch,
 								  fclaw_patch_t *fine_patch,
 								  int coarse_blockno,
@@ -414,7 +422,7 @@ void fclaw2d_patch_average_corner(fclaw_global_t* glob,
 	}
 }
 
-void fclaw2d_patch_interpolate_corner(fclaw_global_t* glob,
+void fclaw_patch_interpolate_corner(fclaw_global_t* glob,
 									  fclaw_patch_t* coarse_patch,
 									  fclaw_patch_t* fine_patch,
 									  int coarse_blockno,
@@ -449,7 +457,7 @@ void fclaw2d_patch_interpolate_corner(fclaw_global_t* glob,
 
 /* -------------------------- Transform functions ------------------------------------- */
 
-void fclaw2d_patch_transform_init_data(fclaw_global_t* glob,
+void fclaw_patch_transform_init_data(fclaw_global_t* glob,
 									   fclaw_patch_t* patch,
 									   int blockno, int patchno,
 									   fclaw_patch_transform_data_t *ftransform)
@@ -460,7 +468,7 @@ void fclaw2d_patch_transform_init_data(fclaw_global_t* glob,
 }
 
 /* This is the transform at block faces.  */
-void fclaw2d_patch_transform_blockface(fclaw_global_t* glob,
+void fclaw_patch_transform_blockface(fclaw_global_t* glob,
 	                                   int faceno, int rfaceno,
 									   int ftransform[])
 {
@@ -470,7 +478,7 @@ void fclaw2d_patch_transform_blockface(fclaw_global_t* glob,
 }
 
 /* Transform within a block, where we only have the identity transform */
-void fclaw2d_patch_transform_blockface_intra(fclaw_global_t* glob,
+void fclaw_patch_transform_blockface_intra(fclaw_global_t* glob,
 	                                         int ftransform[])
 {
 	fclaw_patch_vtable_t *patch_vt = fclaw_patch_vt(glob);
@@ -481,7 +489,7 @@ void fclaw2d_patch_transform_blockface_intra(fclaw_global_t* glob,
 
 /* ------------------------------- Regridding functions ------------------------------- */
 
-int fclaw2d_patch_tag4refinement(fclaw_global_t *glob,
+int fclaw_patch_tag4refinement(fclaw_global_t *glob,
 								 fclaw_patch_t *this_patch,
 								 int blockno, int patchno,
 								 int initflag)
@@ -493,7 +501,7 @@ int fclaw2d_patch_tag4refinement(fclaw_global_t *glob,
 									patchno, initflag);
 }
 
-int fclaw2d_patch_tag4coarsening(fclaw_global_t *glob,
+int fclaw_patch_tag4coarsening(fclaw_global_t *glob,
 									  fclaw_patch_t *fine_patches,
 									  int blockno,
 									  int patchno,
@@ -506,7 +514,7 @@ int fclaw2d_patch_tag4coarsening(fclaw_global_t *glob,
 									blockno, patchno,initflag);
 }
 
-void fclaw2d_patch_average2coarse(fclaw_global_t *glob,
+void fclaw_patch_average2coarse(fclaw_global_t *glob,
 								  fclaw_patch_t *fine_patches,
 								  fclaw_patch_t *coarse_patch,
 								  int blockno, int fine0_patchno,
@@ -520,7 +528,7 @@ void fclaw2d_patch_average2coarse(fclaw_global_t *glob,
 							 blockno,fine0_patchno,coarse_patchno);
 }
 
-void fclaw2d_patch_interpolate2fine(fclaw_global_t* glob,
+void fclaw_patch_interpolate2fine(fclaw_global_t* glob,
 									fclaw_patch_t* coarse_patch,
 									fclaw_patch_t* fine_patches,
 									int this_blockno, int coarse_patchno,
@@ -536,14 +544,14 @@ void fclaw2d_patch_interpolate2fine(fclaw_global_t* glob,
 
 /* ---------------------------- Ghost patches (local and remote) ---------------------- */
 
-size_t fclaw2d_patch_ghost_packsize(fclaw_global_t* glob)
+size_t fclaw_patch_ghost_packsize(fclaw_global_t* glob)
 {
 	fclaw_patch_vtable_t *patch_vt = fclaw_patch_vt(glob);
 	FCLAW_ASSERT(patch_vt->ghost_packsize != NULL);
 	return patch_vt->ghost_packsize(glob);
 }
 
-void fclaw2d_patch_local_ghost_alloc(fclaw_global_t* glob,
+void fclaw_patch_local_ghost_alloc(fclaw_global_t* glob,
 									 void** q)
 {
 	fclaw_patch_vtable_t *patch_vt = fclaw_patch_vt(glob);
@@ -554,13 +562,13 @@ void fclaw2d_patch_local_ghost_alloc(fclaw_global_t* glob,
 	else
 	{
 		/* This assumes that sizeof(char) = 1 */
-		size_t psize = fclaw2d_patch_ghost_packsize(glob);
+		size_t psize = fclaw_patch_ghost_packsize(glob);
 		*q = (void*) FCLAW_ALLOC(char,psize);  /* sizeof(datatype) included in psize */
 		FCLAW_ASSERT(*q != NULL);
 	}
 }
 
-void fclaw2d_patch_local_ghost_free(fclaw_global_t* glob,
+void fclaw_patch_local_ghost_free(fclaw_global_t* glob,
 									void **q)
 {
 	fclaw_patch_vtable_t *patch_vt = fclaw_patch_vt(glob);
@@ -575,7 +583,7 @@ void fclaw2d_patch_local_ghost_free(fclaw_global_t* glob,
 	}
 }
 
-void fclaw2d_patch_local_ghost_pack(fclaw_global_t *glob,
+void fclaw_patch_local_ghost_pack(fclaw_global_t *glob,
 									fclaw_patch_t *this_patch,
 									void *patch_data,
 									int time_interp)
@@ -588,7 +596,7 @@ void fclaw2d_patch_local_ghost_pack(fclaw_global_t *glob,
 							   time_interp);
 }
 
-void fclaw2d_patch_remote_ghost_build(fclaw_global_t *glob,
+void fclaw_patch_remote_ghost_build(fclaw_global_t *glob,
 									  fclaw_patch_t *this_patch,
 									  int blockno,
 									  int patchno,
@@ -609,7 +617,7 @@ void fclaw2d_patch_remote_ghost_build(fclaw_global_t *glob,
 }
 
 
-void fclaw2d_patch_remote_ghost_delete(fclaw_global_t *glob,
+void fclaw_patch_remote_ghost_delete(fclaw_global_t *glob,
 									   fclaw_patch_t *this_patch)
 {
 	fclaw_patch_vtable_t *patch_vt = fclaw_patch_vt(glob);
@@ -633,12 +641,20 @@ void fclaw2d_patch_remote_ghost_delete(fclaw_global_t *glob,
 		FCLAW_FREE(pdata);
 		this_patch->user = NULL;
 
-		fclaw2d_domain_data_t *ddata = glob->domain->d2;
-		++ddata->count_delete_patch;
+		if(glob->domain->dim == 2)
+		{
+			fclaw2d_domain_data_t *ddata = glob->domain->d2;
+			++ddata->count_delete_patch;
+		}
+		else 
+		{
+			fclaw3d_domain_data_t *ddata = glob->domain->d3;
+			++ddata->count_delete_patch;
+		}
 	}
 }
 
-void fclaw2d_patch_remote_ghost_unpack(fclaw_global_t* glob,
+void fclaw_patch_remote_ghost_unpack(fclaw_global_t* glob,
 									   fclaw_patch_t* this_patch,
 									   int this_block_idx,
 									   int this_patch_idx,
@@ -653,7 +669,7 @@ void fclaw2d_patch_remote_ghost_unpack(fclaw_global_t* glob,
 
 /* ----------------------------------- Partitioning ----------------------------------- */
 
-size_t fclaw2d_patch_partition_packsize(fclaw_global_t* glob)
+size_t fclaw_patch_partition_packsize(fclaw_global_t* glob)
 {
 	fclaw_patch_vtable_t *patch_vt = fclaw_patch_vt(glob);
 	FCLAW_ASSERT(patch_vt->partition_packsize != NULL);
@@ -661,7 +677,7 @@ size_t fclaw2d_patch_partition_packsize(fclaw_global_t* glob)
 	return patch_vt->partition_packsize(glob);
 }
 
-void fclaw2d_patch_partition_pack(fclaw_global_t *glob,
+void fclaw_patch_partition_pack(fclaw_global_t *glob,
 								  fclaw_patch_t *this_patch,
 								  int this_block_idx,
 								  int this_patch_idx,
@@ -678,7 +694,7 @@ void fclaw2d_patch_partition_pack(fclaw_global_t *glob,
 }
 
 
-void fclaw2d_patch_partition_unpack(fclaw_global_t *glob,  
+void fclaw_patch_partition_unpack(fclaw_global_t *glob,  
 									fclaw_domain_t *new_domain,
 									fclaw_patch_t *this_patch,
 									int this_block_idx,
@@ -689,7 +705,7 @@ void fclaw2d_patch_partition_unpack(fclaw_global_t *glob,
 
 	fclaw_build_mode_t build_mode = FCLAW_BUILD_FOR_UPDATE;
 
-	fclaw2d_patch_build(glob,this_patch,this_block_idx,
+	fclaw_patch_build(glob,this_patch,this_block_idx,
 						this_patch_idx,(void*) &build_mode);
 
 	/* This copied q data from memory */
@@ -705,9 +721,9 @@ void fclaw2d_patch_partition_unpack(fclaw_global_t *glob,
 
 /* ----------------------------- Conservative updates --------------------------------- */
 
-/* We need to virtualize this because we call it from fclaw2d_face_neighbors */
+/* We need to virtualize this because we call it from fclaw_face_neighbors */
 
-void fclaw2d_patch_time_sync_f2c(fclaw_global_t* glob,
+void fclaw_patch_time_sync_f2c(fclaw_global_t* glob,
 								 fclaw_patch_t *coarse_patch,
 								 fclaw_patch_t *fine_patch,
 								 int coarse_blockno, int fine_blockno,
@@ -729,7 +745,7 @@ void fclaw2d_patch_time_sync_f2c(fclaw_global_t* glob,
 }
 
 /* Correct for metric discontinuities at block boundaries */
-void fclaw2d_patch_time_sync_samesize(fclaw_global_t* glob,
+void fclaw_patch_time_sync_samesize(fclaw_global_t* glob,
                                       fclaw_patch_t *this_patch,
                                       fclaw_patch_t *neighbor_patch,
                                       int iface, int idir,
@@ -743,7 +759,7 @@ void fclaw2d_patch_time_sync_samesize(fclaw_global_t* glob,
 	                             transform_data);    
 }
 
-void fclaw2d_patch_time_sync_reset(fclaw_global_t* glob,
+void fclaw_patch_time_sync_reset(fclaw_global_t* glob,
                                    fclaw_patch_t* this_patch,
                                    int coarse_level,
                                    int reset_mode)
@@ -781,8 +797,8 @@ void fclaw_patch_vtable_initialize(fclaw_global_t* glob)
 
 	patch_vt->is_set = 1;
 
-	FCLAW_ASSERT(fclaw_pointer_map_get(glob->vtables,"fclaw2d_patch") == NULL);
-	fclaw_pointer_map_insert(glob->vtables, "fclaw2d_patch", patch_vt, patch_vt_destroy);
+	FCLAW_ASSERT(fclaw_pointer_map_get(glob->vtables,"fclaw_patch") == NULL);
+	fclaw_pointer_map_insert(glob->vtables, "fclaw_patch", patch_vt, patch_vt_destroy);
 }
 
 /* ------------------------------ User access functions ------------------------------- */
@@ -790,7 +806,7 @@ void fclaw_patch_vtable_initialize(fclaw_global_t* glob)
 fclaw_patch_vtable_t* fclaw_patch_vt(fclaw_global_t* glob)
 {
 	fclaw_patch_vtable_t* patch_vt = (fclaw_patch_vtable_t*) 
-	   							fclaw_pointer_map_get(glob->vtables, "fclaw2d_patch");
+	   							fclaw_pointer_map_get(glob->vtables, "fclaw_patch");
 	FCLAW_ASSERT(patch_vt != NULL);
 	FCLAW_ASSERT(patch_vt->is_set != 0);
 	return patch_vt;
@@ -800,7 +816,7 @@ fclaw_patch_vtable_t* fclaw_patch_vt(fclaw_global_t* glob)
 
 
 /* Use this one if you have the patch or block number */
-void fclaw2d_patch_get_info(fclaw_domain_t * domain,
+void fclaw_patch_get_info(fclaw_domain_t * domain,
 							fclaw_patch_t * patch,
 							int blockno, int patchno,
 							int *global_num, int *local_num, 
@@ -823,7 +839,7 @@ void fclaw2d_patch_get_info(fclaw_domain_t * domain,
 }
 
 /* Use this one if you don't have the patch or block number */
-void fclaw2d_patch_get_info2(fclaw_domain_t * domain,
+void fclaw_patch_get_info2(fclaw_domain_t * domain,
 							fclaw_patch_t * this_patch,
 							int *this_block_idx, int *this_patch_idx,
 							int *global_num, int *level)
@@ -847,26 +863,26 @@ void fclaw2d_patch_get_info2(fclaw_domain_t * domain,
 
 
 void*
-fclaw2d_patch_get_user_patch(fclaw_patch_t* patch)
+fclaw_patch_get_user_patch(fclaw_patch_t* patch)
 
 {
 	return get_user_patch(patch);
 }
 
 fclaw_patch_data_t*
-fclaw2d_patch_get_patch_data(fclaw_patch_t* patch)
+fclaw_patch_get_patch_data(fclaw_patch_t* patch)
 {
 	return get_patch_data(patch);
 }
 
-void* fclaw2d_patch_get_user_data(fclaw_global_t* glob,
+void* fclaw_patch_get_user_data(fclaw_global_t* glob,
                                   fclaw_patch_t* this_patch)
 {
     fclaw_patch_data_t *pdata = get_patch_data(this_patch);
     return pdata->user_data;
 }
 
-void fclaw2d_patch_set_user_data(fclaw_global_t* glob,
+void fclaw_patch_set_user_data(fclaw_global_t* glob,
                                  fclaw_patch_t* this_patch, 
                                  void* user)
 {
@@ -875,7 +891,7 @@ void fclaw2d_patch_set_user_data(fclaw_global_t* glob,
 }
 
 
-void* fclaw2d_patch_metric_patch(fclaw_global_t* glob,
+void* fclaw_patch_metric_patch(fclaw_global_t* glob,
                                  fclaw_patch_t *patch)
 {
 	fclaw_patch_vtable_t* patch_vt = fclaw_patch_vt(glob);    
@@ -884,7 +900,7 @@ void* fclaw2d_patch_metric_patch(fclaw_global_t* glob,
 }
 
 int
-fclaw2d_patch_get_blockno(fclaw_patch_t* this_patch)
+fclaw_patch_get_blockno(fclaw_patch_t* this_patch)
 {
 	/* This is is really only here if we fail to pass in the blockno to a patch 
 	routine.  */
@@ -894,7 +910,7 @@ fclaw2d_patch_get_blockno(fclaw_patch_t* this_patch)
 }
 
 int
-fclaw2d_patch_get_patchno(fclaw_patch_t* this_patch)
+fclaw_patch_get_patchno(fclaw_patch_t* this_patch)
 {
 	/* This is is really only here if we fail to pass in the patchno to a patch 
 	routine.  */
@@ -906,14 +922,14 @@ fclaw2d_patch_get_patchno(fclaw_patch_t* this_patch)
 
 /* -------------------------- Internal ForestClaw functions --------------------------- */
 
-void fclaw2d_patch_set_face_type(fclaw_patch_t *patch,int iface,
+void fclaw_patch_set_face_type(fclaw_patch_t *patch,int iface,
 								 fclaw_patch_relation_t face_type)
 {
 	fclaw_patch_data_t *pdata = get_patch_data(patch);
 	pdata->d2->face_neighbors[iface] = face_type;
 }
 
-void fclaw2d_patch_set_corner_type(fclaw_patch_t *patch,int icorner,
+void fclaw_patch_set_corner_type(fclaw_patch_t *patch,int icorner,
 								   fclaw_patch_relation_t corner_type)
 {
 	fclaw_patch_data_t *pdata = get_patch_data(patch);
@@ -921,13 +937,13 @@ void fclaw2d_patch_set_corner_type(fclaw_patch_t *patch,int icorner,
 	pdata->d2->corners[icorner] = 1;
 }
 
-void fclaw2d_patch_set_missing_corner(fclaw_patch_t *patch,int icorner)
+void fclaw_patch_set_missing_corner(fclaw_patch_t *patch,int icorner)
 {
 	fclaw_patch_data_t *pdata = get_patch_data(patch);
 	pdata->d2->corners[icorner] = 0;
 }
 
-fclaw_patch_relation_t fclaw2d_patch_get_face_type(fclaw_patch_t* patch,
+fclaw_patch_relation_t fclaw_patch_get_face_type(fclaw_patch_t* patch,
 													 int iface)
 {
 	fclaw_patch_data_t *pdata = get_patch_data(patch);
@@ -936,7 +952,7 @@ fclaw_patch_relation_t fclaw2d_patch_get_face_type(fclaw_patch_t* patch,
 	return pdata->d2->face_neighbors[iface];
 }
 
-fclaw_patch_relation_t fclaw2d_patch_get_corner_type(fclaw_patch_t* patch,
+fclaw_patch_relation_t fclaw_patch_get_corner_type(fclaw_patch_t* patch,
 													   int icorner)
 {
 	fclaw_patch_data_t *pdata = get_patch_data(patch);
@@ -945,14 +961,14 @@ fclaw_patch_relation_t fclaw2d_patch_get_corner_type(fclaw_patch_t* patch,
 	return pdata->d2->corner_neighbors[icorner];
 }
 
-int fclaw2d_patch_corner_is_missing(fclaw_patch_t* patch,
+int fclaw_patch_corner_is_missing(fclaw_patch_t* patch,
 									int icorner)
 {
 	fclaw_patch_data_t *pdata = get_patch_data(patch);
 	return !pdata->d2->corners[icorner];
 }
 
-void fclaw2d_patch_neighbors_set(fclaw_patch_t* patch)
+void fclaw_patch_neighbors_set(fclaw_patch_t* patch)
 {
 	int iface, icorner;
 #ifdef P4_TO_P8
@@ -1013,45 +1029,45 @@ void fclaw2d_patch_neighbors_set(fclaw_patch_t* patch)
 	pdata->neighbors_set = 1;
 }
 
-void fclaw2d_patch_neighbors_reset(fclaw_patch_t* patch)
+void fclaw_patch_neighbors_reset(fclaw_patch_t* patch)
 {
 	fclaw_patch_data_t *pdata = get_patch_data(patch);
 	pdata->neighbors_set = 0;
 }
 
-int fclaw2d_patch_neighbor_type_set(fclaw_patch_t* patch)
+int fclaw_patch_neighbor_type_set(fclaw_patch_t* patch)
 {
 	fclaw_patch_data_t *pdata = get_patch_data(patch);
 	return pdata->neighbors_set;
 }
 
 
-int fclaw2d_patch_has_finegrid_neighbors(fclaw_patch_t *patch)
+int fclaw_patch_has_finegrid_neighbors(fclaw_patch_t *patch)
 {
 	fclaw_patch_data_t *pdata = get_patch_data(patch);
 	return pdata->has_finegrid_neighbors;
 }
 
-int fclaw2d_patch_on_coarsefine_interface(fclaw_patch_t *patch)
+int fclaw_patch_on_coarsefine_interface(fclaw_patch_t *patch)
 {
 	fclaw_patch_data_t *pdata = get_patch_data(patch);
 	return pdata->on_coarsefine_interface;
 }
 
 int
-fclaw2d_patch_on_parallel_boundary (const fclaw_patch_t * patch)
+fclaw_patch_on_parallel_boundary (const fclaw_patch_t * patch)
 {
 	return patch->flags & FCLAW2D_PATCH_ON_PARALLEL_BOUNDARY ? 1 : 0;
 }
 
-int* fclaw2d_patch_block_corner_count(fclaw_global_t* glob,
+int* fclaw_patch_block_corner_count(fclaw_global_t* glob,
 									  fclaw_patch_t* this_patch)
 {
 	fclaw_patch_data_t *pdata = get_patch_data(this_patch);
 	return pdata->d2->block_corner_count;
 }
 
-void fclaw2d_patch_set_block_corner_count(fclaw_global_t* glob,
+void fclaw_patch_set_block_corner_count(fclaw_global_t* glob,
 										  fclaw_patch_t* this_patch,
 										  int icorner, int block_corner_count)
 {
@@ -1059,6 +1075,18 @@ void fclaw2d_patch_set_block_corner_count(fclaw_global_t* glob,
 	pdata->d2->block_corner_count[icorner] = block_corner_count;
 }
 
+void fclaw3d_patch_set_edge_type(fclaw_patch_t *patch,int iedge,
+								   fclaw_patch_relation_t edge_type)
+{
+	fclaw_patch_data_t *pdata = get_patch_data(patch);
+	pdata->d3->edge_neighbors[iedge] = edge_type;
+}
 
-
-
+fclaw_patch_relation_t fclaw3d_patch_get_edge_type(fclaw_patch_t* patch,
+													   int iedge)
+{
+	fclaw_patch_data_t *pdata = get_patch_data(patch);
+	FCLAW_ASSERT(pdata->neighbors_set != 0);
+	FCLAW_ASSERT(0 <= iedge && iedge < FCLAW3D_NUMEDGES);
+	return pdata->d3->edge_neighbors[iedge];
+}

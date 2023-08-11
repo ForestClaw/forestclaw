@@ -52,7 +52,7 @@ void cb_restore_time_step(fclaw_domain_t *domain,
                           void *user)
 {
     fclaw_global_iterate_t* s = (fclaw_global_iterate_t*) user;
-    fclaw2d_patch_restore_step(s->glob,this_patch);
+    fclaw_patch_restore_step(s->glob,this_patch);
 }
 
 static
@@ -72,7 +72,7 @@ void cb_save_time_step(fclaw_domain_t *domain,
                        void *user)
 {
     fclaw_global_iterate_t* s = (fclaw_global_iterate_t*) user;
-    fclaw2d_patch_save_step(s->glob,this_patch);
+    fclaw_patch_save_step(s->glob,this_patch);
 }
 
 static

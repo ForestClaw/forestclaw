@@ -62,7 +62,7 @@ void cb_fclaw2d_regrid_tag4refinement(fclaw_domain_t *domain,
     if (level < maxlevel)
     {
         refine_patch  =
-            fclaw2d_patch_tag4refinement(g->glob,this_patch,this_block_idx,
+            fclaw_patch_tag4refinement(g->glob,this_patch,this_block_idx,
                                          this_patch_idx, domain_init);
         if (refine_patch == 1)
         {
@@ -91,7 +91,7 @@ void cb_regrid_tag4coarsening(fclaw_domain_t *domain,
     if (level > minlevel)
     {
         int family_coarsened = 1;
-        family_coarsened = fclaw2d_patch_tag4coarsening(g->glob,&fine_patches[0],
+        family_coarsened = fclaw_patch_tag4coarsening(g->glob,&fine_patches[0],
                                                         blockno, fine0_patchno,
                                                         domain_init);
         if (family_coarsened == 1)
@@ -152,11 +152,11 @@ void cb_fclaw2d_regrid_repopulate(fclaw_domain_t * old_domain,
             --ddata_old->count_set_patch;
             ++ddata_new->count_set_patch;
 
-            fclaw2d_patch_build(g->glob,fine_patch,blockno,
+            fclaw_patch_build(g->glob,fine_patch,blockno,
                                 fine_patchno,(void*) &build_mode);
             if (domain_init)
             {
-                fclaw2d_patch_initialize(g->glob,fine_patch,blockno,fine_patchno);//new_domain
+                fclaw_patch_initialize(g->glob,fine_patch,blockno,fine_patchno);//new_domain
             }
         }
 
@@ -165,11 +165,11 @@ void cb_fclaw2d_regrid_repopulate(fclaw_domain_t * old_domain,
             int coarse_patchno = old_patchno;
             int fine_patchno = new_patchno;
 
-            fclaw2d_patch_interpolate2fine(g->glob,coarse_patch,fine_siblings,
+            fclaw_patch_interpolate2fine(g->glob,coarse_patch,fine_siblings,
                                            blockno,coarse_patchno,fine_patchno);//new_domain
         }
         /* used to pass in old_domain */
-        fclaw2d_patch_data_delete(g->glob,coarse_patch);
+        fclaw_patch_data_delete(g->glob,coarse_patch);
     }
     else if (newsize == FCLAW_PATCH_DOUBLESIZE)
     {
@@ -197,18 +197,18 @@ void cb_fclaw2d_regrid_repopulate(fclaw_domain_t * old_domain,
         
         if (domain_init)
         {
-            fclaw2d_patch_build(g->glob,coarse_patch,blockno,
+            fclaw_patch_build(g->glob,coarse_patch,blockno,
                                 coarse_patchno,(void*) &build_mode);
-            fclaw2d_patch_initialize(g->glob,coarse_patch,blockno,coarse_patchno);
+            fclaw_patch_initialize(g->glob,coarse_patch,blockno,coarse_patchno);
         }
         else
         {
             /* Area (and possibly other things) should be averaged to coarse grid. */
-            fclaw2d_patch_build_from_fine(g->glob,fine_siblings,coarse_patch,
+            fclaw_patch_build_from_fine(g->glob,fine_siblings,coarse_patch,
                                           blockno,coarse_patchno,fine_patchno,
                                           build_mode);
             /* Average the solution. Does this need to be customizable? */
-            fclaw2d_patch_average2coarse(g->glob,fine_siblings,coarse_patch,
+            fclaw_patch_average2coarse(g->glob,fine_siblings,coarse_patch,
                                         blockno,fine_patchno,coarse_patchno);
 
         }
@@ -217,7 +217,7 @@ void cb_fclaw2d_regrid_repopulate(fclaw_domain_t * old_domain,
         {
             fclaw_patch_t* fine_patch = &fine_siblings[i];
             /* used to pass in old_domain */
-            fclaw2d_patch_data_delete(g->glob,fine_patch);
+            fclaw_patch_data_delete(g->glob,fine_patch);
         }
     }
     else
@@ -225,7 +225,7 @@ void cb_fclaw2d_regrid_repopulate(fclaw_domain_t * old_domain,
         fclaw_global_essentialf("cb_adapt_domain : newsize not recognized\n");
         exit(1);
     }
-    fclaw2d_patch_neighbors_reset(new_patch);
+    fclaw_patch_neighbors_reset(new_patch);
 }
 
 /* ----------------------------------------------------------------
@@ -360,7 +360,7 @@ void cb_set_neighbor_types(fclaw_domain_t *domain,
 									 rpatchno,
 									 &rfaceno);
 
-		fclaw2d_patch_set_face_type(this_patch,iface,neighbor_type);
+		fclaw_patch_set_face_type(this_patch,iface,neighbor_type);
 	}
 
 	for (icorner = 0; icorner < 4; icorner++)
@@ -382,13 +382,13 @@ void cb_set_neighbor_types(fclaw_domain_t *domain,
 									   &rcornerno,
 									   &neighbor_type);
 
-		fclaw2d_patch_set_corner_type(this_patch,icorner,neighbor_type);
+		fclaw_patch_set_corner_type(this_patch,icorner,neighbor_type);
 		if (!has_corner_neighbor)
 		{
-			fclaw2d_patch_set_missing_corner(this_patch,icorner);
+			fclaw_patch_set_missing_corner(this_patch,icorner);
 		}
 	}
-	fclaw2d_patch_neighbors_set(this_patch);
+	fclaw_patch_neighbors_set(this_patch);
 }
 
 /* Set neighbor type : samesize, halfsize, or doublesize */

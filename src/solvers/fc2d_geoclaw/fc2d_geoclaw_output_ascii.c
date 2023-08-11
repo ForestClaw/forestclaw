@@ -48,7 +48,7 @@ void cb_geoclaw_output_ascii(fclaw_domain_t *domain,
 
     /* Get info not readily available to user */
     int local_num, global_num, level;
-    fclaw2d_patch_get_info(glob->domain,patch,
+    fclaw_patch_get_info(glob->domain,patch,
                            blockno,patchno,
                            &global_num, 
                            &local_num,&level);

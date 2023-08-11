@@ -93,7 +93,7 @@ static
 fclaw_clawpatch_t* get_clawpatch(fclaw_patch_t *patch)
 {
     fclaw_clawpatch_t *cp = (fclaw_clawpatch_t*) 
-                     fclaw2d_patch_get_user_patch(patch);
+                     fclaw_patch_get_user_patch(patch);
     return cp;
 }
 
@@ -247,7 +247,7 @@ void clawpatch_define(fclaw_global_t* glob,
 
     for (int icorner=0; icorner < 4; icorner++)
     {
-        fclaw2d_patch_set_block_corner_count(glob,patch,icorner,0);
+        fclaw_patch_set_block_corner_count(glob,patch,icorner,0);
     }
 
     fclaw2d_map_context_t* cont = fclaw_global_get_map_2d(glob);

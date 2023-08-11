@@ -113,7 +113,7 @@ void build_remote_ghost_patches(fclaw_global_t* glob)
            need to be passed in */
         patchno = i;
 
-        fclaw2d_patch_remote_ghost_build(glob,ghost_patch,blockno,
+        fclaw_patch_remote_ghost_build(glob,ghost_patch,blockno,
                                          patchno, build_mode);
     }
     fclaw_infof("[%d] Done building remote ghost patches : %d\n",
@@ -129,7 +129,7 @@ void delete_remote_ghost_patches(fclaw_global_t* glob)
     {
         fclaw_patch_t* ghost_patch = &domain->ghost_patches[i];
         
-        fclaw2d_patch_remote_ghost_delete(glob,ghost_patch);
+        fclaw_patch_remote_ghost_delete(glob,ghost_patch);
     }
 }
 
@@ -163,7 +163,7 @@ unpack_remote_ghost_patches(fclaw_global_t* glob,
             {
                 unpack_to_timeinterp_patch = 1;
             }
-            fclaw2d_patch_remote_ghost_unpack(glob, ghost_patch, blockno,
+            fclaw_patch_remote_ghost_unpack(glob, ghost_patch, blockno,
                                               patchno, q, unpack_to_timeinterp_patch);
         }
     }
@@ -180,7 +180,7 @@ void fclaw2d_exchange_setup(fclaw_global_t* glob,
     /* Time spend in build here is negligible and is included in regrid */
     fclaw_timer_start (&glob->timers[FCLAW_TIMER_GHOSTPATCH_BUILD]);
 
-    size_t psize = fclaw2d_patch_ghost_packsize(glob);
+    size_t psize = fclaw_patch_ghost_packsize(glob);
     size_t data_size = psize;  /* Includes sizeof(datatype), i.e. sizeof(double) */
     fclaw2d_domain_exchange_t *e;
 
@@ -207,7 +207,7 @@ void fclaw2d_exchange_setup(fclaw_global_t* glob,
             if (domain->blocks[nb].patches[np].flags &
                 FCLAW2D_PATCH_ON_PARALLEL_BOUNDARY)
             {                
-                fclaw2d_patch_local_ghost_alloc(glob, &e->patch_data[zz++]);
+                fclaw_patch_local_ghost_alloc(glob, &e->patch_data[zz++]);
             }
         }
     }
@@ -287,7 +287,7 @@ void fclaw2d_exchange_delete(fclaw_global_t* glob)
                 if ((*domain)->blocks[nb].patches[np].flags &
                     FCLAW2D_PATCH_ON_PARALLEL_BOUNDARY)
                 {
-                    fclaw2d_patch_local_ghost_free(glob,&e_old->patch_data[zz++]);
+                    fclaw_patch_local_ghost_free(glob,&e_old->patch_data[zz++]);
                 }
             }
         }
@@ -340,7 +340,7 @@ void fclaw2d_exchange_ghost_patches_begin(fclaw_global_t* glob,
                 int pack_time_interp = time_interp && level == minlevel-1;
 
                 /* Pack q and area into one contingous block */
-                fclaw2d_patch_local_ghost_pack(glob,this_patch,
+                fclaw_patch_local_ghost_pack(glob,this_patch,
                                                e->patch_data[zz++],
                                                pack_time_interp);
             }

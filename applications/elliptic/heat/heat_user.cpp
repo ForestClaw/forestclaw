@@ -256,7 +256,7 @@ void cb_heat_output_ascii(fclaw_domain_t * domain,
     /* Get info not readily available to user */
     int global_num, local_num;
     int level;
-    fclaw2d_patch_get_info(glob->domain,patch,
+    fclaw_patch_get_info(glob->domain,patch,
                            blockno,patchno,
                            &global_num,&local_num, &level);
     

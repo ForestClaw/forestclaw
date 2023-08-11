@@ -59,7 +59,7 @@ void cb_time_sync_reset(fclaw_domain_t *domain,
 	int reset_mode = tstype->reset_mode;
 	int coarse_level = tstype->coarse_level;
 
-	fclaw2d_patch_time_sync_reset(glob,this_patch,coarse_level,reset_mode);
+	fclaw_patch_time_sync_reset(glob,this_patch,coarse_level,reset_mode);
 
 }
 

@@ -311,7 +311,7 @@ double clawpack46_step2(fclaw_global_t *glob,
 	fclaw2d_clawpatch_registers_t* cr = 
 		  fclaw2d_clawpatch_get_registers(glob,patch);
 
-	int* block_corner_count = fclaw2d_patch_block_corner_count(glob,patch);
+	int* block_corner_count = fclaw_patch_block_corner_count(glob,patch);
 
 	/* Evaluate fluxes needed in correction terms */
 	if (fclaw_opt->time_sync && fclaw_opt->flux_correction)

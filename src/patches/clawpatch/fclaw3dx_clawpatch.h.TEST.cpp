@@ -99,10 +99,10 @@ struct SinglePatchDomain {
     }
     void setup(){
         fclaw_build_mode_t build_mode = FCLAW_BUILD_FOR_UPDATE;
-        fclaw2d_patch_build(glob, &domain->blocks[0].patches[0], 0, 0, &build_mode);
+        fclaw_patch_build(glob, &domain->blocks[0].patches[0], 0, 0, &build_mode);
     }
     ~SinglePatchDomain(){
-        fclaw2d_patch_data_delete(glob, &domain->blocks[0].patches[0]);
+        fclaw_patch_data_delete(glob, &domain->blocks[0].patches[0]);
         fclaw_clawpatch_options_destroy(opts);
         fclaw_global_destroy(glob);
     }
@@ -147,16 +147,16 @@ struct QuadDomain {
     }
     void setup(){
         fclaw_build_mode_t build_mode = FCLAW_BUILD_FOR_UPDATE;
-        fclaw2d_patch_build(glob, &domain->blocks[0].patches[0], 0, 0, &build_mode);
-        fclaw2d_patch_build(glob, &domain->blocks[0].patches[1], 0, 1, &build_mode);
-        fclaw2d_patch_build(glob, &domain->blocks[0].patches[2], 0, 2, &build_mode);
-        fclaw2d_patch_build(glob, &domain->blocks[0].patches[3], 0, 3, &build_mode);
+        fclaw_patch_build(glob, &domain->blocks[0].patches[0], 0, 0, &build_mode);
+        fclaw_patch_build(glob, &domain->blocks[0].patches[1], 0, 1, &build_mode);
+        fclaw_patch_build(glob, &domain->blocks[0].patches[2], 0, 2, &build_mode);
+        fclaw_patch_build(glob, &domain->blocks[0].patches[3], 0, 3, &build_mode);
     }
     ~QuadDomain(){
-        fclaw2d_patch_data_delete(glob, &domain->blocks[0].patches[0]);
-        fclaw2d_patch_data_delete(glob, &domain->blocks[0].patches[1]);
-        fclaw2d_patch_data_delete(glob, &domain->blocks[0].patches[2]);
-        fclaw2d_patch_data_delete(glob, &domain->blocks[0].patches[3]);
+        fclaw_patch_data_delete(glob, &domain->blocks[0].patches[0]);
+        fclaw_patch_data_delete(glob, &domain->blocks[0].patches[1]);
+        fclaw_patch_data_delete(glob, &domain->blocks[0].patches[2]);
+        fclaw_patch_data_delete(glob, &domain->blocks[0].patches[3]);
         fclaw_clawpatch_options_destroy(opts);
         fclaw_global_destroy(glob);
     }
@@ -267,7 +267,7 @@ TEST_CASE("fclaw3dx_clawpatch patch_build")
 
         fclaw_domain_data_new(glob->domain);
         CHECK(domain->blocks[0].patches[0].user == nullptr);
-        fclaw2d_patch_build(glob, &domain->blocks[0].patches[0], 0, 0, &build_mode);
+        fclaw_patch_build(glob, &domain->blocks[0].patches[0], 0, 0, &build_mode);
         CHECK(domain->blocks[0].patches[0].user != nullptr);
 
         fclaw_clawpatch_t* cp = fclaw2d_clawpatch_get_clawpatch(&domain->blocks[0].patches[0]);
@@ -325,7 +325,7 @@ TEST_CASE("fclaw3dx_clawpatch patch_build")
             CHECK_BOX_DIMENSIONS(cp->elliptic_soln, opts->mbc, opts->d3->mx, opts->d3->my, opts->d3->mz, opts->rhs_fields);
         }
 
-        fclaw2d_patch_data_delete(glob, &domain->blocks[0].patches[0]);
+        fclaw_patch_data_delete(glob, &domain->blocks[0].patches[0]);
         fclaw_global_destroy(glob);
     }
 }
@@ -337,7 +337,7 @@ TEST_CASE("fclaw3dx_clawpatch save_step")
 
     fclaw_clawpatch_t* cp = fclaw2d_clawpatch_get_clawpatch(&test_data.domain->blocks[0].patches[0]);
     cp->griddata.dataPtr()[0] = 1234;
-    fclaw2d_patch_save_step(test_data.glob,&test_data.domain->blocks[0].patches[0]);
+    fclaw_patch_save_step(test_data.glob,&test_data.domain->blocks[0].patches[0]);
     CHECK(cp->griddata_save.dataPtr()[0] == 1234);
 }
 
@@ -361,7 +361,7 @@ TEST_CASE("fclaw3dx_clawpatch restore_step")
     //CHECK
     fclaw_clawpatch_t* cp = fclaw2d_clawpatch_get_clawpatch(&test_data.domain->blocks[0].patches[0]);
     cp->griddata_save.dataPtr()[0] = 1234;
-    fclaw2d_patch_restore_step(test_data.glob,&test_data.domain->blocks[0].patches[0]);
+    fclaw_patch_restore_step(test_data.glob,&test_data.domain->blocks[0].patches[0]);
     CHECK(cp->griddata.dataPtr()[0] == 1234);
 }
 
@@ -779,8 +779,8 @@ TEST_CASE("fclaw3dx_clawpatch setup_timeinterp")
         CHECK(*alpha == timeinterp_alpha);
     };
 
-    fclaw2d_patch_setup_timeinterp(test_data.glob, &test_data.domain->blocks[0].patches[0], 
-                                   timeinterp_alpha);
+    fclaw_patch_setup_timeinterp(test_data.glob, &test_data.domain->blocks[0].patches[0], 
+                                 timeinterp_alpha);
 }
 namespace{
     fclaw_clawpatch_t* t4r_cp;
@@ -829,7 +829,7 @@ TEST_CASE("fclaw3dx_clawpatch tag4refinement")
             *tag_patch = t4r_tag_patch;
         };
 
-        CHECK(fclaw2d_patch_tag4refinement(test_data.glob, &test_data.domain->blocks[0].patches[0], 0, 0, t4r_init_flag) == t4r_tag_patch);
+        CHECK(fclaw_patch_tag4refinement(test_data.glob, &test_data.domain->blocks[0].patches[0], 0, 0, t4r_init_flag) == t4r_tag_patch);
     }
 }
 TEST_CASE("fclaw3dx_clawpatch tag4refinement negative refine threshold")
@@ -842,7 +842,7 @@ TEST_CASE("fclaw3dx_clawpatch tag4refinement negative refine threshold")
 
         t4r_init_flag = init_flag;
 
-        CHECK(fclaw2d_patch_tag4refinement(test_data.glob, &test_data.domain->blocks[0].patches[0], 0, 0, t4r_init_flag) == true);
+        CHECK(fclaw_patch_tag4refinement(test_data.glob, &test_data.domain->blocks[0].patches[0], 0, 0, t4r_init_flag) == true);
     }
 }
 namespace{
@@ -903,7 +903,7 @@ TEST_CASE("fclaw3dx_clawpatch tag4coarsening")
                 *tag_patch = t4c_tag_patch;
             };
 
-            CHECK(fclaw2d_patch_tag4coarsening(test_data.glob, &test_data.domain->blocks[0].patches[0], 0, 0, t4c_init_flag) == t4c_tag_patch);
+            CHECK(fclaw_patch_tag4coarsening(test_data.glob, &test_data.domain->blocks[0].patches[0], 0, 0, t4c_init_flag) == t4c_tag_patch);
         }
     }
 }
@@ -917,7 +917,7 @@ TEST_CASE("fclaw3dx_clawpatch tag4coarsening negative coarsen threshold")
         test_data.fopts.coarsen_threshold = -0.90210;
         test_data.setup();
 
-        CHECK(fclaw2d_patch_tag4coarsening(test_data.glob, &test_data.domain->blocks[0].patches[0], 0, 0, t4c_init_flag) == false);
+        CHECK(fclaw_patch_tag4coarsening(test_data.glob, &test_data.domain->blocks[0].patches[0], 0, 0, t4c_init_flag) == false);
     }
 }
 namespace{
@@ -986,7 +986,7 @@ TEST_CASE("fclaw3dx_clawpatch interpolate2fine")
         CHECK(*manifold == i2f_manifold);
     };
 
-    fclaw2d_patch_interpolate2fine(coarse_test_data.glob,
+    fclaw_patch_interpolate2fine(coarse_test_data.glob,
                                    &coarse_test_data.domain->blocks[0].patches[0],
                                    &fine_test_data.domain->blocks[0].patches[0],
                                    0, 0, 0);

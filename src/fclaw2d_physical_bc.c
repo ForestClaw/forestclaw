@@ -65,7 +65,7 @@ void cb_fclaw2d_physical_set_bc(fclaw_domain_t *domain,
 
     double dt = 1e20;  /* Signals that not a good idea to use dt in this context */
     fclaw2d_physical_get_bc(s->glob,this_block_idx,this_patch_idx,intersects_bc);
-    fclaw2d_patch_physical_bc(s->glob,
+    fclaw_patch_physical_bc(s->glob,
                               this_patch,
                               this_block_idx,
                               this_patch_idx,

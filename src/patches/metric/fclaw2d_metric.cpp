@@ -67,7 +67,7 @@ static
 fclaw2d_metric_patch_t* get_metric_patch(fclaw_global_t* glob,
                                          fclaw_patch_t *patch)
 {
-    return (fclaw2d_metric_patch_t*) fclaw2d_patch_metric_patch(glob, patch);
+    return (fclaw2d_metric_patch_t*) fclaw_patch_metric_patch(glob, patch);
 }
 
 

@@ -350,7 +350,7 @@ double clawpack46_step3(fclaw_global_t *glob,
 	double* hm = FCLAW_ALLOC(double,size);
 
 	int ierror = 0;
-	int* block_corner_count = fclaw2d_patch_block_corner_count(glob,patch);
+	int* block_corner_count = fclaw_patch_block_corner_count(glob,patch);
 
 #if 0
 	if (claw46_vt->flux2 == NULL)

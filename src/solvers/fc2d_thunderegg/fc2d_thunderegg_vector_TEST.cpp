@@ -85,16 +85,16 @@ struct QuadDomain {
     }
     void setup(){
         fclaw_build_mode_t build_mode = FCLAW_BUILD_FOR_UPDATE;
-        fclaw2d_patch_build(glob, &domain->blocks[0].patches[0], 0, 0, &build_mode);
-        fclaw2d_patch_build(glob, &domain->blocks[0].patches[1], 0, 1, &build_mode);
-        fclaw2d_patch_build(glob, &domain->blocks[0].patches[2], 0, 2, &build_mode);
-        fclaw2d_patch_build(glob, &domain->blocks[0].patches[3], 0, 3, &build_mode);
+        fclaw_patch_build(glob, &domain->blocks[0].patches[0], 0, 0, &build_mode);
+        fclaw_patch_build(glob, &domain->blocks[0].patches[1], 0, 1, &build_mode);
+        fclaw_patch_build(glob, &domain->blocks[0].patches[2], 0, 2, &build_mode);
+        fclaw_patch_build(glob, &domain->blocks[0].patches[3], 0, 3, &build_mode);
     }
     ~QuadDomain(){
-        fclaw2d_patch_data_delete(glob, &domain->blocks[0].patches[0]);
-        fclaw2d_patch_data_delete(glob, &domain->blocks[0].patches[1]);
-        fclaw2d_patch_data_delete(glob, &domain->blocks[0].patches[2]);
-        fclaw2d_patch_data_delete(glob, &domain->blocks[0].patches[3]);
+        fclaw_patch_data_delete(glob, &domain->blocks[0].patches[0]);
+        fclaw_patch_data_delete(glob, &domain->blocks[0].patches[1]);
+        fclaw_patch_data_delete(glob, &domain->blocks[0].patches[2]);
+        fclaw_patch_data_delete(glob, &domain->blocks[0].patches[3]);
         fclaw_clawpatch_options_destroy(opts);
         fclaw_global_destroy(glob);
     }
@@ -140,16 +140,16 @@ struct QuadDomainBrick {
     }
     void setup(){
         fclaw_build_mode_t build_mode = FCLAW_BUILD_FOR_UPDATE;
-        fclaw2d_patch_build(glob, &domain->blocks[0].patches[0], 0, 0, &build_mode);
-        fclaw2d_patch_build(glob, &domain->blocks[1].patches[0], 1, 0, &build_mode);
-        fclaw2d_patch_build(glob, &domain->blocks[2].patches[0], 2, 0, &build_mode);
-        fclaw2d_patch_build(glob, &domain->blocks[3].patches[0], 3, 0, &build_mode);
+        fclaw_patch_build(glob, &domain->blocks[0].patches[0], 0, 0, &build_mode);
+        fclaw_patch_build(glob, &domain->blocks[1].patches[0], 1, 0, &build_mode);
+        fclaw_patch_build(glob, &domain->blocks[2].patches[0], 2, 0, &build_mode);
+        fclaw_patch_build(glob, &domain->blocks[3].patches[0], 3, 0, &build_mode);
     }
     ~QuadDomainBrick(){
-        fclaw2d_patch_data_delete(glob, &domain->blocks[0].patches[0]);
-        fclaw2d_patch_data_delete(glob, &domain->blocks[1].patches[0]);
-        fclaw2d_patch_data_delete(glob, &domain->blocks[2].patches[0]);
-        fclaw2d_patch_data_delete(glob, &domain->blocks[3].patches[0]);
+        fclaw_patch_data_delete(glob, &domain->blocks[0].patches[0]);
+        fclaw_patch_data_delete(glob, &domain->blocks[1].patches[0]);
+        fclaw_patch_data_delete(glob, &domain->blocks[2].patches[0]);
+        fclaw_patch_data_delete(glob, &domain->blocks[3].patches[0]);
         fclaw_clawpatch_options_destroy(opts);
         fclaw_global_destroy(glob);
     }
