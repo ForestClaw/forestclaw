@@ -51,7 +51,7 @@ int FCLAW2D_CLAWPATCH_TAG_CRITERIA(const int* blockno,
                                         const int* init_flag,
                                         const int* is_ghost)
 {
-    struct fclaw_global* glob = fclaw2d_global_get_global();
+    struct fclaw_global* glob = fclaw_global_get_static_global();
     fclaw_clawpatch_vtable_t* clawpatch_vt = fclaw_clawpatch_vt(glob);
 
     clawpatch_fort_exceeds_threshold_t user_exceeds_threshold = 

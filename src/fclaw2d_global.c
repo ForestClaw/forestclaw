@@ -244,7 +244,7 @@ void fclaw_global_clear_static (void)
     fclaw2d_global_glob = NULL;
 }
 
-fclaw_global_t* fclaw2d_global_get_global (void)
+fclaw_global_t* fclaw_global_get_static_global (void)
 {
     FCLAW_ASSERT(fclaw2d_global_glob != NULL);
     return fclaw2d_global_glob;

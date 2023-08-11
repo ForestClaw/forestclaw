@@ -71,15 +71,8 @@ void fclaw2d_global_store_map (fclaw_global_t* glob,
 fclaw2d_map_context_t* fclaw2d_global_get_map(fclaw_global_t* glob);
 
 /**
- * @brief Get the static glob variable
- *
- * @return fclaw_global_t* the glob variable
- */
-fclaw_global_t* fclaw2d_global_get_global (void);
-
-/**
  * @brief
- *
+
  * @param glob
  */
 void fclaw2d_set_global_context(fclaw_global_t *glob);

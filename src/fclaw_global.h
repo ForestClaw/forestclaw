@@ -166,6 +166,13 @@ void fclaw_global_set_static (fclaw_global_t* glob);
  */
 void fclaw_global_clear_static (void);
 
+/**
+ * @brief Get the static glob variable
+ *
+ * @return fclaw_global_t* the glob variable
+ */
+fclaw_global_t* fclaw_global_get_static_global (void);
+
 #ifdef __cplusplus
 #if 0
 {                               /* need this because indent is dumb */
