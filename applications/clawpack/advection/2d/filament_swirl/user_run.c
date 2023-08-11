@@ -28,7 +28,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_forestclaw.h>
 #include <fclaw_global.h>
 #include <fclaw2d_options.h>
-#include <fclaw2d_advance.h>
+#include <fclaw_advance.h>
 #include <fclaw2d_regrid.h>
 #include <fclaw2d_output.h>
 #include <fclaw2d_diagnostics.h>
@@ -194,7 +194,7 @@ double outstyle_1(outstyle_1_context_t* ctx, double t_pause, fclaw_global_t *glo
                 }
             }
             glob->curr_dt = ctx->dt_step;  
-            ctx->maxcfl_step = fclaw2d_advance_all_levels(glob, ctx->t_curr,ctx->dt_step);
+            ctx->maxcfl_step = fclaw_advance_all_levels(glob, ctx->t_curr,ctx->dt_step);
 
             if (fclaw_opt->reduce_cfl)
             {
@@ -365,7 +365,7 @@ void outstyle_3(fclaw_global_t *glob)
 
         /* Get current domain data since it may change during regrid */
         glob->curr_dt = dt_step;
-        double maxcfl_step = fclaw2d_advance_all_levels(glob, t_curr,dt_step);
+        double maxcfl_step = fclaw_advance_all_levels(glob, t_curr,dt_step);
 
         /* This is a collective communication - everybody needs to wait here. */
         if (fclaw_opt->reduce_cfl)
@@ -468,7 +468,7 @@ void outstyle_4(fclaw_global_t *glob)
     while (n < nstep_outer)
     {
         /* Get current domain data since it may change during regrid */
-        fclaw2d_advance_all_levels(glob, t_curr, dt_minlevel);
+        fclaw_advance_all_levels(glob, t_curr, dt_minlevel);
 
         int level2print = (fclaw_opt->advance_one_step && fclaw_opt->outstyle_uses_maxlevel) ?
                           fclaw_opt->maxlevel : fclaw_opt->minlevel;

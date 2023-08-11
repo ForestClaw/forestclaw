@@ -30,7 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_forestclaw.h>
 #include <fclaw_global.h>
 #include <fclaw2d_options.h>
-#include <fclaw2d_advance.h>
+#include <fclaw_advance.h>
 #include <fclaw2d_regrid.h>
 #include <fclaw2d_output.h>
 #include <fclaw2d_diagnostics.h>
@@ -120,7 +120,7 @@ double step_dtopo(fclaw_global_t *glob, double tstart_outer, double tend_outer,
 
         glob->curr_dt = dt0;  
         glob->curr_time = tstart_local;
-        double maxcfl_step = fclaw2d_advance_all_levels(glob, tstart_local, dt0);
+        double maxcfl_step = fclaw_advance_all_levels(glob, tstart_local, dt0);
         maxcfl = maxcfl_step;
         glob->curr_time += dt0;
         tstart_local += dt0;
@@ -155,7 +155,7 @@ double step_dtopo(fclaw_global_t *glob, double tstart_outer, double tend_outer,
     for(int n = 0; n < M; n++)
     {
         double tstart = glob->curr_time;
-        double maxcfl_step = fclaw2d_advance_all_levels(glob, tstart, dt1);        
+        double maxcfl_step = fclaw_advance_all_levels(glob, tstart, dt1);        
 
         /* We only keep track of maxcfl;  don't try to retake a time step */
         maxcfl = (maxcfl_step > maxcfl) ? maxcfl_step :  maxcfl;
@@ -172,7 +172,7 @@ double step_dtopo(fclaw_global_t *glob, double tstart_outer, double tend_outer,
     {
         tstart_local = tend_local;
         double dt2 = tend_outer - tstart_local;
-        double maxcfl_step = fclaw2d_advance_all_levels(glob, tstart_local, dt2);  
+        double maxcfl_step = fclaw_advance_all_levels(glob, tstart_local, dt2);  
         maxcfl = (maxcfl_step > maxcfl) ? maxcfl_step :  maxcfl;
         glob->curr_time += dt2;
     }
@@ -297,7 +297,7 @@ void outstyle_1(fclaw_global_t *glob)
             {
                 /* Just to a regular step */
                 glob->curr_dt = dt_step;
-                maxcfl_step = fclaw2d_advance_all_levels(glob, t_curr,dt_step);
+                maxcfl_step = fclaw_advance_all_levels(glob, t_curr,dt_step);
                 tc = t_curr + dt_step;        
             }
 
@@ -502,7 +502,7 @@ void outstyle_3(fclaw_global_t *glob)
         {
             /* Just to a regular step */
             glob->curr_dt = dt_step;
-            maxcfl_step = fclaw2d_advance_all_levels(glob, t_curr,dt_step);
+            maxcfl_step = fclaw_advance_all_levels(glob, t_curr,dt_step);
             tc = t_curr + dt_step;        
         }
 
@@ -615,7 +615,7 @@ void outstyle_4(fclaw_global_t *glob)
     while (n < nstep_outer)
     {
         /* Get current domain data since it may change during regrid */
-        fclaw2d_advance_all_levels(glob, t_curr, dt_minlevel);
+        fclaw_advance_all_levels(glob, t_curr, dt_minlevel);
 
         int level2print = (fclaw_opt->advance_one_step && fclaw_opt->outstyle_uses_maxlevel) ?
                           fclaw_opt->maxlevel : fclaw_opt->minlevel;

@@ -24,7 +24,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include <fclaw2d_advance.h>
+#include <fclaw_advance.h>
 #include <fclaw_math.h>
 
 #include <fclaw2d_timeinterp.h>
@@ -244,7 +244,7 @@ double advance_level(fclaw_global_t *glob,
    Main routine : Called from fclaw2d_run.
    ------------------------------------------------------------- */
 
-double fclaw2d_advance_all_levels(fclaw_global_t *glob,
+double fclaw_advance_all_levels(fclaw_global_t *glob,
 								  double t_curr, double dt)
 {
 	fclaw_domain_t* domain = glob->domain;

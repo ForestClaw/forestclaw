@@ -21,7 +21,7 @@ add_library(forestclaw_c OBJECT
   fclaw2d_map_brick.c
   fclaw2d_convenience.c
   fclaw2d_exchange.c
-  fclaw2d_advance.c
+  fclaw_advance.c
   fclaw2d_elliptic_solver.c
   fclaw2d_physical_bc.c
   fclaw2d_ghost_fill.c
@@ -124,7 +124,7 @@ install(FILES
   fclaw2d_include_all.h 
 	fclaw2d_defs.h 
 	fclaw2d_options.h 
-	fclaw2d_advance.h 
+	fclaw_advance.h 
 	fclaw2d_elliptic_solver.h 
 	fclaw2d_farraybox.hpp 
 	fclaw2d_forestclaw.h
