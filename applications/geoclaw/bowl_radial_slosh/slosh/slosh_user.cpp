@@ -51,7 +51,7 @@ fclaw_domain_t* slosh_create_domain(sc_MPI_Comm mpicomm, fclaw_options_t* gparms
 
 void slosh_run_program(fclaw_global_t* glob)
 {
-    fclaw2d_set_global_context(glob);
+    fclaw_set_global_context(glob);
 
     /* ---------------------------------------------------------------
        Set domain data.
@@ -76,5 +76,5 @@ void slosh_run_program(fclaw_global_t* glob)
 
     fclaw2d_finalize(glob);
 
-    fclaw2d_clear_global_context(glob);
+    fclaw_clear_global_context(glob);
 }

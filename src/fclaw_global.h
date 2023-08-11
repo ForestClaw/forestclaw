@@ -173,6 +173,20 @@ void fclaw_global_clear_static (void);
  */
 fclaw_global_t* fclaw_global_get_static_global (void);
 
+/**
+ * @brief
+
+ * @param glob
+ */
+void fclaw_set_global_context(fclaw_global_t *glob);
+
+/**
+ * @brief
+ *
+ * @param glob
+ */
+void fclaw_clear_global_context(fclaw_global_t *glob);
+
 #ifdef __cplusplus
 #if 0
 {                               /* need this because indent is dumb */

@@ -255,7 +255,7 @@ fclaw_global_t* fclaw_global_get_static_global (void)
 
 static char* old_path = NULL;
 
-void fclaw2d_set_global_context(fclaw_global_t *glob)
+void fclaw_set_global_context(fclaw_global_t *glob)
 {
     fclaw_options_t* opts = fclaw2d_get_options(glob);
     fclaw_set_logging_prefix(opts->logging_prefix);
@@ -268,7 +268,7 @@ void fclaw2d_set_global_context(fclaw_global_t *glob)
     }
 }
 
-void fclaw2d_clear_global_context(fclaw_global_t *glob)
+void fclaw_clear_global_context(fclaw_global_t *glob)
 {
     fclaw_set_logging_prefix(NULL);
 

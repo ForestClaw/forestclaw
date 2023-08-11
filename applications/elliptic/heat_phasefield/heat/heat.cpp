@@ -68,7 +68,7 @@ fclaw_domain_t* heat_create_domain(sc_MPI_Comm mpicomm, fclaw_options_t* fclaw_o
 
 void heat_run_program(fclaw_global_t* glob)
 {
-    fclaw2d_set_global_context(glob);
+    fclaw_set_global_context(glob);
 
     /* ---------------------------------------------------------------
        Set domain data.
@@ -99,5 +99,5 @@ void heat_run_program(fclaw_global_t* glob)
        --------------------------------------------------------------- */
     fclaw2d_finalize(glob);
 
-    fclaw2d_clear_global_context(glob);
+    fclaw_clear_global_context(glob);
 }

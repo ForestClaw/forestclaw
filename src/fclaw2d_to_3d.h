@@ -297,8 +297,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define fclaw_global_set_static       fclaw_global_set_static
 #define fclaw_global_clear_static     fclaw_global_clear_static
 #define fclaw_global_get_static_global       fclaw_global_get_static_global
-#define fclaw2d_set_global_context      fclaw3d_set_global_context
-#define fclaw2d_clear_global_context    fclaw3d_clear_global_context
+#define fclaw_set_global_context      fclaw_set_global_context
+#define fclaw_clear_global_context    fclaw_clear_global_context
 #define fclaw2d_global_get_map          fclaw3d_global_get_map
 
 /* translations for the options */

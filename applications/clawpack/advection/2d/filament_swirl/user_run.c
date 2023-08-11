@@ -535,14 +535,14 @@ void user_run(fclaw_global_t * globs[],int nglobs)
     while(!all_finished){
         for(int i=0; i< nglobs; i++){
             if(!finished[i]){
-                fclaw2d_set_global_context(globs[i]);
+                fclaw_set_global_context(globs[i]);
                 fclaw2d_problem_setup(globs[i]);
 
                 tcurr[i] = outstyle_1(&contexts[i], n*dt[i], globs[i]);
                 finished[i] = tcurr[i] >= fclaw_opts[i]->tfinal;
                 fclaw_global_productionf("Paused at time %12.4f\n\n\n",tcurr[i]);
 
-                fclaw2d_clear_global_context(globs[i]);
+                fclaw_clear_global_context(globs[i]);
             }
         }
         n++;

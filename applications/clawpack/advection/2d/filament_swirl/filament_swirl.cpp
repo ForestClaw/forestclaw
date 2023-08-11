@@ -44,7 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 static
 void filament_initialize(fclaw_global_t* glob)
 {
-    fclaw2d_set_global_context(glob);
+    fclaw_set_global_context(glob);
 
     filament_options_t             *user;
 
@@ -72,23 +72,23 @@ void filament_initialize(fclaw_global_t* glob)
 
     fclaw2d_initialize(glob);
 
-    fclaw2d_clear_global_context(glob);
+    fclaw_clear_global_context(glob);
 }
 
 static
 void filament_finalize(fclaw_global_t* glob)
 {
-    fclaw2d_set_global_context(glob);
+    fclaw_set_global_context(glob);
 
     fclaw2d_problem_setup(glob);
     fclaw2d_finalize(glob);
 
-    fclaw2d_clear_global_context(glob);
+    fclaw_clear_global_context(glob);
 }
 static
 void swirl_initialize(fclaw_global_t* glob)
 {
-    fclaw2d_set_global_context(glob);
+    fclaw_set_global_context(glob);
 
     const swirl_options_t           *swirl_opt;
 
@@ -119,17 +119,17 @@ void swirl_initialize(fclaw_global_t* glob)
        --------------------------------------------------------------- */
     fclaw2d_initialize(glob);
 
-    fclaw2d_clear_global_context(glob);
+    fclaw_clear_global_context(glob);
 }
 static
 void swirl_finalize(fclaw_global_t* glob)
 {
-    fclaw2d_set_global_context(glob);
+    fclaw_set_global_context(glob);
 
     fclaw2d_problem_setup(glob);
     fclaw2d_finalize(glob);
 
-    fclaw2d_clear_global_context(glob);
+    fclaw_clear_global_context(glob);
 }
 
 typedef struct overlap_prodata

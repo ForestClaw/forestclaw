@@ -70,20 +70,6 @@ void fclaw2d_global_store_map (fclaw_global_t* glob,
 
 fclaw2d_map_context_t* fclaw2d_global_get_map(fclaw_global_t* glob);
 
-/**
- * @brief
-
- * @param glob
- */
-void fclaw2d_set_global_context(fclaw_global_t *glob);
-
-/**
- * @brief
- *
- * @param glob
- */
-void fclaw2d_clear_global_context(fclaw_global_t *glob);
-
 #ifdef __cplusplus
 #if 0
 {                               /* need this because indent is dumb */

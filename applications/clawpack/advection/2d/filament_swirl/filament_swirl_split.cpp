@@ -38,7 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 static
 void filament_initialize(fclaw_global_t* glob)
 {
-    fclaw2d_set_global_context(glob);
+    fclaw_set_global_context(glob);
 
     filament_options_t             *user;
 
@@ -66,23 +66,23 @@ void filament_initialize(fclaw_global_t* glob)
 
     fclaw2d_initialize(glob);
 
-    fclaw2d_clear_global_context(glob);
+    fclaw_clear_global_context(glob);
 }
 
 static
 void filament_finalize(fclaw_global_t* glob)
 {
-    fclaw2d_set_global_context(glob);
+    fclaw_set_global_context(glob);
 
     fclaw2d_problem_setup(glob);
     fclaw2d_finalize(glob);
 
-    fclaw2d_clear_global_context(glob);
+    fclaw_clear_global_context(glob);
 }
 static
 void swirl_initialize(fclaw_global_t* glob)
 {
-    fclaw2d_set_global_context(glob);
+    fclaw_set_global_context(glob);
 
     const swirl_options_t           *swirl_opt;
 
@@ -113,17 +113,17 @@ void swirl_initialize(fclaw_global_t* glob)
        --------------------------------------------------------------- */
     fclaw2d_initialize(glob);
 
-    fclaw2d_clear_global_context(glob);
+    fclaw_clear_global_context(glob);
 }
 static
 void swirl_finalize(fclaw_global_t* glob)
 {
-    fclaw2d_set_global_context(glob);
+    fclaw_set_global_context(glob);
 
     fclaw2d_problem_setup(glob);
     fclaw2d_finalize(glob);
 
-    fclaw2d_clear_global_context(glob);
+    fclaw_clear_global_context(glob);
 }
 
 static
@@ -133,11 +133,11 @@ void run_programs(fclaw_global_t* globs[], int nglobs)
     {
         if(globs[i]->mpicomm != sc_MPI_COMM_NULL)
         {
-            fclaw2d_set_global_context(globs[i]);
+            fclaw_set_global_context(globs[i]);
 
             fclaw2d_problem_setup(globs[i]);
 
-            fclaw2d_clear_global_context(globs[i]);
+            fclaw_clear_global_context(globs[i]);
         }
     }
 
@@ -156,19 +156,19 @@ void run_programs(fclaw_global_t* globs[], int nglobs)
     sc_MPI_Allreduce(&one_comm, &split_comms, 1, sc_MPI_INT, sc_MPI_MIN, sc_MPI_COMM_WORLD);
 
     if(split_comms){
-        fclaw2d_set_global_context(globs[glob_index]);
+        fclaw_set_global_context(globs[glob_index]);
 
         fclaw2d_run(globs[glob_index]);
 
-        fclaw2d_clear_global_context(globs[glob_index]);
+        fclaw_clear_global_context(globs[glob_index]);
     }else{
         for(int i = 0; i < nglobs; i++)
         {
-            fclaw2d_set_global_context(globs[i]);
+            fclaw_set_global_context(globs[i]);
 
             fclaw2d_run(globs[i]);
 
-            fclaw2d_clear_global_context(globs[i]);
+            fclaw_clear_global_context(globs[i]);
         }
     }
 }
