@@ -118,7 +118,7 @@ TEST_CASE("FCLAW2D_CLAWPATCH_EXCEEDS_THRESHOLD calls user function")
                                                   params.tag_threshold,
                                                   params.init_flag,
                                                   params.is_ghost);
-    fclaw2d_global_unset_global();
+    fclaw_global_clear_static();
 
     CHECK_EQ(ret, params.return_value);
 
@@ -191,7 +191,7 @@ TEST_CASE("FCLAW3DX_CLAWPATCH_EXCEEDS_THRESHOLD calls user function")
                                                    params.tag_threshold,
                                                    params.init_flag,
                                                    params.is_ghost);
-    fclaw2d_global_unset_global();
+    fclaw_global_clear_static();
 
     CHECK_EQ(ret, params.return_value);
 

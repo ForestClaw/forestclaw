@@ -112,14 +112,14 @@ TEST_CASE("fclaw_global_set_static")
     fclaw_global_t* glob = (fclaw_global_t*)123;
     fclaw_global_set_static(glob);
     CHECK_EQ(fclaw2d_global_get_global(), glob);
-    fclaw2d_global_unset_global();
+    fclaw_global_clear_static();
 }
 
-TEST_CASE("fclaw2d_global_unset_global")
+TEST_CASE("fclaw_global_clear_static")
 {
     fclaw_global_t* glob = (fclaw_global_t*)123;
     fclaw_global_set_static(glob);
-    fclaw2d_global_unset_global();
+    fclaw_global_clear_static();
 #ifdef FCLAW_ENABLE_DEBUG
     CHECK_SC_ABORTED(fclaw2d_global_get_global());
 #else
@@ -134,12 +134,12 @@ TEST_CASE("fclaw_global_set_static twice fails")
     fclaw_global_t* glob = (fclaw_global_t*)123;
     fclaw_global_set_static(glob);
     CHECK_SC_ABORTED(fclaw_global_set_static(glob));
-    fclaw2d_global_unset_global();
+    fclaw_global_clear_static();
 }
 
-TEST_CASE("fclaw2d_global_unset_global assert fails when NULL")
+TEST_CASE("fclaw_global_clear_static assert fails when NULL")
 {
-    CHECK_SC_ABORTED(fclaw2d_global_unset_global());
+    CHECK_SC_ABORTED(fclaw_global_clear_static());
 }
 
 TEST_CASE("fclaw2d_global_get_global assert fails when NULL")

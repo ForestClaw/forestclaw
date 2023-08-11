@@ -310,7 +310,7 @@ int poisson_tag4refinement(fclaw_global_t *glob,
     clawpatch_vt->d2->fort_tag4refinement(&mx,&my,&mbc,&mfields,&xlower,&ylower,&dx,&dy,
                                           &blockno, rhs,&refine_threshold,
                                           &initflag,&tag_patch);
-    fclaw2d_global_unset_global();
+    fclaw_global_clear_static();
     return tag_patch;
 }
 
@@ -345,7 +345,7 @@ int poisson_tag4coarsening(fclaw_global_t *glob,
     clawpatch_vt->d2->fort_tag4coarsening(&mx,&my,&mbc,&mfields,&xlower,&ylower,&dx,&dy,
                                       &blockno, rhs[0],rhs[1],rhs[2],rhs[3],
                                       &coarsen_threshold,&initflag,&tag_patch);
-    fclaw2d_global_unset_global();
+    fclaw_global_clear_static();
     return tag_patch == 1;
 }
 

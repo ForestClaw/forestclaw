@@ -59,11 +59,6 @@ void fclaw3d_global_store_map (fclaw_global_t* glob,
 fclaw_map_context_t* fclaw3d_global_get_map(fclaw_global_t* glob);
 
 /**
- * @brief Set the static glob variable to NULL
- */
-void fclaw3d_global_unset_global (void);
-
-/**
  * @brief Get the static glob variable
  *
  * @return fclaw_global_t* the glob variable

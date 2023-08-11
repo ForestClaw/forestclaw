@@ -967,7 +967,7 @@ int clawpatch_tag4refinement(fclaw_global_t *glob,
                                                   &refine_threshold,
                                                   &initflag,&tag_patch);
         }
-        fclaw2d_global_unset_global();
+        fclaw_global_clear_static();
     }
     return tag_patch;
 }
@@ -1022,7 +1022,7 @@ int clawpatch_tag4coarsening(fclaw_global_t *glob,
                                                   &blockno, q[0],q[1],q[2],q[3],
                                                   &coarsen_threshold,&initflag,&tag_patch);
         }
-        fclaw2d_global_unset_global();
+        fclaw_global_clear_static();
     }
     else
     {
