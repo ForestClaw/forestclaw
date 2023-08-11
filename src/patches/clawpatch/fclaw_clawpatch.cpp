@@ -1562,9 +1562,9 @@ void fclaw_clawpatch_vtable_initialize(int dim, fclaw_global_t* glob,
     }
 
     /* Transform functions (defined in forestclaw2d */
-    patch_vt->d2->transform_init_data  = fclaw2d_clawpatch_transform_init_data;
-    patch_vt->d2->transform_face       = fclaw2d_clawpatch_face_transformation;       /* forestclaw2d.c */
-    patch_vt->d2->transform_face_intra = fclaw2d_clawpatch_face_transformation_intra; /* forestclaw2d.c */
+    patch_vt->transform_init_data  = fclaw2d_clawpatch_transform_init_data;
+    patch_vt->transform_face       = fclaw2d_clawpatch_face_transformation;       /* forestclaw2d.c */
+    patch_vt->transform_face_intra = fclaw2d_clawpatch_face_transformation_intra; /* forestclaw2d.c */
 
     /* Regridding  functions */
     patch_vt->tag4refinement       = clawpatch_tag4refinement;

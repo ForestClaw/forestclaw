@@ -491,8 +491,8 @@ void fclaw2d_patch_transform_init_data(fclaw_global_t* glob,
 									   fclaw_patch_transform_data_t *ftransform)
 {
 	fclaw_patch_vtable_t *patch_vt = fclaw_patch_vt(glob);
-	FCLAW_ASSERT(patch_vt->d2->transform_init_data != NULL);
-	patch_vt->d2->transform_init_data(glob,patch,blockno,patchno,ftransform);    
+	FCLAW_ASSERT(patch_vt->transform_init_data != NULL);
+	patch_vt->transform_init_data(glob,patch,blockno,patchno,ftransform);    
 }
 
 /* This is the transform at block faces.  */
@@ -501,8 +501,8 @@ void fclaw2d_patch_transform_blockface(fclaw_global_t* glob,
 									   int ftransform[])
 {
 	fclaw_patch_vtable_t *patch_vt = fclaw_patch_vt(glob);
-	FCLAW_ASSERT(patch_vt->d2->transform_face != NULL);
-	patch_vt->d2->transform_face(faceno, rfaceno, ftransform);
+	FCLAW_ASSERT(patch_vt->transform_face != NULL);
+	patch_vt->transform_face(faceno, rfaceno, ftransform);
 }
 
 /* Transform within a block, where we only have the identity transform */
@@ -510,8 +510,8 @@ void fclaw2d_patch_transform_blockface_intra(fclaw_global_t* glob,
 	                                         int ftransform[])
 {
 	fclaw_patch_vtable_t *patch_vt = fclaw_patch_vt(glob);
-	FCLAW_ASSERT(patch_vt->d2->transform_face_intra != NULL);
-	patch_vt->d2->transform_face_intra(ftransform);
+	FCLAW_ASSERT(patch_vt->transform_face_intra != NULL);
+	patch_vt->transform_face_intra(ftransform);
 }
 
 
