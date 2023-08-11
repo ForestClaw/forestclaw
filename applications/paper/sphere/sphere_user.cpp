@@ -62,7 +62,7 @@ void sphere_problem_setup(fclaw2d_global_t* glob)
 }
 
 void sphere_patch_setup_manifold(fclaw2d_global_t *glob,
-                                    fclaw2d_patch_t *this_patch,
+                                    fclaw_patch_t *this_patch,
                                     int blockno,
                                     int patchno)
 {
@@ -97,7 +97,7 @@ void sphere_patch_setup_manifold(fclaw2d_global_t *glob,
 
 static
 void sphere_b4step2(fclaw2d_global_t *glob,
-                    fclaw2d_patch_t *this_patch,
+                    fclaw_patch_t *this_patch,
                     int blockno,
                     int patchno,
                     double t, double dt)
@@ -127,7 +127,7 @@ void sphere_b4step2(fclaw2d_global_t *glob,
 
 static
 int sphere_tag4refinement(fclaw2d_global_t *glob,
-                          fclaw2d_patch_t *patch,
+                          fclaw_patch_t *patch,
                           int blockno, int patchno,
                           int initflag)
 {
@@ -164,14 +164,14 @@ int sphere_tag4refinement(fclaw2d_global_t *glob,
 
 static
 int sphere_tag4coarsening(fclaw2d_global_t *glob,
-                          fclaw2d_patch_t *fine_patches,
+                          fclaw_patch_t *fine_patches,
                           int blockno,
                           int patchno,
                           int initflag)
 {
     int mx,my,mbc;
     double xlower,ylower,dx,dy;
-    fclaw2d_patch_t *patch0 = &fine_patches[0];
+    fclaw_patch_t *patch0 = &fine_patches[0];
     fclaw2d_clawpatch_grid_data(glob,patch0,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
@@ -202,7 +202,7 @@ int sphere_tag4coarsening(fclaw2d_global_t *glob,
 
 static
 void cb_sphere_output_ascii (fclaw2d_domain_t * domain,
-                            fclaw2d_patch_t * this_patch,
+                            fclaw_patch_t * this_patch,
                             int this_block_idx, int this_patch_idx,
                             void *user)
 {

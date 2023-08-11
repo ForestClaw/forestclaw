@@ -43,7 +43,7 @@ extern "C"
 #endif
 
 struct fclaw2d_global;
-struct fclaw2d_patch;  /* fclaw2d_patch.h includes this file */
+struct fclaw_patch;  /* fclaw2d_patch.h includes this file */
 /** Struture to store a patch's transform data */
 struct fclaw2d_patch_transform_data;
 
@@ -57,7 +57,7 @@ struct fclaw2d_patch_transform_data;
  * @param[in,out] transform the transform data
  */
 void fclaw3dx_clawpatch_transform_init_data(struct fclaw2d_global* glob, 
-                                           struct fclaw2d_patch* this_patch,
+                                           struct fclaw_patch* this_patch,
                                            int blockno, int patchno,
                                            struct fclaw2d_patch_transform_data* transform);
 

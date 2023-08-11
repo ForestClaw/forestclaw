@@ -66,13 +66,13 @@ extern "C"
    velocities based on a streamfunction */
 
 void advection_patch_setup_manifold(fclaw2d_global_t *glob,
-                                    fclaw2d_patch_t *patch,
+                                    fclaw_patch_t *patch,
                                     int block,
                                     int patchno,
                                     int claw_version);
 
 void advection_b4step2_manifold(fclaw2d_global_t *glob,
-                                fclaw2d_patch_t *patch,
+                                fclaw_patch_t *patch,
                                 int blockno,
                                 int patchno,
                                 double t,

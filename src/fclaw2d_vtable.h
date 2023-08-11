@@ -40,7 +40,7 @@ extern "C"
  */
 
 struct fclaw2d_global;
-struct fclaw2d_patch;
+struct fclaw_patch;
 
 /* ---------------------------------- Typedefs ---------------------------------------- */  
 /**

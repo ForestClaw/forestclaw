@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 #include <fclaw2d_farraybox.hpp>  /* Needed for FArray boxes */
 
-struct fclaw2d_patch;
+struct fclaw_patch;
 struct fclaw2d_global;
 struct fclaw2d_metric_patch_t;
 struct fclaw3d_metric_patch_t;
@@ -130,7 +130,7 @@ struct fclaw_clawpatch_t
  * @return fclaw_clawpatch_t* the clawpatch structure
  */
 fclaw_clawpatch_t* 
-fclaw2d_clawpatch_get_clawpatch(struct fclaw2d_patch* this_patch);
+fclaw2d_clawpatch_get_clawpatch(struct fclaw_patch* this_patch);
 
 /**
  * @brief Get the metrix structure for a patch
@@ -139,7 +139,7 @@ fclaw2d_clawpatch_get_clawpatch(struct fclaw2d_patch* this_patch);
  * @return fclaw2d_metric_patch_t* the metric structure
  */
 fclaw2d_metric_patch_t* 
-fclaw2d_clawpatch_get_metric_patch(struct fclaw2d_patch* this_patch);
+fclaw2d_clawpatch_get_metric_patch(struct fclaw_patch* this_patch);
 
 /**
  * @brief Get the metrix structure for a patch
@@ -148,7 +148,7 @@ fclaw2d_clawpatch_get_metric_patch(struct fclaw2d_patch* this_patch);
  * @return fclaw2d_metric_patch_t* the metric structure
  */
 struct fclaw3d_metric_patch_t* 
-fclaw3dx_clawpatch_get_metric_patch(struct fclaw2d_patch* this_patch);
+fclaw3dx_clawpatch_get_metric_patch(struct fclaw_patch* this_patch);
 
 
 #endif /* !FCLAW2D_CLAWPATCH_HPP */

@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_patch.h>
 
 void fclaw2d_physical_bc_default(fclaw2d_global_t *glob,
-                                 fclaw2d_patch_t *this_patch,
+                                 fclaw_patch_t *this_patch,
                                  int this_block_idx,
                                  int this_patch_idx,
                                  double t,
@@ -44,7 +44,7 @@ void fclaw2d_physical_bc_default(fclaw2d_global_t *glob,
 }
 
 void cb_fclaw2d_physical_set_bc(fclaw2d_domain_t *domain,
-                                fclaw2d_patch_t *this_patch,
+                                fclaw_patch_t *this_patch,
                                 int this_block_idx,
                                 int this_patch_idx,
                                 void *user)

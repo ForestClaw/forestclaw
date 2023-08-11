@@ -36,11 +36,11 @@ extern "C"
 
 struct fclaw2d_global;
 struct fclaw2d_domain;
-struct fclaw2d_patch;
+struct fclaw_patch;
 
 
 void cb_face_fill(struct fclaw2d_domain *domain,
-                  struct fclaw2d_patch *this_patch,
+                  struct fclaw_patch *this_patch,
                   int this_block_idx,
                   int this_patch_idx,
                   void *user);

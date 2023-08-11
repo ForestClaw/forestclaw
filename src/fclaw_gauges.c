@@ -225,7 +225,7 @@ void gauge_update(fclaw2d_global_t *glob, void* acc)
     int i, num_gauges;
 
     fclaw2d_block_t *block;
-    fclaw2d_patch_t *patch;
+    fclaw_patch_t *patch;
     fclaw_gauge_t *g;
 
     const fclaw_options_t * fclaw_opt = fclaw2d_get_options(glob);
@@ -447,7 +447,7 @@ void fclaw_gauge_normalize_coordinates(fclaw2d_global_t *glob,
 
 void  fclaw_update_gauge(fclaw2d_global_t* glob, 
                          fclaw2d_block_t *block,
-                         fclaw2d_patch_t *patch,
+                         fclaw_patch_t *patch,
                          int blockno, int patchno,
                          double tcurr, fclaw_gauge_t *g)
 {

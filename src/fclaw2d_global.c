@@ -49,7 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 void
 fclaw2d_iterate_patch_cb
-  (fclaw2d_domain_t *domain, fclaw2d_patch_t *patch,
+  (fclaw2d_domain_t *domain, fclaw_patch_t *patch,
    int blockno, int patchno, void *user)
 {
   fclaw_global_iterate_t *gi = (fclaw_global_iterate_t *) user;
@@ -60,7 +60,7 @@ fclaw2d_iterate_patch_cb
 
 void
 fclaw2d_iterate_family_cb
-  (fclaw2d_domain_t *domain, fclaw2d_patch_t *patch,
+  (fclaw2d_domain_t *domain, fclaw_patch_t *patch,
    int blockno, int patchno, void *user)
 {
   fclaw_global_iterate_t *gi = (fclaw_global_iterate_t *) user;

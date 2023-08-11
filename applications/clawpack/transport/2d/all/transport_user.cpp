@@ -31,7 +31,7 @@ void transport_problem_setup(fclaw2d_global_t* glob)
 }
 
 void transport_patch_setup_manifold(fclaw2d_global_t *glob,
-                                    fclaw2d_patch_t *patch,
+                                    fclaw_patch_t *patch,
                                     int blockno,
                                     int patchno,
                                     int claw_version)
@@ -61,7 +61,7 @@ void transport_patch_setup_manifold(fclaw2d_global_t *glob,
 }
 
 void transport_b4step2_manifold(fclaw2d_global_t *glob,
-                                fclaw2d_patch_t *patch,
+                                fclaw_patch_t *patch,
                                 int blockno,
                                 int patchno,
                                 double t,

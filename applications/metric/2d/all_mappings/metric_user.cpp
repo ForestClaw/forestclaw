@@ -64,7 +64,7 @@ void metric_problem_setup(fclaw2d_domain_t* domain)
 }
 
 void metric_patch_initialize(fclaw2d_domain_t *domain,
-                             fclaw2d_patch_t *this_patch,
+                             fclaw_patch_t *this_patch,
                              int this_block_idx,
                              int this_patch_idx)
 {

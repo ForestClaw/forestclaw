@@ -32,7 +32,7 @@ extern "C"
 #endif
 
 struct fclaw2d_global;
-struct fclaw2d_patch;
+struct fclaw_patch;
 struct fclaw2d_domain;
 
 /** 
@@ -50,7 +50,7 @@ struct fclaw2d_domain;
  * @param user the user data pointer
  */
 void cb_clawpatch_output_ascii (struct fclaw2d_domain * domain,
-                                struct fclaw2d_patch * patch,
+                                struct fclaw_patch * patch,
                                 int blockno, int patchno,
                                 void *user);
 

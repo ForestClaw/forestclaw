@@ -43,11 +43,11 @@ extern "C"
 /* these are dimension-specific functions */
 
 void fclaw2d_iterate_patch_cb
-  (fclaw2d_domain_t *domain, fclaw2d_patch_t *patch,
+  (fclaw2d_domain_t *domain, fclaw_patch_t *patch,
    int blockno, int patchno, void *user);
 
 void fclaw2d_iterate_family_cb
-  (fclaw2d_domain_t *domain, fclaw2d_patch_t *patch,
+  (fclaw2d_domain_t *domain, fclaw_patch_t *patch,
    int blockno, int patchno, void *user);
 
 /* much of the following will move into fclaw_global.h */

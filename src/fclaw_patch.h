@@ -36,6 +36,41 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 #include <fclaw_base.h>
 
-typedef void fclaw_patch_t;
+typedef struct fclaw_patch fclaw_patch_t;
 
+struct fclaw_patch_bounds_2d
+{
+    double xlower, xupper;
+    double ylower, yupper;
+};
+
+struct fclaw_patch_bounds_3d
+{
+    double xlower, xupper;
+    double ylower, yupper;
+    double zlower, zupper;
+};
+
+/** 
+ * @brief The metadata structure for a forest leaf, which is a forestclaw patch.
+ * The patch may be either a process-local patch or a ghost patch.
+ */
+struct fclaw_patch
+{
+    int dim;
+    struct fclaw_patch_bounds_2d* d2;
+    struct fclaw_patch_bounds_3d* d3;
+    int level;                  /**< 0 is root, increases if refined */
+    int target_level;           /**< level desired after adaptation */
+    int flags;                  /**< flags that encode tree information */
+    /** Union, If this is a local patch, it points to the next patch, otherwise it gives
+     * the bock number of this patch */
+    union
+    {
+        fclaw_patch_t *next;  /**< local: next patch same level same block */
+        int blockno;            /**< off-proc: this patch's block number */
+    }
+    u;
+    void *user;                 /**< User Pointer */
+};
 #endif /* !FCLAW_PATCH_H */

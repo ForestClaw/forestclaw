@@ -49,7 +49,7 @@ void no_solver_link_solvers(fclaw2d_global_t* global)
 }
 
 void no_solver_patch_initialize(fclaw2d_global_t *glob,
-                                fclaw2d_patch_t *this_patch,
+                                fclaw_patch_t *this_patch,
                                 int this_block_idx,
                                 int this_patch_idx)
 {
@@ -67,7 +67,7 @@ void no_solver_patch_initialize(fclaw2d_global_t *glob,
 }
 
 double no_solver_update(fclaw2d_global_t *glob,
-                        fclaw2d_patch_t *this_patch,
+                        fclaw_patch_t *this_patch,
                         int this_block_idx,
                         int this_patch_idx,
                         double t,

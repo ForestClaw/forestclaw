@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 void fclaw2d_clawpatch_time_sync_new (fclaw2d_global_t* glob,
-                                      fclaw2d_patch_t* this_patch,
+                                      fclaw_patch_t* this_patch,
                                       int blockno,int patchno,
                                       fclaw2d_clawpatch_registers_t **registers)
 {
@@ -100,7 +100,7 @@ void fclaw2d_clawpatch_time_sync_new (fclaw2d_global_t* glob,
 }
 
 void fclaw2d_clawpatch_time_sync_pack_registers(fclaw2d_global_t *glob,
-                                                fclaw2d_patch_t *this_patch,
+                                                fclaw_patch_t *this_patch,
                                                 double *qpack,
                                                 int frsize, 
                                                 fclaw_clawpatch_packmode_t packmode, 
@@ -207,7 +207,7 @@ void fclaw2d_clawpatch_time_sync_pack_registers(fclaw2d_global_t *glob,
 
 
 void fclaw2d_clawpatch_time_sync_reset(fclaw2d_global_t *glob,
-                                       fclaw2d_patch_t *this_patch, 
+                                       fclaw_patch_t *this_patch, 
                                        int coarse_level,
                                        int reset_mode)
 {
@@ -325,7 +325,7 @@ void fclaw2d_clawpatch_time_sync_delete (fclaw2d_clawpatch_registers_t **registe
 
 
 void fclaw2d_clawpatch_time_sync_setup(fclaw2d_global_t* glob,
-                                       fclaw2d_patch_t* this_patch,
+                                       fclaw_patch_t* this_patch,
                                        int blockno,int patchno)
 {
 	double *area, *edgelengths, *curvature;
@@ -360,8 +360,8 @@ void fclaw2d_clawpatch_time_sync_setup(fclaw2d_global_t* glob,
 
 /* This is a patch call-back */
 void fclaw2d_clawpatch_time_sync_f2c(fclaw2d_global_t* glob,
-                                     fclaw2d_patch_t* coarse_patch,
-                                     fclaw2d_patch_t* fine_patch,
+                                     fclaw_patch_t* coarse_patch,
+                                     fclaw_patch_t* fine_patch,
                                      int coarse_blockno, int fine_blockno,
                                      int coarse_patchno, 
                                      int idir,
@@ -431,8 +431,8 @@ void fclaw2d_clawpatch_time_sync_f2c(fclaw2d_global_t* glob,
 
 
 void fclaw2d_clawpatch_time_sync_samesize (struct fclaw2d_global* glob,
-                                           struct fclaw2d_patch* this_patch,
-                                           struct fclaw2d_patch* neighbor_patch,
+                                           struct fclaw_patch* this_patch,
+                                           struct fclaw_patch* neighbor_patch,
                                            int this_iface,int idir,
                                            fclaw2d_patch_transform_data_t
                                            *transform_data)

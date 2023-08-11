@@ -46,7 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 const double fclaw2d_smallest_h = 1. / (double) P4EST_ROOT_LEN;
 
 static void
-fclaw2d_patch_set_boundary_xylower (fclaw2d_patch_t * patch,
+fclaw2d_patch_set_boundary_xylower (fclaw_patch_t * patch,
                                     p4est_quadrant_t * quad)
 {
 #ifndef P4_TO_P8
@@ -121,12 +121,12 @@ fclaw2d_domain_new (p4est_wrap_t * wrap, sc_keyvalue_t * attributes)
     p4est_quadrant_t *quad, *mirror;
     fclaw2d_domain_t *domain;
     fclaw2d_block_t *block;
-    fclaw2d_patch_t *patch;
-    fclaw2d_patch_t *currentbylevel[P4EST_MAXLEVEL + 1];
+    fclaw_patch_t *patch;
+    fclaw_patch_t *currentbylevel[P4EST_MAXLEVEL + 1];
 
 #ifdef FCLAW_ENABLE_DEBUG
     memset (currentbylevel, 0,
-            sizeof (fclaw2d_patch_t *) * (P4EST_MAXLEVEL + 1));
+            sizeof (fclaw_patch_t *) * (P4EST_MAXLEVEL + 1));
 #endif
     domain = FCLAW_ALLOC_ZERO (fclaw2d_domain_t, 1);
     domain->mpicomm = wrap->p4est->mpicomm;
@@ -139,7 +139,7 @@ fclaw2d_domain_new (p4est_wrap_t * wrap, sc_keyvalue_t * attributes)
     domain->num_exchange_patches = (int) ghost->mirrors.elem_count;
     if (domain->num_exchange_patches > 0)
     {
-        domain->exchange_patches = FCLAW_ALLOC (fclaw2d_patch_t *,
+        domain->exchange_patches = FCLAW_ALLOC (fclaw_patch_t *,
                                                 domain->num_exchange_patches);
         mirror = p4est_quadrant_array_index (&ghost->mirrors, nm);
         mirror_quadrant_num = (int) mirror->p.piggy3.local_num;
@@ -213,11 +213,11 @@ fclaw2d_domain_new (p4est_wrap_t * wrap, sc_keyvalue_t * attributes)
         }
         block->num_patches = (int) tree->quadrants.elem_count;
         block->patches =
-            FCLAW_ALLOC_ZERO (fclaw2d_patch_t, block->num_patches);
+            FCLAW_ALLOC_ZERO (fclaw_patch_t, block->num_patches);
         block->patch_bounds =
             FCLAW_ALLOC_ZERO (struct fclaw_patch_bounds_2d, block->num_patches);
         block->patchbylevel =
-            FCLAW_ALLOC_ZERO (fclaw2d_patch_t *,
+            FCLAW_ALLOC_ZERO (fclaw_patch_t *,
                               domain->possible_maxlevel + 1);
 
         block_nm_pre = nm;
@@ -292,7 +292,7 @@ fclaw2d_domain_new (p4est_wrap_t * wrap, sc_keyvalue_t * attributes)
 
     /* allocate ghost patches */
     domain->ghost_patches =
-        FCLAW_ALLOC_ZERO (fclaw2d_patch_t, domain->num_ghost_patches);
+        FCLAW_ALLOC_ZERO (fclaw_patch_t, domain->num_ghost_patches);
     domain->ghost_patch_bounds =
         FCLAW_ALLOC_ZERO (struct fclaw_patch_bounds_2d,
                           domain->num_ghost_patches);
@@ -491,7 +491,7 @@ fclaw2d_domain_copy_parameters (fclaw2d_domain_t * domain_dest,
             sizeof (fclaw2d_domain_persist_t));
 }
 
-static fclaw2d_patch_t *
+static fclaw_patch_t *
 fclaw2d_domain_get_neighbor_patch (fclaw2d_domain_t * domain,
                                    int nproc, int nblockno, int npatchno)
 {
@@ -534,7 +534,7 @@ fclaw2d_domain_adapt (fclaw2d_domain_t * domain)
         int k;
         fclaw2d_patch_relation_t nrel;
         fclaw2d_block_t *block;
-        fclaw2d_patch_t *gpatch, *patch, *npatch;
+        fclaw_patch_t *gpatch, *patch, *npatch;
 
         /* exchange target refinement level with parallel neighbors */
         p4est_ghost_exchange_custom (wrap->p4est, p4est_wrap_get_ghost (wrap),
@@ -682,7 +682,7 @@ fclaw2d_domain_adapt (fclaw2d_domain_t * domain)
         /* clean up the target levels since we don't adapt */
         int nb, np;
         fclaw2d_block_t *block;
-        fclaw2d_patch_t *patch;
+        fclaw_patch_t *patch;
 
         for (nb = 0; nb < domain->num_blocks; ++nb)
         {
@@ -783,7 +783,7 @@ fclaw2d_domain_write_vtk (fclaw2d_domain_t * domain, const char *basename)
 
 static void
 fclaw2d_domain_list_level_callback (fclaw2d_domain_t * domain,
-                                    fclaw2d_patch_t * patch, int block_no,
+                                    fclaw_patch_t * patch, int block_no,
                                     int patch_no, void *user)
 {
     FCLAW_ASSERT (0 <= block_no && block_no < domain->num_blocks);
@@ -827,7 +827,7 @@ fclaw2d_domain_list_neighbors_t;
 
 static void
 fclaw2d_domain_list_neighbors_callback (fclaw2d_domain_t * domain,
-                                        fclaw2d_patch_t * patch, int block_no,
+                                        fclaw_patch_t * patch, int block_no,
                                         int patch_no, void *user)
 {
     fclaw2d_domain_list_neighbors_t *ln =
@@ -879,9 +879,9 @@ fclaw2d_domain_list_neighbors (fclaw2d_domain_t * domain, int lp)
 
 static void
 fclaw2d_domain_list_adapted_callback (fclaw2d_domain_t * old_domain,
-                                      fclaw2d_patch_t * old_patch,
+                                      fclaw_patch_t * old_patch,
                                       fclaw2d_domain_t * new_domain,
-                                      fclaw2d_patch_t * new_patch,
+                                      fclaw_patch_t * new_patch,
                                       fclaw2d_patch_relation_t newsize,
                                       int blockno,
                                       int old_patchno, int new_patchno,
@@ -972,7 +972,7 @@ search_point_fn (p4est_t * p4est, p4est_topidx_t which_tree,
     double *xyentry;
     fclaw2d_block_t *block;
 #ifdef FCLAW_ENABLE_DEBUG
-    fclaw2d_patch_t *patch;
+    fclaw_patch_t *patch;
 #endif
     fclaw2d_search_data_t *sd = (fclaw2d_search_data_t *) p4est->user_pointer;
     p4est_qcoord_t qh;
@@ -1193,11 +1193,11 @@ integrate_ray_fn (p4est_t * p4est, p4est_topidx_t which_tree,
     double integral;
     int intersects;
     fclaw2d_domain_t *domain;
-    fclaw2d_patch_t *patch;
+    fclaw_patch_t *patch;
 
 
-    fclaw2d_patch_t fclaw2d_patch;
-    memset (&fclaw2d_patch, 0, sizeof (fclaw2d_patch_t));
+    fclaw_patch_t fclaw2d_patch;
+    memset (&fclaw2d_patch, 0, sizeof (fclaw_patch_t));
 
     struct fclaw_patch_bounds_2d fclaw2d_patch_bounds;
     fclaw2d_patch.d2 = &fclaw2d_patch_bounds;
@@ -1426,10 +1426,10 @@ interpolate_partition_fn (p4est_t * p4est, p4est_topidx_t which_tree,
                           void *point)
 {
     fclaw2d_domain_t *domain;
-    fclaw2d_patch_t *patch;
+    fclaw_patch_t *patch;
 
-    fclaw2d_patch_t fclaw2d_patch;
-    memset(&fclaw2d_patch, 0, sizeof(fclaw2d_patch_t));
+    fclaw_patch_t fclaw2d_patch;
+    memset(&fclaw2d_patch, 0, sizeof(fclaw_patch_t));
 
     struct fclaw_patch_bounds_2d fclaw2d_patch_bounds;
     fclaw2d_patch.d2 = &fclaw2d_patch_bounds;
@@ -1496,10 +1496,10 @@ interpolate_local_fn (p4est_t * p4est, p4est_topidx_t which_tree,
                       void *point)
 {
     fclaw2d_domain_t *domain;
-    fclaw2d_patch_t *patch;
+    fclaw_patch_t *patch;
 
-    fclaw2d_patch_t fclaw2d_patch;
-    memset(&fclaw2d_patch, 0, sizeof(fclaw2d_patch_t));
+    fclaw_patch_t fclaw2d_patch;
+    memset(&fclaw2d_patch, 0, sizeof(fclaw_patch_t));
 
     struct fclaw_patch_bounds_2d fclaw2d_patch_bounds;
     fclaw2d_patch.d2 = &fclaw2d_patch_bounds;

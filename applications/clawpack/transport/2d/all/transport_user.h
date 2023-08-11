@@ -63,18 +63,18 @@ extern "C"
 
 struct fclaw_options;
 struct user_options;
-struct fclaw2d_patch;
+struct fclaw_patch;
 struct fclaw2d_domain;
 
 
 void transport_patch_setup_manifold(fclaw2d_global_t *glob,
-                                    fclaw2d_patch_t *patch,
+                                    fclaw_patch_t *patch,
                                     int blockno,
                                     int patchno,
                                     int claw_version);
 
 void transport_b4step2_manifold(fclaw2d_global_t *glob,
-                                fclaw2d_patch_t *patch,
+                                fclaw_patch_t *patch,
                                 int blockno,
                                 int patchno,
                                 double t,

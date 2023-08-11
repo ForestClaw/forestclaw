@@ -69,7 +69,7 @@ void cudaclaw_setprob(fclaw2d_global_t *glob)
 
 static
 void cudaclaw_qinit(fclaw2d_global_t *glob,
-                      fclaw2d_patch_t *this_patch,
+                      fclaw_patch_t *this_patch,
                       int this_block_idx,
                       int this_patch_idx)
 {
@@ -100,7 +100,7 @@ void cudaclaw_qinit(fclaw2d_global_t *glob,
 
 static
 void cudaclaw_bc2(fclaw2d_global_t *glob,
-                    fclaw2d_patch_t *this_patch,
+                    fclaw_patch_t *this_patch,
                     int this_block_idx,
                     int this_patch_idx,
                     double t,
@@ -160,7 +160,7 @@ void cudaclaw_bc2(fclaw2d_global_t *glob,
 
 static
 void cudaclaw_b4step2(fclaw2d_global_t *glob,
-                        fclaw2d_patch_t *this_patch,
+                        fclaw_patch_t *this_patch,
                         int this_block_idx,
                         int this_patch_idx,
                         double t, double dt)
@@ -195,7 +195,7 @@ void cudaclaw_b4step2(fclaw2d_global_t *glob,
 
 static
 void cudaclaw_src2(fclaw2d_global_t *glob,
-                     fclaw2d_patch_t *this_patch,
+                     fclaw_patch_t *this_patch,
                      int this_block_idx,
                      int this_patch_idx,
                      double t,
@@ -233,7 +233,7 @@ void cudaclaw_src2(fclaw2d_global_t *glob,
 /* This can be used as a value for patch_vt->patch_setup */
 static
 void cudaclaw_setaux(fclaw2d_global_t *glob,
-                       fclaw2d_patch_t *this_patch,
+                       fclaw_patch_t *this_patch,
                        int this_block_idx,
                        int this_patch_idx)
 {
@@ -272,7 +272,7 @@ void cudaclaw_setaux(fclaw2d_global_t *glob,
 
 static
 double cudaclaw_update(fclaw2d_global_t *glob,
-                         fclaw2d_patch_t *this_patch,
+                         fclaw_patch_t *this_patch,
                          int this_block_idx,
                          int this_patch_idx,
                          double t,
@@ -482,7 +482,7 @@ fc2d_cudaclaw_vtable_t* fc2d_cudaclaw_vt(fclaw2d_global_t *glob)
 
 /* This should only be called when a new fclaw_clawpatch_t is created. */
 void fc2d_cudaclaw_set_capacity(fclaw2d_global_t *glob,
-                                  fclaw2d_patch_t *this_patch,
+                                  fclaw_patch_t *this_patch,
                                   int this_block_idx,
                                   int this_patch_idx)
 {
@@ -518,7 +518,7 @@ void fc2d_cudaclaw_setprob(fclaw2d_global_t *glob)
 
 /* This can be set to cudaclaw_vt->src2 */
 void fc2d_cudaclaw_src2(fclaw2d_global_t* glob,
-                          fclaw2d_patch_t *this_patch,
+                          fclaw_patch_t *this_patch,
                           int this_block_idx,
                           int this_patch_idx,
                           double t,
@@ -529,7 +529,7 @@ void fc2d_cudaclaw_src2(fclaw2d_global_t* glob,
 
 
 void fc2d_cudaclaw_setaux(fclaw2d_global_t *glob,
-                            fclaw2d_patch_t *this_patch,
+                            fclaw_patch_t *this_patch,
                             int this_block_idx,
                             int this_patch_idx)
 {
@@ -538,7 +538,7 @@ void fc2d_cudaclaw_setaux(fclaw2d_global_t *glob,
 
 
 void fc2d_cudaclaw_qinit(fclaw2d_global_t *glob,
-                           fclaw2d_patch_t *this_patch,
+                           fclaw_patch_t *this_patch,
                            int this_block_idx,
                            int this_patch_idx)
 {
@@ -546,7 +546,7 @@ void fc2d_cudaclaw_qinit(fclaw2d_global_t *glob,
 }
 
 void fc2d_cudaclaw_b4step2(fclaw2d_global_t* glob,
-                             fclaw2d_patch_t *this_patch,
+                             fclaw_patch_t *this_patch,
                              int this_block_idx,
                              int this_patch_idx,
                              double t,
@@ -556,7 +556,7 @@ void fc2d_cudaclaw_b4step2(fclaw2d_global_t* glob,
 }
 
 void fc2d_cudaclaw_bc2(fclaw2d_global_t *glob,
-                         fclaw2d_patch_t *this_patch,
+                         fclaw_patch_t *this_patch,
                          int this_block_idx,
                          int this_patch_idx,
                          double t,

@@ -53,7 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_global.h>
 
 void fclaw2d_clawpatch_transform_init_data(fclaw2d_global_t* glob, 
-                                           fclaw2d_patch_t* this_patch,
+                                           fclaw_patch_t* this_patch,
                                            int blockno, int patchno,
                                            fclaw2d_patch_transform_data_t* transform)
 {

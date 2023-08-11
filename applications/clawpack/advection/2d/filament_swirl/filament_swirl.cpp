@@ -180,7 +180,7 @@ void apply_consumer_mapping (overlap_point_t * op)
 }
 
 static
-void add_cell_centers (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
+void add_cell_centers (fclaw2d_domain_t * domain, fclaw_patch_t * patch,
                        int blockno, int patchno, void *user)
 {
     overlap_point_t *op;
@@ -294,7 +294,7 @@ int apply_inverse_producer_mapping (overlap_point_t * op, double xy[3],
 }
 
 static
-int overlap_interpolate (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
+int overlap_interpolate (fclaw2d_domain_t * domain, fclaw_patch_t * patch,
                          int blockno, int patchno, void *point, void *user)
 {
     overlap_point_t *op;

@@ -94,7 +94,7 @@ void heat_problem_setup(fclaw2d_global_t *glob)
 
 static
 void heat_initialize(fclaw2d_global_t *glob,
-                     fclaw2d_patch_t *patch,
+                     fclaw_patch_t *patch,
                      int blockno,
                      int patchno)
 {
@@ -117,7 +117,7 @@ void heat_initialize(fclaw2d_global_t *glob,
 
 static
 void heat_rhs(fclaw2d_global_t *glob,
-                fclaw2d_patch_t *patch,
+                fclaw_patch_t *patch,
                 int blockno,
                 int patchno)
 {
@@ -153,7 +153,7 @@ void heat_rhs(fclaw2d_global_t *glob,
 
 static
 void heat_compute_error(fclaw2d_global_t *glob,
-                          fclaw2d_patch_t *patch,
+                          fclaw_patch_t *patch,
                           int blockno,
                           int patchno,
                           void *user)
@@ -245,7 +245,7 @@ void heat_time_header_ascii(fclaw2d_global_t* glob, int iframe)
 
 static
 void cb_heat_output_ascii(fclaw2d_domain_t * domain,
-                            fclaw2d_patch_t * patch,
+                            fclaw_patch_t * patch,
                             int blockno, int patchno,
                             void *user)
 {
@@ -290,7 +290,7 @@ void cb_heat_output_ascii(fclaw2d_domain_t * domain,
 
 
 int heat_tag4refinement(fclaw2d_global_t *glob,
-                        fclaw2d_patch_t *this_patch,
+                        fclaw_patch_t *this_patch,
                         int blockno, int patchno,
                         int initflag)
 {
@@ -322,12 +322,12 @@ int heat_tag4refinement(fclaw2d_global_t *glob,
 
 static
 int heat_tag4coarsening(fclaw2d_global_t *glob,
-                        fclaw2d_patch_t *fine_patches,
+                        fclaw_patch_t *fine_patches,
                         int blockno,
                         int patchno,
                         int initflag)
 {
-    fclaw2d_patch_t *patch0 = &fine_patches[0];
+    fclaw_patch_t *patch0 = &fine_patches[0];
 
     const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
     double coarsen_threshold = fclaw_opt->coarsen_threshold;
@@ -355,7 +355,7 @@ int heat_tag4coarsening(fclaw2d_global_t *glob,
 
 static
 void heat_bc2(fclaw2d_global_t *glob,
-              fclaw2d_patch_t *patch,
+              fclaw_patch_t *patch,
               int block_idx,
               int patch_idx,
               double t,

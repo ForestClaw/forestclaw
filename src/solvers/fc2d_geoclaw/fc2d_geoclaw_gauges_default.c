@@ -229,7 +229,7 @@ void geoclaw_gauge_normalize_coordinates(fclaw2d_global_t *glob,
 
 void geoclaw_gauge_update_default(fclaw2d_global_t* 
                                   glob, fclaw2d_block_t* block,
-                                  fclaw2d_patch_t* patch, 
+                                  fclaw_patch_t* patch, 
                                   int blockno, int patchno,
                                   double tcurr, fclaw_gauge_t *g)
 {

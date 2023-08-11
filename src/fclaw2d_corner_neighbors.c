@@ -131,12 +131,12 @@ static
 void get_corner_neighbor(fclaw2d_global_t *glob,
                          int this_block_idx,
                          int this_patch_idx,
-                         fclaw2d_patch_t* this_patch,
+                         fclaw_patch_t* this_patch,
                          int icorner,
                          int block_iface,
                          int is_block_corner,
                          int *corner_block_idx,
-                         fclaw2d_patch_t** corner_patch,
+                         fclaw_patch_t** corner_patch,
                          int *rcornerno,
                          int **ref_flag_ptr,
                          int *block_corner_count,
@@ -332,7 +332,7 @@ void get_corner_neighbor(fclaw2d_global_t *glob,
 
 
 void cb_corner_fill(fclaw2d_domain_t *domain,
-                    fclaw2d_patch_t *this_patch,
+                    fclaw_patch_t *this_patch,
                     int this_block_idx,
                     int this_patch_idx,
                     void *user)
@@ -409,7 +409,7 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
             int corner_block_idx;
             int neighbor_level;
             int *ref_flag_ptr = &neighbor_level;
-            fclaw2d_patch_t *corner_patch;
+            fclaw_patch_t *corner_patch;
             int rcornerno;
 
             transform_data.icorner = icorner;
@@ -456,8 +456,8 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
                 transform_data.neighbor_patch = corner_patch;
                 if (neighbor_level == FINER_GRID)
                 {
-                    fclaw2d_patch_t* coarse_patch = this_patch;
-                    fclaw2d_patch_t* fine_patch = corner_patch;
+                    fclaw_patch_t* coarse_patch = this_patch;
+                    fclaw_patch_t* fine_patch = corner_patch;
                     int coarse_blockno = this_block_idx;
                     int fine_blockno = corner_block_idx;
                     if (interpolate_to_neighbor && !remote_neighbor)
@@ -475,8 +475,8 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
                     else if (average_from_neighbor)
                     {
                         /* Average even if neighbor is a remote neighbor */
-                        fclaw2d_patch_t* coarse_patch = this_patch;
-                        fclaw2d_patch_t* fine_patch = corner_patch;
+                        fclaw_patch_t* coarse_patch = this_patch;
+                        fclaw_patch_t* fine_patch = corner_patch;
                         fclaw2d_patch_average_corner(s->glob,
                                                      coarse_patch,
                                                      fine_patch,
@@ -507,8 +507,8 @@ void cb_corner_fill(fclaw2d_domain_t *domain,
                 call same routines above, but with remote patch as the "coarse" 
                 grid */
                 
-                fclaw2d_patch_t* coarse_patch = corner_patch;
-                fclaw2d_patch_t* fine_patch = this_patch;
+                fclaw_patch_t* coarse_patch = corner_patch;
+                fclaw_patch_t* fine_patch = this_patch;
                 int coarse_blockno = corner_block_idx;
                 int fine_blockno = this_patch_idx;
 

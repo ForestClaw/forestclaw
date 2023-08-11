@@ -40,7 +40,7 @@ extern "C"
 #endif
 
 struct fclaw2d_global;
-struct fclaw2d_patch;
+struct fclaw_patch;
 
 /**
  * @brief Data structure for default diagnostic routines
@@ -123,7 +123,7 @@ void fclaw_clawpatch_diagnostics_vtable_initialize(struct fclaw2d_global* glob);
  * @param error_data user data pointer
  */
 void fclaw_clawpatch_diagnostics_cons_default(struct fclaw2d_global *glob,
-                                              struct fclaw2d_patch *patch,
+                                              struct fclaw_patch *patch,
                                               int blockno,
                                               int patchno,
                                               void *error_data);
@@ -138,7 +138,7 @@ void fclaw_clawpatch_diagnostics_cons_default(struct fclaw2d_global *glob,
  * @param error_data user data pointer
  */
 void fclaw_clawpatch_diagnostics_error_default(struct fclaw2d_global *glob,
-                                               struct fclaw2d_patch *patch,
+                                               struct fclaw_patch *patch,
                                                int blockno,
                                                int patchno,
                                                void *error_data);

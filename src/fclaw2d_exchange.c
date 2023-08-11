@@ -75,7 +75,7 @@ void build_remote_ghost_patches(fclaw2d_global_t* glob)
     fclaw_infof("[%d] Number of ghost patches : %d\n",
                             domain->mpirank,domain->num_ghost_patches);
     int blockno, patchno;
-    fclaw2d_patch_t *ghost_patch;
+    fclaw_patch_t *ghost_patch;
     fclaw2d_build_mode_t build_mode;
     if (gparms->ghost_patch_pack_area)
     {
@@ -112,7 +112,7 @@ void delete_remote_ghost_patches(fclaw2d_global_t* glob)
     int i;
     for(i = 0; i < domain->num_ghost_patches; i++)
     {
-        fclaw2d_patch_t* ghost_patch = &domain->ghost_patches[i];
+        fclaw_patch_t* ghost_patch = &domain->ghost_patches[i];
         
         fclaw2d_patch_remote_ghost_delete(glob,ghost_patch);
     }
@@ -131,7 +131,7 @@ unpack_remote_ghost_patches(fclaw2d_global_t* glob,
     int i;
     for(i = 0; i < domain->num_ghost_patches; i++)
     {
-        fclaw2d_patch_t* ghost_patch = &domain->ghost_patches[i];
+        fclaw_patch_t* ghost_patch = &domain->ghost_patches[i];
         int level = ghost_patch->level;
 
         if (level >= minlevel-1)
@@ -318,7 +318,7 @@ void fclaw2d_exchange_ghost_patches_begin(fclaw2d_global_t* glob,
             if (domain->blocks[nb].patches[np].flags &
                 FCLAW2D_PATCH_ON_PARALLEL_BOUNDARY)
             {
-                fclaw2d_patch_t *this_patch = &domain->blocks[nb].patches[np];
+                fclaw_patch_t *this_patch = &domain->blocks[nb].patches[np];
                 int level = this_patch->level;
                 FCLAW_ASSERT(level <= maxlevel);
 

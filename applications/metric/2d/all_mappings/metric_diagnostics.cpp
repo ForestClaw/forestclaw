@@ -56,7 +56,7 @@ double metric_surface_area(fclaw2d_map_context_t* cont)
 
 static
 void cb_total_area(fclaw2d_domain_t *domain,
-                   fclaw2d_patch_t *this_patch,
+                   fclaw_patch_t *this_patch,
                    int this_block_idx,
                    int this_patch_idx,
                    void *user)
@@ -78,7 +78,7 @@ void cb_total_area(fclaw2d_domain_t *domain,
 
 static
 void cb_min_cell_area(fclaw2d_domain_t *domain,
-                      fclaw2d_patch_t *this_patch,
+                      fclaw_patch_t *this_patch,
                       int this_block_idx,
                       int this_patch_idx,
                       void *user)
@@ -100,7 +100,7 @@ void cb_min_cell_area(fclaw2d_domain_t *domain,
 
 static
 void cb_max_cell_area(fclaw2d_domain_t *domain,
-                      fclaw2d_patch_t *this_patch,
+                      fclaw_patch_t *this_patch,
                       int this_block_idx,
                       int this_patch_idx,
                       void *user)

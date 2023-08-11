@@ -42,7 +42,7 @@ typedef struct fc2d_geoclaw_vtable fc2d_geoclaw_vtable_t;
 /* Forward declarations */
 struct fclaw2d_patch_transform_data;
 struct fclaw2d_global;
-struct fclaw2d_patch;
+struct fclaw_patch;
 struct geoclaw_gauge;
 
 

@@ -83,7 +83,7 @@ void fclaw_clawpatch_diagnostics_reset(fclaw2d_global_t *glob,
    from fclaw2d_diagnostics_gather */
 static
 void cb_compute_diagnostics(fclaw2d_domain_t *domain,
-                            fclaw2d_patch_t *patch,
+                            fclaw_patch_t *patch,
                             int blockno,
                             int patchno,
                             void* user) //void *patch_acc)

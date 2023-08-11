@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 void fclaw2d_metric_compute_mesh_default(fclaw2d_global_t *glob,
-                                         fclaw2d_patch_t* patch,
+                                         fclaw_patch_t* patch,
                                          int blockno,
                                          int patchno)
 {
@@ -57,7 +57,7 @@ void fclaw2d_metric_compute_mesh_default(fclaw2d_global_t *glob,
 
 
 void fclaw2d_metric_compute_basis_default(fclaw2d_global_t *glob,
-                                            fclaw2d_patch_t *patch,
+                                            fclaw_patch_t *patch,
                                             int blockno,
                                             int patchno)
 {
@@ -108,7 +108,7 @@ void fclaw2d_metric_compute_basis_default(fclaw2d_global_t *glob,
 
 
 void fclaw2d_metric_compute_area_default(fclaw2d_global_t *glob,
-                                         fclaw2d_patch_t *patch,
+                                         fclaw_patch_t *patch,
                                          int blockno,
                                          int patchno)
 {
@@ -135,7 +135,7 @@ void fclaw2d_metric_compute_area_default(fclaw2d_global_t *glob,
 }
 
 void fclaw2d_metric_compute_area_ghost_default(fclaw2d_global_t* glob,
-                                               fclaw2d_patch_t* patch,
+                                               fclaw_patch_t* patch,
                                                int blockno,
                                                int patchno)
 {

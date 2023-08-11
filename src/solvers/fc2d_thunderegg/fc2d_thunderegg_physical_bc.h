@@ -36,7 +36,7 @@ extern "C"
 
 struct fclaw2d_global;
 struct fclaw2d_domain;
-struct fclaw2d_patch;
+struct fclaw_patch;
 
 
 typedef struct fc2d_thunderegg_time_info

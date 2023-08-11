@@ -43,8 +43,8 @@ struct fclaw2d_patch_transform_data;  /* Not used here, so we leave it incomplet
 
 static
 void pillow_copy_block_corner(fclaw2d_global_t* glob,
-                              fclaw2d_patch_t* patch, 
-                              fclaw2d_patch_t *corner_patch,
+                              fclaw_patch_t* patch, 
+                              fclaw_patch_t *corner_patch,
                               int blockno,
                               int corner_blockno,
                               int icorner,
@@ -88,8 +88,8 @@ void pillow_copy_block_corner(fclaw2d_global_t* glob,
 
 static
 void pillow_average_block_corner(fclaw2d_global_t *glob,
-                                 fclaw2d_patch_t* coarse_patch,
-                                 fclaw2d_patch_t *fine_patch,
+                                 fclaw_patch_t* coarse_patch,
+                                 fclaw_patch_t *fine_patch,
                                  int coarse_blockno,
                                  int fine_blockno,
                                  int icorner_coarse,
@@ -140,8 +140,8 @@ void pillow_average_block_corner(fclaw2d_global_t *glob,
 
 static
 void pillow_interpolate_block_corner(fclaw2d_global_t* glob,
-                                     fclaw2d_patch_t* coarse_patch,
-                                     fclaw2d_patch_t *fine_patch,
+                                     fclaw_patch_t* coarse_patch,
+                                     fclaw_patch_t *fine_patch,
                                      int coarse_blockno,
                                      int fine_blockno,
                                      int icoarse_corner,

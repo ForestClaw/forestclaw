@@ -33,7 +33,7 @@ void gaussian_problem_setup(fclaw2d_global_t* glob)
 
 static
 void gaussian_patch_setup_manifold(fclaw2d_global_t *glob,
-                                    fclaw2d_patch_t *patch,
+                                    fclaw_patch_t *patch,
                                     int blockno,
                                     int patchno)
 {
@@ -44,7 +44,7 @@ void gaussian_patch_setup_manifold(fclaw2d_global_t *glob,
 
 static
 void gaussian_b4step2_manifold(fclaw2d_global_t *glob,
-                               fclaw2d_patch_t *patch,
+                               fclaw_patch_t *patch,
                                int blockno,
                                int patchno,
                                double t,

@@ -26,7 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "advection_user.h"
 
 void claw3_advection_patch_setup_manifold(fclaw2d_global_t *glob,
-                                          fclaw2d_patch_t *patch,
+                                          fclaw_patch_t *patch,
                                           int blockno,
                                           int patchno,
                                           int claw_version)

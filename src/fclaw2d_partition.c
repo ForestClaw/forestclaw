@@ -35,7 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 static
 void cb_partition_pack(fclaw2d_domain_t *domain,
-                       fclaw2d_patch_t *patch,
+                       fclaw_patch_t *patch,
                        int blockno,
                        int patchno,
                        void *user)
@@ -56,9 +56,9 @@ void cb_partition_pack(fclaw2d_domain_t *domain,
 
 static
 void  cb_partition_transfer(fclaw2d_domain_t * old_domain,
-                            fclaw2d_patch_t * old_patch,
+                            fclaw_patch_t * old_patch,
                             fclaw2d_domain_t * new_domain,
-                            fclaw2d_patch_t * new_patch,
+                            fclaw_patch_t * new_patch,
                             int blockno,
                             int old_patchno, int new_patchno,
                             void *user)

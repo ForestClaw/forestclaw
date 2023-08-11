@@ -129,7 +129,7 @@ fclaw2d_domain_corner_faces (const fclaw2d_domain_t * domain,
 }
 
 int
-fclaw2d_patch_corner_dimension (const fclaw2d_patch_t * patch, int cornerno)
+fclaw2d_patch_corner_dimension (const fclaw_patch_t * patch, int cornerno)
 {
     const int childid = fclaw2d_patch_childid (patch);
 
@@ -141,7 +141,7 @@ fclaw2d_patch_corner_dimension (const fclaw2d_patch_t * patch, int cornerno)
 }
 
 int
-fclaw2d_patch_childid (const fclaw2d_patch_t * patch)
+fclaw2d_patch_childid (const fclaw_patch_t * patch)
 {
     const int childid = patch->flags & FCLAW2D_PATCH_CHILDID;
 
@@ -151,13 +151,13 @@ fclaw2d_patch_childid (const fclaw2d_patch_t * patch)
 }
 
 int
-fclaw2d_patch_is_first_sibling (const fclaw2d_patch_t * patch)
+fclaw2d_patch_is_first_sibling (const fclaw_patch_t * patch)
 {
     return patch->flags & FCLAW2D_PATCH_FIRST_SIBLING ? 1 : 0;
 }
 
 int
-fclaw2d_patch_is_ghost (const fclaw2d_patch_t * patch)
+fclaw2d_patch_is_ghost (const fclaw_patch_t * patch)
 {
     return patch->flags & FCLAW2D_PATCH_IS_GHOST ? 1 : 0;
 }
@@ -202,7 +202,7 @@ fclaw2d_domain_attribute_remove (fclaw2d_domain_t * domain, const char *name)
     FCLAW_ASSERT (et == SC_KEYVALUE_ENTRY_POINTER);
 }
 
-static fclaw2d_patch_t *
+static fclaw_patch_t *
 fclaw2d_domain_get_patch (fclaw2d_domain_t * domain, int blockno, int patchno)
 {
     fclaw2d_block_t *block;
@@ -230,7 +230,7 @@ fclaw2d_domain_iterate_level (fclaw2d_domain_t * domain, int level,
 {
     int i, j;
     fclaw2d_block_t *block;
-    fclaw2d_patch_t *patch;
+    fclaw_patch_t *patch;
 
     FCLAW_ASSERT (0 <= level && level <= domain->possible_maxlevel);
     for (i = 0; i < domain->num_blocks; ++i)
@@ -253,7 +253,7 @@ fclaw2d_domain_iterate_patches (fclaw2d_domain_t * domain,
 {
     int i, j;
     fclaw2d_block_t *block;
-    fclaw2d_patch_t *patch;
+    fclaw_patch_t *patch;
 
     for (i = 0; i < domain->num_blocks; i++)
     {
@@ -272,7 +272,7 @@ fclaw2d_domain_iterate_families (fclaw2d_domain_t * domain,
 {
     int i, j;
     fclaw2d_block_t *block;
-    fclaw2d_patch_t *patch;
+    fclaw_patch_t *patch;
 
     for (i = 0; i < domain->num_blocks; i++)
     {
@@ -610,8 +610,8 @@ fclaw2d_patch_face_transformation_valid (const int ftransform[])
 }
 
 void
-fclaw2d_patch_transform_face (fclaw2d_patch_t * ipatch,
-                              fclaw2d_patch_t * opatch,
+fclaw2d_patch_transform_face (fclaw_patch_t * ipatch,
+                              fclaw_patch_t * opatch,
                               const int ftransform[],
                               int mx, int my,
 #ifdef P4_TO_P8
@@ -749,8 +749,8 @@ fclaw2d_patch_transform_face (fclaw2d_patch_t * ipatch,
 }
 
 void
-fclaw2d_patch_transform_face2 (fclaw2d_patch_t * ipatch,
-                               fclaw2d_patch_t * opatch,
+fclaw2d_patch_transform_face2 (fclaw_patch_t * ipatch,
+                               fclaw_patch_t * opatch,
                                const int ftransform[],
                                int mx, int my,
 #ifdef P4_TO_P8
@@ -1128,8 +1128,8 @@ fclaw2d_patch_corner_swap (int *cornerno, int *rcornerno)
 }
 
 void
-fclaw2d_patch_transform_corner (fclaw2d_patch_t * ipatch,
-                                fclaw2d_patch_t * opatch,
+fclaw2d_patch_transform_corner (fclaw_patch_t * ipatch,
+                                fclaw_patch_t * opatch,
                                 int icorner, int is_block_boundary,
                                 int mx, int my,
 #ifdef P4_TO_P8
@@ -1232,8 +1232,8 @@ fclaw2d_patch_transform_corner (fclaw2d_patch_t * ipatch,
 }
 
 void
-fclaw2d_patch_transform_corner2 (fclaw2d_patch_t * ipatch,
-                                 fclaw2d_patch_t * opatch,
+fclaw2d_patch_transform_corner2 (fclaw_patch_t * ipatch,
+                                 fclaw_patch_t * opatch,
                                  int icorner, int is_block_boundary,
                                  int mx, int my,
 #ifdef P4_TO_P8
@@ -1389,7 +1389,7 @@ void
 fclaw2d_patch_mark_refine (fclaw2d_domain_t * domain, int blockno,
                            int patchno)
 {
-    fclaw2d_patch_t *patch;
+    fclaw_patch_t *patch;
     p4est_wrap_t *wrap = (p4est_wrap_t *) domain->pp;
 
     /* bump target level up */
@@ -1421,7 +1421,7 @@ void
 fclaw2d_patch_mark_coarsen (fclaw2d_domain_t * domain, int blockno,
                             int patchno)
 {
-    fclaw2d_patch_t *patch;
+    fclaw_patch_t *patch;
     p4est_wrap_t *wrap = (p4est_wrap_t *) domain->pp;
 
     /* bump target level down */
@@ -1446,7 +1446,7 @@ fclaw2d_domain_iterate_adapted (fclaw2d_domain_t * old_domain,
     int i, oj, nj;
     int oskip, nskip;
     fclaw2d_block_t *old_block, *new_block;
-    fclaw2d_patch_t *old_patch, *new_patch;
+    fclaw_patch_t *old_patch, *new_patch;
     fclaw2d_patch_relation_t newsize;
 
     FCLAW_ASSERT (!old_domain->pp_owned);
@@ -1564,7 +1564,7 @@ fclaw2d_domain_iterate_partitioned (fclaw2d_domain_t * old_domain,
     int odone, ndone;
 #endif
     fclaw2d_block_t *old_block, *new_block;
-    fclaw2d_patch_t *old_patch, *new_patch;
+    fclaw_patch_t *old_patch, *new_patch;
 
     FCLAW_ASSERT (!old_domain->pp_owned);
     FCLAW_ASSERT (new_domain->pp_owned);
@@ -2288,7 +2288,7 @@ fclaw2d_domain_init_meta (fclaw2d_domain_t * domain, int mpirank)
  *                      \ref fclaw2d_patch_face_neighbors and friends.
  * \return              The patch that was requested.
  */
-fclaw2d_patch_t *fclaw2d_domain_get_patch (fclaw2d_domain_t * domain,
+fclaw_patch_t *fclaw2d_domain_get_patch (fclaw2d_domain_t * domain,
                                            int blockno, int patchno);
 
 #endif /* ! P4_TO_P8 */

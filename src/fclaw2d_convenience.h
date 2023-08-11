@@ -236,7 +236,7 @@ void fclaw2d_domain_search_points (fclaw2d_domain_t * domain,
  *                              is, in fact, none (a false positive).
  */
 typedef int (*fclaw2d_integrate_ray_t) (fclaw2d_domain_t * domain,
-                                        fclaw2d_patch_t * patch,
+                                        fclaw_patch_t * patch,
                                         int blockno, int patchno,
                                         void *ray, double *integral,
                                         void *user);
@@ -319,7 +319,7 @@ void fclaw2d_domain_integrate_rays (fclaw2d_domain_t * domain,
  *                              we'll be fine.
  */
 typedef int (*fclaw2d_interpolate_point_t) (fclaw2d_domain_t * domain,
-                                            fclaw2d_patch_t * patch,
+                                            fclaw_patch_t * patch,
                                             int blockno, int patchno,
                                             void *point, void *user);
 

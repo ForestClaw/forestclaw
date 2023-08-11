@@ -34,7 +34,7 @@ extern "C"
 #endif
 
 struct fclaw2d_global;
-struct fclaw2d_patch;
+struct fclaw_patch;
 
 typedef  struct fc3d_clawpack46_vtable  fc3d_clawpack46_vtable_t;
 
@@ -43,14 +43,14 @@ typedef  struct fc3d_clawpack46_vtable  fc3d_clawpack46_vtable_t;
 
 /* Virtualize clawpack-specific wrapper functions */
 typedef void (*clawpack46_src3_t)(struct fclaw2d_global* glob,
-								  struct fclaw2d_patch *this_patch,
+								  struct fclaw_patch *this_patch,
 								  int blockno,
 								  int patchno,
 								  double t,
 								  double dt);
 	
 typedef void (*clawpack46_b4step3_t)(struct fclaw2d_global* glob,
-									 struct fclaw2d_patch *this_patch,
+									 struct fclaw_patch *this_patch,
 									 int this_block_idx,
 									 int this_patch_idx,
 									 double t,
@@ -216,29 +216,29 @@ void fc3d_clawpack46_setprob(struct fclaw2d_global* glob);
 
 
 void fc3d_clawpack46_setaux(struct fclaw2d_global* glob,
-							struct fclaw2d_patch *this_patch,
+							struct fclaw_patch *this_patch,
 							int this_block_idx,
 							int this_patch_idx);
 
 void fc3d_clawpack46_set_capacity(struct fclaw2d_global* glob,
-								  struct fclaw2d_patch *this_patch,
+								  struct fclaw_patch *this_patch,
 								  int this_block_idx,
 								  int this_patch_idx);
 
 void fc3d_clawpack46_qinit(struct fclaw2d_global* glob,
-						   struct fclaw2d_patch *this_patch,
+						   struct fclaw_patch *this_patch,
 						   int this_block_idx,
 						   int this_patch_idx);
 
 void fc3d_clawpack46_b4step3(struct fclaw2d_global* glob,
-							 struct fclaw2d_patch *this_patch,
+							 struct fclaw_patch *this_patch,
 							 int this_block_idx,
 							 int this_patch_idx,
 							 double t,
 							 double dt);
 
 void fc3d_clawpack46_bc3(struct fclaw2d_global *glob,
-						 struct fclaw2d_patch *this_patch,
+						 struct fclaw_patch *this_patch,
 						 int this_block_idx,
 						 int this_patch_idx,
 						 double t,
@@ -247,7 +247,7 @@ void fc3d_clawpack46_bc3(struct fclaw2d_global *glob,
 						 int time_interp);
 
 void fc3d_clawpack46_src2(struct fclaw2d_global* glob,
-						  struct fclaw2d_patch *this_patch,
+						  struct fclaw_patch *this_patch,
 						  int this_block_idx,
 						  int this_patch_idx,
 						  double t,

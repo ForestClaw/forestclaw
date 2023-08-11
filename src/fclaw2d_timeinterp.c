@@ -29,7 +29,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 static
 void cb_setup_time_interp(fclaw2d_domain_t *domain,
-                          fclaw2d_patch_t *this_patch,
+                          fclaw_patch_t *this_patch,
                           int blockno,
                           int patchno,
                           void *user)

@@ -81,7 +81,7 @@ void fclaw2d_domain_iterate_level_mthread (struct fclaw2d_domain * domain, int l
 #define FCLAW2D_DOMAIN_MAGIC 0x56780202
 
 void fclaw2d_domain_iterate_cb
-  (fclaw2d_domain_t * d2, fclaw2d_patch_t * patch,
+  (fclaw2d_domain_t * d2, fclaw_patch_t * patch,
    int blockno, int patchno, void *user);
 
 /** Construct a dimension-specific domain and initialize patch data.

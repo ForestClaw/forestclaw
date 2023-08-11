@@ -63,7 +63,7 @@ void square_problem_setup(fclaw2d_global_t* glob)
 }
 
 void square_patch_setup_manifold(fclaw2d_global_t *glob,
-                                    fclaw2d_patch_t *patch,
+                                    fclaw_patch_t *patch,
                                     int blockno,
                                     int patchno)
 {
@@ -123,7 +123,7 @@ void square_patch_setup_manifold(fclaw2d_global_t *glob,
 
 static
 void cb_square_output_ascii (fclaw2d_domain_t * domain,
-                            fclaw2d_patch_t * patch,
+                            fclaw_patch_t * patch,
                             int blockno, int patchno,
                             void *user)
 {

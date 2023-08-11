@@ -19,7 +19,7 @@ static double* s_membuffer_dev;
 static cudaclaw_fluxes_t* s_array_fluxes_struct_dev;
 
 void cudaclaw_allocate_fluxes(fclaw2d_global_t *glob,
-                              fclaw2d_patch_t *patch)
+                              fclaw_patch_t *patch)
 {
     PROFILE_CUDA_GROUP("Allocate patch data in memory device",4);       
     int mx,my,mbc;
@@ -82,7 +82,7 @@ void cudaclaw_allocate_fluxes(fclaw2d_global_t *glob,
 }
 
 void cudaclaw_deallocate_fluxes(fclaw2d_global_t *glob,
-                                     fclaw2d_patch_t *patch)
+                                     fclaw_patch_t *patch)
 {
     PROFILE_CUDA_GROUP("De-allocate patch device memory",4);       
     cudaclaw_fluxes_t *fluxes = (cudaclaw_fluxes_t*) 

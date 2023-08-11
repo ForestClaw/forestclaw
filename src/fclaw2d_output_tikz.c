@@ -50,7 +50,7 @@ typedef struct
 
 static
 void convert_brick(fclaw2d_global_t *glob, 
-                   fclaw2d_patch_t *this_patch, 
+                   fclaw_patch_t *this_patch, 
                    int blockno, 
                    double* xlower, double* ylower)
 {
@@ -94,7 +94,7 @@ void convert_brick(fclaw2d_global_t *glob,
 
 static void
 cb_tikz_output (fclaw2d_domain_t * domain,
-                fclaw2d_patch_t * this_patch,
+                fclaw_patch_t * this_patch,
                 int this_block_idx, int this_patch_idx,
                 void *user)
 {

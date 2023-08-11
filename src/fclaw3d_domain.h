@@ -75,7 +75,7 @@ void fclaw3d_domain_iterate_level_mthread (struct fclaw3d_domain * domain, int l
 #define FCLAW3D_DOMAIN_MAGIC 0x67890303
 
 void fclaw3d_domain_iterate_cb
-  (fclaw3d_domain_t * d3, fclaw3d_patch_t * patch,
+  (fclaw3d_domain_t * d3, fclaw_patch_t * patch,
    int blockno, int patchno, void *user);
 
 /** Construct a dimension-specific domain and initialize patch data.

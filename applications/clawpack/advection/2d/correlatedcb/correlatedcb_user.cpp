@@ -34,7 +34,7 @@ void correlatedcb_problem_setup(fclaw2d_global_t* glob)
 
 static
 void correlatedcb_patch_setup_manifold(fclaw2d_global_t *glob,
-                                    fclaw2d_patch_t *patch,
+                                    fclaw_patch_t *patch,
                                     int blockno,
                                     int patchno)
 {
@@ -44,7 +44,7 @@ void correlatedcb_patch_setup_manifold(fclaw2d_global_t *glob,
 
 static
 void correlatedcb_b4step2_manifold(fclaw2d_global_t *glob,
-                               fclaw2d_patch_t *patch,
+                               fclaw_patch_t *patch,
                                int blockno,
                                int patchno,
                                double t,

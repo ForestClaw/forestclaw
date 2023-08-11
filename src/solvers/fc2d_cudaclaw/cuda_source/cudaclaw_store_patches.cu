@@ -9,7 +9,7 @@
 #include <fc2d_cuda_profiler.h>
 
 void cudaclaw_store_buffer(fclaw2d_global_t* glob,
-                           fclaw2d_patch_t *this_patch,
+                           fclaw_patch_t *this_patch,
                            int this_patch_idx,
                            int count, int iter, 
                            cudaclaw_fluxes_t* flux_array)

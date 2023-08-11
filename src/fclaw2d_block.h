@@ -35,11 +35,11 @@ extern "C"
 #endif
 
 struct fclaw2d_global;
-struct fclaw2d_patch;
+struct fclaw_patch;
 
 void 
 fclaw2d_block_get_block_boundary(struct fclaw2d_global * glob,
-                                 struct fclaw2d_patch * patch,
+                                 struct fclaw_patch * patch,
                                  int *intersects_block);
 
 #ifdef __cplusplus

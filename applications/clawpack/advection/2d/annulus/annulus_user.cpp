@@ -46,7 +46,7 @@ void annulus_problem_setup(fclaw2d_global_t *glob)
 
 static
 void annulus_patch_setup(fclaw2d_global_t *glob,
-                         fclaw2d_patch_t *patch,
+                         fclaw_patch_t *patch,
                          int blockno,
                          int patchno)
 {

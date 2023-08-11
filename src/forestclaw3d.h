@@ -27,6 +27,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define FORESTCLAW3D_H
 
 #include <fclaw_base.h>
+#include <fclaw_patch.h>
 #include <sc_keyvalue.h>
 
 #ifdef __cplusplus
@@ -51,8 +52,6 @@ extern "C"
 typedef struct fclaw3d_domain fclaw3d_domain_t;
 /** Typedef for fclaw3d_block */
 typedef struct fclaw3d_block fclaw3d_block_t;
-/** Typedef for fclaw3d_patch */
-typedef struct fclaw3d_patch fclaw3d_patch_t;
 
 /**
  * @brief Enum for encoding patch information
@@ -87,12 +86,7 @@ fclaw3d_patch_flags_t;
 /** For each of the six faces, the corresponding block boundary flag. */
 extern const fclaw3d_patch_flags_t fclaw3d_patch_block_face_flags[6];
 
-struct fclaw_patch_bounds_3d
-{
-    double xlower, xupper;
-    double ylower, yupper;
-    double zlower, zupper;
-};
+
 
 /** 
  * @brief The metadata structure for a forest leaf, which is a forestclaw patch.
@@ -109,7 +103,7 @@ struct fclaw3d_patch
      * the bock number of this patch */
     union
     {
-        fclaw3d_patch_t *next;  /**< local: next patch same level same block */
+        fclaw_patch_t *next;  /**< local: next patch same level same block */
         int blockno;            /**< off-proc: this patch's block number */
     }
     u;
@@ -145,10 +139,10 @@ struct fclaw3d_block
     int minlevel;
     int maxlevel;
     /** @} */
-    fclaw3d_patch_t *patches;           /**< The patches for this block */
+    fclaw_patch_t *patches;           /**< The patches for this block */
     struct fclaw_patch_bounds_3d *patch_bounds; /**< patch bounds */
-    fclaw3d_patch_t **patchbylevel;     /**< Pointer to the first patch in each level **/
-    fclaw3d_patch_t **exchange_patches; /**< Pointer for each exchange patch */
+    fclaw_patch_t **patchbylevel;     /**< Pointer to the first patch in each level **/
+    fclaw_patch_t **exchange_patches; /**< Pointer for each exchange patch */
     void *user;                         /**< User pointer */
 };
 
@@ -207,9 +201,9 @@ struct fclaw3d_domain
                                    Identified by this expression to be true:
                                    (patch->flags &
                                    FCLAW3D_PATCH_ON_PARALLEL_BOUNDARY) */
-    fclaw3d_patch_t **exchange_patches; /**< explicitly store exchange patches */
+    fclaw_patch_t **exchange_patches; /**< explicitly store exchange patches */
     int num_ghost_patches;      /**< number of off-proc patches relevant to this proc */
-    fclaw3d_patch_t *ghost_patches;     /**< array of off-proc patches */
+    fclaw_patch_t *ghost_patches;     /**< array of off-proc patches */
     struct fclaw_patch_bounds_3d *ghost_patch_bounds; /**< ghost patch bounds */
 
     void **mirror_target_levels;  /**< Points to target level of each mirror. */
@@ -301,7 +295,7 @@ void fclaw3d_domain_corner_faces (const fclaw3d_domain_t * domain,
  *                      1 if the corner would end up in the middle of a face
  *                      when there is a coarser neighbor.
  */
-int fclaw3d_patch_corner_dimension (const fclaw3d_patch_t * patch,
+int fclaw3d_patch_corner_dimension (const fclaw_patch_t * patch,
                                     int cornerno);
 
 /** Return the number of a patch with respect to its parent in the tree.
@@ -309,20 +303,20 @@ int fclaw3d_patch_corner_dimension (const fclaw3d_patch_t * patch,
  * \param [in] patch    A patch with properly set member variables.
  * \return              The child id is a number in 0..7.
  */
-int fclaw3d_patch_childid (const fclaw3d_patch_t * patch);
+int fclaw3d_patch_childid (const fclaw_patch_t * patch);
 
 /** Check if a patch is the first in a family of eight siblings.
  * For ghost patches, we always return false.
  * \param [in] patch    A patch with properly set member variables.
  * \return              True if patch is the first sibling.
  */
-int fclaw3d_patch_is_first_sibling (const fclaw3d_patch_t * patch);
+int fclaw3d_patch_is_first_sibling (const fclaw_patch_t * patch);
 
 /** Check whether a patch is a parallel ghost patch.
  * \param [in] patch    A patch with properly set member variables.
  * \return              True if patch is off-processor, false if local.
  */
-int fclaw3d_patch_is_ghost (const fclaw3d_patch_t * patch);
+int fclaw3d_patch_is_ghost (const fclaw_patch_t * patch);
 
 ///@}
 /* ---------------------------------------------------------------------- */
@@ -339,7 +333,7 @@ int fclaw3d_patch_is_ghost (const fclaw3d_patch_t * patch);
  * \param [in,out] user	Data that was passed into the iterator functions.
  */
 typedef void (*fclaw3d_patch_callback_t)
-    (fclaw3d_domain_t * domain, fclaw3d_patch_t * patch,
+    (fclaw3d_domain_t * domain, fclaw_patch_t * patch,
      int blockno, int patchno, void *user);
 
 /** Iterate over all local patches on a given level.
@@ -522,8 +516,8 @@ int fclaw3d_patch_face_transformation_valid (const int ftransform[]);
  * \param [in,out] j        Integer coordinate along y-axis in \a based .. \a my.
  * \param [in,out] k        Integer coordinate along z-axis in \a based .. \a mz.
  */
-void fclaw3d_patch_transform_face (fclaw3d_patch_t * ipatch,
-                                   fclaw3d_patch_t * opatch,
+void fclaw3d_patch_transform_face (fclaw_patch_t * ipatch,
+                                   fclaw_patch_t * opatch,
                                    const int ftransform[],
                                    int mx, int my, int mz, int based,
                                    int *i, int *j, int *k);
@@ -558,8 +552,8 @@ void fclaw3d_patch_transform_face (fclaw3d_patch_t * ipatch,
  *                          On output, they are relative to the fine patch and
  *                          stored in order of the children of the coarse patch.
  */
-void fclaw3d_patch_transform_face2 (fclaw3d_patch_t * ipatch,
-                                    fclaw3d_patch_t * opatch,
+void fclaw3d_patch_transform_face2 (fclaw_patch_t * ipatch,
+                                    fclaw_patch_t * opatch,
                                     const int ftransform[],
                                     int mx, int my, int mz, int based,
                                     int i[], int j[], int k[]);
@@ -659,8 +653,8 @@ void fclaw3d_patch_corner_swap (int *cornerno, int *rcornerno);
  * \param [in,out] j        Integer coordinate along y-axis in \a based .. \a my.
  * \param [in,out] k        Integer coordinate along z-axis in \a based .. \a mz.
  */
-void fclaw3d_patch_transform_corner (fclaw3d_patch_t * ipatch,
-                                     fclaw3d_patch_t * opatch,
+void fclaw3d_patch_transform_corner (fclaw_patch_t * ipatch,
+                                     fclaw_patch_t * opatch,
                                      int icorner, int is_block_boundary,
                                      int mx, int my, int mz,
                                      int based, int *i, int *j, int *k);
@@ -692,8 +686,8 @@ void fclaw3d_patch_transform_corner (fclaw3d_patch_t * ipatch,
  *                          On output, they are relative to the fine patch and
  *                          stored in order of the children of the coarse patch.
  */
-void fclaw3d_patch_transform_corner2 (fclaw3d_patch_t * ipatch,
-                                      fclaw3d_patch_t * opatch,
+void fclaw3d_patch_transform_corner2 (fclaw_patch_t * ipatch,
+                                      fclaw_patch_t * opatch,
                                       int icorner, int is_block_boundary,
                                       int mx, int my, int mz, int based,
                                       int i[], int j[], int k[]);
@@ -751,9 +745,9 @@ void fclaw3d_patch_mark_coarsen (fclaw3d_domain_t * domain,
  * We iterate over local patches only.
  */
 typedef void (*fclaw3d_match_callback_t) (fclaw3d_domain_t * old_domain,
-                                          fclaw3d_patch_t * old_patch,
+                                          fclaw_patch_t * old_patch,
                                           fclaw3d_domain_t * new_domain,
-                                          fclaw3d_patch_t * new_patch,
+                                          fclaw_patch_t * new_patch,
                                           fclaw3d_patch_relation_t newsize,
                                           int blockno,
                                           int old_patchno, int new_patchno,
@@ -821,9 +815,9 @@ void fclaw3d_domain_retrieve_after_partition (fclaw3d_domain_t * domain,
  *                              fclaw3d_domain_iterate_partitioned.
  */
 typedef void (*fclaw3d_transfer_callback_t) (fclaw3d_domain_t * old_domain,
-                                             fclaw3d_patch_t * old_patch,
+                                             fclaw_patch_t * old_patch,
                                              fclaw3d_domain_t * new_domain,
-                                             fclaw3d_patch_t * new_patch,
+                                             fclaw_patch_t * new_patch,
                                              int blockno,
                                              int old_patchno, int new_patchno,
                                              void *user);

@@ -74,7 +74,7 @@ typedef enum
 struct fclaw3d_patch_data
 {
     /** Pointer to the core patch structure in the domain */
-    const fclaw3d_patch_t *real_patch;
+    const fclaw_patch_t *real_patch;
 
     /** Neighbor relation on each face */
     fclaw3d_patch_relation_t face_neighbors[6];
@@ -111,9 +111,9 @@ struct fclaw3d_patch_data
 struct fclaw3d_patch_transform_data
 {
     /** Pointer to this patch */
-    struct fclaw3d_patch *this_patch;
+    struct fclaw_patch *this_patch;
     /** Pointer to the neighbor patch */
-    struct fclaw3d_patch *neighbor_patch;
+    struct fclaw_patch *neighbor_patch;
     /**
      * @brief Transform array
      * 
@@ -167,8 +167,8 @@ struct fclaw3d_patch;
  * @deprecated NOT USED
  */
 void fclaw3d_patch_reset_data(struct fclaw3d_global* glob,
-                              struct fclaw3d_patch* old_patch,
-                              struct fclaw3d_patch* new_patch,
+                              struct fclaw_patch* old_patch,
+                              struct fclaw_patch* new_patch,
                               int blockno,int old_patchno, int new_patchno);
 
 
@@ -179,7 +179,7 @@ void fclaw3d_patch_reset_data(struct fclaw3d_global* glob,
  * @param[in,out] patch the patch context, user data pointer is set to NULL on return
  */
 void fclaw3d_patch_data_delete(struct fclaw3d_global *glob,
-                               struct fclaw3d_patch *patch);
+                               struct fclaw_patch *patch);
 
 /**
  * @brief Construct a new patch object
@@ -191,7 +191,7 @@ void fclaw3d_patch_data_delete(struct fclaw3d_global *glob,
  * @param[in,out] user user data pointer
  */
 void fclaw3d_patch_build(struct fclaw3d_global *glob,
-                         struct fclaw3d_patch *this_patch,
+                         struct fclaw_patch *this_patch,
                          int blockno,
                          int patchno,
                          void *user);
@@ -208,8 +208,8 @@ void fclaw3d_patch_build(struct fclaw3d_global *glob,
  * @param[in] build_mode the build mode
  */
 void fclaw3d_patch_build_from_fine(struct fclaw3d_global *glob,
-                                   struct fclaw3d_patch *fine_patches,
-                                   struct fclaw3d_patch *coarse_patch,
+                                   struct fclaw_patch *fine_patches,
+                                   struct fclaw_patch *coarse_patch,
                                    int blockno,
                                    int coarse_patchno,
                                    int fine0_patchno,
@@ -231,7 +231,7 @@ void fclaw3d_patch_build_from_fine(struct fclaw3d_global *glob,
  * @param[in] patchno the patch number
  */
 void fclaw3d_patch_initialize(struct fclaw3d_global *glob,
-                              struct fclaw3d_patch *this_patch,
+                              struct fclaw_patch *this_patch,
                               int blockno,
                               int patchno);
 
@@ -248,7 +248,7 @@ void fclaw3d_patch_initialize(struct fclaw3d_global *glob,
  * @param[in] time_interp true if in time interpolation stage (not global)
  */
 void fclaw3d_patch_physical_bc(struct fclaw3d_global *glob,
-                               struct fclaw3d_patch *this_patch,
+                               struct fclaw_patch *this_patch,
                                int blockno,
                                int patchno,
                                double t,
@@ -269,7 +269,7 @@ void fclaw3d_patch_physical_bc(struct fclaw3d_global *glob,
  * @return double the maxcfl
  */
 double fclaw3d_patch_single_step_update(struct fclaw3d_global *glob,
-                                        struct fclaw3d_patch *this_patch,
+                                        struct fclaw_patch *this_patch,
                                         int blockno,
                                         int patchno,
                                         double t,
@@ -284,7 +284,7 @@ double fclaw3d_patch_single_step_update(struct fclaw3d_global *glob,
  * @param[in] patchno the patch number
  */
 void fclaw3d_patch_set_rhs(struct fclaw3d_global *glob,
-                           struct fclaw3d_patch *patch,
+                           struct fclaw_patch *patch,
                            int blockno,
                            int patchno);
 
@@ -302,7 +302,7 @@ void fclaw3d_patch_set_rhs(struct fclaw3d_global *glob,
  * @param[in,out] this_patch the patch context
  */
 void fclaw3d_patch_restore_step(struct fclaw3d_global* glob,
-                                struct fclaw3d_patch* this_patch);
+                                struct fclaw_patch* this_patch);
 
 /**
  * @brief Saves the current solution for later use
@@ -311,7 +311,7 @@ void fclaw3d_patch_restore_step(struct fclaw3d_global* glob,
  * @param[in,out] this_patch the patch context
  */
 void fclaw3d_patch_save_step(struct fclaw3d_global* glob,
-                             struct fclaw3d_patch* this_patch);
+                             struct fclaw_patch* this_patch);
 
 /**
  * @brief Sets up interpolated values for a patch 
@@ -321,7 +321,7 @@ void fclaw3d_patch_save_step(struct fclaw3d_global* glob,
  * @param[in] alpha the alpha value, with 0 being the last time step and 1 being the current time step
  */
 void fclaw3d_patch_setup_timeinterp(struct fclaw3d_global *glob,
-                                    struct fclaw3d_patch *this_patch,
+                                    struct fclaw_patch *this_patch,
                                     double alpha);
 
 ///@}
@@ -341,8 +341,8 @@ void fclaw3d_patch_setup_timeinterp(struct fclaw3d_global *glob,
  * @param[in] tranform_data the tranform data for the neighbor's coordinate system
  */
 void fclaw3d_patch_copy_face(struct fclaw3d_global* glob,
-                             struct fclaw3d_patch *this_patch,
-                             struct fclaw3d_patch *neighbor_patch,
+                             struct fclaw_patch *this_patch,
+                             struct fclaw_patch *neighbor_patch,
                              int iface,
                              int time_interp,
                              struct fclaw3d_patch_transform_data *transform_data);
@@ -363,8 +363,8 @@ void fclaw3d_patch_copy_face(struct fclaw3d_global* glob,
  * @param[in]     tranform_data the tranform data for the neighbor's coordinate system
  */
 void fclaw3d_patch_average_face(struct fclaw3d_global* glob,
-                                struct fclaw3d_patch *coarse_patch,
-                                struct fclaw3d_patch *fine_patch,
+                                struct fclaw_patch *coarse_patch,
+                                struct fclaw_patch *fine_patch,
                                 int idir,
                                 int iface_coarse,
                                 int refine_factor,
@@ -389,8 +389,8 @@ void fclaw3d_patch_average_face(struct fclaw3d_global* glob,
  * @param[in]     tranform_data the tranform data for the neighbor's coordinate system
  */
 void fclaw3d_patch_interpolate_face(struct fclaw3d_global* glob,
-                                    struct fclaw3d_patch *coarse_patch,
-                                    struct fclaw3d_patch *fine_patch,
+                                    struct fclaw_patch *coarse_patch,
+                                    struct fclaw_patch *fine_patch,
                                     int idir,
                                     int iside,
                                     int RefineFactor,
@@ -416,8 +416,8 @@ void fclaw3d_patch_interpolate_face(struct fclaw3d_global* glob,
  * @param[in]     tranform_data the tranform data for the neighbor's coordinate system
  */
 void fclaw3d_patch_copy_corner(struct fclaw3d_global* glob,
-                               struct fclaw3d_patch *this_patch,
-                               struct fclaw3d_patch *neighbor_patch,
+                               struct fclaw_patch *this_patch,
+                               struct fclaw_patch *neighbor_patch,
                                int this_blockno,
                                int neighbor_blockno,
                                int is_block_corner,
@@ -439,8 +439,8 @@ void fclaw3d_patch_copy_corner(struct fclaw3d_global* glob,
  * @param[in]     tranform_data the tranform data for the neighbor's coordinate system
  */
 void fclaw3d_patch_average_corner(struct fclaw3d_global* glob,
-                                  struct fclaw3d_patch *coarse_patch,
-                                  struct fclaw3d_patch *fine_patch,
+                                  struct fclaw_patch *coarse_patch,
+                                  struct fclaw_patch *fine_patch,
                                   int coarse_blockno,
                                   int fine_blockno,
                                   int is_block_corner,
@@ -462,8 +462,8 @@ void fclaw3d_patch_average_corner(struct fclaw3d_global* glob,
  * @param[in]     tranform_data the tranform data for the neighbor's coordinate system
  */
 void fclaw3d_patch_interpolate_corner(struct fclaw3d_global* glob,
-                                      struct fclaw3d_patch* coarse_patch,
-                                      struct fclaw3d_patch* fine_patch,
+                                      struct fclaw_patch* coarse_patch,
+                                      struct fclaw_patch* fine_patch,
                                       int coarse_blockno,
                                       int fine_blockno,
                                       int is_block_corner,
@@ -477,14 +477,14 @@ void fclaw3d_patch_interpolate_corner(struct fclaw3d_global* glob,
  * @deprecated NOT USED
  */
 void fclaw3d_patch_create_user_data(struct fclaw3d_global* glob,
-                                    struct fclaw3d_patch* patch);
+                                    struct fclaw_patch* patch);
 
 /**
  * DEPRECATED
  * @deprecated NOT USED
  */
 void fclaw3d_patch_destroy_user_data(struct fclaw3d_global* glob,
-                                     struct fclaw3d_patch* patch);
+                                     struct fclaw_patch* patch);
 
 /* ------------------------------------------------------------------------------------ */
 ///                         @name Transform Functions
@@ -501,7 +501,7 @@ void fclaw3d_patch_destroy_user_data(struct fclaw3d_global* glob,
  * @param[in,out] tdata the stransform data structure
  */
 void fclaw3d_patch_transform_init_data(struct fclaw3d_global* glob,
-                                       struct fclaw3d_patch* patch,
+                                       struct fclaw_patch* patch,
                                        int blockno, int patchno,
                                        struct fclaw3d_patch_transform_data *tdata);
 
@@ -567,7 +567,7 @@ void fclaw3d_patch_transform_blockface_intra(struct fclaw3d_global* glob,
  * @return true if patch should be refined
  */
 int fclaw3d_patch_tag4refinement(struct fclaw3d_global *glob,
-                                 struct fclaw3d_patch *this_patch,
+                                 struct fclaw_patch *this_patch,
                                  int blockno, int patchno,
                                  int initflag);
 
@@ -582,7 +582,7 @@ int fclaw3d_patch_tag4refinement(struct fclaw3d_global *glob,
  * @return true if patch should be coarsened
  */
 int fclaw3d_patch_tag4coarsening(struct fclaw3d_global *glob,
-                                 struct fclaw3d_patch *fine_patches,
+                                 struct fclaw_patch *fine_patches,
                                  int blockno,
                                  int patchno,
                                  int initflag);
@@ -598,8 +598,8 @@ int fclaw3d_patch_tag4coarsening(struct fclaw3d_global *glob,
  * @param[in] fine0_patchno the patch number of the first fine patch
  */
 void fclaw3d_patch_interpolate2fine(struct fclaw3d_global *glob,
-                                    struct fclaw3d_patch* coarse_patch,
-                                    struct fclaw3d_patch* fine_patches,
+                                    struct fclaw_patch* coarse_patch,
+                                    struct fclaw_patch* fine_patches,
                                     int this_blockno, int coarse_patchno,
                                     int fine0_patchno);
 
@@ -614,8 +614,8 @@ void fclaw3d_patch_interpolate2fine(struct fclaw3d_global *glob,
  * @param[in] coarse_patchno the patch number of the coarse patch
  */
 void fclaw3d_patch_average2coarse(struct fclaw3d_global *glob,
-                                  struct fclaw3d_patch *fine_patches,
-                                  struct fclaw3d_patch *coarse_patch,
+                                  struct fclaw_patch *fine_patches,
+                                  struct fclaw_patch *coarse_patch,
                                   int blockno, int fine0_patchno,
                                   int coarse_patchno);
 
@@ -660,7 +660,7 @@ void fclaw3d_patch_local_ghost_free(struct fclaw3d_global* glob,
  * @param[in] time_interp true if ghost filling for time interpolated level (non-global update)
  */
 void fclaw3d_patch_local_ghost_pack(struct fclaw3d_global *glob,
-                                    struct fclaw3d_patch *this_patch,
+                                    struct fclaw_patch *this_patch,
                                     void *patch_data,
                                     int time_interp);
 
@@ -674,7 +674,7 @@ void fclaw3d_patch_local_ghost_pack(struct fclaw3d_global *glob,
  * @param[in] build_mode the build mode
  */
 void fclaw3d_patch_remote_ghost_build(struct fclaw3d_global *glob,
-                                      struct fclaw3d_patch *this_patch,
+                                      struct fclaw_patch *this_patch,
                                       int blockno,
                                       int patchno,
                                       fclaw3d_build_mode_t build_mode);
@@ -690,7 +690,7 @@ void fclaw3d_patch_remote_ghost_build(struct fclaw3d_global *glob,
  * @param[in] time_interp true if ghost filling for time interpolated level (non-global update)
  */
 void fclaw3d_patch_remote_ghost_unpack(struct fclaw3d_global* glob,
-                                       struct fclaw3d_patch* this_patch,
+                                       struct fclaw_patch* this_patch,
                                        int blockno, int patchno,
                                        void *qdata, int time_interp);
 
@@ -702,7 +702,7 @@ void fclaw3d_patch_remote_ghost_unpack(struct fclaw3d_global* glob,
  * @param[in,out] ghost_patch the patch context
  */
 void fclaw3d_patch_remote_ghost_delete(struct fclaw3d_global *glob,
-                                       struct fclaw3d_patch *ghost_patch);
+                                       struct fclaw_patch *ghost_patch);
 
 ///@}
 /* ------------------------------------------------------------------------------------ */
@@ -721,7 +721,7 @@ void fclaw3d_patch_remote_ghost_delete(struct fclaw3d_global *glob,
  * @param[out] pack_data_here the buffer
  */
 void fclaw3d_patch_partition_pack(struct fclaw3d_global *glob,
-                                  struct fclaw3d_patch *this_patch,
+                                  struct fclaw_patch *this_patch,
                                   int blockno,
                                   int patchno,
                                   void *pack_data_here);
@@ -738,7 +738,7 @@ void fclaw3d_patch_partition_pack(struct fclaw3d_global *glob,
  */
 void fclaw3d_patch_partition_unpack(struct fclaw3d_global *glob,
                                     struct fclaw3d_domain *new_domain,  
-                                    struct fclaw3d_patch *this_patch,
+                                    struct fclaw_patch *this_patch,
                                     int blockno,
                                     int patchno,
                                     void *packed_data);
@@ -775,8 +775,8 @@ size_t fclaw3d_patch_partition_packsize(struct fclaw3d_global* glob);
  * @param[in] transform_data the transform for the neighbor's coordinates
  */
 void fclaw3d_patch_time_sync_f2c(struct fclaw3d_global* glob,
-                                 struct fclaw3d_patch *coarse_patch,
-                                 struct fclaw3d_patch *fine_patch,
+                                 struct fclaw_patch *coarse_patch,
+                                 struct fclaw_patch *fine_patch,
                                  int coarse_blockno, int fine_blockno,
                                  int coarse_patchno, 
                                  int idir,
@@ -797,8 +797,8 @@ void fclaw3d_patch_time_sync_f2c(struct fclaw3d_global* glob,
  * @param[in] transform_data the transform for the neighbor's coordinates
  */
 void fclaw3d_patch_time_sync_samesize(struct fclaw3d_global* glob,
-                                      struct fclaw3d_patch *this_patch,
-                                      struct fclaw3d_patch *neighbor_patch,
+                                      struct fclaw_patch *this_patch,
+                                      struct fclaw_patch *neighbor_patch,
                                       int this_iface, int idir,
                                       struct fclaw3d_patch_transform_data *transform_data);
 
@@ -811,7 +811,7 @@ void fclaw3d_patch_time_sync_samesize(struct fclaw3d_global* glob,
  * @param[in] reset_mode the reset mode ::fclaw3d_time_sync_type
  */
 void fclaw3d_patch_time_sync_reset(struct fclaw3d_global* glob,
-                                   struct fclaw3d_patch* this_patch,
+                                   struct fclaw_patch* this_patch,
                                    int coarse_level,
                                    int reset_mode);
 
@@ -846,7 +846,7 @@ typedef void (*fclaw3d_patch_delete_t)(void *user_patch);
  * @param[in,out] user user data pointer
  */
 typedef void (*fclaw3d_patch_build_t)(struct fclaw3d_global *glob,
-                                      struct fclaw3d_patch *this_patch,
+                                      struct fclaw_patch *this_patch,
                                       int blockno,
                                       int patchno,
                                       void *user);
@@ -863,8 +863,8 @@ typedef void (*fclaw3d_patch_build_t)(struct fclaw3d_global *glob,
  * @param[in] build_mode the build mode
  */
 typedef void (*fclaw3d_patch_build_from_fine_t)(struct fclaw3d_global *glob,
-                                                struct fclaw3d_patch *fine_patches,
-                                                struct fclaw3d_patch *coarse_patch,
+                                                struct fclaw_patch *fine_patches,
+                                                struct fclaw_patch *coarse_patch,
                                                 int blockno,
                                                 int coarse_patchno,
                                                 int fine0_patchno,
@@ -879,7 +879,7 @@ typedef void (*fclaw3d_patch_build_from_fine_t)(struct fclaw3d_global *glob,
  * @param[in] patchno the patch number
  */
 typedef void (*fclaw3d_patch_setup_t)(struct fclaw3d_global *glob,
-                                      struct fclaw3d_patch *this_patch,
+                                      struct fclaw_patch *this_patch,
                                       int patchno,
                                       int blockno);
 
@@ -898,7 +898,7 @@ typedef void (*fclaw3d_patch_setup_t)(struct fclaw3d_global *glob,
  * @param[in] patchno the patch number
  */
 typedef void (*fclaw3d_patch_initialize_t)(struct fclaw3d_global *glob,
-                                           struct fclaw3d_patch *this_patch,
+                                           struct fclaw_patch *this_patch,
                                            int blockno,
                                            int patchno);
 
@@ -916,7 +916,7 @@ typedef void (*fclaw3d_patch_initialize_t)(struct fclaw3d_global *glob,
  * @param[in] time_interp the patch number
  */
 typedef void (*fclaw3d_patch_physical_bc_t)(struct fclaw3d_global *glob,
-                                            struct fclaw3d_patch *this_patch,
+                                            struct fclaw_patch *this_patch,
                                             int blockno,
                                             int patchno,
                                             double t,
@@ -938,7 +938,7 @@ typedef void (*fclaw3d_patch_physical_bc_t)(struct fclaw3d_global *glob,
  * @return the maxcfl
  */
 typedef double (*fclaw3d_patch_single_step_update_t)(struct fclaw3d_global *glob,
-                                                     struct fclaw3d_patch *this_patch,
+                                                     struct fclaw_patch *this_patch,
                                                      int blockno,
                                                      int patchno,
                                                      double t,
@@ -955,7 +955,7 @@ typedef double (*fclaw3d_patch_single_step_update_t)(struct fclaw3d_global *glob
  * @param[in] patchno the patch number
  */
 typedef void (*fclaw3d_patch_rhs_t)(struct fclaw3d_global *glob,
-                                    struct fclaw3d_patch *patch,
+                                    struct fclaw_patch *patch,
                                     int blockno,
                                     int patchno);
 
@@ -967,16 +967,16 @@ typedef void (*fclaw3d_patch_rhs_t)(struct fclaw3d_global *glob,
 
 /** @copydoc fclaw2d_patch_setup_timeinterp() */
 typedef void (*fclaw3d_patch_setup_timeinterp_t)(struct fclaw3d_global *glob,
-                                                 struct fclaw3d_patch *this_patch,
+                                                 struct fclaw_patch *this_patch,
                                                  double alpha);
 
 /** @copydoc fclaw2d_patch_restore_step() */
 typedef void (*fclaw3d_patch_restore_step_t)(struct fclaw3d_global *glob,
-                                             struct fclaw3d_patch* this_patch);
+                                             struct fclaw_patch* this_patch);
 
 /** @copydoc fclaw2d_patch_save_step() */
 typedef void (*fclaw3d_patch_save_step_t)(struct fclaw3d_global *glob,
-                                          struct fclaw3d_patch* this_patch);
+                                          struct fclaw_patch* this_patch);
 
 
 ///@}
@@ -996,8 +996,8 @@ typedef void (*fclaw3d_patch_save_step_t)(struct fclaw3d_global *glob,
  * @param[in] tranform_data the tranform data for the neighbor's coordinate system
  */
 typedef void (*fclaw3d_patch_copy_face_t)(struct fclaw3d_global* glob,
-                                          struct fclaw3d_patch *this_patch,
-                                          struct fclaw3d_patch *neighbor_patch,
+                                          struct fclaw_patch *this_patch,
+                                          struct fclaw_patch *neighbor_patch,
                                           int iface,
                                           int time_interp,
                                           struct fclaw3d_patch_transform_data 
@@ -1019,8 +1019,8 @@ typedef void (*fclaw3d_patch_copy_face_t)(struct fclaw3d_global* glob,
  * @param[in]     tranform_data the tranform data for the neighbor's coordinate system
  */
 typedef void (*fclaw3d_patch_average_face_t)(struct fclaw3d_global* glob,
-                                             struct fclaw3d_patch *coarse_patch,
-                                             struct fclaw3d_patch *fine_patch,
+                                             struct fclaw_patch *coarse_patch,
+                                             struct fclaw_patch *fine_patch,
                                              int idir,
                                              int iface_coarse,
                                              int refine_factor,
@@ -1047,8 +1047,8 @@ typedef void (*fclaw3d_patch_average_face_t)(struct fclaw3d_global* glob,
  * @param[in]     tranform_data the tranform data for the neighbor's coordinate system
  */
 typedef void (*fclaw3d_patch_interpolate_face_t)(struct fclaw3d_global* glob,
-                                                 struct fclaw3d_patch *coarse_patch,
-                                                 struct fclaw3d_patch *fine_patch,
+                                                 struct fclaw_patch *coarse_patch,
+                                                 struct fclaw_patch *fine_patch,
                                                  int idir,
                                                  int iside,
                                                  int refine_factor,
@@ -1074,8 +1074,8 @@ typedef void (*fclaw3d_patch_interpolate_face_t)(struct fclaw3d_global* glob,
  * @param[in]     tranform_data the tranform data for the neighbor's coordinate system
  */
 typedef void (*fclaw3d_patch_copy_corner_t)(struct fclaw3d_global* glob,
-                                            struct fclaw3d_patch *this_patch,
-                                            struct fclaw3d_patch *neighbor_patch,
+                                            struct fclaw_patch *this_patch,
+                                            struct fclaw_patch *neighbor_patch,
                                             int this_blockno,
                                             int neighbor_blockno,
                                             int icorner,
@@ -1096,8 +1096,8 @@ typedef void (*fclaw3d_patch_copy_corner_t)(struct fclaw3d_global* glob,
  * @param[in]     tranform_data the tranform data for the neighbor's coordinate system
  */
 typedef void (*fclaw3d_patch_average_corner_t)(struct fclaw3d_global* glob,
-                                               struct fclaw3d_patch *coarse_patch,
-                                               struct fclaw3d_patch *fine_patch,
+                                               struct fclaw_patch *coarse_patch,
+                                               struct fclaw_patch *fine_patch,
                                                int coarse_blockno,
                                                int fine_blockno,
                                                int icorner,
@@ -1118,8 +1118,8 @@ typedef void (*fclaw3d_patch_average_corner_t)(struct fclaw3d_global* glob,
  * @param[in]     tranform_data the tranform data for the neighbor's coordinate system
  */   
 typedef void (*fclaw3d_patch_interpolate_corner_t)(struct fclaw3d_global* glob,
-                                                   struct fclaw3d_patch *coarse_patch,
-                                                   struct fclaw3d_patch *fine_patch,
+                                                   struct fclaw_patch *coarse_patch,
+                                                   struct fclaw_patch *fine_patch,
                                                    int coarse_blockno,
                                                    int fine_blockno,
                                                    int icorner,
@@ -1143,7 +1143,7 @@ typedef void (*fclaw3d_patch_interpolate_corner_t)(struct fclaw3d_global* glob,
  * @param[in,out] tdata the stransform data structure
  */
 typedef void (*fclaw3d_patch_transform_init_data_t)(struct fclaw3d_global* glob,
-                                                    struct fclaw3d_patch* patch,
+                                                    struct fclaw_patch* patch,
                                                     int blockno, int patchno,
                                                     struct fclaw3d_patch_transform_data *tdata);
 
@@ -1205,7 +1205,7 @@ typedef void (*fclaw3d_patch_transform_blockface_intra_t)(int ftransform[]);
  * @return true if patch should be refined
  */
 typedef int (*fclaw3d_patch_tag4refinement_t)(struct fclaw3d_global *glob,
-                                              struct fclaw3d_patch *this_patch,
+                                              struct fclaw_patch *this_patch,
                                               int this_blockno, int this_patchno,
                                               int initflag);
 
@@ -1220,7 +1220,7 @@ typedef int (*fclaw3d_patch_tag4refinement_t)(struct fclaw3d_global *glob,
  * @return true if patch should be coarsened
  */
 typedef int (*fclaw3d_patch_tag4coarsening_t)(struct fclaw3d_global *glob,
-                                              struct fclaw3d_patch *this_patch,
+                                              struct fclaw_patch *this_patch,
                                               int this_blockno,
                                               int this_patchno,
                                               int initflag);
@@ -1236,8 +1236,8 @@ typedef int (*fclaw3d_patch_tag4coarsening_t)(struct fclaw3d_global *glob,
  * @param[in] fine_patchno the patch number of the first fine patch
  */
 typedef void (*fclaw3d_patch_interpolate2fine_t)(struct fclaw3d_global *glob,
-                                                 struct fclaw3d_patch *coarse_patch,
-                                                 struct fclaw3d_patch* fine_patches,
+                                                 struct fclaw_patch *coarse_patch,
+                                                 struct fclaw_patch* fine_patches,
                                                  int blockno, int coarse_patchno,
                                                  int fine_patchno);
 /**
@@ -1251,8 +1251,8 @@ typedef void (*fclaw3d_patch_interpolate2fine_t)(struct fclaw3d_global *glob,
  * @param[in] coarse_patchno the patch number of the coarse patch
  */
 typedef void (*fclaw3d_patch_average2coarse_t)(struct fclaw3d_global *glob,
-                                               struct fclaw3d_patch *fine_patches,
-                                               struct fclaw3d_patch *coarse_patch,
+                                               struct fclaw_patch *fine_patches,
+                                               struct fclaw_patch *coarse_patch,
                                                int blockno, int fine_patchno,
                                                int coarse_patchno);
 
@@ -1267,7 +1267,7 @@ typedef size_t (*fclaw3d_patch_ghost_packsize_t)(struct fclaw3d_global* glob);
 
 /** @copydoc fclaw2d_patch_local_ghost_pack() */
 typedef void (*fclaw3d_patch_local_ghost_pack_t)(struct fclaw3d_global *glob,
-                                                 struct fclaw3d_patch *this_patch,
+                                                 struct fclaw_patch *this_patch,
                                                  void *patch_data,
                                                  int time_interp);
 
@@ -1282,7 +1282,7 @@ typedef void (*fclaw3d_patch_local_ghost_free_t)(struct fclaw3d_global* glob,
 
 /** @copydoc fclaw2d_patch_remote_ghost_build() */
 typedef void (*fclaw3d_patch_remote_ghost_build_t)(struct fclaw3d_global *glob,
-                                                   struct fclaw3d_patch *this_patch,
+                                                   struct fclaw_patch *this_patch,
                                                    int blockno,
                                                    int patchno,
                                                    fclaw3d_build_mode_t build_mode);
@@ -1296,14 +1296,14 @@ typedef void (*fclaw3d_patch_remote_ghost_build_t)(struct fclaw3d_global *glob,
  * @param[in] blockno the patch number
  */
 typedef void (*fclaw3d_patch_remote_ghost_setup_t)(struct fclaw3d_global *glob,
-                                                   struct fclaw3d_patch *this_patch,
+                                                   struct fclaw_patch *this_patch,
                                                    int blockno,
                                                    int patchno);
 
 
 /** @copydoc fclaw2d_patch_remote_ghost_unpack() */
 typedef void (*fclaw3d_patch_remote_ghost_unpack_t)(struct fclaw3d_global *glob,
-                                                    struct fclaw3d_patch* this_patch,
+                                                    struct fclaw_patch* this_patch,
                                                     int blockno, int patchno,
                                                     void *qdata, int time_interp);
 
@@ -1323,7 +1323,7 @@ typedef size_t (*fclaw3d_patch_partition_packsize_t)(struct fclaw3d_global* glob
 
 /** @copydoc fclaw2d_patch_partition_pack() */
 typedef void (*fclaw3d_patch_partition_pack_t)(struct fclaw3d_global *glob,
-                                               struct fclaw3d_patch *this_patch,
+                                               struct fclaw_patch *this_patch,
                                                int blockno,
                                                int patchno,
                                                void *pack_data_here);
@@ -1331,7 +1331,7 @@ typedef void (*fclaw3d_patch_partition_pack_t)(struct fclaw3d_global *glob,
 /** @copydoc fclaw2d_patch_partition_unpack() */
 typedef void (*fclaw3d_patch_partition_unpack_t)(struct fclaw3d_global *glob,
                                                  struct fclaw3d_domain *new_domain,
-                                                 struct fclaw3d_patch *this_patch,
+                                                 struct fclaw_patch *this_patch,
                                                  int blockno,
                                                  int patchno,
                                                  void *unpack_data_from_here);
@@ -1345,8 +1345,8 @@ typedef void (*fclaw3d_patch_partition_unpack_t)(struct fclaw3d_global *glob,
 
 /** @copydoc fclaw2d_patch_time_sync_f2c() */
 typedef void (*fclaw3d_patch_time_sync_f2c_t)(struct fclaw3d_global* glob,
-                                              struct fclaw3d_patch *coarse_patch,
-                                              struct fclaw3d_patch *fine_patch,
+                                              struct fclaw_patch *coarse_patch,
+                                              struct fclaw_patch *fine_patch,
                                               int coarse_blockno, int fine_blockno,
                                               int coarse_patchno, 
                                               int idir,
@@ -1358,15 +1358,15 @@ typedef void (*fclaw3d_patch_time_sync_f2c_t)(struct fclaw3d_global* glob,
 
 /** @copydoc fclaw2d_patch_time_sync_samesize() */
 typedef void (*fclaw3d_patch_time_sync_samesize_t)(struct fclaw3d_global* glob,
-                                                   struct fclaw3d_patch* this_patch,
-                                                   struct fclaw3d_patch* neighbor_patch,
+                                                   struct fclaw_patch* this_patch,
+                                                   struct fclaw_patch* neighbor_patch,
                                                    int this_iface, int idir,
                                                    struct fclaw3d_patch_transform_data 
                                                    *transform_data);
 
 /** @copydoc fclaw2d_patch_time_sync_reset() */
 typedef void (*fclaw3d_patch_time_sync_reset_t)(struct fclaw3d_global *glob, 
-                                                struct fclaw3d_patch *this_patch,
+                                                struct fclaw_patch *this_patch,
                                                 int coarse_level,
                                                 int reset_mode);
 
@@ -1383,7 +1383,7 @@ typedef void (*fclaw3d_patch_time_sync_reset_t)(struct fclaw3d_global *glob,
  * @param[in,out] patch the patch context
  */
 typedef void (*fclaw3d_patch_create_user_data_t)(struct fclaw3d_global *glob, 
-                                              struct fclaw3d_patch *patch);
+                                              struct fclaw_patch *patch);
 
 /**
  * @brief Destroys user data
@@ -1392,7 +1392,7 @@ typedef void (*fclaw3d_patch_create_user_data_t)(struct fclaw3d_global *glob,
  * @param[in,out] patch the patch context
  */
 typedef void (*fclaw3d_patch_destroy_user_data_t)(struct fclaw3d_global* glob,
-                                                  struct fclaw3d_patch* patch);
+                                                  struct fclaw_patch* patch);
 
 ///@}
 /* ------------------------------------------------------------------------------------ */
@@ -1405,7 +1405,7 @@ typedef void (*fclaw3d_patch_destroy_user_data_t)(struct fclaw3d_global* glob,
  * 
  * @param[in] patch the patch context
  */
-typedef void* (*fclaw3d_patch_metric_patch_t)(struct fclaw3d_patch *patch);
+typedef void* (*fclaw3d_patch_metric_patch_t)(struct fclaw_patch *patch);
 
 ///@}
 /* ------------------------------------------------------------------------------------ */
@@ -1610,7 +1610,7 @@ void fclaw3d_patch_vtable_initialize(struct fclaw3d_global* glob);
  * @param[out] level the level that the patch is on
  */
 void fclaw3d_patch_get_info(struct fclaw3d_domain * domain,
-                            struct fclaw3d_patch * patch,
+                            struct fclaw_patch * patch,
                             int blockno, int patchno,
                             int *global_num, int* local_num, 
                             int *level);
@@ -1627,7 +1627,7 @@ void fclaw3d_patch_get_info(struct fclaw3d_domain * domain,
  */
 /* I don't completely trust this routine */
 void fclaw3d_patch_get_info2(struct fclaw3d_domain * domain,
-                             struct fclaw3d_patch * this_patch,
+                             struct fclaw_patch * this_patch,
                              int *blockno, int *patchno,
                              int *global_num, int *level);
 /**
@@ -1636,7 +1636,7 @@ void fclaw3d_patch_get_info2(struct fclaw3d_domain * domain,
  * @param patch the patch context
  * @return void* the pointer
  */
-void* fclaw3d_patch_get_user_patch(struct fclaw3d_patch* patch);
+void* fclaw3d_patch_get_user_patch(struct fclaw_patch* patch);
 
 /**
  * @brief Get the patch data
@@ -1644,7 +1644,7 @@ void* fclaw3d_patch_get_user_patch(struct fclaw3d_patch* patch);
  * @param patch the patch context
  * @return struct fclaw3d_patch_data* pointer to the patch data
  */
-struct fclaw3d_patch_data* fclaw3d_patch_get_patch_data(struct fclaw3d_patch* patch);
+struct fclaw3d_patch_data* fclaw3d_patch_get_patch_data(struct fclaw_patch* patch);
 
 /**
  * @brief Get the user data pointer
@@ -1654,7 +1654,7 @@ struct fclaw3d_patch_data* fclaw3d_patch_get_patch_data(struct fclaw3d_patch* pa
  * @return void* the user data pointer
  */
 void* fclaw3d_patch_get_user_data(struct fclaw3d_global* glob,
-                                  struct fclaw3d_patch* this_patch);
+                                  struct fclaw_patch* this_patch);
 
 
 /**
@@ -1665,7 +1665,7 @@ void* fclaw3d_patch_get_user_data(struct fclaw3d_global* glob,
  * @return void* pointer to the metric patch
  */
 void* fclaw3d_patch_metric_patch(struct fclaw3d_global* glob,
-                                 struct fclaw3d_patch *patch);
+                                 struct fclaw_patch *patch);
 
 /**
  * @brief Get the block number
@@ -1673,7 +1673,7 @@ void* fclaw3d_patch_metric_patch(struct fclaw3d_global* glob,
  * @param this_patch the patch context
  * @return int the block number
  */
-int fclaw3d_patch_get_blockno(struct fclaw3d_patch* this_patch);
+int fclaw3d_patch_get_blockno(struct fclaw_patch* this_patch);
 
 /**
  * @brief Get the patch number
@@ -1681,7 +1681,7 @@ int fclaw3d_patch_get_blockno(struct fclaw3d_patch* this_patch);
  * @param this_patch the patch context
  * @return int the patch number
  */
-int fclaw3d_patch_get_patchno(struct fclaw3d_patch* this_patch);
+int fclaw3d_patch_get_patchno(struct fclaw_patch* this_patch);
 
 ///@}
 /* ------------------------------------------------------------------------------------ */
@@ -1697,7 +1697,7 @@ int fclaw3d_patch_get_patchno(struct fclaw3d_patch* this_patch);
  * @return void* the user data pointer
  */
 void* fclaw3d_patch_user_data(struct fclaw3d_global* glob,
-                              struct fclaw3d_patch* this_patch);
+                              struct fclaw_patch* this_patch);
 
 /**
  * @brief Set the user data pointer of a patch
@@ -1707,7 +1707,7 @@ void* fclaw3d_patch_user_data(struct fclaw3d_global* glob,
  * @param user the user data pointer
  */
 void fclaw3d_patch_set_user_data(struct fclaw3d_global* glob,
-                                 struct fclaw3d_patch* this_patch, 
+                                 struct fclaw_patch* this_patch, 
                                  void* user);
 
 
@@ -1723,7 +1723,7 @@ void fclaw3d_patch_set_user_data(struct fclaw3d_global* glob,
  * @param patch the patch context
  * @return int true if on parallel boundary
  */
-int fclaw3d_patch_on_parallel_boundary (const struct fclaw3d_patch * patch);
+int fclaw3d_patch_on_parallel_boundary (const struct fclaw_patch * patch);
 
 
 /**
@@ -1733,7 +1733,7 @@ int fclaw3d_patch_on_parallel_boundary (const struct fclaw3d_patch * patch);
  * @param iface the interface
  * @param face_type the face type
  */
-void fclaw3d_patch_set_face_type(struct fclaw3d_patch *patch, int iface,
+void fclaw3d_patch_set_face_type(struct fclaw_patch *patch, int iface,
                                  fclaw3d_patch_relation_t face_type);
 
 /**
@@ -1743,7 +1743,7 @@ void fclaw3d_patch_set_face_type(struct fclaw3d_patch *patch, int iface,
  * @param iedge the edge
  * @param edge_type the edge type
  */
-void fclaw3d_patch_set_edge_type(fclaw3d_patch_t *patch,int iedge,
+void fclaw3d_patch_set_edge_type(fclaw_patch_t *patch,int iedge,
 								   fclaw3d_patch_relation_t edge_type);
 
 /**
@@ -1753,7 +1753,7 @@ void fclaw3d_patch_set_edge_type(fclaw3d_patch_t *patch,int iedge,
  * @param icorner the corner
  * @param corner_type the corner type
  */
-void fclaw3d_patch_set_corner_type(struct fclaw3d_patch *patch, int icorner,
+void fclaw3d_patch_set_corner_type(struct fclaw_patch *patch, int icorner,
                                    fclaw3d_patch_relation_t corner_type);
 
 /**
@@ -1762,7 +1762,7 @@ void fclaw3d_patch_set_corner_type(struct fclaw3d_patch *patch, int icorner,
  * @param patch the patch context
  * @param icorner the missing corner
  */
-void fclaw3d_patch_set_missing_corner(struct fclaw3d_patch *patch, int icorner);
+void fclaw3d_patch_set_missing_corner(struct fclaw_patch *patch, int icorner);
 
 /**
  * @brief Get the face type of a patch
@@ -1771,7 +1771,7 @@ void fclaw3d_patch_set_missing_corner(struct fclaw3d_patch *patch, int icorner);
  * @param iface the face
  * @return fclaw3d_patch_relation_t the face type
  */
-fclaw3d_patch_relation_t fclaw3d_patch_get_face_type(struct fclaw3d_patch* patch,
+fclaw3d_patch_relation_t fclaw3d_patch_get_face_type(struct fclaw_patch* patch,
                                                         int iface);
 
 /**
@@ -1781,7 +1781,7 @@ fclaw3d_patch_relation_t fclaw3d_patch_get_face_type(struct fclaw3d_patch* patch
  * @param iface the edge
  * @return fclaw3d_patch_relation_t the edge type
  */
-fclaw3d_patch_relation_t fclaw2d_patch_get_edge_type(fclaw3d_patch_t* patch,
+fclaw3d_patch_relation_t fclaw2d_patch_get_edge_type(fclaw_patch_t* patch,
 													   int iedge);
 
 /**
@@ -1791,7 +1791,7 @@ fclaw3d_patch_relation_t fclaw2d_patch_get_edge_type(fclaw3d_patch_t* patch,
  * @param icorner the corner
  * @return fclaw3d_patch_relation_t the patch relation
  */
-fclaw3d_patch_relation_t fclaw3d_patch_get_corner_type(struct fclaw3d_patch* patch,
+fclaw3d_patch_relation_t fclaw3d_patch_get_corner_type(struct fclaw_patch* patch,
                                                           int icorner);
 
 /**
@@ -1801,7 +1801,7 @@ fclaw3d_patch_relation_t fclaw3d_patch_get_corner_type(struct fclaw3d_patch* pat
  * @param icorner the corner
  * @return int true if a corner is missing
  */
-int fclaw3d_patch_corner_is_missing(struct fclaw3d_patch* patch,
+int fclaw3d_patch_corner_is_missing(struct fclaw_patch* patch,
                                     int icorner);
 
 /**
@@ -1809,14 +1809,14 @@ int fclaw3d_patch_corner_is_missing(struct fclaw3d_patch* patch,
  * 
  * @param patch the patch context
  */
-void fclaw3d_patch_neighbors_set(fclaw3d_patch_t* patch);
+void fclaw3d_patch_neighbors_set(fclaw_patch_t* patch);
 
 /**
  * @brief Reset the neighbor relation data for a patch
  * 
  * @param patch the patch context
  */
-void fclaw3d_patch_neighbors_reset(struct fclaw3d_patch* patch);
+void fclaw3d_patch_neighbors_reset(struct fclaw_patch* patch);
 
 /**
  * @brief Returns true if the patch neighbor information is set
@@ -1824,7 +1824,7 @@ void fclaw3d_patch_neighbors_reset(struct fclaw3d_patch* patch);
  * @param patch the patch context
  * @return int true if the patch neighbor information is set
  */
-int fclaw3d_patch_neighbor_type_set(struct fclaw3d_patch* patch);
+int fclaw3d_patch_neighbor_type_set(struct fclaw_patch* patch);
 
 /**
  * @brief Returns true if a patch has finer neighbors
@@ -1832,7 +1832,7 @@ int fclaw3d_patch_neighbor_type_set(struct fclaw3d_patch* patch);
  * @param patch the patch context
  * @return int true if the patch has finer neighbors
  */
-int fclaw3d_patch_has_finegrid_neighbors(struct fclaw3d_patch *patch);
+int fclaw3d_patch_has_finegrid_neighbors(struct fclaw_patch *patch);
 
 /**
  * @brief Returns true if the patch is on a coarse fine interface
@@ -1840,7 +1840,7 @@ int fclaw3d_patch_has_finegrid_neighbors(struct fclaw3d_patch *patch);
  * @param patch the patch context
  * @return int true if the patch is on a coarse fine interface
  */
-int fclaw3d_patch_on_coarsefine_interface(struct fclaw3d_patch *patch);
+int fclaw3d_patch_on_coarsefine_interface(struct fclaw_patch *patch);
 
 /**
  * @brief Get the block corner count array for a patch
@@ -1850,7 +1850,7 @@ int fclaw3d_patch_on_coarsefine_interface(struct fclaw3d_patch *patch);
  * @return int* the array with the block corner count (the number of blocks that meet) for each corner
  */
 int* fclaw3d_patch_block_corner_count(struct fclaw3d_global *glob,
-                                      struct fclaw3d_patch* this_patch);
+                                      struct fclaw_patch* this_patch);
 
 /**
  * @brief Set the block corner count for a corner
@@ -1861,7 +1861,7 @@ int* fclaw3d_patch_block_corner_count(struct fclaw3d_global *glob,
  * @param block_corner_count the block corner count (the number of blocks that meet)
  */
 void fclaw3d_patch_set_block_corner_count(struct fclaw3d_global *glob,
-                                          struct fclaw3d_patch* this_patch,
+                                          struct fclaw_patch* this_patch,
                                           int icorner, int block_corner_count);
 
 ///@}

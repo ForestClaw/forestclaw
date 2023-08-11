@@ -61,7 +61,7 @@ void clawpack46_setprob(fclaw2d_global_t *glob)
 
 static
 void clawpack46_qinit(fclaw2d_global_t *glob,
-					  fclaw2d_patch_t *patch,
+					  fclaw_patch_t *patch,
 					  int blockno,
 					  int patchno)
 {
@@ -93,7 +93,7 @@ void clawpack46_qinit(fclaw2d_global_t *glob,
 
 static
 void clawpack46_bc2(fclaw2d_global_t *glob,
-					fclaw2d_patch_t *patch,
+					fclaw_patch_t *patch,
 					int blockno,
 					int patchno,
 					double t,
@@ -148,7 +148,7 @@ void clawpack46_bc2(fclaw2d_global_t *glob,
 
 static
 void clawpack46_b4step2(fclaw2d_global_t *glob,
-						fclaw2d_patch_t *patch,
+						fclaw_patch_t *patch,
 						int blockno,
 						int patchno,
 						double t, double dt)
@@ -182,7 +182,7 @@ void clawpack46_b4step2(fclaw2d_global_t *glob,
 
 static
 void clawpack46_src2(fclaw2d_global_t *glob,
-					 fclaw2d_patch_t *patch,
+					 fclaw_patch_t *patch,
 					 int blockno,
 					 int patchno,
 					 double t,
@@ -222,7 +222,7 @@ void clawpack46_src2(fclaw2d_global_t *glob,
 /* This can be used as a value for patch_vt->patch_setup */
 static
 void clawpack46_setaux(fclaw2d_global_t *glob,
-					   fclaw2d_patch_t *patch,
+					   fclaw_patch_t *patch,
 					   int blockno,
 					   int patchno)
 	{
@@ -258,7 +258,7 @@ void clawpack46_setaux(fclaw2d_global_t *glob,
 /* This is called from the single_step callback. and is of type 'flaw_single_step_t' */
 static
 double clawpack46_step2(fclaw2d_global_t *glob,
-						fclaw2d_patch_t *patch,
+						fclaw_patch_t *patch,
 						int blockno,
 						int patchno,
 						double t,
@@ -401,7 +401,7 @@ double clawpack46_step2(fclaw2d_global_t *glob,
 
 static
 double clawpack46_update(fclaw2d_global_t *glob,
-                         fclaw2d_patch_t *patch,
+                         fclaw_patch_t *patch,
                          int blockno,
                          int patchno,
                          double t,
@@ -554,7 +554,7 @@ fc2d_clawpack46_vtable_t* fc2d_clawpack46_vt(fclaw2d_global_t* glob)
 
 /* This should only be called when a new fclaw_clawpatch_t is created. */
 void fc2d_clawpack46_set_capacity(fclaw2d_global_t *glob,
-								  fclaw2d_patch_t *patch,
+								  fclaw_patch_t *patch,
 								  int blockno,
 								  int patchno)
 {
@@ -588,7 +588,7 @@ void fc2d_clawpack46_setprob(fclaw2d_global_t *glob)
 
 /* This can be set to claw46_vt->src2 */
 void fc2d_clawpack46_src2(fclaw2d_global_t* glob,
-						  fclaw2d_patch_t *patch,
+						  fclaw_patch_t *patch,
 						  int blockno,
 						  int patchno,
 						  double t,
@@ -599,7 +599,7 @@ void fc2d_clawpack46_src2(fclaw2d_global_t* glob,
 
 
 void fc2d_clawpack46_setaux(fclaw2d_global_t *glob,
-							fclaw2d_patch_t *patch,
+							fclaw_patch_t *patch,
 							int blockno,
 							int patchno)
 {
@@ -608,7 +608,7 @@ void fc2d_clawpack46_setaux(fclaw2d_global_t *glob,
 
 
 void fc2d_clawpack46_qinit(fclaw2d_global_t *glob,
-						   fclaw2d_patch_t *patch,
+						   fclaw_patch_t *patch,
 						   int blockno,
 						   int patchno)
 {
@@ -616,7 +616,7 @@ void fc2d_clawpack46_qinit(fclaw2d_global_t *glob,
 }
 
 void fc2d_clawpack46_b4step2(fclaw2d_global_t* glob,
-							 fclaw2d_patch_t *patch,
+							 fclaw_patch_t *patch,
 							 int blockno,
 							 int patchno,
 							 double t,
@@ -626,7 +626,7 @@ void fc2d_clawpack46_b4step2(fclaw2d_global_t* glob,
 }
 
 void fc2d_clawpack46_bc2(fclaw2d_global_t *glob,
-						 fclaw2d_patch_t *patch,
+						 fclaw_patch_t *patch,
 						 int blockno,
 						 int patchno,
 						 double t,

@@ -43,7 +43,7 @@ extern "C"
 
 struct fclaw2d_patch_transform_data;
 struct fclaw2d_global;
-struct fclaw2d_patch;
+struct fclaw_patch;
 
 /**
  * @brief fclaw2d_clawpatch_registers type
@@ -192,7 +192,7 @@ typedef void  (*clawpatch_fort_time_sync_samesize_t)(const int* mx,
  * @param[out] registers the newly allocated registers struct
  */
 void fclaw2d_clawpatch_time_sync_new(struct fclaw2d_global* glob,
-                                     struct fclaw2d_patch* this_patch,
+                                     struct fclaw_patch* this_patch,
                                      int blockno,int patchno,
                                      fclaw2d_clawpatch_registers_t **registers);
 
@@ -212,7 +212,7 @@ void fclaw2d_clawpatch_time_sync_delete(fclaw2d_clawpatch_registers_t **register
  * @param[in] patchno the patch number
  */
 void fclaw2d_clawpatch_time_sync_setup(struct fclaw2d_global* glob,
-                                       struct fclaw2d_patch* this_patch,
+                                       struct fclaw_patch* this_patch,
                                        int blockno,int patchno);
 
 /**
@@ -232,8 +232,8 @@ void fclaw2d_clawpatch_time_sync_setup(struct fclaw2d_global* glob,
  * @param[in] transform_data the transform for the neighbor's coordinates
  */
 void fclaw2d_clawpatch_time_sync_f2c(struct fclaw2d_global* glob,
-                                     struct fclaw2d_patch* coarse_patch,
-                                     struct fclaw2d_patch* fine_patch,
+                                     struct fclaw_patch* coarse_patch,
+                                     struct fclaw_patch* fine_patch,
                                      int coarse_blockno, int fine_blockno,
                                      int coarse_patchno, 
                                      int idir,
@@ -255,8 +255,8 @@ void fclaw2d_clawpatch_time_sync_f2c(struct fclaw2d_global* glob,
  * @param[in] transform_data the transform for the neighbor's coordinates
  */
 void fclaw2d_clawpatch_time_sync_samesize(struct fclaw2d_global* glob,
-                                          struct fclaw2d_patch* this_patch,
-                                          struct fclaw2d_patch* neighbor_patch,
+                                          struct fclaw_patch* this_patch,
+                                          struct fclaw_patch* neighbor_patch,
                                           int this_iface,int idir,
                                           struct fclaw2d_patch_transform_data
                                           *transform_data);
@@ -270,7 +270,7 @@ void fclaw2d_clawpatch_time_sync_samesize(struct fclaw2d_global* glob,
  * @param[in] reset_mode the reset mode ::fclaw2d_time_sync_type
  */
 void fclaw2d_clawpatch_time_sync_reset(struct fclaw2d_global* glob,
-                                       struct fclaw2d_patch *this_patch,
+                                       struct fclaw_patch *this_patch,
                                        int coarse_level,
                                        int reset_mode);
 
@@ -285,7 +285,7 @@ void fclaw2d_clawpatch_time_sync_reset(struct fclaw2d_global* glob,
  * @param[out] ierror the error value
  */
 void fclaw2d_clawpatch_time_sync_pack_registers(struct fclaw2d_global *glob,
-                                                struct fclaw2d_patch *this_patch,
+                                                struct fclaw_patch *this_patch,
                                                 double *qpack,
                                                 int frsize, 
                                                 fclaw_clawpatch_packmode_t packmode, 

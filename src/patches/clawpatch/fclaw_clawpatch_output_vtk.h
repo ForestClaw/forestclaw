@@ -40,7 +40,7 @@ extern "C"
 #endif
 
 struct fclaw2d_global;
-struct fclaw2d_patch;
+struct fclaw_patch;
 
 /** 
  * Callback to access/compute patch data for visualization.
@@ -56,7 +56,7 @@ struct fclaw2d_patch;
  *                     slowest.
  */
 typedef void (*fclaw_vtk_patch_data_t) (struct fclaw2d_global * glob,
-                                        struct fclaw2d_patch * this_patch,
+                                        struct fclaw_patch * this_patch,
                                         int this_block_idx, int this_patch_idx,
                                         char *a);
 	

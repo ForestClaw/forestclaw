@@ -46,7 +46,7 @@ typedef struct fclaw2d_time_sync_info
 
 static 
 void cb_time_sync_reset(fclaw2d_domain_t *domain,
-                        fclaw2d_patch_t *this_patch,
+                        fclaw_patch_t *this_patch,
                         int this_block_idx,
                         int this_patch_idx,
                         void *user)

@@ -56,7 +56,7 @@ fclaw_domain_get_domain (fclaw_domain_t *d)
 
 void
 fclaw2d_domain_iterate_cb
-  (fclaw2d_domain_t * d2, fclaw2d_patch_t * patch,
+  (fclaw2d_domain_t * d2, fclaw_patch_t * patch,
    int blockno, int patchno, void *user)
 {
     fclaw_domain_iterate_t *di = (fclaw_domain_iterate_t *) user;
@@ -80,7 +80,7 @@ fclaw_domain_new2d (fclaw2d_domain_t * domain,
 {
     int i, j;
     fclaw2d_block_t      *block;
-    fclaw2d_patch_t      *patch;
+    fclaw_patch_t      *patch;
     fclaw_domain_t       *d;
     fclaw_patch_t        *p;
     fcd_allocated_patch_t *ap;
@@ -134,7 +134,7 @@ fclaw_domain_destroy2d (fclaw_domain_t * d,
     int i, j;
     fclaw2d_domain_t     *domain;
     fclaw2d_block_t      *block;
-    fclaw2d_patch_t      *patch;
+    fclaw_patch_t      *patch;
     fclaw_patch_t        *p;
 
     FCLAW_ASSERT (d->dim == P4EST_DIM);
@@ -230,7 +230,7 @@ void fclaw2d_domain_reset(fclaw2d_global_t* glob)
         {
             /* This is here to delete any patches created during
                initialization, and not through regridding */
-            fclaw2d_patch_t *patch = block->patches + j;
+            fclaw_patch_t *patch = block->patches + j;
             fclaw2d_patch_data_delete(glob,patch);
         }
         block->user = NULL;
@@ -262,7 +262,7 @@ void fclaw2d_domain_iterate_level_mthread (fclaw2d_domain_t * domain, int level,
 #if (_OPENMP)
     int i, j;
     fclaw2d_block_t *block;
-    fclaw2d_patch_t *patch;
+    fclaw_patch_t *patch;
 
     for (i = 0; i < domain->num_blocks; i++)
     {

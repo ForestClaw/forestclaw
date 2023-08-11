@@ -49,7 +49,7 @@ void cudaclaw5_allocate_fluxes(struct fclaw2d_global *glob,
 }
 
 void cudaclaw5_deallocate_fluxes(fclaw2d_global_t *glob,
-                                 fclaw2d_patch_t *patch)
+                                 fclaw_patch_t *patch)
 {
     cudaclaw5_fluxes_t *fluxes = (cudaclaw5_fluxes_t*) 
                fclaw2d_patch_get_user_data(glob,patch);

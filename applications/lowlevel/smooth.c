@@ -96,7 +96,7 @@ init_values (fclaw_smooth_t * s)
 }
 
 static int
-patch_overlap (fclaw2d_patch_t * patch,
+patch_overlap (fclaw_patch_t * patch,
                const double pxy[2], double rmin2, double rmax2)
 {
     int i;
@@ -134,7 +134,7 @@ mark_patches (fclaw_smooth_t * s)
 {
     int ib, ip;
     fclaw2d_block_t *block;
-    fclaw2d_patch_t *patch;
+    fclaw_patch_t *patch;
 
     for (ib = 0; ib < s->domain->num_blocks; ++ib)
     {

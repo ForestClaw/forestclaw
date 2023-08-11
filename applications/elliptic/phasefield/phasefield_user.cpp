@@ -91,7 +91,7 @@ void phasefield_problem_setup(fclaw2d_global_t *glob)
 
 static
 void phasefield_initialize(fclaw2d_global_t *glob,
-                           fclaw2d_patch_t *patch,
+                           fclaw_patch_t *patch,
                            int blockno,
                            int patchno)
 {
@@ -111,7 +111,7 @@ void phasefield_initialize(fclaw2d_global_t *glob,
 
 static
 void phasefield_rhs(fclaw2d_global_t *glob,
-                fclaw2d_patch_t *patch,
+                fclaw_patch_t *patch,
                 int blockno,
                 int patchno)
 {
@@ -180,7 +180,7 @@ void phasefield_time_header_ascii(fclaw2d_global_t* glob, int iframe)
 
 static
 void cb_phasefield_output_ascii(fclaw2d_domain_t * domain,
-                            fclaw2d_patch_t * patch,
+                            fclaw_patch_t * patch,
                             int blockno, int patchno,
                             void *user)
 {
@@ -226,7 +226,7 @@ void cb_phasefield_output_ascii(fclaw2d_domain_t * domain,
 
 
 int phasefield_tag4refinement(fclaw2d_global_t *glob,
-                             fclaw2d_patch_t *this_patch,
+                             fclaw_patch_t *this_patch,
                              int blockno, int patchno,
                              int initflag)
 {
@@ -257,12 +257,12 @@ int phasefield_tag4refinement(fclaw2d_global_t *glob,
 
 static
 int phasefield_tag4coarsening(fclaw2d_global_t *glob,
-                             fclaw2d_patch_t *fine_patches,
+                             fclaw_patch_t *fine_patches,
                              int blockno,
                              int patchno,
                              int initflag)
 {
-    fclaw2d_patch_t *patch0 = &fine_patches[0];
+    fclaw_patch_t *patch0 = &fine_patches[0];
 
     const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
     double coarsen_threshold = fclaw_opt->coarsen_threshold;
@@ -290,7 +290,7 @@ int phasefield_tag4coarsening(fclaw2d_global_t *glob,
 
 static
 void phasefield_bc2(fclaw2d_global_t *glob,
-                   fclaw2d_patch_t *patch,
+                   fclaw_patch_t *patch,
                    int block_idx,
                    int patch_idx,
                    double t,

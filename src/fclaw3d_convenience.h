@@ -214,7 +214,7 @@ void fclaw3d_domain_search_points (fclaw3d_domain_t * domain,
  *                              is, in fact, none (a false positive).
  */
 typedef int (*fclaw3d_integrate_ray_t) (fclaw3d_domain_t * domain,
-                                        fclaw3d_patch_t * patch,
+                                        fclaw_patch_t * patch,
                                         int blockno, int patchno,
                                         void *ray, double *integral,
                                         void *user);
@@ -297,7 +297,7 @@ void fclaw3d_domain_integrate_rays (fclaw3d_domain_t * domain,
  *                              we'll be fine.
  */
 typedef int (*fclaw3d_interpolate_point_t) (fclaw3d_domain_t * domain,
-                                            fclaw3d_patch_t * patch,
+                                            fclaw_patch_t * patch,
                                             int blockno, int patchno,
                                             void *point, void *user);
 

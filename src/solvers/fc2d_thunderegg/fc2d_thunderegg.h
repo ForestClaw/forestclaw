@@ -35,7 +35,7 @@ extern "C"
 #endif
 
 struct fclaw2d_global;
-struct fclaw2d_patch;
+struct fclaw_patch;
 
 typedef  struct fc2d_thunderegg_vtable  fc2d_thunderegg_vtable_t;
 
@@ -114,7 +114,7 @@ void fc2d_thunderegg_setprob(struct fclaw2d_global* glob);
 
 
 void fc2d_thunderegg_rhs(struct fclaw2d_global* glob,
-                        struct fclaw2d_patch *patch,
+                        struct fclaw_patch *patch,
                         int blockno,
                         int patchno);
 

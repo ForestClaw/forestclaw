@@ -45,7 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 static
 void cb_restore_time_step(fclaw2d_domain_t *domain,
-                          fclaw2d_patch_t *this_patch,
+                          fclaw_patch_t *this_patch,
                           int this_block_idx,
                           int this_patch_idx,
                           void *user)
@@ -65,7 +65,7 @@ void restore_time_step(fclaw2d_global_t *glob)
 
 static
 void cb_save_time_step(fclaw2d_domain_t *domain,
-                       fclaw2d_patch_t *this_patch,
+                       fclaw_patch_t *this_patch,
                        int this_block_idx,
                        int this_patch_idx,
                        void *user)

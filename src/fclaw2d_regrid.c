@@ -43,7 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /* This is also called from fclaw2d_initialize, so is not made static */
 void cb_fclaw2d_regrid_tag4refinement(fclaw2d_domain_t *domain,
-									  fclaw2d_patch_t *this_patch,
+									  fclaw_patch_t *this_patch,
 									  int this_block_idx,
 									  int this_patch_idx,
 									  void *user)
@@ -74,7 +74,7 @@ void cb_fclaw2d_regrid_tag4refinement(fclaw2d_domain_t *domain,
 /* Tag family for coarsening */
 
 void cb_regrid_tag4coarsening(fclaw2d_domain_t *domain,
-							  fclaw2d_patch_t *fine_patches,
+							  fclaw_patch_t *fine_patches,
 							  int blockno, int fine0_patchno,
 							  void *user)
 {
@@ -112,9 +112,9 @@ void cb_regrid_tag4coarsening(fclaw2d_domain_t *domain,
    -------------------------------------------------------------- */
 
 void cb_fclaw2d_regrid_repopulate(fclaw2d_domain_t * old_domain,
-								  fclaw2d_patch_t * old_patch,
+								  fclaw_patch_t * old_patch,
 								  fclaw2d_domain_t * new_domain,
-								  fclaw2d_patch_t * new_patch,
+								  fclaw_patch_t * new_patch,
 								  fclaw2d_patch_relation_t newsize,
 								  int blockno,
 								  int old_patchno,
@@ -139,13 +139,13 @@ void cb_fclaw2d_regrid_repopulate(fclaw2d_domain_t * old_domain,
     }
     else if (newsize == FCLAW2D_PATCH_HALFSIZE)
     {
-        fclaw2d_patch_t *fine_siblings = new_patch;
-        fclaw2d_patch_t *coarse_patch = old_patch;
+        fclaw_patch_t *fine_siblings = new_patch;
+        fclaw_patch_t *coarse_patch = old_patch;
 
         int i;
         for (i = 0; i < 4; i++)
         {
-            fclaw2d_patch_t *fine_patch = &fine_siblings[i];
+            fclaw_patch_t *fine_patch = &fine_siblings[i];
             int fine_patchno = new_patchno + i;
             /* Reason for the following two lines: the glob contains the old domain which is incremented in ddata_old 
                but we really want to increment the new domain. This will be fixed! */
@@ -184,10 +184,10 @@ void cb_fclaw2d_regrid_repopulate(fclaw2d_domain_t * old_domain,
 #endif        
 
         /* Old grids are the finer grids;  new grid is the coarsened grid */
-        fclaw2d_patch_t *fine_siblings = old_patch;
+        fclaw_patch_t *fine_siblings = old_patch;
         int fine_patchno = old_patchno;
 
-        fclaw2d_patch_t *coarse_patch = new_patch;
+        fclaw_patch_t *coarse_patch = new_patch;
         int coarse_patchno = new_patchno;
         
         /* Reason for the following two lines: the glob contains the old domain which is incremented in ddata_old 
@@ -215,7 +215,7 @@ void cb_fclaw2d_regrid_repopulate(fclaw2d_domain_t * old_domain,
         int i;
         for(i = 0; i < 4; i++)
         {
-            fclaw2d_patch_t* fine_patch = &fine_siblings[i];
+            fclaw_patch_t* fine_patch = &fine_siblings[i];
             /* used to pass in old_domain */
             fclaw2d_patch_data_delete(g->glob,fine_patch);
         }
@@ -336,7 +336,7 @@ void fclaw2d_regrid(fclaw2d_global_t *glob)
 
 static
 void cb_set_neighbor_types(fclaw2d_domain_t *domain,
-						   fclaw2d_patch_t *this_patch,
+						   fclaw_patch_t *this_patch,
 						   int blockno,
 						   int patchno,
 						   void *user)

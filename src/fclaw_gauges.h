@@ -87,7 +87,7 @@ typedef struct fclaw_gauge
 } fclaw_gauge_t;
 
 struct fclaw2d_global;
-struct fclaw2d_patch;
+struct fclaw_patch;
 struct fclaw2d_block;
 struct fclaw_gauge;
 
@@ -141,7 +141,7 @@ typedef void (*fclaw_gauge_normalize_t)(struct fclaw2d_global *glob,
  */
 typedef void (*fclaw_gauge_update_t)(struct fclaw2d_global* glob, 
                                      struct fclaw2d_block* block,
-                                     struct fclaw2d_patch* patch, 
+                                     struct fclaw_patch* patch, 
                                      int blockno, int patchno,
                                      double tcurr, struct fclaw_gauge *g);
 
@@ -251,7 +251,7 @@ void fclaw_gauge_normalize_coordinates(struct fclaw2d_global *glob,
  */
 void  fclaw_update_gauge(struct fclaw2d_global* glob, 
                          struct fclaw2d_block *block,
-                         struct fclaw2d_patch *patch,
+                         struct fclaw_patch *patch,
                          int blockno, int patchno,
                          double tcurr, fclaw_gauge_t *g);
 

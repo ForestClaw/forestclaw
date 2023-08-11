@@ -91,7 +91,7 @@ void max_grid_cell_area_(const int& mx, const int& my, const int& mbc,
                          const double area[], double *maxvalue);
 
 void metric_patch_initialize(fclaw2d_domain_t *domain,
-                             fclaw2d_patch_t *this_patch,
+                             fclaw_patch_t *this_patch,
                              int this_block_idx,
                              int this_patch_idx);
 

@@ -83,7 +83,7 @@ typedef struct swirl_ray
 #endif
 
 int swirl_intersect_ray(fclaw2d_domain_t *domain, 
-                         fclaw2d_patch_t * patch,
+                         fclaw_patch_t * patch,
                          int blockno, 
                          int patchno, 
                          void *ray, 

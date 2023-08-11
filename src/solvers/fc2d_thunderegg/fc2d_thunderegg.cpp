@@ -61,7 +61,7 @@ void thunderegg_setup_solver(fclaw2d_global_t *glob)
 
 static
 void thunderegg_rhs(fclaw2d_global_t *glob,
-                   fclaw2d_patch_t *patch,
+                   fclaw_patch_t *patch,
                    int blockno,
                    int patchno)
 {

@@ -166,7 +166,7 @@ void swirl_deallocate_rays(fclaw2d_global_t *glob,
  * the patch-boundary in the search dimension i.
  */
 static int
-intersect_patch (fclaw2d_patch_t *patch, swirl_ray_t *swirl_ray,
+intersect_patch (fclaw_patch_t *patch, swirl_ray_t *swirl_ray,
                  int i, int *untrustworthy, double *dt, double rayni[2])
 {
     int ni, j, isleft, iscenter;
@@ -233,7 +233,7 @@ intersect_patch (fclaw2d_patch_t *patch, swirl_ray_t *swirl_ray,
 }
 
 static int
-swirl_intersect_ray (fclaw2d_domain_t *domain, fclaw2d_patch_t *patch,
+swirl_intersect_ray (fclaw2d_domain_t *domain, fclaw_patch_t *patch,
                      int blockno, int patchno, void *ray, double *integral,
                      void *user)
 {

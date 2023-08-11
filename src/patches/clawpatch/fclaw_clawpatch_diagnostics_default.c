@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_diagnostics.h>
 
 void fclaw_clawpatch_diagnostics_cons_default(fclaw2d_global_t *glob,
-                                              fclaw2d_patch_t *patch,
+                                              fclaw_patch_t *patch,
                                               int blockno,
                                               int patchno,
                                               void *user)
@@ -72,7 +72,7 @@ void fclaw_clawpatch_diagnostics_cons_default(fclaw2d_global_t *glob,
 }
 
 void fclaw_clawpatch_diagnostics_error_default(fclaw2d_global_t *glob,
-                                               fclaw2d_patch_t *patch,
+                                               fclaw_patch_t *patch,
                                                int blockno,
                                                int patchno,
                                                void *user)

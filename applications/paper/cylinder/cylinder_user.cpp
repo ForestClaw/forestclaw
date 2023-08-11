@@ -40,7 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #if 0
 void cylinder_compute_area(fclaw2d_global_t *glob,
-                           fclaw2d_patch_t *this_patch,
+                           fclaw_patch_t *this_patch,
                            int blockno,
                            int patchno);
 #endif                           
@@ -75,7 +75,7 @@ void cylinder_problem_setup(fclaw2d_global_t *glob)
 
 static
 void cylinder_patch_setup(fclaw2d_global_t *glob,
-                       fclaw2d_patch_t *patch,
+                       fclaw_patch_t *patch,
                        int blockno, int patchno)
 {
     int mx,my,mbc;
@@ -115,7 +115,7 @@ void cylinder_patch_setup(fclaw2d_global_t *glob,
 
 static
 void cb_cylinder_output_ascii (fclaw2d_domain_t * domain,
-                            fclaw2d_patch_t * this_patch,
+                            fclaw_patch_t * this_patch,
                             int blockno, int patchno,
                             void *user)
 {
@@ -174,7 +174,7 @@ void cb_cylinder_output_ascii (fclaw2d_domain_t * domain,
 
 static
 void cylinder_compute_area(fclaw2d_global_t *glob,
-                           fclaw2d_patch_t *patch,
+                           fclaw_patch_t *patch,
                            int blockno,
                            int patchno)
 {
@@ -202,7 +202,7 @@ void cylinder_compute_area(fclaw2d_global_t *glob,
 
 static
 void cylinder_compute_tensors(fclaw2d_global_t *glob,
-                              fclaw2d_patch_t *patch,
+                              fclaw_patch_t *patch,
                               int blockno,
                               int patchno)
 {

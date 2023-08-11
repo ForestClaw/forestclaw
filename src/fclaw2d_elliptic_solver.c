@@ -47,7 +47,7 @@ void elliptic_setup_solver(fclaw2d_global_t *glob)
 
 static
 void cb_elliptic_rhs(fclaw2d_domain_t *domain,
-                     fclaw2d_patch_t *patch,
+                     fclaw_patch_t *patch,
                      int blockno,
                      int patchno,
                      void* user)

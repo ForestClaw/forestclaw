@@ -38,7 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_physical_bc.h>
 
 void cb_fc2d_thunderegg_physical_bc(fclaw2d_domain_t *domain,
-                                   fclaw2d_patch_t *patch,
+                                   fclaw_patch_t *patch,
                                    int blockno,
                                    int patchno,
                                    void *user)

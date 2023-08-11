@@ -60,7 +60,7 @@ typedef struct user_options
 } user_options_t;
 
 struct fclaw2d_global;
-struct fclaw2d_patch;
+struct fclaw_patch;
 
 void square_link_solvers(struct fclaw2d_global *glob);
 

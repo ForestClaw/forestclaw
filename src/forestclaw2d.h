@@ -27,6 +27,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define FORESTCLAW2D_H
 
 #include <fclaw_base.h>
+#include <fclaw_patch.h>
 #include <sc_keyvalue.h>
 
 #ifdef __cplusplus
@@ -51,8 +52,6 @@ extern "C"
 typedef struct fclaw2d_domain fclaw2d_domain_t;
 /** Typedef for fclaw2d_block */
 typedef struct fclaw2d_block fclaw2d_block_t;
-/** Typedef for fclaw2d_patch */
-typedef struct fclaw2d_patch fclaw2d_patch_t;
 
 /**
  * @brief Enum for encoding patch information
@@ -90,32 +89,6 @@ fclaw2d_patch_flags_t;
 /** For each of the four faces, the corresponding block boundary flag. */
 extern const fclaw2d_patch_flags_t fclaw2d_patch_block_face_flags[4];
 
-struct fclaw_patch_bounds_2d
-{
-    double xlower, xupper;
-    double ylower, yupper;
-};
-/** 
- * @brief The metadata structure for a forest leaf, which is a forestclaw patch.
- * The patch may be either a process-local patch or a ghost patch.
- */
-struct fclaw2d_patch
-{
-    int dim;
-    struct fclaw_patch_bounds_2d* d2;
-    int level;                  /**< 0 is root, increases if refined */
-    int target_level;           /**< level desired after adaptation */
-    int flags;                  /**< flags that encode tree information */
-    /** Union, If this is a local patch, it points to the next patch, otherwise it gives
-     * the bock number of this patch */
-    union
-    {
-        fclaw2d_patch_t *next;  /**< local: next patch same level same block */
-        int blockno;            /**< off-proc: this patch's block number */
-    }
-    u;
-    void *user;                 /**< User Pointer */
-};
 
 /**
  * @brief Data Structure for a block
@@ -143,10 +116,10 @@ struct fclaw2d_block
     int minlevel;
     int maxlevel;
     /** @} */
-    fclaw2d_patch_t *patches;           /**< The patches for this block */
+    fclaw_patch_t *patches;           /**< The patches for this block */
     struct fclaw_patch_bounds_2d *patch_bounds; /**< patch bounds */
-    fclaw2d_patch_t **patchbylevel;     /**< Pointer to the first patch in each level **/
-    fclaw2d_patch_t **exchange_patches; /**< Pointer for each exchange patch */
+    fclaw_patch_t **patchbylevel;     /**< Pointer to the first patch in each level **/
+    fclaw_patch_t **exchange_patches; /**< Pointer for each exchange patch */
     void *user;                         /**< User pointer */
 };
 
@@ -205,9 +178,9 @@ struct fclaw2d_domain
                                    Identified by this expression to be true:
                                    (patch->flags &
                                    FCLAW2D_PATCH_ON_PARALLEL_BOUNDARY) */
-    fclaw2d_patch_t **exchange_patches; /**< explicitly store exchange patches */
+    fclaw_patch_t **exchange_patches; /**< explicitly store exchange patches */
     int num_ghost_patches;      /**< number of off-proc patches relevant to this proc */
-    fclaw2d_patch_t *ghost_patches;     /**< array of off-proc patches */
+    fclaw_patch_t *ghost_patches;     /**< array of off-proc patches */
     struct fclaw_patch_bounds_2d *ghost_patch_bounds; /**< ghost patch bounds */
 
     void **mirror_target_levels;  /**< Points to target level of each mirror. */
@@ -296,7 +269,7 @@ void fclaw2d_domain_corner_faces (const fclaw2d_domain_t * domain,
  *                      1 if the corner would end up in the middle of a face
  *                      when there is a coarser neighbor.
  */
-int fclaw2d_patch_corner_dimension (const fclaw2d_patch_t * patch,
+int fclaw2d_patch_corner_dimension (const fclaw_patch_t * patch,
                                     int cornerno);
 
 /** Return the number of a patch with respect to its parent in the tree.
@@ -304,20 +277,20 @@ int fclaw2d_patch_corner_dimension (const fclaw2d_patch_t * patch,
  * \param [in] patch    A patch with properly set member variables.
  * \return              The child id is a number in 0..3.
  */
-int fclaw2d_patch_childid (const fclaw2d_patch_t * patch);
+int fclaw2d_patch_childid (const fclaw_patch_t * patch);
 
 /** Check if a patch is the first in a family of four siblings.
  * For ghost patches, we always return false.
  * \param [in] patch    A patch with properly set member variables.
  * \return              True if patch is the first sibling.
  */
-int fclaw2d_patch_is_first_sibling (const fclaw2d_patch_t * patch);
+int fclaw2d_patch_is_first_sibling (const fclaw_patch_t * patch);
 
 /** Check whether a patch is a parallel ghost patch.
  * \param [in] patch    A patch with properly set member variables.
  * \return              True if patch is off-processor, false if local.
  */
-int fclaw2d_patch_is_ghost (const fclaw2d_patch_t * patch);
+int fclaw2d_patch_is_ghost (const fclaw_patch_t * patch);
 
 ///@}
 /* ---------------------------------------------------------------------- */
@@ -334,7 +307,7 @@ int fclaw2d_patch_is_ghost (const fclaw2d_patch_t * patch);
  * \param [in,out] user	Data that was passed into the iterator functions.
  */
 typedef void (*fclaw2d_patch_callback_t)
-    (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
+    (fclaw2d_domain_t * domain, fclaw_patch_t * patch,
      int blockno, int patchno, void *user);
 
 /** Iterate over all local patches on a given level.
@@ -516,8 +489,8 @@ int fclaw2d_patch_face_transformation_valid (const int ftransform[]);
  * \param [in,out] i        Integer coordinate along x-axis in \a based .. \a mx.
  * \param [in,out] j        Integer coordinate along y-axis in \a based .. \a my.
  */
-void fclaw2d_patch_transform_face (fclaw2d_patch_t * ipatch,
-                                   fclaw2d_patch_t * opatch,
+void fclaw2d_patch_transform_face (fclaw_patch_t * ipatch,
+                                   fclaw_patch_t * opatch,
                                    const int ftransform[],
                                    int mx, int my, int based, int *i, int *j);
 
@@ -546,8 +519,8 @@ void fclaw2d_patch_transform_face (fclaw2d_patch_t * ipatch,
  *                          On output, they are relative to the fine patch and
  *                          stored in order of the children of the coarse patch.
  */
-void fclaw2d_patch_transform_face2 (fclaw2d_patch_t * ipatch,
-                                    fclaw2d_patch_t * opatch,
+void fclaw2d_patch_transform_face2 (fclaw_patch_t * ipatch,
+                                    fclaw_patch_t * opatch,
                                     const int ftransform[],
                                     int mx, int my, int based, int i[],
                                     int j[]);
@@ -606,8 +579,8 @@ void fclaw2d_patch_corner_swap (int *cornerno, int *rcornerno);
  * \param [in,out] i        Integer coordinate along x-axis in \a based .. \a mx.
  * \param [in,out] j        Integer coordinate along y-axis in \a based .. \a my.
  */
-void fclaw2d_patch_transform_corner (fclaw2d_patch_t * ipatch,
-                                     fclaw2d_patch_t * opatch,
+void fclaw2d_patch_transform_corner (fclaw_patch_t * ipatch,
+                                     fclaw_patch_t * opatch,
                                      int icorner, int is_block_boundary,
                                      int mx, int my,
                                      int based, int *i, int *j);
@@ -634,8 +607,8 @@ void fclaw2d_patch_transform_corner (fclaw2d_patch_t * ipatch,
  *                          On output, they are relative to the fine patch and
  *                          stored in order of the children of the coarse patch.
  */
-void fclaw2d_patch_transform_corner2 (fclaw2d_patch_t * ipatch,
-                                      fclaw2d_patch_t * opatch,
+void fclaw2d_patch_transform_corner2 (fclaw_patch_t * ipatch,
+                                      fclaw_patch_t * opatch,
                                       int icorner, int is_block_boundary,
                                       int mx, int my, int based,
                                       int i[], int j[]);
@@ -693,9 +666,9 @@ void fclaw2d_patch_mark_coarsen (fclaw2d_domain_t * domain,
  * We iterate over local patches only.
  */
 typedef void (*fclaw2d_match_callback_t) (fclaw2d_domain_t * old_domain,
-                                          fclaw2d_patch_t * old_patch,
+                                          fclaw_patch_t * old_patch,
                                           fclaw2d_domain_t * new_domain,
-                                          fclaw2d_patch_t * new_patch,
+                                          fclaw_patch_t * new_patch,
                                           fclaw2d_patch_relation_t newsize,
                                           int blockno,
                                           int old_patchno, int new_patchno,
@@ -763,9 +736,9 @@ void fclaw2d_domain_retrieve_after_partition (fclaw2d_domain_t * domain,
  *                              fclaw2d_domain_iterate_partitioned.
  */
 typedef void (*fclaw2d_transfer_callback_t) (fclaw2d_domain_t * old_domain,
-                                             fclaw2d_patch_t * old_patch,
+                                             fclaw_patch_t * old_patch,
                                              fclaw2d_domain_t * new_domain,
-                                             fclaw2d_patch_t * new_patch,
+                                             fclaw_patch_t * new_patch,
                                              int blockno,
                                              int old_patchno, int new_patchno,
                                              void *user);

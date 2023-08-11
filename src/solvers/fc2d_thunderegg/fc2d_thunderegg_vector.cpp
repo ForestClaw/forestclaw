@@ -35,7 +35,7 @@
 
 using namespace ThunderEgg;
 
-static void get_data(struct fclaw2d_global* glob, fclaw2d_patch_t* patch, fc2d_thunderegg_data_choice_t data_choice, double** q, int* meqn)
+static void get_data(struct fclaw2d_global* glob, fclaw_patch_t* patch, fc2d_thunderegg_data_choice_t data_choice, double** q, int* meqn)
 {
     switch(data_choice){
         case RHS:

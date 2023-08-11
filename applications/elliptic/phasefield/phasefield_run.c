@@ -53,7 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 static
 void update_q(fclaw2d_domain_t *domain,
-              fclaw2d_patch_t *patch,
+              fclaw_patch_t *patch,
               int blockno, int patchno,
               void *user)
 {

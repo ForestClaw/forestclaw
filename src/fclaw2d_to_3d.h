@@ -41,7 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /* redefine typedefs */
 #define fclaw2d_patch_flags_t           fclaw3d_patch_flags_t
-#define fclaw2d_patch_t                 fclaw3d_patch_t
+#define fclaw_patch_t                 fclaw3d_patch_t
 #define fclaw2d_patch_vtable_t          fclaw3d_patch_vtable_t
 #define fclaw2d_patch_transform_data_t  fclaw3d_patch_transform_data_t
 #define fclaw2d_patch_data_t            fclaw3d_patch_data_t

@@ -57,7 +57,7 @@ void torus_problem_setup(fclaw2d_global_t *glob)
 
 static
 void torus_patch_setup(fclaw2d_global_t *glob,
-                       fclaw2d_patch_t *this_patch,
+                       fclaw_patch_t *this_patch,
                        int this_block_idx,
                        int this_patch_idx)
 {

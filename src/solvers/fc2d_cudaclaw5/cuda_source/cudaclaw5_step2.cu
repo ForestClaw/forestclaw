@@ -75,7 +75,7 @@ double cudaclaw5_compute_cfl(int idir, int mx, int my, int mbc, int mwaves,
 }
 
 double cudaclaw5_step2(fclaw2d_global_t *glob,
-                       fclaw2d_patch_t *this_patch,
+                       fclaw_patch_t *this_patch,
                        int this_block_idx,
                        int this_patch_idx,
                        double t,
