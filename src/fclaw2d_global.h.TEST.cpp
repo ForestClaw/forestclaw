@@ -27,7 +27,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <test.hpp>
 
 TEST_CASE("fclaw2d_global_options_store and fclaw2d_global_get_options test") {
-    fclaw2d_global_t* glob = fclaw2d_global_new();
+    fclaw_global_t* glob = fclaw2d_global_new();
 
     // Test with an integer
     int option1 = 10;
@@ -66,7 +66,7 @@ static bool destroyed_2;
 TEST_CASE("fclaw2d_global_attribute_store and fclaw2d_global_get_attribute test") {
     destroyed = false;
     destroyed_2 = false;
-    fclaw2d_global_t* glob = fclaw2d_global_new();
+    fclaw_global_t* glob = fclaw2d_global_new();
 
     // Test with an integer
     int option1 = 10;
@@ -109,7 +109,7 @@ TEST_CASE("fclaw2d_global_attribute_store and fclaw2d_global_get_attribute test"
 
 TEST_CASE("fclaw2d_global_set_global")
 {
-    fclaw2d_global_t* glob = (fclaw2d_global_t*)123;
+    fclaw_global_t* glob = (fclaw_global_t*)123;
     fclaw2d_global_set_global(glob);
     CHECK_EQ(fclaw2d_global_get_global(), glob);
     fclaw2d_global_unset_global();
@@ -117,7 +117,7 @@ TEST_CASE("fclaw2d_global_set_global")
 
 TEST_CASE("fclaw2d_global_unset_global")
 {
-    fclaw2d_global_t* glob = (fclaw2d_global_t*)123;
+    fclaw_global_t* glob = (fclaw_global_t*)123;
     fclaw2d_global_set_global(glob);
     fclaw2d_global_unset_global();
 #ifdef FCLAW_ENABLE_DEBUG
@@ -131,7 +131,7 @@ TEST_CASE("fclaw2d_global_unset_global")
 
 TEST_CASE("fclaw2d_global_set_global twice fails")
 {
-    fclaw2d_global_t* glob = (fclaw2d_global_t*)123;
+    fclaw_global_t* glob = (fclaw_global_t*)123;
     fclaw2d_global_set_global(glob);
     CHECK_SC_ABORTED(fclaw2d_global_set_global(glob));
     fclaw2d_global_unset_global();

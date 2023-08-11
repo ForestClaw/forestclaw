@@ -66,14 +66,14 @@ typedef struct user_options
 } user_options_t;
 
 
-void radialdam_link_solvers(fclaw2d_global_t *glob);
+void radialdam_link_solvers(fclaw_global_t *glob);
 
 user_options_t* radialdam_options_register (fclaw_app_t * app,
                                           const char *configfile);
 
-void radialdam_options_store (fclaw2d_global_t* glob, user_options_t* user);
+void radialdam_options_store (fclaw_global_t* glob, user_options_t* user);
 
-user_options_t* radialdam_get_options(fclaw2d_global_t* glob);
+user_options_t* radialdam_get_options(fclaw_global_t* glob);
 
 
 void radialdam_global_post_process(fclaw_options_t *fclaw_opt,

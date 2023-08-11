@@ -57,7 +57,7 @@ typedef struct fclaw2d_global_iterate fclaw2d_global_iterate_t;
 
 struct fclaw2d_global_iterate
 {
-    fclaw2d_global_t* glob;
+    fclaw_global_t* glob;
     void* user;
 };
 
@@ -72,38 +72,38 @@ struct fclaw_package_container;
 struct fclaw2d_diagnostics_accumulator;
 
 /** Allocate a new global structure. */
-fclaw2d_global_t* fclaw2d_global_new (void);
+fclaw_global_t* fclaw2d_global_new (void);
 
-fclaw2d_global_t* fclaw2d_global_new_comm (sc_MPI_Comm mpicomm,
+fclaw_global_t* fclaw2d_global_new_comm (sc_MPI_Comm mpicomm,
                                            int mpisize, int mpirank);
 
-void fclaw2d_global_destroy (fclaw2d_global_t * glob);
+void fclaw2d_global_destroy (fclaw_global_t * glob);
 
-void fclaw2d_global_store_domain (fclaw2d_global_t* glob,
+void fclaw2d_global_store_domain (fclaw_global_t* glob,
                                   struct fclaw_domain* domain);
 
-void fclaw2d_global_store_map (fclaw2d_global_t* glob,
+void fclaw2d_global_store_map (fclaw_global_t* glob,
                                struct fclaw2d_map_context * map);
 
-fclaw2d_map_context_t* fclaw2d_global_get_map(fclaw2d_global_t* glob);
+fclaw2d_map_context_t* fclaw2d_global_get_map(fclaw_global_t* glob);
 
-void fclaw2d_global_iterate_level (fclaw2d_global_t * glob, int level,
+void fclaw2d_global_iterate_level (fclaw_global_t * glob, int level,
                                    fclaw2d_patch_callback_t pcb, void *user);
 
-void fclaw2d_global_iterate_patches (fclaw2d_global_t * glob,
+void fclaw2d_global_iterate_patches (fclaw_global_t * glob,
                                      fclaw2d_patch_callback_t pcb, void *user);
 
-void fclaw2d_global_iterate_families (fclaw2d_global_t * glob,
+void fclaw2d_global_iterate_families (fclaw_global_t * glob,
                                       fclaw2d_patch_callback_t pcb, void *user);
 
-void fclaw2d_global_iterate_adapted (fclaw2d_global_t * glob,
+void fclaw2d_global_iterate_adapted (fclaw_global_t * glob,
                                      struct fclaw_domain* new_domain,
                                      fclaw2d_match_callback_t mcb, void *user);
 
-void fclaw2d_global_iterate_level_mthread (fclaw2d_global_t * glob, int level,
+void fclaw2d_global_iterate_level_mthread (fclaw_global_t * glob, int level,
                                            fclaw2d_patch_callback_t pcb, void *user);
 
-void fclaw2d_global_iterate_partitioned (fclaw2d_global_t * glob,
+void fclaw2d_global_iterate_partitioned (fclaw_global_t * glob,
                                          struct fclaw_domain * new_domain,
                                          fclaw2d_transfer_callback_t tcb,
                                          void *user);
@@ -115,7 +115,7 @@ void fclaw2d_global_iterate_partitioned (fclaw2d_global_t * glob,
  * @param key the key to store the options under
  * @param options the options structure
  */
-void fclaw2d_global_options_store (fclaw2d_global_t* glob, const char* key, void* options);
+void fclaw2d_global_options_store (fclaw_global_t* glob, const char* key, void* options);
 
 /**
  * @brief Get an options structure from the glob
@@ -124,7 +124,7 @@ void fclaw2d_global_options_store (fclaw2d_global_t* glob, const char* key, void
  * @param key the key to retrieve the options from
  * @return void* the options
  */
-void* fclaw2d_global_get_options (fclaw2d_global_t* glob, const char* key);
+void* fclaw2d_global_get_options (fclaw_global_t* glob, const char* key);
 
 /**
  * @brief Store an attribute in the glob
@@ -134,7 +134,7 @@ void* fclaw2d_global_get_options (fclaw2d_global_t* glob, const char* key);
  * @param attrubute the attribute to store
  * @param destory callback to destroy the attribute. Optional, can be set to NULL
  */
-void fclaw2d_global_attribute_store (fclaw2d_global_t* glob, 
+void fclaw2d_global_attribute_store (fclaw_global_t* glob, 
                                      const char* key, 
                                      void* attribute,
                                      fclaw_pointer_map_value_destroy_t destroy);
@@ -146,7 +146,7 @@ void fclaw2d_global_attribute_store (fclaw2d_global_t* glob,
  * @param key the key to retrieve the attribute from
  * @return void* the options
  */
-void* fclaw2d_global_get_attribute (fclaw2d_global_t* glob, const char* key);
+void* fclaw2d_global_get_attribute (fclaw_global_t* glob, const char* key);
 
 
 /**
@@ -154,7 +154,7 @@ void* fclaw2d_global_get_attribute (fclaw2d_global_t* glob, const char* key);
  *
  * @param glob the glob variable
  */
-void fclaw2d_global_set_global (fclaw2d_global_t* glob);
+void fclaw2d_global_set_global (fclaw_global_t* glob);
 
 /**
  * @brief Set the static glob variable to NULL
@@ -164,23 +164,23 @@ void fclaw2d_global_unset_global (void);
 /**
  * @brief Get the static glob variable
  *
- * @return fclaw2d_global_t* the glob variable
+ * @return fclaw_global_t* the glob variable
  */
-fclaw2d_global_t* fclaw2d_global_get_global (void);
+fclaw_global_t* fclaw2d_global_get_global (void);
 
 /**
  * @brief
  *
  * @param glob
  */
-void fclaw2d_set_global_context(fclaw2d_global_t *glob);
+void fclaw2d_set_global_context(fclaw_global_t *glob);
 
 /**
  * @brief
  *
  * @param glob
  */
-void fclaw2d_clear_global_context(fclaw2d_global_t *glob);
+void fclaw2d_clear_global_context(fclaw_global_t *glob);
 
 #ifdef __cplusplus
 #if 0

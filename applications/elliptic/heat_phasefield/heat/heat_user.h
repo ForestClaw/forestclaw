@@ -44,9 +44,9 @@ extern "C"
 
 /* --------------------------- Problem dependent functions -----------------------------*/
 
-void heat_link_solvers(fclaw2d_global_t *glob);
+void heat_link_solvers(fclaw_global_t *glob);
 
-void heat_run(fclaw2d_global_t *glob);
+void heat_run(fclaw_global_t *glob);
 
 
 /* --------------------------- Fortran functions ---------------------------------------*/
@@ -179,7 +179,7 @@ void HEAT_FORT_BC2(const int* meqn, const int* mbc,
 
 fclaw_domain_t* heat_create_domain(sc_MPI_Comm mpicomm, fclaw_options_t* fclaw_opt);
 
-void heat_run_program(fclaw2d_global_t* glob);
+void heat_run_program(fclaw_global_t* glob);
 
 #ifdef __cplusplus
 #if 0

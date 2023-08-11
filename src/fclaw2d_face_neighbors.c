@@ -53,7 +53,7 @@ enum
 /* This function is a bit overkill, but I put it here so the logic in both
    the corner fill and face fill are the same */
 static
-void get_face_type(fclaw2d_global_t *glob,
+void get_face_type(fclaw_global_t *glob,
 				   int iface,
 				   int intersects_phys_bdry[],
 				   int intersects_block[],
@@ -66,7 +66,7 @@ void get_face_type(fclaw2d_global_t *glob,
 
 
 static
-void get_face_neighbors(fclaw2d_global_t *glob,
+void get_face_neighbors(fclaw_global_t *glob,
 						int this_block_idx,
 						int this_patch_idx,
 						int iface,
@@ -450,7 +450,7 @@ void cb_face_fill(fclaw_domain_t *domain,
 }
 
 
-void fclaw2d_face_neighbor_ghost(fclaw2d_global_t* glob,
+void fclaw2d_face_neighbor_ghost(fclaw_global_t* glob,
 								 int minlevel,
 								 int maxlevel,
 								 int time_interp)

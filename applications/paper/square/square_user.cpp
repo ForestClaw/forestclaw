@@ -39,7 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_clawpatch_fort.h>  /* headers for tag2refinement, tag4coarsening  */
 
 static
-void square_problem_setup(fclaw2d_global_t* glob)
+void square_problem_setup(fclaw_global_t* glob)
 {
     const user_options_t* user = square_get_options(glob);
 
@@ -62,7 +62,7 @@ void square_problem_setup(fclaw2d_global_t* glob)
 
 }
 
-void square_patch_setup_manifold(fclaw2d_global_t *glob,
+void square_patch_setup_manifold(fclaw_global_t *glob,
                                     fclaw_patch_t *patch,
                                     int blockno,
                                     int patchno)
@@ -128,7 +128,7 @@ void cb_square_output_ascii (fclaw_domain_t * domain,
                             void *user)
 {
     fclaw2d_global_iterate_t* s = (fclaw2d_global_iterate_t*) user;
-    fclaw2d_global_t  *glob = (fclaw2d_global_t*) s->glob;
+    fclaw_global_t  *glob = (fclaw_global_t*) s->glob;
     const fclaw_options_t  *fclaw_opt = fclaw2d_get_options(glob);
 
     int iframe = *((int *) s->user);
@@ -173,7 +173,7 @@ void cb_square_output_ascii (fclaw_domain_t * domain,
 
 
 
-void square_link_solvers(fclaw2d_global_t *glob)
+void square_link_solvers(fclaw_global_t *glob)
 {
     /* ForestClaw core functions */
     fclaw2d_vtable_t *vt = fclaw2d_vt(glob);

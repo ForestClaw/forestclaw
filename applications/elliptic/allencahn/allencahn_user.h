@@ -44,9 +44,9 @@ extern "C"
 
 /* --------------------------- Problem dependent functions -----------------------------*/
 
-void allencahn_link_solvers(fclaw2d_global_t *glob);
+void allencahn_link_solvers(fclaw_global_t *glob);
 
-void allencahn_run(fclaw2d_global_t *glob);
+void allencahn_run(fclaw_global_t *glob);
 
 
 /* --------------------------- Fortran functions ---------------------------------------*/

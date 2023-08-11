@@ -39,7 +39,7 @@ extern "C"
 #endif
 #endif
 
-struct fclaw2d_global;
+struct fclaw_global;
 struct fclaw_patch;
 
 /** 
@@ -55,7 +55,7 @@ struct fclaw_patch;
  *                     The vector index changes fastest, then mx, then my
  *                     slowest.
  */
-typedef void (*fclaw_vtk_patch_data_t) (struct fclaw2d_global * glob,
+typedef void (*fclaw_vtk_patch_data_t) (struct fclaw_global * glob,
                                         struct fclaw_patch * this_patch,
                                         int this_block_idx, int this_patch_idx,
                                         char *a);
@@ -77,7 +77,7 @@ typedef void (*fclaw_vtk_patch_data_t) (struct fclaw2d_global * glob,
  *                  Collective with identical value on all ranks.
  */
 int
-fclaw2d_vtk_write_file (struct fclaw2d_global * glob, const char *basename,
+fclaw2d_vtk_write_file (struct fclaw_global * glob, const char *basename,
                         int mx, int my,
                         int meqn,
                         double vtkspace, int vtkwrite,
@@ -101,7 +101,7 @@ fclaw2d_vtk_write_file (struct fclaw2d_global * glob, const char *basename,
  *                  Collective with identical value on all ranks.
  */
 int
-fclaw3d_vtk_write_file (struct fclaw2d_global * glob, const char *basename,
+fclaw3d_vtk_write_file (struct fclaw_global * glob, const char *basename,
                         int mx, int my, int mz,
                         int meqn,
                         double vtkspace, int vtkwrite,
@@ -115,7 +115,7 @@ fclaw3d_vtk_write_file (struct fclaw2d_global * glob, const char *basename,
  * @param glob the global context
  * @param iframe the the frame index
  */
-void fclaw_clawpatch_output_vtk (struct fclaw2d_global* glob, int iframe);
+void fclaw_clawpatch_output_vtk (struct fclaw_global* glob, int iframe);
 
 
 #ifdef __cplusplus

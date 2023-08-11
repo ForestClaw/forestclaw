@@ -39,7 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #if 0
-void cylinder_compute_area(fclaw2d_global_t *glob,
+void cylinder_compute_area(fclaw_global_t *glob,
                            fclaw_patch_t *this_patch,
                            int blockno,
                            int patchno);
@@ -47,7 +47,7 @@ void cylinder_compute_area(fclaw2d_global_t *glob,
 
 
 static
-void cylinder_problem_setup(fclaw2d_global_t *glob)
+void cylinder_problem_setup(fclaw_global_t *glob)
 {
     const user_options_t* user = cylinder_get_options(glob);
 
@@ -74,7 +74,7 @@ void cylinder_problem_setup(fclaw2d_global_t *glob)
 
 
 static
-void cylinder_patch_setup(fclaw2d_global_t *glob,
+void cylinder_patch_setup(fclaw_global_t *glob,
                        fclaw_patch_t *patch,
                        int blockno, int patchno)
 {
@@ -120,7 +120,7 @@ void cb_cylinder_output_ascii (fclaw_domain_t * domain,
                             void *user)
 {
     fclaw2d_global_iterate_t* s = (fclaw2d_global_iterate_t*) user;
-    fclaw2d_global_t      *glob = (fclaw2d_global_t*) s->glob;
+    fclaw_global_t      *glob = (fclaw_global_t*) s->glob;
 
     const user_options_t *user_opt =  cylinder_get_options(glob);
 
@@ -173,7 +173,7 @@ void cb_cylinder_output_ascii (fclaw_domain_t * domain,
 }
 
 static
-void cylinder_compute_area(fclaw2d_global_t *glob,
+void cylinder_compute_area(fclaw_global_t *glob,
                            fclaw_patch_t *patch,
                            int blockno,
                            int patchno)
@@ -201,7 +201,7 @@ void cylinder_compute_area(fclaw2d_global_t *glob,
 
 
 static
-void cylinder_compute_tensors(fclaw2d_global_t *glob,
+void cylinder_compute_tensors(fclaw_global_t *glob,
                               fclaw_patch_t *patch,
                               int blockno,
                               int patchno)
@@ -262,7 +262,7 @@ void cylinder_compute_tensors(fclaw2d_global_t *glob,
 }
 
 
-void cylinder_link_solvers(fclaw2d_global_t *glob)
+void cylinder_link_solvers(fclaw_global_t *glob)
 {
 
     fclaw2d_vtable_t *vt = fclaw2d_vt(glob);

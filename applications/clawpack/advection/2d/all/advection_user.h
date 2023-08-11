@@ -65,13 +65,13 @@ extern "C"
 /* Common patch setup - this calls a common SETAUX routine that sets 
    velocities based on a streamfunction */
 
-void advection_patch_setup_manifold(fclaw2d_global_t *glob,
+void advection_patch_setup_manifold(fclaw_global_t *glob,
                                     fclaw_patch_t *patch,
                                     int block,
                                     int patchno,
                                     int claw_version);
 
-void advection_b4step2_manifold(fclaw2d_global_t *glob,
+void advection_b4step2_manifold(fclaw_global_t *glob,
                                 fclaw_patch_t *patch,
                                 int blockno,
                                 int patchno,

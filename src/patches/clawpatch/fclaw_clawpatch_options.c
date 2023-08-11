@@ -295,14 +295,14 @@ fclaw_clawpatch_options_register_3d(fclaw_app_t* app, const char* name, const ch
 }
 
 void 
-fclaw_clawpatch_options_store (fclaw2d_global_t *glob, 
+fclaw_clawpatch_options_store (fclaw_global_t *glob, 
                                fclaw_clawpatch_options_t* clawpatch_options)
 {
     fclaw2d_global_options_store(glob, "fclaw_clawpatch", clawpatch_options);
 }
 
 fclaw_clawpatch_options_t* 
-fclaw_clawpatch_get_options(fclaw2d_global_t* glob)
+fclaw_clawpatch_get_options(fclaw_global_t* glob)
 {
     return (fclaw_clawpatch_options_t*) 
             fclaw2d_global_get_options(glob, "fclaw_clawpatch");

@@ -55,7 +55,7 @@ fclaw_domain_t* create_domain(sc_MPI_Comm mpicomm,
 }
 
 static
-void run_program(fclaw2d_global_t* glob)
+void run_program(fclaw_global_t* glob)
 {
     fclaw_domain_t    **domain = &glob->domain;
 
@@ -90,7 +90,7 @@ main (int argc, char **argv)
 
     sc_MPI_Comm mpicomm;
     fclaw_domain_t* domain;
-    fclaw2d_global_t* glob;
+    fclaw_global_t* glob;
 
     /* Initialize application */
     app = fclaw_app_new (&argc, &argv, NULL);

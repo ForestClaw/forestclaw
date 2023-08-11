@@ -49,7 +49,7 @@ typedef struct
 } fclaw2d_tikz_info_t;
 
 static
-void convert_brick(fclaw2d_global_t *glob, 
+void convert_brick(fclaw_global_t *glob, 
                    fclaw_patch_t *this_patch, 
                    int blockno, 
                    double* xlower, double* ylower)
@@ -156,7 +156,7 @@ cb_tikz_output (fclaw_domain_t * domain,
 #endif    
 }
 
-void fclaw2d_output_frame_tikz(fclaw2d_global_t* glob, int iframe)
+void fclaw2d_output_frame_tikz(fclaw_global_t* glob, int iframe)
 {
     fclaw_domain_t *domain = glob->domain;
     fclaw2d_tikz_info_t s_tikz;

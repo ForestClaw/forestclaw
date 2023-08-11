@@ -144,13 +144,13 @@ struct fclaw2d_patch_transform_data
     int block_iface;   
 
     /** Pointer to the glboal context */
-    struct fclaw2d_global *glob;
+    struct fclaw_global *glob;
     /** User pointer */
     void* user;
 };
 
 
-struct fclaw2d_global;
+struct fclaw_global;
 struct fclaw_domain;
 struct fclaw_patch;
 
@@ -164,7 +164,7 @@ struct fclaw_patch;
  * DEPRECATED
  * @deprecated NOT USED
  */
-void fclaw2d_patch_reset_data(struct fclaw2d_global* glob,
+void fclaw2d_patch_reset_data(struct fclaw_global* glob,
                               struct fclaw_patch* old_patch,
                               struct fclaw_patch* new_patch,
                               int blockno,int old_patchno, int new_patchno);
@@ -176,7 +176,7 @@ void fclaw2d_patch_reset_data(struct fclaw2d_global* glob,
  * @param[in] glob the global context 
  * @param[in,out] patch the patch context, user data pointer is set to NULL on return
  */
-void fclaw2d_patch_data_delete(struct fclaw2d_global *glob,
+void fclaw2d_patch_data_delete(struct fclaw_global *glob,
                                struct fclaw_patch *patch);
 
 /**
@@ -188,7 +188,7 @@ void fclaw2d_patch_data_delete(struct fclaw2d_global *glob,
  * @param[in] patchno the patch number
  * @param[in,out] user user data pointer
  */
-void fclaw2d_patch_build(struct fclaw2d_global *glob,
+void fclaw2d_patch_build(struct fclaw_global *glob,
                          struct fclaw_patch *this_patch,
                          int blockno,
                          int patchno,
@@ -205,7 +205,7 @@ void fclaw2d_patch_build(struct fclaw2d_global *glob,
  * @param[in] fine0_patchno first fine patch number
  * @param[in] build_mode the build mode
  */
-void fclaw2d_patch_build_from_fine(struct fclaw2d_global *glob,
+void fclaw2d_patch_build_from_fine(struct fclaw_global *glob,
                                    struct fclaw_patch *fine_patches,
                                    struct fclaw_patch *coarse_patch,
                                    int blockno,
@@ -228,7 +228,7 @@ void fclaw2d_patch_build_from_fine(struct fclaw2d_global *glob,
  * @param[in] blockno the block number
  * @param[in] patchno the patch number
  */
-void fclaw2d_patch_initialize(struct fclaw2d_global *glob,
+void fclaw2d_patch_initialize(struct fclaw_global *glob,
                               struct fclaw_patch *this_patch,
                               int blockno,
                               int patchno);
@@ -245,7 +245,7 @@ void fclaw2d_patch_initialize(struct fclaw2d_global *glob,
  * @param[in] intersects_bc array of values for each face, true if physical boundary
  * @param[in] time_interp true if in time interpolation stage (not global)
  */
-void fclaw2d_patch_physical_bc(struct fclaw2d_global *glob,
+void fclaw2d_patch_physical_bc(struct fclaw_global *glob,
                                struct fclaw_patch *this_patch,
                                int blockno,
                                int patchno,
@@ -266,7 +266,7 @@ void fclaw2d_patch_physical_bc(struct fclaw2d_global *glob,
  * @param[in] user pointer to the ::fclaw2d_single_step_buffer_data struct (used in cudaclaw)
  * @return double the maxcfl
  */
-double fclaw2d_patch_single_step_update(struct fclaw2d_global *glob,
+double fclaw2d_patch_single_step_update(struct fclaw_global *glob,
                                         struct fclaw_patch *this_patch,
                                         int blockno,
                                         int patchno,
@@ -281,7 +281,7 @@ double fclaw2d_patch_single_step_update(struct fclaw2d_global *glob,
  * @param[in] blockno the block number 
  * @param[in] patchno the patch number
  */
-void fclaw2d_patch_set_rhs(struct fclaw2d_global *glob,
+void fclaw2d_patch_set_rhs(struct fclaw_global *glob,
                            struct fclaw_patch *patch,
                            int blockno,
                            int patchno);
@@ -299,7 +299,7 @@ void fclaw2d_patch_set_rhs(struct fclaw2d_global *glob,
  * @param[in] glob the global context
  * @param[in,out] this_patch the patch context
  */
-void fclaw2d_patch_restore_step(struct fclaw2d_global* glob,
+void fclaw2d_patch_restore_step(struct fclaw_global* glob,
                                 struct fclaw_patch* this_patch);
 
 /**
@@ -308,7 +308,7 @@ void fclaw2d_patch_restore_step(struct fclaw2d_global* glob,
  * @param[in] glob the global context
  * @param[in,out] this_patch the patch context
  */
-void fclaw2d_patch_save_step(struct fclaw2d_global* glob,
+void fclaw2d_patch_save_step(struct fclaw_global* glob,
                              struct fclaw_patch* this_patch);
 
 /**
@@ -318,7 +318,7 @@ void fclaw2d_patch_save_step(struct fclaw2d_global* glob,
  * @param[in,out] this_patch the patch context
  * @param[in] alpha the alpha value, with 0 being the last time step and 1 being the current time step
  */
-void fclaw2d_patch_setup_timeinterp(struct fclaw2d_global *glob,
+void fclaw2d_patch_setup_timeinterp(struct fclaw_global *glob,
                                     struct fclaw_patch *this_patch,
                                     double alpha);
 
@@ -338,7 +338,7 @@ void fclaw2d_patch_setup_timeinterp(struct fclaw2d_global *glob,
  * @param[in] time_interp true if ghost filling for time interpolated level (non-global update)
  * @param[in] tranform_data the tranform data for the neighbor's coordinate system
  */
-void fclaw2d_patch_copy_face(struct fclaw2d_global* glob,
+void fclaw2d_patch_copy_face(struct fclaw_global* glob,
                              struct fclaw_patch *this_patch,
                              struct fclaw_patch *neighbor_patch,
                              int iface,
@@ -360,7 +360,7 @@ void fclaw2d_patch_copy_face(struct fclaw2d_global* glob,
  * @param[in]     igrid the index of the fine neighbor in the child array
  * @param[in]     tranform_data the tranform data for the neighbor's coordinate system
  */
-void fclaw2d_patch_average_face(struct fclaw2d_global* glob,
+void fclaw2d_patch_average_face(struct fclaw_global* glob,
                                 struct fclaw_patch *coarse_patch,
                                 struct fclaw_patch *fine_patch,
                                 int idir,
@@ -386,7 +386,7 @@ void fclaw2d_patch_average_face(struct fclaw2d_global* glob,
  * @param[in]     igrid the index of the fine neighbor in the child array
  * @param[in]     tranform_data the tranform data for the neighbor's coordinate system
  */
-void fclaw2d_patch_interpolate_face(struct fclaw2d_global* glob,
+void fclaw2d_patch_interpolate_face(struct fclaw_global* glob,
                                     struct fclaw_patch *coarse_patch,
                                     struct fclaw_patch *fine_patch,
                                     int idir,
@@ -410,7 +410,7 @@ void fclaw2d_patch_interpolate_face(struct fclaw2d_global* glob,
  * @param[in]     time_interp true if ghost filling for time interpolated level (non-global update)
  * @param[in]     tranform_data the tranform data for the neighbor's coordinate system
  */
-void fclaw2d_patch_copy_corner(struct fclaw2d_global* glob,
+void fclaw2d_patch_copy_corner(struct fclaw_global* glob,
                                struct fclaw_patch *this_patch,
                                struct fclaw_patch *neighbor_patch,
                                int this_blockno,
@@ -433,7 +433,7 @@ void fclaw2d_patch_copy_corner(struct fclaw2d_global* glob,
  * @param[in]     time_interp true if ghost filling for time interpolated level (non-global update)
  * @param[in]     tranform_data the tranform data for the neighbor's coordinate system
  */
-void fclaw2d_patch_average_corner(struct fclaw2d_global* glob,
+void fclaw2d_patch_average_corner(struct fclaw_global* glob,
                                   struct fclaw_patch *coarse_patch,
                                   struct fclaw_patch *fine_patch,
                                   int coarse_blockno,
@@ -456,7 +456,7 @@ void fclaw2d_patch_average_corner(struct fclaw2d_global* glob,
  * @param[in]     time_interp true if ghost filling for time interpolated level (non-global update)
  * @param[in]     tranform_data the tranform data for the neighbor's coordinate system
  */
-void fclaw2d_patch_interpolate_corner(struct fclaw2d_global* glob,
+void fclaw2d_patch_interpolate_corner(struct fclaw_global* glob,
                                       struct fclaw_patch* coarse_patch,
                                       struct fclaw_patch* fine_patch,
                                       int coarse_blockno,
@@ -471,14 +471,14 @@ void fclaw2d_patch_interpolate_corner(struct fclaw2d_global* glob,
  * DEPRECATED
  * @deprecated NOT USED
  */
-void fclaw2d_patch_create_user_data(struct fclaw2d_global* glob,
+void fclaw2d_patch_create_user_data(struct fclaw_global* glob,
                                     struct fclaw_patch* patch);
 
 /**
  * DEPRECATED
  * @deprecated NOT USED
  */
-void fclaw2d_patch_destroy_user_data(struct fclaw2d_global* glob,
+void fclaw2d_patch_destroy_user_data(struct fclaw_global* glob,
                                      struct fclaw_patch* patch);
 
 /* ------------------------------------------------------------------------------------ */
@@ -495,7 +495,7 @@ void fclaw2d_patch_destroy_user_data(struct fclaw2d_global* glob,
  * @param[in] patchno the patch number
  * @param[in,out] tdata the stransform data structure
  */
-void fclaw2d_patch_transform_init_data(struct fclaw2d_global* glob,
+void fclaw2d_patch_transform_init_data(struct fclaw_global* glob,
                                        struct fclaw_patch* patch,
                                        int blockno, int patchno,
                                        struct fclaw2d_patch_transform_data *tdata);
@@ -521,7 +521,7 @@ void fclaw2d_patch_transform_init_data(struct fclaw2d_global* glob,
  *                                   the \a ftransform contents are ignored.
  *              [1,4,7]     0 (unused for compatibility with 3D).ftransform 
  */
-void fclaw2d_patch_transform_blockface(struct fclaw2d_global* glob,
+void fclaw2d_patch_transform_blockface(struct fclaw_global* glob,
                                        int faceno, int rfaceno,
                                        int ftransform[]);
 
@@ -544,7 +544,7 @@ void fclaw2d_patch_transform_blockface(struct fclaw2d_global* glob,
  *                                   the \a ftransform contents are ignored.
  *              [1,4,7]     0 (unused for compatibility with 3D).ftransform 
  */
-void fclaw2d_patch_transform_blockface_intra(struct fclaw2d_global* glob, 
+void fclaw2d_patch_transform_blockface_intra(struct fclaw_global* glob, 
                                              int ftransform[]);
   
 ///@}
@@ -563,7 +563,7 @@ void fclaw2d_patch_transform_blockface_intra(struct fclaw2d_global* glob,
  * @param[in] initflag true if in init phase
  * @return true if patch should be refined
  */
-int fclaw2d_patch_tag4refinement(struct fclaw2d_global *glob,
+int fclaw2d_patch_tag4refinement(struct fclaw_global *glob,
                                  struct fclaw_patch *this_patch,
                                  int blockno, int patchno,
                                  int initflag);
@@ -578,7 +578,7 @@ int fclaw2d_patch_tag4refinement(struct fclaw2d_global *glob,
  * @param[in] initflag true if in init phase
  * @return true if patch should be coarsened
  */
-int fclaw2d_patch_tag4coarsening(struct fclaw2d_global *glob,
+int fclaw2d_patch_tag4coarsening(struct fclaw_global *glob,
                                  struct fclaw_patch *fine_patches,
                                  int blockno,
                                  int patchno,
@@ -594,7 +594,7 @@ int fclaw2d_patch_tag4coarsening(struct fclaw2d_global *glob,
  * @param[in] coarse_patchno the patch number of the coarse patch
  * @param[in] fine0_patchno the patch number of the first fine patch
  */
-void fclaw2d_patch_interpolate2fine(struct fclaw2d_global *glob,
+void fclaw2d_patch_interpolate2fine(struct fclaw_global *glob,
                                     struct fclaw_patch* coarse_patch,
                                     struct fclaw_patch* fine_patches,
                                     int this_blockno, int coarse_patchno,
@@ -610,7 +610,7 @@ void fclaw2d_patch_interpolate2fine(struct fclaw2d_global *glob,
  * @param[in] fine_patchno the patch number of the first fine patch
  * @param[in] coarse_patchno the patch number of the coarse patch
  */
-void fclaw2d_patch_average2coarse(struct fclaw2d_global *glob,
+void fclaw2d_patch_average2coarse(struct fclaw_global *glob,
                                   struct fclaw_patch *fine_patches,
                                   struct fclaw_patch *coarse_patch,
                                   int blockno, int fine0_patchno,
@@ -628,7 +628,7 @@ void fclaw2d_patch_average2coarse(struct fclaw2d_global *glob,
  * @param[in] glob the global context
  * @return the buffer size (in bytes)
  */
-size_t fclaw2d_patch_ghost_packsize(struct fclaw2d_global* glob);
+size_t fclaw2d_patch_ghost_packsize(struct fclaw_global* glob);
 
 /**
  * @brief Allocates a buffer for the patch ghost data
@@ -636,7 +636,7 @@ size_t fclaw2d_patch_ghost_packsize(struct fclaw2d_global* glob);
  * @param[in] glob the global context
  * @param[out] q pointer to the allocated buffer
  */
-void fclaw2d_patch_local_ghost_alloc(struct fclaw2d_global* glob,
+void fclaw2d_patch_local_ghost_alloc(struct fclaw_global* glob,
                                      void** q);
 
 /**
@@ -645,7 +645,7 @@ void fclaw2d_patch_local_ghost_alloc(struct fclaw2d_global* glob,
  * @param[in] glob the global context
  * @param[out] q pointer to the buffer to free
  */
-void fclaw2d_patch_local_ghost_free(struct fclaw2d_global* glob,
+void fclaw2d_patch_local_ghost_free(struct fclaw_global* glob,
                                     void **q);
 
 /**
@@ -656,7 +656,7 @@ void fclaw2d_patch_local_ghost_free(struct fclaw2d_global* glob,
  * @param[in,out] patch_data the buffer
  * @param[in] time_interp true if ghost filling for time interpolated level (non-global update)
  */
-void fclaw2d_patch_local_ghost_pack(struct fclaw2d_global *glob,
+void fclaw2d_patch_local_ghost_pack(struct fclaw_global *glob,
                                     struct fclaw_patch *this_patch,
                                     void *patch_data,
                                     int time_interp);
@@ -670,7 +670,7 @@ void fclaw2d_patch_local_ghost_pack(struct fclaw2d_global *glob,
  * @param[in] patchno the patch number
  * @param[in] build_mode the build mode
  */
-void fclaw2d_patch_remote_ghost_build(struct fclaw2d_global *glob,
+void fclaw2d_patch_remote_ghost_build(struct fclaw_global *glob,
                                       struct fclaw_patch *this_patch,
                                       int blockno,
                                       int patchno,
@@ -686,7 +686,7 @@ void fclaw2d_patch_remote_ghost_build(struct fclaw2d_global *glob,
  * @param[in] qdata the buffer to unpack from
  * @param[in] time_interp true if ghost filling for time interpolated level (non-global update)
  */
-void fclaw2d_patch_remote_ghost_unpack(struct fclaw2d_global* glob,
+void fclaw2d_patch_remote_ghost_unpack(struct fclaw_global* glob,
                                        struct fclaw_patch* this_patch,
                                        int blockno, int patchno,
                                        void *qdata, int time_interp);
@@ -698,7 +698,7 @@ void fclaw2d_patch_remote_ghost_unpack(struct fclaw2d_global* glob,
  * @param[in] glob the global context
  * @param[in,out] ghost_patch the patch context
  */
-void fclaw2d_patch_remote_ghost_delete(struct fclaw2d_global *glob,
+void fclaw2d_patch_remote_ghost_delete(struct fclaw_global *glob,
                                        struct fclaw_patch *ghost_patch);
 
 ///@}
@@ -717,7 +717,7 @@ void fclaw2d_patch_remote_ghost_delete(struct fclaw2d_global *glob,
  * @param[in] patchno the patch number
  * @param[out] pack_data_here the buffer
  */
-void fclaw2d_patch_partition_pack(struct fclaw2d_global *glob,
+void fclaw2d_patch_partition_pack(struct fclaw_global *glob,
                                   struct fclaw_patch *this_patch,
                                   int blockno,
                                   int patchno,
@@ -733,7 +733,7 @@ void fclaw2d_patch_partition_pack(struct fclaw2d_global *glob,
  * @param[in] patchno the patch number
  * @param[in] packed_data the buffer
  */
-void fclaw2d_patch_partition_unpack(struct fclaw2d_global *glob,
+void fclaw2d_patch_partition_unpack(struct fclaw_global *glob,
                                     struct fclaw_domain *new_domain,  
                                     struct fclaw_patch *this_patch,
                                     int blockno,
@@ -746,7 +746,7 @@ void fclaw2d_patch_partition_unpack(struct fclaw2d_global *glob,
  * @param[in] glob the global context
  * @return size_t the size of buffer needed
  */
-size_t fclaw2d_patch_partition_packsize(struct fclaw2d_global* glob);
+size_t fclaw2d_patch_partition_packsize(struct fclaw_global* glob);
 
 
 ///@}
@@ -771,7 +771,7 @@ size_t fclaw2d_patch_partition_packsize(struct fclaw2d_global* glob);
  * @param[in] time_interp true if ghost filling for time interpolated level (non-global update)
  * @param[in] transform_data the transform for the neighbor's coordinates
  */
-void fclaw2d_patch_time_sync_f2c(struct fclaw2d_global* glob,
+void fclaw2d_patch_time_sync_f2c(struct fclaw_global* glob,
                                  struct fclaw_patch *coarse_patch,
                                  struct fclaw_patch *fine_patch,
                                  int coarse_blockno, int fine_blockno,
@@ -793,7 +793,7 @@ void fclaw2d_patch_time_sync_f2c(struct fclaw2d_global* glob,
  *            1 for left/right
  * @param[in] transform_data the transform for the neighbor's coordinates
  */
-void fclaw2d_patch_time_sync_samesize(struct fclaw2d_global* glob,
+void fclaw2d_patch_time_sync_samesize(struct fclaw_global* glob,
                                       struct fclaw_patch *this_patch,
                                       struct fclaw_patch *neighbor_patch,
                                       int this_iface, int idir,
@@ -807,7 +807,7 @@ void fclaw2d_patch_time_sync_samesize(struct fclaw2d_global* glob,
  * @param[in] coarse_level the the level of the coarse patch
  * @param[in] reset_mode the reset mode ::fclaw2d_time_sync_type
  */
-void fclaw2d_patch_time_sync_reset(struct fclaw2d_global* glob,
+void fclaw2d_patch_time_sync_reset(struct fclaw_global* glob,
                                    struct fclaw_patch* this_patch,
                                    int coarse_level,
                                    int reset_mode);
@@ -842,7 +842,7 @@ typedef void (*fclaw2d_patch_delete_t)(void *user_patch);
  * @param[in] patchno patch number
  * @param[in,out] user user data pointer
  */
-typedef void (*fclaw2d_patch_build_t)(struct fclaw2d_global *glob,
+typedef void (*fclaw2d_patch_build_t)(struct fclaw_global *glob,
                                       struct fclaw_patch *this_patch,
                                       int blockno,
                                       int patchno,
@@ -859,7 +859,7 @@ typedef void (*fclaw2d_patch_build_t)(struct fclaw2d_global *glob,
  * @param[in] fine0_patchno first fine patch number
  * @param[in] build_mode the build mode
  */
-typedef void (*fclaw2d_patch_build_from_fine_t)(struct fclaw2d_global *glob,
+typedef void (*fclaw2d_patch_build_from_fine_t)(struct fclaw_global *glob,
                                                 struct fclaw_patch *fine_patches,
                                                 struct fclaw_patch *coarse_patch,
                                                 int blockno,
@@ -875,7 +875,7 @@ typedef void (*fclaw2d_patch_build_from_fine_t)(struct fclaw2d_global *glob,
  * @param[in] blockno the block number
  * @param[in] patchno the patch number
  */
-typedef void (*fclaw2d_patch_setup_t)(struct fclaw2d_global *glob,
+typedef void (*fclaw2d_patch_setup_t)(struct fclaw_global *glob,
                                       struct fclaw_patch *this_patch,
                                       int patchno,
                                       int blockno);
@@ -894,7 +894,7 @@ typedef void (*fclaw2d_patch_setup_t)(struct fclaw2d_global *glob,
  * @param[in] blockno the block number
  * @param[in] patchno the patch number
  */
-typedef void (*fclaw2d_patch_initialize_t)(struct fclaw2d_global *glob,
+typedef void (*fclaw2d_patch_initialize_t)(struct fclaw_global *glob,
                                            struct fclaw_patch *this_patch,
                                            int blockno,
                                            int patchno);
@@ -912,7 +912,7 @@ typedef void (*fclaw2d_patch_initialize_t)(struct fclaw2d_global *glob,
  *                          a physical boundary
  * @param[in] time_interp the patch number
  */
-typedef void (*fclaw2d_patch_physical_bc_t)(struct fclaw2d_global *glob,
+typedef void (*fclaw2d_patch_physical_bc_t)(struct fclaw_global *glob,
                                             struct fclaw_patch *this_patch,
                                             int blockno,
                                             int patchno,
@@ -934,7 +934,7 @@ typedef void (*fclaw2d_patch_physical_bc_t)(struct fclaw2d_global *glob,
  *                            (used in cudaclaw)
  * @return the maxcfl
  */
-typedef double (*fclaw2d_patch_single_step_update_t)(struct fclaw2d_global *glob,
+typedef double (*fclaw2d_patch_single_step_update_t)(struct fclaw_global *glob,
                                                      struct fclaw_patch *this_patch,
                                                      int blockno,
                                                      int patchno,
@@ -951,7 +951,7 @@ typedef double (*fclaw2d_patch_single_step_update_t)(struct fclaw2d_global *glob
  * @param[in] blockno the block number
  * @param[in] patchno the patch number
  */
-typedef void (*fclaw2d_patch_rhs_t)(struct fclaw2d_global *glob,
+typedef void (*fclaw2d_patch_rhs_t)(struct fclaw_global *glob,
                                     struct fclaw_patch *patch,
                                     int blockno,
                                     int patchno);
@@ -963,16 +963,16 @@ typedef void (*fclaw2d_patch_rhs_t)(struct fclaw2d_global *glob,
 ///@{
 
 /** @copydoc fclaw2d_patch_setup_timeinterp() */
-typedef void (*fclaw2d_patch_setup_timeinterp_t)(struct fclaw2d_global *glob,
+typedef void (*fclaw2d_patch_setup_timeinterp_t)(struct fclaw_global *glob,
                                                  struct fclaw_patch *this_patch,
                                                  double alpha);
 
 /** @copydoc fclaw2d_patch_restore_step() */
-typedef void (*fclaw2d_patch_restore_step_t)(struct fclaw2d_global *glob,
+typedef void (*fclaw2d_patch_restore_step_t)(struct fclaw_global *glob,
                                              struct fclaw_patch* this_patch);
 
 /** @copydoc fclaw2d_patch_save_step() */
-typedef void (*fclaw2d_patch_save_step_t)(struct fclaw2d_global *glob,
+typedef void (*fclaw2d_patch_save_step_t)(struct fclaw_global *glob,
                                           struct fclaw_patch* this_patch);
 
 
@@ -992,7 +992,7 @@ typedef void (*fclaw2d_patch_save_step_t)(struct fclaw2d_global *glob,
  * @param[in] time_interp true if ghost filling for time interpolated level (non-global update)
  * @param[in] tranform_data the tranform data for the neighbor's coordinate system
  */
-typedef void (*fclaw2d_patch_copy_face_t)(struct fclaw2d_global* glob,
+typedef void (*fclaw2d_patch_copy_face_t)(struct fclaw_global* glob,
                                           struct fclaw_patch *this_patch,
                                           struct fclaw_patch *neighbor_patch,
                                           int iface,
@@ -1015,7 +1015,7 @@ typedef void (*fclaw2d_patch_copy_face_t)(struct fclaw2d_global* glob,
  * @param[in]     igrid the index of the fine neighbor in the child array
  * @param[in]     tranform_data the tranform data for the neighbor's coordinate system
  */
-typedef void (*fclaw2d_patch_average_face_t)(struct fclaw2d_global* glob,
+typedef void (*fclaw2d_patch_average_face_t)(struct fclaw_global* glob,
                                              struct fclaw_patch *coarse_patch,
                                              struct fclaw_patch *fine_patch,
                                              int idir,
@@ -1043,7 +1043,7 @@ typedef void (*fclaw2d_patch_average_face_t)(struct fclaw2d_global* glob,
  * @param[in]     manifold true if using mainifold
  * @param[in]     tranform_data the tranform data for the neighbor's coordinate system
  */
-typedef void (*fclaw2d_patch_interpolate_face_t)(struct fclaw2d_global* glob,
+typedef void (*fclaw2d_patch_interpolate_face_t)(struct fclaw_global* glob,
                                                  struct fclaw_patch *coarse_patch,
                                                  struct fclaw_patch *fine_patch,
                                                  int idir,
@@ -1067,7 +1067,7 @@ typedef void (*fclaw2d_patch_interpolate_face_t)(struct fclaw2d_global* glob,
  * @param[in]     time_interp true if ghost filling for time interpolated level (non-global update)
  * @param[in]     tranform_data the tranform data for the neighbor's coordinate system
  */
-typedef void (*fclaw2d_patch_copy_corner_t)(struct fclaw2d_global* glob,
+typedef void (*fclaw2d_patch_copy_corner_t)(struct fclaw_global* glob,
                                             struct fclaw_patch *this_patch,
                                             struct fclaw_patch *neighbor_patch,
                                             int this_blockno,
@@ -1089,7 +1089,7 @@ typedef void (*fclaw2d_patch_copy_corner_t)(struct fclaw2d_global* glob,
  * @param[in]     time_interp true if ghost filling for time interpolated level (non-global update)
  * @param[in]     tranform_data the tranform data for the neighbor's coordinate system
  */
-typedef void (*fclaw2d_patch_average_corner_t)(struct fclaw2d_global* glob,
+typedef void (*fclaw2d_patch_average_corner_t)(struct fclaw_global* glob,
                                                struct fclaw_patch *coarse_patch,
                                                struct fclaw_patch *fine_patch,
                                                int coarse_blockno,
@@ -1111,7 +1111,7 @@ typedef void (*fclaw2d_patch_average_corner_t)(struct fclaw2d_global* glob,
  * @param[in]     time_interp true if ghost filling for time interpolated level (non-global update)
  * @param[in]     tranform_data the tranform data for the neighbor's coordinate system
  */   
-typedef void (*fclaw2d_patch_interpolate_corner_t)(struct fclaw2d_global* glob,
+typedef void (*fclaw2d_patch_interpolate_corner_t)(struct fclaw_global* glob,
                                                    struct fclaw_patch *coarse_patch,
                                                    struct fclaw_patch *fine_patch,
                                                    int coarse_blockno,
@@ -1136,7 +1136,7 @@ typedef void (*fclaw2d_patch_interpolate_corner_t)(struct fclaw2d_global* glob,
  * @param[in] patchno the patch number
  * @param[in,out] tdata the stransform data structure
  */
-typedef void (*fclaw2d_patch_transform_init_data_t)(struct fclaw2d_global* glob,
+typedef void (*fclaw2d_patch_transform_init_data_t)(struct fclaw_global* glob,
                                                     struct fclaw_patch* patch,
                                                     int blockno, int patchno,
                                                     struct fclaw2d_patch_transform_data *tdata);
@@ -1200,7 +1200,7 @@ typedef void (*fclaw2d_patch_transform_blockface_intra_t)(int ftransform[]);
  * @param[in] initflag true if in init phase
  * @return true if patch should be refined
  */
-typedef int (*fclaw2d_patch_tag4refinement_t)(struct fclaw2d_global *glob,
+typedef int (*fclaw2d_patch_tag4refinement_t)(struct fclaw_global *glob,
                                               struct fclaw_patch *this_patch,
                                               int this_blockno, int this_patchno,
                                               int initflag);
@@ -1215,7 +1215,7 @@ typedef int (*fclaw2d_patch_tag4refinement_t)(struct fclaw2d_global *glob,
  * @param[in] initflag true if in init phase
  * @return true if patch should be coarsened
  */
-typedef int (*fclaw2d_patch_tag4coarsening_t)(struct fclaw2d_global *glob,
+typedef int (*fclaw2d_patch_tag4coarsening_t)(struct fclaw_global *glob,
                                               struct fclaw_patch *this_patch,
                                               int this_blockno,
                                               int this_patchno,
@@ -1231,7 +1231,7 @@ typedef int (*fclaw2d_patch_tag4coarsening_t)(struct fclaw2d_global *glob,
  * @param[in] coarse_patchno the patch number of the coarse patch
  * @param[in] fine_patchno the patch number of the first fine patch
  */
-typedef void (*fclaw2d_patch_interpolate2fine_t)(struct fclaw2d_global *glob,
+typedef void (*fclaw2d_patch_interpolate2fine_t)(struct fclaw_global *glob,
                                                  struct fclaw_patch *coarse_patch,
                                                  struct fclaw_patch* fine_patches,
                                                  int blockno, int coarse_patchno,
@@ -1246,7 +1246,7 @@ typedef void (*fclaw2d_patch_interpolate2fine_t)(struct fclaw2d_global *glob,
  * @param[in] fine_patchno the patch number of the first fine patch
  * @param[in] coarse_patchno the patch number of the coarse patch
  */
-typedef void (*fclaw2d_patch_average2coarse_t)(struct fclaw2d_global *glob,
+typedef void (*fclaw2d_patch_average2coarse_t)(struct fclaw_global *glob,
                                                struct fclaw_patch *fine_patches,
                                                struct fclaw_patch *coarse_patch,
                                                int blockno, int fine_patchno,
@@ -1259,25 +1259,25 @@ typedef void (*fclaw2d_patch_average2coarse_t)(struct fclaw2d_global *glob,
 ///@{
 
 /** @copydoc fclaw2d_patch_ghost_packsize() */
-typedef size_t (*fclaw2d_patch_ghost_packsize_t)(struct fclaw2d_global* glob);
+typedef size_t (*fclaw2d_patch_ghost_packsize_t)(struct fclaw_global* glob);
 
 /** @copydoc fclaw2d_patch_local_ghost_pack() */
-typedef void (*fclaw2d_patch_local_ghost_pack_t)(struct fclaw2d_global *glob,
+typedef void (*fclaw2d_patch_local_ghost_pack_t)(struct fclaw_global *glob,
                                                  struct fclaw_patch *this_patch,
                                                  void *patch_data,
                                                  int time_interp);
 
 /** @copydoc fclaw2d_patch_local_ghost_alloc() */
-typedef void (*fclaw2d_patch_local_ghost_alloc_t)(struct fclaw2d_global* glob,
+typedef void (*fclaw2d_patch_local_ghost_alloc_t)(struct fclaw_global* glob,
                                                  void** q);
 
 /** @copydoc fclaw2d_patch_local_ghost_free() */
-typedef void (*fclaw2d_patch_local_ghost_free_t)(struct fclaw2d_global* glob,
+typedef void (*fclaw2d_patch_local_ghost_free_t)(struct fclaw_global* glob,
                                                  void **q);
 
 
 /** @copydoc fclaw2d_patch_remote_ghost_build() */
-typedef void (*fclaw2d_patch_remote_ghost_build_t)(struct fclaw2d_global *glob,
+typedef void (*fclaw2d_patch_remote_ghost_build_t)(struct fclaw_global *glob,
                                                    struct fclaw_patch *this_patch,
                                                    int blockno,
                                                    int patchno,
@@ -1291,14 +1291,14 @@ typedef void (*fclaw2d_patch_remote_ghost_build_t)(struct fclaw2d_global *glob,
  * @param[in] blockno the block number
  * @param[in] blockno the patch number
  */
-typedef void (*fclaw2d_patch_remote_ghost_setup_t)(struct fclaw2d_global *glob,
+typedef void (*fclaw2d_patch_remote_ghost_setup_t)(struct fclaw_global *glob,
                                                    struct fclaw_patch *this_patch,
                                                    int blockno,
                                                    int patchno);
 
 
 /** @copydoc fclaw2d_patch_remote_ghost_unpack() */
-typedef void (*fclaw2d_patch_remote_ghost_unpack_t)(struct fclaw2d_global *glob,
+typedef void (*fclaw2d_patch_remote_ghost_unpack_t)(struct fclaw_global *glob,
                                                     struct fclaw_patch* this_patch,
                                                     int blockno, int patchno,
                                                     void *qdata, int time_interp);
@@ -1314,18 +1314,18 @@ typedef void (*fclaw2d_patch_remote_ghost_delete_t)(void *user_patch);
 ///@{
 
 /** @copydoc fclaw2d_patch_partition_packsize() */
-typedef size_t (*fclaw2d_patch_partition_packsize_t)(struct fclaw2d_global* glob);
+typedef size_t (*fclaw2d_patch_partition_packsize_t)(struct fclaw_global* glob);
 
 
 /** @copydoc fclaw2d_patch_partition_pack() */
-typedef void (*fclaw2d_patch_partition_pack_t)(struct fclaw2d_global *glob,
+typedef void (*fclaw2d_patch_partition_pack_t)(struct fclaw_global *glob,
                                                struct fclaw_patch *this_patch,
                                                int blockno,
                                                int patchno,
                                                void *pack_data_here);
 
 /** @copydoc fclaw2d_patch_partition_unpack() */
-typedef void (*fclaw2d_patch_partition_unpack_t)(struct fclaw2d_global *glob,
+typedef void (*fclaw2d_patch_partition_unpack_t)(struct fclaw_global *glob,
                                                  struct fclaw_domain *new_domain,
                                                  struct fclaw_patch *this_patch,
                                                  int blockno,
@@ -1340,7 +1340,7 @@ typedef void (*fclaw2d_patch_partition_unpack_t)(struct fclaw2d_global *glob,
 
 
 /** @copydoc fclaw2d_patch_time_sync_f2c() */
-typedef void (*fclaw2d_patch_time_sync_f2c_t)(struct fclaw2d_global* glob,
+typedef void (*fclaw2d_patch_time_sync_f2c_t)(struct fclaw_global* glob,
                                               struct fclaw_patch *coarse_patch,
                                               struct fclaw_patch *fine_patch,
                                               int coarse_blockno, int fine_blockno,
@@ -1353,7 +1353,7 @@ typedef void (*fclaw2d_patch_time_sync_f2c_t)(struct fclaw2d_global* glob,
                                               *transform_data);
 
 /** @copydoc fclaw2d_patch_time_sync_samesize() */
-typedef void (*fclaw2d_patch_time_sync_samesize_t)(struct fclaw2d_global* glob,
+typedef void (*fclaw2d_patch_time_sync_samesize_t)(struct fclaw_global* glob,
                                                    struct fclaw_patch* this_patch,
                                                    struct fclaw_patch* neighbor_patch,
                                                    int this_iface, int idir,
@@ -1361,7 +1361,7 @@ typedef void (*fclaw2d_patch_time_sync_samesize_t)(struct fclaw2d_global* glob,
                                                    *transform_data);
 
 /** @copydoc fclaw2d_patch_time_sync_reset() */
-typedef void (*fclaw2d_patch_time_sync_reset_t)(struct fclaw2d_global *glob, 
+typedef void (*fclaw2d_patch_time_sync_reset_t)(struct fclaw_global *glob, 
                                                 struct fclaw_patch *this_patch,
                                                 int coarse_level,
                                                 int reset_mode);
@@ -1378,7 +1378,7 @@ typedef void (*fclaw2d_patch_time_sync_reset_t)(struct fclaw2d_global *glob,
  * @param[in] glob the global context
  * @param[in,out] patch the patch context
  */
-typedef void (*fclaw2d_patch_create_user_data_t)(struct fclaw2d_global *glob, 
+typedef void (*fclaw2d_patch_create_user_data_t)(struct fclaw_global *glob, 
                                               struct fclaw_patch *patch);
 
 /**
@@ -1387,7 +1387,7 @@ typedef void (*fclaw2d_patch_create_user_data_t)(struct fclaw2d_global *glob,
  * @param[in] glob the global context
  * @param[in,out] patch the patch context
  */
-typedef void (*fclaw2d_patch_destroy_user_data_t)(struct fclaw2d_global* glob,
+typedef void (*fclaw2d_patch_destroy_user_data_t)(struct fclaw_global* glob,
                                                   struct fclaw_patch* patch);
 
 ///@}
@@ -1575,14 +1575,14 @@ struct fclaw2d_patch_vtable
  * @param glob the global context
  * @return fclaw2d_patch_vtable_t* the vtable
  */
-fclaw2d_patch_vtable_t* fclaw2d_patch_vt(struct fclaw2d_global* glob);
+fclaw2d_patch_vtable_t* fclaw2d_patch_vt(struct fclaw_global* glob);
 
 /**
  * @brief Initialize the patch vtable
  * 
  * @param glob the global context
  */
-void fclaw2d_patch_vtable_initialize(struct fclaw2d_global* glob);
+void fclaw2d_patch_vtable_initialize(struct fclaw_global* glob);
 
 
 ///@}
@@ -1646,7 +1646,7 @@ struct fclaw2d_patch_data* fclaw2d_patch_get_patch_data(struct fclaw_patch* patc
  * @param this_patch the patch context
  * @return void* the user data pointer
  */
-void* fclaw2d_patch_get_user_data(struct fclaw2d_global* glob,
+void* fclaw2d_patch_get_user_data(struct fclaw_global* glob,
                                   struct fclaw_patch* this_patch);
 
 
@@ -1657,7 +1657,7 @@ void* fclaw2d_patch_get_user_data(struct fclaw2d_global* glob,
  * @param patch the patch context
  * @return void* pointer to the metric patch
  */
-void* fclaw2d_patch_metric_patch(struct fclaw2d_global* glob,
+void* fclaw2d_patch_metric_patch(struct fclaw_global* glob,
                                  struct fclaw_patch *patch);
 
 /**
@@ -1689,7 +1689,7 @@ int fclaw2d_patch_get_patchno(struct fclaw_patch* this_patch);
  * @param this_patch the patch context
  * @return void* the user data pointer
  */
-void* fclaw2d_patch_user_data(struct fclaw2d_global* glob,
+void* fclaw2d_patch_user_data(struct fclaw_global* glob,
                               struct fclaw_patch* this_patch);
 
 /**
@@ -1699,7 +1699,7 @@ void* fclaw2d_patch_user_data(struct fclaw2d_global* glob,
  * @param this_patch the patch context
  * @param user the user data pointer
  */
-void fclaw2d_patch_set_user_data(struct fclaw2d_global* glob,
+void fclaw2d_patch_set_user_data(struct fclaw_global* glob,
                                  struct fclaw_patch* this_patch, 
                                  void* user);
 
@@ -1822,7 +1822,7 @@ int fclaw2d_patch_on_coarsefine_interface(struct fclaw_patch *patch);
  * @param this_patch the patch context
  * @return int* the array with the block corner count (the number of blocks that meet) for each corner
  */
-int* fclaw2d_patch_block_corner_count(struct fclaw2d_global *glob,
+int* fclaw2d_patch_block_corner_count(struct fclaw_global *glob,
                                       struct fclaw_patch* this_patch);
 
 /**
@@ -1833,7 +1833,7 @@ int* fclaw2d_patch_block_corner_count(struct fclaw2d_global *glob,
  * @param icorner the corner to set
  * @param block_corner_count the block corner count (the number of blocks that meet)
  */
-void fclaw2d_patch_set_block_corner_count(struct fclaw2d_global *glob,
+void fclaw2d_patch_set_block_corner_count(struct fclaw_global *glob,
                                           struct fclaw_patch* this_patch,
                                           int icorner, int block_corner_count);
 

@@ -39,7 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw3d_metric.h>
 
 
-void overpressure_problem_setup(fclaw2d_global_t* glob)
+void overpressure_problem_setup(fclaw_global_t* glob)
 {
     const user_options_t* user = overpressure_get_options(glob);
     fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
@@ -88,7 +88,7 @@ void overpressure_problem_setup(fclaw2d_global_t* glob)
 }
 
 static
-void overpressure_patch_setup(fclaw2d_global_t *glob,
+void overpressure_patch_setup(fclaw_global_t *glob,
                               fclaw_patch_t *patch,
                               int blockno,
                               int patchno)
@@ -123,7 +123,7 @@ void overpressure_patch_setup(fclaw2d_global_t *glob,
 
 
 
-void overpressure_link_solvers(fclaw2d_global_t *glob)
+void overpressure_link_solvers(fclaw_global_t *glob)
 {
     const user_options_t* user = overpressure_get_options(glob);
     fclaw2d_vtable_t *fclaw_vt = fclaw2d_vt(glob);

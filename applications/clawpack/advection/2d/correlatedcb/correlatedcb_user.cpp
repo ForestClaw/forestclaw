@@ -26,14 +26,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "correlatedcb_user.h"
 
 static
-void correlatedcb_problem_setup(fclaw2d_global_t* glob)
+void correlatedcb_problem_setup(fclaw_global_t* glob)
 {
     SETPROB();
 }
 
 
 static
-void correlatedcb_patch_setup_manifold(fclaw2d_global_t *glob,
+void correlatedcb_patch_setup_manifold(fclaw_global_t *glob,
                                     fclaw_patch_t *patch,
                                     int blockno,
                                     int patchno)
@@ -43,7 +43,7 @@ void correlatedcb_patch_setup_manifold(fclaw2d_global_t *glob,
 }
 
 static
-void correlatedcb_b4step2_manifold(fclaw2d_global_t *glob,
+void correlatedcb_b4step2_manifold(fclaw_global_t *glob,
                                fclaw_patch_t *patch,
                                int blockno,
                                int patchno,
@@ -54,7 +54,7 @@ void correlatedcb_b4step2_manifold(fclaw2d_global_t *glob,
     advection_b4step2_manifold(glob,patch,blockno,patchno,t,dt,user->claw_version);
 }
 
-void correlatedcb_link_solvers(fclaw2d_global_t *glob)
+void correlatedcb_link_solvers(fclaw_global_t *glob)
 {
     /* Custom setprob */
     fclaw2d_vtable_t *vt = fclaw2d_vt(glob);

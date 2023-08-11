@@ -48,16 +48,16 @@ typedef struct user_options
 #define MESH_SETPROB FCLAW_F77_FUNC(mesh_setprob, MESH_SETPROB)
 void MESH_SETPROB(double* tperiod);
 
-void mesh_link_solvers(fclaw2d_global_t *glob);
+void mesh_link_solvers(fclaw_global_t *glob);
 
-void mesh_problem_setup(fclaw2d_global_t* glob);
+void mesh_problem_setup(fclaw_global_t* glob);
 
 void mesh_patch_setup(fclaw_domain_t *domain,
                        fclaw_patch_t *this_patch,
                        int this_block_idx,
                        int this_patch_idx);
 
-const user_options_t* mesh_user_get_options(fclaw2d_global_t* glob);
+const user_options_t* mesh_user_get_options(fclaw_global_t* glob);
 
 /* Mappings */
 fclaw2d_map_context_t* fclaw2d_map_new_nomap();

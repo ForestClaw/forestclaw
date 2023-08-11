@@ -77,7 +77,7 @@ const int swirl_nlines = 3;
 
 /* Virtual function for setting rays */
 static void
-swirl_allocate_and_define_rays (fclaw2d_global_t * glob,
+swirl_allocate_and_define_rays (fclaw_global_t * glob,
                                 fclaw2d_ray_t ** rays, int *num_rays)
 {
     int i;
@@ -137,7 +137,7 @@ swirl_allocate_and_define_rays (fclaw2d_global_t * glob,
 }
 
 static
-void swirl_deallocate_rays(fclaw2d_global_t *glob,
+void swirl_deallocate_rays(fclaw_global_t *glob,
                            fclaw2d_ray_t** rays,
                            int* num_rays)
 {
@@ -277,7 +277,7 @@ swirl_intersect_ray (fclaw_domain_t *domain, fclaw_patch_t *patch,
         int mx, my, mbc, meqn, sol_rows, j, k, klower, kupper, k_current;
         double xlower, ylower, dx, dy, *sol, tstep,
                nilower, niupper, raynilower, rayniupper;
-        fclaw2d_global_t *glob = (fclaw2d_global_t *) user;
+        fclaw_global_t *glob = (fclaw_global_t *) user;
         FCLAW_ASSERT(glob != NULL);
 
         /* Obtain cell indices of the hits. */
@@ -361,7 +361,7 @@ swirl_intersect_ray (fclaw_domain_t *domain, fclaw_patch_t *patch,
     }
 }
 
-void swirl_initialize_rays(fclaw2d_global_t* glob)
+void swirl_initialize_rays(fclaw_global_t* glob)
 {
     /* Set up rays */
     fclaw2d_ray_vtable_t* rays_vt = fclaw2d_ray_vt(glob);
@@ -392,7 +392,7 @@ fclaw_domain_t* create_domain(sc_MPI_Comm mpicomm, fclaw_options_t* gparms)
 }
 
 static
-void run_program(fclaw2d_global_t* glob)
+void run_program(fclaw_global_t* glob)
 {
     const user_options_t           *user_opt;
 
@@ -442,7 +442,7 @@ main (int argc, char **argv)
     fc2d_clawpack46_options_t   *claw46_opt;
     fc2d_clawpack5_options_t    *claw5_opt;
 
-    fclaw2d_global_t            *glob;
+    fclaw_global_t            *glob;
     fclaw_domain_t            *domain;
     sc_MPI_Comm mpicomm;
 

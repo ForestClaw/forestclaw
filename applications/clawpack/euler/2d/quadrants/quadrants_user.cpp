@@ -37,7 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "../rp/euler_user_fort.h"
 
 static
-void quadrants_problem_setup(fclaw2d_global_t* glob)
+void quadrants_problem_setup(fclaw_global_t* glob)
 {
     const user_options_t* user = quadrants_get_options(glob);
 
@@ -53,7 +53,7 @@ void quadrants_problem_setup(fclaw2d_global_t* glob)
     SETPROB();
 }
 
-void quadrants_link_solvers(fclaw2d_global_t *glob)
+void quadrants_link_solvers(fclaw_global_t *glob)
 {
     user_options_t *user =  quadrants_get_options(glob);
     fclaw2d_vtable_t *fclaw_vt = fclaw2d_vt(glob);

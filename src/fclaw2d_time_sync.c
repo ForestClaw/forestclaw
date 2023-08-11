@@ -52,7 +52,7 @@ void cb_time_sync_reset(fclaw_domain_t *domain,
                         void *user)
 {
 	fclaw2d_global_iterate_t* g = (fclaw2d_global_iterate_t*) user;
-	fclaw2d_global_t *glob = (fclaw2d_global_t*) g->glob;
+	fclaw_global_t *glob = (fclaw_global_t*) g->glob;
 
 	fclaw2d_time_sync_info_t *tstype = (fclaw2d_time_sync_info_t*) g->user;
 
@@ -64,7 +64,7 @@ void cb_time_sync_reset(fclaw_domain_t *domain,
 }
 
 static
-void time_sync_reset (fclaw2d_global_t* glob,
+void time_sync_reset (fclaw_global_t* glob,
                       int coarse_level, int reset_mode)
 {
 	fclaw2d_time_sync_info_t ts_info;
@@ -84,7 +84,7 @@ void time_sync_reset (fclaw2d_global_t* glob,
 }
 
 static
-void copy_at_blockbdry(fclaw2d_global_t *glob,
+void copy_at_blockbdry(fclaw_global_t *glob,
 					   int level,
 					   int read_parallel_patches,
 					   fclaw2d_ghost_fill_parallel_mode_t ghost_mode)
@@ -101,7 +101,7 @@ void copy_at_blockbdry(fclaw2d_global_t *glob,
 
 
 static
-void fine2coarse(fclaw2d_global_t *glob,
+void fine2coarse(fclaw_global_t *glob,
 				int level,
 				int read_parallel_patches,
 				fclaw2d_ghost_fill_parallel_mode_t ghost_mode)
@@ -116,7 +116,7 @@ void fine2coarse(fclaw2d_global_t *glob,
 }
 
 static
-void correct_coarse_cells(fclaw2d_global_t *glob, 
+void correct_coarse_cells(fclaw_global_t *glob, 
                           int minlevel, 
                           int read_parallel_patches,
                           fclaw2d_ghost_fill_parallel_mode_t ghost_mode)
@@ -154,7 +154,7 @@ void correct_coarse_cells(fclaw2d_global_t *glob,
 }
 
 
-void fclaw2d_time_sync(fclaw2d_global_t *glob, int minlevel, int maxlevel)
+void fclaw2d_time_sync(fclaw_global_t *glob, int minlevel, int maxlevel)
 {
 
 

@@ -166,12 +166,12 @@ user_options_t* swirl_options_register (fclaw_app_t * app,
     return user;
 }
 
-void swirl_options_store (fclaw3d_global_t* glob, user_options_t* user)
+void swirl_options_store (fclaw_global_t* glob, user_options_t* user)
 {
     fclaw3d_global_options_store(glob, "user", user);
 }
 
-const user_options_t* swirl_get_options(fclaw3d_global_t* glob)
+const user_options_t* swirl_get_options(fclaw_global_t* glob)
 {
     return (user_options_t*) fclaw3d_global_get_options(glob, "user");
 }

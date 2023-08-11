@@ -28,7 +28,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 static
-void poisson_problem_setup(fclaw2d_global_t *glob)
+void poisson_problem_setup(fclaw_global_t *glob)
 {
     if (glob->mpirank == 0)
     {
@@ -74,7 +74,7 @@ void poisson_problem_setup(fclaw2d_global_t *glob)
 
 
 static
-void poisson_rhs(fclaw2d_global_t *glob,
+void poisson_rhs(fclaw_global_t *glob,
                 fclaw_patch_t *patch,
                 int blockno,
                 int patchno)
@@ -97,7 +97,7 @@ void poisson_rhs(fclaw2d_global_t *glob,
     mg_vt->fort_rhs(&blockno,&mbc,&mx,&my,&mfields, &xlower,&ylower,&dx,&dy,rhs);
 }
 
-static void poisson_patch_setup(struct fclaw2d_global *glob,
+static void poisson_patch_setup(struct fclaw_global *glob,
                                 struct fclaw_patch *patch,
                                 int blockno,
                                 int patchno)
@@ -106,7 +106,7 @@ static void poisson_patch_setup(struct fclaw2d_global *glob,
 }
 
 static
-void poisson_compute_error(fclaw2d_global_t *glob,
+void poisson_compute_error(fclaw_global_t *glob,
                           fclaw_patch_t *patch,
                           int blockno,
                           int patchno,
@@ -151,7 +151,7 @@ void poisson_compute_error(fclaw2d_global_t *glob,
 
 
 static
-void poisson_conservation_check(fclaw2d_global_t *glob,
+void poisson_conservation_check(fclaw_global_t *glob,
                                fclaw_patch_t *patch,
                                int blockno,
                                int patchno,
@@ -195,7 +195,7 @@ void poisson_conservation_check(fclaw2d_global_t *glob,
 
 
 static
-void poisson_time_header_ascii(fclaw2d_global_t* glob, int iframe)
+void poisson_time_header_ascii(fclaw_global_t* glob, int iframe)
 {
     const fclaw_clawpatch_options_t *clawpatch_opt = 
                 fclaw_clawpatch_get_options(glob);
@@ -240,7 +240,7 @@ void cb_poisson_output_ascii(fclaw_domain_t * domain,
                             void *user)
 {
     fclaw2d_global_iterate_t* s = (fclaw2d_global_iterate_t*) user;
-    fclaw2d_global_t *glob = (fclaw2d_global_t*) s->glob;
+    fclaw_global_t *glob = (fclaw_global_t*) s->glob;
     int iframe = *((int *) s->user);
 
     /* Get info not readily available to user */
@@ -282,7 +282,7 @@ void cb_poisson_output_ascii(fclaw_domain_t * domain,
 }
 
 
-int poisson_tag4refinement(fclaw2d_global_t *glob,
+int poisson_tag4refinement(fclaw_global_t *glob,
                              fclaw_patch_t *this_patch,
                              int blockno, int patchno,
                              int initflag)
@@ -315,7 +315,7 @@ int poisson_tag4refinement(fclaw2d_global_t *glob,
 }
 
 static
-int poisson_tag4coarsening(fclaw2d_global_t *glob,
+int poisson_tag4coarsening(fclaw_global_t *glob,
                              fclaw_patch_t *fine_patches,
                              int blockno,
                              int patchno,
@@ -350,7 +350,7 @@ int poisson_tag4coarsening(fclaw2d_global_t *glob,
 }
 
 
-void poisson_link_solvers(fclaw2d_global_t *glob)
+void poisson_link_solvers(fclaw_global_t *glob)
 {
     /* ForestClaw vtable */
     fclaw2d_vtable_t *fclaw_vt = fclaw2d_vt(glob);

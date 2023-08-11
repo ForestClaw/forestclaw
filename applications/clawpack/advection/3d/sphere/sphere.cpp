@@ -71,7 +71,7 @@ fclaw_domain_t* create_domain(sc_MPI_Comm mpicomm,
 }
 
 static
-void run_program(fclaw2d_global_t* glob)
+void run_program(fclaw_global_t* glob)
 {
     const user_options_t           *user_opt;
 
@@ -119,7 +119,7 @@ main (int argc, char **argv)
    fclaw_clawpatch_options_t *clawpatch_opt;
     fc3d_clawpack46_options_t   *claw46_opt;
 
-    fclaw2d_global_t            *glob;
+    fclaw_global_t            *glob;
     fclaw_domain_t            *domain;
     sc_MPI_Comm mpicomm;
 

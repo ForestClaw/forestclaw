@@ -37,7 +37,7 @@ extern "C"
 #endif
 
 
-void teton_link_solvers(fclaw2d_global_t *glob);
+void teton_link_solvers(fclaw_global_t *glob);
 
 #define TETON_QINIT   FCLAW_F77_FUNC(teton_qinit,TETON_QINIT)
 void TETON_QINIT(const int* meqn,const int* mbc,

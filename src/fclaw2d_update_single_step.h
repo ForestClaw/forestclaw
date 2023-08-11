@@ -39,7 +39,7 @@ extern "C"
 #endif
 #endif
 
-struct fclaw2d_global;
+struct fclaw_global;
 
 /**
  * @brief Buffer data for cudaclaw
@@ -90,7 +90,7 @@ typedef struct fclaw2d_single_step_data
  * @param dt the time step
  * @return double the maxcfl
  */
-double fclaw2d_update_single_step(struct fclaw2d_global *glob,
+double fclaw2d_update_single_step(struct fclaw_global *glob,
                                   int level,
                                   double t, double dt);
 

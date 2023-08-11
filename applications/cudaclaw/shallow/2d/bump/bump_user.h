@@ -68,14 +68,14 @@ void bump_assign_speeds(cudaclaw_cuda_speeds_t *speeds);
 
 void setprob_cuda();
 
-void bump_link_solvers(fclaw2d_global_t *glob);
+void bump_link_solvers(fclaw_global_t *glob);
 
 user_options_t* bump_options_register (fclaw_app_t * app,
                                        const char *configfile);
 
-void bump_options_store (fclaw2d_global_t* glob, user_options_t* user);
+void bump_options_store (fclaw_global_t* glob, user_options_t* user);
 
-user_options_t* bump_get_options(fclaw2d_global_t* glob);
+user_options_t* bump_get_options(fclaw_global_t* glob);
 
 
 /* --------------------------------------- non-Cuda ----------------------------------------*/
@@ -99,7 +99,7 @@ void USER5_SETAUX_MANIFOLD(const int* mbc,
                            double area[]);
 
 
-void bump_patch_setup(fclaw2d_global_t *glob,
+void bump_patch_setup(fclaw_global_t *glob,
                            fclaw_patch_t *this_patch,
                            int this_block_idx,
                            int this_patch_idx);

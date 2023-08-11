@@ -49,7 +49,7 @@ extern "C"
 /** Typedef for ::fclaw3d_metric_vtable */
 typedef struct fclaw3d_metric_vtable fclaw3d_metric_vtable_t;
 
-struct fclaw2d_global;
+struct fclaw_global;
 struct fclaw_patch;
 
 /* --------------------------- Metric routines (typedefs) ----------------------------- */
@@ -61,7 +61,7 @@ struct fclaw_patch;
  * @param[in] block_no the block number
  * @param[in] patchno the patch number
  */
-typedef void (*fclaw3d_metric_compute_mesh_t)(struct fclaw2d_global *glob,
+typedef void (*fclaw3d_metric_compute_mesh_t)(struct fclaw_global *glob,
                                               struct fclaw_patch *patch,
                                               int blockno,
                                               int patchno);
@@ -74,7 +74,7 @@ typedef void (*fclaw3d_metric_compute_mesh_t)(struct fclaw2d_global *glob,
  * @param[in] block_no the block number
  * @param[in] patchno the patch number
  */
-typedef void (*fclaw3d_metric_compute_volume_t)(struct fclaw2d_global *glob,
+typedef void (*fclaw3d_metric_compute_volume_t)(struct fclaw_global *glob,
                                                 struct fclaw_patch *patch,
                                                 int blockno,
                                                 int patchno);
@@ -87,7 +87,7 @@ typedef void (*fclaw3d_metric_compute_volume_t)(struct fclaw2d_global *glob,
  * @param[in] block_no the block number
  * @param[in] patchno the patch number
  */
-typedef void (*fclaw3d_metric_compute_volume_ghost_t)(struct fclaw2d_global *glob,
+typedef void (*fclaw3d_metric_compute_volume_ghost_t)(struct fclaw_global *glob,
                                                       struct fclaw_patch *patch,
                                                       int blockno,
                                                       int patchno);
@@ -101,7 +101,7 @@ typedef void (*fclaw3d_metric_compute_volume_ghost_t)(struct fclaw2d_global *glo
  * @param[in] patchno the patch number
  */
 
-typedef void (*fclaw3d_metric_compute_basis_t)(struct fclaw2d_global *glob,
+typedef void (*fclaw3d_metric_compute_basis_t)(struct fclaw_global *glob,
                                                struct fclaw_patch *patch,
                                                int blockno,
                                                int patchno);
@@ -124,7 +124,7 @@ typedef void (*fclaw3d_metric_compute_basis_t)(struct fclaw2d_global *glob,
  * @param[in] build_mode the build mode
  */
 
-void fclaw3d_metric_patch_define(struct fclaw2d_global* glob,
+void fclaw3d_metric_patch_define(struct fclaw_global* glob,
                                   struct fclaw_patch *patch,
                                   int mx, int my, int mz, 
                                   int mbc, 
@@ -143,7 +143,7 @@ void fclaw3d_metric_patch_define(struct fclaw2d_global* glob,
  * @param[in] blockno the block number
  * @param[in] patchno the patch number
  */
-void fclaw3d_metric_patch_build(struct fclaw2d_global* glob,
+void fclaw3d_metric_patch_build(struct fclaw_global* glob,
 								struct fclaw_patch* patch,
 								int blockno,
 								int patchno);
@@ -158,7 +158,7 @@ void fclaw3d_metric_patch_build(struct fclaw2d_global* glob,
  * @param[in] coarse_patchno the block number of the coarse patch
  * @param[in] fine0_patchno the patch number of the first fine patch
  */
-void fclaw3d_metric_patch_build_from_fine(struct fclaw2d_global *glob,
+void fclaw3d_metric_patch_build_from_fine(struct fclaw_global *glob,
 										  struct fclaw_patch *fine_patches,
 										  struct fclaw_patch *coarse_coarse,
 										  int blockno,
@@ -172,7 +172,7 @@ void fclaw3d_metric_patch_build_from_fine(struct fclaw2d_global *glob,
  * @param[in] blockno the block number
  * @param[in] patchno the patch number
  */
-void fclaw3d_metric_patch_compute_volume(struct fclaw2d_global *glob,
+void fclaw3d_metric_patch_compute_volume(struct fclaw_global *glob,
                                          struct fclaw_patch* patch,
                                          int blockno, int patchno);
 
@@ -188,7 +188,7 @@ void fclaw3d_metric_patch_compute_volume(struct fclaw2d_global *glob,
  * @param[out] xlower, ylower the coordinate of the lower left corner
  * @param[out] dx, dy the spacings in the x and y directions
  */
-void fclaw3d_metric_patch_grid_data(struct fclaw2d_global* glob,
+void fclaw3d_metric_patch_grid_data(struct fclaw_global* glob,
 									struct fclaw_patch* patch,
 									int* mx, int* my, int* mz, 
                                     int* mbc,
@@ -207,7 +207,7 @@ void fclaw3d_metric_patch_grid_data(struct fclaw2d_global* glob,
  *             (i,j,k,2) contains the area of face with normal (0,1,0) (front face)
  *             (i,j,k,3) contains the area of face with normal (0,0,1) (bottom face)
  */
-void fclaw3d_metric_patch_scalar(struct fclaw2d_global* glob,
+void fclaw3d_metric_patch_scalar(struct fclaw_global* glob,
 								 struct fclaw_patch* patch,
 								 double **volume, double** faceareas);
 
@@ -221,7 +221,7 @@ void fclaw3d_metric_patch_scalar(struct fclaw2d_global* glob,
  *             where 'N' is user-defined value for the number of components
  *             to store (maximum is 3x(3x3) = 27)
  */
-void fclaw3d_metric_patch_basis(struct fclaw2d_global* glob,
+void fclaw3d_metric_patch_basis(struct fclaw_global* glob,
                                  struct fclaw_patch* patch,
                                  double **xrot, double **yrot, double **zrot);
 
@@ -234,7 +234,7 @@ void fclaw3d_metric_patch_basis(struct fclaw2d_global* glob,
  * @param[out] xd, yd, zd the coordinates of the nodes
  * @param[out] area the area of each cell
  */
-void fclaw3d_metric_patch_mesh_data(struct fclaw2d_global* glob,
+void fclaw3d_metric_patch_mesh_data(struct fclaw_global* glob,
 									struct fclaw_patch* patch,
 									double **xp, double **yp, double **zp,
 									double **xd, double **yd, double **zd,
@@ -252,7 +252,7 @@ void fclaw3d_metric_patch_mesh_data(struct fclaw2d_global* glob,
  *             (i,j,k,2) contains the area of face with normal (0,1,0) (front face)
  *             (i,j,k,3) contains the area of face with normal (0,0,1) (bottom face)
  */
-void fclaw3d_metric_patch_mesh_data2(struct fclaw2d_global* glob,
+void fclaw3d_metric_patch_mesh_data2(struct fclaw_global* glob,
 									 struct fclaw2d_patch* patch,
                                      double **xrot, double **yrot, double **zrot);
 #endif
@@ -264,7 +264,7 @@ void fclaw3d_metric_patch_mesh_data2(struct fclaw2d_global* glob,
  * @param patch the patch to get the are for
  * @return double* the area array
  */
-double* fclaw3d_metric_patch_get_volume(struct fclaw2d_global* glob,
+double* fclaw3d_metric_patch_get_volume(struct fclaw_global* glob,
                                         struct fclaw_patch* patch);
 
 
@@ -277,7 +277,7 @@ double* fclaw3d_metric_patch_get_volume(struct fclaw2d_global* glob,
  * 
  * @details @copydetails ::fclaw3d_metric_compute_area_t
  */
-void fclaw3d_metric_compute_volume_default(struct fclaw2d_global *glob,
+void fclaw3d_metric_compute_volume_default(struct fclaw_global *glob,
                                            struct fclaw_patch* patch,
                                            int blockno, int patchno);
 
@@ -289,7 +289,7 @@ void fclaw3d_metric_compute_volume_default(struct fclaw2d_global *glob,
  * 
  * @details @copydetails ::fclaw3d_metric_compute_area_ghost_t
  */
-void fclaw3d_metric_compute_volume_ghost_default(struct fclaw2d_global* glob,
+void fclaw3d_metric_compute_volume_ghost_default(struct fclaw_global* glob,
                                                  struct fclaw_patch* patch,
                                                  int blockno,
                                                  int patchno);
@@ -303,7 +303,7 @@ void fclaw3d_metric_compute_volume_ghost_default(struct fclaw2d_global* glob,
  * 
  * @details @copydetails ::fclaw3d_metric_compute_mesh_t
  */
-void fclaw3d_metric_compute_mesh_default(struct fclaw2d_global *glob,
+void fclaw3d_metric_compute_mesh_default(struct fclaw_global *glob,
 										 struct fclaw_patch *patch,
 										 int blockno,
 										 int patchno);
@@ -317,7 +317,7 @@ void fclaw3d_metric_compute_mesh_default(struct fclaw2d_global *glob,
  * @details @copydetails ::fclaw3d_metric_compute_tensors_t
  */
 
-void fclaw3d_metric_compute_basis_default(struct fclaw2d_global *glob,
+void fclaw3d_metric_compute_basis_default(struct fclaw_global *glob,
                                           struct fclaw_patch *patch,
                                           int blockno,
                                           int patchno);
@@ -365,15 +365,15 @@ struct fclaw3d_metric_vtable
  * 
  * @return fclaw3d_metric_vtable_t* the vtable
  */
-fclaw3d_metric_vtable_t* fclaw3d_metric_vt(struct fclaw2d_global* glob);
+fclaw3d_metric_vtable_t* fclaw3d_metric_vt(struct fclaw_global* glob);
 
 /**
  * @brief Initializes a global vtable variable
  */
-void fclaw3d_metric_vtable_initialize(struct fclaw2d_global* glob);
+void fclaw3d_metric_vtable_initialize(struct fclaw_global* glob);
 
 
-int fclaw3d_metric_patch_nodes_size(struct fclaw2d_global* glob,
+int fclaw3d_metric_patch_nodes_size(struct fclaw_global* glob,
                                     struct fclaw_patch* patch);
 
 

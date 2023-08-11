@@ -34,7 +34,7 @@
 /* ---------------------------- Setup solver functions -------------------------------- */
 
 static
-void elliptic_setup_solver(fclaw2d_global_t *glob)
+void elliptic_setup_solver(fclaw_global_t *glob)
 {
     fclaw2d_elliptic_vtable_t* elliptic_vt = fclaw2d_elliptic_vt(glob);
 
@@ -63,14 +63,14 @@ void cb_elliptic_rhs(fclaw_domain_t *domain,
 }
 
 static
-void elliptic_rhs_default(fclaw2d_global_t *glob)
+void elliptic_rhs_default(fclaw_global_t *glob)
 {
     /* Set up right hand side by iterating over patches. */
     fclaw2d_global_iterate_patches (glob, cb_elliptic_rhs, NULL);
 }
 
 static
-void elliptic_rhs(fclaw2d_global_t *glob)
+void elliptic_rhs(fclaw_global_t *glob)
 {
     fclaw2d_elliptic_vtable_t* elliptic_vt = fclaw2d_elliptic_vt(glob);
 
@@ -85,7 +85,7 @@ void elliptic_rhs(fclaw2d_global_t *glob)
 /* ----------------------------------- Solve functions -------------------------------- */
 
 static
-void elliptic_solve(fclaw2d_global_t *glob)
+void elliptic_solve(fclaw_global_t *glob)
 {
     fclaw2d_elliptic_vtable_t* elliptic_vt = fclaw2d_elliptic_vt(glob);
 
@@ -98,7 +98,7 @@ void elliptic_solve(fclaw2d_global_t *glob)
 
 /*----------------------------------- Public interface -------------------------------- */
 
-void fclaw2d_elliptic_solve(fclaw2d_global_t *glob)
+void fclaw2d_elliptic_solve(fclaw_global_t *glob)
 {
     fclaw_domain_t* domain = glob->domain;
 
@@ -133,7 +133,7 @@ void elliptic_vt_destroy(void* vt)
 }
 
 
-void fclaw2d_elliptic_vtable_initialize(fclaw2d_global_t* glob)
+void fclaw2d_elliptic_vtable_initialize(fclaw_global_t* glob)
 {
     fclaw2d_elliptic_vtable_t *elliptic_vt = elliptic_vt_new();
 
@@ -148,7 +148,7 @@ void fclaw2d_elliptic_vtable_initialize(fclaw2d_global_t* glob)
 
 /*----------------------------------- Access functions -------------------------------- */
 
-fclaw2d_elliptic_vtable_t* fclaw2d_elliptic_vt(fclaw2d_global_t* glob)
+fclaw2d_elliptic_vtable_t* fclaw2d_elliptic_vt(fclaw_global_t* glob)
 {
 	fclaw2d_elliptic_vtable_t* elliptic_vt = (fclaw2d_elliptic_vtable_t*) 
 	   							fclaw_pointer_map_get(glob->vtables, "fclaw2d_elliptic");

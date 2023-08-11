@@ -30,7 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_patch.h>
 
 
-void fclaw2d_block_get_block_boundary(fclaw2d_global_t * glob,
+void fclaw2d_block_get_block_boundary(fclaw_global_t * glob,
                                       fclaw_patch_t * patch,
                                       int *intersects_block)
 {

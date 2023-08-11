@@ -55,8 +55,8 @@ main (int argc, char **argv)
 
     sc_MPI_Comm                 mpicomm;
     fclaw_domain_t            *radial_domain;
-    fclaw2d_global_t            *radial_glob;
-    fclaw2d_global_t            *slosh_glob;
+    fclaw_global_t            *radial_glob;
+    fclaw_global_t            *slosh_glob;
     fclaw_domain_t            *slosh_domain;
 
     /* Initialize application */

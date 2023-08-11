@@ -36,7 +36,7 @@ extern "C"
 #endif
 #endif
 
-struct fclaw2d_global;
+struct fclaw_global;
 
 typedef struct fc2d_cudaclaw5_options fc2d_cudaclaw5_options_t;
 
@@ -72,12 +72,12 @@ fc2d_cudaclaw5_options_t *fc2d_cudaclaw5_options_register (fclaw_app_t *
                                                            const char
                                                            *configfile);
 
-void fc2d_cudaclaw5_options_store (struct fclaw2d_global* glob, 
+void fc2d_cudaclaw5_options_store (struct fclaw_global* glob, 
                                    fc2d_cudaclaw5_options_t* clawopt);
 
-fc2d_cudaclaw5_options_t* fc2d_cudaclaw5_get_options(struct fclaw2d_global *glob);
+fc2d_cudaclaw5_options_t* fc2d_cudaclaw5_get_options(struct fclaw_global *glob);
 
-void fc2d_cudaclaw5_output(struct fclaw2d_global *glob, int iframe);
+void fc2d_cudaclaw5_output(struct fclaw_global *glob, int iframe);
 
 /* Check in cudaclaw5_flux2.cu */
 int cudaclaw5_check_dims(int meqn, int maux, int mwaves);

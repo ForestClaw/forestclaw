@@ -26,13 +26,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "gaussian_user.h"
 
 static
-void gaussian_problem_setup(fclaw2d_global_t* glob)
+void gaussian_problem_setup(fclaw_global_t* glob)
 {
     SETPROB();
 }
 
 static
-void gaussian_patch_setup_manifold(fclaw2d_global_t *glob,
+void gaussian_patch_setup_manifold(fclaw_global_t *glob,
                                     fclaw_patch_t *patch,
                                     int blockno,
                                     int patchno)
@@ -43,7 +43,7 @@ void gaussian_patch_setup_manifold(fclaw2d_global_t *glob,
 }
 
 static
-void gaussian_b4step2_manifold(fclaw2d_global_t *glob,
+void gaussian_b4step2_manifold(fclaw_global_t *glob,
                                fclaw_patch_t *patch,
                                int blockno,
                                int patchno,
@@ -55,7 +55,7 @@ void gaussian_b4step2_manifold(fclaw2d_global_t *glob,
                                user->claw_version);
 }
 
-void gaussian_link_solvers(fclaw2d_global_t *glob)
+void gaussian_link_solvers(fclaw_global_t *glob)
 {
     /* Custom setprob */
     fclaw2d_vtable_t *vt = fclaw2d_vt(glob);

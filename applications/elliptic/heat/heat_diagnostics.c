@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_domain.h>
 #include <fclaw2d_diagnostics.h>
 
-void heat_diagnostics_initialize(fclaw2d_global_t *glob,
+void heat_diagnostics_initialize(fclaw_global_t *glob,
                                    void **acc_patch)
 {
     const fclaw_clawpatch_options_t *clawpatch_opt = 
@@ -60,7 +60,7 @@ void heat_diagnostics_initialize(fclaw2d_global_t *glob,
 
 }
 
-void heat_diagnostics_reset(fclaw2d_global_t *glob,
+void heat_diagnostics_reset(fclaw_global_t *glob,
                               void* patch_acc)
 {
     heat_error_info_t *error_data = (heat_error_info_t*) patch_acc;
@@ -118,7 +118,7 @@ void heat_compute(fclaw_domain_t *domain,
     }
 }
 
-void heat_diagnostics_compute(fclaw2d_global_t* glob,
+void heat_diagnostics_compute(fclaw_global_t* glob,
                                            void* patch_acc)
 {
     const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
@@ -131,7 +131,7 @@ void heat_diagnostics_compute(fclaw2d_global_t* glob,
 
 
 /* Accumulate the errors computed above */
-void heat_diagnostics_gather(fclaw2d_global_t *glob,
+void heat_diagnostics_gather(fclaw_global_t *glob,
                                void* patch_acc,
                                int init_flag)
 {
@@ -199,7 +199,7 @@ void heat_diagnostics_gather(fclaw2d_global_t *glob,
 }
 
 
-void heat_diagnostics_finalize(fclaw2d_global_t *glob,
+void heat_diagnostics_finalize(fclaw_global_t *glob,
                                  void** patch_acc)
 {
     heat_error_info_t *error_data = *((heat_error_info_t**) patch_acc);

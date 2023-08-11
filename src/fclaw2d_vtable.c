@@ -42,7 +42,7 @@ void vt_destroy(void* vt)
     FCLAW_FREE (vt);
 }
 
-fclaw2d_vtable_t* fclaw2d_vt(fclaw2d_global_t *glob)
+fclaw2d_vtable_t* fclaw2d_vt(fclaw_global_t *glob)
 {
 	fclaw2d_vtable_t* vt = (fclaw2d_vtable_t*) 
 	   							fclaw_pointer_map_get(glob->vtables, "fclaw2d");
@@ -52,7 +52,7 @@ fclaw2d_vtable_t* fclaw2d_vt(fclaw2d_global_t *glob)
 }
 
 
-void fclaw2d_after_regrid(fclaw2d_global_t *glob)
+void fclaw2d_after_regrid(fclaw_global_t *glob)
 {
     fclaw2d_vtable_t *fclaw_vt = fclaw2d_vt(glob);
     if (fclaw_vt->after_regrid != NULL)
@@ -62,7 +62,7 @@ void fclaw2d_after_regrid(fclaw2d_global_t *glob)
 }
 
 /* Initialize any settings that can be set here */
-void fclaw2d_vtable_initialize(fclaw2d_global_t *glob)
+void fclaw2d_vtable_initialize(fclaw_global_t *glob)
 {
 
     fclaw2d_vtable_t *vt = vt_new();

@@ -197,7 +197,7 @@ typedef void  (*fclaw3dx_clawpatch_pillow_fort_interpolate_block_corner_t)(int* 
 /**
  * @brief Sets global patch_vtable to use pollow sphere routines
  */
-void fclaw_clawpatch_use_pillowsphere(struct fclaw2d_global* glob);
+void fclaw_clawpatch_use_pillowsphere(struct fclaw_global* glob);
 
 /* --------------------------------- Virtual table ------------------------------------ */
 
@@ -207,7 +207,7 @@ void fclaw_clawpatch_use_pillowsphere(struct fclaw2d_global* glob);
  * @param glob the global context
  * @param claw_version the clawaptck verstion 4 for v4.6, 5 for v5
  */
-void fclaw2d_clawpatch_pillow_vtable_initialize(struct fclaw2d_global* glob, 
+void fclaw2d_clawpatch_pillow_vtable_initialize(struct fclaw_global* glob, 
                                                 int claw_version);
 /**
  * @brief Initialize the pillow vtable for 3d clawpatch
@@ -215,7 +215,7 @@ void fclaw2d_clawpatch_pillow_vtable_initialize(struct fclaw2d_global* glob,
  * @param glob the global context
  * @param claw_version the clawaptck verstion 4 for v4.6, 5 for v5
  */
-void fclaw3d_clawpatch_pillow_vtable_initialize(struct fclaw2d_global* glob, 
+void fclaw3d_clawpatch_pillow_vtable_initialize(struct fclaw_global* glob, 
                                                 int claw_version);
 
 
@@ -265,7 +265,7 @@ struct fclaw_clawpatch_pillow_vtable
  * @param glob the global context
  * @return fclaw2d_clawpatch_pillow_vtable_t* the vtable
  */
-fclaw_clawpatch_pillow_vtable_t* fclaw_clawpatch_pillow_vt(struct fclaw2d_global* glob);
+fclaw_clawpatch_pillow_vtable_t* fclaw_clawpatch_pillow_vt(struct fclaw_global* glob);
 
 
 #ifdef __cplusplus

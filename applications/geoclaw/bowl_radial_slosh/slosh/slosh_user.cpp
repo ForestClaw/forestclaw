@@ -27,7 +27,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "fclaw2d_global.h"
 #include <fclaw_filesystem.h>
 
-void slosh_link_solvers(fclaw2d_global_t *glob)
+void slosh_link_solvers(fclaw_global_t *glob)
 {
     fc2d_geoclaw_vtable_t* geoclaw_vt = fc2d_geoclaw_vt(glob);
     geoclaw_vt->qinit       = &FC2D_GEOCLAW_QINIT;
@@ -49,7 +49,7 @@ fclaw_domain_t* slosh_create_domain(sc_MPI_Comm mpicomm, fclaw_options_t* gparms
     return domain;
 }
 
-void slosh_run_program(fclaw2d_global_t* glob)
+void slosh_run_program(fclaw_global_t* glob)
 {
     fclaw2d_set_global_context(glob);
 

@@ -39,7 +39,7 @@ extern "C"
 #endif
 
 struct p4est_connectivity;
-struct fclaw2d_global;
+struct fclaw_global;
 
 struct fclaw2d_map_context;
 
@@ -300,7 +300,7 @@ fclaw2d_map_context_t* fclaw2d_map_new_brick_conn
    ---------------------------------------------------------------------------------- */
 
 /* This is called to determine is a map is a pillow sphere or not */
-int fclaw2d_map_pillowsphere(struct fclaw2d_global* glob);
+int fclaw2d_map_pillowsphere(struct fclaw_global* glob);
 
 
 #if 0

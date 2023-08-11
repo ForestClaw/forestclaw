@@ -79,15 +79,15 @@ void COMPUTE_EXACT();
 
 
 
-void cylinder_link_solvers(fclaw2d_global_t *glob);
+void cylinder_link_solvers(fclaw_global_t *glob);
 
 user_options_t* cylinder_options_register (fclaw_app_t * app,
                                        const char *configfile);
 
 
-void cylinder_options_store (fclaw2d_global_t* glob, user_options_t* user);
+void cylinder_options_store (fclaw_global_t* glob, user_options_t* user);
 
-const user_options_t* cylinder_get_options(fclaw2d_global_t* glob);
+const user_options_t* cylinder_get_options(fclaw_global_t* glob);
 
 fclaw2d_map_context_t *
     fclaw2d_map_new_cylinder (fclaw2d_map_context_t* brick, const double scale[], 

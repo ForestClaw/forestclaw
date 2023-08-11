@@ -25,7 +25,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "transport_user.h"
 
-void transport_b4step2_manifold(fclaw2d_global_t *glob,
+void transport_b4step2_manifold(fclaw_global_t *glob,
                                 fclaw_patch_t *patch,
                                 int blockno,
                                 int patchno,

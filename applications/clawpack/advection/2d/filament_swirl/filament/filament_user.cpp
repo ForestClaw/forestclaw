@@ -27,7 +27,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "filament_fort.h"
 
 static
-void filament_patch_setup(fclaw2d_global_t *glob,
+void filament_patch_setup(fclaw_global_t *glob,
                           fclaw_patch_t *patch,
                           int blockno,
                           int patchno)
@@ -37,7 +37,7 @@ void filament_patch_setup(fclaw2d_global_t *glob,
                                    user->claw_version); 
 }
 
-void filament_link_solvers(fclaw2d_global_t *glob)
+void filament_link_solvers(fclaw_global_t *glob)
 {
     const fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
 

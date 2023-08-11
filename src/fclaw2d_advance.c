@@ -52,7 +52,7 @@ typedef struct fclaw2d_level_data
 typedef fclaw2d_level_data_t fclaw2d_timestep_counters;
 
 static
-void initialize_timestep_counters(fclaw2d_global_t* glob,
+void initialize_timestep_counters(fclaw_global_t* glob,
 								  fclaw2d_timestep_counters **ts_counter_ptr,
 								  double t_init, double dt)
 {
@@ -150,7 +150,7 @@ int timeinterp_level(fclaw2d_timestep_counters *ts_counter, int maxlevel)
 }
 
 static
-double compute_alpha(fclaw2d_global_t *glob,
+double compute_alpha(fclaw_global_t *glob,
 					 fclaw2d_timestep_counters *ts_counter,
 					 int level)
 {
@@ -174,7 +174,7 @@ double compute_alpha(fclaw2d_global_t *glob,
    ---------------------------------------------------------- */
 
 static
-double update_level_solution(fclaw2d_global_t *glob,
+double update_level_solution(fclaw_global_t *glob,
 							 int level,
 							 double t, double dt)
 {
@@ -185,7 +185,7 @@ double update_level_solution(fclaw2d_global_t *glob,
 }
 
 static
-double advance_level(fclaw2d_global_t *glob,
+double advance_level(fclaw_global_t *glob,
 					 const int level,
 					 const int curr_fine_step,
 					 double maxcfl,
@@ -244,7 +244,7 @@ double advance_level(fclaw2d_global_t *glob,
    Main routine : Called from fclaw2d_run.
    ------------------------------------------------------------- */
 
-double fclaw2d_advance_all_levels(fclaw2d_global_t *glob,
+double fclaw2d_advance_all_levels(fclaw_global_t *glob,
 								  double t_curr, double dt)
 {
 	fclaw_domain_t* domain = glob->domain;

@@ -51,14 +51,14 @@ typedef struct user_options
 } user_options_t;
 
 
-void bump_link_solvers(fclaw2d_global_t *glob);
+void bump_link_solvers(fclaw_global_t *glob);
 
 user_options_t* bump_options_register (fclaw_app_t * app,
                                           const char *configfile);
 
-void bump_options_store (fclaw2d_global_t* glob, user_options_t* user);
+void bump_options_store (fclaw_global_t* glob, user_options_t* user);
 
-user_options_t* bump_get_options(fclaw2d_global_t* glob);
+user_options_t* bump_get_options(fclaw_global_t* glob);
 
 fclaw2d_map_context_t* fclaw2d_map_new_nomap();
 

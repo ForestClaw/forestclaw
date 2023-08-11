@@ -40,7 +40,7 @@ void cb_clawpatch_output_ascii (fclaw_domain_t * domain,
                                 void *user)
 {
     fclaw2d_global_iterate_t* s = (fclaw2d_global_iterate_t*) user;
-    fclaw2d_global_t *glob = (fclaw2d_global_t*) s->glob;
+    fclaw_global_t *glob = (fclaw_global_t*) s->glob;
 
 
     /* Get info not readily available to user */
@@ -96,7 +96,7 @@ void cb_clawpatch_output_ascii (fclaw_domain_t * domain,
 
 
 /* This function isn't virtualized;  should it be? */
-void fclaw_clawpatch_time_header_ascii(fclaw2d_global_t* glob, int iframe)
+void fclaw_clawpatch_time_header_ascii(fclaw_global_t* glob, int iframe)
 {
     const fclaw_clawpatch_options_t *clawpatch_opt = fclaw_clawpatch_get_options(glob);
     fclaw_clawpatch_vtable_t *clawpatch_vt = fclaw_clawpatch_vt(glob);
@@ -123,7 +123,7 @@ void fclaw_clawpatch_time_header_ascii(fclaw2d_global_t* glob, int iframe)
            vt->output_frame = &fclaw2d_clawpatch_output_ascii;
     -------------------------------------------------------------------- */
 
-void fclaw_clawpatch_output_ascii(fclaw2d_global_t* glob,int iframe)
+void fclaw_clawpatch_output_ascii(fclaw_global_t* glob,int iframe)
 {
     fclaw_domain_t *domain = glob->domain;
     fclaw_clawpatch_vtable_t *clawpatch_vt = fclaw_clawpatch_vt(glob);

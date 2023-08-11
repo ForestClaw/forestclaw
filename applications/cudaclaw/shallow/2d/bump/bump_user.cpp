@@ -27,7 +27,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 static
-void bump_problem_setup(fclaw2d_global_t* glob)
+void bump_problem_setup(fclaw_global_t* glob)
 {
     const user_options_t* user = bump_get_options(glob);
 
@@ -43,7 +43,7 @@ void bump_problem_setup(fclaw2d_global_t* glob)
 }
 
 
-void bump_link_solvers(fclaw2d_global_t *glob)
+void bump_link_solvers(fclaw_global_t *glob)
 {
     fclaw2d_vtable_t *vt = fclaw2d_vt(glob);
     vt->problem_setup = &bump_problem_setup;  /* Version-independent */
@@ -65,7 +65,7 @@ void bump_link_solvers(fclaw2d_global_t *glob)
 
 
 #if 0
-void bump_patch_setup(fclaw2d_global_t *glob,
+void bump_patch_setup(fclaw_global_t *glob,
                            fclaw_patch_t *this_patch,
                            int this_block_idx,
                            int this_patch_idx)

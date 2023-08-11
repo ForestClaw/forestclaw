@@ -18,7 +18,7 @@ static double* s_membuffer;
 static double* s_membuffer_dev;
 static cudaclaw_fluxes_t* s_array_fluxes_struct_dev;
 
-void cudaclaw_allocate_fluxes(fclaw2d_global_t *glob,
+void cudaclaw_allocate_fluxes(fclaw_global_t *glob,
                               fclaw_patch_t *patch)
 {
     PROFILE_CUDA_GROUP("Allocate patch data in memory device",4);       
@@ -81,7 +81,7 @@ void cudaclaw_allocate_fluxes(fclaw2d_global_t *glob,
     fclaw2d_patch_set_user_data(glob,patch,fluxes);
 }
 
-void cudaclaw_deallocate_fluxes(fclaw2d_global_t *glob,
+void cudaclaw_deallocate_fluxes(fclaw_global_t *glob,
                                      fclaw_patch_t *patch)
 {
     PROFILE_CUDA_GROUP("De-allocate patch device memory",4);       
@@ -109,7 +109,7 @@ void cudaclaw_deallocate_fluxes(fclaw2d_global_t *glob,
 
 
 
-void fc2d_cudaclaw_allocate_buffers(fclaw2d_global_t *glob)
+void fc2d_cudaclaw_allocate_buffers(fclaw_global_t *glob)
 {
     fclaw_clawpatch_options_t *clawpatch_opt = fclaw_clawpatch_get_options(glob);
     int mx = clawpatch_opt->d2->mx;
@@ -131,7 +131,7 @@ void fc2d_cudaclaw_allocate_buffers(fclaw2d_global_t *glob)
                      batch_size*sizeof(cudaclaw_fluxes_t)));
 }
 
-void fc2d_cudaclaw_deallocate_buffers(fclaw2d_global_t *glob)
+void fc2d_cudaclaw_deallocate_buffers(fclaw_global_t *glob)
 {
     cudaFreeHost(s_membuffer);
     cudaFree(s_membuffer_dev);

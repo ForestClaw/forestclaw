@@ -30,8 +30,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 TEST_CASE("fc2d_clawpack5_options can store options in two seperate globs")
 {
-	fclaw2d_global_t* glob1 = fclaw2d_global_new();
-	fclaw2d_global_t* glob2 = fclaw2d_global_new();
+	fclaw_global_t* glob1 = fclaw2d_global_new();
+	fclaw_global_t* glob2 = fclaw2d_global_new();
 
 	fc2d_clawpack5_options_t* opts1 = FCLAW_ALLOC_ZERO(fc2d_clawpack5_options_t,1);
 	fc2d_clawpack5_options_t* opts2 = FCLAW_ALLOC_ZERO(fc2d_clawpack5_options_t,1);
@@ -52,8 +52,8 @@ TEST_CASE("fc2d_clawpack5_options can store options in two seperate globs")
 
 TEST_CASE("fc2d_clawpack5_get_options fails if not intialized")
 {
-	fclaw2d_global_t* glob1 = fclaw2d_global_new();
-	fclaw2d_global_t* glob2 = fclaw2d_global_new();
+	fclaw_global_t* glob1 = fclaw2d_global_new();
+	fclaw_global_t* glob2 = fclaw2d_global_new();
 
 	CHECK_SC_ABORTED(fc2d_clawpack5_get_options(glob1));
 
@@ -65,8 +65,8 @@ TEST_CASE("fc2d_clawpack5_get_options fails if not intialized")
 
 TEST_CASE("fc2d_clawpack5_options_store fails if called twice on a glob")
 {
-	fclaw2d_global_t* glob1 = fclaw2d_global_new();
-	fclaw2d_global_t* glob2 = fclaw2d_global_new();
+	fclaw_global_t* glob1 = fclaw2d_global_new();
+	fclaw_global_t* glob2 = fclaw2d_global_new();
 
 	fc2d_clawpack5_options_store(glob1, FCLAW_ALLOC_ZERO(fc2d_clawpack5_options_t,1));
 	CHECK_SC_ABORTED(fc2d_clawpack5_options_store(glob1, FCLAW_ALLOC_ZERO(fc2d_clawpack5_options_t,1)));

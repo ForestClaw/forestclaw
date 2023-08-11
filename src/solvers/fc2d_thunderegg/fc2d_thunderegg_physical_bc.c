@@ -84,7 +84,7 @@ void cb_fc2d_thunderegg_physical_bc(fclaw_domain_t *domain,
 }
 
 /* This is needed by other routines, so we don't set it to static. */
-void fc2d_thunderegg_physical_get_bc(fclaw2d_global_t *glob,
+void fc2d_thunderegg_physical_get_bc(fclaw_global_t *glob,
                                     int blockno,
                                     int patchno,
                                     int *intersects_bdry)
@@ -106,7 +106,7 @@ void fc2d_thunderegg_physical_get_bc(fclaw2d_global_t *glob,
    Public interface : Set physical boundary conditions on a patch
    ----------------------------------------------------------------------------- */
 
-void fc2d_thunderegg_physical_bc(fclaw2d_global_t *glob)
+void fc2d_thunderegg_physical_bc(fclaw_global_t *glob)
 {
 
     fc2d_thunderegg_time_info_t tinfo;

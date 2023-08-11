@@ -36,9 +36,9 @@ extern "C"
 #endif
 #endif
 
-struct fclaw2d_global;
+struct fclaw_global;
 
-void fclaw2d_timeinterp(struct fclaw2d_global *glob,
+void fclaw2d_timeinterp(struct fclaw_global *glob,
                        int level, double alpha);
 
 #define FCLAW2D_TIMEINTERP_FORT FCLAW_F77_FUNC (fclaw2d_timeinterp_fort, \

@@ -112,11 +112,11 @@ DEFINE_READ_AND_WRITE(long int,long_int,ld)
  * This function is used to output the expected values for regression tests. If there are any
  * discrepancies, it will create a new file with the actual values and terminate the program.
  *
- * @param[in] glob Pointer to the fclaw2d_global_t object containing the global state.
+ * @param[in] glob Pointer to the fclaw_global_t object containing the global state.
  * @param[in] filename Name of the file containing the expected values for the regression tests.
  */
 static void 
-output_expected_values(fclaw2d_global_t* glob, const char* filename)
+output_expected_values(fclaw_global_t* glob, const char* filename)
 {
     if(glob->mpirank == 0)
     {
@@ -167,7 +167,7 @@ output_expected_values(fclaw2d_global_t* glob, const char* filename)
    Public interface
    ---------------------------------------------------------------- */
 
-void fclaw2d_finalize(fclaw2d_global_t* glob)
+void fclaw2d_finalize(fclaw_global_t* glob)
 {
     const fclaw_options_t *gparms = fclaw2d_get_options(glob);
 

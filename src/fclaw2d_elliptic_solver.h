@@ -35,15 +35,15 @@ extern "C"
 #endif
 #endif
 
-struct fclaw2d_global;
+struct fclaw_global;
 
-typedef void (*fclaw2d_elliptic_setup_t)(struct fclaw2d_global *glob);
+typedef void (*fclaw2d_elliptic_setup_t)(struct fclaw_global *glob);
 
-typedef void (*fclaw2d_elliptic_rhs_t)(struct fclaw2d_global *glob);
+typedef void (*fclaw2d_elliptic_rhs_t)(struct fclaw_global *glob);
 
-typedef void (*fclaw2d_elliptic_solve_t)(struct fclaw2d_global *glob);
+typedef void (*fclaw2d_elliptic_solve_t)(struct fclaw_global *glob);
 
-typedef void (*fclaw2d_elliptic_physical_bc_t)(struct fclaw2d_global *glob);
+typedef void (*fclaw2d_elliptic_physical_bc_t)(struct fclaw_global *glob);
 
 
 
@@ -58,11 +58,11 @@ typedef struct fclaw2d_elliptic_vtable
 
 } fclaw2d_elliptic_vtable_t;
 
-void fclaw2d_elliptic_vtable_initialize(struct fclaw2d_global* glob);
+void fclaw2d_elliptic_vtable_initialize(struct fclaw_global* glob);
 
-void fclaw2d_elliptic_solve(struct fclaw2d_global *glob);
+void fclaw2d_elliptic_solve(struct fclaw_global *glob);
 
-fclaw2d_elliptic_vtable_t* fclaw2d_elliptic_vt(struct fclaw2d_global* glob);
+fclaw2d_elliptic_vtable_t* fclaw2d_elliptic_vt(struct fclaw_global* glob);
 
 #ifdef __cplusplus
 #if 0

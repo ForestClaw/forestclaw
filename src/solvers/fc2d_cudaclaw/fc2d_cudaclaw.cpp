@@ -56,7 +56,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /* --------------------- Clawpack solver functions (required) ------------------------- */
 
 static
-void cudaclaw_setprob(fclaw2d_global_t *glob)
+void cudaclaw_setprob(fclaw_global_t *glob)
 {
     fc2d_cudaclaw_vtable_t*  cudaclaw_vt = fc2d_cudaclaw_vt(glob);
     if (cudaclaw_vt->fort_setprob != NULL)
@@ -68,7 +68,7 @@ void cudaclaw_setprob(fclaw2d_global_t *glob)
 
 
 static
-void cudaclaw_qinit(fclaw2d_global_t *glob,
+void cudaclaw_qinit(fclaw_global_t *glob,
                       fclaw_patch_t *this_patch,
                       int this_block_idx,
                       int this_patch_idx)
@@ -99,7 +99,7 @@ void cudaclaw_qinit(fclaw2d_global_t *glob,
 
 
 static
-void cudaclaw_bc2(fclaw2d_global_t *glob,
+void cudaclaw_bc2(fclaw_global_t *glob,
                     fclaw_patch_t *this_patch,
                     int this_block_idx,
                     int this_patch_idx,
@@ -159,7 +159,7 @@ void cudaclaw_bc2(fclaw2d_global_t *glob,
 
 
 static
-void cudaclaw_b4step2(fclaw2d_global_t *glob,
+void cudaclaw_b4step2(fclaw_global_t *glob,
                         fclaw_patch_t *this_patch,
                         int this_block_idx,
                         int this_patch_idx,
@@ -194,7 +194,7 @@ void cudaclaw_b4step2(fclaw2d_global_t *glob,
 }
 
 static
-void cudaclaw_src2(fclaw2d_global_t *glob,
+void cudaclaw_src2(fclaw_global_t *glob,
                      fclaw_patch_t *this_patch,
                      int this_block_idx,
                      int this_patch_idx,
@@ -232,7 +232,7 @@ void cudaclaw_src2(fclaw2d_global_t *glob,
 
 /* This can be used as a value for patch_vt->patch_setup */
 static
-void cudaclaw_setaux(fclaw2d_global_t *glob,
+void cudaclaw_setaux(fclaw_global_t *glob,
                        fclaw_patch_t *this_patch,
                        int this_block_idx,
                        int this_patch_idx)
@@ -271,7 +271,7 @@ void cudaclaw_setaux(fclaw2d_global_t *glob,
 }
 
 static
-double cudaclaw_update(fclaw2d_global_t *glob,
+double cudaclaw_update(fclaw_global_t *glob,
                          fclaw_patch_t *this_patch,
                          int this_block_idx,
                          int this_patch_idx,
@@ -372,7 +372,7 @@ double cudaclaw_update(fclaw2d_global_t *glob,
 /* ---------------------------------- Output functions -------------------------------- */
 
 static
-void cudaclaw_output(fclaw2d_global_t *glob, int iframe)
+void cudaclaw_output(fclaw_global_t *glob, int iframe)
 {
     const fc2d_cudaclaw_options_t* clawpack_options;
     clawpack_options = fc2d_cudaclaw_get_options(glob);
@@ -403,7 +403,7 @@ void cudaclaw_vt_destroy(void* vt)
     FCLAW_FREE (vt);
 }
 
-void fc2d_cudaclaw_solver_initialize(fclaw2d_global_t* glob)
+void fc2d_cudaclaw_solver_initialize(fclaw_global_t* glob)
 {
 	fclaw_clawpatch_options_t* clawpatch_opt = fclaw_clawpatch_get_options(glob);
 	fc2d_cudaclaw_options_t* clawopt = fc2d_cudaclaw_get_options(glob);
@@ -471,7 +471,7 @@ void fc2d_cudaclaw_solver_initialize(fclaw2d_global_t* glob)
 
 /* These are here in case the user wants to call Clawpack routines directly */
 
-fc2d_cudaclaw_vtable_t* fc2d_cudaclaw_vt(fclaw2d_global_t *glob)
+fc2d_cudaclaw_vtable_t* fc2d_cudaclaw_vt(fclaw_global_t *glob)
 {
 	fc2d_cudaclaw_vtable_t* cudaclaw_vt = (fc2d_cudaclaw_vtable_t*) 
 	   							fclaw_pointer_map_get(glob->vtables, "fc2d_cudaclaw");
@@ -481,7 +481,7 @@ fc2d_cudaclaw_vtable_t* fc2d_cudaclaw_vt(fclaw2d_global_t *glob)
 }
 
 /* This should only be called when a new fclaw_clawpatch_t is created. */
-void fc2d_cudaclaw_set_capacity(fclaw2d_global_t *glob,
+void fc2d_cudaclaw_set_capacity(fclaw_global_t *glob,
                                   fclaw_patch_t *this_patch,
                                   int this_block_idx,
                                   int this_patch_idx)
@@ -511,13 +511,13 @@ void fc2d_cudaclaw_set_capacity(fclaw2d_global_t *glob,
 /* -------------------------- Public interface to Clawpack wrappers --------------------*/
 
 /* These are overkill;  it isn't obvious why the user would want these */
-void fc2d_cudaclaw_setprob(fclaw2d_global_t *glob)
+void fc2d_cudaclaw_setprob(fclaw_global_t *glob)
 {
     cudaclaw_setprob(glob);
 }
 
 /* This can be set to cudaclaw_vt->src2 */
-void fc2d_cudaclaw_src2(fclaw2d_global_t* glob,
+void fc2d_cudaclaw_src2(fclaw_global_t* glob,
                           fclaw_patch_t *this_patch,
                           int this_block_idx,
                           int this_patch_idx,
@@ -528,7 +528,7 @@ void fc2d_cudaclaw_src2(fclaw2d_global_t* glob,
 }
 
 
-void fc2d_cudaclaw_setaux(fclaw2d_global_t *glob,
+void fc2d_cudaclaw_setaux(fclaw_global_t *glob,
                             fclaw_patch_t *this_patch,
                             int this_block_idx,
                             int this_patch_idx)
@@ -537,7 +537,7 @@ void fc2d_cudaclaw_setaux(fclaw2d_global_t *glob,
 }
 
 
-void fc2d_cudaclaw_qinit(fclaw2d_global_t *glob,
+void fc2d_cudaclaw_qinit(fclaw_global_t *glob,
                            fclaw_patch_t *this_patch,
                            int this_block_idx,
                            int this_patch_idx)
@@ -545,7 +545,7 @@ void fc2d_cudaclaw_qinit(fclaw2d_global_t *glob,
     cudaclaw_qinit(glob,this_patch,this_block_idx,this_patch_idx);
 }
 
-void fc2d_cudaclaw_b4step2(fclaw2d_global_t* glob,
+void fc2d_cudaclaw_b4step2(fclaw_global_t* glob,
                              fclaw_patch_t *this_patch,
                              int this_block_idx,
                              int this_patch_idx,
@@ -555,7 +555,7 @@ void fc2d_cudaclaw_b4step2(fclaw2d_global_t* glob,
     cudaclaw_b4step2(glob,this_patch,this_block_idx,this_patch_idx,t,dt);
 }
 
-void fc2d_cudaclaw_bc2(fclaw2d_global_t *glob,
+void fc2d_cudaclaw_bc2(fclaw_global_t *glob,
                          fclaw_patch_t *this_patch,
                          int this_block_idx,
                          int this_patch_idx,

@@ -50,7 +50,7 @@ typedef struct fclaw2d_ray_acc
 
 /* Do I need this level of indirection? */
 static
-void ray_allocate_and_define(fclaw2d_global_t* glob, 
+void ray_allocate_and_define(fclaw_global_t* glob, 
                              fclaw2d_ray_t **rays, 
                              int *num_rays)
 {
@@ -61,7 +61,7 @@ void ray_allocate_and_define(fclaw2d_global_t* glob,
 }
 
 static
-void ray_deallocate(fclaw2d_global_t* glob, 
+void ray_deallocate(fclaw_global_t* glob, 
                     fclaw2d_ray_t **rays, 
                     int *num_rays)
 {
@@ -73,7 +73,7 @@ void ray_deallocate(fclaw2d_global_t* glob,
 
 
 static
-void ray_initialize(fclaw2d_global_t* glob, void** acc)
+void ray_initialize(fclaw_global_t* glob, void** acc)
 {
     fclaw2d_ray_acc_t *ray_acc = FCLAW_ALLOC(fclaw2d_ray_acc_t,1);
 
@@ -126,7 +126,7 @@ void ray_initialize(fclaw2d_global_t* glob, void** acc)
 }
 
 static
-void ray_reset(fclaw2d_global_t *glob, void*acc)
+void ray_reset(fclaw_global_t *glob, void*acc)
 {
     fclaw2d_ray_acc_t* ray_acc = (fclaw2d_ray_acc_t*) acc;
 
@@ -150,7 +150,7 @@ void ray_reset(fclaw2d_global_t *glob, void*acc)
 
 
 static
-void ray_integrate(fclaw2d_global_t *glob, void *acc)
+void ray_integrate(fclaw_global_t *glob, void *acc)
 {
     fclaw2d_ray_acc_t* ray_acc = (fclaw2d_ray_acc_t*) acc;
 
@@ -205,7 +205,7 @@ void ray_integrate(fclaw2d_global_t *glob, void *acc)
 }
 
 static
-void ray_gather(fclaw2d_global_t *glob, void* acc, int init_flag)
+void ray_gather(fclaw_global_t *glob, void* acc, int init_flag)
 {
     /* Here is where we would do an all-reduce, but again this
       is handled by fclaw2d_convenience routines */
@@ -253,7 +253,7 @@ void ray_gather(fclaw2d_global_t *glob, void* acc, int init_flag)
 
 
 static
-void ray_finalize(fclaw2d_global_t *glob, void** acc)
+void ray_finalize(fclaw_global_t *glob, void** acc)
 {
     fclaw2d_ray_acc_t* ray_acc = *((fclaw2d_ray_acc_t**) acc);
     if (ray_acc->rays != NULL)
@@ -300,7 +300,7 @@ fclaw2d_ray_vtable_t* fclaw2d_ray_vt()
 }
 #endif
 
-void fclaw2d_ray_vtable_initialize(fclaw2d_global_t *glob)
+void fclaw2d_ray_vtable_initialize(fclaw_global_t *glob)
 {
     fclaw2d_diagnostics_vtable_t * diag_vt = fclaw2d_diagnostics_vt(glob);
     diag_vt->ray_init_diagnostics     = ray_initialize;    
@@ -321,7 +321,7 @@ void fclaw2d_ray_vtable_initialize(fclaw2d_global_t *glob)
 /* ---------------------------- Get Access Functions ---------------------------------- */
 
 
-fclaw2d_ray_vtable_t* fclaw2d_ray_vt(fclaw2d_global_t* glob)
+fclaw2d_ray_vtable_t* fclaw2d_ray_vt(fclaw_global_t* glob)
 {
     fclaw2d_ray_vtable_t* ray_vt = (fclaw2d_ray_vtable_t*) 
                                 fclaw_pointer_map_get(glob->vtables, "fclaw2d_rays");

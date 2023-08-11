@@ -68,7 +68,7 @@ Vector<2> restrict_beta_vec(const Vector<2>& prev_beta_vec,
     return restrictor.restrict(prev_beta_vec);
 }
 
-void fc2d_thunderegg_starpatch_solve(fclaw2d_global_t *glob) 
+void fc2d_thunderegg_starpatch_solve(fclaw_global_t *glob) 
 {
     // get needed options
     fclaw_clawpatch_options_t *clawpatch_opt =

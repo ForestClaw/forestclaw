@@ -51,18 +51,18 @@ typedef struct {
 
 /* --------------------------- Problem dependent functions -----------------------------*/
 
-void heat_diagnostics_initialize(fclaw2d_global_t *glob, void **acc_patch);
+void heat_diagnostics_initialize(fclaw_global_t *glob, void **acc_patch);
 
 
-void heat_diagnostics_reset(fclaw2d_global_t *glob, void* patch_acc);
+void heat_diagnostics_reset(fclaw_global_t *glob, void* patch_acc);
 
-void heat_diagnostics_compute(fclaw2d_global_t* glob,
+void heat_diagnostics_compute(fclaw_global_t* glob,
                                            void* patch_acc);
 
-void heat_diagnostics_gather(fclaw2d_global_t *glob, void* patch_acc,
+void heat_diagnostics_gather(fclaw_global_t *glob, void* patch_acc,
                                int init_flag);
 
-void heat_diagnostics_finalize(fclaw2d_global_t *glob, void** patch_acc);
+void heat_diagnostics_finalize(fclaw_global_t *glob, void** patch_acc);
 
 void heat_compute_diagnostics(fclaw_domain_t *domain,
                                 fclaw_patch_t *patch,

@@ -36,12 +36,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    Public interface to ForestClaw options
    --------------------------------------------------------- */
 
-void fclaw2d_options_store (fclaw2d_global_t *glob, fclaw_options_t* gparms)
+void fclaw2d_options_store (fclaw_global_t *glob, fclaw_options_t* gparms)
 {
     fclaw2d_global_options_store(glob, "fclaw2d", gparms);
 }
 
-fclaw_options_t* fclaw2d_get_options(fclaw2d_global_t* glob)
+fclaw_options_t* fclaw2d_get_options(fclaw_global_t* glob)
 {
     return (fclaw_options_t*) fclaw2d_global_get_options(glob, "fclaw2d");
 }

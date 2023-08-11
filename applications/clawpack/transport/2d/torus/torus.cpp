@@ -26,7 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "torus_user.h"
 
 static
-void create_domain (fclaw2d_global_t * glob,
+void create_domain (fclaw_global_t * glob,
                     fclaw_options_t* fclaw_opt, user_options_t* user)
 {
     /* Mapped, multi-block domain */
@@ -67,7 +67,7 @@ void create_domain (fclaw2d_global_t * glob,
 }
 
 static
-void run_program(fclaw2d_global_t* glob)
+void run_program(fclaw_global_t* glob)
 {
     const user_options_t  *user;
 
@@ -142,7 +142,7 @@ main (int argc, char **argv)
         /* Create global structure which stores the domain, timers, etc */
         int size, rank;
         sc_MPI_Comm mpicomm = fclaw_app_get_mpi_size_rank (app, &size, &rank);
-        fclaw2d_global_t *glob = fclaw2d_global_new_comm (mpicomm, size, rank);
+        fclaw_global_t *glob = fclaw2d_global_new_comm (mpicomm, size, rank);
         create_domain (glob, fclaw_opt, user);
 
         /* Store option packages in glob */

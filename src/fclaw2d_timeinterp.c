@@ -48,7 +48,7 @@ void cb_setup_time_interp(fclaw_domain_t *domain,
    via interpolating and averaging) ghost cell values.
    -------------------------------------------------------------------- */
 
-void fclaw2d_timeinterp(fclaw2d_global_t *glob,
+void fclaw2d_timeinterp(fclaw_global_t *glob,
                         int level,double alpha)
 {
     /* Store time interpolated data into m_griddata_time_sync. */

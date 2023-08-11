@@ -64,7 +64,7 @@ typedef struct fclaw_clawpatch_vtable fclaw_clawpatch_vtable_t;
  * @param[in] patch the patch context
  * @param[in] user the pointer to the user data
  */
-typedef void (*clawpatch_set_user_data_t)(struct fclaw2d_global *glob, 
+typedef void (*clawpatch_set_user_data_t)(struct fclaw_global *glob, 
                                           struct fclaw_patch *patch,
                                           void* user);
 
@@ -78,7 +78,7 @@ typedef void (*clawpatch_set_user_data_t)(struct fclaw2d_global *glob,
  * @param[in] packmode enum fclaw2d_clawpatch_packmode enum
  * @param[out] ierror error value
  */
-typedef void (*clawpatch_time_sync_pack_registers_t)(struct fclaw2d_global *glob,
+typedef void (*clawpatch_time_sync_pack_registers_t)(struct fclaw_global *glob,
                                                      struct fclaw_patch *this_patch,
                                                      double *qpack,
                                                      int frsize, 
@@ -97,7 +97,7 @@ typedef void (*clawpatch_time_sync_pack_registers_t)(struct fclaw2d_global *glob
  * @param[in]     packmode the packing mode (0 for packing aux, 1 for unpacking aux)
  * @param[out]    ierror error value
  */
-typedef void (*clawpatch_local_ghost_pack_aux_t)(struct fclaw2d_global *glob,
+typedef void (*clawpatch_local_ghost_pack_aux_t)(struct fclaw_global *glob,
                                                  struct fclaw_patch *patch,
                                                  const int mint,
                                                  double qpack[], int extrasize,
@@ -112,7 +112,7 @@ typedef void (*clawpatch_local_ghost_pack_aux_t)(struct fclaw2d_global *glob,
  * @param[in]     the size of the buffer
  * @param[out]    ierror error value
  */
-typedef void (*clawpatch_fort_local_ghost_pack_registers_t)(struct fclaw2d_global *glob,
+typedef void (*clawpatch_fort_local_ghost_pack_registers_t)(struct fclaw_global *glob,
                                                             struct fclaw_patch *patch,
                                                             double qpack[], int frsize,
                                                             int* ierror);
@@ -124,7 +124,7 @@ typedef void (*clawpatch_fort_local_ghost_pack_registers_t)(struct fclaw2d_globa
  * @param[in] glob the global context
  * @param[in] iframe the frame
  */
-typedef void (*clawpatch_time_header_t)(struct fclaw2d_global* glob, int iframe);
+typedef void (*clawpatch_time_header_t)(struct fclaw_global* glob, int iframe);
 
 
 /* ---------------------------- typedefs - diagnostics -------------------------------- */
@@ -139,7 +139,7 @@ typedef void (*clawpatch_time_header_t)(struct fclaw2d_global* glob, int iframe)
  * @param[in,out] error_data a user defined structure
  * 
  */
-typedef void (*clawpatch_diagnostics_cons_t)(struct fclaw2d_global *glob,
+typedef void (*clawpatch_diagnostics_cons_t)(struct fclaw_global *glob,
                                              struct fclaw_patch *patch,
                                              int blockno,
                                              int patchno,
@@ -155,7 +155,7 @@ typedef void (*clawpatch_diagnostics_cons_t)(struct fclaw2d_global *glob,
  * @param[in,out] error_data a user defined structure
  * 
  */
-typedef void (*clawpatch_diagnostics_error_t)(struct fclaw2d_global *glob,
+typedef void (*clawpatch_diagnostics_error_t)(struct fclaw_global *glob,
                                               struct fclaw_patch *patch,
                                               int blockno,
                                               int patchno,
@@ -170,7 +170,7 @@ typedef void (*clawpatch_diagnostics_error_t)(struct fclaw2d_global *glob,
  * 
  * @param claw_version the version of clawpack (4 for 4.6, 5 for 5)
  */
-void fclaw2d_clawpatch_vtable_initialize(struct fclaw2d_global *global,
+void fclaw2d_clawpatch_vtable_initialize(struct fclaw_global *global,
                                          int claw_version);
 
 /**
@@ -178,14 +178,14 @@ void fclaw2d_clawpatch_vtable_initialize(struct fclaw2d_global *global,
  * 
  * @param claw_version the version of clawpack (4 for 4.6, 5 for 5)
  */
-void fclaw3d_clawpatch_vtable_initialize(struct fclaw2d_global *glob, int claw_version);
+void fclaw3d_clawpatch_vtable_initialize(struct fclaw_global *glob, int claw_version);
 
 /**
  * @brief Get a pointer to a clawpatch vtable global variable
  * 
  * @return fclaw_clawpatch_vtable_t* the vtable
  */
-fclaw_clawpatch_vtable_t* fclaw_clawpatch_vt(struct fclaw2d_global* glob);
+fclaw_clawpatch_vtable_t* fclaw_clawpatch_vt(struct fclaw_global* glob);
 
 /**
  * @brief vtable for 2d clawpatch related functions
@@ -415,7 +415,7 @@ struct fclaw_clawpatch_vtable
  * @param[in]  glob glob the global context
  * @param[in]  patch the patch context
  */
-void fclaw_clawpatch_save_current_step(struct fclaw2d_global* glob,
+void fclaw_clawpatch_save_current_step(struct fclaw_global* glob,
                                        struct fclaw_patch* this_patch);
 
 
@@ -431,7 +431,7 @@ void fclaw_clawpatch_save_current_step(struct fclaw2d_global* glob,
  * @param[out] xlower, ylower the lower left coordinate of the patch
  * @param[out] dx, dy the spacings in the x and y directions
  */
-void fclaw2d_clawpatch_grid_data(struct fclaw2d_global* glob,
+void fclaw2d_clawpatch_grid_data(struct fclaw_global* glob,
                                  struct fclaw_patch* patch,
                                  int* mx, 
                                  int* my, 
@@ -451,7 +451,7 @@ void fclaw2d_clawpatch_grid_data(struct fclaw2d_global* glob,
  * @param[out] xlower, ylower, zlower the lower bottom left coordinate of the patch
  * @param[out] dx, dy, dz the spacings in the x, y, and z directions
  */
-void fclaw3d_clawpatch_grid_data(struct fclaw2d_global* glob,
+void fclaw3d_clawpatch_grid_data(struct fclaw_global* glob,
                                  struct fclaw_patch* patch,
                                  int* mx, 
                                  int* my, 
@@ -476,7 +476,7 @@ void fclaw3d_clawpatch_grid_data(struct fclaw2d_global* glob,
  *             (i,j,2) contains the the left edge length for cell (i,j).
  * @param[out] curvature the curvature for each cell in the patch
  */
-void fclaw2d_clawpatch_metric_scalar(struct fclaw2d_global* glob,
+void fclaw2d_clawpatch_metric_scalar(struct fclaw_global* glob,
                                      struct fclaw_patch* patch,
                                      double **area,
                                      double **edgelengths,
@@ -498,7 +498,7 @@ void fclaw2d_clawpatch_metric_scalar(struct fclaw2d_global* glob,
  * @param[out] surfnormals the surface normal for each cell center of the patch
  *             An array of dimension(-mbc:mx+mbc+1,-mbc:my+mbc+1,3)
  */
-void fclaw2d_clawpatch_metric_vector(struct fclaw2d_global* glob,
+void fclaw2d_clawpatch_metric_vector(struct fclaw_global* glob,
                                      struct fclaw_patch* patch,
                                      double **xnormals, 
                                      double **ynormals,
@@ -515,7 +515,7 @@ void fclaw2d_clawpatch_metric_vector(struct fclaw2d_global* glob,
  * @param[out] xd, yd, zd the coordinates of the nodes
  * @param[out] area the area of each cell
  */
-void fclaw2d_clawpatch_metric_data(struct fclaw2d_global* glob,
+void fclaw2d_clawpatch_metric_data(struct fclaw_global* glob,
                                    struct fclaw_patch* patch,
                                    double **xp, 
                                    double **yp, 
@@ -545,7 +545,7 @@ void fclaw2d_clawpatch_metric_data(struct fclaw2d_global* glob,
  *             (i,j,2) contains the the left edge length for cell (i,j).
  * @param[out] curvature the curvature for each cell in the patch
  */
-void fclaw2d_clawpatch_metric_data2(struct fclaw2d_global* glob,
+void fclaw2d_clawpatch_metric_data2(struct fclaw_global* glob,
                                     struct fclaw_patch* patch,
                                     double **xnormals, 
                                     double **ynormals,
@@ -567,7 +567,7 @@ void fclaw2d_clawpatch_metric_data2(struct fclaw2d_global* glob,
  *             (i,j,2) contains the the left edge length for cell (i,j).
  * @param[out] curvature the curvature for each cell in the patch
  */
-void fclaw3d_clawpatch_metric_scalar(struct fclaw2d_global* glob,
+void fclaw3d_clawpatch_metric_scalar(struct fclaw_global* glob,
                                      struct fclaw_patch* patch,
                                      double **volume,
                                      double **faceareas);
@@ -588,7 +588,7 @@ void fclaw3d_clawpatch_metric_scalar(struct fclaw2d_global* glob,
  * @param[out] surfnormals the surface normal for each cell center of the patch
  *             An array of dimension(-mbc:mx+mbc+1,-mbc:my+mbc+1,3)
  */
-void fclaw3d_clawpatch_metric_basis(struct fclaw2d_global* glob,
+void fclaw3d_clawpatch_metric_basis(struct fclaw_global* glob,
                                       struct fclaw_patch* patch,
                                       double **xrot, 
                                       double **yrot,
@@ -603,7 +603,7 @@ void fclaw3d_clawpatch_metric_basis(struct fclaw2d_global* glob,
  * @param[out] xd, yd, zd the coordinates of the nodes
  * @param[out] area the area of each cell
  */
-void fclaw3d_clawpatch_mesh_data(struct fclaw2d_global* glob,
+void fclaw3d_clawpatch_mesh_data(struct fclaw_global* glob,
                                  struct fclaw_patch* patch,
                                  double **xp, 
                                  double **yp, 
@@ -621,7 +621,7 @@ void fclaw3d_clawpatch_mesh_data(struct fclaw2d_global* glob,
  * @param this_patch the patch to get the are for
  * @return double* the area array
  */
-double* fclaw2d_clawpatch_get_area(struct fclaw2d_global* glob,
+double* fclaw2d_clawpatch_get_area(struct fclaw_global* glob,
                                    struct fclaw_patch* patch);
 
 /**
@@ -630,7 +630,7 @@ double* fclaw2d_clawpatch_get_area(struct fclaw2d_global* glob,
  * @param this_patch the patch to get the are for
  * @return double* the area array
  */
-double* fclaw3d_clawpatch_get_volume(struct fclaw2d_global* glob,
+double* fclaw3d_clawpatch_get_volume(struct fclaw_global* glob,
                                      struct fclaw_patch* this_patch);
 
 
@@ -642,7 +642,7 @@ double* fclaw3d_clawpatch_get_volume(struct fclaw2d_global* glob,
  * @param[out] q the solution array
  * @param[out] meqn the number of equations
  */
-void fclaw_clawpatch_soln_data(struct fclaw2d_global* glob,
+void fclaw_clawpatch_soln_data(struct fclaw_global* glob,
                                struct fclaw_patch* patch,
                                double **q, 
                                int* meqn);
@@ -654,7 +654,7 @@ void fclaw_clawpatch_soln_data(struct fclaw2d_global* glob,
  * @param[out] aux the aux array
  * @param[out] maux the number of equations
  */
-void fclaw_clawpatch_aux_data(struct fclaw2d_global *glob,
+void fclaw_clawpatch_aux_data(struct fclaw_global *glob,
                               struct fclaw_patch *patch,
                               double **aux, 
                               int* maux);
@@ -667,7 +667,7 @@ void fclaw_clawpatch_aux_data(struct fclaw2d_global *glob,
  * @param[out] rhs the rhs array
  * @param[out] mfields the number fields
  */
-void fclaw_clawpatch_rhs_data(struct fclaw2d_global* glob,
+void fclaw_clawpatch_rhs_data(struct fclaw_global* glob,
                               fclaw_patch_t* patch,
                               double **rhs, 
                               int *mfields);
@@ -679,7 +679,7 @@ void fclaw_clawpatch_rhs_data(struct fclaw2d_global* glob,
  * @param[out] err the error array
  * @param[out] mfields the number fields
  */
-void fclaw_clawpatch_elliptic_error_data(struct fclaw2d_global* glob,
+void fclaw_clawpatch_elliptic_error_data(struct fclaw_global* glob,
                                          struct fclaw_patch* patch,
                                          double **err, 
                                          int *mfields);
@@ -691,7 +691,7 @@ void fclaw_clawpatch_elliptic_error_data(struct fclaw2d_global* glob,
  * @param[out] soln the solution array
  * @param[out] mfields the number fields
  */
-void fclaw_clawpatch_elliptic_soln_data(struct fclaw2d_global* glob,
+void fclaw_clawpatch_elliptic_soln_data(struct fclaw_global* glob,
                                         struct fclaw_patch* patch,
                                         double **soln, 
                                         int *mfields);
@@ -703,7 +703,7 @@ void fclaw_clawpatch_elliptic_soln_data(struct fclaw2d_global* glob,
  * @param[in]  this_patch the patch context
  * @return double* the solution array
  */
-double* fclaw_clawpatch_get_q(struct fclaw2d_global* glob,
+double* fclaw_clawpatch_get_q(struct fclaw_global* glob,
                               struct fclaw_patch* patch);
 
 /**
@@ -713,7 +713,7 @@ double* fclaw_clawpatch_get_q(struct fclaw2d_global* glob,
  * @param[in]  this_patch the patch context
  * @return double* the error array
  */
-double* fclaw_clawpatch_get_error(struct fclaw2d_global* glob,
+double* fclaw_clawpatch_get_error(struct fclaw_global* glob,
                                   struct fclaw_patch* patch);
 
 /**
@@ -723,7 +723,7 @@ double* fclaw_clawpatch_get_error(struct fclaw2d_global* glob,
  * @param[in]  this_patch the patch context
  * @return double* the exact solution array
  */
-double* fclaw_clawpatch_get_exactsoln(struct fclaw2d_global* glob,
+double* fclaw_clawpatch_get_exactsoln(struct fclaw_global* glob,
                                       struct fclaw_patch* patch);
 
 /**
@@ -732,7 +732,7 @@ double* fclaw_clawpatch_get_exactsoln(struct fclaw2d_global* glob,
  * @param glob the global context
  * @return size_t the size
  */
-size_t fclaw_clawpatch_size(struct fclaw2d_global *glob);
+size_t fclaw_clawpatch_size(struct fclaw_global *glob);
 
 
 /**
@@ -742,7 +742,7 @@ size_t fclaw_clawpatch_size(struct fclaw2d_global *glob);
  * @param patch the patch context
  * @return void* the pointer
  */
-void* fclaw_clawpatch_get_user_data(struct fclaw2d_global* glob,
+void* fclaw_clawpatch_get_user_data(struct fclaw_global* glob,
                                       struct fclaw_patch* patch);
 
 /**
@@ -752,7 +752,7 @@ void* fclaw_clawpatch_get_user_data(struct fclaw2d_global* glob,
  * @param patch the patch context
  * @param udata the user data pointer
  */
-void fclaw_clawpatch_set_user_data(struct fclaw2d_global* glob,
+void fclaw_clawpatch_set_user_data(struct fclaw_global* glob,
                                    struct fclaw_patch* patch,
                                    void* udata);
 /**
@@ -762,7 +762,7 @@ void fclaw_clawpatch_set_user_data(struct fclaw2d_global* glob,
  * @param patch the patch context
  * @return void* the pointer
  */
-void* fclaw_clawpatch_get_solver_data(struct fclaw2d_global* glob,
+void* fclaw_clawpatch_get_solver_data(struct fclaw_global* glob,
                                       struct fclaw_patch* patch);
 
 /**
@@ -772,7 +772,7 @@ void* fclaw_clawpatch_get_solver_data(struct fclaw2d_global* glob,
  * @param patch the patch context
  * @param sdata the solver data pointer
  */
-void fclaw_clawpatch_set_solver_data(struct fclaw2d_global* glob,
+void fclaw_clawpatch_set_solver_data(struct fclaw_global* glob,
                                      struct fclaw_patch* patch,
                                      void* sdata);
 
@@ -788,7 +788,7 @@ void fclaw_clawpatch_set_solver_data(struct fclaw2d_global* glob,
  * @param[out] q the interpolated solution
  * @param[out] meqn the number of equations
  */
-void fclaw_clawpatch_timesync_data(struct fclaw2d_global* glob,
+void fclaw_clawpatch_timesync_data(struct fclaw_global* glob,
                                    struct fclaw_patch* patch,
                                    int time_interp,
                                    double **q, 
@@ -802,7 +802,7 @@ void fclaw_clawpatch_timesync_data(struct fclaw2d_global* glob,
  * @param time_interp true if interpolated grid data should be returned
  * @return the interpolated solution
  */
-double* fclaw_clawpatch_get_q_timesync(struct fclaw2d_global* glob,
+double* fclaw_clawpatch_get_q_timesync(struct fclaw_global* glob,
                                        struct fclaw_patch* patch,
                                        int time_interp);
 /**
@@ -813,7 +813,7 @@ double* fclaw_clawpatch_get_q_timesync(struct fclaw2d_global* glob,
  * @return the registers
  */
 struct fclaw2d_clawpatch_registers* 
-fclaw2d_clawpatch_get_registers(struct fclaw2d_global* glob,
+fclaw2d_clawpatch_get_registers(struct fclaw_global* glob,
                                 struct fclaw_patch* patch);
 
 #ifdef __cplusplus

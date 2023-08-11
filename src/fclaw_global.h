@@ -26,9 +26,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW_GLOBAL_H
 #define FCLAW_GLOBAL_H
 
-#include <forestclaw2d.h>  /* Needed to declare callbacks (below) */
-#include <fclaw2d_map.h>   /* Needed to store the map context */
-
 #include <fclaw_timer.h>   /* Needed to create statically allocated array of timers */
 #include <fclaw_pointer_map.h>
 
@@ -40,9 +37,9 @@ extern "C"
 #endif
 #endif
 
-typedef struct fclaw2d_global fclaw2d_global_t;
+typedef struct fclaw_global fclaw_global_t;
 
-struct fclaw2d_global
+struct fclaw_global
 {
     int count_amr_advance;
     int count_ghost_exchange;

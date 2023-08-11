@@ -35,7 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /* edit: right now this is not the case, switching to static */
 static
 fclaw2d_domain_exchange_t*
-    get_exchange_data(fclaw2d_global_t* glob)
+    get_exchange_data(fclaw_global_t* glob)
 {
     fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data (glob->domain);
     return ddata->domain_exchange;
@@ -43,7 +43,7 @@ fclaw2d_domain_exchange_t*
 
 /* Should these be access functions in domain?  */
 static
-void set_exchange_data(fclaw2d_global_t* glob,
+void set_exchange_data(fclaw_global_t* glob,
                        fclaw2d_domain_exchange_t *e)
 {
     fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data (glob->domain);
@@ -52,14 +52,14 @@ void set_exchange_data(fclaw2d_global_t* glob,
 
 static
 fclaw2d_domain_indirect_t*
-    get_indirect_data(fclaw2d_global_t* glob)
+    get_indirect_data(fclaw_global_t* glob)
 {
     fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data (glob->domain);
     return ddata->domain_indirect;
 }
 
 static
-void set_indirect_data(fclaw2d_global_t* glob,
+void set_indirect_data(fclaw_global_t* glob,
                        fclaw2d_domain_indirect_t *ind)
 {
     fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data (glob->domain);
@@ -67,7 +67,7 @@ void set_indirect_data(fclaw2d_global_t* glob,
 }
 
 static
-void build_remote_ghost_patches(fclaw2d_global_t* glob)
+void build_remote_ghost_patches(fclaw_global_t* glob)
 {
     fclaw_domain_t *domain = glob->domain;
     const fclaw_options_t *gparms = fclaw2d_get_options(glob);
@@ -106,7 +106,7 @@ void build_remote_ghost_patches(fclaw2d_global_t* glob)
 }
 
 static
-void delete_remote_ghost_patches(fclaw2d_global_t* glob)
+void delete_remote_ghost_patches(fclaw_global_t* glob)
 {
     fclaw_domain_t *domain = glob->domain;
     int i;
@@ -120,7 +120,7 @@ void delete_remote_ghost_patches(fclaw2d_global_t* glob)
 
 
 static void
-unpack_remote_ghost_patches(fclaw2d_global_t* glob,
+unpack_remote_ghost_patches(fclaw_global_t* glob,
                             fclaw2d_domain_exchange_t *e,
                             int minlevel,
                             int maxlevel,
@@ -158,7 +158,7 @@ unpack_remote_ghost_patches(fclaw2d_global_t* glob,
    Public interface
    -------------------------------------------------------------------------- */
 /* This is called whenever a new domain is created (initialize, regrid) */
-void fclaw2d_exchange_setup(fclaw2d_global_t* glob,
+void fclaw2d_exchange_setup(fclaw_global_t* glob,
                             fclaw2d_timer_names_t running)
 {
     fclaw_domain_t* domain = glob->domain;
@@ -249,7 +249,7 @@ void fclaw2d_exchange_setup(fclaw2d_global_t* glob,
     }
 }
 
-void fclaw2d_exchange_delete(fclaw2d_global_t* glob)
+void fclaw2d_exchange_delete(fclaw_global_t* glob)
 {
     fclaw_domain_t** domain = &glob->domain;
     fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_GHOSTPATCH_BUILD]);
@@ -295,7 +295,7 @@ void fclaw2d_exchange_delete(fclaw2d_global_t* glob)
    -------------------------------------------------------------- */
 
 /* This is called whenever all time levels are time synchronized. */
-void fclaw2d_exchange_ghost_patches_begin(fclaw2d_global_t* glob,
+void fclaw2d_exchange_ghost_patches_begin(fclaw_global_t* glob,
                                           int minlevel,
                                           int maxlevel,
                                           int time_interp,
@@ -360,7 +360,7 @@ void fclaw2d_exchange_ghost_patches_begin(fclaw2d_global_t* glob,
 }
 
 /* This is called whenever all time levels are time synchronized. */
-void fclaw2d_exchange_ghost_patches_end(fclaw2d_global_t* glob,
+void fclaw2d_exchange_ghost_patches_end(fclaw_global_t* glob,
                                         int minlevel,
                                         int maxlevel,
                                         int time_interp,

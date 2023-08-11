@@ -36,7 +36,7 @@ extern "C"
 #endif
 #endif
 
-struct fclaw2d_global;
+struct fclaw_global;
 struct fclaw_domain;
 struct fclaw_patch;
 
@@ -63,13 +63,13 @@ void cb_fclaw2d_regrid_repopulate(struct fclaw_domain * old_domain,
                                   int new_patchno,
                                   void *user);
 
-void fclaw2d_regrid_set_neighbor_types(struct fclaw2d_global *glob);
+void fclaw2d_regrid_set_neighbor_types(struct fclaw_global *glob);
 
-void fclaw2d_regrid(struct fclaw2d_global *glob);
+void fclaw2d_regrid(struct fclaw_global *glob);
 
-void fclaw2d_after_regrid(struct fclaw2d_global *glob);
+void fclaw2d_after_regrid(struct fclaw_global *glob);
 
-void fclaw2d_regrid_set_neighbor_types(struct fclaw2d_global *glob);
+void fclaw2d_regrid_set_neighbor_types(struct fclaw_global *glob);
 
 
 

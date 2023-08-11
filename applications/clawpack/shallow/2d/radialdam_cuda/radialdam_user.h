@@ -56,17 +56,17 @@ typedef struct user_options
     int is_registered;
 } user_options_t;
 
-void radialdam_problem_setup(fclaw2d_global_t *glob);
+void radialdam_problem_setup(fclaw_global_t *glob);
 
-void radialdam_link_solvers(fclaw2d_global_t *glob);
+void radialdam_link_solvers(fclaw_global_t *glob);
 
 /* ------------------------------------- Options ---------------------------------------*/
 user_options_t* radialdam_options_register (fclaw_app_t * app,
                                           const char *configfile);
 
-void radialdam_options_store (fclaw2d_global_t* glob, user_options_t* user);
+void radialdam_options_store (fclaw_global_t* glob, user_options_t* user);
 
-user_options_t* radialdam_get_options(fclaw2d_global_t* glob);
+user_options_t* radialdam_get_options(fclaw_global_t* glob);
 
 /* --------------------------------------- Cuda ----------------------------------------*/
 
@@ -97,7 +97,7 @@ void USER5_SETAUX_MANIFOLD(const int* mbc,
                            double area[]);
 
 
-void radialdam_patch_setup(fclaw2d_global_t *glob,
+void radialdam_patch_setup(fclaw_global_t *glob,
                            fclaw_patch_t *this_patch,
                            int this_block_idx,
                            int this_patch_idx);

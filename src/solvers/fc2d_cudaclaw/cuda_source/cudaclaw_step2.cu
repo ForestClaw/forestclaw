@@ -46,7 +46,7 @@ void cudaclaw_compute_speeds_batch (const int mx,    const int my,
                                     cudaclaw_cuda_b4step2_t b4step2);
 
 
-double cudaclaw_step2_batch(fclaw2d_global_t *glob,
+double cudaclaw_step2_batch(fclaw_global_t *glob,
         cudaclaw_fluxes_t* array_fluxes_struct, 
         int batch_size, double t, double dt)
 {

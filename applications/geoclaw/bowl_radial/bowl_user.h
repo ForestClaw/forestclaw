@@ -36,7 +36,7 @@ extern "C"
 #endif
 #endif
 
-void bowl_link_solvers(fclaw2d_global_t *glob);
+void bowl_link_solvers(fclaw_global_t *glob);
 
 #ifdef __cplusplus
 #if 0

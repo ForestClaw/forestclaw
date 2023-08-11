@@ -31,7 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_clawpatch.h>
 
 static
-void create_domain_map (fclaw2d_global_t *glob,
+void create_domain_map (fclaw_global_t *glob,
                         fclaw_options_t* fclaw_opt)
 {
     fclaw_domain_t         *domain = NULL;
@@ -44,7 +44,7 @@ void create_domain_map (fclaw2d_global_t *glob,
 }
 
 static
-void run_program(fclaw2d_global_t* glob)
+void run_program(fclaw_global_t* glob)
 {
     /* ---------------------------------------------------------------
        Set domain data.
@@ -98,7 +98,7 @@ main (int argc, char **argv)
         /* Create global structure which stores the domain, timers, etc */
         int size, rank;
         sc_MPI_Comm mpicomm = fclaw_app_get_mpi_size_rank (app, &size, &rank);
-        fclaw2d_global_t *glob = fclaw2d_global_new_comm (glob->mpicomm, size, rank);
+        fclaw_global_t *glob = fclaw2d_global_new_comm (glob->mpicomm, size, rank);
         create_domain_map (glob, fclaw_opt);
 
         /* Store option packages in glob */

@@ -43,7 +43,7 @@ void cb_swirl_output_ascii (fclaw_domain_t * domain,
                             void *user);
 
 
-void swirlcons_link_solvers(fclaw2d_global_t *glob)
+void swirlcons_link_solvers(fclaw_global_t *glob)
 {
     fclaw2d_vtable_t                     *vt = fclaw2d_vt(glob);
     fclaw2d_patch_vtable_t         *patch_vt = fclaw2d_patch_vt(glob);
@@ -130,7 +130,7 @@ void swirlcons_link_solvers(fclaw2d_global_t *glob)
     clawpack46_vt->fort_qinit     = CLAWPACK46_QINIT;
 }
 
-void swirlcons_problem_setup(fclaw2d_global_t* glob)
+void swirlcons_problem_setup(fclaw_global_t* glob)
 {
     const user_options_t* user = swirlcons_get_options(glob);
 
@@ -162,7 +162,7 @@ void swirlcons_problem_setup(fclaw2d_global_t* glob)
 }
 
 
-void swirlcons_patch_setup_manifold(fclaw2d_global_t *glob,
+void swirlcons_patch_setup_manifold(fclaw_global_t *glob,
                                     fclaw_patch_t *patch,
                                     int blockno,
                                     int patchno)
@@ -223,7 +223,7 @@ void cb_swirl_output_ascii (fclaw_domain_t * domain,
                             void *user)
 {
     fclaw2d_global_iterate_t* s = (fclaw2d_global_iterate_t*) user;
-    fclaw2d_global_t *glob = (fclaw2d_global_t*) s->glob;
+    fclaw_global_t *glob = (fclaw_global_t*) s->glob;
 
     int iframe = *((int *) s->user);
     double time = glob->curr_time;

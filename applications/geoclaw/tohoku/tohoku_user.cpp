@@ -30,7 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_clawpatch.h>
 #include <fc2d_geoclaw.h>
 
-void tohoku_link_solvers(fclaw2d_global_t *glob)
+void tohoku_link_solvers(fclaw_global_t *glob)
 {
 
     /* These are set by GeoClaw for convenience, but the user

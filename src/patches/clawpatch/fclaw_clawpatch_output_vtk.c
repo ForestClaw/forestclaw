@@ -445,7 +445,7 @@ write_meqn_cb (fclaw_domain_t * domain, fclaw_patch_t * patch,
 }
 
 static void
-fclaw2d_vtk_write_field (fclaw2d_global_t * glob, fclaw2d_vtk_state_t * s,
+fclaw2d_vtk_write_field (fclaw_global_t * glob, fclaw2d_vtk_state_t * s,
                          int64_t offset_field, int64_t psize_field,
                          fclaw2d_patch_callback_t cb)
 {
@@ -510,7 +510,7 @@ fclaw2d_vtk_write_field (fclaw2d_global_t * glob, fclaw2d_vtk_state_t * s,
 }
 
 static void
-fclaw2d_vtk_write_data (fclaw2d_global_t * glob, fclaw2d_vtk_state_t * s)
+fclaw2d_vtk_write_data (fclaw_global_t * glob, fclaw2d_vtk_state_t * s)
 {
 #ifdef P4EST_ENABLE_MPIIO
     int mpiret;
@@ -583,7 +583,7 @@ fclaw2d_vtk_write_footer (fclaw_domain_t * domain, fclaw2d_vtk_state_t * s)
 }
 
 static int
-fclaw_vtk_write_file (int dim, fclaw2d_global_t * glob, const char *basename,
+fclaw_vtk_write_file (int dim, fclaw_global_t * glob, const char *basename,
                       int mx, int my, int mz,
                       int meqn,
                       double vtkspace, int vtkwrite,
@@ -690,7 +690,7 @@ fclaw_vtk_write_file (int dim, fclaw2d_global_t * glob, const char *basename,
 }
 
 int
-fclaw2d_vtk_write_file (fclaw2d_global_t * glob, const char *basename,
+fclaw2d_vtk_write_file (fclaw_global_t * glob, const char *basename,
                         int mx, int my,
                         int meqn,
                         double vtkspace, int vtkwrite,
@@ -702,7 +702,7 @@ fclaw2d_vtk_write_file (fclaw2d_global_t * glob, const char *basename,
 }
 
 int
-fclaw3d_vtk_write_file (fclaw2d_global_t * glob, const char *basename,
+fclaw3d_vtk_write_file (fclaw_global_t * glob, const char *basename,
                         int mx, int my, int mz,
                         int meqn,
                         double vtkspace, int vtkwrite,
@@ -714,7 +714,7 @@ fclaw3d_vtk_write_file (fclaw2d_global_t * glob, const char *basename,
 }
 
 static void
-fclaw2d_output_vtk_coordinate_cb (fclaw2d_global_t * glob,
+fclaw2d_output_vtk_coordinate_cb (fclaw_global_t * glob,
                                   fclaw_patch_t * patch,
                                   int blockno, int patchno,
                                   char *a)
@@ -755,7 +755,7 @@ fclaw2d_output_vtk_coordinate_cb (fclaw2d_global_t * glob,
 }
 
 static void
-fclaw3d_output_vtk_coordinate_cb (fclaw2d_global_t * glob,
+fclaw3d_output_vtk_coordinate_cb (fclaw_global_t * glob,
                                   fclaw_patch_t * patch,
                                   int blockno, int patchno,
                                   char *a)
@@ -800,7 +800,7 @@ fclaw3d_output_vtk_coordinate_cb (fclaw2d_global_t * glob,
 
 
 static void
-fclaw2d_output_vtk_value_cb (fclaw2d_global_t * glob,
+fclaw2d_output_vtk_value_cb (fclaw_global_t * glob,
                              fclaw_patch_t * patch,
                              int blockno, int patchno,
                              char *a)
@@ -838,7 +838,7 @@ fclaw2d_output_vtk_value_cb (fclaw2d_global_t * glob,
 }
 
 static void
-fclaw3d_output_vtk_value_cb (fclaw2d_global_t * glob,
+fclaw3d_output_vtk_value_cb (fclaw_global_t * glob,
                              fclaw_patch_t * patch,
                              int blockno, int patchno,
                              char *a)
@@ -884,7 +884,7 @@ fclaw3d_output_vtk_value_cb (fclaw2d_global_t * glob,
     ------------------------------------------------------------------------- */
 #if 0
 static void
-fclaw2d_output_write_vtk_debug (fclaw2d_global_t * glob, const char *basename)
+fclaw2d_output_write_vtk_debug (fclaw_global_t * glob, const char *basename)
 {
     const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
     const fclaw_clawpatch_options_t *clawpatch_opt = fclaw_clawpatch_get_options(glob);
@@ -906,7 +906,7 @@ fclaw2d_output_write_vtk_debug (fclaw2d_global_t * glob, const char *basename)
     Public interface
     --------------------------------------------------------------------------- */
 
-void fclaw_clawpatch_output_vtk (fclaw2d_global_t * glob, int iframe)
+void fclaw_clawpatch_output_vtk (fclaw_global_t * glob, int iframe)
 {
     const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
     const fclaw_clawpatch_options_t *clawpatch_opt = fclaw_clawpatch_get_options(glob);

@@ -175,13 +175,13 @@ user_options_t* sphere_options_register (fclaw_app_t * app,
     return user;
 }
 
-void sphere_options_store (fclaw2d_global_t* glob, user_options_t* user)
+void sphere_options_store (fclaw_global_t* glob, user_options_t* user)
 {
     FCLAW_ASSERT(fclaw_pointer_map_get(glob->options,"user") == NULL);
     fclaw_pointer_map_insert(glob->options, "user", user, NULL);
 }
 
-const user_options_t* sphere_get_options(fclaw2d_global_t* glob)
+const user_options_t* sphere_get_options(fclaw_global_t* glob)
 {
     user_options_t* user = (user_options_t*) 
                               fclaw_pointer_map_get(glob->options, "user");

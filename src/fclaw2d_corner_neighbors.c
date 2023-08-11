@@ -47,7 +47,7 @@ enum
 
 
 static
-void get_corner_type(fclaw2d_global_t* glob,
+void get_corner_type(fclaw_global_t* glob,
                      int icorner,
                      int intersects_bdry[],
                      int intersects_block[],
@@ -128,7 +128,7 @@ void get_corner_type(fclaw2d_global_t* glob,
    ------------------------------------------------------ */
 
 static
-void get_corner_neighbor(fclaw2d_global_t *glob,
+void get_corner_neighbor(fclaw_global_t *glob,
                          int this_block_idx,
                          int this_patch_idx,
                          fclaw_patch_t* this_patch,

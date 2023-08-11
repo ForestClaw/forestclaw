@@ -55,21 +55,21 @@ typedef struct user_options
 
 } user_options_t;
 
-struct fclaw2d_global;
+struct fclaw_global;
 struct fclaw2d_patch;
 
 #define SWIRLCONS_SETPROB FCLAW_F77_FUNC(swirlcons_setprob, SWIRLCONS_SETPROB)
 void SWIRLCONS_SETPROB();
 
-void swirlcons_link_solvers(struct fclaw2d_global *glob);
+void swirlcons_link_solvers(struct fclaw_global *glob);
 
-void swirlcons_problem_setup(struct fclaw2d_global* glob);
+void swirlcons_problem_setup(struct fclaw_global* glob);
 
 /* ---------------------------------- Options ----------------------------------------- */
 
-const user_options_t* swirlcons_get_options(struct fclaw2d_global* glob);
+const user_options_t* swirlcons_get_options(struct fclaw_global* glob);
 
-void swirlcons_options_store (fclaw2d_global_t* glob, user_options_t* user);
+void swirlcons_options_store (fclaw_global_t* glob, user_options_t* user);
 
 
 user_options_t* swirlcons_options_register (fclaw_app_t * app,
@@ -92,15 +92,15 @@ fclaw2d_map_context_t* fclaw2d_map_new_bilinear(fclaw2d_map_context_t *brick,
                                                 const double rotate[],
                                                 const double center[]);
 
-void swirlcons_patch_setup_manifold(struct fclaw2d_global *glob,
+void swirlcons_patch_setup_manifold(struct fclaw_global *glob,
                                     struct fclaw2d_patch *this_patch,
                                     int this_block_idx,
                                     int this_patch_idx);
 
 /* --------------------------------- Riemann Problems --------------------------------- */
-void swirlcons_options_store (fclaw2d_global_t* glob, user_options_t* user);
+void swirlcons_options_store (fclaw_global_t* glob, user_options_t* user);
 
-const user_options_t* swirlcons_get_options(fclaw2d_global_t* glob);
+const user_options_t* swirlcons_get_options(fclaw_global_t* glob);
 
 
 /* ---------------------------- Fortran headers --------------------------------------- */

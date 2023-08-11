@@ -72,13 +72,13 @@ fclaw_mpi_barrier (sc_MPI_Comm mpicomm)
 }
 
 void
-fclaw_mpi_serialization_enter (struct fclaw2d_global *glob)
+fclaw_mpi_serialization_enter (struct fclaw_global *glob)
 {
     fclaw2d_domain_serialization_enter(glob->domain);
 }
 
 void
-fclaw_mpi_serialization_leave (struct fclaw2d_global *glob)
+fclaw_mpi_serialization_leave (struct fclaw_global *glob)
 {
     fclaw2d_domain_serialization_leave(glob->domain);
 }

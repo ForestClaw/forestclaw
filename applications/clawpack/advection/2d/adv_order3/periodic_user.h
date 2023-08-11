@@ -56,13 +56,13 @@ typedef struct user_options
 
 user_options_t* periodic_options_register (fclaw_app_t * app, const char *configfile);
 
-void periodic_options_store (fclaw2d_global_t* glob, user_options_t* user);
+void periodic_options_store (fclaw_global_t* glob, user_options_t* user);
 
-const user_options_t* periodic_get_options(fclaw2d_global_t* glob);
+const user_options_t* periodic_get_options(fclaw_global_t* glob);
 
 /* ------------------- Public functions defined in periodic_user -----------------------*/
 
-void periodic_link_solvers(fclaw2d_global_t *glob);
+void periodic_link_solvers(fclaw_global_t *glob);
 
 /* ------------------------------------ Fortran ----------------------------------------*/
 #define PERIODIC_SETPROB FCLAW_F77_FUNC(periodic_setprob, PERIODIC_SETPROB)

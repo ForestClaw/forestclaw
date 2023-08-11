@@ -43,12 +43,12 @@ extern "C"
 #endif
 #endif
 
-struct fclaw3d_global;
+struct fclaw_global;
 struct fclaw_options;
 
-void fclaw3d_options_store (struct fclaw3d_global *glob, struct fclaw_options* fclaw_opt);
+void fclaw3d_options_store (struct fclaw_global *glob, struct fclaw_options* fclaw_opt);
 
-fclaw_options_t* fclaw3d_get_options(struct fclaw3d_global *glob);
+fclaw_options_t* fclaw3d_get_options(struct fclaw_global *glob);
 
 
 #ifndef FCLAW_PATCH_DIM

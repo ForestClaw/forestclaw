@@ -34,7 +34,7 @@ extern "C"
 #endif
 #endif
 
-struct fclaw2d_global;
+struct fclaw_global;
 struct fclaw_domain;
 struct fclaw_patch;
 
@@ -55,17 +55,17 @@ void cb_fclaw2d_physical_set_bc(struct fclaw_domain *domain,
 
 
 /* This is needed by other routines, so we don't set it to static. */
-void fclaw2d_physical_get_bc(struct fclaw2d_global *glob,
+void fclaw2d_physical_get_bc(struct fclaw_global *glob,
                              int this_block_idx,
                              int this_patch_idx,
                              int *intersects_bdry);
 
-void fclaw2d_physical_set_bc(struct fclaw2d_global *glob,
+void fclaw2d_physical_set_bc(struct fclaw_global *glob,
                              int level,
                              double level_time,
                              int time_interp);
 
-void fclaw2d_physical_bc_default(struct fclaw2d_global *glob,
+void fclaw2d_physical_bc_default(struct fclaw_global *glob,
                                  struct fclaw_patch *this_patch,
                                  int this_block_idx,
                                  int this_patch_idx,

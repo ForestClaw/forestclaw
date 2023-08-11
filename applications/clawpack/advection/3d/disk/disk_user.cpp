@@ -26,7 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "disk_user.h"
 
 static
-void disk_problem_setup(fclaw2d_global_t* glob)
+void disk_problem_setup(fclaw_global_t* glob)
 {
     const user_options_t* user = disk_get_options(glob);
     fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
@@ -43,7 +43,7 @@ void disk_problem_setup(fclaw2d_global_t* glob)
 }
 
 static
-void disk_patch_setup(fclaw2d_global_t *glob,
+void disk_patch_setup(fclaw_global_t *glob,
                       fclaw_patch_t *patch,
                       int blockno,
                       int patchno)
@@ -54,7 +54,7 @@ void disk_patch_setup(fclaw2d_global_t *glob,
 }
 
 
-void disk_link_solvers(fclaw2d_global_t *glob)
+void disk_link_solvers(fclaw_global_t *glob)
 {
     fclaw2d_vtable_t *fclaw_vt = fclaw2d_vt(glob);
     fclaw_vt->problem_setup = disk_problem_setup;

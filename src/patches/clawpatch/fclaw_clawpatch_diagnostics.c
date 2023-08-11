@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_clawpatch.h>
 #include <fclaw_clawpatch_options.h>
 
-void fclaw_clawpatch_diagnostics_initialize(fclaw2d_global_t *glob,
+void fclaw_clawpatch_diagnostics_initialize(fclaw_global_t *glob,
                                             void **acc_patch)
 {
 
@@ -56,7 +56,7 @@ void fclaw_clawpatch_diagnostics_initialize(fclaw2d_global_t *glob,
 
 }
 
-void fclaw_clawpatch_diagnostics_reset(fclaw2d_global_t *glob,
+void fclaw_clawpatch_diagnostics_reset(fclaw_global_t *glob,
                                        void* patch_acc)
 {
     fclaw_debugf("Resetting diagnostics\n");
@@ -121,7 +121,7 @@ void cb_compute_diagnostics(fclaw_domain_t *domain,
         clawpatch_vt->conservation_check(s->glob, patch, blockno, patchno, error_data);
 }
 
-void fclaw_clawpatch_diagnostics_compute(fclaw2d_global_t* glob,
+void fclaw_clawpatch_diagnostics_compute(fclaw_global_t* glob,
                                          void* patch_acc)
 {
     fclaw_debugf("Computing diagnostics\n");
@@ -134,7 +134,7 @@ void fclaw_clawpatch_diagnostics_compute(fclaw2d_global_t* glob,
 
 
 /* Accumulate the errors computed above */
-void fclaw_clawpatch_diagnostics_gather(fclaw2d_global_t *glob,
+void fclaw_clawpatch_diagnostics_gather(fclaw_global_t *glob,
                                         void* patch_acc,
                                         int init_flag)
 {
@@ -201,7 +201,7 @@ void fclaw_clawpatch_diagnostics_gather(fclaw2d_global_t *glob,
     }
 }
 
-void fclaw_clawpatch_diagnostics_finalize(fclaw2d_global_t *glob,
+void fclaw_clawpatch_diagnostics_finalize(fclaw_global_t *glob,
                                           void** patch_acc)
 {
     error_info_t *error_data = *((error_info_t**) patch_acc);
@@ -214,7 +214,7 @@ void fclaw_clawpatch_diagnostics_finalize(fclaw2d_global_t *glob,
     *patch_acc = NULL;
 }
 
-void fclaw_clawpatch_diagnostics_vtable_initialize(fclaw2d_global_t* glob)
+void fclaw_clawpatch_diagnostics_vtable_initialize(fclaw_global_t* glob)
 {
     /* diagnostic functions that apply to patches (error, conservation) */
     fclaw2d_diagnostics_vtable_t *diag_vt = fclaw2d_diagnostics_vt(glob);

@@ -204,12 +204,12 @@ allencahn_options_t* allencahn_options_register (fclaw_app_t * app,
     return user;
 }
 
-void allencahn_options_store (fclaw2d_global_t* glob, allencahn_options_t* user)
+void allencahn_options_store (fclaw_global_t* glob, allencahn_options_t* user)
 {
     fclaw2d_global_options_store(glob, "user", user);
 }
 
-const allencahn_options_t* allencahn_get_options(fclaw2d_global_t* glob)
+const allencahn_options_t* allencahn_get_options(fclaw_global_t* glob)
 {
     return (allencahn_options_t*) fclaw2d_global_get_options(glob, "user");
 }

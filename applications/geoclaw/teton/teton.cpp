@@ -63,7 +63,7 @@ fclaw_domain_t* create_domain(sc_MPI_Comm mpicomm, fclaw_options_t* fclaw_opt)
 
 
 static
-void run_program(fclaw2d_global_t* glob)
+void run_program(fclaw_global_t* glob)
 {
 
     /* ---------------------------------------------------------------
@@ -102,7 +102,7 @@ main (int argc, char **argv)
     fclaw_clawpatch_options_t *clawpatch_opt;
     fc2d_geoclaw_options_t      *geoclaw_opt;
 
-    fclaw2d_global_t            *glob;
+    fclaw_global_t            *glob;
     fclaw_domain_t            *domain;
     sc_MPI_Comm mpicomm;
 

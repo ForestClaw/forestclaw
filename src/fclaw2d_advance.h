@@ -35,9 +35,9 @@ extern "C"
 #endif
 #endif
 
-struct fclaw2d_global;
+struct fclaw_global;
 
-double fclaw2d_advance_all_levels (struct fclaw2d_global * glob,double t, double dt);
+double fclaw2d_advance_all_levels (struct fclaw_global * glob,double t, double dt);
 
 
 #ifdef __cplusplus

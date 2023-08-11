@@ -49,7 +49,7 @@ static fc2d_cudaclaw5_vtable_t s_cudaclaw5_vt;
 /* -------------------------- Clawpack solver functions ------------------------------ */
 
 static
-void cudaclaw5_setprob(fclaw2d_global_t *glob)
+void cudaclaw5_setprob(fclaw_global_t *glob)
 {
     fc2d_cudaclaw5_vtable_t*  cuclaw5_vt = fc2d_cudaclaw5_vt();
     if (cuclaw5_vt->fort_setprob != NULL)
@@ -60,7 +60,7 @@ void cudaclaw5_setprob(fclaw2d_global_t *glob)
 
 /* This should only be called when a new fclaw_clawpatch_t is created. */
 static
-void cudaclaw5_setaux(fclaw2d_global_t *glob,
+void cudaclaw5_setaux(fclaw_global_t *glob,
                       fclaw_patch_t *this_patch,
                       int this_block_idx,
                       int this_patch_idx)
@@ -94,7 +94,7 @@ void cudaclaw5_setaux(fclaw2d_global_t *glob,
 }
 
 static
-void cudaclaw5_qinit(fclaw2d_global_t *glob,
+void cudaclaw5_qinit(fclaw_global_t *glob,
                      fclaw_patch_t *this_patch,
                      int this_block_idx,
                      int this_patch_idx)
@@ -120,7 +120,7 @@ void cudaclaw5_qinit(fclaw2d_global_t *glob,
 }
 
 static
-void cudaclaw5_b4step2(fclaw2d_global_t *glob,
+void cudaclaw5_b4step2(fclaw_global_t *glob,
                        fclaw_patch_t *this_patch,
                        int this_block_idx,
                        int this_patch_idx,
@@ -151,7 +151,7 @@ void cudaclaw5_b4step2(fclaw2d_global_t *glob,
 }
 
 static
-void cudaclaw5_src2(fclaw2d_global_t *glob,
+void cudaclaw5_src2(fclaw_global_t *glob,
                     fclaw_patch_t *this_patch,
                     int this_block_idx,
                     int this_patch_idx,
@@ -182,7 +182,7 @@ void cudaclaw5_src2(fclaw2d_global_t *glob,
 }
 
 static
-void cudaclaw5_bc2(fclaw2d_global_t *glob,
+void cudaclaw5_bc2(fclaw_global_t *glob,
                    fclaw_patch_t *this_patch,
                    int this_block_idx,
                    int this_patch_idx,
@@ -238,7 +238,7 @@ void cudaclaw5_bc2(fclaw2d_global_t *glob,
 }
 
 static
-double cudaclaw5_update(fclaw2d_global_t *glob,
+double cudaclaw5_update(fclaw_global_t *glob,
                         fclaw_patch_t *this_patch,
                         int this_block_idx,
                         int this_patch_idx,
@@ -281,7 +281,7 @@ double cudaclaw5_update(fclaw2d_global_t *glob,
 /* ---------------------------------- Output functions -------------------------------- */
 
 static
-void cudaclaw5_output(fclaw2d_global_t *glob, int iframe)
+void cudaclaw5_output(fclaw_global_t *glob, int iframe)
 {
     const fc2d_cudaclaw5_options_t* cudaclaw_options;
     cudaclaw_options = fc2d_cudaclaw5_get_options(glob);
@@ -367,12 +367,12 @@ fc2d_cudaclaw5_vtable_t* fc2d_cudaclaw5_vt()
 }
 
 
-void fc2d_cudaclaw5_setprob(fclaw2d_global_t *glob)
+void fc2d_cudaclaw5_setprob(fclaw_global_t *glob)
 {
     cudaclaw5_setprob(glob);
 }
 
-void fc2d_cudaclaw5_setaux(fclaw2d_global_t *glob,
+void fc2d_cudaclaw5_setaux(fclaw_global_t *glob,
                             fclaw_patch_t *this_patch,
                             int this_block_idx,
                             int this_patch_idx)
@@ -382,7 +382,7 @@ void fc2d_cudaclaw5_setaux(fclaw2d_global_t *glob,
 
 
 /* This should only be called when a new fclaw_clawpatch_t is created. */
-void fc2d_cudaclaw5_set_capacity(fclaw2d_global_t *glob,
+void fc2d_cudaclaw5_set_capacity(fclaw_global_t *glob,
                                   fclaw_patch_t *this_patch,
                                   int this_block_idx,
                                   int this_patch_idx)
@@ -407,7 +407,7 @@ void fc2d_cudaclaw5_set_capacity(fclaw2d_global_t *glob,
                             &maux,aux);
 }
 
-void fc2d_cudaclaw5_qinit(fclaw2d_global_t *glob,
+void fc2d_cudaclaw5_qinit(fclaw_global_t *glob,
                            fclaw_patch_t *this_patch,
                            int this_block_idx,
                            int this_patch_idx)
@@ -415,7 +415,7 @@ void fc2d_cudaclaw5_qinit(fclaw2d_global_t *glob,
     cudaclaw5_qinit(glob,this_patch,this_block_idx,this_patch_idx);
 }
 
-void fc2d_cudaclaw5_b4step2(fclaw2d_global_t* glob,
+void fc2d_cudaclaw5_b4step2(fclaw_global_t* glob,
                              fclaw_patch_t *this_patch,
                              int this_block_idx,
                              int this_patch_idx,
@@ -425,7 +425,7 @@ void fc2d_cudaclaw5_b4step2(fclaw2d_global_t* glob,
     cudaclaw5_b4step2(glob,this_patch,this_block_idx,this_patch_idx,t,dt);
 }
 
-void fc2d_cudaclaw5_bc2(fclaw2d_global_t *glob,
+void fc2d_cudaclaw5_bc2(fclaw_global_t *glob,
                          fclaw_patch_t *this_patch,
                          int this_block_idx,
                          int this_patch_idx,
@@ -438,7 +438,7 @@ void fc2d_cudaclaw5_bc2(fclaw2d_global_t *glob,
                    intersects_bc,time_interp);
 }
 
-void fc2d_cudaclaw5_src2(fclaw2d_global_t* glob,
+void fc2d_cudaclaw5_src2(fclaw_global_t* glob,
                           fclaw_patch_t *this_patch,
                           int this_block_idx,
                           int this_patch_idx,

@@ -219,7 +219,7 @@ fc2d_cudaclaw_options_t*  fc2d_cudaclaw_options_register (fclaw_app_t * app,
     return clawopt;
 }
 
-fc2d_cudaclaw_options_t* fc2d_cudaclaw_get_options(fclaw2d_global_t *glob)
+fc2d_cudaclaw_options_t* fc2d_cudaclaw_get_options(fclaw_global_t *glob)
 {
 	fc2d_cudaclaw_options_t* clawopt = (fc2d_cudaclaw_options_t*) 
 	   							fclaw_pointer_map_get(glob->options, "fc2d_cudaclaw");
@@ -227,7 +227,7 @@ fc2d_cudaclaw_options_t* fc2d_cudaclaw_get_options(fclaw2d_global_t *glob)
 	return clawopt;
 }
 
-void fc2d_cudaclaw_options_store (fclaw2d_global_t* glob, fc2d_cudaclaw_options_t* clawopt)
+void fc2d_cudaclaw_options_store (fclaw_global_t* glob, fc2d_cudaclaw_options_t* clawopt)
 {
 	FCLAW_ASSERT(fclaw_pointer_map_get(glob->options,"fc2d_cudaclaw") == NULL);
 	fclaw_pointer_map_insert(glob->options, "fc2d_cudaclaw", clawopt, NULL);

@@ -48,7 +48,7 @@ void diagnostics_vt_destroy(void* vt)
     Public interface
     ------------------------------------------------ */
 
-fclaw2d_diagnostics_vtable_t* fclaw2d_diagnostics_vt(fclaw2d_global_t* glob)
+fclaw2d_diagnostics_vtable_t* fclaw2d_diagnostics_vt(fclaw_global_t* glob)
 {
 	fclaw2d_diagnostics_vtable_t* diagnostics_vt = (fclaw2d_diagnostics_vtable_t*) 
 	   							fclaw_pointer_map_get(glob->vtables, "fclaw2d_diagnostics");
@@ -75,7 +75,7 @@ double fclaw2d_domain_global_minimum (fclaw_domain_t* domain, double d)
    Note that the check for whether the user has specified diagnostics
    to run is done here, not in fclaw2d_run.cpp
    ---------------------------------------------------------------- */
-void fclaw2d_diagnostics_vtable_initialize(fclaw2d_global_t* glob)
+void fclaw2d_diagnostics_vtable_initialize(fclaw_global_t* glob)
 {
 
     fclaw2d_diagnostics_vtable_t *diag_vt = diagnostics_vt_new();
@@ -93,7 +93,7 @@ static void acc_destroy(void* acc)
     FCLAW_FREE(acc);
 }
 
-void fclaw2d_diagnostics_initialize(fclaw2d_global_t *glob)
+void fclaw2d_diagnostics_initialize(fclaw_global_t *glob)
 {
     fclaw2d_diagnostics_vtable_t *diag_vt = fclaw2d_diagnostics_vt(glob);
 
@@ -124,7 +124,7 @@ void fclaw2d_diagnostics_initialize(fclaw2d_global_t *glob)
 
 
 /* Collect statistics in the accumulator */
-void fclaw2d_diagnostics_gather(fclaw2d_global_t *glob,
+void fclaw2d_diagnostics_gather(fclaw_global_t *glob,
                                 int init_flag)
 {
     fclaw2d_diagnostics_accumulator_t *acc = fclaw2d_global_get_attribute(glob, "acc");
@@ -185,7 +185,7 @@ void fclaw2d_diagnostics_gather(fclaw2d_global_t *glob,
     fclaw2d_diagnostics_reset(glob);
 }
 
-void fclaw2d_diagnostics_reset(fclaw2d_global_t *glob)
+void fclaw2d_diagnostics_reset(fclaw_global_t *glob)
 {
     fclaw2d_diagnostics_accumulator_t *acc = fclaw2d_global_get_attribute(glob, "acc");
     const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
@@ -211,7 +211,7 @@ void fclaw2d_diagnostics_reset(fclaw2d_global_t *glob)
     fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_DIAGNOSTICS]);
 }
 
-void fclaw2d_diagnostics_finalize(fclaw2d_global_t *glob)
+void fclaw2d_diagnostics_finalize(fclaw_global_t *glob)
 {
     fclaw2d_diagnostics_accumulator_t *acc = fclaw2d_global_get_attribute(glob, "acc");
     const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);

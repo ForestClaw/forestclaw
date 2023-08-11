@@ -199,12 +199,12 @@ fc2d_clawpack46_options_t*  fc2d_clawpack46_options_register (fclaw_app_t * app,
     return clawopt;
 }
 
-fc2d_clawpack46_options_t* fc2d_clawpack46_get_options(fclaw2d_global_t *glob)
+fc2d_clawpack46_options_t* fc2d_clawpack46_get_options(fclaw_global_t *glob)
 {
     return (fc2d_clawpack46_options_t*) fclaw2d_global_get_options(glob, "fc2d_clawpack46");
 }
 
-void fc2d_clawpack46_options_store (fclaw2d_global_t* glob, fc2d_clawpack46_options_t* clawopt)
+void fc2d_clawpack46_options_store (fclaw_global_t* glob, fc2d_clawpack46_options_t* clawopt)
 {
     fclaw2d_global_options_store(glob, "fc2d_clawpack46", clawopt);
 }

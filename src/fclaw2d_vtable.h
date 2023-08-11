@@ -39,7 +39,7 @@ extern "C"
  *  @brief ForestClaw vtable
  */
 
-struct fclaw2d_global;
+struct fclaw_global;
 struct fclaw_patch;
 
 /* ---------------------------------- Typedefs ---------------------------------------- */  
@@ -48,7 +48,7 @@ struct fclaw_patch;
  * 
  * @param glob the global context
  */
-typedef void (*fclaw2d_problem_setup_t)(struct fclaw2d_global *glob);
+typedef void (*fclaw2d_problem_setup_t)(struct fclaw_global *glob);
 
 /**
  * @brief Sets up common blocks in Fortran
@@ -56,14 +56,14 @@ typedef void (*fclaw2d_problem_setup_t)(struct fclaw2d_global *glob);
  * @param glob the global context
  * @param iframe frame number
  */
-typedef void (*fclaw2d_output_frame_t)(struct fclaw2d_global * glob, int iframe);
+typedef void (*fclaw2d_output_frame_t)(struct fclaw_global * glob, int iframe);
 
 /**
  * @brief Called after each regridding
  *  
  * @param glob the global context
  */
-typedef void (*fclaw2d_after_regrid_t)(struct fclaw2d_global *glob);
+typedef void (*fclaw2d_after_regrid_t)(struct fclaw_global *glob);
 
 /* ------------------------------------ vtable ---------------------------------------- */  
 /**
@@ -91,21 +91,21 @@ typedef struct fclaw2d_vtable
  * 
  * @param glob the global context
  */
-fclaw2d_vtable_t* fclaw2d_vt(struct fclaw2d_global* glob);
+fclaw2d_vtable_t* fclaw2d_vt(struct fclaw_global* glob);
 
 /**
  * @brief Initialize fclaw2d vtable
  * 
  * @param glob the global context
  */
-void fclaw2d_vtable_initialize(struct fclaw2d_global* glob);
+void fclaw2d_vtable_initialize(struct fclaw_global* glob);
 
 /**
  * @brief Called after each regridding
  * 
  * @param glob the global context
  */
-void fclaw2d_after_regrid(struct fclaw2d_global *glob);
+void fclaw2d_after_regrid(struct fclaw_global *glob);
 
 #ifdef __cplusplus
 #if 0

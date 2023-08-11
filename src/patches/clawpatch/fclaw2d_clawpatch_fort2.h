@@ -35,7 +35,7 @@ extern "C"
 /* Fix syntax highlighting ... */
 #endif
 
-struct fclaw2d_global;
+struct fclaw_global;
 struct fclaw2d_patch;
 
 struct fclaw2d_patch_transform_data;  /* Should be replaced by long int?  */

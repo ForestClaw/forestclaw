@@ -36,7 +36,7 @@ extern "C"
 #endif
 #endif
 
-struct fclaw2d_global;
+struct fclaw_global;
 struct fclaw2d_patch;
 struct cudaclaw_fluxes;
 
@@ -45,14 +45,14 @@ typedef  struct fc2d_cudaclaw_vtable  fc2d_cudaclaw_vtable_t;
 /* --------------------------- Clawpack solver functions ------------------------------ */
 
 /* Virtualize clawpack-specific wrapper functions */
-typedef void (*cudaclaw_src2_t)(struct fclaw2d_global* glob,
+typedef void (*cudaclaw_src2_t)(struct fclaw_global* glob,
                                 struct fclaw2d_patch *this_patch,
                                 int this_block_idx,
                                 int this_patch_idx,
                                 double t,
                                 double dt);
     
-typedef void (*cudaclaw_b4step2_t)(struct fclaw2d_global* glob,
+typedef void (*cudaclaw_b4step2_t)(struct fclaw_global* glob,
                                    struct fclaw2d_patch *this_patch,
                                    int this_block_idx,
                                    int this_patch_idx,
@@ -174,7 +174,7 @@ struct fc2d_cudaclaw_vtable
  * 
  * @param global the global context
  */
-void fc2d_cudaclaw_solver_initialize(struct fclaw2d_global* glob);
+void fc2d_cudaclaw_solver_initialize(struct fclaw_global* glob);
 
 /**
  * @brief Get the cudaclaw vtable
@@ -182,37 +182,37 @@ void fc2d_cudaclaw_solver_initialize(struct fclaw2d_global* glob);
  * @param global the global context
  * @return fc2d_cudaclaw_vtable_t* the vtable
  */
-fc2d_cudaclaw_vtable_t* fc2d_cudaclaw_vt(struct fclaw2d_global* glob);
+fc2d_cudaclaw_vtable_t* fc2d_cudaclaw_vt(struct fclaw_global* glob);
 
 
 /* ----------------------------- User access to solver functions ---------------------- */
 
-void fc2d_cudaclaw_setprob(struct fclaw2d_global* glob);
+void fc2d_cudaclaw_setprob(struct fclaw_global* glob);
 
 
-void fc2d_cudaclaw_setaux(struct fclaw2d_global* glob,
+void fc2d_cudaclaw_setaux(struct fclaw_global* glob,
                             struct fclaw2d_patch *this_patch,
                             int this_block_idx,
                             int this_patch_idx);
 
-void fc2d_cudaclaw_set_capacity(struct fclaw2d_global* glob,
+void fc2d_cudaclaw_set_capacity(struct fclaw_global* glob,
                                   struct fclaw2d_patch *this_patch,
                                   int this_block_idx,
                                   int this_patch_idx);
 
-void fc2d_cudaclaw_qinit(struct fclaw2d_global* glob,
+void fc2d_cudaclaw_qinit(struct fclaw_global* glob,
                            struct fclaw2d_patch *this_patch,
                            int this_block_idx,
                            int this_patch_idx);
 
-void fc2d_cudaclaw_b4step2(struct fclaw2d_global* glob,
+void fc2d_cudaclaw_b4step2(struct fclaw_global* glob,
                              struct fclaw2d_patch *this_patch,
                              int this_block_idx,
                              int this_patch_idx,
                              double t,
                              double dt);
 
-void fc2d_cudaclaw_bc2(struct fclaw2d_global *glob,
+void fc2d_cudaclaw_bc2(struct fclaw_global *glob,
                          struct fclaw2d_patch *this_patch,
                          int this_block_idx,
                          int this_patch_idx,
@@ -221,7 +221,7 @@ void fc2d_cudaclaw_bc2(struct fclaw2d_global *glob,
                          int intersects_bc[],
                          int time_interp);
 
-void fc2d_cudaclaw_src2(struct fclaw2d_global* glob,
+void fc2d_cudaclaw_src2(struct fclaw_global* glob,
                           struct fclaw2d_patch *this_patch,
                           int this_block_idx,
                           int this_patch_idx,

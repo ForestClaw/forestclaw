@@ -36,7 +36,7 @@ extern "C"
 #endif
 #endif
 
-struct fclaw2d_global;
+struct fclaw_global;
 struct fclaw_domain;
 struct fclaw_patch;
 
@@ -95,14 +95,14 @@ void cb_face_fill(struct fclaw_domain *domain,
 				  int this_patch_idx,
 				  void *user);
 
-void fclaw2d_ghost_update(struct fclaw2d_global* glob,
+void fclaw2d_ghost_update(struct fclaw_global* glob,
 						  int fine_level,
 						  int coarse_level,
 						  double sync_time,
 						  int time_interp,
 						  fclaw2d_timer_names_t running);
 
-void fclaw2d_ghost_update_async(struct fclaw2d_global* glob,
+void fclaw2d_ghost_update_async(struct fclaw_global* glob,
 								int fine_level,
 								int coarse_level,
 								double sync_time,
@@ -124,7 +124,7 @@ void fclaw2d_ghost_update_async(struct fclaw2d_global* glob,
  *   the logic here is considerably simpler than for the partial
  *   update used in intermediate steps in the subcycled case.
  **/
-void fclaw2d_ghost_update_nonasync(struct fclaw2d_global* glob,
+void fclaw2d_ghost_update_nonasync(struct fclaw_global* glob,
 								   int fine_level,
 								   int coarse_level,
 								   double sync_time,
@@ -146,7 +146,7 @@ void fclaw2d_ghost_update_nonasync(struct fclaw2d_global* glob,
  *   the logic here is considerably simpler than for the partial
  *   update used in intermediate steps in the subcycled case.
  **/
-void fclaw2d_face_neighbor_ghost(struct fclaw2d_global* glob,
+void fclaw2d_face_neighbor_ghost(struct fclaw_global* glob,
 								 int minlevel,
 								 int maxlevel,
 								 int time_interp);

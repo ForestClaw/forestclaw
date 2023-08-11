@@ -91,9 +91,9 @@ typedef struct allencahn_options
 allencahn_options_t* allencahn_options_register (fclaw_app_t * app,
                                            const char *configfile);
 
-void allencahn_options_store(fclaw2d_global_t* glob, allencahn_options_t* user);
+void allencahn_options_store(fclaw_global_t* glob, allencahn_options_t* user);
 
-const allencahn_options_t* allencahn_get_options(fclaw2d_global_t* glob);
+const allencahn_options_t* allencahn_get_options(fclaw_global_t* glob);
 
 
 #ifdef __cplusplus

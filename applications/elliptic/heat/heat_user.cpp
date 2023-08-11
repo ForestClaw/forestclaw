@@ -48,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 static
-void heat_problem_setup(fclaw2d_global_t *glob)
+void heat_problem_setup(fclaw_global_t *glob)
 {
     if (glob->mpirank == 0)
     {
@@ -93,7 +93,7 @@ void heat_problem_setup(fclaw2d_global_t *glob)
 }
 
 static
-void heat_initialize(fclaw2d_global_t *glob,
+void heat_initialize(fclaw_global_t *glob,
                      fclaw_patch_t *patch,
                      int blockno,
                      int patchno)
@@ -116,7 +116,7 @@ void heat_initialize(fclaw2d_global_t *glob,
 
 
 static
-void heat_rhs(fclaw2d_global_t *glob,
+void heat_rhs(fclaw_global_t *glob,
                 fclaw_patch_t *patch,
                 int blockno,
                 int patchno)
@@ -152,7 +152,7 @@ void heat_rhs(fclaw2d_global_t *glob,
 
 
 static
-void heat_compute_error(fclaw2d_global_t *glob,
+void heat_compute_error(fclaw_global_t *glob,
                           fclaw_patch_t *patch,
                           int blockno,
                           int patchno,
@@ -204,7 +204,7 @@ void heat_compute_error(fclaw2d_global_t *glob,
 
 
 static
-void heat_time_header_ascii(fclaw2d_global_t* glob, int iframe)
+void heat_time_header_ascii(fclaw_global_t* glob, int iframe)
 {
     const fclaw_clawpatch_options_t *clawpatch_opt = 
                 fclaw_clawpatch_get_options(glob);
@@ -250,7 +250,7 @@ void cb_heat_output_ascii(fclaw_domain_t * domain,
                             void *user)
 {
     fclaw2d_global_iterate_t* s = (fclaw2d_global_iterate_t*) user;
-    fclaw2d_global_t *glob = (fclaw2d_global_t*) s->glob;
+    fclaw_global_t *glob = (fclaw_global_t*) s->glob;
     int iframe = *((int *) s->user);
 
     /* Get info not readily available to user */
@@ -289,7 +289,7 @@ void cb_heat_output_ascii(fclaw_domain_t * domain,
 }
 
 
-int heat_tag4refinement(fclaw2d_global_t *glob,
+int heat_tag4refinement(fclaw_global_t *glob,
                         fclaw_patch_t *this_patch,
                         int blockno, int patchno,
                         int initflag)
@@ -321,7 +321,7 @@ int heat_tag4refinement(fclaw2d_global_t *glob,
 }
 
 static
-int heat_tag4coarsening(fclaw2d_global_t *glob,
+int heat_tag4coarsening(fclaw_global_t *glob,
                         fclaw_patch_t *fine_patches,
                         int blockno,
                         int patchno,
@@ -354,7 +354,7 @@ int heat_tag4coarsening(fclaw2d_global_t *glob,
 }
 
 static
-void heat_bc2(fclaw2d_global_t *glob,
+void heat_bc2(fclaw_global_t *glob,
               fclaw_patch_t *patch,
               int block_idx,
               int patch_idx,
@@ -379,7 +379,7 @@ void heat_bc2(fclaw2d_global_t *glob,
 }
 
 
-void heat_link_solvers(fclaw2d_global_t *glob)
+void heat_link_solvers(fclaw_global_t *glob)
 {
 #if 0 
     /* These are listed here for reference */

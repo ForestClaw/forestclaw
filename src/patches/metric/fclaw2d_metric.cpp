@@ -64,7 +64,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_patch.h>  
 
 static
-fclaw2d_metric_patch_t* get_metric_patch(fclaw2d_global_t* glob,
+fclaw2d_metric_patch_t* get_metric_patch(fclaw_global_t* glob,
                                          fclaw_patch_t *patch)
 {
     return (fclaw2d_metric_patch_t*) fclaw2d_patch_metric_patch(glob, patch);
@@ -88,7 +88,7 @@ void fclaw2d_metric_patch_delete(fclaw2d_metric_patch_t **mp)
 
 
 #if PATCH_DIM == 2
-void fclaw2d_metric_patch_define(fclaw2d_global_t* glob,
+void fclaw2d_metric_patch_define(fclaw_global_t* glob,
                                  fclaw_patch_t* patch, 
                                  int mx, int my, int mbc, 
                                  double dx, double dy,
@@ -97,7 +97,7 @@ void fclaw2d_metric_patch_define(fclaw2d_global_t* glob,
                                  int blockno, int patchno, 
                                  fclaw2d_build_mode_t build_mode)
 #elif PATCH_DIM == 3
-void fclaw3d_metric_patch_define(fclaw2d_global_t* glob,
+void fclaw3d_metric_patch_define(fclaw_global_t* glob,
                                  fclaw_patch_t* patch, 
                                  int mx, int my, int mz, int mbc, 
                                  double dx, double dy,double dz,
@@ -268,7 +268,7 @@ void fclaw3d_metric_patch_define(fclaw2d_global_t* glob,
 
 /* For 3d extruded mesh, this averages cell volumes */
 static
-void metric_average_area_from_fine(fclaw2d_global_t *glob,
+void metric_average_area_from_fine(fclaw_global_t *glob,
                                    fclaw_patch_t *fine_patches,
                                    fclaw_patch_t *coarse_patch,
                                    int blockno, 
@@ -340,7 +340,7 @@ void metric_average_area_from_fine(fclaw2d_global_t *glob,
 
 /* --------------------------------- Public interface  -------------------------------- */
 
-void fclaw2d_metric_patch_compute_area (fclaw2d_global_t *glob,
+void fclaw2d_metric_patch_compute_area (fclaw_global_t *glob,
                                        fclaw_patch_t* patch,
                                        int blockno, int patchno)
 {
@@ -355,7 +355,7 @@ void fclaw2d_metric_patch_compute_area (fclaw2d_global_t *glob,
 }
 
 
-void fclaw2d_metric_patch_build(fclaw2d_global_t* glob,
+void fclaw2d_metric_patch_build(fclaw_global_t* glob,
                                 fclaw_patch_t* patch,
                                 int blockno,
                                 int patchno)
@@ -390,7 +390,7 @@ void fclaw2d_metric_patch_build(fclaw2d_global_t* glob,
 
 
 
-void fclaw2d_metric_patch_build_from_fine(fclaw2d_global_t *glob,
+void fclaw2d_metric_patch_build_from_fine(fclaw_global_t *glob,
                                           fclaw_patch_t *fine_patches,
                                           fclaw_patch_t *coarse_patch,
                                           int blockno,
@@ -438,7 +438,7 @@ void metric_vt_destroy(void* vt)
     FCLAW_FREE (vt);
 }
 
-fclaw2d_metric_vtable_t* fclaw2d_metric_vt(fclaw2d_global_t* glob)
+fclaw2d_metric_vtable_t* fclaw2d_metric_vt(fclaw_global_t* glob)
 {
 	fclaw2d_metric_vtable_t* metric_vt = (fclaw2d_metric_vtable_t*) 
 	   							fclaw_pointer_map_get(glob->vtables, METRIC_VTABLE_NAME);
@@ -448,7 +448,7 @@ fclaw2d_metric_vtable_t* fclaw2d_metric_vt(fclaw2d_global_t* glob)
 }
 
 
-void fclaw2d_metric_vtable_initialize(fclaw2d_global_t* glob)  
+void fclaw2d_metric_vtable_initialize(fclaw_global_t* glob)  
 {
     fclaw2d_metric_vtable_t *metric_vt = metric_vt_new();
 
@@ -488,14 +488,14 @@ void fclaw2d_metric_vtable_initialize(fclaw2d_global_t* glob)
 /* These functions are not virtualized and are not defined by the 
    patch interface */
 
-fclaw2d_metric_patch_t* fclaw2d_metric_get_metric_patch(fclaw2d_global_t* glob,
+fclaw2d_metric_patch_t* fclaw2d_metric_get_metric_patch(fclaw_global_t* glob,
                                                         fclaw_patch_t* patch)
 
 {
     return get_metric_patch(glob, patch);
 }
 
-double* fclaw2d_metric_patch_get_area(fclaw2d_global_t* glob,
+double* fclaw2d_metric_patch_get_area(fclaw_global_t* glob,
                                       fclaw_patch_t* patch)
 {
     fclaw2d_metric_patch_t* mp = get_metric_patch(glob, patch);
@@ -510,12 +510,12 @@ double* fclaw2d_metric_patch_get_area(fclaw2d_global_t* glob,
 /* ----------- See fclaw3d_metric.cpp for 3d versions of functions below -------------- */
 
 #if PATCH_DIM == 2
-void fclaw2d_metric_patch_scalar(fclaw2d_global_t* glob,
+void fclaw2d_metric_patch_scalar(fclaw_global_t* glob,
                                  fclaw_patch_t* patch,
                                  double **area, double** edgelengths,
                                  double **curvature)
 #elif PATCH_DIM == 3
-void fclaw3d_metric_patch_scalar(fclaw2d_global_t* glob,
+void fclaw3d_metric_patch_scalar(fclaw_global_t* glob,
                                  fclaw_patch_t* patch,
                                  double **volume, double** faceareas)
 #endif
@@ -534,13 +534,13 @@ void fclaw3d_metric_patch_scalar(fclaw2d_global_t* glob,
 
 
 #if PATCH_DIM == 2
-void fclaw2d_metric_patch_vector(struct fclaw2d_global* glob,
+void fclaw2d_metric_patch_vector(struct fclaw_global* glob,
                                  struct fclaw_patch* patch,
                                  double **xnormals, double **ynormals,
                                  double **xtangents, double **ytangents,
                                  double **surfnormals)
 #elif PATCH_DIM == 3
-void fclaw3d_metric_patch_basis(fclaw2d_global_t* glob,
+void fclaw3d_metric_patch_basis(fclaw_global_t* glob,
                                 fclaw_patch_t* patch,
                                 double **xrot, double **yrot, double **zrot)
 #endif
@@ -560,13 +560,13 @@ void fclaw3d_metric_patch_basis(fclaw2d_global_t* glob,
 }
 
 #if PATCH_DIM == 2
-void fclaw2d_metric_patch_grid_data(fclaw2d_global_t* glob,
+void fclaw2d_metric_patch_grid_data(fclaw_global_t* glob,
                                     fclaw_patch_t* patch,
                                     int* mx, int* my, int* mbc,
                                     double* xlower, double* ylower,
                                     double* dx, double* dy)
 #elif PATCH_DIM == 3
-void fclaw3d_metric_patch_grid_data(fclaw2d_global_t* glob,
+void fclaw3d_metric_patch_grid_data(fclaw_global_t* glob,
                                     fclaw_patch_t* patch,
                                     int* mx, int* my, int* mz, 
                                     int* mbc,
@@ -591,13 +591,13 @@ void fclaw3d_metric_patch_grid_data(fclaw2d_global_t* glob,
 
 
 #if PATCH_DIM == 2
-void fclaw2d_metric_patch_mesh_data(fclaw2d_global_t* glob,
+void fclaw2d_metric_patch_mesh_data(fclaw_global_t* glob,
                                     fclaw_patch_t* patch,
                                     double **xp, double **yp, double **zp,
                                     double **xd, double **yd, double **zd,
                                     double **area)
 #elif PATCH_DIM == 3
-void fclaw3d_metric_patch_mesh_data(fclaw2d_global_t* glob,
+void fclaw3d_metric_patch_mesh_data(fclaw_global_t* glob,
                                     fclaw_patch_t* patch,
                                     double **xp, double **yp, double **zp,
                                     double **xd, double **yd, double **zd,
@@ -620,7 +620,7 @@ void fclaw3d_metric_patch_mesh_data(fclaw2d_global_t* glob,
 }
 
 #if PATCH_DIM == 2
-void fclaw2d_metric_patch_mesh_data2(fclaw2d_global_t* glob,
+void fclaw2d_metric_patch_mesh_data2(fclaw_global_t* glob,
                                      fclaw_patch_t* patch,
                                      double **xnormals, double **ynormals,
                                      double **xtangents, double **ytangents,
@@ -638,7 +638,7 @@ void fclaw2d_metric_patch_mesh_data2(fclaw2d_global_t* glob,
 }
 #endif
 
-int fclaw2d_metric_patch_nodes_size(fclaw2d_global_t* glob,
+int fclaw2d_metric_patch_nodes_size(fclaw_global_t* glob,
                                     fclaw_patch_t* patch)
 {
     fclaw2d_metric_patch_t* mp = get_metric_patch(glob, patch);

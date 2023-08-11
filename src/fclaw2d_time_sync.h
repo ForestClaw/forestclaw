@@ -36,7 +36,7 @@ extern "C"
 #endif
 
 
-struct fclaw2d_global;
+struct fclaw_global;
 
 /** 
  *  @file
@@ -67,7 +67,7 @@ typedef enum fclaw2d_time_sync_type
  * @param minlevel the minimum level
  * @param maxlevel the maximmum level
  */
-void fclaw2d_time_sync(struct fclaw2d_global *glob, int minlevel, int maxlevel);
+void fclaw2d_time_sync(struct fclaw_global *glob, int minlevel, int maxlevel);
 
 
 #ifdef __cplusplus

@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_farraybox.hpp>  /* Needed for FArray boxes */
 
 struct fclaw_patch;
-struct fclaw2d_global;
+struct fclaw_global;
 struct fclaw2d_metric_patch_t;
 struct fclaw3d_metric_patch_t;
 

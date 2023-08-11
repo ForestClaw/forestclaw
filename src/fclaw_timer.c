@@ -123,7 +123,7 @@ void fclaw2d_timer_stop_threadsafe(fclaw2d_timer_t *timer)
 }
 
 void
-fclaw2d_timer_report(fclaw2d_global_t *glob)
+fclaw2d_timer_report(fclaw_global_t *glob)
 {
     sc_statinfo_t stats[FCLAW2D_TIMER_COUNT];
 

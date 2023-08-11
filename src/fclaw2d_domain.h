@@ -46,7 +46,7 @@ extern "C"
        Deleting patch and exchange data in domain_reset might go into a
        toplevel algorithmic function quite naturally outside of domain.
  */
-struct fclaw2d_global;
+struct fclaw_global;
 
 typedef struct fclaw2d_domain_data
 {
@@ -63,10 +63,10 @@ void fclaw2d_domain_data_new(struct fclaw_domain *domain);
 
 void fclaw2d_domain_data_delete(struct fclaw_domain* domain);
 
-void fclaw2d_domain_setup(struct fclaw2d_global* glob,
+void fclaw2d_domain_setup(struct fclaw_global* glob,
                           struct fclaw_domain* new_domain);
 
-void fclaw2d_domain_reset(struct fclaw2d_global* glob);
+void fclaw2d_domain_reset(struct fclaw_global* glob);
 
 fclaw2d_domain_data_t* fclaw2d_domain_get_data(struct fclaw_domain *domain);
 

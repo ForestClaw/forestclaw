@@ -56,7 +56,7 @@ typedef struct user_options
 
 } user_options_t;
 
-struct fclaw2d_global;
+struct fclaw_global;
 struct fclaw2d_patch;
 
 #if 0
@@ -66,13 +66,13 @@ struct fclaw2d_patch;
 #define SPHERE_SETPROB FCLAW_F77_FUNC(sphere_setprob, SPHERE_SETPROB)
 void SPHERE_SETPROB();
 
-void sphere_link_solvers(struct fclaw2d_global *glob);
+void sphere_link_solvers(struct fclaw_global *glob);
 
 /* ---------------------------------- Options ----------------------------------------- */
 
-const user_options_t* sphere_get_options(struct fclaw2d_global* glob);
+const user_options_t* sphere_get_options(struct fclaw_global* glob);
 
-void sphere_options_store (fclaw2d_global_t* glob, user_options_t* user);
+void sphere_options_store (fclaw_global_t* glob, user_options_t* user);
 
 user_options_t* sphere_options_register (fclaw_app_t * app, const char *configfile);
 
@@ -83,9 +83,9 @@ fclaw2d_map_context_t * fclaw2d_map_new_cubedsphere(const double scale[],
 fclaw2d_map_context_t * fclaw2d_map_new_pillowsphere(const double scale[]);
 
 /* --------------------------------- Riemann Problems --------------------------------- */
-void sphere_options_store (fclaw2d_global_t* glob, user_options_t* user);
+void sphere_options_store (fclaw_global_t* glob, user_options_t* user);
 
-const user_options_t* sphere_get_options(fclaw2d_global_t* glob);
+const user_options_t* sphere_get_options(fclaw_global_t* glob);
 
 /* ---------------------------- Fortran headers --------------------------------------- */
 

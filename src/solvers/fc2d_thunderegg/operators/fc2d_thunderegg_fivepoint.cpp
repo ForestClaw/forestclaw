@@ -262,7 +262,7 @@ void fivePoint::modifyRHSForInternalBoundaryConditions(const PatchInfo<2>& pinfo
 }
  
 
-void fc2d_thunderegg_fivepoint_solve(fclaw2d_global_t *glob) 
+void fc2d_thunderegg_fivepoint_solve(fclaw_global_t *glob) 
 {
     // get needed options
     fclaw_clawpatch_options_t *clawpatch_opt =

@@ -73,9 +73,9 @@ phasefield_options_t* phasefield_options_register (fclaw_app_t * app,
                                                    const char *section,
                                                    const char *configfile);
 
-void phasefield_options_store(fclaw2d_global_t* glob, phasefield_options_t* user);
+void phasefield_options_store(fclaw_global_t* glob, phasefield_options_t* user);
 
-const phasefield_options_t* phasefield_get_options(fclaw2d_global_t* glob);
+const phasefield_options_t* phasefield_get_options(fclaw_global_t* glob);
 
 
 #ifdef __cplusplus

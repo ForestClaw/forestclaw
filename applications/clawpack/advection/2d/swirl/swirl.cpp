@@ -29,7 +29,7 @@
 
 
 static
-void create_domain_map (fclaw2d_global_t *glob, fclaw_options_t* gparms)
+void create_domain_map (fclaw_global_t *glob, fclaw_options_t* gparms)
 {
     /* Mapped, multi-block domain */
     fclaw_domain_t         *domain = NULL;
@@ -44,7 +44,7 @@ void create_domain_map (fclaw2d_global_t *glob, fclaw_options_t* gparms)
 }
 
 static
-void run_program(fclaw2d_global_t* glob)
+void run_program(fclaw_global_t* glob)
 {
     /* ---------------------------------------------------------------
        Set domain data.
@@ -112,7 +112,7 @@ main (int argc, char **argv)
         /* Create global structure which stores the domain, timers, etc */
         int size, rank;
         sc_MPI_Comm mpicomm = fclaw_app_get_mpi_size_rank (app, &size, &rank);
-        fclaw2d_global_t *glob = fclaw2d_global_new_comm (mpicomm, size, rank);
+        fclaw_global_t *glob = fclaw2d_global_new_comm (mpicomm, size, rank);
         create_domain_map (glob, fclaw_opt);
 
         /* Store option packages in glob */

@@ -10,7 +10,7 @@
 
 
 
-void cudaclaw5_allocate_fluxes(struct fclaw2d_global *glob,
+void cudaclaw5_allocate_fluxes(struct fclaw_global *glob,
                                struct fclaw2d_patch *patch)
 {
     const fclaw_clawpatch_options_t *claw_opt = fclaw_clawpatch_get_options(glob);
@@ -48,7 +48,7 @@ void cudaclaw5_allocate_fluxes(struct fclaw2d_global *glob,
     fclaw2d_patch_set_user_data(glob,patch,fluxes);
 }
 
-void cudaclaw5_deallocate_fluxes(fclaw2d_global_t *glob,
+void cudaclaw5_deallocate_fluxes(fclaw_global_t *glob,
                                  fclaw_patch_t *patch)
 {
     cudaclaw5_fluxes_t *fluxes = (cudaclaw5_fluxes_t*) 

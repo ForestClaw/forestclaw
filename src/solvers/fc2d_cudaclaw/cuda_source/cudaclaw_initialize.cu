@@ -34,7 +34,7 @@
 
 #include <fclaw_mpi.h>
 
-void fc2d_cudaclaw_initialize_GPUs(fclaw2d_global_t *glob)
+void fc2d_cudaclaw_initialize_GPUs(fclaw_global_t *glob)
 {
     cudaDeviceProp  prop;
 

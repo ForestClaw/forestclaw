@@ -142,7 +142,7 @@ static void cb_parallel_wrap(fclaw_domain_t* domain,
 
 
 static
-void copy2ghost(fclaw2d_global_t *glob,
+void copy2ghost(fclaw_global_t *glob,
 				int level,
 				int time_interp,
 				int read_parallel_patches,
@@ -169,7 +169,7 @@ void copy2ghost(fclaw2d_global_t *glob,
 
 
 static
-void average2ghost(fclaw2d_global_t *glob,
+void average2ghost(fclaw_global_t *glob,
 				   int coarse_level,
 				   int time_interp,
 				   int read_parallel_patches,
@@ -223,7 +223,7 @@ void average2ghost(fclaw2d_global_t *glob,
 }
 
 static
-void interpolate2ghost(fclaw2d_global_t *glob,
+void interpolate2ghost(fclaw_global_t *glob,
 					   int coarse_level,
 					   int time_interp,
 					   int read_parallal_patches,
@@ -283,7 +283,7 @@ void interpolate2ghost(fclaw2d_global_t *glob,
 
 
 static
-void setphysical(fclaw2d_global_t *glob,
+void setphysical(fclaw_global_t *glob,
 				 int level,
 				 double sync_time,
 				 int time_interp,
@@ -310,7 +310,7 @@ void setphysical(fclaw2d_global_t *glob,
 
 #if 0
 static
-void time_sync(fclaw2d_global_t* glob,
+void time_sync(fclaw_global_t* glob,
 			   int minlevel,
 			   int maxlevel,
 			   int time_interp,
@@ -339,7 +339,7 @@ void time_sync(fclaw2d_global_t* glob,
 
 
 static
-void copy_samelevel(fclaw2d_global_t* glob,
+void copy_samelevel(fclaw_global_t* glob,
 					int minlevel,
 					int maxlevel,
 					int time_interp,
@@ -370,7 +370,7 @@ void copy_samelevel(fclaw2d_global_t* glob,
  * Fill in coarse grid ghost cells by averaging or copying  from neighboring fine grids.
  */
 static
-void average_fine2coarse_ghost(fclaw2d_global_t *glob,
+void average_fine2coarse_ghost(fclaw_global_t *glob,
 							   int mincoarse,
 							   int maxcoarse,
 							   int time_interp,
@@ -401,7 +401,7 @@ void average_fine2coarse_ghost(fclaw2d_global_t *glob,
 }
 
 static
-void interpolate_coarse2fine_ghost(fclaw2d_global_t* glob,
+void interpolate_coarse2fine_ghost(fclaw_global_t* glob,
 								   int mincoarse,
 								   int maxcoarse,
 								   int time_interp,
@@ -431,7 +431,7 @@ void interpolate_coarse2fine_ghost(fclaw2d_global_t* glob,
 
 
 static
-void fill_physical_ghost(fclaw2d_global_t* glob,
+void fill_physical_ghost(fclaw_global_t* glob,
 						 int minlevel,
 						 int maxlevel,
 						 double sync_time,
@@ -463,7 +463,7 @@ void fill_physical_ghost(fclaw2d_global_t* glob,
    Public interface
    ---------------------------------------------------------------------*/
 
-void fclaw2d_ghost_update_nonasync(fclaw2d_global_t* glob,
+void fclaw2d_ghost_update_nonasync(fclaw_global_t* glob,
 								   int minlevel,
 								   int maxlevel,
 								   double sync_time,
@@ -608,7 +608,7 @@ void fclaw2d_ghost_update_nonasync(fclaw2d_global_t* glob,
 }
 
 
-void fclaw2d_ghost_update_async(fclaw2d_global_t* glob,
+void fclaw2d_ghost_update_async(fclaw_global_t* glob,
 								int minlevel,
 								int maxlevel,
 								double sync_time,
@@ -835,7 +835,7 @@ void fclaw2d_ghost_update_async(fclaw2d_global_t* glob,
    Public interface
    ---------------------------------------------------------------------*/
 
-void fclaw2d_ghost_update(fclaw2d_global_t* glob,
+void fclaw2d_ghost_update(fclaw_global_t* glob,
 						  int minlevel,
 						  int maxlevel,
 						  double sync_time,

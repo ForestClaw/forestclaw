@@ -39,7 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 static
-void annulus_problem_setup(fclaw2d_global_t *glob)
+void annulus_problem_setup(fclaw_global_t *glob)
 {
     const user_options_t *user = annulus_get_options(glob);
 
@@ -70,7 +70,7 @@ void annulus_problem_setup(fclaw2d_global_t *glob)
 
 
 static
-void annulus_patch_setup(fclaw2d_global_t *glob,
+void annulus_patch_setup(fclaw_global_t *glob,
                          fclaw_patch_t *patch,
                          int blockno, int patchno)
 {
@@ -114,7 +114,7 @@ void annulus_patch_setup(fclaw2d_global_t *glob,
 
 
 static
-void annulus_b4step2(fclaw2d_global_t *glob,
+void annulus_b4step2(fclaw_global_t *glob,
                     fclaw_patch_t *this_patch,
                     int blockno,
                     int patchno,
@@ -142,7 +142,7 @@ void annulus_b4step2(fclaw2d_global_t *glob,
                            aux,&maux);
 }
 
-void annulus_link_solvers(fclaw2d_global_t *glob)
+void annulus_link_solvers(fclaw_global_t *glob)
 {
     /* ForestClaw virtual functions */
     fclaw2d_vtable_t  *vt = fclaw2d_vt(glob);

@@ -48,11 +48,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /* much of this will eventually move into fclaw_global.c */
 
-fclaw2d_global_t* fclaw2d_global_new (void)
+fclaw_global_t* fclaw2d_global_new (void)
 {
-    fclaw2d_global_t *glob;
+    fclaw_global_t *glob;
 
-    glob = FCLAW_ALLOC (fclaw2d_global_t, 1);
+    glob = FCLAW_ALLOC (fclaw_global_t, 1);
 
     /* these variables need to be set after calling this function */
     glob->mpicomm = sc_MPI_COMM_NULL;
@@ -79,10 +79,10 @@ fclaw2d_global_t* fclaw2d_global_new (void)
     return glob;
 }
 
-fclaw2d_global_t* fclaw2d_global_new_comm (sc_MPI_Comm mpicomm,
+fclaw_global_t* fclaw2d_global_new_comm (sc_MPI_Comm mpicomm,
                                            int mpisize, int mpirank)
 {
-    fclaw2d_global_t *glob = fclaw2d_global_new ();
+    fclaw_global_t *glob = fclaw2d_global_new ();
 
     /*
      * Set the communicator.
@@ -97,7 +97,7 @@ fclaw2d_global_t* fclaw2d_global_new_comm (sc_MPI_Comm mpicomm,
 }
 
 void
-fclaw2d_global_store_domain (fclaw2d_global_t* glob, fclaw_domain_t* domain)
+fclaw2d_global_store_domain (fclaw_global_t* glob, fclaw_domain_t* domain)
 {
     glob->domain = domain;
 
@@ -119,20 +119,20 @@ fclaw2d_global_store_domain (fclaw2d_global_t* glob, fclaw_domain_t* domain)
 }
 
 void
-fclaw2d_global_store_map (fclaw2d_global_t* glob,
+fclaw2d_global_store_map (fclaw_global_t* glob,
                           fclaw2d_map_context_t * map)
 {
     fclaw2d_global_attribute_store(glob, "map", map, NULL);
 }
 
 fclaw2d_map_context_t*
-fclaw2d_global_get_map(fclaw2d_global_t* glob)
+fclaw2d_global_get_map(fclaw_global_t* glob)
 {
     return (fclaw2d_map_context_t*) fclaw2d_global_get_attribute(glob,"map");
 }
 
 void
-fclaw2d_global_destroy (fclaw2d_global_t * glob)
+fclaw2d_global_destroy (fclaw_global_t * glob)
 {
     FCLAW_ASSERT (glob != NULL);
 
@@ -144,7 +144,7 @@ fclaw2d_global_destroy (fclaw2d_global_t * glob)
     FCLAW_FREE (glob);
 }
 
-void fclaw2d_global_iterate_level (fclaw2d_global_t * glob, int level,
+void fclaw2d_global_iterate_level (fclaw_global_t * glob, int level,
                                    fclaw2d_patch_callback_t pcb, void *user)
 {
     fclaw2d_global_iterate_t g;
@@ -153,7 +153,7 @@ void fclaw2d_global_iterate_level (fclaw2d_global_t * glob, int level,
     fclaw2d_domain_iterate_level (glob->domain, level, pcb, &g);
 }
 
-void fclaw2d_global_iterate_patches (fclaw2d_global_t * glob,
+void fclaw2d_global_iterate_patches (fclaw_global_t * glob,
                                      fclaw2d_patch_callback_t pcb, void *user)
 {
     fclaw2d_global_iterate_t g;
@@ -162,7 +162,7 @@ void fclaw2d_global_iterate_patches (fclaw2d_global_t * glob,
     fclaw2d_domain_iterate_patches (glob->domain, pcb, &g);
 }
 
-void fclaw2d_global_iterate_families (fclaw2d_global_t * glob,
+void fclaw2d_global_iterate_families (fclaw_global_t * glob,
                                       fclaw2d_patch_callback_t pcb, void *user)
 {
     fclaw2d_global_iterate_t g;
@@ -171,7 +171,7 @@ void fclaw2d_global_iterate_families (fclaw2d_global_t * glob,
     fclaw2d_domain_iterate_families (glob->domain, pcb, &g);
 }
 
-void fclaw2d_global_iterate_adapted (fclaw2d_global_t * glob, fclaw_domain_t* new_domain,
+void fclaw2d_global_iterate_adapted (fclaw_global_t * glob, fclaw_domain_t* new_domain,
                                      fclaw2d_match_callback_t mcb, void *user)
 {
     fclaw2d_global_iterate_t g;
@@ -180,7 +180,7 @@ void fclaw2d_global_iterate_adapted (fclaw2d_global_t * glob, fclaw_domain_t* ne
     fclaw2d_domain_iterate_adapted (glob->domain, new_domain,mcb,&g);
 }
 
-void fclaw2d_global_iterate_level_mthread (fclaw2d_global_t * glob, int level,
+void fclaw2d_global_iterate_level_mthread (fclaw_global_t * glob, int level,
                                            fclaw2d_patch_callback_t pcb, void *user)
 {
     fclaw2d_global_iterate_t g;
@@ -189,7 +189,7 @@ void fclaw2d_global_iterate_level_mthread (fclaw2d_global_t * glob, int level,
     fclaw2d_domain_iterate_level_mthread (glob->domain, level,pcb,&g);
 }
 
-void fclaw2d_global_iterate_partitioned (fclaw2d_global_t * glob,
+void fclaw2d_global_iterate_partitioned (fclaw_global_t * glob,
                                          fclaw_domain_t * new_domain,
                                          fclaw2d_transfer_callback_t tcb,
                                          void *user)
@@ -200,14 +200,14 @@ void fclaw2d_global_iterate_partitioned (fclaw2d_global_t * glob,
     fclaw2d_domain_iterate_partitioned (glob->domain,new_domain,tcb,&g);
 }
 
-void fclaw2d_global_options_store (fclaw2d_global_t* glob, const char* key, void* options)
+void fclaw2d_global_options_store (fclaw_global_t* glob, const char* key, void* options)
 {
     
     FCLAW_ASSERT(fclaw_pointer_map_get(glob->options,key) == NULL);
     fclaw_pointer_map_insert(glob->options, key, options, NULL);
 }
 
-void* fclaw2d_global_get_options (fclaw2d_global_t* glob, const char* key)
+void* fclaw2d_global_get_options (fclaw_global_t* glob, const char* key)
 {
     
     void* options = fclaw_pointer_map_get(glob->options, key);
@@ -215,7 +215,7 @@ void* fclaw2d_global_get_options (fclaw2d_global_t* glob, const char* key)
     return options;   
 }
 
-void fclaw2d_global_attribute_store (fclaw2d_global_t* glob, 
+void fclaw2d_global_attribute_store (fclaw_global_t* glob, 
                                      const char* key, 
                                      void* options,
                                      fclaw_pointer_map_value_destroy_t destroy)
@@ -224,15 +224,15 @@ void fclaw2d_global_attribute_store (fclaw2d_global_t* glob,
     fclaw_pointer_map_insert(glob->attributes, key, options, destroy);
 }
 
-void* fclaw2d_global_get_attribute (fclaw2d_global_t* glob, const char* key)
+void* fclaw2d_global_get_attribute (fclaw_global_t* glob, const char* key)
 {
     
     return fclaw_pointer_map_get(glob->attributes, key);
 }
 
-static fclaw2d_global_t* fclaw2d_global_glob = NULL;
+static fclaw_global_t* fclaw2d_global_glob = NULL;
 
-void fclaw2d_global_set_global (fclaw2d_global_t* glob)
+void fclaw2d_global_set_global (fclaw_global_t* glob)
 {
     FCLAW_ASSERT (fclaw2d_global_glob == NULL);
     fclaw2d_global_glob = glob;
@@ -244,7 +244,7 @@ void fclaw2d_global_unset_global (void)
     fclaw2d_global_glob = NULL;
 }
 
-fclaw2d_global_t* fclaw2d_global_get_global (void)
+fclaw_global_t* fclaw2d_global_get_global (void)
 {
     FCLAW_ASSERT(fclaw2d_global_glob != NULL);
     return fclaw2d_global_glob;
@@ -255,7 +255,7 @@ fclaw2d_global_t* fclaw2d_global_get_global (void)
 
 static char* old_path = NULL;
 
-void fclaw2d_set_global_context(fclaw2d_global_t *glob)
+void fclaw2d_set_global_context(fclaw_global_t *glob)
 {
     fclaw_options_t* opts = fclaw2d_get_options(glob);
     fclaw_set_logging_prefix(opts->logging_prefix);
@@ -268,7 +268,7 @@ void fclaw2d_set_global_context(fclaw2d_global_t *glob)
     }
 }
 
-void fclaw2d_clear_global_context(fclaw2d_global_t *glob)
+void fclaw2d_clear_global_context(fclaw_global_t *glob)
 {
     fclaw_set_logging_prefix(NULL);
 

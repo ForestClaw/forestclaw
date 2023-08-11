@@ -54,7 +54,7 @@ main (int argc, char **argv)
     fc2d_thunderegg_options_t   *heat_mg_opt;
     heat_options_t              *heat_user_opt;
 
-    fclaw2d_global_t            *heat_glob;
+    fclaw_global_t            *heat_glob;
     fclaw_domain_t            *heat_domain;
 
     fclaw_options_t             *phasefield_fclaw_opt;
@@ -63,7 +63,7 @@ main (int argc, char **argv)
     fc2d_thunderegg_options_t   *phasefield_mg_opt;
     phasefield_options_t        *phasefield_user_opt;
 
-    fclaw2d_global_t            *phasefield_glob;
+    fclaw_global_t            *phasefield_glob;
     fclaw_domain_t            *phasefield_domain;
     sc_MPI_Comm mpicomm;
 

@@ -70,7 +70,7 @@ void cb_single_step(fclaw_domain_t *domain,
 }
 
 
-double fclaw2d_update_single_step(fclaw2d_global_t *glob,
+double fclaw2d_update_single_step(fclaw_global_t *glob,
                                   int level,
                                   double t, double dt)
 {

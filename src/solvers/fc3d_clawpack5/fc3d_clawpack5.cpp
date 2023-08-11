@@ -123,7 +123,7 @@ void fc3d_clawpack5_set_vtable_defaults()
 #endif
 }
 
-fc3d_clawpack5_options_t* fc3d_clawpack5_get_options(fclaw2d_global_t *glob)
+fc3d_clawpack5_options_t* fc3d_clawpack5_get_options(fclaw_global_t *glob)
 {
     return (fc3d_clawpack5_options_t*) fclaw2d_global_get_options(glob,
                                                                   "fc3d_clawpack5");
@@ -133,7 +133,7 @@ fc3d_clawpack5_options_t* fc3d_clawpack5_get_options(fclaw2d_global_t *glob)
    Public interface to routines in this file
    ----------------------------------------------------------- */
 #if 0
-void fc3d_clawpack5_register (fclaw_app_t* app, const char *configfile, fclaw2d_global_t* glob)
+void fc3d_clawpack5_register (fclaw_app_t* app, const char *configfile, fclaw_global_t* glob)
 {
     fc3d_clawpack5_options_t* clawopt;
     int id;
@@ -152,19 +152,19 @@ void fc3d_clawpack5_register (fclaw_app_t* app, const char *configfile, fclaw2d_
 }
 #endif
 
-void fc3d_clawpack5_set_options (fclaw2d_global_t* glob, fc3d_clawpack5_options_t* clawopt)
+void fc3d_clawpack5_set_options (fclaw_global_t* glob, fc3d_clawpack5_options_t* clawopt)
 {
     fclaw2d_global_options_store(glob, "fc3d_clawpack5", clawopt);
 }
 
-void fc3d_clawpack5_aux_data(fclaw2d_global_t *glob,
+void fc3d_clawpack5_aux_data(fclaw_global_t *glob,
                               fclaw_patch_t *this_patch,
                               double **aux, int* maux)
 {
     fclaw2d_clawpatch_aux_data(glob, this_patch, aux, maux);
 }
 
-void fc3d_clawpack5_setprob(fclaw2d_global_t *glob)
+void fc3d_clawpack5_setprob(fclaw_global_t *glob)
 {
     if (classic_vt.setprob != NULL)
     {
@@ -173,7 +173,7 @@ void fc3d_clawpack5_setprob(fclaw2d_global_t *glob)
 }
 
 /* This should only be called when a new fclaw_clawpatch_t is created. */
-void fc3d_clawpack5_setaux(fclaw2d_global_t *glob,
+void fc3d_clawpack5_setaux(fclaw_global_t *glob,
                             fclaw_patch_t *this_patch,
                             int this_block_idx,
                             int this_patch_idx)
@@ -211,7 +211,7 @@ void fc3d_clawpack5_setaux(fclaw2d_global_t *glob,
 }
 
 /* This should only be called when a new fclaw_clawpatch_t is created. */
-void fc3d_clawpack5_set_capacity(fclaw2d_global_t *glob,
+void fc3d_clawpack5_set_capacity(fclaw_global_t *glob,
                                   fclaw_patch_t *this_patch,
                                   int this_block_idx,
                                   int this_patch_idx)
@@ -237,7 +237,7 @@ void fc3d_clawpack5_set_capacity(fclaw2d_global_t *glob,
 }
 
 
-void fc3d_clawpack5_qinit(fclaw2d_global_t *glob,
+void fc3d_clawpack5_qinit(fclaw_global_t *glob,
                            fclaw_patch_t *this_patch,
                            int this_block_idx,
                            int this_patch_idx)
@@ -260,7 +260,7 @@ void fc3d_clawpack5_qinit(fclaw2d_global_t *glob,
     CLAWPACK5_UNSET_BLOCK();
 }
 
-void fc3d_clawpack5_b4step2(fclaw2d_global_t *glob,
+void fc3d_clawpack5_b4step2(fclaw_global_t *glob,
                              fclaw_patch_t *this_patch,
                              int this_block_idx,
                              int this_patch_idx,
@@ -285,7 +285,7 @@ void fc3d_clawpack5_b4step2(fclaw2d_global_t *glob,
     CLAWPACK5_UNSET_BLOCK();
 }
 
-void fc3d_clawpack5_src2(fclaw2d_global_t *glob,
+void fc3d_clawpack5_src2(fclaw_global_t *glob,
                           fclaw_patch_t *this_patch,
                           int this_block_idx,
                           int this_patch_idx,
@@ -313,7 +313,7 @@ void fc3d_clawpack5_src2(fclaw2d_global_t *glob,
 
 
 /* Use this to return only the right hand side of the clawpack algorithm */
-double fc3d_clawpack5_step2_rhs(fclaw2d_global_t *glob,
+double fc3d_clawpack5_step2_rhs(fclaw_global_t *glob,
                                  fclaw_patch_t *this_patch,
                                  int this_block_idx,
                                  int this_patch_idx,
@@ -328,7 +328,7 @@ double fc3d_clawpack5_step2_rhs(fclaw2d_global_t *glob,
 }
 
 
-void fc3d_clawpack5_bc2(fclaw2d_global_t *glob,
+void fc3d_clawpack5_bc2(fclaw_global_t *glob,
                          fclaw_patch_t *this_patch,
                          int this_block_idx,
                          int this_patch_idx,
@@ -382,7 +382,7 @@ void fc3d_clawpack5_bc2(fclaw2d_global_t *glob,
 
 
 /* This is called from the single_step callback. and is of type 'flaw_single_step_t' */
-double fc3d_clawpack5_step2(fclaw2d_global_t *glob,
+double fc3d_clawpack5_step2(fclaw_global_t *glob,
                              fclaw_patch_t *this_patch,
                              int this_block_idx,
                              int this_patch_idx,
@@ -462,7 +462,7 @@ double fc3d_clawpack5_step2(fclaw2d_global_t *glob,
     return cflgrid;
 }
 
-double fc3d_clawpack5_update(fclaw2d_global_t *glob,
+double fc3d_clawpack5_update(fclaw_global_t *glob,
                               fclaw_patch_t *this_patch,
                               int this_block_idx,
                               int this_patch_idx,
@@ -492,7 +492,7 @@ double fc3d_clawpack5_update(fclaw2d_global_t *glob,
     return maxcfl;
 }
 
-void fc3d_clawpack5_output_header_ascii(fclaw2d_global_t* glob,
+void fc3d_clawpack5_output_header_ascii(fclaw_global_t* glob,
                                         int iframe)
 {
     const fclaw_clawpatch_options_t *clawpatch_opt;

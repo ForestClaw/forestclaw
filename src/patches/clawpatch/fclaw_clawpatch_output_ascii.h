@@ -31,7 +31,7 @@ extern "C"
 {
 #endif
 
-struct fclaw2d_global;
+struct fclaw_global;
 struct fclaw_patch;
 struct fclaw_domain;
 
@@ -60,7 +60,7 @@ void cb_clawpatch_output_ascii (struct fclaw_domain * domain,
  * @param glob the global context
  * @param iframe the frame index
  */
-void fclaw_clawpatch_output_ascii(struct fclaw2d_global* glob,int iframe);
+void fclaw_clawpatch_output_ascii(struct fclaw_global* glob,int iframe);
 
 /**
  * @brief output ascii time header
@@ -68,7 +68,7 @@ void fclaw_clawpatch_output_ascii(struct fclaw2d_global* glob,int iframe);
  * @param glob the global context
  * @param iframe the frame index
  */
-void fclaw_clawpatch_time_header_ascii(struct fclaw2d_global* glob, int iframe);
+void fclaw_clawpatch_time_header_ascii(struct fclaw_global* glob, int iframe);
 
 
 #ifdef __cplusplus

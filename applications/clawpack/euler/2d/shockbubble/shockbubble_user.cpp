@@ -38,7 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "../rp/euler_user_fort.h"
 
 
-void shockbubble_problem_setup(fclaw2d_global_t* glob)
+void shockbubble_problem_setup(fclaw_global_t* glob)
 {
     const user_options_t* user = shockbubble_get_options(glob);
 
@@ -60,7 +60,7 @@ void shockbubble_problem_setup(fclaw2d_global_t* glob)
     SETPROB();
 }
 
-void shockbubble_link_solvers(fclaw2d_global_t *glob)
+void shockbubble_link_solvers(fclaw_global_t *glob)
 {
     const user_options_t* user = shockbubble_get_options(glob);
     fclaw2d_vtable_t *fclaw_vt = fclaw2d_vt(glob);

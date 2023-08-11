@@ -46,7 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 typedef struct torthem
 {
-    fclaw2d_global_t *global;
+    fclaw_global_t *global;
 
 #if 0
     fc2d_clawpack46_options_t claw_opt;

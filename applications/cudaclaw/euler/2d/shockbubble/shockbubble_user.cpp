@@ -25,7 +25,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "shockbubble_user.h"
 
-void shockbubble_problem_setup(fclaw2d_global_t* glob)
+void shockbubble_problem_setup(fclaw_global_t* glob)
 {
     const user_options_t* user = shockbubble_get_options(glob);
 
@@ -55,7 +55,7 @@ void shockbubble_problem_setup(fclaw2d_global_t* glob)
 
 #if 0
 static
-void shockbubble_problem_setup(fclaw2d_global_t* glob)
+void shockbubble_problem_setup(fclaw_global_t* glob)
 {
     const user_options_t* user = shockbubble_get_options(glob);
 
@@ -74,7 +74,7 @@ void shockbubble_problem_setup(fclaw2d_global_t* glob)
 }
 #endif
 
-void shockbubble_link_solvers(fclaw2d_global_t *glob)
+void shockbubble_link_solvers(fclaw_global_t *glob)
 {
     // const user_options_t* user = shockbubble_get_options(glob);
     // fclaw_clawpatch_vtable_t *clawpatch_vt = fclaw_clawpatch_vt(glob);

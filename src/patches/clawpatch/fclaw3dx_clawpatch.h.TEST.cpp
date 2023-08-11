@@ -61,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace{
 struct SinglePatchDomain {
-    fclaw2d_global_t* glob;
+    fclaw_global_t* glob;
     fclaw_options_t fopts;
     fclaw_domain_t *domain;
     fclaw_clawpatch_options_t* opts;
@@ -108,7 +108,7 @@ struct SinglePatchDomain {
     }
 };
 struct QuadDomain {
-    fclaw2d_global_t* glob;
+    fclaw_global_t* glob;
     fclaw_options_t fopts;
     fclaw_domain_t *domain;
     fclaw_clawpatch_options_t* opts;
@@ -164,7 +164,7 @@ struct QuadDomain {
 }
 TEST_CASE("fclaw3dx_clawpatch_vtable_initialize")
 {
-    fclaw2d_global_t* glob = fclaw2d_global_new();
+    fclaw_global_t* glob = fclaw2d_global_new();
     fclaw2d_vtables_initialize(glob);
 
     fclaw3d_clawpatch_vtable_initialize(glob, 4);
@@ -234,7 +234,7 @@ TEST_CASE("fclaw3dx_clawpatch patch_build")
     for(const int& rhs_fields : {0,2})
     for(fclaw2d_build_mode_t build_mode : {FCLAW2D_BUILD_FOR_GHOST_AREA_COMPUTED, FCLAW2D_BUILD_FOR_UPDATE})
     {
-        fclaw2d_global_t* glob = fclaw2d_global_new(); 
+        fclaw_global_t* glob = fclaw2d_global_new(); 
         fclaw2d_vtables_initialize(glob);
 
         fclaw3d_clawpatch_vtable_initialize(glob, 4);
@@ -654,7 +654,7 @@ TEST_CASE("fclaw3dx_clawpatch_metric_scalar")
 /* DAC : Fix this test for fclaw3d_metric? */
 TEST_CASE("fclaw3dx_clawpatch_metric_vector")
 {
-    fclaw2d_global_t* glob = fclaw2d_global_new(); 
+    fclaw_global_t* glob = fclaw2d_global_new(); 
     fclaw2d_vtables_initialize(glob);
 
     SinglePatchDomain test_data;

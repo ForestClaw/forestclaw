@@ -113,7 +113,7 @@ fclaw_package_container_add (fclaw_package_container_t * pkg_container,
     return id;
 }
 
-int fclaw_package_container_add_pkg(fclaw2d_global_t* glob,
+int fclaw_package_container_add_pkg(fclaw_global_t* glob,
                                     void* opt)
 {
     fclaw_package_container_t *pkg_container = 
@@ -122,7 +122,7 @@ int fclaw_package_container_add_pkg(fclaw2d_global_t* glob,
 }
 
 
-void* fclaw_package_get_options(fclaw2d_global_t *glob, 
+void* fclaw_package_get_options(fclaw_global_t *glob, 
                                 int id)
 {
     fclaw_package_t *pkg;

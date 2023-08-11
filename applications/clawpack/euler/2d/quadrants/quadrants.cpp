@@ -37,7 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fc2d_clawpack5.h>
 
 static
-void create_domain_map (fclaw2d_global_t *glob,
+void create_domain_map (fclaw_global_t *glob,
                         fclaw_options_t* fclaw_opt)
 {
     fclaw_domain_t         *domain;
@@ -49,7 +49,7 @@ void create_domain_map (fclaw2d_global_t *glob,
 }
 
 static
-void run_program(fclaw2d_global_t* glob)
+void run_program(fclaw_global_t* glob)
 {
     const user_options_t  *user_opt;
 
@@ -97,7 +97,7 @@ main (int argc, char **argv)
     fc2d_clawpack46_options_t   *claw46_opt;
     fc2d_clawpack5_options_t    *claw5_opt;
 
-    fclaw2d_global_t            *glob;
+    fclaw_global_t            *glob;
     fclaw_domain_t            *domain;
     sc_MPI_Comm mpicomm;
 

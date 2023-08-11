@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_elliptic_solver.h>
 
-void fclaw2d_vtables_initialize(fclaw2d_global_t *glob)
+void fclaw2d_vtables_initialize(fclaw_global_t *glob)
 {
     fclaw2d_vtable_initialize(glob);
     fclaw2d_patch_vtable_initialize(glob);
@@ -44,7 +44,7 @@ void fclaw2d_vtables_initialize(fclaw2d_global_t *glob)
     fclaw2d_ray_vtable_initialize(glob);
 }
 
-void fclaw2d_problem_setup(fclaw2d_global_t *glob)
+void fclaw2d_problem_setup(fclaw_global_t *glob)
 {
 	fclaw2d_vtable_t *fclaw_vt = fclaw2d_vt(glob);
 	

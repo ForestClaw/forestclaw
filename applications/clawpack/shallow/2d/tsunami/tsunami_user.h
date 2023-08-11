@@ -59,15 +59,15 @@ typedef struct user_options
 void TSUNAMI_SETPROB();
 
 
-void tsunami_problem_setup(fclaw2d_global_t *glob);
-void tsunami_link_solvers(fclaw2d_global_t *glob);
+void tsunami_problem_setup(fclaw_global_t *glob);
+void tsunami_link_solvers(fclaw_global_t *glob);
 
 user_options_t* tsunami_options_register (fclaw_app_t * app,
                                           const char *configfile);
 
-void tsunami_options_store (fclaw2d_global_t* glob, user_options_t* user);
+void tsunami_options_store (fclaw_global_t* glob, user_options_t* user);
 
-user_options_t* tsunami_get_options(fclaw2d_global_t* glob);
+user_options_t* tsunami_get_options(fclaw_global_t* glob);
 
 fclaw2d_map_context_t* fclaw2d_map_new_nomap();
 

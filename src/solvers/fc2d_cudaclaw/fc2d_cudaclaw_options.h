@@ -36,7 +36,7 @@ extern "C"
 #endif
 #endif
 
-struct fclaw2d_global;
+struct fclaw_global;
 typedef struct fc2d_cudaclaw_options fc2d_cudaclaw_options_t;
 
 struct fc2d_cudaclaw_options
@@ -88,11 +88,11 @@ fc2d_cudaclaw_options_t*  fc2d_cudaclaw_options_register (fclaw_app_t * app,
 void fc2d_cudaclaw_package_register(fclaw_app_t* app,
                                       fc2d_cudaclaw_options_t* clawopt);
 
-fc2d_cudaclaw_options_t* fc2d_cudaclaw_get_options(struct fclaw2d_global *glob);
+fc2d_cudaclaw_options_t* fc2d_cudaclaw_get_options(struct fclaw_global *glob);
 
-void fc2d_cudaclaw_options_store (struct fclaw2d_global* glob, fc2d_cudaclaw_options_t* clawopt);
+void fc2d_cudaclaw_options_store (struct fclaw_global* glob, fc2d_cudaclaw_options_t* clawopt);
 
-void fc2d_cudaclaw_output(struct fclaw2d_global *glob, int iframe);
+void fc2d_cudaclaw_output(struct fclaw_global *glob, int iframe);
 
 int cudaclaw_check_parameters(int mwaves);
 void cudaclaw_set_method_parameters(int order[], int mthlim[], int mwaves, int use_fwaves);

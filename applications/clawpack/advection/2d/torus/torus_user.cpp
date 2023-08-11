@@ -28,7 +28,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "../all/advection_user.h"
 
 static
-void torus_problem_setup(fclaw2d_global_t *glob)
+void torus_problem_setup(fclaw_global_t *glob)
 {
     const user_options_t* user = torus_get_options(glob);
 
@@ -48,7 +48,7 @@ void torus_problem_setup(fclaw2d_global_t *glob)
 }
 
 static
-void torus_patch_setup(fclaw2d_global_t *glob,
+void torus_patch_setup(fclaw_global_t *glob,
                        fclaw_patch_t *patch,
                        int blockno,
                        int patchno)
@@ -67,7 +67,7 @@ void torus_patch_setup(fclaw2d_global_t *glob,
 }
 
 
-void torus_link_solvers(fclaw2d_global_t *glob)
+void torus_link_solvers(fclaw_global_t *glob)
 {
     fclaw2d_vtable_t *vt = fclaw2d_vt(glob);
     vt->problem_setup = &torus_problem_setup;  /* Version-independent */

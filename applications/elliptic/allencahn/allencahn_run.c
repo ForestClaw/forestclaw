@@ -63,7 +63,7 @@ void cb_restore_time_step(fclaw_domain_t *domain,
 }
 
 static
-void restore_time_step(fclaw2d_global_t *glob)
+void restore_time_step(fclaw_global_t *glob)
 {
     fclaw2d_global_iterate_patches(glob,cb_restore_time_step,(void *) NULL);
 
@@ -83,7 +83,7 @@ void cb_save_time_step(fclaw_domain_t *domain,
 }
 
 static
-void save_time_step(fclaw2d_global_t *glob)
+void save_time_step(fclaw_global_t *glob)
 {
     fclaw2d_global_iterate_patches(glob,cb_save_time_step,(void *) NULL);
 }
@@ -118,7 +118,7 @@ void update_q(fclaw_domain_t *domain,
 
 
 static
-void allencahn_run_update_q(fclaw2d_global_t *glob)
+void allencahn_run_update_q(fclaw_global_t *glob)
 {
     fclaw2d_global_iterate_patches(glob, update_q, NULL);
 }
@@ -129,7 +129,7 @@ void allencahn_run_update_q(fclaw2d_global_t *glob)
    Output times are at times [0,dT, 2*dT, 3*dT,...,Tfinal], where dT = tfinal/nout
    -------------------------------------------------------------------------------- */
 static
-void outstyle_1(fclaw2d_global_t *glob)
+void outstyle_1(fclaw_global_t *glob)
 {
     fclaw_domain_t** domain = &glob->domain;
 
@@ -233,7 +233,7 @@ void outstyle_1(fclaw2d_global_t *glob)
 }
 
 #if 0
-static void outstyle_2(fclaw2d_global_t *glob)
+static void outstyle_2(fclaw_global_t *glob)
 {
     // fclaw_domain_t** domain = &glob->domain;
     // Output time at specific time steps.
@@ -241,7 +241,7 @@ static void outstyle_2(fclaw2d_global_t *glob)
 #endif
 
 static
-void outstyle_3(fclaw2d_global_t *glob)
+void outstyle_3(fclaw_global_t *glob)
 {
     fclaw_domain_t** domain = &glob->domain;
 
@@ -354,7 +354,7 @@ void outstyle_3(fclaw2d_global_t *glob)
 
 
 static
-void outstyle_4(fclaw2d_global_t *glob)
+void outstyle_4(fclaw_global_t *glob)
 {
 
     /* Write out an initial time file */
@@ -420,7 +420,7 @@ void outstyle_4(fclaw2d_global_t *glob)
    Public interface
    ---------------------------------------------------------------- */
 
-void allencahn_run(fclaw2d_global_t *glob)
+void allencahn_run(fclaw_global_t *glob)
 {
 
     const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);

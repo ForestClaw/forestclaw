@@ -139,7 +139,7 @@ fclaw_domain_t* create_domain(sc_MPI_Comm mpicomm,
 }
 
 static
-void run_program(fclaw3d_global_t* glob)
+void run_program(fclaw_global_t* glob)
 {
     const user_options_t           *user_opt;
 
@@ -195,7 +195,7 @@ main (int argc, char **argv)
     int first_arg;
     fclaw_exit_type_t vexit;
 
-    fclaw3d_global_t            *glob;
+    fclaw_global_t            *glob;
     fclaw_domain_t            *domain;
 
     int retval;

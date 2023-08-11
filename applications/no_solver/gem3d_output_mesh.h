@@ -34,7 +34,7 @@ extern "C"
 #endif
 #endif
 
-struct fclaw2d_global;
+struct fclaw_global;
 struct fclaw2d_patch;
 struct fclaw_domain;
 
@@ -43,7 +43,7 @@ void cb_gem3d_output_mesh (struct fclaw_domain * domain,
                            int this_block_idx, int this_patch_idx,
                            void *user);
 
-void gem3d_output_mesh(struct fclaw2d_global* glob,int iframe);
+void gem3d_output_mesh(struct fclaw_global* glob,int iframe);
 
 
 #ifdef __cplusplus

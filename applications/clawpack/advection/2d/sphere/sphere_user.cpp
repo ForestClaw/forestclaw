@@ -26,7 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "sphere_user.h"
 
 static
-void sphere_problem_setup(fclaw2d_global_t* glob)
+void sphere_problem_setup(fclaw_global_t* glob)
 {
     const user_options_t *user = sphere_get_options(glob);
 
@@ -42,7 +42,7 @@ void sphere_problem_setup(fclaw2d_global_t* glob)
 }
 
 static
-void sphere_patch_setup(fclaw2d_global_t *glob,
+void sphere_patch_setup(fclaw_global_t *glob,
                         fclaw_patch_t *patch,
                         int blockno,
                         int patchno)
@@ -53,7 +53,7 @@ void sphere_patch_setup(fclaw2d_global_t *glob,
 }
 
 
-void sphere_link_solvers(fclaw2d_global_t *glob)
+void sphere_link_solvers(fclaw_global_t *glob)
 {
     fclaw2d_vtable_t *vt = fclaw2d_vt(glob);
     vt->problem_setup    = &sphere_problem_setup;  /* Version-independent */

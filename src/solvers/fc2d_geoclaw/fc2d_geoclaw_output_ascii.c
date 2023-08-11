@@ -42,7 +42,7 @@ void cb_geoclaw_output_ascii(fclaw_domain_t *domain,
                              void *user)
 {
     fclaw2d_global_iterate_t* s = (fclaw2d_global_iterate_t*) user;
-    fclaw2d_global_t *glob = (fclaw2d_global_t*) s->glob;
+    fclaw_global_t *glob = (fclaw_global_t*) s->glob;
 
     int iframe = *((int *) s->user);    
 
@@ -72,7 +72,7 @@ void cb_geoclaw_output_ascii(fclaw_domain_t *domain,
 }
 
 static
-void geoclaw_header_ascii(fclaw2d_global_t* glob,int iframe)
+void geoclaw_header_ascii(fclaw_global_t* glob,int iframe)
 {
     double time = glob->curr_time;
     int ngrids = glob->domain->global_num_patches;
@@ -88,7 +88,7 @@ void geoclaw_header_ascii(fclaw2d_global_t* glob,int iframe)
 	Public interface
    ------------------------------------------------------------ */
 
-void fc2d_geoclaw_output_ascii(fclaw2d_global_t* glob,int iframe)
+void fc2d_geoclaw_output_ascii(fclaw_global_t* glob,int iframe)
 {
     fclaw_domain_t *domain = glob->domain;
 

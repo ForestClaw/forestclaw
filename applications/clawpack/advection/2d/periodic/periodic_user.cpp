@@ -26,7 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "periodic_user.h"
 
 static
-void periodic_problem_setup(fclaw2d_global_t* glob)
+void periodic_problem_setup(fclaw_global_t* glob)
 {
     const user_options_t* user = periodic_get_options(glob);
 
@@ -45,7 +45,7 @@ void periodic_problem_setup(fclaw2d_global_t* glob)
 }
 
 
-void periodic_link_solvers(fclaw2d_global_t *glob)
+void periodic_link_solvers(fclaw_global_t *glob)
 {
     fclaw2d_vtable_t *vt = fclaw2d_vt(glob);
     vt->problem_setup = &periodic_problem_setup;  /* Version-independent */

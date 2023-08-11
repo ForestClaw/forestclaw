@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     -------------------------------------------------------------------- */
 
 void
-fclaw2d_output_frame (fclaw2d_global_t * glob, int iframe)
+fclaw2d_output_frame (fclaw_global_t * glob, int iframe)
 {
     const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
 

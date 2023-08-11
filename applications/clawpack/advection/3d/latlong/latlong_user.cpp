@@ -26,7 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "latlong_user.h"
 
 
-void latlong_problem_setup(fclaw2d_global_t *glob)
+void latlong_problem_setup(fclaw_global_t *glob)
 {
     const user_options_t* user = latlong_get_options(glob);
     fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
@@ -48,7 +48,7 @@ void latlong_problem_setup(fclaw2d_global_t *glob)
 }
 
 static
-void latlong_patch_setup(fclaw2d_global_t *glob,
+void latlong_patch_setup(fclaw_global_t *glob,
                          fclaw_patch_t *patch,
                          int blockno,
                          int patchno)
@@ -58,7 +58,7 @@ void latlong_patch_setup(fclaw2d_global_t *glob,
                                          user->claw_version);
 }
 
-void latlong_link_solvers(fclaw2d_global_t *glob)
+void latlong_link_solvers(fclaw_global_t *glob)
 {
     fclaw2d_vtable_t *fclaw_vt = fclaw2d_vt(glob);
 

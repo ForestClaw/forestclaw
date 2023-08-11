@@ -231,7 +231,7 @@ void cb_fclaw2d_regrid_repopulate(fclaw_domain_t * old_domain,
 /* ----------------------------------------------------------------
    Public interface
    -------------------------------------------------------------- */
-void fclaw2d_regrid(fclaw2d_global_t *glob)
+void fclaw2d_regrid(fclaw_global_t *glob)
 {
     fclaw_domain_t** domain = &glob->domain;
     fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_REGRID]);
@@ -392,7 +392,7 @@ void cb_set_neighbor_types(fclaw_domain_t *domain,
 }
 
 /* Set neighbor type : samesize, halfsize, or doublesize */
-void fclaw2d_regrid_set_neighbor_types(fclaw2d_global_t *glob)
+void fclaw2d_regrid_set_neighbor_types(fclaw_global_t *glob)
 {
 	fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_NEIGHBOR_SEARCH]);
 	fclaw2d_global_iterate_patches(glob,cb_set_neighbor_types,NULL);

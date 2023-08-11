@@ -33,7 +33,7 @@
 
 #include "../rp/shallow_user_fort.h"
 
-void radialdam_link_solvers(fclaw2d_global_t *glob)
+void radialdam_link_solvers(fclaw_global_t *glob)
 {
 	fclaw2d_vtable_t *vt = fclaw2d_vt(glob);
 
@@ -94,7 +94,7 @@ void radialdam_link_solvers(fclaw2d_global_t *glob)
 }
 
 
-void radialdam_problem_setup(fclaw2d_global_t* glob)
+void radialdam_problem_setup(fclaw_global_t* glob)
 {
 	const user_options_t* user = radialdam_get_options(glob);
 
@@ -107,7 +107,7 @@ void radialdam_problem_setup(fclaw2d_global_t* glob)
 }
 
 
-void radialdam_patch_setup(fclaw2d_global_t *glob,
+void radialdam_patch_setup(fclaw_global_t *glob,
 		fclaw_patch_t *this_patch,
 		int this_block_idx,
 		int this_patch_idx)

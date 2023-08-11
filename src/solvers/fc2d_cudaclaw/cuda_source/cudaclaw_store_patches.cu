@@ -8,7 +8,7 @@
 #include "cudaclaw_allocate.h"
 #include <fc2d_cuda_profiler.h>
 
-void cudaclaw_store_buffer(fclaw2d_global_t* glob,
+void cudaclaw_store_buffer(fclaw_global_t* glob,
                            fclaw_patch_t *this_patch,
                            int this_patch_idx,
                            int count, int iter, 

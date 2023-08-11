@@ -35,7 +35,7 @@
 
 using namespace ThunderEgg;
 
-static void get_data(struct fclaw2d_global* glob, fclaw_patch_t* patch, fc2d_thunderegg_data_choice_t data_choice, double** q, int* meqn)
+static void get_data(struct fclaw_global* glob, fclaw_patch_t* patch, fc2d_thunderegg_data_choice_t data_choice, double** q, int* meqn)
 {
     switch(data_choice){
         case RHS:
@@ -49,7 +49,7 @@ static void get_data(struct fclaw2d_global* glob, fclaw_patch_t* patch, fc2d_thu
         break;
     }
 }
-ThunderEgg::Vector<2> fc2d_thunderegg_get_vector(struct fclaw2d_global *glob, fc2d_thunderegg_data_choice_t data_choice)
+ThunderEgg::Vector<2> fc2d_thunderegg_get_vector(struct fclaw_global *glob, fc2d_thunderegg_data_choice_t data_choice)
 {
     fclaw_clawpatch_options_t *clawpatch_opt =
         fclaw_clawpatch_get_options(glob);
@@ -84,7 +84,7 @@ ThunderEgg::Vector<2> fc2d_thunderegg_get_vector(struct fclaw2d_global *glob, fc
     Communicator comm(glob->mpicomm);
     return ThunderEgg::Vector<2>(comm,starts,strides,ns,mbc);
 }
-void fc2d_thunderegg_store_vector(struct fclaw2d_global *glob, fc2d_thunderegg_data_choice_t data_choice, const ThunderEgg::Vector<2>& vec)
+void fc2d_thunderegg_store_vector(struct fclaw_global *glob, fc2d_thunderegg_data_choice_t data_choice, const ThunderEgg::Vector<2>& vec)
 {
     fclaw_clawpatch_options_t *clawpatch_opt =
         fclaw_clawpatch_get_options(glob);

@@ -93,7 +93,7 @@ fclaw2d_domain_data_t *fclaw2d_domain_get_data(fclaw_domain_t *domain)
     return (fclaw2d_domain_data_t *) domain->user;
 }
 
-void fclaw2d_domain_setup(fclaw2d_global_t* glob,
+void fclaw2d_domain_setup(fclaw_global_t* glob,
                           fclaw_domain_t* new_domain)
 {
     fclaw_domain_t *old_domain = glob->domain;
@@ -113,7 +113,7 @@ void fclaw2d_domain_setup(fclaw2d_global_t* glob,
     fclaw_global_infof("Done\n");
 }
 
-void fclaw2d_domain_reset(fclaw2d_global_t* glob)
+void fclaw2d_domain_reset(fclaw_global_t* glob)
 {
     fclaw_domain_t** domain = &glob->domain;
     fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data (*domain);

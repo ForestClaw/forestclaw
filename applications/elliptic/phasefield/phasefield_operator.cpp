@@ -72,7 +72,7 @@ Vector<2> restrict_phi_n_vec(const Vector<2>& prev_beta_vec,
     return restrictor.restrict(prev_beta_vec);
 }
 
-void phasefield_solve(fclaw2d_global_t *glob) 
+void phasefield_solve(fclaw_global_t *glob) 
 {
     // get needed options
     const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);

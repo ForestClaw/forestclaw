@@ -39,7 +39,7 @@ void cb_gem3d_output_mesh (fclaw_domain_t * domain,
                            void *user)
 {
     fclaw2d_global_iterate_t* s = (fclaw2d_global_iterate_t*) user;
-    fclaw2d_global_t *glob = (fclaw2d_global_t*) s->glob;
+    fclaw_global_t *glob = (fclaw_global_t*) s->glob;
 
     int patch_num;
     int level;
@@ -110,7 +110,7 @@ void cb_gem3d_output_mesh (fclaw_domain_t * domain,
 
 /* This function isn't virtualized;  should it be? */
 static
-void gem3d_output_header_mesh(fclaw2d_global_t* glob, int iframe)
+void gem3d_output_header_mesh(fclaw_global_t* glob, int iframe)
 {
     char matname1[11];  /* One extra for the null-termination character */
  
@@ -131,7 +131,7 @@ void gem3d_output_header_mesh(fclaw2d_global_t* glob, int iframe)
            vt->output_frame = &fclaw2d_clawpatch_output_ascii;
     -------------------------------------------------------------------- */
 
-void gem3d_output_mesh(fclaw2d_global_t* glob,int iframe)
+void gem3d_output_mesh(fclaw_global_t* glob,int iframe)
 {
 
     fclaw_domain_t *domain = glob->domain;

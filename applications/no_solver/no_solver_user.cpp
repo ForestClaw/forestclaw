@@ -34,9 +34,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "gem3d_output_mesh.h"
 
 static
-void no_solver_output(fclaw2d_global_t* glob,int iframe);
+void no_solver_output(fclaw_global_t* glob,int iframe);
 
-void no_solver_link_solvers(fclaw2d_global_t* global)
+void no_solver_link_solvers(fclaw_global_t* global)
 {
     fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt(glob);
     fclaw2d_vtable_t* vt = fclaw2d_vt(glob);
@@ -48,7 +48,7 @@ void no_solver_link_solvers(fclaw2d_global_t* global)
 
 }
 
-void no_solver_patch_initialize(fclaw2d_global_t *glob,
+void no_solver_patch_initialize(fclaw_global_t *glob,
                                 fclaw_patch_t *this_patch,
                                 int this_block_idx,
                                 int this_patch_idx)
@@ -66,7 +66,7 @@ void no_solver_patch_initialize(fclaw2d_global_t *glob,
     INITIALIZE(&mx,&my,&meqn,&mbc,&blockno,&xlower,&ylower,&dx,&dy,q);
 }
 
-double no_solver_update(fclaw2d_global_t *glob,
+double no_solver_update(fclaw_global_t *glob,
                         fclaw_patch_t *this_patch,
                         int this_block_idx,
                         int this_patch_idx,
@@ -78,7 +78,7 @@ double no_solver_update(fclaw2d_global_t *glob,
 }
 
 static
-void no_solver_output(fclaw2d_global_t* glob,int iframe)
+void no_solver_output(fclaw_global_t* glob,int iframe)
 {
     /* Create usual output */
     fclaw2d_clawpatch_output_ascii(glob,iframe);

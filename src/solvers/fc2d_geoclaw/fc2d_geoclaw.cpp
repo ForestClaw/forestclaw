@@ -59,7 +59,7 @@ struct region_type region_type_for_debug;
 
 /* ----------------------------- static function defs ------------------------------- */
 static
-void geoclaw_setaux(fclaw2d_global_t *glob,
+void geoclaw_setaux(fclaw_global_t *glob,
                     fclaw_patch_t *patch,
                     int blockno,
                     int patchno);
@@ -69,7 +69,7 @@ void geoclaw_setaux(fclaw2d_global_t *glob,
 /* --------------------------- Creating/deleting patches ---------------------------- */
 
 static
-void geoclaw_patch_setup(fclaw2d_global_t *glob,
+void geoclaw_patch_setup(fclaw_global_t *glob,
                          fclaw_patch_t *patch,
                          int blockno,
                          int patchno)
@@ -82,7 +82,7 @@ void geoclaw_patch_setup(fclaw2d_global_t *glob,
 
 
 static
-void geoclaw_setprob(fclaw2d_global_t *glob)
+void geoclaw_setprob(fclaw_global_t *glob)
 {
     fc2d_geoclaw_vtable_t *geoclaw_vt = fc2d_geoclaw_vt(glob);
     if (geoclaw_vt->setprob != NULL)
@@ -90,7 +90,7 @@ void geoclaw_setprob(fclaw2d_global_t *glob)
 }
 
 static
-void geoclaw_qinit(fclaw2d_global_t *glob,
+void geoclaw_qinit(fclaw_global_t *glob,
                    fclaw_patch_t *patch,
                    int blockno,
                    int patchno)
@@ -119,7 +119,7 @@ void geoclaw_qinit(fclaw2d_global_t *glob,
 }
 
 static
-void geoclaw_bc2(fclaw2d_global_t *glob,
+void geoclaw_bc2(fclaw_global_t *glob,
                  fclaw_patch_t *patch,
                  int blockno,
                  int patchno,
@@ -176,7 +176,7 @@ void geoclaw_bc2(fclaw2d_global_t *glob,
 }
 
 static
-void geoclaw_setaux(fclaw2d_global_t *glob,
+void geoclaw_setaux(fclaw_global_t *glob,
                     fclaw_patch_t *patch,
                     int blockno,
                     int patchno)
@@ -207,7 +207,7 @@ void geoclaw_setaux(fclaw2d_global_t *glob,
 
 
 static
-void geoclaw_b4step2(fclaw2d_global_t *glob,
+void geoclaw_b4step2(fclaw_global_t *glob,
                      fclaw_patch_t *patch,
                      int blockno,
                      int patchno,
@@ -239,7 +239,7 @@ void geoclaw_b4step2(fclaw2d_global_t *glob,
 }
 
 static
-void geoclaw_src2(fclaw2d_global_t *glob,
+void geoclaw_src2(fclaw_global_t *glob,
                   fclaw_patch_t *patch,
                   int blockno,
                   int patchno,
@@ -271,7 +271,7 @@ void geoclaw_src2(fclaw2d_global_t *glob,
 
 /* This is called from the single_step callback. and is of type 'flaw_single_step_t' */
 static
-double geoclaw_step2(fclaw2d_global_t *glob,
+double geoclaw_step2(fclaw_global_t *glob,
                      fclaw_patch_t *patch,
                      int blockno,
                      int patchno,
@@ -339,7 +339,7 @@ double geoclaw_step2(fclaw2d_global_t *glob,
 
 
 #if 0
-void fc2d_geoclaw_dt(fclaw2d_global_t *glob,double t, double* dt)
+void fc2d_geoclaw_dt(fclaw_global_t *glob,double t, double* dt)
 {
     /* What was the idea here? */
 }
@@ -348,7 +348,7 @@ void fc2d_geoclaw_dt(fclaw2d_global_t *glob,double t, double* dt)
 
 
 static
-double geoclaw_update(fclaw2d_global_t *glob,
+double geoclaw_update(fclaw_global_t *glob,
                       fclaw_patch_t *patch,
                       int blockno,
                       int patchno,
@@ -384,7 +384,7 @@ double geoclaw_update(fclaw2d_global_t *glob,
 /* --------------------------------- Output functions ---------------------------- */
 
 static
-void geoclaw_output(fclaw2d_global_t *glob, int iframe)
+void geoclaw_output(fclaw_global_t *glob, int iframe)
 {
     const fc2d_geoclaw_options_t*geo_opt = fc2d_geoclaw_get_options(glob);
     if (geo_opt->ascii_out != 0)
@@ -396,7 +396,7 @@ void geoclaw_output(fclaw2d_global_t *glob, int iframe)
 
 
 static
-int geoclaw_patch_tag4refinement(fclaw2d_global_t *glob,
+int geoclaw_patch_tag4refinement(fclaw_global_t *glob,
                                  fclaw_patch_t *patch,
                                  int blockno, 
                                  int patchno,
@@ -452,7 +452,7 @@ int geoclaw_patch_tag4refinement(fclaw2d_global_t *glob,
 
 
 static
-int geoclaw_patch_tag4coarsening(fclaw2d_global_t *glob,
+int geoclaw_patch_tag4coarsening(fclaw_global_t *glob,
                                  fclaw_patch_t *fine_patches,
                                  int blockno, 
                                  int patchno,
@@ -500,7 +500,7 @@ int geoclaw_patch_tag4coarsening(fclaw2d_global_t *glob,
 }
 
 static
-void geoclaw_interpolate2fine(fclaw2d_global_t *glob,
+void geoclaw_interpolate2fine(fclaw_global_t *glob,
                               fclaw_patch_t *coarse_patch,
                               fclaw_patch_t *fine_patches,
                               int blockno, 
@@ -538,7 +538,7 @@ void geoclaw_interpolate2fine(fclaw2d_global_t *glob,
 }
 
 static
-void geoclaw_average2coarse(fclaw2d_global_t *glob,
+void geoclaw_average2coarse(fclaw_global_t *glob,
                             fclaw_patch_t *fine_patches,
                             fclaw_patch_t *coarse_patch,
                             int blockno, 
@@ -581,7 +581,7 @@ void geoclaw_average2coarse(fclaw2d_global_t *glob,
 
 /* ------------------------- Ghost filling - patch specific ------------------------ */
 
-void geoclaw_average_face(fclaw2d_global_t *glob,
+void geoclaw_average_face(fclaw_global_t *glob,
                           fclaw_patch_t *coarse_patch,
                           fclaw_patch_t *fine_patch,
                           int idir,
@@ -629,7 +629,7 @@ void geoclaw_average_face(fclaw2d_global_t *glob,
                                    &igrid,&transform_data);
 }
 
-void geoclaw_interpolate_face(fclaw2d_global_t *glob,
+void geoclaw_interpolate_face(fclaw_global_t *glob,
                               fclaw_patch_t *coarse_patch,
                               fclaw_patch_t *fine_patch,
                               int idir,
@@ -662,7 +662,7 @@ void geoclaw_interpolate_face(fclaw2d_global_t *glob,
                                        &igrid, &transform_data);
 }
 
-void geoclaw_average_corner(fclaw2d_global_t *glob,
+void geoclaw_average_corner(fclaw_global_t *glob,
                             fclaw_patch_t *coarse_patch,
                             fclaw_patch_t *fine_patch,
                             int coarse_blockno,
@@ -707,7 +707,7 @@ void geoclaw_average_corner(fclaw2d_global_t *glob,
 
 }
 
-void geoclaw_interpolate_corner(fclaw2d_global_t* glob,
+void geoclaw_interpolate_corner(fclaw_global_t* glob,
                                 fclaw_patch_t* coarse_patch,
                                 fclaw_patch_t* fine_patch,
                                 int coarse_blockno,
@@ -744,7 +744,7 @@ void geoclaw_interpolate_corner(fclaw2d_global_t* glob,
 
 /* --------------------------- Parallel ghost patches -------------------------------- */
 
-void geoclaw_remote_ghost_setup(fclaw2d_global_t *glob,
+void geoclaw_remote_ghost_setup(fclaw_global_t *glob,
                                 fclaw_patch_t *patch,
                                 int blockno,
                                 int patchno)
@@ -763,7 +763,7 @@ void geoclaw_remote_ghost_setup(fclaw2d_global_t *glob,
 }
 
 static
-void geoclaw_local_ghost_pack_aux(fclaw2d_global_t *glob,
+void geoclaw_local_ghost_pack_aux(fclaw_global_t *glob,
                                   fclaw_patch_t *patch,
                                   int mint,
                                   double *auxpack,
@@ -786,7 +786,7 @@ void geoclaw_local_ghost_pack_aux(fclaw2d_global_t *glob,
 /* ------------------------------ Misc access functions ----------------------------- */
 
 /* Called from application routines */
-void fc2d_geoclaw_module_setup(fclaw2d_global_t *glob)
+void fc2d_geoclaw_module_setup(fclaw_global_t *glob)
 {
     const fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
     const fclaw_clawpatch_options_t *clawpatch_opt = fclaw_clawpatch_get_options(glob);
@@ -818,7 +818,7 @@ void fc2d_geoclaw_vt_destroy(void* vt)
     FCLAW_FREE (vt);
 }
 
-fc2d_geoclaw_vtable_t* fc2d_geoclaw_vt(fclaw2d_global_t* glob)
+fc2d_geoclaw_vtable_t* fc2d_geoclaw_vt(fclaw_global_t* glob)
 {
 	fc2d_geoclaw_vtable_t* geoclaw_vt = (fc2d_geoclaw_vtable_t*) 
 	   							fclaw_pointer_map_get(glob->vtables, "fc2d_geoclaw");
@@ -827,7 +827,7 @@ fc2d_geoclaw_vtable_t* fc2d_geoclaw_vt(fclaw2d_global_t* glob)
 	return geoclaw_vt;
 }
 
-void fc2d_geoclaw_solver_initialize(fclaw2d_global_t* glob)
+void fc2d_geoclaw_solver_initialize(fclaw_global_t* glob)
 {
 	fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
 	fclaw_clawpatch_options_t* clawpatch_opt = fclaw_clawpatch_get_options(glob);

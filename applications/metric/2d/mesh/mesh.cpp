@@ -69,12 +69,12 @@ void register_user_options (fclaw_app_t * app,
 }
 
 static 
-void user_set_options (fclaw2d_global_t* glob, user_options_t* user)
+void user_set_options (fclaw_global_t* glob, user_options_t* user)
 {
     fclaw2d_global_options_store(glob, "user", user);
 }
 
-const user_options_t* mesh_user_get_options(fclaw2d_global_t* glob)
+const user_options_t* mesh_user_get_options(fclaw_global_t* glob)
 {
     return (user_options_t*) fclaw2d_global_get_options(glob, "user");
 }
@@ -99,7 +99,7 @@ fclaw_domain_t* create_domain(sc_MPI_Comm mpicomm, amr_options_t* gparms)
 }
 
 static
-void run_program(fclaw2d_global_t* glob)
+void run_program(fclaw_global_t* glob)
 {
     user_options_t           *user;
 
@@ -143,7 +143,7 @@ main (int argc, char **argv)
     fc2d_clawpack46_options_t   *claw46opt;
     fc2d_clawpack5_options_t    *claw5opt;
 
-    fclaw2d_global_t         *glob;
+    fclaw_global_t         *glob;
     fclaw_domain_t         *domain;
     sc_MPI_Comm mpicomm;
 

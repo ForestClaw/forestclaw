@@ -52,14 +52,14 @@ typedef struct user_options
 
 } user_options_t;
 
-void slosh_link_solvers(fclaw2d_global_t *glob);
+void slosh_link_solvers(fclaw_global_t *glob);
 
 user_options_t* slosh_options_register (fclaw_app_t * app,
                                        const char *configfile);
 
-void slosh_options_store (fclaw2d_global_t* glob, user_options_t* user);
+void slosh_options_store (fclaw_global_t* glob, user_options_t* user);
 
-user_options_t* slosh_get_options(fclaw2d_global_t* glob);
+user_options_t* slosh_get_options(fclaw_global_t* glob);
 
 
 

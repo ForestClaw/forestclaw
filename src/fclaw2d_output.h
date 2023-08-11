@@ -34,11 +34,11 @@ extern "C"
 #endif
 #endif
 
-struct fclaw2d_global;  /* This is a hack !! */
+struct fclaw_global;  /* This is a hack !! */
 
-void fclaw2d_output_frame(struct fclaw2d_global * glob, int iframe);
+void fclaw2d_output_frame(struct fclaw_global * glob, int iframe);
 
-void fclaw2d_output_frame_tikz(struct fclaw2d_global* glob, int iframe);
+void fclaw2d_output_frame_tikz(struct fclaw_global* glob, int iframe);
 
 #ifdef __cplusplus
 #if 0

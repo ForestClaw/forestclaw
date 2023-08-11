@@ -47,15 +47,15 @@ typedef struct user_options
 
 } user_options_t;
 
-void burgers_link_solvers(fclaw2d_global_t *glob);
+void burgers_link_solvers(fclaw_global_t *glob);
 
 /* ------------------------------------- Options ---------------------------------------*/
 user_options_t* burgers_options_register (fclaw_app_t * app,
                                         const char *configfile);
 
-void burgers_options_store (fclaw2d_global_t* glob, user_options_t* user);
+void burgers_options_store (fclaw_global_t* glob, user_options_t* user);
 
-const user_options_t* burgers_get_options(fclaw2d_global_t* glob);
+const user_options_t* burgers_get_options(fclaw_global_t* glob);
 
 /* ------------------------------------ Fortran ----------------------------------------*/
 #define BURGERS_FLUX2 FCLAW_F77_FUNC(burgers_flux2,BURGERS_FLUX2)

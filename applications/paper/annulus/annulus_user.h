@@ -61,7 +61,7 @@ typedef struct user_options
 user_options_t;
 
 
-void annulus_link_solvers(fclaw2d_global_t *glob);
+void annulus_link_solvers(fclaw_global_t *glob);
 
 #define SETPROB_ANNULUS FCLAW_F77_FUNC(setprob_annulus, \
                                        SETPROB_ANNULUS)
@@ -72,9 +72,9 @@ void SETPROB_ANNULUS(void);
 user_options_t* annulus_options_register (fclaw_app_t * app,
                                           const char *configfile);
 
-void annulus_options_store (fclaw2d_global_t* glob, user_options_t* user);
+void annulus_options_store (fclaw_global_t* glob, user_options_t* user);
 
-const user_options_t* annulus_get_options(fclaw2d_global_t *glob);
+const user_options_t* annulus_get_options(fclaw_global_t *glob);
 
 fclaw2d_map_context_t *
     fclaw2d_map_new_annulus (fclaw2d_map_context_t* brick,

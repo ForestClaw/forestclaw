@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <clawpack46_user_fort.h>
 
-void tsunami_link_solvers(fclaw2d_global_t *glob)
+void tsunami_link_solvers(fclaw_global_t *glob)
 {
     fclaw2d_vtable_t *vt = fclaw2d_vt(glob);
     vt->problem_setup = &geoclaw_problem_setup;  /* Version-independent */
@@ -64,7 +64,7 @@ void tsunami_link_solvers(fclaw2d_global_t *glob)
 }
 
 
-void geoclaw_problem_setup(fclaw2d_global_t* glob)
+void geoclaw_problem_setup(fclaw_global_t* glob)
 {
     const user_options_t* user = tsunami_get_options(glob);
 

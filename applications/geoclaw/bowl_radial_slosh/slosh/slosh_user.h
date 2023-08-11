@@ -50,19 +50,19 @@ typedef struct slosh_user_options
   int is_registered;
 } slosh_user_options_t;
 
-void slosh_link_solvers(fclaw2d_global_t *glob);
+void slosh_link_solvers(fclaw_global_t *glob);
 
 slosh_user_options_t* slosh_options_register (fclaw_app_t * app,
                                         const char *section,
                                         const char *configfile);
 
-void slosh_options_store (fclaw2d_global_t* glob, slosh_user_options_t* user);
+void slosh_options_store (fclaw_global_t* glob, slosh_user_options_t* user);
 
-slosh_user_options_t* slosh_get_options(fclaw2d_global_t* glob);
+slosh_user_options_t* slosh_get_options(fclaw_global_t* glob);
 
 fclaw_domain_t* slosh_create_domain(sc_MPI_Comm mpicomm, fclaw_options_t* gparms);
 
-void slosh_run_program(fclaw2d_global_t* glob);
+void slosh_run_program(fclaw_global_t* glob);
 
 #ifdef __cplusplus
 }

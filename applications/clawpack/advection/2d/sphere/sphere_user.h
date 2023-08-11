@@ -50,11 +50,11 @@ typedef struct user_options
 user_options_t* sphere_options_register (fclaw_app_t * app,
                                              const char *configfile);
 
-void sphere_options_store (fclaw2d_global_t* glob, user_options_t* user);
+void sphere_options_store (fclaw_global_t* glob, user_options_t* user);
 
-const user_options_t* sphere_get_options(fclaw2d_global_t* glob);
+const user_options_t* sphere_get_options(fclaw_global_t* glob);
 
-void sphere_link_solvers(fclaw2d_global_t *glob);
+void sphere_link_solvers(fclaw_global_t *glob);
 
 
 #ifdef __cplusplus

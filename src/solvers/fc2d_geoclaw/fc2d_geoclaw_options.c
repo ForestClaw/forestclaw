@@ -229,12 +229,12 @@ fc2d_geoclaw_options_register (fclaw_app_t * app,
     return geo_opt;
 }
 
-fc2d_geoclaw_options_t* fc2d_geoclaw_get_options(fclaw2d_global_t *glob)
+fc2d_geoclaw_options_t* fc2d_geoclaw_get_options(fclaw_global_t *glob)
 {
     return (fc2d_geoclaw_options_t*) fclaw2d_global_get_options(glob, "fc2d_geoclaw");
 }
 
-void fc2d_geoclaw_options_store (fclaw2d_global_t* glob, 
+void fc2d_geoclaw_options_store (fclaw_global_t* glob, 
                                fc2d_geoclaw_options_t* geo_opt)
 {
     fclaw2d_global_options_store(glob, "fc2d_geoclaw", geo_opt);

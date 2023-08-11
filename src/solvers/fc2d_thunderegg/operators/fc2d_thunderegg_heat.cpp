@@ -56,7 +56,7 @@ class heat : public PatchOperator<2>
 public:
     static double lambda;
 
-    heat(fclaw2d_global_t *glob, 
+    heat(fclaw_global_t *glob, 
          const Domain<2>& domain,
          const GhostFiller<2>& ghost_filler);
 
@@ -95,7 +95,7 @@ double fc2d_thunderegg_heat_get_lambda()
     return heat::lambda;
 }
 
-heat::heat(fclaw2d_global_t *glob,
+heat::heat(fclaw_global_t *glob,
            const Domain<2>& domain,
            const GhostFiller<2>& ghost_filler) 
                     : PatchOperator<2>(domain,ghost_filler)
@@ -327,7 +327,7 @@ void heat::modifyRHSForInternalBoundaryConditions(const PatchInfo<2>& pinfo,
 }
  
 
-void fc2d_thunderegg_heat_solve(fclaw2d_global_t *glob) 
+void fc2d_thunderegg_heat_solve(fclaw_global_t *glob) 
 {
     // get needed options
     fclaw_clawpatch_options_t *clawpatch_opt =

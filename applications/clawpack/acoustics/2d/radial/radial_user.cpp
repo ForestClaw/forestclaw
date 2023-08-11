@@ -26,7 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "radial_user.h"
 
 static
-void radial_problem_setup(fclaw2d_global_t* glob)
+void radial_problem_setup(fclaw_global_t* glob)
 {
     user_options_t* user = radial_get_options(glob);
 
@@ -47,7 +47,7 @@ void radial_problem_setup(fclaw2d_global_t* glob)
 }
 
 static
-void radial_patch_setup(fclaw2d_global_t *glob,
+void radial_patch_setup(fclaw_global_t *glob,
                         fclaw_patch_t *patch,
                         int blockno,
                         int patchno)
@@ -94,7 +94,7 @@ void radial_patch_setup(fclaw2d_global_t *glob,
 
 }
 
-void radial_link_solvers(fclaw2d_global_t *glob)
+void radial_link_solvers(fclaw_global_t *glob)
 {
     fclaw2d_vtable_t *vt = fclaw2d_vt(glob);
 

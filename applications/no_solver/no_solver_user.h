@@ -50,25 +50,25 @@ typedef struct user_options
 user_options_t* no_solver_options_register (fclaw_app_t * app,
                                             const char *configfile);
 
-void no_solver_options_store (fclaw2d_global_t* glob, user_options_t* user);
+void no_solver_options_store (fclaw_global_t* glob, user_options_t* user);
 
-const user_options_t* no_solver_get_options(fclaw2d_global_t* glob);
+const user_options_t* no_solver_get_options(fclaw_global_t* glob);
 
 /* ------- Link solvers ------ */
-void no_solver_patch_initialize(fclaw2d_global_t *glob,
+void no_solver_patch_initialize(fclaw_global_t *glob,
                                 fclaw_patch_t *this_patch,
                                 int this_block_idx,
                                 int this_patch_idx);
 
 
-double no_solver_update(fclaw2d_global_t *glob,
+double no_solver_update(fclaw_global_t *glob,
                         fclaw_patch_t *this_patch,
                         int this_block_idx,
                         int this_patch_idx,
                         double t,
                         double dt);
 
-void no_solver_link_solvers(fclaw2d_global_t* global);
+void no_solver_link_solvers(fclaw_global_t* global);
 
 
 /* ------- Mapping functions ------- */

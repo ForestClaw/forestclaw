@@ -36,7 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <sc_mpi.h>
 
 static
-void filament_initialize(fclaw2d_global_t* glob)
+void filament_initialize(fclaw_global_t* glob)
 {
     fclaw2d_set_global_context(glob);
 
@@ -70,7 +70,7 @@ void filament_initialize(fclaw2d_global_t* glob)
 }
 
 static
-void filament_finalize(fclaw2d_global_t* glob)
+void filament_finalize(fclaw_global_t* glob)
 {
     fclaw2d_set_global_context(glob);
 
@@ -80,7 +80,7 @@ void filament_finalize(fclaw2d_global_t* glob)
     fclaw2d_clear_global_context(glob);
 }
 static
-void swirl_initialize(fclaw2d_global_t* glob)
+void swirl_initialize(fclaw_global_t* glob)
 {
     fclaw2d_set_global_context(glob);
 
@@ -116,7 +116,7 @@ void swirl_initialize(fclaw2d_global_t* glob)
     fclaw2d_clear_global_context(glob);
 }
 static
-void swirl_finalize(fclaw2d_global_t* glob)
+void swirl_finalize(fclaw_global_t* glob)
 {
     fclaw2d_set_global_context(glob);
 
@@ -127,7 +127,7 @@ void swirl_finalize(fclaw2d_global_t* glob)
 }
 
 static
-void run_programs(fclaw2d_global_t* globs[], int nglobs)
+void run_programs(fclaw_global_t* globs[], int nglobs)
 {
     for(int i = 0; i < nglobs; i++)
     {
@@ -194,10 +194,10 @@ main (int argc, char **argv)
     fc2d_clawpack46_options_t   *swirl_claw46_opt;
     fc2d_clawpack5_options_t    *swirl_claw5_opt;
 
-    fclaw2d_global_t         *filament_glob;
+    fclaw_global_t         *filament_glob;
     fclaw_domain_t         *filament_domain;
 
-    fclaw2d_global_t         *swirl_glob;
+    fclaw_global_t         *swirl_glob;
     fclaw_domain_t         *swirl_domain;
 
     sc_MPI_Comm mpicomm = sc_MPI_COMM_WORLD;

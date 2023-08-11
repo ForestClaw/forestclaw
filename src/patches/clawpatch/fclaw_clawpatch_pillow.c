@@ -42,7 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 struct fclaw2d_patch_transform_data;  /* Not used here, so we leave it incomplete */
 
 static
-void pillow_copy_block_corner(fclaw2d_global_t* glob,
+void pillow_copy_block_corner(fclaw_global_t* glob,
                               fclaw_patch_t* patch, 
                               fclaw_patch_t *corner_patch,
                               int blockno,
@@ -87,7 +87,7 @@ void pillow_copy_block_corner(fclaw2d_global_t* glob,
 }
 
 static
-void pillow_average_block_corner(fclaw2d_global_t *glob,
+void pillow_average_block_corner(fclaw_global_t *glob,
                                  fclaw_patch_t* coarse_patch,
                                  fclaw_patch_t *fine_patch,
                                  int coarse_blockno,
@@ -139,7 +139,7 @@ void pillow_average_block_corner(fclaw2d_global_t *glob,
 }
 
 static
-void pillow_interpolate_block_corner(fclaw2d_global_t* glob,
+void pillow_interpolate_block_corner(fclaw_global_t* glob,
                                      fclaw_patch_t* coarse_patch,
                                      fclaw_patch_t *fine_patch,
                                      int coarse_blockno,
@@ -184,7 +184,7 @@ void pillow_interpolate_block_corner(fclaw2d_global_t* glob,
 
 /* ----------------------------- Use pillow sphere ------------------------------------ */
 
-void fclaw_clawpatch_use_pillowsphere(fclaw2d_global_t* glob)
+void fclaw_clawpatch_use_pillowsphere(fclaw_global_t* glob)
 {
     fclaw2d_patch_vtable_t* patch_vt = fclaw2d_patch_vt(glob);
 
@@ -231,7 +231,7 @@ void pillow_vt_destroy(void* vt)
 
 static
 void fclaw_clawpatch_pillow_vtable_initialize(int dim, 
-                                              fclaw2d_global_t* glob,
+                                              fclaw_global_t* glob,
                                               int claw_version)
 {
     fclaw_clawpatch_pillow_vtable_t *pillow_vt = pillow_vt_new(dim);
@@ -268,13 +268,13 @@ void fclaw_clawpatch_pillow_vtable_initialize(int dim,
 
 }
 
-void fclaw2d_clawpatch_pillow_vtable_initialize(fclaw2d_global_t* glob,
+void fclaw2d_clawpatch_pillow_vtable_initialize(fclaw_global_t* glob,
                                                 int claw_version)
 {
     fclaw_clawpatch_pillow_vtable_initialize(2,glob,claw_version);
 }
 
-void fclaw3d_clawpatch_pillow_vtable_initialize(fclaw2d_global_t* glob,
+void fclaw3d_clawpatch_pillow_vtable_initialize(fclaw_global_t* glob,
                                                 int claw_version)
 {
     fclaw_clawpatch_pillow_vtable_initialize(3,glob,claw_version);
@@ -284,7 +284,7 @@ void fclaw3d_clawpatch_pillow_vtable_initialize(fclaw2d_global_t* glob,
 /* ------------------------------- Public access functions ---------------------------- */
 
 
-fclaw_clawpatch_pillow_vtable_t* fclaw_clawpatch_pillow_vt(fclaw2d_global_t* glob)
+fclaw_clawpatch_pillow_vtable_t* fclaw_clawpatch_pillow_vt(fclaw_global_t* glob)
 {
 
     fclaw_clawpatch_pillow_vtable_t* pillow_vt = (fclaw_clawpatch_pillow_vtable_t*) 

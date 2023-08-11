@@ -36,7 +36,7 @@ extern "C"
 #endif
 #endif
 
-struct fclaw2d_global;
+struct fclaw_global;
 struct fclaw_patch;
 
 typedef  struct fc2d_clawpack46_vtable  fc2d_clawpack46_vtable_t;
@@ -45,14 +45,14 @@ typedef  struct fc2d_clawpack46_vtable  fc2d_clawpack46_vtable_t;
 /* --------------------------- Clawpack solver functions ------------------------------ */
 
 /* Virtualize clawpack-specific wrapper functions */
-typedef void (*clawpack46_src2_t)(struct fclaw2d_global* glob,
+typedef void (*clawpack46_src2_t)(struct fclaw_global* glob,
 								  struct fclaw_patch *this_patch,
 								  int this_block_idx,
 								  int this_patch_idx,
 								  double t,
 								  double dt);
 	
-typedef void (*clawpack46_b4step2_t)(struct fclaw2d_global* glob,
+typedef void (*clawpack46_b4step2_t)(struct fclaw_global* glob,
 									 struct fclaw_patch *this_patch,
 									 int this_block_idx,
 									 int this_patch_idx,
@@ -197,7 +197,7 @@ struct fc2d_clawpack46_vtable
  * 
  * @param global the global context
  */
-void fc2d_clawpack46_solver_initialize(struct fclaw2d_global* global);
+void fc2d_clawpack46_solver_initialize(struct fclaw_global* global);
 
 /**
  * @brief Get the clawpack46 vtable
@@ -205,37 +205,37 @@ void fc2d_clawpack46_solver_initialize(struct fclaw2d_global* global);
  * @param global the global context
  * @return fc2d_clawpack46_vtable_t* the vtable
  */
-fc2d_clawpack46_vtable_t* fc2d_clawpack46_vt(struct fclaw2d_global* global);
+fc2d_clawpack46_vtable_t* fc2d_clawpack46_vt(struct fclaw_global* global);
 
 
 /* ----------------------------- User access to solver functions ---------------------- */
 
-void fc2d_clawpack46_setprob(struct fclaw2d_global* glob);
+void fc2d_clawpack46_setprob(struct fclaw_global* glob);
 
 
-void fc2d_clawpack46_setaux(struct fclaw2d_global* glob,
+void fc2d_clawpack46_setaux(struct fclaw_global* glob,
 							struct fclaw_patch *this_patch,
 							int this_block_idx,
 							int this_patch_idx);
 
-void fc2d_clawpack46_set_capacity(struct fclaw2d_global* glob,
+void fc2d_clawpack46_set_capacity(struct fclaw_global* glob,
 								  struct fclaw_patch *this_patch,
 								  int this_block_idx,
 								  int this_patch_idx);
 
-void fc2d_clawpack46_qinit(struct fclaw2d_global* glob,
+void fc2d_clawpack46_qinit(struct fclaw_global* glob,
 						   struct fclaw_patch *this_patch,
 						   int this_block_idx,
 						   int this_patch_idx);
 
-void fc2d_clawpack46_b4step2(struct fclaw2d_global* glob,
+void fc2d_clawpack46_b4step2(struct fclaw_global* glob,
 							 struct fclaw_patch *this_patch,
 							 int this_block_idx,
 							 int this_patch_idx,
 							 double t,
 							 double dt);
 
-void fc2d_clawpack46_bc2(struct fclaw2d_global *glob,
+void fc2d_clawpack46_bc2(struct fclaw_global *glob,
 						 struct fclaw_patch *this_patch,
 						 int this_block_idx,
 						 int this_patch_idx,
@@ -244,7 +244,7 @@ void fc2d_clawpack46_bc2(struct fclaw2d_global *glob,
 						 int intersects_bc[],
 						 int time_interp);
 
-void fc2d_clawpack46_src2(struct fclaw2d_global* glob,
+void fc2d_clawpack46_src2(struct fclaw_global* glob,
 						  struct fclaw_patch *this_patch,
 						  int this_block_idx,
 						  int this_patch_idx,

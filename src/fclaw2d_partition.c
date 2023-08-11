@@ -110,7 +110,7 @@ void  cb_partition_transfer(fclaw_domain_t * old_domain,
    Public interface
    -------------------------------------------------------------------------- */
 /* Question : Do all patches on this processor get packed? */
-void fclaw2d_partition_domain(fclaw2d_global_t* glob,
+void fclaw2d_partition_domain(fclaw_global_t* glob,
                               fclaw2d_timer_names_t running)
 {
     fclaw_domain_t** domain = &glob->domain;

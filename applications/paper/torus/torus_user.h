@@ -77,15 +77,15 @@ void COMPUTE_EXACT();
 
 
 
-void torus_link_solvers(fclaw2d_global_t *glob);
+void torus_link_solvers(fclaw_global_t *glob);
 
 user_options_t* torus_options_register (fclaw_app_t * app,
                                        const char *configfile);
 
 
-void torus_options_store (fclaw2d_global_t* glob, user_options_t* user);
+void torus_options_store (fclaw_global_t* glob, user_options_t* user);
 
-const user_options_t* torus_get_options(fclaw2d_global_t* glob);
+const user_options_t* torus_get_options(fclaw_global_t* glob);
 
 fclaw2d_map_context_t *
     fclaw2d_map_new_torus (fclaw2d_map_context_t* brick, const double scale[]);

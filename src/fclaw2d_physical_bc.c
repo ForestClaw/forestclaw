@@ -31,7 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_global.h>
 #include <fclaw2d_patch.h>
 
-void fclaw2d_physical_bc_default(fclaw2d_global_t *glob,
+void fclaw2d_physical_bc_default(fclaw_global_t *glob,
                                  fclaw_patch_t *this_patch,
                                  int this_block_idx,
                                  int this_patch_idx,
@@ -76,7 +76,7 @@ void cb_fclaw2d_physical_set_bc(fclaw_domain_t *domain,
 }
 
 /* This is needed by other routines, so we don't set it to static. */
-void fclaw2d_physical_get_bc(fclaw2d_global_t *glob,
+void fclaw2d_physical_get_bc(fclaw_global_t *glob,
                              int this_block_idx,
                              int this_patch_idx,
                              int *intersects_bdry)
@@ -97,7 +97,7 @@ void fclaw2d_physical_get_bc(fclaw2d_global_t *glob,
    Public interface : Set physical boundary conditions on a patch
    ----------------------------------------------------------------------------- */
 
-void fclaw2d_physical_set_bc(fclaw2d_global_t *glob,
+void fclaw2d_physical_set_bc(fclaw_global_t *glob,
                              int level,
                              double sync_time,
                              int time_interp)

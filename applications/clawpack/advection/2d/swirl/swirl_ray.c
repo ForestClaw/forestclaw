@@ -146,7 +146,7 @@ int swirl_intersect_ray (fclaw_domain_t *domain,
                          void* user)
 {
 
-    fclaw2d_global_t *glob = (fclaw2d_global_t*) user;
+    fclaw_global_t *glob = (fclaw_global_t*) user;
 
     /* assert that ray is a valid swirl_ray_t */
     fclaw2d_ray_t *fclaw_ray = (fclaw2d_ray_t *) ray;  
@@ -296,7 +296,7 @@ static int nlines = 3;
 
 /* Virtual function for setting rays */
 static
-void swirl_allocate_and_define_rays(fclaw2d_global_t *glob, 
+void swirl_allocate_and_define_rays(fclaw_global_t *glob, 
                                     fclaw2d_ray_t** rays, 
                                     int* num_rays)
 {
@@ -339,7 +339,7 @@ void swirl_allocate_and_define_rays(fclaw2d_global_t *glob,
 
 
 static
-void swirl_deallocate_rays(fclaw2d_global_t *glob, 
+void swirl_deallocate_rays(fclaw_global_t *glob, 
                            fclaw2d_ray_t** rays, 
                            int* num_rays)
 {
@@ -358,7 +358,7 @@ void swirl_deallocate_rays(fclaw2d_global_t *glob,
     *num_rays = fclaw2d_ray_deallocate_rays(rays);
 }
 
-void swirl_initialize_rays(fclaw2d_global_t* glob)
+void swirl_initialize_rays(fclaw_global_t* glob)
 {
     /* Set up rays */
     fclaw2d_ray_vtable_t* rays_vt = fclaw2d_ray_vt(glob); 

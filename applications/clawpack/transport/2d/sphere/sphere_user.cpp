@@ -26,7 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "sphere_user.h"
 
 static
-void sphere_problem_setup(fclaw2d_global_t* glob)
+void sphere_problem_setup(fclaw_global_t* glob)
 {
     const user_options_t* user = sphere_get_options(glob);
 
@@ -46,7 +46,7 @@ void sphere_problem_setup(fclaw2d_global_t* glob)
     SETPROB();
 }
 
-void sphere_patch_setup_manifold(fclaw2d_global_t *glob,
+void sphere_patch_setup_manifold(fclaw_global_t *glob,
                                     fclaw_patch_t *patch,
                                     int blockno,
                                     int patchno)
@@ -58,7 +58,7 @@ void sphere_patch_setup_manifold(fclaw2d_global_t *glob,
 
 
 static
-void sphere_b4step2(fclaw2d_global_t *glob,
+void sphere_b4step2(fclaw_global_t *glob,
                     fclaw_patch_t *patch,
                     int blockno,
                     int patchno,
@@ -78,7 +78,7 @@ void cb_sphere_output_ascii (fclaw_domain_t * domain,
                             void *user)
 {
     fclaw2d_global_iterate_t* s = (fclaw2d_global_iterate_t*) user;
-    fclaw2d_global_t      *glob = (fclaw2d_global_t*) s->glob;
+    fclaw_global_t      *glob = (fclaw_global_t*) s->glob;
 
     //fclaw_clawpatch_vtable_t *clawpatch_vt = fclaw_clawpatch_vt(glob);
 
@@ -131,7 +131,7 @@ void cb_sphere_output_ascii (fclaw_domain_t * domain,
 
 
 
-void sphere_link_solvers(fclaw2d_global_t *glob)
+void sphere_link_solvers(fclaw_global_t *glob)
 {
     /* ForestClaw core functions */
     fclaw2d_vtable_t *vt = fclaw2d_vt(glob);

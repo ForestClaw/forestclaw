@@ -38,7 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_clawpatch_fort.h>
 
 static
-void periodic_problem_setup(fclaw2d_global_t* glob)
+void periodic_problem_setup(fclaw_global_t* glob)
 {
     const user_options_t* user = periodic_get_options(glob);
 
@@ -70,7 +70,7 @@ void cb_periodic_output_ascii (fclaw_domain_t * domain,
     int iframe;
 
     fclaw2d_global_iterate_t* s = (fclaw2d_global_iterate_t*) user;
-    fclaw2d_global_t      *glob = (fclaw2d_global_t*) s->glob;
+    fclaw_global_t      *glob = (fclaw_global_t*) s->glob;
 
     //fclaw_clawpatch_vtable_t *clawpatch_vt = fclaw_clawpatch_vt(glob);
     const fclaw_options_t         *fclaw_opt = fclaw2d_get_options(glob);
@@ -113,7 +113,7 @@ void cb_periodic_output_ascii (fclaw_domain_t * domain,
 
 
 
-void periodic_link_solvers(fclaw2d_global_t *glob)
+void periodic_link_solvers(fclaw_global_t *glob)
 {
     fclaw2d_vtable_t *vt = fclaw2d_vt(glob);
 

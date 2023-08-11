@@ -91,9 +91,9 @@ typedef struct heat_options
 heat_options_t* heat_options_register (fclaw_app_t * app,
                                            const char *configfile);
 
-void heat_options_store(fclaw2d_global_t* glob, heat_options_t* user);
+void heat_options_store(fclaw_global_t* glob, heat_options_t* user);
 
-const heat_options_t* heat_get_options(fclaw2d_global_t* glob);
+const heat_options_t* heat_get_options(fclaw_global_t* glob);
 
 
 #ifdef __cplusplus

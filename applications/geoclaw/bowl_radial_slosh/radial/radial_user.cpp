@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw_filesystem.h>
 
-void radial_link_solvers(fclaw2d_global_t *glob)
+void radial_link_solvers(fclaw_global_t *glob)
 {
 
 	/* User customizations ... */
@@ -58,7 +58,7 @@ fclaw_domain_t* radial_create_domain(sc_MPI_Comm mpicomm,
     return domain;
 }
 
-void radial_run_program(fclaw2d_global_t* glob)
+void radial_run_program(fclaw_global_t* glob)
 {
     fclaw2d_set_global_context(glob);
 

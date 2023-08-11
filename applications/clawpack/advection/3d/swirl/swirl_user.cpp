@@ -27,7 +27,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw3d_metric.h>
 
-void swirl_problem_setup(fclaw2d_global_t *glob)
+void swirl_problem_setup(fclaw_global_t *glob)
 {
     const user_options_t* user = swirl_get_options(glob);
     fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
@@ -50,7 +50,7 @@ void swirl_problem_setup(fclaw2d_global_t *glob)
 }
 
 static
-void swirl_patch_setup(fclaw2d_global_t *glob,
+void swirl_patch_setup(fclaw_global_t *glob,
                           fclaw_patch_t *patch,
                           int blockno,
                           int patchno)
@@ -78,7 +78,7 @@ void swirl_patch_setup(fclaw2d_global_t *glob,
 }
 
 
-void swirl_link_solvers(fclaw2d_global_t *glob)
+void swirl_link_solvers(fclaw_global_t *glob)
 {
     fclaw2d_vtable_t *fclaw_vt = fclaw2d_vt(glob);
     fclaw_vt->problem_setup = swirl_problem_setup;

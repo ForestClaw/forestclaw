@@ -91,9 +91,9 @@ typedef struct poisson_options
 poisson_options_t* poisson_options_register (fclaw_app_t * app,
                                            const char *configfile);
 
-void poisson_options_store(fclaw2d_global_t* glob, poisson_options_t* user);
+void poisson_options_store(fclaw_global_t* glob, poisson_options_t* user);
 
-const poisson_options_t* poisson_get_options(fclaw2d_global_t* glob);
+const poisson_options_t* poisson_get_options(fclaw_global_t* glob);
 
 
 #ifdef __cplusplus

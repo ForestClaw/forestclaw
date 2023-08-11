@@ -56,11 +56,11 @@ filament_options_t* filament_options_register (fclaw_app_t * app,
                                                const char *section,
                                                const char *configfile);
 
-void filament_options_store (fclaw2d_global_t* glob, filament_options_t* user);
+void filament_options_store (fclaw_global_t* glob, filament_options_t* user);
 
-const filament_options_t* filament_get_options(fclaw2d_global_t* glob);
+const filament_options_t* filament_get_options(fclaw_global_t* glob);
 
-void filament_link_solvers(fclaw2d_global_t *glob);
+void filament_link_solvers(fclaw_global_t *glob);
 
 fclaw_domain_t* filament_create_domain(sc_MPI_Comm mpicomm, 
                                          fclaw_options_t* fclaw_opt, 

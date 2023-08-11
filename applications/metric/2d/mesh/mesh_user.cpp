@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fc2d_clawpack46.h>
 #include <fc2d_clawpack5.h>
 
-void mesh_link_solvers(fclaw2d_global_t *glob)
+void mesh_link_solvers(fclaw_global_t *glob)
 {
     const user_options_t* user = mesh_user_get_options(glob);
 
@@ -56,7 +56,7 @@ void mesh_link_solvers(fclaw2d_global_t *glob)
     }
 }
 
-void mesh_problem_setup(fclaw2d_global_t* glob)
+void mesh_problem_setup(fclaw_global_t* glob)
 {
     const user_options_t* user = mesh_user_get_options(glob);
 

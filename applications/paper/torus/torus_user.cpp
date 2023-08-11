@@ -38,7 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 static
-void torus_problem_setup(fclaw2d_global_t *glob)
+void torus_problem_setup(fclaw_global_t *glob)
 {
     const user_options_t* user = torus_get_options(glob);
 
@@ -65,7 +65,7 @@ void torus_problem_setup(fclaw2d_global_t *glob)
 
 
 static
-void torus_patch_setup(fclaw2d_global_t *glob,
+void torus_patch_setup(fclaw_global_t *glob,
                        fclaw_patch_t *patch,
                        int blockno, int patchno)
 {
@@ -111,7 +111,7 @@ void cb_torus_output_ascii (fclaw_domain_t * domain,
                             void *user)
 {
     fclaw2d_global_iterate_t* s = (fclaw2d_global_iterate_t*) user;
-    fclaw2d_global_t      *glob = (fclaw2d_global_t*) s->glob;
+    fclaw_global_t      *glob = (fclaw_global_t*) s->glob;
 
     const user_options_t *user_opt =  torus_get_options(glob);
 
@@ -164,7 +164,7 @@ void cb_torus_output_ascii (fclaw_domain_t * domain,
 }
 
 
-void torus_link_solvers(fclaw2d_global_t *glob)
+void torus_link_solvers(fclaw_global_t *glob)
 {
 
     fclaw2d_vtable_t *vt = fclaw2d_vt(glob);

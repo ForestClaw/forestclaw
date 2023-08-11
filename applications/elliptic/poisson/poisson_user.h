@@ -59,7 +59,7 @@ extern "C"
 
 /* --------------------------- Problem dependent functions -----------------------------*/
 
-void poisson_link_solvers(fclaw2d_global_t *glob);
+void poisson_link_solvers(fclaw_global_t *glob);
 
 
 /* --------------------------- Fortran functions ---------------------------------------*/

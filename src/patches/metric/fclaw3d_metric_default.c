@@ -31,7 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "fclaw3d_metric_default_fort.h"
 
 
-void fclaw3d_metric_compute_mesh_default(fclaw2d_global_t *glob,
+void fclaw3d_metric_compute_mesh_default(fclaw_global_t *glob,
                                          fclaw_patch_t* patch,
                                          int blockno,
                                          int patchno)
@@ -59,7 +59,7 @@ void fclaw3d_metric_compute_mesh_default(fclaw2d_global_t *glob,
 }
 
 
-void fclaw3d_metric_compute_basis_default(fclaw2d_global_t *glob,
+void fclaw3d_metric_compute_basis_default(fclaw_global_t *glob,
                                           fclaw_patch_t *patch,
                                           int blockno,
                                           int patchno)
@@ -93,7 +93,7 @@ void fclaw3d_metric_compute_basis_default(fclaw2d_global_t *glob,
 }
 
 
-void fclaw3d_metric_compute_volume_default(fclaw2d_global_t *glob,
+void fclaw3d_metric_compute_volume_default(fclaw_global_t *glob,
                                          fclaw_patch_t *patch,
                                          int blockno,
                                          int patchno)
@@ -144,7 +144,7 @@ void fclaw3d_metric_compute_volume_default(fclaw2d_global_t *glob,
     FCLAW_FREE(hexstore);
 }
 
-void fclaw3d_metric_compute_volume_ghost_default(fclaw2d_global_t* glob,
+void fclaw3d_metric_compute_volume_ghost_default(fclaw_global_t* glob,
                                                  fclaw_patch_t* patch,
                                                  int blockno,
                                                  int patchno)

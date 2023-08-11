@@ -281,7 +281,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define fclaw2d_iterate_family_cb       fclaw3d_iterate_family_cb
 #define fclaw2d_domain_integrate_rays   fclaw3d_domain_integrate_rays
 #define fclaw2d_overlap_exchange        fclaw3d_overlap_exchange
-#define fclaw2d_global_t                fclaw3d_global_t
+#define fclaw_global_t                fclaw3d_global_t
 #define fclaw2d_global_iterate_t        fclaw3d_global_iterate_t
 #define fclaw2d_global_new              fclaw3d_global_new
 #define fclaw2d_global_new_comm         fclaw3d_global_new_comm

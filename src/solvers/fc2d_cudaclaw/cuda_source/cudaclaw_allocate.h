@@ -10,7 +10,7 @@ extern "C"
 
 
 struct fclaw2d_patch;
-struct fclaw2d_global;
+struct fclaw_global;
 
 /* This can breaks cuda if memory is not aligne dproperly; use -malign-double flag
    in gcc */

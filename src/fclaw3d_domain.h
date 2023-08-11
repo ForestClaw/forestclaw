@@ -40,7 +40,7 @@ extern "C"
 #endif
 #endif
 
-struct fclaw3d_global;
+struct fclaw_global;
 
 typedef struct fclaw3d_domain_data
 {
@@ -57,10 +57,10 @@ void fclaw3d_domain_data_new(struct fclaw_domain *domain);
 
 void fclaw3d_domain_data_delete(struct fclaw_domain* domain);
 
-void fclaw3d_domain_setup(struct fclaw3d_global* glob,
+void fclaw3d_domain_setup(struct fclaw_global* glob,
                           struct fclaw_domain* new_domain);
 
-void fclaw3d_domain_reset(struct fclaw3d_global* glob);
+void fclaw3d_domain_reset(struct fclaw_global* glob);
 
 fclaw3d_domain_data_t* fclaw3d_domain_get_data(struct fclaw_domain *domain);
 
