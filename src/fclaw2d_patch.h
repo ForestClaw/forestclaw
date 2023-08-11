@@ -1259,25 +1259,25 @@ typedef void (*fclaw_patch_average2coarse_t)(struct fclaw_global *glob,
 ///@{
 
 /** @copydoc fclaw2d_patch_ghost_packsize() */
-typedef size_t (*fclaw2d_patch_ghost_packsize_t)(struct fclaw_global* glob);
+typedef size_t (*fclaw_patch_ghost_packsize_t)(struct fclaw_global* glob);
 
 /** @copydoc fclaw2d_patch_local_ghost_pack() */
-typedef void (*fclaw2d_patch_local_ghost_pack_t)(struct fclaw_global *glob,
+typedef void (*fclaw_patch_local_ghost_pack_t)(struct fclaw_global *glob,
                                                  struct fclaw_patch *this_patch,
                                                  void *patch_data,
                                                  int time_interp);
 
 /** @copydoc fclaw2d_patch_local_ghost_alloc() */
-typedef void (*fclaw2d_patch_local_ghost_alloc_t)(struct fclaw_global* glob,
+typedef void (*fclaw_patch_local_ghost_alloc_t)(struct fclaw_global* glob,
                                                  void** q);
 
 /** @copydoc fclaw2d_patch_local_ghost_free() */
-typedef void (*fclaw2d_patch_local_ghost_free_t)(struct fclaw_global* glob,
+typedef void (*fclaw_patch_local_ghost_free_t)(struct fclaw_global* glob,
                                                  void **q);
 
 
 /** @copydoc fclaw2d_patch_remote_ghost_build() */
-typedef void (*fclaw2d_patch_remote_ghost_build_t)(struct fclaw_global *glob,
+typedef void (*fclaw_patch_remote_ghost_build_t)(struct fclaw_global *glob,
                                                    struct fclaw_patch *this_patch,
                                                    int blockno,
                                                    int patchno,
@@ -1291,20 +1291,20 @@ typedef void (*fclaw2d_patch_remote_ghost_build_t)(struct fclaw_global *glob,
  * @param[in] blockno the block number
  * @param[in] blockno the patch number
  */
-typedef void (*fclaw2d_patch_remote_ghost_setup_t)(struct fclaw_global *glob,
+typedef void (*fclaw_patch_remote_ghost_setup_t)(struct fclaw_global *glob,
                                                    struct fclaw_patch *this_patch,
                                                    int blockno,
                                                    int patchno);
 
 
 /** @copydoc fclaw2d_patch_remote_ghost_unpack() */
-typedef void (*fclaw2d_patch_remote_ghost_unpack_t)(struct fclaw_global *glob,
+typedef void (*fclaw_patch_remote_ghost_unpack_t)(struct fclaw_global *glob,
                                                     struct fclaw_patch* this_patch,
                                                     int blockno, int patchno,
                                                     void *qdata, int time_interp);
 
 /** @copydoc fclaw2d_patch_remote_ghost_delete() */
-typedef void (*fclaw2d_patch_remote_ghost_delete_t)(void *user_patch);
+typedef void (*fclaw_patch_remote_ghost_delete_t)(void *user_patch);
 
 
 ///@}
@@ -1409,9 +1409,74 @@ typedef void* (*fclaw2d_patch_metric_patch_t)(struct fclaw_patch *patch);
 /* ------------------------------------------------------------------------------------ */
 ///@{
 
+typedef struct fclaw_patch_vtable_d2
+{
+    /** @copybrief ::fclaw2d_patch_metric_patch_t */
+    fclaw2d_patch_metric_patch_t          metric_patch;
+
+    /** @{ @name Face Ghost Filling Functions */
+
+    /** @copybrief ::fclaw2d_patch_copy_face_t */
+    fclaw2d_patch_copy_face_t             copy_face;
+    /** @copybrief ::fclaw2d_patch_average_face_t */
+    fclaw2d_patch_average_face_t          average_face;
+    /** @copybrief ::fclaw2d_patch_interpolate_face_t */
+    fclaw2d_patch_interpolate_face_t      interpolate_face;
+
+    /** @} */
+
+    /** @{ @name Block Face and Interior Corner Ghost Filling Functions */
+
+    /** @copybrief ::fclaw2d_patch_copy_corner_t */
+    fclaw2d_patch_copy_corner_t           copy_corner;
+    /** @copybrief ::fclaw2d_patch_average_corner_t */
+    fclaw2d_patch_average_corner_t        average_corner;
+    /** @copybrief ::fclaw2d_patch_interpolate_corner_t */
+    fclaw2d_patch_interpolate_corner_t    interpolate_corner;
+
+    /** @} */
+
+    /** @{ @name Block Corner Ghost Filling Functions */
+
+    /** @copybrief ::fclaw2d_patch_copy_corner_t */
+    fclaw2d_patch_copy_corner_t           copy_block_corner;
+    /** @copybrief ::fclaw2d_patch_average_corner_t */
+    fclaw2d_patch_average_corner_t        average_block_corner;
+    /** @copybrief ::fclaw2d_patch_interpolate_corner_t */
+    fclaw2d_patch_interpolate_corner_t    interpolate_block_corner;
+
+    /** @} */
+
+    /** @{ @name Transform Functions */
+
+    /** @copybrief ::fclaw2d_patch_transform_init_data_t */
+    fclaw2d_patch_transform_init_data_t        transform_init_data;
+    /** @copybrief ::fclaw2d_patch_transform_blockface_t */
+    fclaw2d_patch_transform_blockface_t        transform_face;
+    /** @copybrief ::fclaw2d_patch_transform_blockface_intra_t */
+    fclaw2d_patch_transform_blockface_intra_t  transform_face_intra;
+
+    /** @} */
+
+    /** @{ @name Time Syncing Functions for Conservation */
+
+    /** @copybrief ::fclaw2d_patch_time_sync_f2c_t */
+    fclaw2d_patch_time_sync_f2c_t         time_sync_f2c;
+    /** @copybrief ::fclaw2d_patch_time_sync_samesize_t */
+    fclaw2d_patch_time_sync_samesize_t    time_sync_samesize;
+    /** @copybrief ::fclaw2d_patch_time_sync_reset_t */
+    fclaw2d_patch_time_sync_reset_t       time_sync_reset;
+
+    /** @} */
+
+} fclaw_patch_vtable_d2_t;
+
 /** vtable for patch level routines */
 struct fclaw2d_patch_vtable
 {
+    int dim;
+    fclaw_patch_vtable_d2_t* d2;
+
     /** @{ @name Creating/Deleting/Building */
 
     /** @copybrief ::fclaw_patch_new_t */
@@ -1486,83 +1551,25 @@ struct fclaw2d_patch_vtable
 
     /** @} */
 
-    /** @copybrief ::fclaw2d_patch_metric_patch_t */
-    fclaw2d_patch_metric_patch_t          metric_patch;
-
-    /** @{ @name Face Ghost Filling Functions */
-
-    /** @copybrief ::fclaw2d_patch_copy_face_t */
-    fclaw2d_patch_copy_face_t             copy_face;
-    /** @copybrief ::fclaw2d_patch_average_face_t */
-    fclaw2d_patch_average_face_t          average_face;
-    /** @copybrief ::fclaw2d_patch_interpolate_face_t */
-    fclaw2d_patch_interpolate_face_t      interpolate_face;
-
-    /** @} */
-
-    /** @{ @name Block Face and Interior Corner Ghost Filling Functions */
-
-    /** @copybrief ::fclaw2d_patch_copy_corner_t */
-    fclaw2d_patch_copy_corner_t           copy_corner;
-    /** @copybrief ::fclaw2d_patch_average_corner_t */
-    fclaw2d_patch_average_corner_t        average_corner;
-    /** @copybrief ::fclaw2d_patch_interpolate_corner_t */
-    fclaw2d_patch_interpolate_corner_t    interpolate_corner;
-
-    /** @} */
-
-    /** @{ @name Block Corner Ghost Filling Functions */
-
-    /** @copybrief ::fclaw2d_patch_copy_corner_t */
-    fclaw2d_patch_copy_corner_t           copy_block_corner;
-    /** @copybrief ::fclaw2d_patch_average_corner_t */
-    fclaw2d_patch_average_corner_t        average_block_corner;
-    /** @copybrief ::fclaw2d_patch_interpolate_corner_t */
-    fclaw2d_patch_interpolate_corner_t    interpolate_block_corner;
-
-    /** @} */
-
-    /** @{ @name Transform Functions */
-
-    /** @copybrief ::fclaw2d_patch_transform_init_data_t */
-    fclaw2d_patch_transform_init_data_t        transform_init_data;
-    /** @copybrief ::fclaw2d_patch_transform_blockface_t */
-    fclaw2d_patch_transform_blockface_t        transform_face;
-    /** @copybrief ::fclaw2d_patch_transform_blockface_intra_t */
-    fclaw2d_patch_transform_blockface_intra_t  transform_face_intra;
-
-    /** @} */
-
     /** @{ @name Ghost Packing Functions (for parallel use) */
 
     /** @copybrief ::fclaw2d_patch_ghost_packsize_t */
-    fclaw2d_patch_ghost_packsize_t        ghost_packsize;
+    fclaw_patch_ghost_packsize_t        ghost_packsize;
     /** @copybrief ::fclaw2d_patch_local_ghost_pack_t */
-    fclaw2d_patch_local_ghost_pack_t      local_ghost_pack;
+    fclaw_patch_local_ghost_pack_t      local_ghost_pack;
     /** @copybrief ::fclaw2d_patch_local_ghost_alloc_t */
-    fclaw2d_patch_local_ghost_alloc_t     local_ghost_alloc;
+    fclaw_patch_local_ghost_alloc_t     local_ghost_alloc;
     /** @copybrief ::fclaw2d_patch_local_ghost_free_t */
-    fclaw2d_patch_local_ghost_free_t      local_ghost_free;
+    fclaw_patch_local_ghost_free_t      local_ghost_free;
 
     /** @copybrief ::fclaw2d_patch_remote_ghost_build_t */
-    fclaw2d_patch_remote_ghost_build_t    remote_ghost_build;
+    fclaw_patch_remote_ghost_build_t    remote_ghost_build;
     /** @copybrief ::fclaw2d_patch_remote_ghost_setup_t */
-    fclaw2d_patch_remote_ghost_setup_t    remote_ghost_setup;
+    fclaw_patch_remote_ghost_setup_t    remote_ghost_setup;
     /** @copybrief ::fclaw2d_patch_remote_ghost_unpack_t */
-    fclaw2d_patch_remote_ghost_unpack_t   remote_ghost_unpack;
+    fclaw_patch_remote_ghost_unpack_t   remote_ghost_unpack;
     /** @copybrief ::fclaw2d_patch_remote_ghost_delete_t */
-    fclaw2d_patch_remote_ghost_delete_t   remote_ghost_delete;
-
-    /** @} */
-
-    /** @{ @name Time Syncing Functions for Conservation */
-
-    /** @copybrief ::fclaw2d_patch_time_sync_f2c_t */
-    fclaw2d_patch_time_sync_f2c_t         time_sync_f2c;
-    /** @copybrief ::fclaw2d_patch_time_sync_samesize_t */
-    fclaw2d_patch_time_sync_samesize_t    time_sync_samesize;
-    /** @copybrief ::fclaw2d_patch_time_sync_reset_t */
-    fclaw2d_patch_time_sync_reset_t       time_sync_reset;
+    fclaw_patch_remote_ghost_delete_t   remote_ghost_delete;
 
     /** @} */
 

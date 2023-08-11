@@ -188,9 +188,9 @@ void fclaw_clawpatch_use_pillowsphere(fclaw_global_t* glob)
 {
     fclaw2d_patch_vtable_t* patch_vt = fclaw2d_patch_vt(glob);
 
-    patch_vt->copy_block_corner          = pillow_copy_block_corner;
-    patch_vt->average_block_corner       = pillow_average_block_corner;
-    patch_vt->interpolate_block_corner   = pillow_interpolate_block_corner;
+    patch_vt->d2->copy_block_corner          = pillow_copy_block_corner;
+    patch_vt->d2->average_block_corner       = pillow_average_block_corner;
+    patch_vt->d2->interpolate_block_corner   = pillow_interpolate_block_corner;
 
 }
 

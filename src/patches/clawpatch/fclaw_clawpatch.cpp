@@ -1540,31 +1540,31 @@ void fclaw_clawpatch_vtable_initialize(int dim, fclaw_global_t* glob,
     patch_vt->setup_timeinterp      = clawpatch_setup_timeinterp;
 
     /* Ghost filling */
-    patch_vt->copy_face            = clawpatch_copy_face;
-    patch_vt->average_face         = clawpatch_average_face;
-    patch_vt->interpolate_face     = clawpatch_interpolate_face;
+    patch_vt->d2->copy_face            = clawpatch_copy_face;
+    patch_vt->d2->average_face         = clawpatch_average_face;
+    patch_vt->d2->interpolate_face     = clawpatch_interpolate_face;
 
-    patch_vt->copy_corner          = clawpatch_copy_corner;
-    patch_vt->average_corner       = clawpatch_average_corner;
-    patch_vt->interpolate_corner   = clawpatch_interpolate_corner;
+    patch_vt->d2->copy_corner          = clawpatch_copy_corner;
+    patch_vt->d2->average_corner       = clawpatch_average_corner;
+    patch_vt->d2->interpolate_corner   = clawpatch_interpolate_corner;
 
     /* Assume regular block corners;  Change by calling 'fclaw2d_clawpatch_use_pillowsphere' */    
-    patch_vt->copy_block_corner          = clawpatch_copy_corner;
-    patch_vt->average_block_corner       = clawpatch_average_corner;
-    patch_vt->interpolate_block_corner   = clawpatch_interpolate_corner;
+    patch_vt->d2->copy_block_corner          = clawpatch_copy_corner;
+    patch_vt->d2->average_block_corner       = clawpatch_average_corner;
+    patch_vt->d2->interpolate_block_corner   = clawpatch_interpolate_corner;
 
     if(clawpatch_vt->dim == 2)
     {
         /* Timing syncing module for conservation */
-        patch_vt->time_sync_f2c       = fclaw2d_clawpatch_time_sync_f2c;
-        patch_vt->time_sync_samesize  = fclaw2d_clawpatch_time_sync_samesize;
-        patch_vt->time_sync_reset     = fclaw2d_clawpatch_time_sync_reset;
+        patch_vt->d2->time_sync_f2c       = fclaw2d_clawpatch_time_sync_f2c;
+        patch_vt->d2->time_sync_samesize  = fclaw2d_clawpatch_time_sync_samesize;
+        patch_vt->d2->time_sync_reset     = fclaw2d_clawpatch_time_sync_reset;
     }
 
     /* Transform functions (defined in forestclaw2d */
-    patch_vt->transform_init_data  = fclaw2d_clawpatch_transform_init_data;
-    patch_vt->transform_face       = fclaw2d_clawpatch_face_transformation;       /* forestclaw2d.c */
-    patch_vt->transform_face_intra = fclaw2d_clawpatch_face_transformation_intra; /* forestclaw2d.c */
+    patch_vt->d2->transform_init_data  = fclaw2d_clawpatch_transform_init_data;
+    patch_vt->d2->transform_face       = fclaw2d_clawpatch_face_transformation;       /* forestclaw2d.c */
+    patch_vt->d2->transform_face_intra = fclaw2d_clawpatch_face_transformation_intra; /* forestclaw2d.c */
 
     /* Regridding  functions */
     patch_vt->tag4refinement       = clawpatch_tag4refinement;
@@ -1593,11 +1593,11 @@ void fclaw_clawpatch_vtable_initialize(int dim, fclaw_global_t* glob,
     /* Metric access */
     if(clawpatch_vt->dim == 2)
     {
-        patch_vt->metric_patch = clawpatch_get_metric_patch_2d;
+        patch_vt->d2->metric_patch = clawpatch_get_metric_patch_2d;
     }
     else
     {
-        patch_vt->metric_patch = clawpatch_get_metric_patch_3d;
+        patch_vt->d2->metric_patch = clawpatch_get_metric_patch_3d;
     }
 
     if(clawpatch_vt->dim == 2)

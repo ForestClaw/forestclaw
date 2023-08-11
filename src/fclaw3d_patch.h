@@ -1397,9 +1397,78 @@ typedef void* (*fclaw3d_patch_metric_patch_t)(struct fclaw_patch *patch);
 /* ------------------------------------------------------------------------------------ */
 ///@{
 
+typedef struct fclaw_patch_vtable_d3
+{
+    /** @copybrief ::fclaw2d_patch_metric_patch_t */
+    fclaw3d_patch_metric_patch_t          metric_patch;
+
+
+    /** @{ @name Face Ghost Filling Functions */
+
+    /** @copybrief ::fclaw2d_patch_copy_face_t */
+    fclaw3d_patch_copy_face_t             copy_face;
+    /** @copybrief ::fclaw2d_patch_average_face_t */
+    fclaw3d_patch_average_face_t          average_face;
+    /** @copybrief ::fclaw2d_patch_interpolate_face_t */
+    fclaw3d_patch_interpolate_face_t      interpolate_face;
+
+    /** @} */
+
+    /* Do we want to include a fclaw3d_patch_copy/average/interpolate_edge_t?
+     * Feel free to add. */
+
+    /** @{ @name Block Face and Interior Corner Ghost Filling Functions */
+
+    /** @copybrief ::fclaw2d_patch_copy_corner_t */
+    fclaw3d_patch_copy_corner_t           copy_corner;
+    /** @copybrief ::fclaw2d_patch_average_corner_t */
+    fclaw3d_patch_average_corner_t        average_corner;
+    /** @copybrief ::fclaw2d_patch_interpolate_corner_t */
+    fclaw3d_patch_interpolate_corner_t    interpolate_corner;
+
+    /** @} */
+
+    /** @{ @name Block Corner Ghost Filling Functions */
+
+    /** @copybrief ::fclaw2d_patch_copy_corner_t */
+    fclaw3d_patch_copy_corner_t           copy_block_corner;
+    /** @copybrief ::fclaw2d_patch_average_corner_t */
+    fclaw3d_patch_average_corner_t        average_block_corner;
+    /** @copybrief ::fclaw2d_patch_interpolate_corner_t */
+    fclaw3d_patch_interpolate_corner_t    interpolate_block_corner;
+
+    /** @} */
+
+    /** @{ @name Transform Functions */
+
+    /** @copybrief ::fclaw2d_patch_transform_init_data_t */
+    fclaw3d_patch_transform_init_data_t        transform_init_data;
+    /** @copybrief ::fclaw2d_patch_transform_blockface_t */
+    fclaw3d_patch_transform_blockface_t        transform_face;
+    /** @copybrief ::fclaw2d_patch_transform_blockface_intra_t */
+    fclaw3d_patch_transform_blockface_intra_t  transform_face_intra;
+
+    /** @} */
+
+    /** @{ @name Time Syncing Functions for Conservation */
+
+    /** @copybrief ::fclaw2d_patch_time_sync_f2c_t */
+    fclaw3d_patch_time_sync_f2c_t         time_sync_f2c;
+    /** @copybrief ::fclaw2d_patch_time_sync_samesize_t */
+    fclaw3d_patch_time_sync_samesize_t    time_sync_samesize;
+    /** @copybrief ::fclaw2d_patch_time_sync_reset_t */
+    fclaw3d_patch_time_sync_reset_t     time_sync_reset;
+
+    /** @} */
+
+} fclaw_patch_vtable_d3_t;
+
 /** vtable for patch level routines */
 struct fclaw3d_patch_vtable
 {
+    int dim;
+    fclaw_patch_vtable_d3_t* d3;
+
     /** @{ @name Creating/Deleting/Building */
 
     /** @copybrief ::fclaw2d_patch_new_t */
@@ -1472,57 +1541,6 @@ struct fclaw3d_patch_vtable
 
     /** @} */
 
-    /** @copybrief ::fclaw2d_patch_metric_patch_t */
-    fclaw3d_patch_metric_patch_t          metric_patch;
-
-
-    /** @{ @name Face Ghost Filling Functions */
-
-    /** @copybrief ::fclaw2d_patch_copy_face_t */
-    fclaw3d_patch_copy_face_t             copy_face;
-    /** @copybrief ::fclaw2d_patch_average_face_t */
-    fclaw3d_patch_average_face_t          average_face;
-    /** @copybrief ::fclaw2d_patch_interpolate_face_t */
-    fclaw3d_patch_interpolate_face_t      interpolate_face;
-
-    /** @} */
-
-    /* Do we want to include a fclaw3d_patch_copy/average/interpolate_edge_t?
-     * Feel free to add. */
-
-    /** @{ @name Block Face and Interior Corner Ghost Filling Functions */
-
-    /** @copybrief ::fclaw2d_patch_copy_corner_t */
-    fclaw3d_patch_copy_corner_t           copy_corner;
-    /** @copybrief ::fclaw2d_patch_average_corner_t */
-    fclaw3d_patch_average_corner_t        average_corner;
-    /** @copybrief ::fclaw2d_patch_interpolate_corner_t */
-    fclaw3d_patch_interpolate_corner_t    interpolate_corner;
-
-    /** @} */
-
-    /** @{ @name Block Corner Ghost Filling Functions */
-
-    /** @copybrief ::fclaw2d_patch_copy_corner_t */
-    fclaw3d_patch_copy_corner_t           copy_block_corner;
-    /** @copybrief ::fclaw2d_patch_average_corner_t */
-    fclaw3d_patch_average_corner_t        average_block_corner;
-    /** @copybrief ::fclaw2d_patch_interpolate_corner_t */
-    fclaw3d_patch_interpolate_corner_t    interpolate_block_corner;
-
-    /** @} */
-
-    /** @{ @name Transform Functions */
-
-    /** @copybrief ::fclaw2d_patch_transform_init_data_t */
-    fclaw3d_patch_transform_init_data_t        transform_init_data;
-    /** @copybrief ::fclaw2d_patch_transform_blockface_t */
-    fclaw3d_patch_transform_blockface_t        transform_face;
-    /** @copybrief ::fclaw2d_patch_transform_blockface_intra_t */
-    fclaw3d_patch_transform_blockface_intra_t  transform_face_intra;
-
-    /** @} */
-
     /** @{ @name Ghost Packing Functions (for parallel use) */
 
     /** @copybrief ::fclaw2d_patch_ghost_packsize_t */
@@ -1545,18 +1563,7 @@ struct fclaw3d_patch_vtable
 
     /** @} */
 
-    /** @{ @name Time Syncing Functions for Conservation */
-
-    /** @copybrief ::fclaw2d_patch_time_sync_f2c_t */
-    fclaw3d_patch_time_sync_f2c_t         time_sync_f2c;
-    /** @copybrief ::fclaw2d_patch_time_sync_samesize_t */
-    fclaw3d_patch_time_sync_samesize_t    time_sync_samesize;
-    /** @copybrief ::fclaw2d_patch_time_sync_reset_t */
-    fclaw3d_patch_time_sync_reset_t     time_sync_reset;
-
-    /** @} */
-
-    /** True if vtable has been set */
+   /** True if vtable has been set */
     int is_set;
 };
 
