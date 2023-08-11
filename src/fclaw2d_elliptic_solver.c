@@ -52,7 +52,7 @@ void cb_elliptic_rhs(fclaw_domain_t *domain,
                      int patchno,
                      void* user)
 {
-    fclaw2d_global_iterate_t* g = (fclaw2d_global_iterate_t*) user;
+    fclaw_global_iterate_t* g = (fclaw_global_iterate_t*) user;
 
     fclaw2d_patch_vtable_t* patch_vt = fclaw2d_patch_vt(g->glob);
 

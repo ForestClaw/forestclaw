@@ -92,7 +92,7 @@ void heat_compute(fclaw_domain_t *domain,
                     int patchno,
                     void* user) //void *patch_acc)
 {
-    fclaw2d_global_iterate_t *s = (fclaw2d_global_iterate_t *) user;
+    fclaw_global_iterate_t *s = (fclaw_global_iterate_t *) user;
     heat_error_info_t *error_data = (heat_error_info_t*) s->user; 
 
     /* Accumulate area for final computation of error */

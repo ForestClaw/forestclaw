@@ -34,7 +34,7 @@ void cb_setup_time_interp(fclaw_domain_t *domain,
                           int patchno,
                           void *user)
 {
-    fclaw2d_global_iterate_t *s = (fclaw2d_global_iterate_t*) user;
+    fclaw_global_iterate_t *s = (fclaw_global_iterate_t*) user;
     if (fclaw2d_patch_has_finegrid_neighbors(this_patch))
     {
         double alpha = *((double*) s->user);

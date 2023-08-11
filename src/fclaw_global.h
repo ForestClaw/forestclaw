@@ -73,6 +73,14 @@ struct fclaw_global
     void *user;
 };
 
+typedef struct fclaw_global_iterate fclaw_global_iterate_t;
+
+struct fclaw_global_iterate
+{
+    fclaw_global_t* glob;
+    void* user;
+};
+
 #ifdef __cplusplus
 #if 0
 {                               /* need this because indent is dumb */

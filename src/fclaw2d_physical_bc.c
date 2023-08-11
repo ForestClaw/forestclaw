@@ -49,7 +49,7 @@ void cb_fclaw2d_physical_set_bc(fclaw_domain_t *domain,
                                 int this_patch_idx,
                                 void *user)
 {
-    fclaw2d_global_iterate_t* s = (fclaw2d_global_iterate_t*) user;
+    fclaw_global_iterate_t* s = (fclaw_global_iterate_t*) user;
 
     fclaw2d_physical_time_info_t *t_info;
 

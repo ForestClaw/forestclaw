@@ -44,7 +44,7 @@ void cb_fc2d_thunderegg_physical_bc(fclaw_domain_t *domain,
                                    void *user)
 
 {
-    fclaw2d_global_iterate_t* s = (fclaw2d_global_iterate_t*) user;
+    fclaw_global_iterate_t* s = (fclaw_global_iterate_t*) user;
     fc2d_thunderegg_time_info_t *tinfo = (fc2d_thunderegg_time_info_t*) s->user;
 
     double t = tinfo->t;

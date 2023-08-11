@@ -95,7 +95,7 @@ void update_q(fclaw_domain_t *domain,
               int blockno, int patchno,
               void *user)
 {
-    fclaw2d_global_iterate_t *g = (fclaw2d_global_iterate_t *) user;
+    fclaw_global_iterate_t *g = (fclaw_global_iterate_t *) user;
 
     int mx,my,mbc;
     double xlower,ylower,dx,dy;

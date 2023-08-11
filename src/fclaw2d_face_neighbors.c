@@ -198,7 +198,7 @@ void cb_face_fill(fclaw_domain_t *domain,
 				  int this_patch_idx,
 				  void *user)
 {
-	fclaw2d_global_iterate_t* s = (fclaw2d_global_iterate_t*) user; 
+	fclaw_global_iterate_t* s = (fclaw_global_iterate_t*) user; 
 
 	fclaw2d_exchange_info_t *filltype = (fclaw2d_exchange_info_t*) s->user;
 	int time_interp = filltype->time_interp;

@@ -51,7 +51,7 @@ void cb_time_sync_reset(fclaw_domain_t *domain,
                         int this_patch_idx,
                         void *user)
 {
-	fclaw2d_global_iterate_t* g = (fclaw2d_global_iterate_t*) user;
+	fclaw_global_iterate_t* g = (fclaw_global_iterate_t*) user;
 	fclaw_global_t *glob = (fclaw_global_t*) g->glob;
 
 	fclaw2d_time_sync_info_t *tstype = (fclaw2d_time_sync_info_t*) g->user;

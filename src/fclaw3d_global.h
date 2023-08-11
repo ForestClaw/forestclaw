@@ -53,14 +53,6 @@ void fclaw3d_iterate_family_cb
 
 /* much of the following will move into fclaw_global.h */
 
-typedef struct fclaw3d_global_iterate fclaw3d_global_iterate_t;
-
-struct fclaw3d_global_iterate
-{
-    fclaw_global_t* glob;
-    void* user;
-};
-
 /** Allocate a new global structure. */
 fclaw_global_t* fclaw3d_global_new (void);
 

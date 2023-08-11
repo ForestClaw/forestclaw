@@ -42,7 +42,7 @@ void cb_partition_pack(fclaw_domain_t *domain,
 
 {
     /* Pack everything in old domain */
-    fclaw2d_global_iterate_t *g = (fclaw2d_global_iterate_t *) user;
+    fclaw_global_iterate_t *g = (fclaw_global_iterate_t *) user;
 
     fclaw_block_t *this_block = &domain->blocks[blockno];
     int patch_num = this_block->num_patches_before + patchno;
@@ -64,7 +64,7 @@ void  cb_partition_transfer(fclaw_domain_t * old_domain,
                             void *user)
 {
     /* Transfer data to new domain */
-    fclaw2d_global_iterate_t *g = (fclaw2d_global_iterate_t *) user;
+    fclaw_global_iterate_t *g = (fclaw_global_iterate_t *) user;
     fclaw2d_domain_data_t *ddata_old = fclaw2d_domain_get_data (old_domain);
     fclaw2d_domain_data_t *ddata_new = fclaw2d_domain_get_data (new_domain);
 

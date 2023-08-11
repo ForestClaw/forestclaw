@@ -77,7 +77,7 @@ void cb_sphere_output_ascii (fclaw_domain_t * domain,
                             int blockno, int patchno,
                             void *user)
 {
-    fclaw2d_global_iterate_t* s = (fclaw2d_global_iterate_t*) user;
+    fclaw_global_iterate_t* s = (fclaw_global_iterate_t*) user;
     fclaw_global_t      *glob = (fclaw_global_t*) s->glob;
 
     //fclaw_clawpatch_vtable_t *clawpatch_vt = fclaw_clawpatch_vt(glob);

@@ -53,13 +53,7 @@ void fclaw2d_iterate_family_cb
 
 /* much of the following will move into fclaw_global.h */
 
-typedef struct fclaw2d_global_iterate fclaw2d_global_iterate_t;
 
-struct fclaw2d_global_iterate
-{
-    fclaw_global_t* glob;
-    void* user;
-};
 
 /* Use forward references here, since this file gets included everywhere */
 /* CB: is there a way not to need the forward references?

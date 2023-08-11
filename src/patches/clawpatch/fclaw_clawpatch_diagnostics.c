@@ -89,7 +89,7 @@ void cb_compute_diagnostics(fclaw_domain_t *domain,
                             void* user) //void *patch_acc)
 {
 
-    fclaw2d_global_iterate_t *s = (fclaw2d_global_iterate_t *) user;
+    fclaw_global_iterate_t *s = (fclaw_global_iterate_t *) user;
     error_info_t *error_data = (error_info_t*) s->user; 
 
     /* Accumulate area for final computation of error */

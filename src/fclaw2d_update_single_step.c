@@ -36,7 +36,7 @@ void cb_single_step_count(fclaw_domain_t *domain,
                           int this_patch_idx,
                           void *user)
 {    
-    fclaw2d_global_iterate_t* g = (fclaw2d_global_iterate_t*) user;
+    fclaw_global_iterate_t* g = (fclaw_global_iterate_t*) user;
     int *count = (int*) g->user;
     (*count)++;
 }
@@ -48,7 +48,7 @@ void cb_single_step(fclaw_domain_t *domain,
                     int this_patch_idx,
                     void *user)
 {
-    fclaw2d_global_iterate_t* g = (fclaw2d_global_iterate_t*) user;
+    fclaw_global_iterate_t* g = (fclaw_global_iterate_t*) user;
 
     double maxcfl;
     

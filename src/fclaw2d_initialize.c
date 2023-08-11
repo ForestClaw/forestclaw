@@ -56,7 +56,7 @@ void cb_initialize (fclaw_domain_t *domain,
 					int this_patch_idx,
 					void *user)
 {
-	fclaw2d_global_iterate_t* g = (fclaw2d_global_iterate_t*) user;
+	fclaw_global_iterate_t* g = (fclaw_global_iterate_t*) user;
 
 	fclaw2d_build_mode_t build_mode = FCLAW2D_BUILD_FOR_UPDATE;
 
