@@ -286,9 +286,9 @@ int apply_inverse_producer_mapping (overlap_point_t * op, double xy[3],
      * system of the whole brick. Next, we shift xy back to the
      * [0,1]x[0,1]x[0,1] reference system of the block with index blockno on
      *  which we are operating right now. */
-    xy[0] = xy[0] - geo->blocks[blockno].vertices[0];
-    xy[1] = xy[1] - geo->blocks[blockno].vertices[1];
-    xy[2] = xy[2] - geo->blocks[blockno].vertices[2];
+    xy[0] = xy[0] - geo->blocks[blockno].d2->vertices[0];
+    xy[1] = xy[1] - geo->blocks[blockno].d2->vertices[1];
+    xy[2] = xy[2] - geo->blocks[blockno].d2->vertices[2];
 
     return 1;                   /* the point lies in the domain */
 }

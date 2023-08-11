@@ -90,10 +90,7 @@ fclaw2d_patch_flags_t;
 extern const fclaw2d_patch_flags_t fclaw2d_patch_block_face_flags[4];
 
 
-/**
- * @brief Data Structure for a block
- */
-struct fclaw2d_block
+typedef struct fclaw_block_d2
 {
     /** @{ @brief lower left coordinate */
     double xlower, xupper;
@@ -104,6 +101,15 @@ struct fclaw2d_block
     double vertices[4 * 3];     /**< for each block corner, the xyz coordinates
                                      of the p4est_connectivity structure */
     int is_boundary[4];         /**< physical boundary flag */
+} fclaw_block_d2_t;
+
+/**
+ * @brief Data Structure for a block
+ */
+struct fclaw2d_block
+{
+    int dim;
+    struct fclaw_block_d2* d2;
     int num_patches;            /**< local patches in this block */
     int num_patches_before;     /**< in all previous blocks */
     int num_exchange_patches;   /**< exchange patches in this block */

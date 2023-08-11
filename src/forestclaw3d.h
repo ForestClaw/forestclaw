@@ -86,34 +86,7 @@ fclaw3d_patch_flags_t;
 /** For each of the six faces, the corresponding block boundary flag. */
 extern const fclaw3d_patch_flags_t fclaw3d_patch_block_face_flags[6];
 
-
-
-/** 
- * @brief The metadata structure for a forest leaf, which is a forestclaw patch.
- * The patch may be either a process-local patch or a ghost patch.
- */
-struct fclaw3d_patch
-{
-    int dim;
-    int level;                  /**< 0 is root, increases if refined */
-    int target_level;           /**< level desired after adaptation */
-    int flags;                  /**< flags that encode tree information */
-    fclaw_patch_bounds_3d_t* d3;
-    /** Union, If this is a local patch, it points to the next patch, otherwise it gives
-     * the bock number of this patch */
-    union
-    {
-        fclaw_patch_t *next;  /**< local: next patch same level same block */
-        int blockno;            /**< off-proc: this patch's block number */
-    }
-    u;
-    void *user;                 /**< User Pointer */
-};
-
-/**
- * @brief Data Structure for a block
- */
-struct fclaw3d_block
+typedef struct fclaw_block_d3
 {
     /** @{ @brief left/right coordinate */
     double xlower, xupper;
@@ -127,6 +100,16 @@ struct fclaw3d_block
     double vertices[8 * 3];     /**< for each block corner, the xyz coordinates
                                      of the p8est_connectivity structure */
     int is_boundary[6];         /**< physical boundary flag */
+} fclaw_block_d3_t;
+
+/**
+ * @brief Data Structure for a block
+ */
+struct fclaw3d_block
+{
+    int dim;
+    struct fclaw_block_d3* d3;
+    
     int num_patches;            /**< local patches in this block */
     int num_patches_before;     /**< in all previous blocks */
     int num_exchange_patches;   /**< exchange patches in this block */

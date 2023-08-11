@@ -41,6 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // needs to be defined AFTER all other headers
 #define d2 d3
 #define fclaw_patch_bounds_2d_t fclaw_patch_bounds_3d_t
+#define fclaw_block_d2_t fclaw_block_d3_t
 
 #endif
 
@@ -180,13 +181,14 @@ fclaw2d_domain_new (p4est_wrap_t * wrap, sc_keyvalue_t * attributes)
             p4est_tree_array_index (wrap->p4est->trees, (p4est_topidx_t) i);
         tree_minlevel = domain->possible_maxlevel;
         tree_maxlevel = -1;
-        block->xlower = 0.;
-        block->xupper = 1.;
-        block->ylower = 0.;
-        block->yupper = 1.;
+        block->d2 = FCLAW_ALLOC_ZERO (fclaw_block_d2_t, 1);
+        block->d2->xlower = 0.;
+        block->d2->xupper = 1.;
+        block->d2->ylower = 0.;
+        block->d2->yupper = 1.;
 #ifdef P4_TO_P8
-        block->zlower = 0.;
-        block->zupper = 1.;
+        block->d3->zlower = 0.;
+        block->d3->zupper = 1.;
 #endif
         if (conn->vertices != NULL && conn->tree_to_vertex != NULL)
         {
@@ -194,13 +196,13 @@ fclaw2d_domain_new (p4est_wrap_t * wrap, sc_keyvalue_t * attributes)
             {
                 vnum = conn->tree_to_vertex[P4EST_CHILDREN * i + j];
                 FCLAW_ASSERT (0 <= vnum && vnum < conn->num_vertices);
-                memcpy (block->vertices + 3 * j, conn->vertices + 3 * vnum,
+                memcpy (block->d2->vertices + 3 * j, conn->vertices + 3 * vnum,
                         3 * sizeof (double));
             }
         }
         else
         {
-            memset (block->vertices, 0, P4EST_CHILDREN * 3 * sizeof (double));
+            memset (block->d2->vertices, 0, P4EST_CHILDREN * 3 * sizeof (double));
         }
         for (face = 0; face < P4EST_FACES; ++face)
         {
@@ -209,7 +211,7 @@ fclaw2d_domain_new (p4est_wrap_t * wrap, sc_keyvalue_t * attributes)
                 && conn->tree_to_face[P4EST_FACES * i + face] ==
                 (int8_t) face)
             {
-                block->is_boundary[face] = 1;
+                block->d2->is_boundary[face] = 1;
             }
         }
         block->num_patches = (int) tree->quadrants.elem_count;

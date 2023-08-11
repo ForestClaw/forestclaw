@@ -338,7 +338,7 @@ fclaw2d_patch_boundary_type (fclaw2d_domain_t * domain,
         qtf = mesh->quad_to_face[P4EST_FACES * totalleaf + faceno];
         if (qtq == totalleaf && qtf == faceno)
         {
-            FCLAW_ASSERT (block->is_boundary[faceno]);
+            FCLAW_ASSERT (block->d2->is_boundary[faceno]);
             anyboundary = 1;
             boundaries[faceno] = 1;
         }
@@ -487,7 +487,7 @@ fclaw2d_patch_face_neighbors (fclaw2d_domain_t * domain,
     if (qtq == totalleaf && qtf == faceno)
     {
         /* physical domain boundary encoded by same patch face */
-        FCLAW_ASSERT (block->is_boundary[faceno]);
+        FCLAW_ASSERT (block->d2->is_boundary[faceno]);
         rproc[0] = domain->mpirank;
         *rblockno = blockno;
         rpatchno[0] = patchno;
