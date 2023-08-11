@@ -237,7 +237,7 @@ void fclaw2d_initialize(fclaw_global_t *glob)
     fclaw2d_diagnostics_initialize(glob);
     fclaw_locate_gauges(glob);
 
-    fclaw2d_after_regrid(glob);
+    fclaw_after_regrid(glob);
 
     /* Print global minimum and maximum levels */
     fclaw_global_infof("Global minlevel %d maxlevel %d\n",

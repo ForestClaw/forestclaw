@@ -59,8 +59,8 @@ void filament_link_solvers(fclaw_global_t *glob)
     const fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
     FCLAW_ASSERT(fclaw_opt->manifold != 0);
 
-    fclaw2d_vtable_t *fclaw_vt = fclaw2d_vt(glob);
-    fclaw_vt->problem_setup = filament_problem_setup;
+    fclaw_vtable_t *fc_vt = fclaw_vt(glob);
+    fc_vt->problem_setup = filament_problem_setup;
 
     fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt(glob);
     patch_vt->setup = filament_patch_setup;        

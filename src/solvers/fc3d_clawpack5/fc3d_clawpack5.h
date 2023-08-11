@@ -27,7 +27,7 @@
 #define FC3D_CLAWPACK5_H
 
 #include <fclaw_clawpatch3.h>
-#include <fclaw2d_vtable.h>
+#include <fclaw_vtable.h>
 #include <fclaw_package.h>
 #include <fclaw_global.h>
 

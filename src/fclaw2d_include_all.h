@@ -38,7 +38,7 @@
 #include <fclaw2d_diagnostics.h>
 #include <fclaw2d_convenience.h>
 #include <fclaw_global.h>
-#include <fclaw2d_vtable.h>
+#include <fclaw_vtable.h>
 
 #include <fclaw2d_physical_bc.h>
 

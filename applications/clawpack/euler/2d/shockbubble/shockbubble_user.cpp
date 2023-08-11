@@ -63,9 +63,9 @@ void shockbubble_problem_setup(fclaw_global_t* glob)
 void shockbubble_link_solvers(fclaw_global_t *glob)
 {
     const user_options_t* user = shockbubble_get_options(glob);
-    fclaw2d_vtable_t *fclaw_vt = fclaw2d_vt(glob);
+    fclaw_vtable_t *fc_vt = fclaw_vt(glob);
 
-    fclaw_vt->problem_setup = &shockbubble_problem_setup;
+    fc_vt->problem_setup = &shockbubble_problem_setup;
 
     if (user->claw_version == 4)
     {

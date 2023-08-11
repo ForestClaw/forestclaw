@@ -38,7 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_patch.h>
 #include <fclaw_global.h>
-#include <fclaw2d_vtable.h>
+#include <fclaw_vtable.h>
 #include <fclaw2d_output.h>
 
 #include <fclaw_domain.h>
@@ -170,8 +170,8 @@ void fc2d_thunderegg_solver_initialize(fclaw_global_t* glob)
     //fclaw_clawpatch_vtable_t*      clawpatch_vt = fclaw_clawpatch_vt(glob);
 
 	/* ForestClaw vtable items */
-	fclaw2d_vtable_t*   fclaw_vt = fclaw2d_vt(glob);
-	fclaw_vt->output_frame      = thunderegg_output;
+	fclaw_vtable_t*   fc_vt = fclaw_vt(glob);
+	fc_vt->output_frame      = thunderegg_output;
 
 	/* These could be over-written by user specific settings */
 	fclaw2d_patch_vtable_t*   patch_vt = fclaw2d_patch_vt(glob);  

@@ -43,7 +43,7 @@ void interface_problem_setup(fclaw_global_t* glob)
 
 void interface_link_solvers(fclaw_global_t *glob)
 {
-    fclaw2d_vtable_t *vt = fclaw2d_vt(glob);
+    fclaw_vtable_t *vt = fclaw_vt(glob);
 
     vt->problem_setup = &interface_problem_setup;  /* Version-independent */
 

@@ -52,7 +52,7 @@ void bump_problem_setup(fclaw_global_t* glob)
 
 void bump_link_solvers(fclaw_global_t *glob)
 {
-    fclaw2d_vtable_t *vt = fclaw2d_vt(glob);
+    fclaw_vtable_t *vt = fclaw_vt(glob);
 
     vt->problem_setup = &bump_problem_setup;  /* Version-independent */
 

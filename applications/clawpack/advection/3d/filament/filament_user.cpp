@@ -59,8 +59,8 @@ void filament_patch_setup(fclaw_global_t *glob,
 
 void filament_link_solvers(fclaw_global_t *glob)
 {
-    fclaw2d_vtable_t *fclaw_vt = fclaw2d_vt(glob);
-    fclaw_vt->problem_setup = filament_problem_setup;
+    fclaw_vtable_t *fc_vt = fclaw_vt(glob);
+    fc_vt->problem_setup = filament_problem_setup;
 
     fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
     const user_options_t* user = filament_get_options(glob);

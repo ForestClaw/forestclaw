@@ -56,9 +56,9 @@ void quadrants_problem_setup(fclaw_global_t* glob)
 void quadrants_link_solvers(fclaw_global_t *glob)
 {
     user_options_t *user =  quadrants_get_options(glob);
-    fclaw2d_vtable_t *fclaw_vt = fclaw2d_vt(glob);
+    fclaw_vtable_t *fc_vt = fclaw_vt(glob);
 
-    fclaw_vt->problem_setup = &quadrants_problem_setup;
+    fc_vt->problem_setup = &quadrants_problem_setup;
 
     if (user->claw_version == 4)
     {

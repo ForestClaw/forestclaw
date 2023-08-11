@@ -69,7 +69,7 @@ void torus_patch_setup(fclaw_global_t *glob,
 
 void torus_link_solvers(fclaw_global_t *glob)
 {
-    fclaw2d_vtable_t *vt = fclaw2d_vt(glob);
+    fclaw_vtable_t *vt = fclaw_vt(glob);
     vt->problem_setup = &torus_problem_setup;  /* Version-independent */
 
     /* Torus uses special patch setup (not advection_patch_setup), since the

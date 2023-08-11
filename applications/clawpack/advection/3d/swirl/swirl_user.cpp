@@ -80,8 +80,8 @@ void swirl_patch_setup(fclaw_global_t *glob,
 
 void swirl_link_solvers(fclaw_global_t *glob)
 {
-    fclaw2d_vtable_t *fclaw_vt = fclaw2d_vt(glob);
-    fclaw_vt->problem_setup = swirl_problem_setup;
+    fclaw_vtable_t *fc_vt = fclaw_vt(glob);
+    fc_vt->problem_setup = swirl_problem_setup;
 
     /* example of how to set up a user defined criteria */
     fclaw_clawpatch_vtable_t *clawpatch_vt = fclaw_clawpatch_vt(glob);

@@ -60,7 +60,7 @@ void annulus_link_solvers(fclaw_global_t *glob)
 {
     const user_options_t   *user      =  annulus_get_options(glob);
 
-    fclaw2d_vtable_t           *vt           = fclaw2d_vt(glob);
+    fclaw_vtable_t           *vt           = fclaw_vt(glob);
     fclaw2d_patch_vtable_t     *patch_vt     = fclaw2d_patch_vt(glob);
 
     vt->problem_setup  = &annulus_problem_setup;

@@ -49,7 +49,7 @@ void replicated_problem_setup(fclaw_global_t* glob)
 
 void replicated_link_solvers(fclaw_global_t *glob)
 {
-    fclaw2d_vtable_t *vt = fclaw2d_vt(glob);
+    fclaw_vtable_t *vt = fclaw_vt(glob);
     vt->problem_setup = &replicated_problem_setup; 
 
     const user_options_t* user = replicated_get_options(glob);

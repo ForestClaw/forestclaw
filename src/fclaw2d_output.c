@@ -26,7 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_output.h>
 #include <fclaw_global.h>
 #include <fclaw2d_options.h>
-#include <fclaw2d_vtable.h>
+#include <fclaw_vtable.h>
 
 /* -----------------------------------------------------------------------
     Public interface
@@ -43,7 +43,7 @@ fclaw2d_output_frame (fclaw_global_t * glob, int iframe)
 
     if (fclaw_opt->output != 0)
     {
-        fclaw2d_vtable_t *vt = fclaw2d_vt(glob);
+        fclaw_vtable_t *vt = fclaw_vt(glob);
 
         FCLAW_ASSERT(vt->output_frame != NULL);
 

@@ -2,6 +2,7 @@
 
 # -- c library
 add_library(forestclaw_c OBJECT 
+  fclaw_advance.c
   fclaw_base.c 
   fclaw_domain.c
   fclaw_options.c 
@@ -13,17 +14,16 @@ add_library(forestclaw_c OBJECT
   fclaw_math.c
   fclaw_timer.c
   fclaw_mpi.c
+  fclaw_vtable.c
 
   fclaw2d_block.c
   fclaw2d_options.c
   fclaw2d_forestclaw.c
-  fclaw2d_vtable.c
   fclaw2d_map.c
   fclaw2d_map_query.c
   fclaw2d_map_brick.c
   fclaw2d_convenience.c
   fclaw2d_exchange.c
-  fclaw_advance.c
   fclaw2d_elliptic_solver.c
   fclaw2d_physical_bc.c
   fclaw2d_ghost_fill.c
@@ -122,6 +122,7 @@ install(FILES
 	fclaw_timer.h 
 	fclaw_mpi.h 
 	fclaw_math.h 
+	fclaw_vtable.h
 	forestclaw2d.h 
 	fp_exception_glibc_extension.h 
   fclaw2d_include_all.h 
@@ -133,7 +134,6 @@ install(FILES
 	fclaw2d_forestclaw.h
 	fclaw2d_block.h
 	fclaw2d_patch.h
-	fclaw2d_vtable.h
 	fclaw2d_output.h
 	fclaw2d_time_sync.h
 	fclaw2d_update_single_step.h
@@ -180,7 +180,7 @@ if(BUILD_TESTING)
       fclaw_global.h.TEST.cpp
       fclaw2d_options.h.TEST.cpp
       fclaw2d_patch.h.TEST.cpp
-      fclaw2d_vtable.h.TEST.cpp
+      fclaw_vtable.h.TEST.cpp
   )
 
   target_link_libraries(forestclaw.TEST testutils forestclaw)

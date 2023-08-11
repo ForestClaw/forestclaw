@@ -60,9 +60,9 @@ void latlong_patch_setup(fclaw_global_t *glob,
 
 void latlong_link_solvers(fclaw_global_t *glob)
 {
-    fclaw2d_vtable_t *fclaw_vt = fclaw2d_vt(glob);
+    fclaw_vtable_t *fc_vt = fclaw_vt(glob);
 
-    fclaw_vt->problem_setup = latlong_problem_setup;
+    fc_vt->problem_setup = latlong_problem_setup;
 
     fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt(glob);
     patch_vt->setup = &latlong_patch_setup;

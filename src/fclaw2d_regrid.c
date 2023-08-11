@@ -36,7 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_ghost_fill.h>
 #include <fclaw2d_partition.h>
 #include <fclaw2d_exchange.h>
-#include <fclaw2d_vtable.h>
+#include <fclaw_vtable.h>
 #include <fclaw_domain.h>
 #include <fclaw2d_patch.h>
 
@@ -321,7 +321,7 @@ void fclaw2d_regrid(fclaw_global_t *glob)
     }
 
     /* User defined */
-    fclaw2d_after_regrid(glob);
+    fclaw_after_regrid(glob);
 
     /* Only if gauges count > 0 */
     fclaw_locate_gauges(glob);

@@ -46,7 +46,7 @@ void swirl_problem_setup(fclaw_global_t* glob)
 
 void swirl_link_solvers(fclaw_global_t *glob)
 {
-    fclaw2d_vtable_t *vt = fclaw2d_vt(glob);
+    fclaw_vtable_t *vt = fclaw_vt(glob);
     vt->problem_setup = &swirl_problem_setup;  /* Version-independent */
 
     const user_options_t* user = swirl_get_options(glob);

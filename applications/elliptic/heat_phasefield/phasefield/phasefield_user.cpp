@@ -324,8 +324,8 @@ void phasefield_link_solvers(fclaw_global_t *glob)
     fclaw_clawpatch_vtable_t *clawpatch_vt = fclaw_clawpatch_vt(glob);
 #endif
     /* ForestClaw vtable */
-    fclaw2d_vtable_t *fclaw_vt = fclaw2d_vt(glob);
-    fclaw_vt->problem_setup = &phasefield_problem_setup;  
+    fclaw_vtable_t *fc_vt = fclaw_vt(glob);
+    fc_vt->problem_setup = &phasefield_problem_setup;  
 
     /* Patch : RHS function */
     fclaw2d_patch_vtable_t* patch_vt = fclaw2d_patch_vt(glob);

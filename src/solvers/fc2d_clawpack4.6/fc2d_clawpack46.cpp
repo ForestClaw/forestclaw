@@ -39,7 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_patch.h>
 #include <fclaw_global.h>
-#include <fclaw2d_vtable.h>
+#include <fclaw_vtable.h>
 #include <fclaw2d_options.h>
 #include <fclaw2d_defs.h>
 
@@ -495,15 +495,15 @@ void fc2d_clawpack46_solver_initialize(fclaw_global_t* glob)
 	int claw_version = 4;
 	fclaw2d_clawpatch_vtable_initialize(glob, claw_version);
 
-	fclaw2d_vtable_t*                fclaw_vt = fclaw2d_vt(glob);
+	fclaw_vtable_t*                	 fc_vt = fclaw_vt(glob);
 	fclaw2d_patch_vtable_t*          patch_vt = fclaw2d_patch_vt(glob);  
     fclaw_clawpatch_vtable_t*      clawpatch_vt = fclaw_clawpatch_vt(glob);
 
 	fc2d_clawpack46_vtable_t*  claw46_vt = clawpack46_vt_new();
 
 	/* ForestClaw vtable items */
-	fclaw_vt->output_frame      = clawpack46_output;
-	fclaw_vt->problem_setup     = clawpack46_setprob;    
+	fc_vt->output_frame      = clawpack46_output;
+	fc_vt->problem_setup     = clawpack46_setprob;    
 
 	/* These could be over-written by user specific settings */
 	patch_vt->initialize                     = clawpack46_qinit;

@@ -24,16 +24,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include <fclaw_pointer_map.h>
-#include <fclaw2d_vtable.h>
+#include <fclaw_vtable.h>
 #include <fclaw2d_output.h>
 #include <fclaw_global.h>
 
 #include <forestclaw2d.h>
 
 static
-fclaw2d_vtable_t* vt_new()
+fclaw_vtable_t* vt_new()
 {
-    return (fclaw2d_vtable_t*) FCLAW_ALLOC_ZERO (fclaw2d_vtable_t, 1);
+    return (fclaw_vtable_t*) FCLAW_ALLOC_ZERO (fclaw_vtable_t, 1);
 }
 
 static
@@ -42,33 +42,33 @@ void vt_destroy(void* vt)
     FCLAW_FREE (vt);
 }
 
-fclaw2d_vtable_t* fclaw2d_vt(fclaw_global_t *glob)
+fclaw_vtable_t* fclaw_vt(fclaw_global_t *glob)
 {
-	fclaw2d_vtable_t* vt = (fclaw2d_vtable_t*) 
-	   							fclaw_pointer_map_get(glob->vtables, "fclaw2d");
+	fclaw_vtable_t* vt = (fclaw_vtable_t*) 
+	   							fclaw_pointer_map_get(glob->vtables, "fclaw");
 	FCLAW_ASSERT(vt != NULL);
 	FCLAW_ASSERT(vt->is_set != 0);
 	return vt;
 }
 
 
-void fclaw2d_after_regrid(fclaw_global_t *glob)
+void fclaw_after_regrid(fclaw_global_t *glob)
 {
-    fclaw2d_vtable_t *fclaw_vt = fclaw2d_vt(glob);
-    if (fclaw_vt->after_regrid != NULL)
+    fclaw_vtable_t *vt = fclaw_vt(glob);
+    if (vt->after_regrid != NULL)
     {
-        fclaw_vt->after_regrid(glob);
+        vt->after_regrid(glob);
     }
 }
 
 /* Initialize any settings that can be set here */
-void fclaw2d_vtable_initialize(fclaw_global_t *glob)
+void fclaw_vtable_initialize(fclaw_global_t *glob)
 {
 
-    fclaw2d_vtable_t *vt = vt_new();
+    fclaw_vtable_t *vt = vt_new();
 
     vt->is_set = 1;
 
-	FCLAW_ASSERT(fclaw_pointer_map_get(glob->vtables,"fclaw2d") == NULL);
-	fclaw_pointer_map_insert(glob->vtables, "fclaw2d", vt, vt_destroy);
+	FCLAW_ASSERT(fclaw_pointer_map_get(glob->vtables,"fclaw") == NULL);
+	fclaw_pointer_map_insert(glob->vtables, "fclaw", vt, vt_destroy);
 }

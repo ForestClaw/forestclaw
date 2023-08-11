@@ -41,7 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_map_brick.h>
 #include <fclaw2d_options.h>
 #include <fclaw2d_patch.h>
-#include <fclaw2d_vtable.h>
+#include <fclaw_vtable.h>
 
 #include <p4est_bits.h>
 #include <p4est_wrap.h>

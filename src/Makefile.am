@@ -27,7 +27,7 @@ libforestclaw_installed_headers = \
 	src/fclaw_domain.h \
 	src/fclaw2d_block.h \
 	src/fclaw2d_patch.h \
-	src/fclaw2d_vtable.h \
+	src/fclaw_vtable.h \
 	src/fclaw2d_output.h \
 	src/fclaw2d_time_sync.h \
 	src/fclaw2d_update_single_step.h \
@@ -187,7 +187,7 @@ src_forestclaw_TEST_SOURCES = \
 	src/fclaw_global.h.TEST.cpp \
 	src/fclaw2d_options.h.TEST.cpp \
 	src/fclaw2d_patch.h.TEST.cpp \
-	src/fclaw2d_vtable.h.TEST.cpp 
+	src/fclaw_vtable.h.TEST.cpp 
 
 src_forestclaw_TEST_CPPFLAGS = \
 	$(test_libtestutils_la_CPPFLAGS) \

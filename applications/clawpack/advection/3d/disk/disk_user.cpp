@@ -56,8 +56,8 @@ void disk_patch_setup(fclaw_global_t *glob,
 
 void disk_link_solvers(fclaw_global_t *glob)
 {
-    fclaw2d_vtable_t *fclaw_vt = fclaw2d_vt(glob);
-    fclaw_vt->problem_setup = disk_problem_setup;
+    fclaw_vtable_t *fc_vt = fclaw_vt(glob);
+    fc_vt->problem_setup = disk_problem_setup;
 
     fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt(glob);    
     patch_vt->setup = disk_patch_setup;    
