@@ -344,8 +344,8 @@ int overlap_interpolate (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
     }
 
     /* we check if the query point intersects the patch */
-    if ((xy[0] < patch->xlower - tol || xy[0] > patch->xupper + tol)
-        || (xy[1] < patch->ylower - tol || xy[1] > patch->yupper + tol)
+    if ((xy[0] < patch->d2->xlower - tol || xy[0] > patch->d2->xupper + tol)
+        || (xy[1] < patch->d2->ylower - tol || xy[1] > patch->d2->yupper + tol)
         || (xy[2] < 0. - tol || xy[2] > 1. + tol))     /* extruded reference is [0, 1] */
     {
         /* this IS the actual check for overlapping a point with a patch. */
@@ -354,8 +354,8 @@ int overlap_interpolate (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
 
     fclaw_debugf
         ("Found inversely-mapped point [%f,%f] in patch [%f,%f]x[%f,%f] of block %d.\n",
-         xy[0], xy[1], patch->xlower, patch->xupper, patch->ylower,
-         patch->yupper, blockno);
+         xy[0], xy[1], patch->d2->xlower, patch->d2->xupper, patch->d2->ylower,
+         patch->d2->yupper, blockno);
 
     /* Although the point is located within a certain tolerance of the patch,
      * it may still lie outside of the [0,1]x[0,1]-block on which the domain is

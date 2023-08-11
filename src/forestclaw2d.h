@@ -90,21 +90,22 @@ fclaw2d_patch_flags_t;
 /** For each of the four faces, the corresponding block boundary flag. */
 extern const fclaw2d_patch_flags_t fclaw2d_patch_block_face_flags[4];
 
+struct fclaw_patch_bounds_2d
+{
+    double xlower, xupper;
+    double ylower, yupper;
+};
 /** 
  * @brief The metadata structure for a forest leaf, which is a forestclaw patch.
  * The patch may be either a process-local patch or a ghost patch.
  */
 struct fclaw2d_patch
 {
+    int dim;
+    struct fclaw_patch_bounds_2d* d2;
     int level;                  /**< 0 is root, increases if refined */
     int target_level;           /**< level desired after adaptation */
     int flags;                  /**< flags that encode tree information */
-    /** @{ @brief lower left coordinate */
-    double xlower, xupper;
-    /** @} */
-    /** @{ @brief upper right coordinate */
-    double ylower, yupper;
-    /** @} */
     /** Union, If this is a local patch, it points to the next patch, otherwise it gives
      * the bock number of this patch */
     union
@@ -143,6 +144,7 @@ struct fclaw2d_block
     int maxlevel;
     /** @} */
     fclaw2d_patch_t *patches;           /**< The patches for this block */
+    struct fclaw_patch_bounds_2d *patch_bounds; /**< patch bounds */
     fclaw2d_patch_t **patchbylevel;     /**< Pointer to the first patch in each level **/
     fclaw2d_patch_t **exchange_patches; /**< Pointer for each exchange patch */
     void *user;                         /**< User pointer */
@@ -206,6 +208,7 @@ struct fclaw2d_domain
     fclaw2d_patch_t **exchange_patches; /**< explicitly store exchange patches */
     int num_ghost_patches;      /**< number of off-proc patches relevant to this proc */
     fclaw2d_patch_t *ghost_patches;     /**< array of off-proc patches */
+    struct fclaw_patch_bounds_2d *ghost_patch_bounds; /**< ghost patch bounds */
 
     void **mirror_target_levels;  /**< Points to target level of each mirror. */
     int *ghost_target_levels;   /**< Contains target level for each ghost. */

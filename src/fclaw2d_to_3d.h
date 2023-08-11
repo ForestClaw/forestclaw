@@ -32,7 +32,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <p4est_to_p8est.h>
 
-/* redefine macros */
 #define FCLAW2D_SPACEDIM                FCLAW3D_SPACEDIM
 #define FCLAW2D_NUMFACES                FCLAW3D_NUMFACES
 #define FCLAW2D_NUMCORNERS              FCLAW3D_NUMCORNERS

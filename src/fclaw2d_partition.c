@@ -70,10 +70,10 @@ void  cb_partition_transfer(fclaw2d_domain_t * old_domain,
 
     if (old_patch != NULL)
     {
-        FCLAW_ASSERT(old_patch->xlower == new_patch->xlower);
-        FCLAW_ASSERT(old_patch->ylower == new_patch->ylower);
-        FCLAW_ASSERT(old_patch->xupper == new_patch->xupper);
-        FCLAW_ASSERT(old_patch->yupper == new_patch->yupper);
+        FCLAW_ASSERT(old_patch->d2->xlower == new_patch->d2->xlower);
+        FCLAW_ASSERT(old_patch->d2->ylower == new_patch->d2->ylower);
+        FCLAW_ASSERT(old_patch->d2->xupper == new_patch->d2->xupper);
+        FCLAW_ASSERT(old_patch->d2->yupper == new_patch->d2->yupper);
 
         new_patch->user = old_patch->user;
         old_patch->user = NULL;

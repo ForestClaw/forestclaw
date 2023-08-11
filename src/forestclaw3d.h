@@ -87,24 +87,24 @@ fclaw3d_patch_flags_t;
 /** For each of the six faces, the corresponding block boundary flag. */
 extern const fclaw3d_patch_flags_t fclaw3d_patch_block_face_flags[6];
 
+struct fclaw_patch_bounds_3d
+{
+    double xlower, xupper;
+    double ylower, yupper;
+    double zlower, zupper;
+};
+
 /** 
  * @brief The metadata structure for a forest leaf, which is a forestclaw patch.
  * The patch may be either a process-local patch or a ghost patch.
  */
 struct fclaw3d_patch
 {
+    int dim;
     int level;                  /**< 0 is root, increases if refined */
     int target_level;           /**< level desired after adaptation */
     int flags;                  /**< flags that encode tree information */
-    /** @{ @brief left/right coordinate */
-    double xlower, xupper;
-    /** @} */
-    /** @{ @brief front/back coordinate */
-    double ylower, yupper;
-    /** @} */
-    /** @{ @brief bottom/top coordinate */
-    double zlower, zupper;
-    /** @} */
+    struct fclaw_patch_bounds_3d* d3;
     /** Union, If this is a local patch, it points to the next patch, otherwise it gives
      * the bock number of this patch */
     union
@@ -146,6 +146,7 @@ struct fclaw3d_block
     int maxlevel;
     /** @} */
     fclaw3d_patch_t *patches;           /**< The patches for this block */
+    struct fclaw_patch_bounds_3d *patch_bounds; /**< patch bounds */
     fclaw3d_patch_t **patchbylevel;     /**< Pointer to the first patch in each level **/
     fclaw3d_patch_t **exchange_patches; /**< Pointer for each exchange patch */
     void *user;                         /**< User pointer */
@@ -209,6 +210,7 @@ struct fclaw3d_domain
     fclaw3d_patch_t **exchange_patches; /**< explicitly store exchange patches */
     int num_ghost_patches;      /**< number of off-proc patches relevant to this proc */
     fclaw3d_patch_t *ghost_patches;     /**< array of off-proc patches */
+    struct fclaw_patch_bounds_3d *ghost_patch_bounds; /**< ghost patch bounds */
 
     void **mirror_target_levels;  /**< Points to target level of each mirror. */
     int *ghost_target_levels;   /**< Contains target level for each ghost. */

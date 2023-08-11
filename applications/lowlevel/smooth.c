@@ -105,9 +105,9 @@ patch_overlap (fclaw2d_patch_t * patch,
     double ssmin, ssmax;
     double center[2], fdist[2];
 
-    hw = .5 * (patch->xupper - patch->xlower);
-    center[0] = patch->xlower + hw;
-    center[1] = patch->ylower + hw;
+    hw = .5 * (patch->d2->xupper - patch->d2->xlower);
+    center[0] = patch->d2->xlower + hw;
+    center[1] = patch->d2->ylower + hw;
 
     for (i = 0; i < 2; ++i)
     {

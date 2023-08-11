@@ -259,17 +259,17 @@ void clawpatch_define(fclaw2d_global_t* glob,
     {
         if(cp->dim == 2)
         {
-            cp->d2->xlower = patch->xlower;
-            cp->d2->ylower = patch->ylower;
-            cp->d2->xupper = patch->xupper;
-            cp->d2->yupper = patch->yupper;
+            cp->d2->xlower = patch->d2->xlower;
+            cp->d2->ylower = patch->d2->ylower;
+            cp->d2->xupper = patch->d2->xupper;
+            cp->d2->yupper = patch->d2->yupper;
         }
         else 
         {
-            cp->d3->xlower = patch->xlower;
-            cp->d3->ylower = patch->ylower;
-            cp->d3->xupper = patch->xupper;
-            cp->d3->yupper = patch->yupper;
+            cp->d3->xlower = patch->d2->xlower;
+            cp->d3->ylower = patch->d2->ylower;
+            cp->d3->xupper = patch->d2->xupper;
+            cp->d3->yupper = patch->d2->yupper;
             //if REFINE_DIM == 2
             cp->d3->zlower = 0;
             cp->d3->zupper = 1;
@@ -283,10 +283,10 @@ void clawpatch_define(fclaw2d_global_t* glob,
         double ay = fclaw_opt->ay;
         double by = fclaw_opt->by;
 
-        double xl = patch->xlower;
-        double yl = patch->ylower;
-        double xu = patch->xupper;
-        double yu = patch->yupper;
+        double xl = patch->d2->xlower;
+        double yl = patch->d2->ylower;
+        double xu = patch->d2->xupper;
+        double yu = patch->d2->yupper;
 
         double xlower, ylower, xupper, yupper;
 

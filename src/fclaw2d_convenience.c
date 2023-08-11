@@ -36,6 +36,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <p8est_search.h>
 #include <p8est_vtk.h>
 #include <p8est_wrap.h>
+
+// for dimension dependent values
+#define d2 d3
+#define fclaw_patch_bounds_2d fclaw_patch_bounds_3d
+
 #endif
 
 const double fclaw2d_smallest_h = 1. / (double) P4EST_ROOT_LEN;
@@ -44,6 +49,12 @@ static void
 fclaw2d_patch_set_boundary_xylower (fclaw2d_patch_t * patch,
                                     p4est_quadrant_t * quad)
 {
+#ifndef P4_TO_P8
+    patch->dim = 2;
+#else
+    patch->dim = 3;
+#endif
+
     p4est_qcoord_t qh;
 
     qh = P4EST_QUADRANT_LEN (quad->level);
@@ -75,13 +86,13 @@ fclaw2d_patch_set_boundary_xylower (fclaw2d_patch_t * patch,
 #endif
     /* This suffices to test for block corners by using bitwise and */
 
-    patch->xlower = quad->x * fclaw2d_smallest_h;
-    patch->xupper = (quad->x + qh) * fclaw2d_smallest_h;
-    patch->ylower = quad->y * fclaw2d_smallest_h;
-    patch->yupper = (quad->y + qh) * fclaw2d_smallest_h;
+    patch->d2->xlower = quad->x * fclaw2d_smallest_h;
+    patch->d2->xupper = (quad->x + qh) * fclaw2d_smallest_h;
+    patch->d2->ylower = quad->y * fclaw2d_smallest_h;
+    patch->d2->yupper = (quad->y + qh) * fclaw2d_smallest_h;
 #ifdef P4_TO_P8
-    patch->zlower = quad->z * fclaw2d_smallest_h;
-    patch->zupper = (quad->z + qh) * fclaw2d_smallest_h;
+    patch->d3->zlower = quad->z * fclaw2d_smallest_h;
+    patch->d3->zupper = (quad->z + qh) * fclaw2d_smallest_h;
 #endif
 }
 
@@ -203,6 +214,8 @@ fclaw2d_domain_new (p4est_wrap_t * wrap, sc_keyvalue_t * attributes)
         block->num_patches = (int) tree->quadrants.elem_count;
         block->patches =
             FCLAW_ALLOC_ZERO (fclaw2d_patch_t, block->num_patches);
+        block->patch_bounds =
+            FCLAW_ALLOC_ZERO (struct fclaw_patch_bounds_2d, block->num_patches);
         block->patchbylevel =
             FCLAW_ALLOC_ZERO (fclaw2d_patch_t *,
                               domain->possible_maxlevel + 1);
@@ -211,6 +224,7 @@ fclaw2d_domain_new (p4est_wrap_t * wrap, sc_keyvalue_t * attributes)
         for (j = 0; j < block->num_patches; ++j)
         {
             patch = block->patches + j;
+            patch->d2 = block->patch_bounds + j;
             quad = p4est_quadrant_array_index (&tree->quadrants, (size_t) j);
             patch->target_level = patch->level = level = (int) quad->level;
             patch->flags = p4est_quadrant_child_id (quad);
@@ -279,9 +293,13 @@ fclaw2d_domain_new (p4est_wrap_t * wrap, sc_keyvalue_t * attributes)
     /* allocate ghost patches */
     domain->ghost_patches =
         FCLAW_ALLOC_ZERO (fclaw2d_patch_t, domain->num_ghost_patches);
+    domain->ghost_patch_bounds =
+        FCLAW_ALLOC_ZERO (struct fclaw_patch_bounds_2d,
+                          domain->num_ghost_patches);
     for (i = 0; i < domain->num_ghost_patches; ++i)
     {
         patch = domain->ghost_patches + i;
+        patch->d2 = domain->ghost_patch_bounds + i;
         quad = p4est_quadrant_array_index (&ghost->ghosts, (size_t) i);
         patch->target_level = patch->level = level = (int) quad->level;
         patch->flags =
@@ -445,11 +463,13 @@ fclaw2d_domain_destroy (fclaw2d_domain_t * domain)
     {
         block = domain->blocks + i;
         FCLAW_FREE (block->patches);
+        FCLAW_FREE (block->patch_bounds);
         FCLAW_FREE (block->patchbylevel);
     }
     FCLAW_FREE (domain->blocks);
 
     FCLAW_FREE (domain->ghost_patches);
+    FCLAW_FREE (domain->ghost_patch_bounds);
     FCLAW_FREE (domain->ghost_target_levels);
     FCLAW_FREE (domain->mirror_target_levels);
     FCLAW_FREE (domain->exchange_patches);
@@ -1017,10 +1037,10 @@ search_point_fn (p4est_t * p4est, p4est_topidx_t which_tree,
 #endif
 
     /* do the check a second time with the patch data */
-    FCLAW_ASSERT (x >= patch->xlower && x <= patch->xupper);
-    FCLAW_ASSERT (y >= patch->ylower && y <= patch->yupper);
+    FCLAW_ASSERT (x >= patch->d2->xlower && x <= patch->d2->xupper);
+    FCLAW_ASSERT (y >= patch->d2->ylower && y <= patch->d2->yupper);
 #ifdef P4_TO_P8
-    FCLAW_ASSERT (z >= patch->zlower && z <= patch->zupper);
+    FCLAW_ASSERT (z >= patch->d3->zlower && z <= patch->d3->zupper);
 #endif
 
     /* remember the smallest local quadrant number as result */
@@ -1174,7 +1194,14 @@ integrate_ray_fn (p4est_t * p4est, p4est_topidx_t which_tree,
     int intersects;
     fclaw2d_domain_t *domain;
     fclaw2d_patch_t *patch;
+
+
     fclaw2d_patch_t fclaw2d_patch;
+    memset (&fclaw2d_patch, 0, sizeof (fclaw2d_patch_t));
+
+    struct fclaw_patch_bounds_2d fclaw2d_patch_bounds;
+    fclaw2d_patch.d2 = &fclaw2d_patch_bounds;
+
     int patchno;
 
     /* assert that the user_pointer contains a valid integrate_ray_data_t */
@@ -1400,7 +1427,13 @@ interpolate_partition_fn (p4est_t * p4est, p4est_topidx_t which_tree,
 {
     fclaw2d_domain_t *domain;
     fclaw2d_patch_t *patch;
+
     fclaw2d_patch_t fclaw2d_patch;
+    memset(&fclaw2d_patch, 0, sizeof(fclaw2d_patch_t));
+
+    struct fclaw_patch_bounds_2d fclaw2d_patch_bounds;
+    fclaw2d_patch.d2 = &fclaw2d_patch_bounds;
+
     int patchno;
     int intersects;
 
@@ -1464,7 +1497,13 @@ interpolate_local_fn (p4est_t * p4est, p4est_topidx_t which_tree,
 {
     fclaw2d_domain_t *domain;
     fclaw2d_patch_t *patch;
+
     fclaw2d_patch_t fclaw2d_patch;
+    memset(&fclaw2d_patch, 0, sizeof(fclaw2d_patch_t));
+
+    struct fclaw_patch_bounds_2d fclaw2d_patch_bounds;
+    fclaw2d_patch.d2 = &fclaw2d_patch_bounds;
+
     int patchno;
 
     /* assert that the user_pointer contains a valid interpolation_data_t */

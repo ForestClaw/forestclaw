@@ -31,6 +31,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <forestclaw3d.h>
 #include <p8est_bits.h>
 #include <p8est_wrap.h>
+
+// for dimension dependent values
+#define d2 d3
+
 #endif
 
 #ifndef P4_TO_P8
@@ -623,13 +627,13 @@ fclaw2d_patch_transform_face (fclaw2d_patch_t * ipatch,
 
     FCLAW_ASSERT (ipatch->level == opatch->level);
     FCLAW_ASSERT (0 <= ipatch->level && ipatch->level < P4EST_MAXLEVEL);
-    FCLAW_ASSERT (ipatch->xlower >= 0. && ipatch->xlower < 1.);
-    FCLAW_ASSERT (opatch->xlower >= 0. && opatch->xlower < 1.);
-    FCLAW_ASSERT (ipatch->ylower >= 0. && ipatch->ylower < 1.);
-    FCLAW_ASSERT (opatch->ylower >= 0. && opatch->ylower < 1.);
+    FCLAW_ASSERT (ipatch->d2->xlower >= 0. && ipatch->d2->xlower < 1.);
+    FCLAW_ASSERT (opatch->d2->xlower >= 0. && opatch->d2->xlower < 1.);
+    FCLAW_ASSERT (ipatch->d2->ylower >= 0. && ipatch->d2->ylower < 1.);
+    FCLAW_ASSERT (opatch->d2->ylower >= 0. && opatch->d2->ylower < 1.);
 #ifdef P4_TO_P8
-    FCLAW_ASSERT (ipatch->zlower >= 0. && ipatch->zlower < 1.);
-    FCLAW_ASSERT (opatch->zlower >= 0. && opatch->zlower < 1.);
+    FCLAW_ASSERT (ipatch->d3->zlower >= 0. && ipatch->d3->zlower < 1.);
+    FCLAW_ASSERT (opatch->d3->zlower >= 0. && opatch->d3->zlower < 1.);
 #endif
 
     FCLAW_ASSERT (mx >= 1 && my >= 1);
@@ -655,10 +659,10 @@ fclaw2d_patch_transform_face (fclaw2d_patch_t * ipatch,
     if (ftransform[8] & 4)
     {
         /* The two patches are in the same block.  ftransform is not used */
-        *i += (int) ((ipatch->xlower - opatch->xlower) * iwidth * (double) mx);
-        *j += (int) ((ipatch->ylower - opatch->ylower) * iwidth * (double) my);
+        *i += (int) ((ipatch->d2->xlower - opatch->d2->xlower) * iwidth * (double) mx);
+        *j += (int) ((ipatch->d2->ylower - opatch->d2->ylower) * iwidth * (double) my);
 #ifdef P4_TO_P8
-        *k += (int) ((ipatch->zlower - opatch->zlower) * iwidth * (double) mz);
+        *k += (int) ((ipatch->d3->zlower - opatch->d3->zlower) * iwidth * (double) mz);
 #endif
     }
     else
@@ -687,10 +691,10 @@ fclaw2d_patch_transform_face (fclaw2d_patch_t * ipatch,
 #endif
 
         /* the reference cube is stretched to mx times my units */
-        my_xyz[0] = ipatch->xlower * Rmxmymz[0] + *i - .5 * based;
-        my_xyz[1] = ipatch->ylower * Rmxmymz[1] + *j - .5 * based;
+        my_xyz[0] = ipatch->d2->xlower * Rmxmymz[0] + *i - .5 * based;
+        my_xyz[1] = ipatch->d2->ylower * Rmxmymz[1] + *j - .5 * based;
 #ifdef P4_TO_P8
-        my_xyz[2] = ipatch->zlower * Rmxmymz[2] + *k - .5 * based;
+        my_xyz[2] = ipatch->d3->zlower * Rmxmymz[2] + *k - .5 * based;
 #endif
 
         /* transform transversal directions */
@@ -729,10 +733,10 @@ fclaw2d_patch_transform_face (fclaw2d_patch_t * ipatch,
         }
 
         /* transform back to integer coordinates: this is exact */
-        *i = (int) (target_xyz[0] - opatch->xlower * Rmxmymz[0] + .5 * based);
-        *j = (int) (target_xyz[1] - opatch->ylower * Rmxmymz[1] + .5 * based);
+        *i = (int) (target_xyz[0] - opatch->d2->xlower * Rmxmymz[0] + .5 * based);
+        *j = (int) (target_xyz[1] - opatch->d2->ylower * Rmxmymz[1] + .5 * based);
 #ifdef P4_TO_P8
-        *k = (int) (target_xyz[2] - opatch->zlower * Rmxmymz[2] + .5 * based);
+        *k = (int) (target_xyz[2] - opatch->d3->zlower * Rmxmymz[2] + .5 * based);
 #endif
     }
 
@@ -766,13 +770,13 @@ fclaw2d_patch_transform_face2 (fclaw2d_patch_t * ipatch,
 
     FCLAW_ASSERT (ipatch->level + 1 == opatch->level);
     FCLAW_ASSERT (0 <= ipatch->level && opatch->level < P4EST_MAXLEVEL);
-    FCLAW_ASSERT (ipatch->xlower >= 0. && ipatch->xlower < 1.);
-    FCLAW_ASSERT (opatch->xlower >= 0. && opatch->xlower < 1.);
-    FCLAW_ASSERT (ipatch->ylower >= 0. && ipatch->ylower < 1.);
-    FCLAW_ASSERT (opatch->ylower >= 0. && opatch->ylower < 1.);
+    FCLAW_ASSERT (ipatch->d2->xlower >= 0. && ipatch->d2->xlower < 1.);
+    FCLAW_ASSERT (opatch->d2->xlower >= 0. && opatch->d2->xlower < 1.);
+    FCLAW_ASSERT (ipatch->d2->ylower >= 0. && ipatch->d2->ylower < 1.);
+    FCLAW_ASSERT (opatch->d2->ylower >= 0. && opatch->d2->ylower < 1.);
 #ifdef P4_TO_P8
-    FCLAW_ASSERT (ipatch->zlower >= 0. && ipatch->zlower < 1.);
-    FCLAW_ASSERT (opatch->zlower >= 0. && opatch->zlower < 1.);
+    FCLAW_ASSERT (ipatch->d2->zlower >= 0. && ipatch->d3->zlower < 1.);
+    FCLAW_ASSERT (opatch->d2->zlower >= 0. && opatch->d3->zlower < 1.);
 #endif
 
     FCLAW_ASSERT (mx >= 1 && my >= 1);
@@ -801,14 +805,14 @@ fclaw2d_patch_transform_face2 (fclaw2d_patch_t * ipatch,
 
         /* The two patches are in the same block.  ftransform is undefined */
         di = based + (int)
-            ((ipatch->xlower - opatch->xlower) * owidth * (double) mx +
+            ((ipatch->d2->xlower - opatch->d2->xlower) * owidth * (double) mx +
              2. * (*i - based));
         dj = based +
-            (int) ((ipatch->ylower - opatch->ylower) * owidth * (double) my +
+            (int) ((ipatch->d2->ylower - opatch->d2->ylower) * owidth * (double) my +
                    2. * (*j - based));
 #ifdef P4_TO_P8
         dk = based + (int)
-            ((ipatch->zlower - opatch->zlower) * owidth * (double) mz +
+            ((ipatch->d3->zlower - opatch->d3->zlower) * owidth * (double) mz +
              2. * (*k - based));
 #else
         kz = 0;
@@ -865,10 +869,10 @@ fclaw2d_patch_transform_face2 (fclaw2d_patch_t * ipatch,
 #endif
 
         /* the reference cube is stretched to mx times my units */
-        my_xyz[0] = ipatch->xlower * Rmxmymz[0] + 2. * (*i + .5 - based);
-        my_xyz[1] = ipatch->ylower * Rmxmymz[1] + 2. * (*j + .5 - based);
+        my_xyz[0] = ipatch->d2->xlower * Rmxmymz[0] + 2. * (*i + .5 - based);
+        my_xyz[1] = ipatch->d2->ylower * Rmxmymz[1] + 2. * (*j + .5 - based);
 #ifdef P4_TO_P8
-        my_xyz[2] = ipatch->zlower * Rmxmymz[2] + 2. * (*k + .5 - based);
+        my_xyz[2] = ipatch->d3->zlower * Rmxmymz[2] + 2. * (*k + .5 - based);
 #else
         is[2] = ik[1] = ib[1] = in[2] = 0;
 #endif
@@ -908,10 +912,10 @@ fclaw2d_patch_transform_face2 (fclaw2d_patch_t * ipatch,
         }
 
         /* move back into integer coordinates: this is exact */
-        di = (int) (target_xyz[0] - opatch->xlower * Rmxmymz[0]) + based - 1;
-        dj = (int) (target_xyz[1] - opatch->ylower * Rmxmymz[1]) + based - 1;
+        di = (int) (target_xyz[0] - opatch->d2->xlower * Rmxmymz[0]) + based - 1;
+        dj = (int) (target_xyz[1] - opatch->d2->ylower * Rmxmymz[1]) + based - 1;
 #ifdef P4_TO_P8
-        dk = (int) (target_xyz[2] - opatch->zlower * Rmxmymz[2]) + based - 1;
+        dk = (int) (target_xyz[2] - opatch->d3->zlower * Rmxmymz[2]) + based - 1;
 #endif
 
         /* Run through the child cells in order of the small patch */
@@ -1144,13 +1148,13 @@ fclaw2d_patch_transform_corner (fclaw2d_patch_t * ipatch,
 
     FCLAW_ASSERT (ipatch->level == opatch->level);
     FCLAW_ASSERT (0 <= ipatch->level && ipatch->level < P4EST_MAXLEVEL);
-    FCLAW_ASSERT (ipatch->xlower >= 0. && ipatch->xlower < 1.);
-    FCLAW_ASSERT (opatch->xlower >= 0. && opatch->xlower < 1.);
-    FCLAW_ASSERT (ipatch->ylower >= 0. && ipatch->ylower < 1.);
-    FCLAW_ASSERT (opatch->ylower >= 0. && opatch->ylower < 1.);
+    FCLAW_ASSERT (ipatch->d2->xlower >= 0. && ipatch->d2->xlower < 1.);
+    FCLAW_ASSERT (opatch->d2->xlower >= 0. && opatch->d2->xlower < 1.);
+    FCLAW_ASSERT (ipatch->d2->ylower >= 0. && ipatch->d2->ylower < 1.);
+    FCLAW_ASSERT (opatch->d2->ylower >= 0. && opatch->d2->ylower < 1.);
 #ifdef P4_TO_P8
-    FCLAW_ASSERT (ipatch->zlower >= 0. && ipatch->zlower < 1.);
-    FCLAW_ASSERT (opatch->zlower >= 0. && opatch->zlower < 1.);
+    FCLAW_ASSERT (ipatch->d3->zlower >= 0. && ipatch->d3->zlower < 1.);
+    FCLAW_ASSERT (opatch->d3->zlower >= 0. && opatch->d3->zlower < 1.);
 #endif
 
     FCLAW_ASSERT (mx >= 1 && my >= 1);
@@ -1220,10 +1224,10 @@ fclaw2d_patch_transform_corner (fclaw2d_patch_t * ipatch,
 
     /* The two patches are in the same block, or in a different block
      * that has a coordinate system with the same orientation */
-    *i += (int) ((ipatch->xlower - opatch->xlower + xshift) * Rmxmymz[0]);
-    *j += (int) ((ipatch->ylower - opatch->ylower + yshift) * Rmxmymz[1]);
+    *i += (int) ((ipatch->d2->xlower - opatch->d2->xlower + xshift) * Rmxmymz[0]);
+    *j += (int) ((ipatch->d2->ylower - opatch->d2->ylower + yshift) * Rmxmymz[1]);
 #ifdef P4_TO_P8
-    *k += (int) ((ipatch->zlower - opatch->zlower + zshift) * Rmxmymz[2]);
+    *k += (int) ((ipatch->d3->zlower - opatch->d3->zlower + zshift) * Rmxmymz[2]);
 #endif
 }
 
@@ -1251,13 +1255,13 @@ fclaw2d_patch_transform_corner2 (fclaw2d_patch_t * ipatch,
 
     FCLAW_ASSERT (ipatch->level + 1 == opatch->level);
     FCLAW_ASSERT (0 <= ipatch->level && opatch->level < P4EST_MAXLEVEL);
-    FCLAW_ASSERT (ipatch->xlower >= 0. && ipatch->xlower < 1.);
-    FCLAW_ASSERT (opatch->xlower >= 0. && opatch->xlower < 1.);
-    FCLAW_ASSERT (ipatch->ylower >= 0. && ipatch->ylower < 1.);
-    FCLAW_ASSERT (opatch->ylower >= 0. && opatch->ylower < 1.);
+    FCLAW_ASSERT (ipatch->d2->xlower >= 0. && ipatch->d2->xlower < 1.);
+    FCLAW_ASSERT (opatch->d2->xlower >= 0. && opatch->d2->xlower < 1.);
+    FCLAW_ASSERT (ipatch->d2->ylower >= 0. && ipatch->d2->ylower < 1.);
+    FCLAW_ASSERT (opatch->d2->ylower >= 0. && opatch->d2->ylower < 1.);
 #ifdef P4_TO_P8
-    FCLAW_ASSERT (ipatch->zlower >= 0. && ipatch->zlower < 1.);
-    FCLAW_ASSERT (opatch->zlower >= 0. && opatch->zlower < 1.);
+    FCLAW_ASSERT (ipatch->d3->zlower >= 0. && ipatch->d3->zlower < 1.);
+    FCLAW_ASSERT (opatch->d3->zlower >= 0. && opatch->d3->zlower < 1.);
 #endif
 
     FCLAW_ASSERT (mx >= 1 && my >= 1);
@@ -1328,14 +1332,14 @@ fclaw2d_patch_transform_corner2 (fclaw2d_patch_t * ipatch,
     /* The two patches are in the same block, or in a different block
      * that has a coordinate system with the same orientation */
     di = based
-        + (int) ((ipatch->xlower - opatch->xlower + xshift) * Rmxmymz[0] +
+        + (int) ((ipatch->d2->xlower - opatch->d2->xlower + xshift) * Rmxmymz[0] +
                  2. * (*i - based));
     dj = based
-        + (int) ((ipatch->ylower - opatch->ylower + yshift) * Rmxmymz[1] +
+        + (int) ((ipatch->d2->ylower - opatch->d2->ylower + yshift) * Rmxmymz[1] +
                  2. * (*j - based));
 #ifdef P4_TO_P8
     dk = based
-        + (int) ((ipatch->zlower - opatch->zlower + zshift) * Rmxmymz[2] +
+        + (int) ((ipatch->d3->zlower - opatch->d3->zlower + zshift) * Rmxmymz[2] +
                  2. * (*k - based));
 #else
     ks = 0;
@@ -2256,6 +2260,7 @@ fclaw2d_domain_init_meta (fclaw2d_domain_t * domain, int mpirank)
     domain->blocks = NULL;
     domain->exchange_patches = NULL;
     domain->ghost_patches = NULL;
+    domain->ghost_patch_bounds = NULL;
     domain->mirror_target_levels = NULL;
     domain->ghost_target_levels = NULL;
     domain->pp = NULL;
