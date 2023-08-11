@@ -38,8 +38,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <p8est_wrap.h>
 
 // for dimension dependent values
+// needs to be defined AFTER all other headers
 #define d2 d3
-#define fclaw_patch_bounds_2d fclaw_patch_bounds_3d
+#define fclaw_patch_bounds_2d_t fclaw_patch_bounds_3d_t
 
 #endif
 
@@ -215,7 +216,7 @@ fclaw2d_domain_new (p4est_wrap_t * wrap, sc_keyvalue_t * attributes)
         block->patches =
             FCLAW_ALLOC_ZERO (fclaw_patch_t, block->num_patches);
         block->patch_bounds =
-            FCLAW_ALLOC_ZERO (struct fclaw_patch_bounds_2d, block->num_patches);
+            FCLAW_ALLOC_ZERO (fclaw_patch_bounds_2d_t, block->num_patches);
         block->patchbylevel =
             FCLAW_ALLOC_ZERO (fclaw_patch_t *,
                               domain->possible_maxlevel + 1);
@@ -294,7 +295,7 @@ fclaw2d_domain_new (p4est_wrap_t * wrap, sc_keyvalue_t * attributes)
     domain->ghost_patches =
         FCLAW_ALLOC_ZERO (fclaw_patch_t, domain->num_ghost_patches);
     domain->ghost_patch_bounds =
-        FCLAW_ALLOC_ZERO (struct fclaw_patch_bounds_2d,
+        FCLAW_ALLOC_ZERO (fclaw_patch_bounds_2d_t,
                           domain->num_ghost_patches);
     for (i = 0; i < domain->num_ghost_patches; ++i)
     {
@@ -1199,7 +1200,7 @@ integrate_ray_fn (p4est_t * p4est, p4est_topidx_t which_tree,
     fclaw_patch_t fclaw2d_patch;
     memset (&fclaw2d_patch, 0, sizeof (fclaw_patch_t));
 
-    struct fclaw_patch_bounds_2d fclaw2d_patch_bounds;
+    fclaw_patch_bounds_2d_t fclaw2d_patch_bounds;
     fclaw2d_patch.d2 = &fclaw2d_patch_bounds;
 
     int patchno;
@@ -1431,7 +1432,7 @@ interpolate_partition_fn (p4est_t * p4est, p4est_topidx_t which_tree,
     fclaw_patch_t fclaw2d_patch;
     memset(&fclaw2d_patch, 0, sizeof(fclaw_patch_t));
 
-    struct fclaw_patch_bounds_2d fclaw2d_patch_bounds;
+    fclaw_patch_bounds_2d_t fclaw2d_patch_bounds;
     fclaw2d_patch.d2 = &fclaw2d_patch_bounds;
 
     int patchno;
@@ -1501,7 +1502,7 @@ interpolate_local_fn (p4est_t * p4est, p4est_topidx_t which_tree,
     fclaw_patch_t fclaw2d_patch;
     memset(&fclaw2d_patch, 0, sizeof(fclaw_patch_t));
 
-    struct fclaw_patch_bounds_2d fclaw2d_patch_bounds;
+    fclaw_patch_bounds_2d_t fclaw2d_patch_bounds;
     fclaw2d_patch.d2 = &fclaw2d_patch_bounds;
 
     int patchno;

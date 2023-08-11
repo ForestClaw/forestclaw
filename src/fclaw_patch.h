@@ -37,6 +37,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_base.h>
 
 typedef struct fclaw_patch fclaw_patch_t;
+typedef struct fclaw_patch_bounds_2d fclaw_patch_bounds_2d_t;
+typedef struct fclaw_patch_bounds_3d fclaw_patch_bounds_3d_t;
 
 struct fclaw_patch_bounds_2d
 {
@@ -58,8 +60,8 @@ struct fclaw_patch_bounds_3d
 struct fclaw_patch
 {
     int dim;
-    struct fclaw_patch_bounds_2d* d2;
-    struct fclaw_patch_bounds_3d* d3;
+    fclaw_patch_bounds_2d_t* d2;
+    fclaw_patch_bounds_3d_t* d3;
     int level;                  /**< 0 is root, increases if refined */
     int target_level;           /**< level desired after adaptation */
     int flags;                  /**< flags that encode tree information */
