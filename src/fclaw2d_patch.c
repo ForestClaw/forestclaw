@@ -35,6 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw3d_defs.h>
 #include <fclaw2d_to_3d.h>
 #define d2 d3
+#define fclaw_patch_vtable_d2_t fclaw_patch_vtable_d3_t
 #endif
 
 struct fclaw2d_patch_transform_data;
@@ -785,20 +786,25 @@ void fclaw2d_patch_time_sync_reset(fclaw_global_t* glob,
 /* ----------------------------------- Virtual table ---------------------------------- */
 
 static
-fclaw2d_patch_vtable_t* patch_vt_new()
+fclaw2d_patch_vtable_t* patch_vt_new(int dim)
 {
-    return (fclaw2d_patch_vtable_t*) FCLAW_ALLOC_ZERO (fclaw2d_patch_vtable_t, 1);
+    fclaw2d_patch_vtable_t* vt = FCLAW_ALLOC_ZERO (fclaw2d_patch_vtable_t, 1);
+	vt->dim = dim;
+	vt->d2 = FCLAW_ALLOC_ZERO (fclaw_patch_vtable_d2_t, 1);
+    return vt;
 }
 
 static
 void patch_vt_destroy(void* vt)
 {
-    FCLAW_FREE (vt);
+	fclaw2d_patch_vtable_t* patch_vt = (fclaw2d_patch_vtable_t*) vt;
+	FCLAW_FREE (patch_vt->d2);
+    FCLAW_FREE (patch_vt);
 }
 
 void fclaw2d_patch_vtable_initialize(fclaw_global_t* glob)
 {
-	fclaw2d_patch_vtable_t *patch_vt = patch_vt_new();
+	fclaw2d_patch_vtable_t *patch_vt = patch_vt_new(glob->domain->dim);
 
 	patch_vt->is_set = 1;
 
@@ -899,8 +905,8 @@ void* fclaw2d_patch_metric_patch(fclaw_global_t* glob,
                                  fclaw_patch_t *patch)
 {
 	fclaw2d_patch_vtable_t* patch_vt = fclaw2d_patch_vt(glob);    
-	FCLAW_ASSERT(patch_vt->d2->metric_patch != NULL);
-	return patch_vt->d2->metric_patch(patch);
+	FCLAW_ASSERT(patch_vt->metric_patch != NULL);
+	return patch_vt->metric_patch(patch);
 }
 
 int

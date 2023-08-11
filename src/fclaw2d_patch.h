@@ -1401,7 +1401,7 @@ typedef void (*fclaw_patch_destroy_user_data_t)(struct fclaw_global* glob,
  * 
  * @param[in] patch the patch context
  */
-typedef void* (*fclaw2d_patch_metric_patch_t)(struct fclaw_patch *patch);
+typedef void* (*fclaw_patch_metric_patch_t)(struct fclaw_patch *patch);
 
 ///@}
 /* ------------------------------------------------------------------------------------ */
@@ -1411,8 +1411,6 @@ typedef void* (*fclaw2d_patch_metric_patch_t)(struct fclaw_patch *patch);
 
 typedef struct fclaw_patch_vtable_d2
 {
-    /** @copybrief ::fclaw2d_patch_metric_patch_t */
-    fclaw2d_patch_metric_patch_t          metric_patch;
 
     /** @{ @name Face Ghost Filling Functions */
 
@@ -1572,6 +1570,9 @@ struct fclaw2d_patch_vtable
     fclaw_patch_remote_ghost_delete_t   remote_ghost_delete;
 
     /** @} */
+
+    /** @copybrief ::fclaw_patch_metric_patch_t */
+    fclaw_patch_metric_patch_t          metric_patch;
 
     /** True if vtable has been set */
     int is_set;

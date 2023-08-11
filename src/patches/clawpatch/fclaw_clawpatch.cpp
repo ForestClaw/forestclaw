@@ -1593,11 +1593,11 @@ void fclaw_clawpatch_vtable_initialize(int dim, fclaw_global_t* glob,
     /* Metric access */
     if(clawpatch_vt->dim == 2)
     {
-        patch_vt->d2->metric_patch = clawpatch_get_metric_patch_2d;
+        patch_vt->metric_patch = clawpatch_get_metric_patch_2d;
     }
     else
     {
-        patch_vt->d2->metric_patch = clawpatch_get_metric_patch_3d;
+        patch_vt->metric_patch = clawpatch_get_metric_patch_3d;
     }
 
     if(clawpatch_vt->dim == 2)

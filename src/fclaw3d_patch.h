@@ -1399,9 +1399,6 @@ typedef void* (*fclaw3d_patch_metric_patch_t)(struct fclaw_patch *patch);
 
 typedef struct fclaw_patch_vtable_d3
 {
-    /** @copybrief ::fclaw2d_patch_metric_patch_t */
-    fclaw3d_patch_metric_patch_t          metric_patch;
-
 
     /** @{ @name Face Ghost Filling Functions */
 
@@ -1562,6 +1559,9 @@ struct fclaw3d_patch_vtable
     fclaw3d_patch_remote_ghost_delete_t   remote_ghost_delete;
 
     /** @} */
+
+    /** @copybrief ::fclaw2d_patch_metric_patch_t */
+    fclaw3d_patch_metric_patch_t          metric_patch;
 
    /** True if vtable has been set */
     int is_set;
