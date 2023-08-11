@@ -18,7 +18,7 @@ libforestclaw_installed_headers = \
 	src/fp_exception_glibc_extension.h \
 	src/fclaw2d_include_all.h \
 	src/fclaw2d_defs.h \
-	src/fclaw2d_options.h \
+	src/fclaw_options.h \
 	src/fclaw_advance.h \
 	src/fclaw2d_elliptic_solver.h \
 	src/fclaw2d_farraybox.hpp \
@@ -185,7 +185,7 @@ src_forestclaw_TEST_SOURCES = \
 	src/fclaw2d_elliptic_solver.h.TEST.cpp \
 	src/fclaw2d_diagnostics.h.TEST.cpp \
 	src/fclaw_global.h.TEST.cpp \
-	src/fclaw2d_options.h.TEST.cpp \
+	src/fclaw_options.h.TEST.cpp \
 	src/fclaw2d_patch.h.TEST.cpp \
 	src/fclaw_vtable.h.TEST.cpp 
 

@@ -97,7 +97,7 @@ main (int argc, char **argv)
         fclaw_global_store_domain(heat_glob, heat_domain);
 
         /* Store option packages in glob */
-        fclaw2d_options_store           (heat_glob, heat_fclaw_opt);
+        fclaw_options_store           (heat_glob, heat_fclaw_opt);
         fclaw_clawpatch_options_store (heat_glob, heat_clawpatch_opt);
         fc2d_thunderegg_options_store    (heat_glob, heat_mg_opt);
         heat_options_store            (heat_glob, heat_user_opt);
@@ -112,7 +112,7 @@ main (int argc, char **argv)
         fclaw_global_store_domain(phasefield_glob, phasefield_domain);
 
         /* Store option packages in glob */
-        fclaw2d_options_store           (phasefield_glob, phasefield_fclaw_opt);
+        fclaw_options_store           (phasefield_glob, phasefield_fclaw_opt);
         fclaw_clawpatch_options_store (phasefield_glob, phasefield_clawpatch_opt);
         fc2d_thunderegg_options_store    (phasefield_glob, phasefield_mg_opt);
         phasefield_options_store            (phasefield_glob, phasefield_user_opt);

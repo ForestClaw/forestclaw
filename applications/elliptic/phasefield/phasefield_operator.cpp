@@ -42,7 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_global.h>
 #include <fclaw2d_map.h>
 #include <fclaw2d_map_brick.h>
-#include <fclaw2d_options.h>
+#include <fclaw_options.h>
 #include <fclaw2d_patch.h>
 #include <fclaw_vtable.h>
 
@@ -75,7 +75,7 @@ Vector<2> restrict_phi_n_vec(const Vector<2>& prev_beta_vec,
 void phasefield_solve(fclaw_global_t *glob) 
 {
     // get needed options
-    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+    const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
     const fc2d_thunderegg_options_t *mg_opt = fc2d_thunderegg_get_options(glob);
     const fclaw_clawpatch_options_t *clawpatch_opt = fclaw_clawpatch_get_options(glob);
   

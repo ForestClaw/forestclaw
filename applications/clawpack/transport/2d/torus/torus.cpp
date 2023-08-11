@@ -88,7 +88,7 @@ void run_program(fclaw_global_t* glob)
     }
     else if (user->claw_version == 5)
     {
-        fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+        fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
         if (fclaw_opt->time_sync != 0)
         {
             fclaw_global_essentialf("Conservation correction not yet implemented in " \
@@ -146,7 +146,7 @@ main (int argc, char **argv)
         create_domain (glob, fclaw_opt, user);
 
         /* Store option packages in glob */
-        fclaw2d_options_store           (glob, fclaw_opt);
+        fclaw_options_store           (glob, fclaw_opt);
         fclaw_clawpatch_options_store (glob, clawpatch_opt);
         fc2d_clawpack46_options_store   (glob, claw46_opt);
         fc2d_clawpack5_options_store    (glob, claw5_opt);

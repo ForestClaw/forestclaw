@@ -37,7 +37,7 @@
 #include <fclaw2d_convenience.h>
 #include <fclaw2d_metric.hpp>
 #include <fclaw2d_metric.h>
-#include <fclaw2d_options.h>
+#include <fclaw_options.h>
 #include <test.hpp>
 #include <test/test.hpp>
 using namespace ThunderEgg;
@@ -70,7 +70,7 @@ struct QuadDomain {
 
         domain = create_test_domain(sc_MPI_COMM_WORLD,&fopts);
         fclaw_global_store_domain(glob, domain);
-        fclaw2d_options_store(glob, &fopts);
+        fclaw_options_store(glob, &fopts);
 
         opts->d2->mx     = 5;
         opts->d2->my     = 6;
@@ -126,7 +126,7 @@ struct QuadDomainBrick {
 
         domain = create_test_domain(sc_MPI_COMM_WORLD,&fopts);
         fclaw_global_store_domain(glob, domain);
-        fclaw2d_options_store(glob, &fopts);
+        fclaw_options_store(glob, &fopts);
 
         opts->d2->mx     = 5;
         opts->d2->my     = 6;

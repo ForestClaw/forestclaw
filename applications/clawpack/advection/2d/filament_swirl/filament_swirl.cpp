@@ -489,7 +489,7 @@ main (int argc, char **argv)
         filament_glob = fclaw_global_new();
         fclaw_global_store_domain(filament_glob, filament_domain);
 
-        fclaw2d_options_store            (filament_glob, filament_fclaw_opt);
+        fclaw_options_store            (filament_glob, filament_fclaw_opt);
         fclaw_clawpatch_options_store  (filament_glob, filament_clawpatch_opt);
         fc2d_clawpack46_options_store    (filament_glob, filament_claw46_opt);
         fc2d_clawpack5_options_store     (filament_glob, filament_claw5_opt);
@@ -498,7 +498,7 @@ main (int argc, char **argv)
         swirl_glob = fclaw_global_new();
         fclaw_global_store_domain(swirl_glob, swirl_domain);
 
-        fclaw2d_options_store           (swirl_glob, swirl_fclaw_opt);
+        fclaw_options_store           (swirl_glob, swirl_fclaw_opt);
         fclaw_clawpatch_options_store (swirl_glob, swirl_clawpatch_opt);
         fc2d_clawpack46_options_store   (swirl_glob, swirl_claw46_opt);
         fc2d_clawpack5_options_store    (swirl_glob, swirl_claw5_opt);

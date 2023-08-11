@@ -25,7 +25,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "fclaw2d_rays.h"
 #include "fclaw_global.h"
-#include "fclaw2d_options.h"
+#include "fclaw_options.h"
 #include "fclaw2d_diagnostics.h"
 
 #include "fclaw2d_convenience.h"
@@ -79,7 +79,7 @@ void ray_initialize(fclaw_global_t* glob, void** acc)
 
     /* Check to see if user wants ray output */
     int i, num_rays;
-    const fclaw_options_t * fclaw_opt = fclaw2d_get_options(glob);
+    const fclaw_options_t * fclaw_opt = fclaw_get_options(glob);
     if (!fclaw_opt->output_rays)
     {
         num_rays = 0;

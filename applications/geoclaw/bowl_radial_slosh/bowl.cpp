@@ -83,7 +83,7 @@ main (int argc, char **argv)
         radial_glob = fclaw_global_new();
         fclaw_global_store_domain(radial_glob, radial_domain);
 
-        fclaw2d_options_store           (radial_glob, radial_gparms);
+        fclaw_options_store           (radial_glob, radial_gparms);
         fclaw_clawpatch_options_store (radial_glob, radial_clawpatchopt);
         fc2d_geoclaw_options_store      (radial_glob, radial_geoclawopt);
         radial_options_store            (radial_glob, radial_user_opt);
@@ -100,7 +100,7 @@ main (int argc, char **argv)
         fclaw_global_store_domain(slosh_glob, slosh_domain);
 
         /* Store option packages in glob */
-        fclaw2d_options_store           (slosh_glob, slosh_fclaw_opt);
+        fclaw_options_store           (slosh_glob, slosh_fclaw_opt);
         fclaw_clawpatch_options_store (slosh_glob, sloshclawpatch_opt);
         fc2d_geoclaw_options_store      (slosh_glob, slosh_geo_opt);
         slosh_options_store             (slosh_glob, slosh_user_opt);

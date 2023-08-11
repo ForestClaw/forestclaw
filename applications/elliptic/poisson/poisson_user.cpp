@@ -113,7 +113,7 @@ void poisson_compute_error(fclaw_global_t *glob,
                           void *user)
 {
     poisson_error_info_t* error_data = (poisson_error_info_t*) user;
-    //const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+    //const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
 
     fclaw_clawpatch_vtable_t *clawpatch_vt = fclaw_clawpatch_vt(glob);
 
@@ -266,7 +266,7 @@ void cb_poisson_output_ascii(fclaw_domain_t * domain,
     fclaw_clawpatch_elliptic_soln_data(glob,patch,&soln,&mfields);
 
     char fname[BUFSIZ];
-    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+    const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
     snprintf (fname, BUFSIZ, "%s.q%04d", fclaw_opt->prefix, iframe);
 
     /* The fort routine is defined by a clawpack solver and handles 
@@ -289,7 +289,7 @@ int poisson_tag4refinement(fclaw_global_t *glob,
 {
     fclaw_clawpatch_vtable_t* clawpatch_vt = fclaw_clawpatch_vt(glob);
 
-    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+    const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
 
     int tag_patch;
     double refine_threshold;
@@ -323,7 +323,7 @@ int poisson_tag4coarsening(fclaw_global_t *glob,
 {
     fclaw_patch_t *patch0 = &fine_patches[0];
 
-    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+    const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
     double coarsen_threshold = fclaw_opt->coarsen_threshold;
 
     int mx,my,mbc;
@@ -388,7 +388,7 @@ void poisson_link_solvers(fclaw_global_t *glob)
 
     // Output routines
 
-    fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+    fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
     if (fclaw_opt->compute_error) 
     {
         clawpatch_vt->time_header_ascii = poisson_time_header_ascii;

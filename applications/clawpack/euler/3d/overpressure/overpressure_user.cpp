@@ -42,7 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 void overpressure_problem_setup(fclaw_global_t* glob)
 {
     const user_options_t* user = overpressure_get_options(glob);
-    fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
+    fclaw_options_t* fclaw_opt = fclaw_get_options(glob);
     fc3d_clawpack46_options_t *clawopt = fc3d_clawpack46_get_options(glob);
 
     if (glob->mpirank == 0)
@@ -144,7 +144,7 @@ void overpressure_link_solvers(fclaw_global_t *glob)
         fclaw_clawpatch_vtable_t *clawpatch_vt = fclaw_clawpatch_vt(glob);
         clawpatch_vt->d3->fort_user_exceeds_threshold = &EULER3D_PRESSURE_EXCEEDS_TH;
 
-        fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+        fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
         if (fclaw_opt->manifold)
         {
             /* This calls a manifold version of setaux */

@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_clawpatch.h>
 #include <fclaw_clawpatch_options.h>
 
-#include <fclaw2d_options.h>
+#include <fclaw_options.h>
 #include <fclaw_global.h>
 
 #ifdef __cplusplus
@@ -213,7 +213,7 @@ void geoclaw_gauge_normalize_coordinates(fclaw_global_t *glob,
        Return normalized (xc,yc) coordinates for gauge.
     */
 
-    fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+    fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
     double ax,bx,ay,by;
 
     ax = fclaw_opt->ax;

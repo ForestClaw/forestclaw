@@ -28,7 +28,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw_pointer_map.h>
 
-#include <fclaw2d_options.h>
+#include <fclaw_options.h>
 #include <fclaw_global.h>
 #include <fclaw2d_convenience.h>  /* Needed to get search function for gauges */
 #include <fclaw2d_diagnostics.h>
@@ -64,7 +64,7 @@ typedef struct fclaw_gauge_info
 static
 void gauge_initialize(fclaw_global_t* glob, void** acc)
 {
-    const fclaw_options_t * fclaw_opt = fclaw2d_get_options(glob);
+    const fclaw_options_t * fclaw_opt = fclaw_get_options(glob);
 
     /* ------------------------------------------------------------------
        These two calls are the only calls that should worry about the format
@@ -228,7 +228,7 @@ void gauge_update(fclaw_global_t *glob, void* acc)
     fclaw_patch_t *patch;
     fclaw_gauge_t *g;
 
-    const fclaw_options_t * fclaw_opt = fclaw2d_get_options(glob);
+    const fclaw_options_t * fclaw_opt = fclaw_get_options(glob);
 
     fclaw_gauge_acc_t* gauge_acc = (fclaw_gauge_acc_t*) acc;
     fclaw_gauge_t *gauges = gauge_acc->gauges;

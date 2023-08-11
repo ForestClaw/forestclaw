@@ -31,7 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_patch.h>
 #include <fclaw_global.h>
-#include <fclaw2d_options.h>
+#include <fclaw_options.h>
 
 
 void cb_clawpatch_output_ascii (fclaw_domain_t * domain,
@@ -53,7 +53,7 @@ void cb_clawpatch_output_ascii (fclaw_domain_t * domain,
     double *q;
     fclaw_clawpatch_soln_data(glob,patch,&q,&meqn);
 
-    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+    const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
     int iframe = *((int *) s->user);
     char fname[BUFSIZ];
     snprintf (fname, BUFSIZ, "%s.q%04d", fclaw_opt->prefix, iframe);

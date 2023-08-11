@@ -30,7 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_patch.h>
 #include <fclaw_global.h>
-#include <fclaw2d_options.h>
+#include <fclaw_options.h>
 
 
 void cb_gem3d_output_mesh (fclaw_domain_t * domain,

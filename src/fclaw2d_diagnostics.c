@@ -27,7 +27,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw_global.h>
 #include <fclaw_domain.h>
-#include <fclaw2d_options.h>
+#include <fclaw_options.h>
 
 #include <fclaw_gauges.h>
 #include <fclaw_pointer_map.h>
@@ -99,7 +99,7 @@ void fclaw2d_diagnostics_initialize(fclaw_global_t *glob)
 
     fclaw2d_diagnostics_accumulator_t *acc = FCLAW_ALLOC (fclaw2d_diagnostics_accumulator_t, 1);
     fclaw_global_attribute_store(glob, "acc", acc, acc_destroy);
-    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+    const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
 
     /* Return an error accumulator */
     if (diag_vt->patch_init_diagnostics != NULL)
@@ -128,7 +128,7 @@ void fclaw2d_diagnostics_gather(fclaw_global_t *glob,
                                 int init_flag)
 {
     fclaw2d_diagnostics_accumulator_t *acc = fclaw_global_get_attribute(glob, "acc");
-    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+    const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
     fclaw2d_diagnostics_vtable_t *diag_vt = fclaw2d_diagnostics_vt(glob);
 
     /* -----------------------------------------------------
@@ -188,7 +188,7 @@ void fclaw2d_diagnostics_gather(fclaw_global_t *glob,
 void fclaw2d_diagnostics_reset(fclaw_global_t *glob)
 {
     fclaw2d_diagnostics_accumulator_t *acc = fclaw_global_get_attribute(glob, "acc");
-    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+    const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
     fclaw2d_diagnostics_vtable_t *diag_vt = fclaw2d_diagnostics_vt(glob);
 
     fclaw_timer_start (&glob->timers[FCLAW_TIMER_DIAGNOSTICS]);
@@ -214,7 +214,7 @@ void fclaw2d_diagnostics_reset(fclaw_global_t *glob)
 void fclaw2d_diagnostics_finalize(fclaw_global_t *glob)
 {
     fclaw2d_diagnostics_accumulator_t *acc = fclaw_global_get_attribute(glob, "acc");
-    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+    const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
     fclaw2d_diagnostics_vtable_t *diag_vt = fclaw2d_diagnostics_vt(glob);
 
     fclaw_timer_start (&glob->timers[FCLAW_TIMER_DIAGNOSTICS]);

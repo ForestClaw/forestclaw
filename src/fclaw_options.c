@@ -23,6 +23,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include <fclaw_global.h>
 #include <fclaw_options.h>
 #include <fclaw_timer.h>
 #include <fclaw_mpi.h>
@@ -617,3 +618,12 @@ void fclaw_options_destroy_array(void* array)
     FCLAW_FREE (array);
 }
 
+void fclaw_options_store (fclaw_global_t *glob, fclaw_options_t* gparms)
+{
+    fclaw_global_options_store(glob, "fclaw2d", gparms);
+}
+
+fclaw_options_t* fclaw_get_options(fclaw_global_t* glob)
+{
+    return (fclaw_options_t*) fclaw_global_get_options(glob, "fclaw2d");
+}

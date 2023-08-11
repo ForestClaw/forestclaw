@@ -43,7 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_patch.h>
 #include <fclaw_global.h>
 #include <fclaw_vtable.h>
-#include <fclaw2d_options.h>
+#include <fclaw_options.h>
 #include <fclaw2d_defs.h>
 
 
@@ -282,7 +282,7 @@ double clawpack5_step2(fclaw_global_t *glob,
           fclaw2d_clawpatch_get_registers(glob,this_patch);
 
     /* Evaluate fluxes needed in correction terms */
-    const fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
+    const fclaw_options_t* fclaw_opt = fclaw_get_options(glob);
     if (fclaw_opt->time_sync && fclaw_opt->flux_correction)
     {
         FCLAW_ASSERT(claw5_vt->fort_rpn2_cons != NULL);

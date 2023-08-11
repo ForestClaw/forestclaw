@@ -43,7 +43,6 @@
 
 #endif /* P8HACK */
 
-#include <fclaw3d_options.h>
 #include <fclaw3d_convenience.h>
 
 #ifdef P8HACK

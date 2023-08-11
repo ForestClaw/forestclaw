@@ -17,7 +17,6 @@ add_library(forestclaw_c OBJECT
   fclaw_vtable.c
 
   fclaw2d_block.c
-  fclaw2d_options.c
   fclaw2d_forestclaw.c
   fclaw2d_map.c
   fclaw2d_map_query.c
@@ -50,7 +49,6 @@ add_library(forestclaw_c OBJECT
   fclaw3d_map.c
   fclaw3d_patch.c
   fclaw3d_exchange.c
-  fclaw3d_options.c
 
   fp_exception_glibc_extension.c
   mappings/fclaw2d_map_nomap.c
@@ -127,7 +125,6 @@ install(FILES
 	fp_exception_glibc_extension.h 
   fclaw2d_include_all.h 
 	fclaw2d_defs.h 
-	fclaw2d_options.h 
 	fclaw_advance.h 
 	fclaw2d_elliptic_solver.h 
 	fclaw2d_farraybox.hpp 
@@ -159,7 +156,6 @@ install(FILES
   fclaw3d_map.h
   fclaw3d_patch.h
   fclaw3d_exchange.h
-  fclaw3d_options.h
   fclaw3d_include_all.h 
   forestclaw.h
   DESTINATION include
@@ -178,7 +174,7 @@ if(BUILD_TESTING)
       fclaw2d_elliptic_solver.h.TEST.cpp
       fclaw2d_diagnostics.h.TEST.cpp
       fclaw_global.h.TEST.cpp
-      fclaw2d_options.h.TEST.cpp
+      fclaw_options.h.TEST.cpp
       fclaw2d_patch.h.TEST.cpp
       fclaw_vtable.h.TEST.cpp
   )

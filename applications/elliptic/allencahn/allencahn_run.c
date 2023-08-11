@@ -31,7 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_forestclaw.h>
 #include <fclaw_global.h>
 #include <fclaw2d_ghost_fill.h>
-#include <fclaw2d_options.h>
+#include <fclaw_options.h>
 #include <fclaw_advance.h>
 #include <fclaw2d_regrid.h>
 #include <fclaw2d_output.h>
@@ -67,7 +67,7 @@ void restore_time_step(fclaw_global_t *glob)
 {
     fclaw_global_iterate_patches(glob,cb_restore_time_step,(void *) NULL);
 
-    //fclaw_options_t *fopt = fclaw2d_get_options(glob);
+    //fclaw_options_t *fopt = fclaw_get_options(glob);
     //fclaw2d_time_sync_reset(glob,fopt->minlevel,fopt->maxlevel,0);
 }
 
@@ -137,7 +137,7 @@ void outstyle_1(fclaw_global_t *glob)
 
     fclaw2d_output_frame(glob,iframe);
 
-    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+    const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
 
     double final_time = fclaw_opt->tfinal;
     int nout = fclaw_opt->nout;
@@ -253,7 +253,7 @@ void outstyle_3(fclaw_global_t *glob)
     fclaw2d_output_frame(glob,iframe);
 
 
-    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+    const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
     double initial_dt = fclaw_opt->initial_dt;
 
 
@@ -365,7 +365,7 @@ void outstyle_4(fclaw_global_t *glob)
     fclaw2d_diagnostics_gather(glob,init_flag);
     init_flag = 0;
 
-    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+    const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
     double initial_dt = fclaw_opt->initial_dt;
     int nstep_outer = fclaw_opt->nout;
     int nstep_inner = fclaw_opt->nstep;
@@ -423,7 +423,7 @@ void outstyle_4(fclaw_global_t *glob)
 void allencahn_run(fclaw_global_t *glob)
 {
 
-    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+    const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
 
     switch (fclaw_opt->outstyle)
     {

@@ -144,7 +144,7 @@ main (int argc, char **argv)
         fclaw_global_store_domain(glob, domain);
 
         /* Store option packages in glob */
-        fclaw2d_options_store           (glob, fclaw_opt);
+        fclaw_options_store           (glob, fclaw_opt);
         fclaw_clawpatch_options_store (glob, clawpatch_opt);
         fc2d_thunderegg_options_store    (glob, mg_opt);
         phasefield_options_store            (glob, user_opt);

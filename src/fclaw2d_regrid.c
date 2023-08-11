@@ -25,7 +25,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_regrid.h>
 
-#include <fclaw2d_options.h>
+#include <fclaw_options.h>
 
 #include <fclaw2d_convenience.h>   /* p4est domain, patch handling routines */
 #include <forestclaw2d.h>          /* Needed for patch_relation_t data */
@@ -54,7 +54,7 @@ void cb_fclaw2d_regrid_tag4refinement(fclaw_domain_t *domain,
     fclaw_global_iterate_t* g = (fclaw_global_iterate_t*) user;
     int domain_init = *((int*) g->user);
 
-    fclaw_opt = fclaw2d_get_options(g->glob);
+    fclaw_opt = fclaw_get_options(g->glob);
 
     maxlevel = fclaw_opt->maxlevel;
     level = this_patch->level;
@@ -81,7 +81,7 @@ void cb_regrid_tag4coarsening(fclaw_domain_t *domain,
     const fclaw_options_t* fclaw_opt;
     fclaw_global_iterate_t* g = (fclaw_global_iterate_t*) user;
 
-    fclaw_opt = fclaw2d_get_options(g->glob);
+    fclaw_opt = fclaw_get_options(g->glob);
     int domain_init = *((int*) g->user);
 
     int minlevel = fclaw_opt->minlevel;

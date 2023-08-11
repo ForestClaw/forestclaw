@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef P4_TO_P8
 #include <fclaw2d_defs.h>
 #include <fclaw_global.h>
-#include <fclaw2d_options.h>
+#include <fclaw_options.h>
 
 #include <fclaw_domain.h>
 #include <fclaw2d_diagnostics.h>
@@ -270,7 +270,7 @@ static char* old_path = NULL;
 
 void fclaw_set_global_context(fclaw_global_t *glob)
 {
-    fclaw_options_t* opts = fclaw2d_get_options(glob);
+    fclaw_options_t* opts = fclaw_get_options(glob);
     fclaw_set_logging_prefix(opts->logging_prefix);
 
     // Change run directory

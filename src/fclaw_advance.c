@@ -30,7 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_timeinterp.h>
 #include <fclaw2d_ghost_fill.h>
 #include <fclaw2d_update_single_step.h>
-#include <fclaw2d_options.h>
+#include <fclaw_options.h>
 #include <fclaw_global.h>
 #include <fclaw_vtable.h>
 
@@ -57,7 +57,7 @@ void initialize_timestep_counters(fclaw_global_t* glob,
 								  double t_init, double dt)
 {
 	fclaw_domain_t *domain = glob->domain;
-	const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+	const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
 	fclaw2d_timestep_counters *ts_counter;
 	int level;
 
@@ -192,7 +192,7 @@ double advance_level(fclaw_global_t *glob,
 					 fclaw2d_timestep_counters* ts_counter)
 {
 	fclaw_domain_t* domain = glob->domain;
-	const fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
+	const fclaw_options_t* fclaw_opt = fclaw_get_options(glob);
 	double t_level = ts_counter[level].current_time;
 	double dt_level = ts_counter[level].dt_step;
 
@@ -252,7 +252,7 @@ double fclaw_advance_all_levels(fclaw_global_t *glob,
 	int level;
 	fclaw_timer_start (&glob->timers[FCLAW_TIMER_ADVANCE]);
 
-	const fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
+	const fclaw_options_t* fclaw_opt = fclaw_get_options(glob);
 	fclaw2d_timestep_counters *ts_counter;
 
 	initialize_timestep_counters(glob,&ts_counter,t_curr,dt);

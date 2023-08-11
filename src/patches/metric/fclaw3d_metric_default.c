@@ -24,7 +24,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include <fclaw_global.h>
-#include <fclaw2d_options.h>
+#include <fclaw_options.h>
 #include <fclaw_math.h>
 
 #include "fclaw3d_metric.h"
@@ -103,7 +103,7 @@ void fclaw3d_metric_compute_volume_default(fclaw_global_t *glob,
     fclaw3d_metric_patch_grid_data(glob,patch,&mx,&my,&mz,&mbc,
                                    &xlower,&ylower,&zlower,&dx,&dy,&dz);
 
-    const fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
+    const fclaw_options_t* fclaw_opt = fclaw_get_options(glob);
     int level = patch->level;
     int maxlevel = fclaw_opt->maxlevel;
     int refratio = 2;
@@ -163,7 +163,7 @@ void fclaw3d_metric_compute_volume_ghost_default(fclaw_global_t* glob,
 
 
     /* Set area in ghost cells not set above */
-    const fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
+    const fclaw_options_t* fclaw_opt = fclaw_get_options(glob);
     int level = patch->level;
     int maxlevel = fclaw_opt->maxlevel;
     int refratio = fclaw_opt->refratio;

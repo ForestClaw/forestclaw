@@ -26,7 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_forestclaw.h>
 
 #include <fclaw_global.h>
-#include <fclaw2d_options.h>
+#include <fclaw_options.h>
 
 #include <fclaw2d_convenience.h>
 
@@ -77,7 +77,7 @@ void fclaw2d_initialize(fclaw_global_t *glob)
 	fclaw_domain_t** domain = &glob->domain;
 
     int time_interp = 0;
-    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+    const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
 
 	/* This mapping context is needed by fortran mapping functions */
 	fclaw2d_map_context_t *cont = fclaw_global_get_map_2d(glob);

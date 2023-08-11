@@ -25,6 +25,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw_global.h>
 #include <fclaw_domain.h>
+#include <fclaw_options.h>
 
 #ifndef P4_TO_P8
 
@@ -32,15 +33,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_patch.h>
 
-#include <fclaw2d_options.h>
 
 #else
 
 #include <fclaw3d_exchange.h>
 
 #include <fclaw3d_patch.h>
-
-#include <fclaw3d_options.h>
 
 #include <fclaw2d_to_3d.h>
 
@@ -87,7 +85,7 @@ static
 void build_remote_ghost_patches(fclaw_global_t* glob)
 {
     fclaw_domain_t *domain = glob->domain;
-    const fclaw_options_t *gparms = fclaw2d_get_options(glob);
+    const fclaw_options_t *gparms = fclaw_get_options(glob);
 
     fclaw_infof("[%d] Number of ghost patches : %d\n",
                             domain->mpirank,domain->num_ghost_patches);

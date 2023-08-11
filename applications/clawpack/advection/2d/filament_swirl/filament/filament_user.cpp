@@ -39,7 +39,7 @@ void filament_patch_setup(fclaw_global_t *glob,
 
 void filament_link_solvers(fclaw_global_t *glob)
 {
-    const fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
+    const fclaw_options_t* fclaw_opt = fclaw_get_options(glob);
 
     if (fclaw_opt->manifold)
     {

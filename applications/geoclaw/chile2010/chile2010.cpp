@@ -110,7 +110,7 @@ main (int argc, char **argv)
         glob = fclaw_global_new();
         fclaw_global_store_domain(glob, domain);
 
-        fclaw2d_options_store (glob, fclaw_opt);
+        fclaw_options_store (glob, fclaw_opt);
         fclaw_clawpatch_options_store (glob, clawpatchopt);
         fc2d_geoclaw_options_store (glob, geoclawopt);
 

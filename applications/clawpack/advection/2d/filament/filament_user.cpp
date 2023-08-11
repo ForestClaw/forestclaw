@@ -56,7 +56,7 @@ void filament_patch_setup(fclaw_global_t *glob,
 void filament_link_solvers(fclaw_global_t *glob)
 {
     /* All examples require manifold = T */
-    const fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
+    const fclaw_options_t* fclaw_opt = fclaw_get_options(glob);
     FCLAW_ASSERT(fclaw_opt->manifold != 0);
 
     fclaw_vtable_t *fc_vt = fclaw_vt(glob);

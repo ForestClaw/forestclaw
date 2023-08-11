@@ -27,7 +27,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_global.h>
 
 #include <fclaw2d_diagnostics.h>
-#include <fclaw2d_options.h>
+#include <fclaw_options.h>
 #include <fclaw2d_map.h>
 #include <fclaw_domain.h>
 #include <fclaw2d_forestclaw.h>
@@ -169,7 +169,7 @@ output_expected_values(fclaw_global_t* glob, const char* filename)
 
 void fclaw2d_finalize(fclaw_global_t* glob)
 {
-    const fclaw_options_t *gparms = fclaw2d_get_options(glob);
+    const fclaw_options_t *gparms = fclaw_get_options(glob);
 
     fclaw_global_essentialf("Finalizing run\n");
     fclaw2d_diagnostics_finalize(glob);

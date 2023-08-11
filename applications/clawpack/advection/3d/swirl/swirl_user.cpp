@@ -30,7 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 void swirl_problem_setup(fclaw_global_t *glob)
 {
     const user_options_t* user = swirl_get_options(glob);
-    fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
+    fclaw_options_t* fclaw_opt = fclaw_get_options(glob);
     if (glob->mpirank == 0)
     {
         FILE *f = fopen("setprob.data","w");
@@ -87,7 +87,7 @@ void swirl_link_solvers(fclaw_global_t *glob)
     fclaw_clawpatch_vtable_t *clawpatch_vt = fclaw_clawpatch_vt(glob);
     clawpatch_vt->d3->fort_user_exceeds_threshold = &FCLAW3DX_USER_EXCEEDS_TH;
 
-    fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
+    fclaw_options_t* fclaw_opt = fclaw_get_options(glob);
 
     const user_options_t* user = swirl_get_options(glob);
     if (user->claw_version == 4)

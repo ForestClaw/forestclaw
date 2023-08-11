@@ -272,10 +272,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define fclaw2d_overlap_exchange        fclaw3d_overlap_exchange
 #define fclaw2d_global_store_map        fclaw3d_global_store_map
 
-/* translations for the options */
-#define fclaw2d_options_store           fclaw3d_options_store
-#define fclaw2d_get_options            fclaw3d_get_options
-
 /* translations not found in p4est */
 #ifndef p4est_wrap_new_unitsquare
 #define p4est_wrap_new_unitsquare       p8est_wrap_new_unitcube

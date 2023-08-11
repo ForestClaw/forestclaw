@@ -30,7 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw_global.h>
 
-#include <fclaw2d_options.h>
+#include <fclaw_options.h>
 #include <fclaw2d_map.h>
 
 typedef struct fclaw2d_vtk_state
@@ -724,7 +724,7 @@ fclaw2d_output_vtk_coordinate_cb (fclaw_global_t * glob,
     fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
-    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+    const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
     fclaw2d_map_context_t* cont = fclaw_global_get_map_2d(glob);
 
     /* Enumerate point coordinates in the patch */
@@ -765,7 +765,7 @@ fclaw3d_output_vtk_coordinate_cb (fclaw_global_t * glob,
     fclaw3d_clawpatch_grid_data(glob,patch,&mx,&my,&mz, &mbc,
                                 &xlower,&ylower,&zlower, &dx,&dy, &dz);
 
-    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+    const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
     fclaw2d_map_context_t* cont = fclaw_global_get_map_2d(glob);
     /* Enumerate point coordinates in the patch */
     double *d = (double *) a;
@@ -886,7 +886,7 @@ fclaw3d_output_vtk_value_cb (fclaw_global_t * glob,
 static void
 fclaw2d_output_write_vtk_debug (fclaw_global_t * glob, const char *basename)
 {
-    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+    const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
     const fclaw_clawpatch_options_t *clawpatch_opt = fclaw_clawpatch_get_options(glob);
 
     (void) fclaw2d_vtk_write_file (glob, basename,
@@ -908,7 +908,7 @@ fclaw2d_output_write_vtk_debug (fclaw_global_t * glob, const char *basename)
 
 void fclaw_clawpatch_output_vtk (fclaw_global_t * glob, int iframe)
 {
-    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+    const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
     const fclaw_clawpatch_options_t *clawpatch_opt = fclaw_clawpatch_get_options(glob);
 
 

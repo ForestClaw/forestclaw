@@ -24,7 +24,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include <fclaw_global.h>
-#include <fclaw2d_options.h>
+#include <fclaw_options.h>
 #include <fclaw_domain.h>
 #include <fclaw2d_diagnostics.h>
 
@@ -113,7 +113,7 @@ void cb_compute_diagnostics(fclaw_domain_t *domain,
     }
 
     /* Compute error */
-    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(s->glob);
+    const fclaw_options_t *fclaw_opt = fclaw_get_options(s->glob);
     if (fclaw_opt->compute_error)
         clawpatch_vt->compute_error(s->glob, patch, blockno, patchno, error_data);
 
@@ -125,7 +125,7 @@ void fclaw_clawpatch_diagnostics_compute(fclaw_global_t* glob,
                                          void* patch_acc)
 {
     fclaw_debugf("Computing diagnostics\n");
-    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+    const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
     int check = fclaw_opt->compute_error || fclaw_opt->conservation_check;
     if (!check) return;
 
@@ -142,7 +142,7 @@ void fclaw_clawpatch_diagnostics_gather(fclaw_global_t *glob,
     fclaw_domain_t *domain = glob->domain;
     
     error_info_t *error_data = (error_info_t*) patch_acc;
-    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+    const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
     const fclaw_clawpatch_options_t *clawpatch_opt = fclaw_clawpatch_get_options(glob);
     
     int meqn = clawpatch_opt->meqn;  /* clawpatch->meqn */

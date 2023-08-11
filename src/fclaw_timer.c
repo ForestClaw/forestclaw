@@ -25,7 +25,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw_timer.h>
 #include <fclaw_global.h>
-#include <fclaw2d_options.h>
+#include <fclaw_options.h>
 
 #include <fclaw2d_partition.h>
 #include <sc_statistics.h>
@@ -128,7 +128,7 @@ fclaw_timer_report(fclaw_global_t *glob)
     sc_statinfo_t stats[FCLAW_TIMER_COUNT];
 
 
-    fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+    fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
 
     fclaw_timer_stop (&glob->timers[FCLAW_TIMER_WALLTIME]);
 

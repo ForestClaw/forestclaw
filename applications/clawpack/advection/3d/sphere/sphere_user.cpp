@@ -31,7 +31,7 @@ static
 void sphere_problem_setup(fclaw_global_t* glob)
 {
     const user_options_t *user = sphere_get_options(glob);
-    fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
+    fclaw_options_t* fclaw_opt = fclaw_get_options(glob);
 
     if (glob->mpirank == 0)
     {

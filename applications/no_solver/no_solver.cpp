@@ -102,7 +102,7 @@ main (int argc, char **argv)
         create_domain_map (glob, fclaw_opt);
 
         /* Store option packages in glob */
-        fclaw2d_options_store           (glob, fclaw_opt);
+        fclaw_options_store           (glob, fclaw_opt);
         fclaw_clawpatch_options_store (glob, clawpatch_opt);
         no_solver_options_store         (glob, user_opt);
 

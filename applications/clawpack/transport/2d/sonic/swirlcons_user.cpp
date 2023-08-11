@@ -53,7 +53,7 @@ void swirlcons_link_solvers(fclaw_global_t *glob)
     fc2d_clawpack46_options_t  *clawopt = fc2d_clawpack46_get_options(glob);
     const user_options_t*          user = swirlcons_get_options(glob);
 
-    const fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
+    const fclaw_options_t* fclaw_opt = fclaw_get_options(glob);
 
     /* ForestClaw functions */
     vt->problem_setup = &swirlcons_problem_setup;  /* Version-independent */
@@ -249,7 +249,7 @@ void cb_swirl_output_ascii (fclaw_domain_t * domain,
     double* error = fclaw2d_clawpatch_get_error(glob,patch);
     double* soln = fclaw2d_clawpatch_get_exactsoln(glob,patch);
 
-    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+    const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
     char fname[BUFSIZ];
     snprintf (fname, BUFSIZ, "%s.q%04d", fclaw_opt->prefix, iframe);
 

@@ -73,7 +73,7 @@ void cb_periodic_output_ascii (fclaw_domain_t * domain,
     fclaw_global_t      *glob = (fclaw_global_t*) s->glob;
 
     //fclaw_clawpatch_vtable_t *clawpatch_vt = fclaw_clawpatch_vt(glob);
-    const fclaw_options_t         *fclaw_opt = fclaw2d_get_options(glob);
+    const fclaw_options_t         *fclaw_opt = fclaw_get_options(glob);
     const user_options_t  *user_opt =  periodic_get_options(glob);
 
 
@@ -134,7 +134,7 @@ void periodic_link_solvers(fclaw_global_t *glob)
         clawpatch_vt->fort_tag4coarsening = &TAG4COARSENING;
         clawpatch_vt->fort_tag4refinement = &TAG4REFINEMENT;
 
-        const fclaw_options_t  *fclaw_opt = fclaw2d_get_options(glob);
+        const fclaw_options_t  *fclaw_opt = fclaw_get_options(glob);
         if (fclaw_opt->compute_error)
         {
             clawpatch_vt->fort_compute_patch_error = &PERIODIC_COMPUTE_ERROR;

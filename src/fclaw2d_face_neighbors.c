@@ -35,7 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_block.h>
 #include <fclaw2d_patch.h>
 #include <fclaw2d_ghost_fill.h>
-#include <fclaw2d_options.h>
+#include <fclaw_options.h>
 #include <fclaw2d_physical_bc.h>
 #include <fclaw2d_regrid.h>
 #include <fclaw_domain.h>
@@ -216,7 +216,7 @@ void cb_face_fill(fclaw_domain_t *domain,
 	int time_sync_fine_to_coarse = filltype->exchange_type == FCLAW2D_TIME_SYNC_F2C;
 	int time_sync_samesize = filltype->exchange_type == FCLAW2D_TIME_SYNC_SAMESIZE;
 
-	const fclaw_options_t *gparms = fclaw2d_get_options(s->glob);
+	const fclaw_options_t *gparms = fclaw_get_options(s->glob);
 	const int refratio = gparms->refratio;
 
 	int intersects_phys_bdry[FCLAW2D_NUMFACES];
@@ -458,7 +458,7 @@ void fclaw2d_face_neighbor_ghost(fclaw_global_t* glob,
 	fclaw_domain_t *domain = glob->domain;
 
 	fclaw2d_domain_data_t *ddata = domain->d2;
-	const fclaw_options_t *gparms = fclaw2d_get_options(glob);
+	const fclaw_options_t *gparms = fclaw_get_options(glob);
 	int refratio = gparms->refratio;
 
 	int rproc[2];

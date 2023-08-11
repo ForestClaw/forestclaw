@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_convenience.h>
 #include <fclaw3d_metric.hpp>
 #include <fclaw3d_metric.h>
-#include <fclaw2d_options.h>
+#include <fclaw_options.h>
 #include <test.hpp>
 #include <test/test.hpp>
 #include <fstream>
@@ -84,7 +84,7 @@ struct SinglePatchDomain {
 
         domain = create_test_domain(sc_MPI_COMM_WORLD,&fopts);
         fclaw_global_store_domain(glob, domain);
-        fclaw2d_options_store(glob, &fopts);
+        fclaw_options_store(glob, &fopts);
 
         opts->d3->mx   = 5;
         opts->d3->my   = 6;
@@ -132,7 +132,7 @@ struct QuadDomain {
 
         domain = create_test_domain(sc_MPI_COMM_WORLD,&fopts);
         fclaw_global_store_domain(glob, domain);
-        fclaw2d_options_store(glob, &fopts);
+        fclaw_options_store(glob, &fopts);
 
         opts->d3->mx   = 5;
         opts->d3->my   = 6;
@@ -253,7 +253,7 @@ TEST_CASE("fclaw3dx_clawpatch patch_build")
 
         fclaw_domain_t *domain = create_test_domain(sc_MPI_COMM_WORLD,&fopts);
         fclaw_global_store_domain(glob, domain);
-        fclaw2d_options_store(glob, &fopts);
+        fclaw_options_store(glob, &fopts);
 
         fclaw_clawpatch_options_t* opts = fclaw_clawpatch_options_new(3);
         opts->d3->mx     = mx;

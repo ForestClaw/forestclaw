@@ -57,7 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_defs.h>
 #include <fclaw_global.h>
 #include <fclaw_vtable.h>
-#include <fclaw2d_options.h>
+#include <fclaw_options.h>
 
 #include <fclaw2d_timeinterp.h>
 #include <fclaw2d_diagnostics.h>
@@ -73,7 +73,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /* Added to turn off time_interp */
 static int fill_ghost(fclaw_global_t* glob, int time_interp)
 {
-    const fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
+    const fclaw_options_t* fclaw_opt = fclaw_get_options(glob);
     if (fclaw_opt->timeinterp2fillghost)
         /* This will always fill ghost cells using data from "qsync", which is either 
            coarse grid data at time step, or time interpolated data */
@@ -223,7 +223,7 @@ void clawpatch_define(fclaw_global_t* glob,
     /* We are getting closer to getting rid the class fclaw_clawpatch_t */
     fclaw_clawpatch_t *cp = get_clawpatch(patch);
 
-    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+    const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
     const fclaw_clawpatch_options_t *clawpatch_opt = 
                          fclaw_clawpatch_get_options(glob);
 
@@ -447,7 +447,7 @@ void clawpatch_build(fclaw_global_t *glob,
                      void *user)
 {
     fclaw2d_build_mode_t build_mode =  *((fclaw2d_build_mode_t*) user);
-    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+    const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
     const fclaw_clawpatch_options_t* clawpatch_opt = 
                          fclaw_clawpatch_get_options(glob);
 
@@ -493,7 +493,7 @@ void clawpatch_build_from_fine(fclaw_global_t *glob,
 {
     const fclaw_clawpatch_options_t* clawpatch_opt = 
                          fclaw_clawpatch_get_options(glob);
-    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+    const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
     clawpatch_define(glob,coarse_patch,blockno,coarse_patchno,build_mode);
 
     if (fclaw_opt->manifold)
@@ -689,7 +689,7 @@ void clawpatch_average_face(fclaw_global_t *glob,
     const fclaw_clawpatch_options_t *clawpatch_opt = fclaw_clawpatch_get_options(glob);
     int mbc = clawpatch_opt->mbc;
 
-    const fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
+    const fclaw_options_t* fclaw_opt = fclaw_get_options(glob);
     int manifold = fclaw_opt->manifold;
     fclaw_clawpatch_vtable_t* clawpatch_vt = fclaw_clawpatch_vt(glob);
 
@@ -829,7 +829,7 @@ void clawpatch_average_corner(fclaw_global_t *glob,
     const fclaw_clawpatch_options_t *clawpatch_opt = fclaw_clawpatch_get_options(glob);
     int mbc = clawpatch_opt->mbc;
 
-    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+    const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
     int manifold = fclaw_opt->manifold;
     if (fill_ghost(glob,time_interp))
     {
@@ -925,7 +925,7 @@ int clawpatch_tag4refinement(fclaw_global_t *glob,
     double *q;
     fclaw_clawpatch_soln_data(glob,patch,&q,&meqn);
 
-    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+    const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
     double refine_threshold = fclaw_opt->refine_threshold;
 
     int tag_patch;
@@ -1000,7 +1000,7 @@ int clawpatch_tag4coarsening(fclaw_global_t *glob,
         }
     }
 
-    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+    const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
     double coarsen_threshold = fclaw_opt->coarsen_threshold;
 
     int tag_patch = 0;
@@ -1049,7 +1049,7 @@ void clawpatch_interpolate2fine(fclaw_global_t* glob,
         fclaw_patch_t *fine_patch = &fine_patches[igrid];
         double *qfine = fclaw_clawpatch_get_q(glob,fine_patch);
 
-        const fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
+        const fclaw_options_t* fclaw_opt = fclaw_get_options(glob);
 
         fclaw_clawpatch_vtable_t* clawpatch_vt = fclaw_clawpatch_vt(glob);
 
@@ -1108,7 +1108,7 @@ void clawpatch_average2coarse(fclaw_global_t *glob,
         fclaw_patch_t *fine_patch = &fine_patches[igrid];
         double *qfine = fclaw_clawpatch_get_q(glob,fine_patch);
 
-        const fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
+        const fclaw_options_t* fclaw_opt = fclaw_get_options(glob);
 
         fclaw_clawpatch_vtable_t* clawpatch_vt = fclaw_clawpatch_vt(glob);
 
@@ -1168,7 +1168,7 @@ size_t clawpatch_ghost_pack_elems(fclaw_global_t* glob)
     int mbc = clawpatch_opt->mbc;
     int meqn = clawpatch_opt->meqn;
 
-    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+    const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
     int refratio = fclaw_opt->refratio;
     int packextra = fclaw_opt->ghost_patch_pack_numextrafields;
     int packarea = fclaw_opt->ghost_patch_pack_area && fclaw_opt->manifold;
@@ -1235,7 +1235,7 @@ void clawpatch_ghost_comm(fclaw_global_t* glob,
 
     int packarea = packmode/2;   // (0,1)/2 = 0;  (2,3)/2 = 1;
 
-    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+    const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
     int packextra = fclaw_opt->ghost_patch_pack_numextrafields;
     int packregisters = fclaw_opt->time_sync;  // For conservation
     int refratio = fclaw_opt->refratio;
@@ -1356,7 +1356,7 @@ void clawpatch_local_ghost_pack(fclaw_global_t *glob,
                                 void *patch_data,
                                 int time_interp)
 {
-    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+    const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
     int packarea = fclaw_opt->ghost_patch_pack_area && fclaw_opt->manifold;
     int packmode = 2*packarea;  // 0 or 2  (for pack)
 
@@ -1370,7 +1370,7 @@ void clawpatch_remote_ghost_unpack(fclaw_global_t* glob,
                                    int patchno,
                                    void *qdata, int time_interp)
 {
-    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+    const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
     int packarea = fclaw_opt->ghost_patch_pack_area && fclaw_opt->manifold;
     int packmode = 2*packarea + 1;  // 1 or 3  (for unpack)
 
@@ -1384,7 +1384,7 @@ void clawpatch_remote_ghost_build(fclaw_global_t *glob,
                                   int patchno,
                                   fclaw2d_build_mode_t build_mode)
 {
-    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+    const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
     const fclaw_clawpatch_options_t* clawpatch_opt = 
                              fclaw_clawpatch_get_options(glob);
 

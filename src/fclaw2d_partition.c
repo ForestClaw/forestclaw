@@ -31,7 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_domain.h>
 #include <fclaw2d_patch.h>
 
-#include <fclaw2d_options.h>
+#include <fclaw_options.h>
 
 static
 void cb_partition_pack(fclaw_domain_t *domain,
@@ -117,7 +117,7 @@ void fclaw2d_partition_domain(fclaw_global_t* glob,
     fclaw_timer_start (&glob->timers[FCLAW_TIMER_PARTITION]);
 
     /* will need to access the subcyle switch */
-    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+    const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
 
     /* allocate memory for parallel transfor of patches
        use data size (in bytes per patch) below. */

@@ -40,7 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /* Basic forestclaw functions */
 #include <fclaw2d_patch.h>
 #include <fclaw2d_convenience.h>  /* Needed to get search function for gauges */
-#include "fclaw2d_options.h"
+#include "fclaw_options.h"
 #include <fclaw_global.h>
 #include <fclaw_vtable.h>
 #include <fclaw2d_diagnostics.h>
@@ -440,7 +440,7 @@ int geoclaw_patch_tag4refinement(fclaw_global_t *glob,
     if (tag_patch < 0)
     {
         /* Need maxlevel to get length speed_tolerance - hackish? */
-        const fclaw_options_t * fclaw_opt = fclaw2d_get_options(glob);
+        const fclaw_options_t * fclaw_opt = fclaw_get_options(glob);
         int maxlevel = fclaw_opt->maxlevel;
         FC2D_GEOCLAW_FORT_TAG4REFINEMENT(&mx,&my,&mbc,&meqn,&maux,&xlower,&ylower,
                                          &dx,&dy,&t,&blockno,q,aux,&level,&maxlevel,
@@ -487,7 +487,7 @@ int geoclaw_patch_tag4coarsening(fclaw_global_t *glob,
     if (tag_patch < 0) 
     {
         /* Region tagging is inconclusive */
-        const fclaw_options_t * fclaw_opt = fclaw2d_get_options(glob);
+        const fclaw_options_t * fclaw_opt = fclaw_get_options(glob);
         int maxlevel = fclaw_opt->maxlevel;
 
         FC2D_GEOCLAW_FORT_TAG4COARSENING(&blockno,&mx,&my,&mbc,&meqn,&maux,xlower,ylower,
@@ -614,7 +614,7 @@ void geoclaw_average_face(fclaw_global_t *glob,
     const fc2d_geoclaw_options_t *geo_opt = fc2d_geoclaw_get_options(glob);
     int mcapa = geo_opt->mcapa;
 
-    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+    const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
     int manifold = fclaw_opt->manifold;
     if (manifold != 0)
     {
@@ -691,7 +691,7 @@ void geoclaw_average_corner(fclaw_global_t *glob,
     const fc2d_geoclaw_options_t *geo_opt = fc2d_geoclaw_get_options(glob);
     int mcapa = geo_opt->mcapa;
 
-    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+    const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
     int manifold = fclaw_opt->manifold;
     if (manifold != 0)
     {
@@ -788,7 +788,7 @@ void geoclaw_local_ghost_pack_aux(fclaw_global_t *glob,
 /* Called from application routines */
 void fc2d_geoclaw_module_setup(fclaw_global_t *glob)
 {
-    const fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
+    const fclaw_options_t* fclaw_opt = fclaw_get_options(glob);
     const fclaw_clawpatch_options_t *clawpatch_opt = fclaw_clawpatch_get_options(glob);
     const fc2d_geoclaw_options_t *geo_opt = fc2d_geoclaw_get_options(glob);
 
@@ -829,7 +829,7 @@ fc2d_geoclaw_vtable_t* fc2d_geoclaw_vt(fclaw_global_t* glob)
 
 void fc2d_geoclaw_solver_initialize(fclaw_global_t* glob)
 {
-	fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
+	fclaw_options_t* fclaw_opt = fclaw_get_options(glob);
 	fclaw_clawpatch_options_t* clawpatch_opt = fclaw_clawpatch_get_options(glob);
 	fc2d_geoclaw_options_t* geo_opt = fc2d_geoclaw_get_options(glob);
 

@@ -136,7 +136,7 @@ void cb_torus_output_ascii (fclaw_domain_t * domain,
     double* error = fclaw2d_clawpatch_get_error(glob,this_patch);
     double* soln = fclaw2d_clawpatch_get_exactsoln(glob,this_patch);
 
-    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+    const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
     char fname[BUFSIZ];
     snprintf (fname, BUFSIZ, "%s.q%04d", fclaw_opt->prefix, iframe);
 
@@ -184,7 +184,7 @@ void torus_link_solvers(fclaw_global_t *glob)
     clawpatch_vt->fort_tag4coarsening = &TORUS_TAG4COARSENING;
 
     /* Include error in output files */
-    const fclaw_options_t  *fclaw_opt = fclaw2d_get_options(glob);
+    const fclaw_options_t  *fclaw_opt = fclaw_get_options(glob);
     if (fclaw_opt->compute_error)
     {
         clawpatch_vt->fort_compute_patch_error = &TORUS46_COMPUTE_ERROR;

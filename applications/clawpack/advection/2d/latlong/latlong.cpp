@@ -150,7 +150,7 @@ main (int argc, char **argv)
         glob = fclaw_global_new();
         fclaw_global_store_domain(glob, domain);
 
-        fclaw2d_options_store            (glob, fclaw_opt);
+        fclaw_options_store            (glob, fclaw_opt);
         fclaw_clawpatch_options_store  (glob, clawpatch_opt);
         fc2d_clawpack46_options_store    (glob, claw46_opt);
         fc2d_clawpack5_options_store     (glob, claw5_opt);

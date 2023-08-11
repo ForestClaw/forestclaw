@@ -28,7 +28,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_global.h>
 #include <fclaw2d_ghost_fill.h>
 #include <fclaw2d_patch.h>
-#include <fclaw2d_options.h>
+#include <fclaw_options.h>
 #include <fclaw2d_exchange.h>
 
 typedef struct fclaw2d_time_sync_info
@@ -122,7 +122,7 @@ void correct_coarse_cells(fclaw_global_t *glob,
                           fclaw2d_ghost_fill_parallel_mode_t ghost_mode)
 
 {
-	fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+	fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
 
 	/* This step accounts for any metric discontinuities at block boundaries
 	   between grids at the same level */

@@ -40,7 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_patch.h>
 #include <fclaw_global.h>
 #include <fclaw_vtable.h>
-#include <fclaw2d_options.h>
+#include <fclaw_options.h>
 #include <fclaw2d_defs.h>
 
 #include <fclaw_pointer_map.h>
@@ -265,7 +265,7 @@ double clawpack46_step2(fclaw_global_t *glob,
 						double dt)
 {
 	fc2d_clawpack46_vtable_t*  claw46_vt = fc2d_clawpack46_vt(glob);
-	const fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
+	const fclaw_options_t* fclaw_opt = fclaw_get_options(glob);
 	const fc2d_clawpack46_options_t* clawpack_options;
 
 	clawpack_options = fc2d_clawpack46_get_options(glob);

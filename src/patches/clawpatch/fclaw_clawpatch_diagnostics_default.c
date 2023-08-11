@@ -27,7 +27,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_clawpatch_options.h>
 
 #include <fclaw_global.h>
-#include <fclaw2d_options.h>
+#include <fclaw_options.h>
 #include <fclaw_domain.h>
 #include <fclaw2d_diagnostics.h>
 
@@ -78,7 +78,7 @@ void fclaw_clawpatch_diagnostics_error_default(fclaw_global_t *glob,
                                                void *user)
 {
     error_info_t* error_data = (error_info_t*) user;
-    //const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+    //const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
 
     fclaw_clawpatch_vtable_t *clawpatch_vt = fclaw_clawpatch_vt(glob);
 

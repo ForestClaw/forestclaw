@@ -68,7 +68,7 @@ void phasefield_problem_setup(fclaw_global_t *glob)
         fprintf(f,  "%-24.6f   %s",user->y0,         "% y0\n");
 
 #if 0
-        const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+        const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
         double xlower = fclaw_opt->ax;
         double xupper = fclaw_opt->bx;
         double ylower = fclaw_opt->ay;
@@ -208,7 +208,7 @@ void cb_phasefield_output_ascii(fclaw_domain_t * domain,
     double *soln  = fclaw2d_clawpatch_get_exactsoln(glob,patch);
 
     char fname[BUFSIZ];
-    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+    const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
     snprintf (fname, BUFSIZ, "%s.q%04d", fclaw_opt->prefix, iframe);
 
     /* The fort routine is defined by a clawpack solver and handles 
@@ -232,7 +232,7 @@ int phasefield_tag4refinement(fclaw_global_t *glob,
 {
     fclaw_clawpatch_vtable_t* clawpatch_vt = fclaw_clawpatch_vt(glob);
 
-    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+    const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
 
     int tag_patch;
     double refine_threshold;
@@ -264,7 +264,7 @@ int phasefield_tag4coarsening(fclaw_global_t *glob,
 {
     fclaw_patch_t *patch0 = &fine_patches[0];
 
-    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+    const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
     double coarsen_threshold = fclaw_opt->coarsen_threshold;
 
     int mx,my,mbc;

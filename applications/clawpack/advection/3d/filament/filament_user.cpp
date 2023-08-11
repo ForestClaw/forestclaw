@@ -29,7 +29,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 void filament_problem_setup(fclaw_global_t *glob)
 {
     const user_options_t* user = filament_get_options(glob);
-    fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
+    fclaw_options_t* fclaw_opt = fclaw_get_options(glob);
     if (glob->mpirank == 0)
     {
         FILE *f = fopen("setprob.data","w");
@@ -62,7 +62,7 @@ void filament_link_solvers(fclaw_global_t *glob)
     fclaw_vtable_t *fc_vt = fclaw_vt(glob);
     fc_vt->problem_setup = filament_problem_setup;
 
-    fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
+    fclaw_options_t* fclaw_opt = fclaw_get_options(glob);
     const user_options_t* user = filament_get_options(glob);
 
     /* example of how to set up a user defined criteria */

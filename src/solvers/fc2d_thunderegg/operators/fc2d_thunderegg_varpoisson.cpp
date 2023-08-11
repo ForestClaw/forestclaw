@@ -39,7 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_global.h>
 #include <fclaw2d_map.h>
 #include <fclaw2d_map_brick.h>
-#include <fclaw2d_options.h>
+#include <fclaw_options.h>
 #include <fclaw2d_patch.h>
 #include <fclaw_vtable.h>
 
@@ -332,7 +332,7 @@ void fc2d_thunderegg_varpoisson_solve(fclaw_global_t *glob)
     // get needed options
     fclaw_clawpatch_options_t *clawpatch_opt =
                         fclaw_clawpatch_get_options(glob);
-    fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+    fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
     fc2d_thunderegg_options_t *mg_opt = fc2d_thunderegg_get_options(glob);
 
     GhostFillingType fill_type = GhostFillingType::Faces;

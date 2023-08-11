@@ -75,7 +75,7 @@ void cb_square_output_ascii (fclaw_domain_t * domain,
 {
     fclaw_global_iterate_t* s = (fclaw_global_iterate_t*) user;
     fclaw_global_t  *glob = (fclaw_global_t*) s->glob;
-    const fclaw_options_t  *fclaw_opt = fclaw2d_get_options(glob);
+    const fclaw_options_t  *fclaw_opt = fclaw_get_options(glob);
 
     int iframe = *((int *) s->user);
     double time = glob->curr_time;
@@ -154,7 +154,7 @@ void square_link_solvers(fclaw_global_t *glob)
     }
 
     /* Include error in output files */
-    const fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
+    const fclaw_options_t* fclaw_opt = fclaw_get_options(glob);
     if (fclaw_opt->compute_error)
     {
         if (user->claw_version == 4)

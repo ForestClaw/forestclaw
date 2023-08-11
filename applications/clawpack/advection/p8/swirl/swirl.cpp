@@ -232,7 +232,7 @@ main (int argc, char **argv)
         fclaw_global_store_domain(glob, domain);
 
         /* Store option packages in glob */
-        fclaw3d_options_store           (glob, fclaw_opt);
+        fclaw_options_store           (glob, fclaw_opt);
 
 #ifdef P8HACK
         fclaw_clawpatch_options_store(glob, clawpatch_opt);

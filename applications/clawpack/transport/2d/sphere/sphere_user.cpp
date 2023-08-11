@@ -102,7 +102,7 @@ void cb_sphere_output_ascii (fclaw_domain_t * domain,
     double* error = fclaw_clawpatch_get_error(glob,patch);
     double* soln = fclaw_clawpatch_get_exactsoln(glob,patch);
 
-    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+    const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
     char fname[BUFSIZ];
     snprintf (fname, BUFSIZ, "%s.q%04d", fclaw_opt->prefix, iframe);
 
@@ -158,7 +158,7 @@ void sphere_link_solvers(fclaw_global_t *glob)
         fclaw_clawpatch_vtable_t *clawpatch_vt = fclaw_clawpatch_vt(glob);
 
         /* Include error in output files */
-        const fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
+        const fclaw_options_t* fclaw_opt = fclaw_get_options(glob);
         if (fclaw_opt->compute_error)
         {
             clawpatch_vt->d2->fort_compute_patch_error = &SPHERE46_COMPUTE_ERROR;
@@ -179,7 +179,7 @@ void sphere_link_solvers(fclaw_global_t *glob)
         fclaw_clawpatch_vtable_t *clawpatch_vt = fclaw_clawpatch_vt(glob);
 
         /* Include error in output files */
-        const fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
+        const fclaw_options_t* fclaw_opt = fclaw_get_options(glob);
         if (fclaw_opt->compute_error)
         {
             clawpatch_vt->d2->fort_compute_patch_error = &SPHERE5_COMPUTE_ERROR;

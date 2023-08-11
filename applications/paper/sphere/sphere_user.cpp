@@ -140,7 +140,7 @@ int sphere_tag4refinement(fclaw_global_t *glob,
     int meqn;
     fclaw2d_clawpatch_soln_data(glob,patch,&q,&meqn);
 
-    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+    const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
     double refine_threshold = fclaw_opt->refine_threshold;
 
     int tag_patch = 1;
@@ -182,7 +182,7 @@ int sphere_tag4coarsening(fclaw_global_t *glob,
         fclaw2d_clawpatch_soln_data(glob,&fine_patches[igrid],&q[igrid],&meqn);
     }
 
-    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+    const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
     double coarsen_threshold = fclaw_opt->coarsen_threshold;
 
     int tag_patch = 0;
@@ -235,7 +235,7 @@ void cb_sphere_output_ascii (fclaw_domain_t * domain,
     fclaw2d_clawpatch_aux_data(glob,this_patch,&aux,&maux);
 
 
-    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+    const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
     char fname[BUFSIZ];
     snprintf (fname, BUFSIZ, "%s.q%04d", fclaw_opt->prefix, iframe);
 
@@ -276,7 +276,7 @@ void sphere_link_solvers(fclaw_global_t *glob)
     clawpatch_vt->fort_header_ascii   = &SPHERE_FORT_HEADER_ASCII;
     clawpatch_vt->cb_output_ascii     = &cb_sphere_output_ascii;                
 
-    const fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
+    const fclaw_options_t* fclaw_opt = fclaw_get_options(glob);
     if (fclaw_opt->compute_error)
     {
         clawpatch_vt->fort_compute_patch_error = &SPHERE_COMPUTE_ERROR;

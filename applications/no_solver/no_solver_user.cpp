@@ -73,7 +73,7 @@ double no_solver_update(fclaw_global_t *glob,
                         double t,
                         double dt)
 {
-    const fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
+    const fclaw_options_t* fclaw_opt = fclaw_get_options(glob);
     return fclaw_opt->desired_cfl;
 }
 
