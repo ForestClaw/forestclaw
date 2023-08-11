@@ -14,6 +14,7 @@ add_library(forestclaw_c OBJECT
   fclaw_mpi.c
   fclaw_options.c 
   fclaw_output.c
+  fclaw_patch.c
   fclaw_package.c 
   fclaw_pointer_map.c
   fclaw_timer.c
@@ -33,7 +34,6 @@ add_library(forestclaw_c OBJECT
   fclaw2d_rays.c
   fclaw2d_update_single_step.c
   fclaw2d_regrid.c
-  fclaw2d_patch.c
   fclaw2d_partition.c
   fclaw2d_timeinterp.c
   fclaw2d_initialize.c
@@ -47,7 +47,6 @@ add_library(forestclaw_c OBJECT
 
   fclaw3d_convenience.c
   fclaw3d_map.c
-  fclaw3d_patch.c
   fclaw3d_exchange.c
 
   fp_exception_glibc_extension.c
@@ -122,6 +121,7 @@ install(FILES
 	fclaw_options.h 
 	fclaw_output.h
 	fclaw_package.h 
+	fclaw_patch.h
 	fclaw_pointer_map.h 
 	fclaw_timer.h 
 	fclaw_mpi.h 
@@ -136,7 +136,6 @@ install(FILES
 	fclaw2d_defs.h 
 	fclaw2d_forestclaw.h
 	fclaw2d_block.h
-	fclaw2d_patch.h
 	fclaw2d_time_sync.h
 	fclaw2d_update_single_step.h
 	fclaw2d_physical_bc.h
@@ -161,7 +160,6 @@ install(FILES
   fclaw3d_convenience.h
   fclaw3d_defs.h
   fclaw3d_map.h
-  fclaw3d_patch.h
   fclaw3d_exchange.h
   fclaw3d_include_all.h 
   DESTINATION include

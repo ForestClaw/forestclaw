@@ -37,7 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_vtable.h>
 #include <fclaw2d_update_single_step.h>  
 
-#include <fclaw2d_patch.h>
+#include <fclaw_patch.h>
 #include <fclaw_clawpatch.hpp>
 #include <fclaw_clawpatch.h>
 #include <fclaw_global.h>

@@ -27,11 +27,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_domain.h>
 
 #include <fclaw2d_convenience.h>  /* Contains domain_destroy and others */
-#include <fclaw2d_patch.h>
+#include <fclaw_patch.h>
 #include <fclaw2d_exchange.h>
 
 #include <fclaw3d_convenience.h>  /* Contains domain_destroy and others */
-#include <fclaw3d_patch.h>
+#include <fclaw_patch.h>
 #include <fclaw3d_exchange.h>
 
 

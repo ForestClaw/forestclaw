@@ -40,7 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw3d_metric.h>
 #include <fclaw3d_metric.hpp>
 
-#include <fclaw2d_patch.h>
+#include <fclaw_patch.h>
 #include <fclaw_global.h>
 #include <fclaw_vtable.h>
 #include <fclaw_options.h>

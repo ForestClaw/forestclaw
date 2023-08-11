@@ -1,7 +1,7 @@
 #include "../fc2d_cudaclaw5.h"
 #include "cudaclaw5_allocate.h"
 
-#include <fclaw2d_patch.h>
+#include <fclaw_patch.h>
 #include <fclaw_global.h>
 #include <fclaw_clawpatch.h>
 

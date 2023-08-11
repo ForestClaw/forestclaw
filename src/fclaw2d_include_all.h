@@ -30,7 +30,7 @@
 #include <fclaw_package.h>
 #include <fclaw2d_defs.h>
 
-#include <fclaw2d_patch.h>
+#include <fclaw_patch.h>
 
 #include <fclaw2d_forestclaw.h>
 #include <fclaw_options.h>

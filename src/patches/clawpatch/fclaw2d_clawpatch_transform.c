@@ -49,7 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #endif
 
-#include <fclaw2d_patch.h>
+#include <fclaw_patch.h>
 #include <fclaw_global.h>
 
 void fclaw2d_clawpatch_transform_init_data(fclaw_global_t* glob, 

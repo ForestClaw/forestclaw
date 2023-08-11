@@ -33,7 +33,7 @@
 #include <fclaw2d_forestclaw.h>
 #include <fclaw_global.h>
 #include <fclaw_domain.h>
-#include <fclaw2d_patch.h>
+#include <fclaw_patch.h>
 #include <fclaw2d_convenience.h>
 #include <fclaw2d_metric.hpp>
 #include <fclaw2d_metric.h>

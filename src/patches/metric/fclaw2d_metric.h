@@ -31,7 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW2D_METRIC_H
 #define FCLAW2D_METRIC_H
 
-#include <fclaw2d_patch.h>                /* Needed to get enum for build modes */
+#include <fclaw_patch.h>                /* Needed to get enum for build modes */
 
 #include "fclaw2d_metric_default_fort.h"  /* Needed for fort typdefs in vtable */
 

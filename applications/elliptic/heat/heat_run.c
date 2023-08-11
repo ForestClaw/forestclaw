@@ -26,7 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "heat_user.h"
 
 #include <fclaw_clawpatch.h>
-#include <fclaw2d_patch.h>
+#include <fclaw_patch.h>
 
 #include <fclaw2d_forestclaw.h>
 #include <fclaw_global.h>

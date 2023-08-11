@@ -26,19 +26,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_global.h>
 #include <fclaw_domain.h>
 #include <fclaw_options.h>
+#include <fclaw_patch.h>
 
 #ifndef P4_TO_P8
 
 #include <fclaw2d_exchange.h>
 
-#include <fclaw2d_patch.h>
 
 
 #else
 
 #include <fclaw3d_exchange.h>
 
-#include <fclaw3d_patch.h>
+#include <fclaw3d_convenience.h>
 
 #include <fclaw2d_to_3d.h>
 

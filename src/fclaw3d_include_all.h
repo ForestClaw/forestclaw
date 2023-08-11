@@ -36,7 +36,7 @@
 
 #ifdef P8HACK
 
-#include <fclaw3d_patch.h>
+#include <fclaw_patch.h>
 
 #include <fclaw3d_forestclaw.h>
 #include <fclaw3d_diagnostics.h>

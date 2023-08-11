@@ -28,7 +28,7 @@
 #include <fclaw_clawpatch_options.h>
 #include <fclaw_domain.h>
 #include <fclaw_global.h>
-#include <fclaw2d_patch.h>
+#include <fclaw_patch.h>
 
 #include "fc2d_thunderegg.h"
 #include "fc2d_thunderegg_options.h"

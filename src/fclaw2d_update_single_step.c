@@ -27,7 +27,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw_global.h>
 #include <fclaw_domain.h>
-#include <fclaw2d_patch.h>
+#include <fclaw_patch.h>
 
 static
 void cb_single_step_count(fclaw_domain_t *domain,

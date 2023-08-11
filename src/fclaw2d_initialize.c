@@ -39,7 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_ghost_fill.h>
 #include <fclaw2d_diagnostics.h>
 #include <fclaw2d_map.h>
-#include <fclaw2d_patch.h>
+#include <fclaw_patch.h>
 #include <fclaw_domain.h>
 
 #if defined(_OPENMP)

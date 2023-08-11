@@ -28,7 +28,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_global.h>
 #include <fclaw_domain.h>
 
-#include <fclaw2d_patch.h>
+#include <fclaw_patch.h>
 #include <fclaw2d_defs.h>
 #include <fclaw3d_defs.h>
 
@@ -1172,14 +1172,14 @@ void fclaw_patch_set_block_corner_count(fclaw_global_t* glob,
 	}
 }
 
-void fclaw3d_patch_set_edge_type(fclaw_patch_t *patch,int iedge,
-								   fclaw_patch_relation_t edge_type)
+void fclaw_patch_set_edge_type(fclaw_patch_t *patch,int iedge,
+							   fclaw_patch_relation_t edge_type)
 {
 	fclaw_patch_data_t *pdata = get_patch_data(patch);
 	pdata->d3->edge_neighbors[iedge] = edge_type;
 }
 
-fclaw_patch_relation_t fclaw3d_patch_get_edge_type(fclaw_patch_t* patch,
+fclaw_patch_relation_t fclaw_patch_get_edge_type(fclaw_patch_t* patch,
 													   int iedge)
 {
 	fclaw_patch_data_t *pdata = get_patch_data(patch);

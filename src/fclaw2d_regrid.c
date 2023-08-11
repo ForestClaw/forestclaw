@@ -38,7 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_exchange.h>
 #include <fclaw_vtable.h>
 #include <fclaw_domain.h>
-#include <fclaw2d_patch.h>
+#include <fclaw_patch.h>
 
 
 /* This is also called from fclaw2d_initialize, so is not made static */

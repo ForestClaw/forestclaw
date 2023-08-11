@@ -71,7 +71,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw_global.h>
 #include <fclaw_timer.h>
-#include <fclaw2d_patch.h>
+#include <fclaw_patch.h>
 #include <fclaw2d_partition.h>
 #include <fclaw2d_exchange.h>
 #include <fclaw_domain.h>

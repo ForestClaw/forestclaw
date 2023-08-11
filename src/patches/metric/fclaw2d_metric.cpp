@@ -61,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_pointer_map.h>
 
 #include <fclaw_global.h>
-#include <fclaw2d_patch.h>  
+#include <fclaw_patch.h>  
 
 static
 fclaw2d_metric_patch_t* get_metric_patch(fclaw_global_t* glob,

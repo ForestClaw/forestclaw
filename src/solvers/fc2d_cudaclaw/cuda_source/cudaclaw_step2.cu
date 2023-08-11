@@ -5,7 +5,7 @@
 #include "cudaclaw_allocate.h"  /* Needed for def of cudaclaw_fluxes_t */
 
 
-#include <fclaw2d_patch.h>
+#include <fclaw_patch.h>
 #include <fclaw_global.h>
 #include <fclaw_vtable.h>
 

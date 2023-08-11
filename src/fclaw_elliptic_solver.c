@@ -28,7 +28,7 @@
 #include <fclaw_elliptic_solver.h>
 #include <fclaw_global.h>
 
-#include <fclaw2d_patch.h>
+#include <fclaw_patch.h>
 
 
 /* ---------------------------- Setup solver functions -------------------------------- */

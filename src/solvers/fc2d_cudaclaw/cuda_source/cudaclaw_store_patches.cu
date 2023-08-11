@@ -1,6 +1,6 @@
 #include "../fc2d_cudaclaw.h"
 #include <fclaw_global.h>
-#include <fclaw2d_patch.h>
+#include <fclaw_patch.h>
 
 #include <fclaw_clawpatch.h>
 #include <fc2d_cudaclaw_options.h>
