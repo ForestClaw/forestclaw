@@ -144,5 +144,5 @@ void filament_options_store (fclaw_global_t* glob, filament_options_t* user)
 
 const filament_options_t* filament_get_options(fclaw_global_t* glob)
 {
-    return (filament_options_t*) fclaw2d_global_get_options(glob, "user");
+    return (filament_options_t*) fclaw_global_get_options(glob, "user");
 }

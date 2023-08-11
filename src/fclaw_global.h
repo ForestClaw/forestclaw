@@ -123,6 +123,15 @@ void fclaw_global_iterate_partitioned (fclaw_global_t * glob,
  */
 void fclaw_global_options_store (fclaw_global_t* glob, const char* key, void* options);
 
+/**
+ * @brief Get an options structure from the glob
+ * 
+ * @param glob the global context
+ * @param key the key to retrieve the options from
+ * @return void* the options
+ */
+void* fclaw_global_get_options (fclaw_global_t* glob, const char* key);
+
 #ifdef __cplusplus
 #if 0
 {                               /* need this because indent is dumb */

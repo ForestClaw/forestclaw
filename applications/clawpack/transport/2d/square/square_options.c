@@ -178,5 +178,5 @@ void square_options_store (fclaw_global_t* glob, user_options_t* user)
 
 const user_options_t* square_get_options(fclaw_global_t* glob)
 {
-    return (user_options_t*) fclaw2d_global_get_options(glob, "user");
+    return (user_options_t*) fclaw_global_get_options(glob, "user");
 }

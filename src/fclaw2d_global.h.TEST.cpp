@@ -26,7 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_global.h>
 #include <test.hpp>
 
-TEST_CASE("fclaw_global_options_store and fclaw2d_global_get_options test") {
+TEST_CASE("fclaw_global_options_store and fclaw_global_get_options test") {
     fclaw_global_t* glob = fclaw_global_new();
 
     // Test with an integer
@@ -34,7 +34,7 @@ TEST_CASE("fclaw_global_options_store and fclaw2d_global_get_options test") {
     const char* key1 = "option1";
     fclaw_global_options_store(glob, key1, &option1);
 
-    int* retrieved_option1 = static_cast<int*>(fclaw2d_global_get_options(glob, key1));
+    int* retrieved_option1 = static_cast<int*>(fclaw_global_get_options(glob, key1));
     CHECK_EQ(*retrieved_option1, option1);
 
     // Test with a string
@@ -42,7 +42,7 @@ TEST_CASE("fclaw_global_options_store and fclaw2d_global_get_options test") {
     const char* key2 = "option2";
     fclaw_global_options_store(glob, key2, &option2);
 
-    const char** retrieved_option2 = static_cast<const char**>(fclaw2d_global_get_options(glob, key2));
+    const char** retrieved_option2 = static_cast<const char**>(fclaw_global_get_options(glob, key2));
     CHECK_EQ(retrieved_option2, &option2);
 
 #ifdef FCLAW_ENABLE_DEBUG
@@ -52,9 +52,9 @@ TEST_CASE("fclaw_global_options_store and fclaw2d_global_get_options test") {
     // Test with a non-existing key
     const char* key3 = "non-existing key";
 #ifdef FCLAW_ENABLE_DEBUG
-    CHECK_SC_ABORTED(fclaw2d_global_get_options(glob, key3));
+    CHECK_SC_ABORTED(fclaw_global_get_options(glob, key3));
 #else
-    void* retrieved_option3 = fclaw2d_global_get_options(glob, key3);
+    void* retrieved_option3 = fclaw_global_get_options(glob, key3);
     CHECK_EQ(retrieved_option3, nullptr);
 #endif
 

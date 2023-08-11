@@ -125,7 +125,7 @@ void fc3d_clawpack5_set_vtable_defaults()
 
 fc3d_clawpack5_options_t* fc3d_clawpack5_get_options(fclaw_global_t *glob)
 {
-    return (fc3d_clawpack5_options_t*) fclaw2d_global_get_options(glob,
+    return (fc3d_clawpack5_options_t*) fclaw_global_get_options(glob,
                                                                   "fc3d_clawpack5");
 }
 

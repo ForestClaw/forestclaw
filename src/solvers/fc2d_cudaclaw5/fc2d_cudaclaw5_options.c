@@ -233,7 +233,7 @@ fc2d_cudaclaw5_options_t*  fc2d_cudaclaw5_options_register (fclaw_app_t * app,
 
 fc2d_cudaclaw5_options_t* fc2d_cudaclaw5_get_options(fclaw_global_t *glob)
 {
-    return (fc2d_cudaclaw5_options_t*) fclaw2d_global_get_options(glob, "cudaclaw5");
+    return (fc2d_cudaclaw5_options_t*) fclaw_global_get_options(glob, "cudaclaw5");
 }
 
 void fc2d_cudaclaw5_options_store (fclaw_global_t* glob, fc2d_cudaclaw5_options_t* clawopt)

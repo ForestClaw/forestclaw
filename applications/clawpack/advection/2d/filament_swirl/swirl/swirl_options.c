@@ -158,5 +158,5 @@ void swirl_options_store (fclaw_global_t* glob, swirl_options_t* user)
 
 const swirl_options_t* swirl_get_options(fclaw_global_t* glob)
 {
-    return (swirl_options_t*) fclaw2d_global_get_options(glob, "user");
+    return (swirl_options_t*) fclaw_global_get_options(glob, "user");
 }

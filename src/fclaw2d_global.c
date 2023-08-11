@@ -207,7 +207,7 @@ void fclaw_global_options_store (fclaw_global_t* glob, const char* key, void* op
     fclaw_pointer_map_insert(glob->options, key, options, NULL);
 }
 
-void* fclaw2d_global_get_options (fclaw_global_t* glob, const char* key)
+void* fclaw_global_get_options (fclaw_global_t* glob, const char* key)
 {
     
     void* options = fclaw_pointer_map_get(glob->options, key);

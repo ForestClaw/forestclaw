@@ -305,5 +305,5 @@ fclaw_clawpatch_options_t*
 fclaw_clawpatch_get_options(fclaw_global_t* glob)
 {
     return (fclaw_clawpatch_options_t*) 
-            fclaw2d_global_get_options(glob, "fclaw_clawpatch");
+            fclaw_global_get_options(glob, "fclaw_clawpatch");
 }

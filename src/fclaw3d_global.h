@@ -59,15 +59,6 @@ void fclaw3d_global_store_map (fclaw_global_t* glob,
 fclaw_map_context_t* fclaw3d_global_get_map(fclaw_global_t* glob);
 
 /**
- * @brief Get an options structure from the glob
- * 
- * @param glob the global context
- * @param key the key to retrieve the options from
- * @return void* the options
- */
-void* fclaw3d_global_get_options (fclaw_global_t* glob, const char* key);
-
-/**
  * @brief Store an attribute in the glob
  * 
  * @param glob the global context
