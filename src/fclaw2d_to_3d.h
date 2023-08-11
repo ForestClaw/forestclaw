@@ -293,7 +293,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define fclaw_global_options_store    fclaw_global_options_store
 #define fclaw_global_get_options      fclaw_global_get_options
 #define fclaw_global_attribute_store  fclaw_global_attribute_store
-#define fclaw2d_global_get_attribute    fclaw3d_global_get_attribute
+#define fclaw_global_get_attribute    fclaw_global_get_attribute
 #define fclaw2d_global_set_global       fclaw3d_global_set_global
 #define fclaw2d_global_unset_global     fclaw3d_global_unset_global
 #define fclaw2d_global_get_global       fclaw3d_global_get_global

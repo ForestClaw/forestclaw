@@ -281,7 +281,7 @@ void fclaw_locate_gauges(fclaw_global_t *glob)
     int i,index,num;
     fclaw_gauge_t *g;
 
-    fclaw2d_diagnostics_accumulator_t* acc = fclaw2d_global_get_attribute(glob, "acc");
+    fclaw2d_diagnostics_accumulator_t* acc = fclaw_global_get_attribute(glob, "acc");
     fclaw_gauge_acc_t* gauge_acc = 
               (fclaw_gauge_acc_t*) acc->gauge_accumulator;
     fclaw_gauge_info_t* gauge_info = gauge_acc->info;

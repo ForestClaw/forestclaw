@@ -145,6 +145,15 @@ void fclaw_global_attribute_store (fclaw_global_t* glob,
                                      void* attribute,
                                      fclaw_pointer_map_value_destroy_t destroy);
 
+/**
+ * @brief Get an attribute structure from the glob
+ * 
+ * @param glob the global context
+ * @param key the key to retrieve the attribute from
+ * @return void* the options
+ */
+void* fclaw_global_get_attribute (fclaw_global_t* glob, const char* key);
+
 #ifdef __cplusplus
 #if 0
 {                               /* need this because indent is dumb */

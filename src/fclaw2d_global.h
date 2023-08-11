@@ -71,16 +71,6 @@ void fclaw2d_global_store_map (fclaw_global_t* glob,
 fclaw2d_map_context_t* fclaw2d_global_get_map(fclaw_global_t* glob);
 
 /**
- * @brief Get an attribute structure from the glob
- * 
- * @param glob the global context
- * @param key the key to retrieve the attribute from
- * @return void* the options
- */
-void* fclaw2d_global_get_attribute (fclaw_global_t* glob, const char* key);
-
-
-/**
  * @brief Store a glob variable in static memory
  *
  * @param glob the glob variable

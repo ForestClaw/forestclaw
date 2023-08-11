@@ -63,7 +63,7 @@ TEST_CASE("fclaw_global_options_store and fclaw_global_get_options test") {
 
 static bool destroyed;
 static bool destroyed_2;
-TEST_CASE("fclaw_global_attribute_store and fclaw2d_global_get_attribute test") {
+TEST_CASE("fclaw_global_attribute_store and fclaw_global_get_attribute test") {
     destroyed = false;
     destroyed_2 = false;
     fclaw_global_t* glob = fclaw_global_new();
@@ -76,7 +76,7 @@ TEST_CASE("fclaw_global_attribute_store and fclaw2d_global_get_attribute test") 
         destroyed = true;
     });
 
-    int* retrieved_option1 = static_cast<int*>(fclaw2d_global_get_attribute(glob, key1));
+    int* retrieved_option1 = static_cast<int*>(fclaw_global_get_attribute(glob, key1));
     CHECK_EQ(*retrieved_option1, option1);
 
     // Test with a string
@@ -86,7 +86,7 @@ TEST_CASE("fclaw_global_attribute_store and fclaw2d_global_get_attribute test") 
         destroyed_2 = true;
     });
 
-    const char** retrieved_option2 = static_cast<const char**>(fclaw2d_global_get_attribute(glob, key2));
+    const char** retrieved_option2 = static_cast<const char**>(fclaw_global_get_attribute(glob, key2));
     CHECK_EQ(retrieved_option2, &option2);
 
 #ifdef FCLAW_ENABLE_DEBUG
@@ -96,9 +96,9 @@ TEST_CASE("fclaw_global_attribute_store and fclaw2d_global_get_attribute test") 
     // Test with a non-existing key
     const char* key3 = "non-existing key";
 #ifdef FCLAW_ENABLE_DEBUG
-    CHECK_SC_ABORTED(fclaw2d_global_get_attribute(glob, key3));
+    CHECK_SC_ABORTED(fclaw_global_get_attribute(glob, key3));
 #else
-    void* retrieved_option3 = fclaw2d_global_get_attribute(glob, key3);
+    void* retrieved_option3 = fclaw_global_get_attribute(glob, key3);
     CHECK_EQ(retrieved_option3, nullptr);
 #endif
 

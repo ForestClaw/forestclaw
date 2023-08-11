@@ -128,7 +128,7 @@ fclaw2d_global_store_map (fclaw_global_t* glob,
 fclaw2d_map_context_t*
 fclaw2d_global_get_map(fclaw_global_t* glob)
 {
-    return (fclaw2d_map_context_t*) fclaw2d_global_get_attribute(glob,"map");
+    return (fclaw2d_map_context_t*) fclaw_global_get_attribute(glob,"map");
 }
 
 void
@@ -224,7 +224,7 @@ void fclaw_global_attribute_store (fclaw_global_t* glob,
     fclaw_pointer_map_insert(glob->attributes, key, options, destroy);
 }
 
-void* fclaw2d_global_get_attribute (fclaw_global_t* glob, const char* key)
+void* fclaw_global_get_attribute (fclaw_global_t* glob, const char* key)
 {
     
     return fclaw_pointer_map_get(glob->attributes, key);

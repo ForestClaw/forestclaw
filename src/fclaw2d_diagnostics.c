@@ -127,7 +127,7 @@ void fclaw2d_diagnostics_initialize(fclaw_global_t *glob)
 void fclaw2d_diagnostics_gather(fclaw_global_t *glob,
                                 int init_flag)
 {
-    fclaw2d_diagnostics_accumulator_t *acc = fclaw2d_global_get_attribute(glob, "acc");
+    fclaw2d_diagnostics_accumulator_t *acc = fclaw_global_get_attribute(glob, "acc");
     const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
     fclaw2d_diagnostics_vtable_t *diag_vt = fclaw2d_diagnostics_vt(glob);
 
@@ -187,7 +187,7 @@ void fclaw2d_diagnostics_gather(fclaw_global_t *glob,
 
 void fclaw2d_diagnostics_reset(fclaw_global_t *glob)
 {
-    fclaw2d_diagnostics_accumulator_t *acc = fclaw2d_global_get_attribute(glob, "acc");
+    fclaw2d_diagnostics_accumulator_t *acc = fclaw_global_get_attribute(glob, "acc");
     const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
     fclaw2d_diagnostics_vtable_t *diag_vt = fclaw2d_diagnostics_vt(glob);
 
@@ -213,7 +213,7 @@ void fclaw2d_diagnostics_reset(fclaw_global_t *glob)
 
 void fclaw2d_diagnostics_finalize(fclaw_global_t *glob)
 {
-    fclaw2d_diagnostics_accumulator_t *acc = fclaw2d_global_get_attribute(glob, "acc");
+    fclaw2d_diagnostics_accumulator_t *acc = fclaw_global_get_attribute(glob, "acc");
     const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
     fclaw2d_diagnostics_vtable_t *diag_vt = fclaw2d_diagnostics_vt(glob);
 
