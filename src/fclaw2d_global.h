@@ -41,10 +41,6 @@ extern "C"
 #endif
 #endif
 
-void fclaw2d_global_store_map (fclaw_global_t* glob,
-                               struct fclaw2d_map_context * map);
-
-fclaw2d_map_context_t* fclaw2d_global_get_map(fclaw_global_t* glob);
 
 #ifdef __cplusplus
 #if 0

@@ -35,6 +35,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw3d_patch.h>
 #include <fclaw3d_exchange.h>
 #include <fclaw3d_global.h>
+
+#include <fclaw2d_to_3d.h>
 #endif
 
 /* dimension-independent helper functions first */

@@ -23,7 +23,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <fclaw2d_to_3d.h>
+#define P4_TO_P8
 #include "fclaw2d_patch.c"
 
 void fclaw3d_patch_set_edge_type(fclaw_patch_t *patch,int iedge,

@@ -23,8 +23,27 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <fclaw2d_to_3d.h>
+#define P4_TO_P8
 #include "forestclaw2d.c"
+
+fclaw3d_domain_indirect_t *
+fclaw3d_domain_indirect_begin (fclaw_domain_t * domain)
+{
+    //DUMMY
+    return NULL;
+}
+
+void
+fclaw3d_domain_indirect_end (fclaw_domain_t * domain, fclaw3d_domain_indirect_t * ind)
+{
+    //DUMMY
+}
+
+void
+fclaw3d_domain_indirect_destroy (fclaw_domain_t * domain, fclaw3d_domain_indirect_t * ind)
+{
+    //DUMMY
+}
 
 const fclaw3d_patch_flags_t fclaw3d_patch_block_face_flags[6] = {
     FCLAW3D_PATCH_ON_BLOCK_FACE_0,

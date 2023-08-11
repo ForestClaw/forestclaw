@@ -30,6 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #else
 #include <fclaw3d_options.h>
 #include <fclaw3d_global.h>
+#include <fclaw2d_to_3d.h>
 #endif
 
 /* ---------------------------------------------------------

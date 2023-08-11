@@ -23,13 +23,29 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include <fclaw_global.h>
+
+#ifndef P4_TO_P8
+
 #include <fclaw2d_exchange.h>
 
-#include <fclaw2d_global.h>
 #include <fclaw2d_domain.h>
 #include <fclaw2d_patch.h>
 
 #include <fclaw2d_options.h>
+
+#else
+
+#include <fclaw3d_exchange.h>
+
+#include <fclaw3d_domain.h>
+#include <fclaw3d_patch.h>
+
+#include <fclaw3d_options.h>
+
+#include <fclaw2d_to_3d.h>
+
+#endif
 
 /* Also needed in fclaw2d_domain_reset */
 /* edit: right now this is not the case, switching to static */

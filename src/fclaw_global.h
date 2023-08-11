@@ -26,6 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW_GLOBAL_H
 #define FCLAW_GLOBAL_H
 
+#include "fclaw2d_map.h"
 #include <forestclaw.h>
 #include <fclaw_timer.h>   /* Needed to create statically allocated array of timers */
 #include <fclaw_pointer_map.h>
@@ -39,6 +40,8 @@ extern "C"
 #endif
 
 typedef struct fclaw_global fclaw_global_t;
+typedef struct fclaw2d_map_context fclaw2d_map_context_t;
+typedef struct fclaw3d_map_context fclaw3d_map_context_t;
 
 struct fclaw_global
 {
@@ -92,6 +95,16 @@ void fclaw_global_destroy (fclaw_global_t * glob);
 
 void fclaw_global_store_domain (fclaw_global_t* glob,
                                   struct fclaw_domain* domain);
+
+void fclaw2d_global_store_map (fclaw_global_t* glob,
+                               struct fclaw2d_map_context * map);
+
+fclaw2d_map_context_t* fclaw2d_global_get_map(fclaw_global_t* glob);
+
+void fclaw3d_global_store_map (fclaw_global_t* glob,
+                               fclaw3d_map_context_t * map);
+
+fclaw3d_map_context_t* fclaw3d_global_get_map(fclaw_global_t* glob);
 
 void fclaw_global_iterate_level (fclaw_global_t * glob, int level,
                                    fclaw_patch_callback_t pcb, void *user);

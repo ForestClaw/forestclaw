@@ -41,17 +41,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /* redefine typedefs */
 #define fclaw2d_patch_flags_t           fclaw3d_patch_flags_t
-#define fclaw_patch_t                 fclaw3d_patch_t
 #define fclaw2d_patch_vtable_t          fclaw3d_patch_vtable_t
 #define fclaw2d_patch_transform_data_t  fclaw3d_patch_transform_data_t
 #define fclaw2d_patch_data_t            fclaw3d_patch_data_t
-#define fclaw_block_t                 fclaw_block_t
-#define fclaw_domain_t                fclaw_domain_t
 #define fclaw2d_domain_data_t           fclaw3d_domain_data_t
 #define fclaw2d_domain_persist_t        fclaw3d_domain_persist_t
-#define fclaw2d_timer_names_t           fclaw3d_timer_names_t
 #define fclaw2d_patch_callback_t        fclaw3d_patch_callback_t
-#define fclaw_patch_relation_t        fclaw3d_patch_relation_t
 #define fclaw2d_match_callback_t        fclaw3d_match_callback_t
 #define fclaw2d_transfer_callback_t     fclaw3d_transfer_callback_t
 #define fclaw2d_domain_exchange_t       fclaw3d_domain_exchange_t
@@ -100,6 +95,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define fclaw2d_patch_create_user_data_t fclaw3d_patch_create_user_data_t
 #define fclaw2d_patch_destroy_user_data_t fclaw3d_patch_destroy_user_data_t
 #define fclaw2d_patch_metric_patch_t    fclaw3d_patch_metric_patch_t
+#define fclaw2d_domain_indirect_t       fclaw3d_domain_indirect_t
 
 /* redefine enums */
 #define FCLAW2D_PATCH_CHILDID           FCLAW3D_PATCH_CHILDID
@@ -242,6 +238,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define fclaw2d_domain_ghost_exchange_begin fclaw3d_domain_ghost_exchange_begin
 #define fclaw2d_domain_ghost_exchange_end   fclaw3d_domain_ghost_exchange_end
 #define fclaw2d_domain_free_after_exchange  fclaw3d_domain_free_after_exchange
+#define fclaw2d_domain_indirect_destroy     fclaw3d_domain_indirect_destroy
+#define fclaw2d_domain_indirect_end         fclaw3d_domain_indirect_end
+#define fclaw2d_domain_indirect_begin       fclaw3d_domain_indirect_begin
 
 #define fclaw2d_exchange_setup          fclaw3d_exchange_setup
 #define fclaw2d_exchange_delete         fclaw3d_exchange_delete
@@ -263,8 +262,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define fclaw2d_domain_search_points    fclaw3d_domain_search_points
 #define fclaw2d_domain_iterate_cb       fclaw3d_domain_iterate_cb
 #define fclaw2d_domain_iterate_level_mthread fclaw3d_domain_iterate_level_mthread
-#define fclaw_domain_new2d              fclaw_domain_new3d
-#define fclaw_domain_destroy2d          fclaw_domain_destroy3d
 
 /* translations for maps */
 #define fclaw2d_map_context_t           fclaw3d_map_context_t
@@ -277,29 +274,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define fclaw2d_iterate_family_cb       fclaw3d_iterate_family_cb
 #define fclaw2d_domain_integrate_rays   fclaw3d_domain_integrate_rays
 #define fclaw2d_overlap_exchange        fclaw3d_overlap_exchange
-#define fclaw_global_t                fclaw3d_global_t
-#define fclaw_global_iterate_t        fclaw_global_iterate_t
-#define fclaw_global_new              fclaw_global_new
-#define fclaw_global_new_comm         fclaw_global_new_comm
-#define fclaw_global_destroy          fclaw_global_destroy
-#define fclaw_global_store_domain     fclaw_global_store_domain
 #define fclaw2d_global_store_map        fclaw3d_global_store_map
-#define fclaw_global_iterate_level    fclaw_global_iterate_level
-#define fclaw_global_iterate_patches  fclaw_global_iterate_patches
-#define fclaw_global_iterate_families fclaw_global_iterate_families
-#define fclaw_global_iterate_adapted  fclaw_global_iterate_adapted
-#define fclaw_global_iterate_level_mthread fclaw_global_iterate_level_mthread
-#define fclaw_global_iterate_partitioned fclaw_global_iterate_partitioned
-#define fclaw_global_options_store    fclaw_global_options_store
-#define fclaw_global_get_options      fclaw_global_get_options
-#define fclaw_global_attribute_store  fclaw_global_attribute_store
-#define fclaw_global_get_attribute    fclaw_global_get_attribute
-#define fclaw_global_set_static       fclaw_global_set_static
-#define fclaw_global_clear_static     fclaw_global_clear_static
-#define fclaw_global_get_static_global       fclaw_global_get_static_global
-#define fclaw_set_global_context      fclaw_set_global_context
-#define fclaw_clear_global_context    fclaw_clear_global_context
-#define fclaw2d_global_get_map          fclaw3d_global_get_map
 
 /* translations for the options */
 #define fclaw2d_options_store           fclaw3d_options_store

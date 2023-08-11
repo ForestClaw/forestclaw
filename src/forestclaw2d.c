@@ -32,6 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <p8est_bits.h>
 #include <p8est_wrap.h>
 
+#include <fclaw2d_to_3d.h>
 // for dimension dependent values
 #define d2 d3
 

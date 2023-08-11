@@ -41,10 +41,6 @@ extern "C"
 #endif
 #endif
 
-void fclaw3d_global_store_map (fclaw_global_t* glob,
-                               fclaw_map_context_t * map);
-
-fclaw_map_context_t* fclaw3d_global_get_map(fclaw_global_t* glob);
 
 #ifdef __cplusplus
 #if 0

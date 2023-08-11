@@ -77,11 +77,11 @@ struct fclaw3d_patch_data
     const fclaw_patch_t *real_patch;
 
     /** Neighbor relation on each face */
-    fclaw3d_patch_relation_t face_neighbors[6];
+    fclaw_patch_relation_t face_neighbors[6];
     /** Neighbor relation on each corner */
-    fclaw3d_patch_relation_t edge_neighbors[12];
+    fclaw_patch_relation_t edge_neighbors[12];
     /** Neighbor relation on each corner */
-    fclaw3d_patch_relation_t corner_neighbors[8];
+    fclaw_patch_relation_t corner_neighbors[8];
     /** Edge variables required or not? Feel free to add */
     /** True if corner has neighbor */
     int corners[8];
@@ -1734,7 +1734,7 @@ int fclaw3d_patch_on_parallel_boundary (const struct fclaw_patch * patch);
  * @param face_type the face type
  */
 void fclaw3d_patch_set_face_type(struct fclaw_patch *patch, int iface,
-                                 fclaw3d_patch_relation_t face_type);
+                                 fclaw_patch_relation_t face_type);
 
 /**
  * @brief Set the edge type for a patch
@@ -1744,7 +1744,7 @@ void fclaw3d_patch_set_face_type(struct fclaw_patch *patch, int iface,
  * @param edge_type the edge type
  */
 void fclaw3d_patch_set_edge_type(fclaw_patch_t *patch,int iedge,
-								   fclaw3d_patch_relation_t edge_type);
+								   fclaw_patch_relation_t edge_type);
 
 /**
  * @brief Set the corner type for a patch
@@ -1754,7 +1754,7 @@ void fclaw3d_patch_set_edge_type(fclaw_patch_t *patch,int iedge,
  * @param corner_type the corner type
  */
 void fclaw3d_patch_set_corner_type(struct fclaw_patch *patch, int icorner,
-                                   fclaw3d_patch_relation_t corner_type);
+                                   fclaw_patch_relation_t corner_type);
 
 /**
  * @brief Set the missing corner of a patch
@@ -1771,7 +1771,7 @@ void fclaw3d_patch_set_missing_corner(struct fclaw_patch *patch, int icorner);
  * @param iface the face
  * @return fclaw3d_patch_relation_t the face type
  */
-fclaw3d_patch_relation_t fclaw3d_patch_get_face_type(struct fclaw_patch* patch,
+fclaw_patch_relation_t fclaw3d_patch_get_face_type(struct fclaw_patch* patch,
                                                         int iface);
 
 /**
@@ -1781,7 +1781,7 @@ fclaw3d_patch_relation_t fclaw3d_patch_get_face_type(struct fclaw_patch* patch,
  * @param iface the edge
  * @return fclaw3d_patch_relation_t the edge type
  */
-fclaw3d_patch_relation_t fclaw2d_patch_get_edge_type(fclaw_patch_t* patch,
+fclaw_patch_relation_t fclaw2d_patch_get_edge_type(fclaw_patch_t* patch,
 													   int iedge);
 
 /**
@@ -1791,7 +1791,7 @@ fclaw3d_patch_relation_t fclaw2d_patch_get_edge_type(fclaw_patch_t* patch,
  * @param icorner the corner
  * @return fclaw3d_patch_relation_t the patch relation
  */
-fclaw3d_patch_relation_t fclaw3d_patch_get_corner_type(struct fclaw_patch* patch,
+fclaw_patch_relation_t fclaw3d_patch_get_corner_type(struct fclaw_patch* patch,
                                                           int icorner);
 
 /**

@@ -39,7 +39,7 @@ extern "C"
 struct fclaw_global;
 
 void fclaw3d_exchange_setup(struct fclaw_global* glob,
-                            fclaw3d_timer_names_t running);
+                            fclaw2d_timer_names_t running);
 
 void fclaw3d_exchange_delete(struct fclaw_global* glob);
 
@@ -47,13 +47,13 @@ void fclaw3d_exchange_ghost_patches_begin(struct fclaw_global* glob,
                                           int minlevel,
                                           int maxlevel,
                                           int time_interp,
-                                          fclaw3d_timer_names_t running);
+                                          fclaw2d_timer_names_t running);
 
 void fclaw3d_exchange_ghost_patches_end(struct fclaw_global* glob,
                                         int minlevel,
                                         int maxlevel,
                                         int time_interp,
-                                        fclaw3d_timer_names_t running);
+                                        fclaw2d_timer_names_t running);
 
 
 #ifdef __cplusplus

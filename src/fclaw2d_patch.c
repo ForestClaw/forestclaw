@@ -35,6 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw3d_global.h>
 #include <fclaw3d_domain.h>
 #include <fclaw3d_defs.h>
+#include <fclaw2d_to_3d.h>
 #endif
 
 struct fclaw2d_patch_transform_data;

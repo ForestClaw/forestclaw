@@ -47,6 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #else /* this is full 3D */
 #include <fclaw3d_map.h>
+#include <fclaw2d_to_3d.h>
 #endif
 
 #ifndef P4_TO_P8
