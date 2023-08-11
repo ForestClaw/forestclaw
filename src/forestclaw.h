@@ -142,6 +142,35 @@ typedef struct fclaw_domain_persist
 }
 fclaw_domain_persist_t;
 
+typedef struct fclaw2d_domain_exchange fclaw2d_domain_exchange_t;
+typedef struct fclaw2d_domain_indirect fclaw2d_domain_indirect_t;
+
+typedef struct fclaw2d_domain_data
+{
+    /* Debug counters and timers */
+    int count_set_patch;
+    int count_delete_patch;
+
+    fclaw2d_domain_exchange_t *domain_exchange;
+    fclaw2d_domain_indirect_t *domain_indirect;
+
+} fclaw2d_domain_data_t;
+
+typedef struct fclaw3d_domain_exchange fclaw3d_domain_exchange_t;
+typedef struct fclaw3d_domain_indirect fclaw3d_domain_indirect_t;
+
+typedef struct fclaw3d_domain_data
+{
+    /* Debug counters and timers */
+    int count_set_patch;
+    int count_delete_patch;
+
+    fclaw3d_domain_exchange_t *domain_exchange;
+    fclaw3d_domain_indirect_t *domain_indirect;
+
+} fclaw3d_domain_data_t;
+
+
 /**
  * @brief The domain structure is a collection of blocks
  * 
@@ -153,6 +182,10 @@ fclaw_domain_persist_t;
  */
 typedef struct fclaw_domain
 {
+    int dim;
+    fclaw2d_domain_data_t* d2;
+    fclaw3d_domain_data_t* d3;
+
     sc_MPI_Comm mpicomm;        /**< MPI communicator */
     int mpisize;                /**< MPI size */
     int mpirank;                /**< MPI rank */

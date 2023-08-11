@@ -37,6 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <p8est_vtk.h>
 #include <p8est_wrap.h>
 
+#include <fclaw2d_to_3d.h>
 // for dimension dependent values
 // needs to be defined AFTER all other headers
 #define d2 d3

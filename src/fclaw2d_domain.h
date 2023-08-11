@@ -48,17 +48,6 @@ extern "C"
  */
 struct fclaw_global;
 
-typedef struct fclaw2d_domain_data
-{
-    /* Debug counters and timers */
-    int count_set_patch;
-    int count_delete_patch;
-
-    fclaw2d_domain_exchange_t *domain_exchange;
-    fclaw2d_domain_indirect_t *domain_indirect;
-
-} fclaw2d_domain_data_t;
-
 void fclaw2d_domain_data_new(struct fclaw_domain *domain);
 
 void fclaw2d_domain_data_delete(struct fclaw_domain* domain);
