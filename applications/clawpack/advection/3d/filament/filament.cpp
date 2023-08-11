@@ -192,7 +192,7 @@ main (int argc, char **argv)
                                clawpatch_opt,
                                claw46_opt);
             
-        glob = fclaw2d_global_new();
+        glob = fclaw_global_new();
         fclaw2d_global_store_domain(glob, domain);
 
         fclaw2d_options_store            (glob, fclaw_opt);

@@ -62,7 +62,7 @@ TEST_CASE("FCLAW2D_CLAWPATCH_EXCEEDS_THRESHOLD calls user function")
     global_exceeds_test_parameters = exceeds_test_parameters();
     exceeds_test_parameters& params = global_exceeds_test_parameters;
 
-	fclaw_global_t* glob = fclaw2d_global_new();
+	fclaw_global_t* glob = fclaw_global_new();
 
     fclaw2d_vtables_initialize(glob);
     fclaw2d_clawpatch_vtable_initialize(glob, 4);
@@ -129,7 +129,7 @@ TEST_CASE("FCLAW3DX_CLAWPATCH_EXCEEDS_THRESHOLD calls user function")
     global_exceeds_test_parameters = exceeds_test_parameters();
     exceeds_test_parameters& params = global_exceeds_test_parameters;
 
-	fclaw_global_t* glob = fclaw2d_global_new();
+	fclaw_global_t* glob = fclaw_global_new();
 
     fclaw2d_vtables_initialize(glob);
     fclaw3d_clawpatch_vtable_initialize(glob, 4);

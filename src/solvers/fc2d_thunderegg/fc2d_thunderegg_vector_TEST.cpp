@@ -50,7 +50,7 @@ struct QuadDomain {
     fclaw_clawpatch_options_t* opts;
 
     QuadDomain(){
-        glob = fclaw2d_global_new();
+        glob = fclaw_global_new();
         opts = fclaw_clawpatch_options_new(2);
 
         fclaw2d_vtables_initialize(glob);
@@ -106,7 +106,7 @@ struct QuadDomainBrick {
     fclaw_clawpatch_options_t* opts;
 
     QuadDomainBrick(){
-        glob = fclaw2d_global_new();
+        glob = fclaw_global_new();
         opts = fclaw_clawpatch_options_new(2);
 
         fclaw2d_vtables_initialize(glob);

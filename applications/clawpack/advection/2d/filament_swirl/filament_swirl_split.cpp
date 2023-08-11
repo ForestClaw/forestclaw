@@ -248,7 +248,7 @@ main (int argc, char **argv)
         mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
 
         /* Globs */
-        filament_glob = fclaw2d_global_new();
+        filament_glob = fclaw_global_new();
 
         fclaw2d_options_store            (filament_glob, filament_fclaw_opt);
         fclaw_clawpatch_options_store  (filament_glob, filament_clawpatch_opt);
@@ -256,7 +256,7 @@ main (int argc, char **argv)
         fc2d_clawpack5_options_store     (filament_glob, filament_claw5_opt);
         filament_options_store           (filament_glob, filament_user_opt);
 
-        swirl_glob = fclaw2d_global_new();
+        swirl_glob = fclaw_global_new();
 
         fclaw2d_options_store           (swirl_glob, swirl_fclaw_opt);
         fclaw_clawpatch_options_store (swirl_glob, swirl_clawpatch_opt);

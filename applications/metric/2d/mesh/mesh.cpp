@@ -164,7 +164,7 @@ main (int argc, char **argv)
     mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
     domain = create_domain(mpicomm, gparms);
     
-    glob = fclaw2d_global_new();
+    glob = fclaw_global_new();
     fclaw2d_global_set_domain(glob, domain);
 
     fclaw2d_forestclaw_set_options (glob, gparms);

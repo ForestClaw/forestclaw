@@ -93,7 +93,7 @@ main (int argc, char **argv)
         heat_domain = heat_create_domain(mpicomm, heat_fclaw_opt);
     
         /* Create global structure which stores the domain, timers, etc */
-        heat_glob = fclaw2d_global_new();
+        heat_glob = fclaw_global_new();
         fclaw2d_global_store_domain(heat_glob, heat_domain);
 
         /* Store option packages in glob */
@@ -108,7 +108,7 @@ main (int argc, char **argv)
         phasefield_domain = phasefield_create_domain(mpicomm, phasefield_fclaw_opt);
     
         /* Create global structure which stores the domain, timers, etc */
-        phasefield_glob = fclaw2d_global_new();
+        phasefield_glob = fclaw_global_new();
         fclaw2d_global_store_domain(phasefield_glob, phasefield_domain);
 
         /* Store option packages in glob */

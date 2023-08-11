@@ -48,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /* much of this will eventually move into fclaw_global.c */
 
-fclaw_global_t* fclaw2d_global_new (void)
+fclaw_global_t* fclaw_global_new (void)
 {
     fclaw_global_t *glob;
 
@@ -79,10 +79,10 @@ fclaw_global_t* fclaw2d_global_new (void)
     return glob;
 }
 
-fclaw_global_t* fclaw2d_global_new_comm (sc_MPI_Comm mpicomm,
+fclaw_global_t* fclaw_global_new_comm (sc_MPI_Comm mpicomm,
                                            int mpisize, int mpirank)
 {
-    fclaw_global_t *glob = fclaw2d_global_new ();
+    fclaw_global_t *glob = fclaw_global_new ();
 
     /*
      * Set the communicator.

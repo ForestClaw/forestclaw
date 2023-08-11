@@ -71,7 +71,7 @@ torthem_init (torthem_t * torthem)
 
     memset (torthem, 0, sizeof (*torthem));
 #if 1
-    torthem->global = fclaw2d_global_new ();
+    torthem->global = fclaw_global_new ();
 #endif
 
 #if 0

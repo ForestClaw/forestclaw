@@ -143,7 +143,7 @@ main (int argc, char **argv)
         domain = create_domain(mpicomm, fclaw_opt, user);
 
         /* Create global structure which stores the domain, timers, etc */
-        glob = fclaw2d_global_new();
+        glob = fclaw_global_new();
         fclaw2d_global_store_domain(glob, domain);
 
         /* Store option packages in glob */

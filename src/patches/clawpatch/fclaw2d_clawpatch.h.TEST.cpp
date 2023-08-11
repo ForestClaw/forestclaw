@@ -30,8 +30,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 TEST_CASE("fclaw2d_clawpatch_vtable_initialize stores two separate vtables in two separate globs")
 {
-	fclaw_global_t* glob1 = fclaw2d_global_new();
-	fclaw_global_t* glob2 = fclaw2d_global_new();
+	fclaw_global_t* glob1 = fclaw_global_new();
+	fclaw_global_t* glob2 = fclaw_global_new();
     fclaw2d_vtables_initialize(glob1);
     fclaw2d_vtables_initialize(glob2);
 
@@ -46,8 +46,8 @@ TEST_CASE("fclaw2d_clawpatch_vtable_initialize stores two separate vtables in tw
 
 TEST_CASE("fclaw3dx_clawpatch_vtable_initialize stores two separate vtables in two separate globs")
 {
-	fclaw_global_t* glob1 = fclaw2d_global_new();
-	fclaw_global_t* glob2 = fclaw2d_global_new();
+	fclaw_global_t* glob1 = fclaw_global_new();
+	fclaw_global_t* glob2 = fclaw_global_new();
     fclaw2d_vtables_initialize(glob1);
     fclaw2d_vtables_initialize(glob2);
 
@@ -62,7 +62,7 @@ TEST_CASE("fclaw3dx_clawpatch_vtable_initialize stores two separate vtables in t
 
 TEST_CASE("fclaw2d_clawpatch_vtable_initialize sets is_set flag")
 {
-	fclaw_global_t* glob = fclaw2d_global_new();
+	fclaw_global_t* glob = fclaw_global_new();
 
     fclaw2d_vtables_initialize(glob);
 	fclaw2d_clawpatch_vtable_initialize(glob, 4);
@@ -74,7 +74,7 @@ TEST_CASE("fclaw2d_clawpatch_vtable_initialize sets is_set flag")
 
 TEST_CASE("fclaw3dx_clawpatch_vtable_initialize sets is_set flag")
 {
-	fclaw_global_t* glob = fclaw2d_global_new();
+	fclaw_global_t* glob = fclaw_global_new();
 
     fclaw2d_vtables_initialize(glob);
 	fclaw3d_clawpatch_vtable_initialize(glob, 4);
@@ -90,8 +90,8 @@ TEST_CASE("fclaw3dx_clawpatch_vtable_initialize sets is_set flag")
 
 TEST_CASE("fclaw2d_clawpatch_vtable_initialize fails if called twice on a glob")
 {
-	fclaw_global_t* glob1 = fclaw2d_global_new();
-	fclaw_global_t* glob2 = fclaw2d_global_new();
+	fclaw_global_t* glob1 = fclaw_global_new();
+	fclaw_global_t* glob2 = fclaw_global_new();
     fclaw2d_vtables_initialize(glob1);
     fclaw2d_vtables_initialize(glob2);
 
@@ -106,8 +106,8 @@ TEST_CASE("fclaw2d_clawpatch_vtable_initialize fails if called twice on a glob")
 
 TEST_CASE("fclaw3dx_clawpatch_vtable_initialize fails if called twice on a glob")
 {
-	fclaw_global_t* glob1 = fclaw2d_global_new();
-	fclaw_global_t* glob2 = fclaw2d_global_new();
+	fclaw_global_t* glob1 = fclaw_global_new();
+	fclaw_global_t* glob2 = fclaw_global_new();
     fclaw2d_vtables_initialize(glob1);
     fclaw2d_vtables_initialize(glob2);
 

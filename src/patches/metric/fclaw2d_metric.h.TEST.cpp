@@ -29,8 +29,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 TEST_CASE("fclaw2d_metric_vtable_initialize stores two seperate vtables in two seperate globs")
 {
-	fclaw_global_t* glob1 = fclaw2d_global_new();
-	fclaw_global_t* glob2 = fclaw2d_global_new();
+	fclaw_global_t* glob1 = fclaw_global_new();
+	fclaw_global_t* glob2 = fclaw_global_new();
 
 	fclaw2d_metric_vtable_initialize(glob1);
 	fclaw2d_metric_vtable_initialize(glob2);
@@ -43,7 +43,7 @@ TEST_CASE("fclaw2d_metric_vtable_initialize stores two seperate vtables in two s
 
 TEST_CASE("fclaw2d_metric_vtable_initialize sets is_set flag")
 {
-	fclaw_global_t* glob = fclaw2d_global_new();
+	fclaw_global_t* glob = fclaw_global_new();
 
 	fclaw2d_metric_vtable_initialize(glob);
 
@@ -56,8 +56,8 @@ TEST_CASE("fclaw2d_metric_vtable_initialize sets is_set flag")
 
 TEST_CASE("fclaw2d_metric_vtable_initialize fails if called twice on a glob")
 {
-	fclaw_global_t* glob1 = fclaw2d_global_new();
-	fclaw_global_t* glob2 = fclaw2d_global_new();
+	fclaw_global_t* glob1 = fclaw_global_new();
+	fclaw_global_t* glob2 = fclaw_global_new();
 
 	fclaw2d_metric_vtable_initialize(glob1);
 	CHECK_SC_ABORTED(fclaw2d_metric_vtable_initialize(glob1));

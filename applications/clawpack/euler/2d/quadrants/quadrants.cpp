@@ -122,7 +122,7 @@ main (int argc, char **argv)
         /* Create global structure which stores the domain, timers, etc */
         int size, rank;
         mpicomm = fclaw_app_get_mpi_size_rank (app, &size, &rank);
-        glob = fclaw2d_global_new_comm (mpicomm, size, rank);
+        glob = fclaw_global_new_comm (mpicomm, size, rank);
         create_domain_map (glob, fclaw_opt);
 
          /* Store option packages in glob */

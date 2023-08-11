@@ -80,7 +80,7 @@ main (int argc, char **argv)
         mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
         radial_domain = radial_create_domain(mpicomm, radial_gparms);
     
-        radial_glob = fclaw2d_global_new();
+        radial_glob = fclaw_global_new();
         fclaw2d_global_store_domain(radial_glob, radial_domain);
 
         fclaw2d_options_store           (radial_glob, radial_gparms);
@@ -96,7 +96,7 @@ main (int argc, char **argv)
         slosh_domain = slosh_create_domain(mpicomm, slosh_fclaw_opt);
     
         /* Create global structure which stores the domain, timers, etc */
-        slosh_glob = fclaw2d_global_new();
+        slosh_glob = fclaw_global_new();
         fclaw2d_global_store_domain(slosh_glob, slosh_domain);
 
         /* Store option packages in glob */

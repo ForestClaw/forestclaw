@@ -54,9 +54,9 @@ void fclaw3d_iterate_family_cb
 /* much of the following will move into fclaw_global.h */
 
 /** Allocate a new global structure. */
-fclaw_global_t* fclaw3d_global_new (void);
+fclaw_global_t* fclaw_global_new (void);
 
-fclaw_global_t* fclaw3d_global_new_comm (sc_MPI_Comm mpicomm,
+fclaw_global_t* fclaw_global_new_comm (sc_MPI_Comm mpicomm,
                                            int mpisize, int mpirank);
 
 void fclaw3d_global_destroy (fclaw_global_t * glob);

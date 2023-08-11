@@ -30,8 +30,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 TEST_CASE("fc2d_thunderegg_solver_initialize stores two seperate vtables in two seperate globs")
 {
-	fclaw_global_t* glob1 = fclaw2d_global_new();
-	fclaw_global_t* glob2 = fclaw2d_global_new();
+	fclaw_global_t* glob1 = fclaw_global_new();
+	fclaw_global_t* glob2 = fclaw_global_new();
 
 	fclaw2d_vtables_initialize(glob1);
 	fc2d_thunderegg_solver_initialize(glob1);
@@ -47,7 +47,7 @@ TEST_CASE("fc2d_thunderegg_solver_initialize stores two seperate vtables in two 
 
 TEST_CASE("fc2d_thunderegg_solver_initialize sets is_set flag")
 {
-	fclaw_global_t* glob = fclaw2d_global_new();
+	fclaw_global_t* glob = fclaw_global_new();
 
 	fclaw2d_vtables_initialize(glob);
 	fc2d_thunderegg_solver_initialize(glob);
@@ -62,8 +62,8 @@ TEST_CASE("fc2d_thunderegg_solver_initialize sets is_set flag")
 
 TEST_CASE("fc2d_thunderegg_vtable_initialize fails if called twice on a glob")
 {
-	fclaw_global_t* glob1 = fclaw2d_global_new();
-	fclaw_global_t* glob2 = fclaw2d_global_new();
+	fclaw_global_t* glob1 = fclaw_global_new();
+	fclaw_global_t* glob2 = fclaw_global_new();
 
 	fclaw2d_vtables_initialize(glob1);
 	fc2d_thunderegg_solver_initialize(glob1);

@@ -132,7 +132,7 @@ main (int argc, char **argv)
 
         int size, rank;
         sc_MPI_Comm mpicomm = fclaw_app_get_mpi_size_rank (app, &size, &rank);
-        fclaw_global_t * glob = fclaw2d_global_new_comm (mpicomm, size, rank);
+        fclaw_global_t * glob = fclaw_global_new_comm (mpicomm, size, rank);
         create_domain_map (glob, fclaw_opt);
 
         /* Store option packages in glob */
