@@ -46,7 +46,6 @@ add_library(forestclaw_c OBJECT
   forestclaw3d.c
   fclaw3d_convenience.c
   fclaw3d_domain.c
-  fclaw3d_global.c
   fclaw3d_map.c
   fclaw3d_patch.c
   fclaw3d_exchange.c
