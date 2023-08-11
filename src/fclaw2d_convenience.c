@@ -217,8 +217,6 @@ fclaw2d_domain_new (p4est_wrap_t * wrap, sc_keyvalue_t * attributes)
         block->num_patches = (int) tree->quadrants.elem_count;
         block->patches =
             FCLAW_ALLOC_ZERO (fclaw_patch_t, block->num_patches);
-        block->patch_bounds =
-            FCLAW_ALLOC_ZERO (fclaw_patch_bounds_2d_t, block->num_patches);
         block->patchbylevel =
             FCLAW_ALLOC_ZERO (fclaw_patch_t *,
                               domain->possible_maxlevel + 1);
@@ -227,7 +225,7 @@ fclaw2d_domain_new (p4est_wrap_t * wrap, sc_keyvalue_t * attributes)
         for (j = 0; j < block->num_patches; ++j)
         {
             patch = block->patches + j;
-            patch->d2 = block->patch_bounds + j;
+            patch->d2 = FCLAW_ALLOC_ZERO(fclaw_patch_bounds_2d_t,1);
             quad = p4est_quadrant_array_index (&tree->quadrants, (size_t) j);
             patch->target_level = patch->level = level = (int) quad->level;
             patch->flags = p4est_quadrant_child_id (quad);
@@ -465,8 +463,12 @@ fclaw2d_domain_destroy (fclaw2d_domain_t * domain)
     for (i = 0; i < domain->num_blocks; ++i)
     {
         block = domain->blocks + i;
+        for (int p = 0; p < block->num_patches; ++p)
+        {
+            FCLAW_FREE (block->patches[p].d2);
+        }
+        FCLAW_FREE (block->d2);
         FCLAW_FREE (block->patches);
-        FCLAW_FREE (block->patch_bounds);
         FCLAW_FREE (block->patchbylevel);
     }
     FCLAW_FREE (domain->blocks);

@@ -127,7 +127,6 @@ struct fclaw2d_block
     int maxlevel;
     /** @} */
     fclaw_patch_t *patches;           /**< The patches for this block */
-    fclaw_patch_bounds_2d_t *patch_bounds; /**< patch bounds */
     fclaw_patch_t **patchbylevel;     /**< Pointer to the first patch in each level **/
     fclaw_patch_t **exchange_patches; /**< Pointer for each exchange patch */
     void *user;                         /**< User pointer */
