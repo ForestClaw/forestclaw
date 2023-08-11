@@ -42,7 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fc2d_thunderegg_starpatch.h>
 #include <fc2d_thunderegg_fivepoint.h>
 
-#include <fclaw2d_elliptic_solver.h>
+#include <fclaw_elliptic_solver.h>
 
 
 //#include <fclaw2d_farraybox.hpp>

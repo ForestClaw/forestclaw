@@ -33,7 +33,7 @@
 #include <fclaw_global.h>
 #include <fclaw2d_diagnostics.h>
 
-#include <fclaw2d_elliptic_solver.h>
+#include <fclaw_elliptic_solver.h>
 
 #include <fclaw_clawpatch_options.h>
 #include <fclaw_clawpatch.h>

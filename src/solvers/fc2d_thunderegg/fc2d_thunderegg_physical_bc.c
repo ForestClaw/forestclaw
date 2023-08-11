@@ -29,7 +29,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "fc2d_thunderegg.h"
 #include "fc2d_thunderegg_options.h"
 
-#include <fclaw2d_elliptic_solver.h>
+#include <fclaw_elliptic_solver.h>
 
 #include <fclaw_global.h>
 #include <fclaw_domain.h>

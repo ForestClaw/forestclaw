@@ -38,7 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_diagnostics.h>
 #include <fclaw_vtable.h>
 
-#include <fclaw2d_elliptic_solver.h>
+#include <fclaw_elliptic_solver.h>
 
 #include "fclaw_math.h"
 
@@ -197,7 +197,7 @@ void outstyle_1(fclaw_global_t *glob)
             fc2d_thunderegg_heat_set_lambda(lambda);
 
             /* Solve the elliptic problem; RHS is set here */
-            fclaw2d_elliptic_solve(glob);
+            fclaw_elliptic_solve(glob);
 
             /* Update solution stored in RHS */
             heat_run_update_q(glob);
@@ -306,7 +306,7 @@ void outstyle_3(fclaw_global_t *glob)
 
 
         /* Solve the elliptic problem; RHS is set here */
-        fclaw2d_elliptic_solve(glob);
+        fclaw_elliptic_solve(glob);
 
         /* Update solution stored in RHS */
         heat_run_update_q(glob);

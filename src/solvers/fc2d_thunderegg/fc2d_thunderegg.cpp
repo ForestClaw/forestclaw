@@ -30,7 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw_pointer_map.h>
 
-#include <fclaw2d_elliptic_solver.h>
+#include <fclaw_elliptic_solver.h>
 
 #include <fclaw_clawpatch.h>
 #include <fclaw_clawpatch_output_ascii.h> 
@@ -178,7 +178,7 @@ void fc2d_thunderegg_solver_initialize(fclaw_global_t* glob)
 	patch_vt->rhs            = thunderegg_rhs;  /* Calls FORTRAN routine */
 	patch_vt->setup          = NULL;
     
-    fclaw2d_elliptic_vtable_t *elliptic_vt = fclaw2d_elliptic_vt(glob);
+    fclaw_elliptic_vtable_t *elliptic_vt = fclaw_elliptic_vt(glob);
     elliptic_vt->setup = thunderegg_setup_solver;
     elliptic_vt->solve = thunderegg_solve;    
     elliptic_vt->apply_bc = fc2d_thunderegg_physical_bc;

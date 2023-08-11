@@ -30,7 +30,7 @@
 #include <fclaw_output.h>
 #include <fclaw2d_diagnostics.h>
 
-#include <fclaw2d_elliptic_solver.h>
+#include <fclaw_elliptic_solver.h>
 
 #include <fclaw_clawpatch_options.h>
 #include <fclaw_clawpatch.h>
@@ -103,7 +103,7 @@ void run_program(fclaw_global_t* glob)
     fclaw_output_frame(glob,Frame);
  
     /* Solve the elliptic problem */
-    fclaw2d_elliptic_solve(glob);
+    fclaw_elliptic_solve(glob);
 
     /* Compute error, compute conservation */
     fclaw2d_diagnostics_gather(glob, init_flag);                
