@@ -210,5 +210,5 @@ fc2d_clawpack5_options_t* fc2d_clawpack5_get_options(fclaw_global_t *glob)
 
 void fc2d_clawpack5_options_store (fclaw_global_t* glob, fc2d_clawpack5_options_t* clawopt)
 {
-    fclaw2d_global_options_store(glob,"fc2d_clawpack5",clawopt);
+    fclaw_global_options_store(glob,"fc2d_clawpack5",clawopt);
 }

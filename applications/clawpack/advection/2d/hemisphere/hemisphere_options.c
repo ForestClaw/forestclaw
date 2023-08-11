@@ -132,7 +132,7 @@ user_options_t* hemisphere_options_register (fclaw_app_t * app,
 
 void hemisphere_options_store (fclaw_global_t* glob, user_options_t* user)
 {
-    fclaw2d_global_options_store(glob, "user", user);
+    fclaw_global_options_store(glob, "user", user);
 }
 
 const user_options_t* hemisphere_get_options(fclaw_global_t* glob)

@@ -153,7 +153,7 @@ swirl_options_t* swirl_options_register (fclaw_app_t * app,
 
 void swirl_options_store (fclaw_global_t* glob, swirl_options_t* user)
 {
-    fclaw2d_global_options_store(glob, "user", user);
+    fclaw_global_options_store(glob, "user", user);
 }
 
 const swirl_options_t* swirl_get_options(fclaw_global_t* glob)

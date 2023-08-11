@@ -26,13 +26,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_global.h>
 #include <test.hpp>
 
-TEST_CASE("fclaw2d_global_options_store and fclaw2d_global_get_options test") {
+TEST_CASE("fclaw_global_options_store and fclaw2d_global_get_options test") {
     fclaw_global_t* glob = fclaw_global_new();
 
     // Test with an integer
     int option1 = 10;
     const char* key1 = "option1";
-    fclaw2d_global_options_store(glob, key1, &option1);
+    fclaw_global_options_store(glob, key1, &option1);
 
     int* retrieved_option1 = static_cast<int*>(fclaw2d_global_get_options(glob, key1));
     CHECK_EQ(*retrieved_option1, option1);
@@ -40,14 +40,14 @@ TEST_CASE("fclaw2d_global_options_store and fclaw2d_global_get_options test") {
     // Test with a string
     const char* option2 = "Test string";
     const char* key2 = "option2";
-    fclaw2d_global_options_store(glob, key2, &option2);
+    fclaw_global_options_store(glob, key2, &option2);
 
     const char** retrieved_option2 = static_cast<const char**>(fclaw2d_global_get_options(glob, key2));
     CHECK_EQ(retrieved_option2, &option2);
 
 #ifdef FCLAW_ENABLE_DEBUG
     // TEST inserting twice
-    CHECK_SC_ABORTED(fclaw2d_global_options_store(glob, key2, &option2));
+    CHECK_SC_ABORTED(fclaw_global_options_store(glob, key2, &option2));
 #endif
     // Test with a non-existing key
     const char* key3 = "non-existing key";

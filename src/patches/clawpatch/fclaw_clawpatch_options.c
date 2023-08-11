@@ -298,7 +298,7 @@ void
 fclaw_clawpatch_options_store (fclaw_global_t *glob, 
                                fclaw_clawpatch_options_t* clawpatch_options)
 {
-    fclaw2d_global_options_store(glob, "fclaw_clawpatch", clawpatch_options);
+    fclaw_global_options_store(glob, "fclaw_clawpatch", clawpatch_options);
 }
 
 fclaw_clawpatch_options_t* 

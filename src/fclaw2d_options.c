@@ -38,7 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 void fclaw2d_options_store (fclaw_global_t *glob, fclaw_options_t* gparms)
 {
-    fclaw2d_global_options_store(glob, "fclaw2d", gparms);
+    fclaw_global_options_store(glob, "fclaw2d", gparms);
 }
 
 fclaw_options_t* fclaw2d_get_options(fclaw_global_t* glob)

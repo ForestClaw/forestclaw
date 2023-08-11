@@ -97,7 +97,7 @@ user_options_t* slosh_options_register (fclaw_app_t * app,
 
 void slosh_options_store (fclaw_global_t* glob, user_options_t* user)
 {
-    fclaw2d_global_options_store(glob, "user", user);
+    fclaw_global_options_store(glob, "user", user);
 }
 
 user_options_t* slosh_get_options(fclaw_global_t* glob)

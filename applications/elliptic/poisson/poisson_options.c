@@ -216,7 +216,7 @@ poisson_options_t* poisson_options_register (fclaw_app_t * app,
 
 void poisson_options_store (fclaw_global_t* glob, poisson_options_t* user)
 {
-    fclaw2d_global_options_store(glob, "user", user);
+    fclaw_global_options_store(glob, "user", user);
 }
 
 const poisson_options_t* poisson_get_options(fclaw_global_t* glob)

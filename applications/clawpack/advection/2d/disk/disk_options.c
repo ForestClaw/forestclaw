@@ -159,7 +159,7 @@ user_options_t* disk_options_register (fclaw_app_t * app,
 
 void disk_options_store (fclaw_global_t* glob, user_options_t* user_opt)
 {
-    fclaw2d_global_options_store(glob, "user", user_opt);
+    fclaw_global_options_store(glob, "user", user_opt);
 }
 
 const user_options_t* disk_get_options(fclaw_global_t* glob)

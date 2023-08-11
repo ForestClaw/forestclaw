@@ -154,7 +154,7 @@ void fc3d_clawpack5_register (fclaw_app_t* app, const char *configfile, fclaw_gl
 
 void fc3d_clawpack5_set_options (fclaw_global_t* glob, fc3d_clawpack5_options_t* clawopt)
 {
-    fclaw2d_global_options_store(glob, "fc3d_clawpack5", clawopt);
+    fclaw_global_options_store(glob, "fc3d_clawpack5", clawopt);
 }
 
 void fc3d_clawpack5_aux_data(fclaw_global_t *glob,

@@ -200,7 +200,7 @@ void fclaw_global_iterate_partitioned (fclaw_global_t * glob,
     fclaw2d_domain_iterate_partitioned (glob->domain,new_domain,tcb,&g);
 }
 
-void fclaw2d_global_options_store (fclaw_global_t* glob, const char* key, void* options)
+void fclaw_global_options_store (fclaw_global_t* glob, const char* key, void* options)
 {
     
     FCLAW_ASSERT(fclaw_pointer_map_get(glob->options,key) == NULL);

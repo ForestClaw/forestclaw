@@ -114,6 +114,15 @@ void fclaw_global_iterate_partitioned (fclaw_global_t * glob,
                                          fclaw_transfer_callback_t tcb,
                                          void *user);
 
+/**
+ * @brief Store an options structure in the glob
+ * 
+ * @param glob the global context
+ * @param key the key to store the options under
+ * @param options the options structure
+ */
+void fclaw_global_options_store (fclaw_global_t* glob, const char* key, void* options);
+
 #ifdef __cplusplus
 #if 0
 {                               /* need this because indent is dumb */

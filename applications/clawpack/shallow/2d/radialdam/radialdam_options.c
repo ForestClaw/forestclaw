@@ -137,7 +137,7 @@ user_options_t* radialdam_options_register (fclaw_app_t * app,
 
 void radialdam_options_store (fclaw_global_t* glob, user_options_t* user)
 {
-    fclaw2d_global_options_store(glob, "user", user);
+    fclaw_global_options_store(glob, "user", user);
 }
 
 user_options_t* radialdam_get_options(fclaw_global_t* glob)

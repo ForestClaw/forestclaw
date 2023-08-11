@@ -290,7 +290,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define fclaw_global_iterate_adapted  fclaw_global_iterate_adapted
 #define fclaw_global_iterate_level_mthread fclaw_global_iterate_level_mthread
 #define fclaw_global_iterate_partitioned fclaw_global_iterate_partitioned
-#define fclaw2d_global_options_store    fclaw3d_global_options_store
+#define fclaw_global_options_store    fclaw_global_options_store
 #define fclaw2d_global_get_options      fclaw3d_global_get_options
 #define fclaw2d_global_attribute_store  fclaw3d_global_attribute_store
 #define fclaw2d_global_get_attribute    fclaw3d_global_get_attribute

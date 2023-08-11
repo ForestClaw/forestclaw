@@ -235,5 +235,5 @@ fc2d_thunderegg_options_t* fc2d_thunderegg_get_options(fclaw_global_t *glob)
 
 void fc2d_thunderegg_options_store (fclaw_global_t* glob, fc2d_thunderegg_options_t* mg_opt)
 {
-    fclaw2d_global_options_store(glob, "fc2d_thunderegg", mg_opt);
+    fclaw_global_options_store(glob, "fc2d_thunderegg", mg_opt);
 }
