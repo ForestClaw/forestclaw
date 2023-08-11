@@ -54,7 +54,7 @@ void cb_elliptic_rhs(fclaw_domain_t *domain,
 {
     fclaw_global_iterate_t* g = (fclaw_global_iterate_t*) user;
 
-    fclaw_patch_vtable_t* patch_vt = fclaw2d_patch_vt(g->glob);
+    fclaw_patch_vtable_t* patch_vt = fclaw_patch_vt(g->glob);
 
     /* Check that the user has set the right hand side function */
     FCLAW_ASSERT(patch_vt->rhs != NULL);

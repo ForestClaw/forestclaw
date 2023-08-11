@@ -496,7 +496,7 @@ void fc3d_clawpack46_solver_initialize(fclaw_global_t* glob)
     //fclaw_clawpatch_vtable_t*      clawpatch_vt = fclaw_clawpatch_vt();
 
 	fclaw_vtable_t*                fc_vt = fclaw_vt(glob);
-	fclaw_patch_vtable_t*          patch_vt = fclaw2d_patch_vt(glob);  
+	fclaw_patch_vtable_t*          patch_vt = fclaw_patch_vt(glob);  
 
 	fc3d_clawpack46_vtable_t*  claw46_vt = clawpack46_vt_new();
 

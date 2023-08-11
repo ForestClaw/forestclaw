@@ -43,7 +43,7 @@ void filament_link_solvers(fclaw_global_t *glob)
 
     if (fclaw_opt->manifold)
     {
-        fclaw_patch_vtable_t *patch_vt = fclaw2d_patch_vt(glob);
+        fclaw_patch_vtable_t *patch_vt = fclaw_patch_vt(glob);
         patch_vt->setup = filament_patch_setup;        
     }
 

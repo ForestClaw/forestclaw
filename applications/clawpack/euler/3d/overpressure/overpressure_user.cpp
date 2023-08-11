@@ -130,7 +130,7 @@ void overpressure_link_solvers(fclaw_global_t *glob)
 
     fc_vt->problem_setup = &overpressure_problem_setup;
 
-    fclaw_patch_vtable_t *patch_vt = fclaw2d_patch_vt(glob);
+    fclaw_patch_vtable_t *patch_vt = fclaw_patch_vt(glob);
 
     if (user->claw_version == 4)
     {

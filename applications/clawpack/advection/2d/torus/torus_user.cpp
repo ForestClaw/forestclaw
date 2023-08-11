@@ -75,7 +75,7 @@ void torus_link_solvers(fclaw_global_t *glob)
     /* Torus uses special patch setup (not advection_patch_setup), since the
        streamfunction depends on computational coordinates, not physical
        coordinates */
-    fclaw_patch_vtable_t *patch_vt = fclaw2d_patch_vt(glob);
+    fclaw_patch_vtable_t *patch_vt = fclaw_patch_vt(glob);
     patch_vt->setup   = &torus_patch_setup;
 
     const user_options_t *user =  torus_get_options(glob);

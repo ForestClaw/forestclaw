@@ -161,7 +161,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define fclaw2d_patch_time_sync_f2c     fclaw3d_patch_time_sync_f2c
 #define fclaw2d_patch_time_sync_samesize fclaw3d_patch_time_sync_samesize
 #define fclaw2d_patch_time_sync_reset   fclaw3d_patch_time_sync_reset
-#define fclaw2d_patch_vtable_initialize fclaw3d_patch_vtable_initialize
 #define fclaw2d_patch_get_info          fclaw3d_patch_get_info
 #define fclaw2d_patch_get_info2         fclaw3d_patch_get_info2
 #define fclaw2d_patch_get_user_patch    fclaw3d_patch_get_user_patch

@@ -97,7 +97,7 @@ void swirl_link_solvers(fclaw_global_t *glob)
         if (fclaw_opt->manifold)
         {
             /* This calls a manifold version of setaux */
-            fclaw_patch_vtable_t *patch_vt = fclaw2d_patch_vt(glob);
+            fclaw_patch_vtable_t *patch_vt = fclaw_patch_vt(glob);
             patch_vt->setup = swirl_patch_setup;
         }
         else

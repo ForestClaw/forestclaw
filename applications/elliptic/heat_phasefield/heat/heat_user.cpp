@@ -392,7 +392,7 @@ void heat_link_solvers(fclaw_global_t *glob)
     fc_vt->problem_setup = &heat_problem_setup;  
 
     /* Patch : RHS function */
-    fclaw_patch_vtable_t* patch_vt = fclaw2d_patch_vt(glob);
+    fclaw_patch_vtable_t* patch_vt = fclaw_patch_vt(glob);
     patch_vt->physical_bc = heat_bc2;     
     patch_vt->rhs = heat_rhs;          /* Overwrites default */
     patch_vt->initialize = heat_initialize;   /* Get an initial refinement */

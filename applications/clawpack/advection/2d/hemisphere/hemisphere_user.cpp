@@ -39,7 +39,7 @@ void hemisphere_patch_setup(fclaw_global_t *glob,
 
 void hemisphere_link_solvers(fclaw_global_t *glob)
 {
-    fclaw_patch_vtable_t *patch_vt = fclaw2d_patch_vt(glob);
+    fclaw_patch_vtable_t *patch_vt = fclaw_patch_vt(glob);
     patch_vt->setup      = &hemisphere_patch_setup;    
 
     const user_options_t* user = hemisphere_get_options(glob);

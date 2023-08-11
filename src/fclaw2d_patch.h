@@ -1692,14 +1692,14 @@ struct fclaw_patch_vtable
  * @param glob the global context
  * @return fclaw2d_patch_vtable_t* the vtable
  */
-fclaw_patch_vtable_t* fclaw2d_patch_vt(struct fclaw_global* glob);
+fclaw_patch_vtable_t* fclaw_patch_vt(struct fclaw_global* glob);
 
 /**
  * @brief Initialize the patch vtable
  * 
  * @param glob the global context
  */
-void fclaw2d_patch_vtable_initialize(struct fclaw_global* glob);
+void fclaw_patch_vtable_initialize(struct fclaw_global* glob);
 
 
 ///@}

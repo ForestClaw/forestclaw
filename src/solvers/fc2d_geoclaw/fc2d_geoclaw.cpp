@@ -848,7 +848,7 @@ void fc2d_geoclaw_solver_initialize(fclaw_global_t* glob)
     fclaw_gauges_vtable_t*           gauges_vt = fclaw_gauges_vt(glob);
 
     fclaw_vtable_t*                fc_vt = fclaw_vt(glob);
-    fclaw_patch_vtable_t*          patch_vt = fclaw2d_patch_vt(glob);
+    fclaw_patch_vtable_t*          patch_vt = fclaw_patch_vt(glob);
     fclaw_clawpatch_vtable_t*  clawpatch_vt = fclaw_clawpatch_vt(glob);
 
     fc2d_geoclaw_vtable_t*  geoclaw_vt = fc2d_geoclaw_vt_new();

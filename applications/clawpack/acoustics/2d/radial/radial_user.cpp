@@ -114,7 +114,7 @@ void radial_link_solvers(fclaw_global_t *glob)
         }
         else if (user->example == 1 || user->example == 2)
         {
-            fclaw_patch_vtable_t  *patch_vt = fclaw2d_patch_vt(glob);
+            fclaw_patch_vtable_t  *patch_vt = fclaw_patch_vt(glob);
             
             patch_vt->setup = &radial_patch_setup;
 
@@ -135,7 +135,7 @@ void radial_link_solvers(fclaw_global_t *glob)
         }
         else if (user->example == 1 || user->example == 2)
         {
-            fclaw_patch_vtable_t  *patch_vt = fclaw2d_patch_vt(glob);
+            fclaw_patch_vtable_t  *patch_vt = fclaw_patch_vt(glob);
             
             patch_vt->setup = &radial_patch_setup;
 
