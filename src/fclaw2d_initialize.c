@@ -126,7 +126,7 @@ void fclaw2d_initialize(fclaw_global_t *glob)
 
     /* Initialize patches on uniformly refined level minlevel */
     fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_REGRID_BUILD]);
-    fclaw2d_global_iterate_level(glob, minlevel, cb_initialize,
+    fclaw_global_iterate_level(glob, minlevel, cb_initialize,
                                  NULL);
     fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_REGRID_BUILD]);
 
@@ -165,10 +165,10 @@ void fclaw2d_initialize(fclaw_global_t *glob)
         {
             fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_REGRID_TAGGING]);
 
-            fclaw2d_global_iterate_families(glob, cb_regrid_tag4coarsening,
+            fclaw_global_iterate_families(glob, cb_regrid_tag4coarsening,
                                             (void*) &domain_init);
 
-            fclaw2d_global_iterate_patches(glob,cb_fclaw2d_regrid_tag4refinement,
+            fclaw_global_iterate_patches(glob,cb_fclaw2d_regrid_tag4refinement,
                                          &domain_init);
             
             fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_REGRID_TAGGING]);
@@ -196,7 +196,7 @@ void fclaw2d_initialize(fclaw_global_t *glob)
                 /* Re-initialize new grids.   Ghost cell values needed for
                    interpolation have already been set by initialization */
                 fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_REGRID_BUILD]);
-                fclaw2d_global_iterate_adapted(glob, new_domain,
+                fclaw_global_iterate_adapted(glob, new_domain,
                                                cb_fclaw2d_regrid_repopulate,
                                                (void *) &domain_init);
 

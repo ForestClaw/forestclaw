@@ -144,7 +144,7 @@ fclaw_global_destroy (fclaw_global_t * glob)
     FCLAW_FREE (glob);
 }
 
-void fclaw2d_global_iterate_level (fclaw_global_t * glob, int level,
+void fclaw_global_iterate_level (fclaw_global_t * glob, int level,
                                    fclaw_patch_callback_t pcb, void *user)
 {
     fclaw_global_iterate_t g;
@@ -153,7 +153,7 @@ void fclaw2d_global_iterate_level (fclaw_global_t * glob, int level,
     fclaw2d_domain_iterate_level (glob->domain, level, pcb, &g);
 }
 
-void fclaw2d_global_iterate_patches (fclaw_global_t * glob,
+void fclaw_global_iterate_patches (fclaw_global_t * glob,
                                      fclaw_patch_callback_t pcb, void *user)
 {
     fclaw_global_iterate_t g;
@@ -162,7 +162,7 @@ void fclaw2d_global_iterate_patches (fclaw_global_t * glob,
     fclaw2d_domain_iterate_patches (glob->domain, pcb, &g);
 }
 
-void fclaw2d_global_iterate_families (fclaw_global_t * glob,
+void fclaw_global_iterate_families (fclaw_global_t * glob,
                                       fclaw_patch_callback_t pcb, void *user)
 {
     fclaw_global_iterate_t g;
@@ -171,7 +171,7 @@ void fclaw2d_global_iterate_families (fclaw_global_t * glob,
     fclaw2d_domain_iterate_families (glob->domain, pcb, &g);
 }
 
-void fclaw2d_global_iterate_adapted (fclaw_global_t * glob, fclaw_domain_t* new_domain,
+void fclaw_global_iterate_adapted (fclaw_global_t * glob, fclaw_domain_t* new_domain,
                                      fclaw_match_callback_t mcb, void *user)
 {
     fclaw_global_iterate_t g;
@@ -180,7 +180,7 @@ void fclaw2d_global_iterate_adapted (fclaw_global_t * glob, fclaw_domain_t* new_
     fclaw2d_domain_iterate_adapted (glob->domain, new_domain,mcb,&g);
 }
 
-void fclaw2d_global_iterate_level_mthread (fclaw_global_t * glob, int level,
+void fclaw_global_iterate_level_mthread (fclaw_global_t * glob, int level,
                                            fclaw_patch_callback_t pcb, void *user)
 {
     fclaw_global_iterate_t g;
@@ -189,7 +189,7 @@ void fclaw2d_global_iterate_level_mthread (fclaw_global_t * glob, int level,
     fclaw2d_domain_iterate_level_mthread (glob->domain, level,pcb,&g);
 }
 
-void fclaw2d_global_iterate_partitioned (fclaw_global_t * glob,
+void fclaw_global_iterate_partitioned (fclaw_global_t * glob,
                                          fclaw_domain_t * new_domain,
                                          fclaw_transfer_callback_t tcb,
                                          void *user)

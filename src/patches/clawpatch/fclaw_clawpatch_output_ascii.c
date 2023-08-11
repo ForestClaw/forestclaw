@@ -139,7 +139,7 @@ void fclaw_clawpatch_output_ascii(fclaw_global_t* glob,int iframe)
     }
 
     /* Write out each patch to fort.qXXXX */
-    fclaw2d_global_iterate_patches (glob, clawpatch_vt->cb_output_ascii, &iframe);
+    fclaw_global_iterate_patches (glob, clawpatch_vt->cb_output_ascii, &iframe);
 
     fclaw2d_domain_serialization_leave (domain);
     /* END OF NON-SCALABLE CODE */

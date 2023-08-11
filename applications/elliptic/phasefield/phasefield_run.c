@@ -80,7 +80,7 @@ void update_q(fclaw_domain_t *domain,
 static
 void phasefield_run_update_q(fclaw_global_t *glob)
 {
-    fclaw2d_global_iterate_patches(glob, update_q, NULL);
+    fclaw_global_iterate_patches(glob, update_q, NULL);
 }
 
 

@@ -491,7 +491,7 @@ fclaw2d_vtk_write_field (fclaw_global_t * glob, fclaw2d_vtk_state_t * s,
         SC_CHECK_MPI (mpiret);
 #endif
     }
-    fclaw2d_global_iterate_patches (glob, cb, s);
+    fclaw_global_iterate_patches (glob, cb, s);
     P4EST_FREE (s->buf);
 
 #ifdef P4EST_ENABLE_MPIIO

@@ -129,7 +129,7 @@ void fclaw_clawpatch_diagnostics_compute(fclaw_global_t* glob,
     int check = fclaw_opt->compute_error || fclaw_opt->conservation_check;
     if (!check) return;
 
-    fclaw2d_global_iterate_patches(glob, cb_compute_diagnostics, patch_acc);
+    fclaw_global_iterate_patches(glob, cb_compute_diagnostics, patch_acc);
 }
 
 

@@ -66,7 +66,7 @@ static
 void elliptic_rhs_default(fclaw_global_t *glob)
 {
     /* Set up right hand side by iterating over patches. */
-    fclaw2d_global_iterate_patches (glob, cb_elliptic_rhs, NULL);
+    fclaw_global_iterate_patches (glob, cb_elliptic_rhs, NULL);
 }
 
 static

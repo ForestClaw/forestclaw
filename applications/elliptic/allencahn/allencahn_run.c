@@ -58,14 +58,14 @@ void cb_restore_time_step(fclaw_domain_t *domain,
                           int this_patch_idx,
                           void *user)
 {
-    fclaw2d_global_iterate_t* s = (fclaw2d_global_iterate_t*) user;
+    fclaw_global_iterate_t* s = (fclaw_global_iterate_t*) user;
     fclaw2d_patch_restore_step(s->glob,this_patch);
 }
 
 static
 void restore_time_step(fclaw_global_t *glob)
 {
-    fclaw2d_global_iterate_patches(glob,cb_restore_time_step,(void *) NULL);
+    fclaw_global_iterate_patches(glob,cb_restore_time_step,(void *) NULL);
 
     //fclaw_options_t *fopt = fclaw2d_get_options(glob);
     //fclaw2d_time_sync_reset(glob,fopt->minlevel,fopt->maxlevel,0);
@@ -78,14 +78,14 @@ void cb_save_time_step(fclaw_domain_t *domain,
                        int this_patch_idx,
                        void *user)
 {
-    fclaw2d_global_iterate_t* s = (fclaw2d_global_iterate_t*) user;
+    fclaw_global_iterate_t* s = (fclaw_global_iterate_t*) user;
     fclaw2d_patch_save_step(s->glob,this_patch);
 }
 
 static
 void save_time_step(fclaw_global_t *glob)
 {
-    fclaw2d_global_iterate_patches(glob,cb_save_time_step,(void *) NULL);
+    fclaw_global_iterate_patches(glob,cb_save_time_step,(void *) NULL);
 }
 #endif
 
@@ -120,7 +120,7 @@ void update_q(fclaw_domain_t *domain,
 static
 void allencahn_run_update_q(fclaw_global_t *glob)
 {
-    fclaw2d_global_iterate_patches(glob, update_q, NULL);
+    fclaw_global_iterate_patches(glob, update_q, NULL);
 }
 
 

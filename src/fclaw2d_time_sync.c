@@ -72,12 +72,12 @@ void time_sync_reset (fclaw_global_t* glob,
 	ts_info.reset_mode = (fclaw2d_time_sync_type_t) reset_mode;
 	ts_info.coarse_level = coarse_level;
 
-	fclaw2d_global_iterate_level(glob, coarse_level, 
+	fclaw_global_iterate_level(glob, coarse_level, 
 	                             cb_time_sync_reset, &ts_info);
 
 	if (reset_mode == FCLAW2D_TIME_SYNC_RESET_F2C)
 	{
-		fclaw2d_global_iterate_level(glob, coarse_level+1, 
+		fclaw_global_iterate_level(glob, coarse_level+1, 
 		                             cb_time_sync_reset, &ts_info);
 	}
 
@@ -95,7 +95,7 @@ void copy_at_blockbdry(fclaw_global_t *glob,
 	e_info.time_interp = 0;
 	e_info.read_parallel_patches = read_parallel_patches;
 
-	fclaw2d_global_iterate_level(glob, level, cb_face_fill,
+	fclaw_global_iterate_level(glob, level, cb_face_fill,
 						 &e_info);    
 }
 
@@ -112,7 +112,7 @@ void fine2coarse(fclaw_global_t *glob,
 	e_info.time_interp = 0;
 	e_info.read_parallel_patches = read_parallel_patches;
 
-	fclaw2d_global_iterate_level(glob, level, cb_face_fill, &e_info);
+	fclaw_global_iterate_level(glob, level, cb_face_fill, &e_info);
 }
 
 static

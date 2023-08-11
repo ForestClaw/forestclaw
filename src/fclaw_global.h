@@ -26,6 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW_GLOBAL_H
 #define FCLAW_GLOBAL_H
 
+#include <forestclaw.h>
 #include <fclaw_timer.h>   /* Needed to create statically allocated array of timers */
 #include <fclaw_pointer_map.h>
 
@@ -91,6 +92,27 @@ void fclaw_global_destroy (fclaw_global_t * glob);
 
 void fclaw_global_store_domain (fclaw_global_t* glob,
                                   struct fclaw_domain* domain);
+
+void fclaw_global_iterate_level (fclaw_global_t * glob, int level,
+                                   fclaw_patch_callback_t pcb, void *user);
+
+void fclaw_global_iterate_patches (fclaw_global_t * glob,
+                                     fclaw_patch_callback_t pcb, void *user);
+
+void fclaw_global_iterate_families (fclaw_global_t * glob,
+                                      fclaw_patch_callback_t pcb, void *user);
+
+void fclaw_global_iterate_adapted (fclaw_global_t * glob,
+                                     struct fclaw_domain* new_domain,
+                                     fclaw_match_callback_t mcb, void *user);
+
+void fclaw_global_iterate_level_mthread (fclaw_global_t * glob, int level,
+                                           fclaw_patch_callback_t pcb, void *user);
+
+void fclaw_global_iterate_partitioned (fclaw_global_t * glob,
+                                         struct fclaw_domain * new_domain,
+                                         fclaw_transfer_callback_t tcb,
+                                         void *user);
 
 #ifdef __cplusplus
 #if 0

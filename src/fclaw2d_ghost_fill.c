@@ -159,11 +159,11 @@ void copy2ghost(fclaw_global_t *glob,
     parallel_mode.user = (void*) &e_info;
 
     parallel_mode.cb_fill = cb_face_fill;
-    fclaw2d_global_iterate_level(glob, level, cb_parallel_wrap,
+    fclaw_global_iterate_level(glob, level, cb_parallel_wrap,
                          (void *) &parallel_mode);
     /* corner exchanges */
     parallel_mode.cb_fill = cb_corner_fill;
-    fclaw2d_global_iterate_level(glob, level, cb_parallel_wrap,
+    fclaw_global_iterate_level(glob, level, cb_parallel_wrap,
                           (void *) &parallel_mode);
 }
 
@@ -190,12 +190,12 @@ void average2ghost(fclaw_global_t *glob,
 	parallel_mode.ghost_mode = ghost_mode;
 
     parallel_mode.cb_fill = cb_face_fill;
-    fclaw2d_global_iterate_level(glob, coarse_level,
+    fclaw_global_iterate_level(glob, coarse_level,
                    cb_interface_wrap, (void *) &parallel_mode);
 
     /* Corner average */
     parallel_mode.cb_fill = cb_corner_fill;
-    fclaw2d_global_iterate_level(glob, coarse_level, cb_interface_wrap,
+    fclaw_global_iterate_level(glob, coarse_level, cb_interface_wrap,
                    (void *) &parallel_mode);
 
 	if (read_parallel_patches)
@@ -208,7 +208,7 @@ void average2ghost(fclaw_global_t *glob,
 
 		/* Face average */
 		parallel_mode.cb_fill = cb_face_fill;
-		fclaw2d_global_iterate_level(glob, fine_level,
+		fclaw_global_iterate_level(glob, fine_level,
 									 cb_interface_wrap, (void *) &parallel_mode);
 
 		/* Corner average :
@@ -251,12 +251,12 @@ void interpolate2ghost(fclaw_global_t *glob,
 
     /* Face interpolate */
     parallel_mode.cb_fill = cb_face_fill;
-    fclaw2d_global_iterate_level(glob,coarse_level, cb_interface_wrap,
+    fclaw_global_iterate_level(glob,coarse_level, cb_interface_wrap,
                                          (void *) &parallel_mode);
 
     /* Corner interpolate */
     parallel_mode.cb_fill = cb_corner_fill;
-    fclaw2d_global_iterate_level(glob,coarse_level, cb_interface_wrap,
+    fclaw_global_iterate_level(glob,coarse_level, cb_interface_wrap,
                   (void *) &parallel_mode);
     /* -----------------------------------------------------
        Second pass - Iterate over local fine grids, looking
@@ -271,13 +271,13 @@ void interpolate2ghost(fclaw_global_t *glob,
     int fine_level = coarse_level + 1;
 
     parallel_mode.cb_fill = cb_face_fill;
-    fclaw2d_global_iterate_level(glob, fine_level, cb_interface_wrap,
+    fclaw_global_iterate_level(glob, fine_level, cb_interface_wrap,
                                  (void *) &parallel_mode);
 
     /* Interpolate to corners at parallel boundaries from coarse grid
        ghost patches */
     parallel_mode.cb_fill = cb_corner_fill;
-    fclaw2d_global_iterate_level(glob, fine_level, cb_interface_wrap,
+    fclaw_global_iterate_level(glob, fine_level, cb_interface_wrap,
                                  (void *) &parallel_mode);
 }
 
@@ -299,7 +299,7 @@ void setphysical(fclaw_global_t *glob,
 	parallel_mode.user = (void*) &t_info;
 
 	parallel_mode.cb_fill = cb_fclaw2d_physical_set_bc;
-	fclaw2d_global_iterate_level(glob, level, cb_parallel_wrap,
+	fclaw_global_iterate_level(glob, level, cb_parallel_wrap,
 								 (void *) &parallel_mode);
 }
 

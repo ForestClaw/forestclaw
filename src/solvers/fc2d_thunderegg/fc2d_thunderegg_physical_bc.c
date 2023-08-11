@@ -111,7 +111,7 @@ void fc2d_thunderegg_physical_bc(fclaw_global_t *glob)
 
     fc2d_thunderegg_time_info_t tinfo;
     tinfo.t = glob->curr_time;
-    fclaw2d_global_iterate_patches(glob,
+    fclaw_global_iterate_patches(glob,
                                    cb_fc2d_thunderegg_physical_bc,
                                    (void *) &tinfo);
 }

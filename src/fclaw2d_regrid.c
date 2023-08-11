@@ -241,10 +241,10 @@ void fclaw2d_regrid(fclaw_global_t *glob)
     fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_REGRID_TAGGING]);
     /* First determine which families should be coarsened. */
     int domain_init = 0;
-    fclaw2d_global_iterate_families(glob, cb_regrid_tag4coarsening,
+    fclaw_global_iterate_families(glob, cb_regrid_tag4coarsening,
                                     (void *) &domain_init);
 
-    fclaw2d_global_iterate_patches(glob, cb_fclaw2d_regrid_tag4refinement,
+    fclaw_global_iterate_patches(glob, cb_fclaw2d_regrid_tag4refinement,
                                    (void *) &domain_init);
 
     fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_REGRID_TAGGING]);
@@ -275,7 +275,7 @@ void fclaw2d_regrid(fclaw_global_t *glob)
 
         /* Average to new coarse grids and interpolate to new fine grids */
         fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_REGRID_BUILD]);
-        fclaw2d_global_iterate_adapted(glob, new_domain,
+        fclaw_global_iterate_adapted(glob, new_domain,
                                        cb_fclaw2d_regrid_repopulate,
                                        (void *) &domain_init);
         fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_REGRID_BUILD]);
@@ -395,6 +395,6 @@ void cb_set_neighbor_types(fclaw_domain_t *domain,
 void fclaw2d_regrid_set_neighbor_types(fclaw_global_t *glob)
 {
 	fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_NEIGHBOR_SEARCH]);
-	fclaw2d_global_iterate_patches(glob,cb_set_neighbor_types,NULL);
+	fclaw_global_iterate_patches(glob,cb_set_neighbor_types,NULL);
 	fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_NEIGHBOR_SEARCH]);
 }

@@ -131,7 +131,7 @@ void fclaw2d_partition_domain(fclaw_global_t* glob,
 
     /* For all (patch i) { pack its numerical data into patch_data[i] }
        Does all the data in every patch need to be copied?  */
-    fclaw2d_global_iterate_patches(glob,
+    fclaw_global_iterate_patches(glob,
                                    cb_partition_pack,
                                    (void *) patch_data);
     fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_PARTITION_BUILD]);
@@ -172,7 +172,7 @@ void fclaw2d_partition_domain(fclaw_global_t* glob,
         fclaw2d_domain_retrieve_after_partition (domain_partitioned,&patch_data);
 
         /* New version? */
-        fclaw2d_global_iterate_partitioned(glob,domain_partitioned,
+        fclaw_global_iterate_partitioned(glob,domain_partitioned,
                                            cb_partition_transfer,
                                            (void*) patch_data);
 

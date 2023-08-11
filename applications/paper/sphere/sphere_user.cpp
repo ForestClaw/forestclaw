@@ -206,7 +206,7 @@ void cb_sphere_output_ascii (fclaw_domain_t * domain,
                             int this_block_idx, int this_patch_idx,
                             void *user)
 {
-    fclaw2d_global_iterate_t* s = (fclaw2d_global_iterate_t*) user;
+    fclaw_global_iterate_t* s = (fclaw_global_iterate_t*) user;
     fclaw_global_t      *glob = (fclaw_global_t*) s->glob;
 
     int iframe = *((int *) s->user);

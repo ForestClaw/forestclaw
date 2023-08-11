@@ -38,7 +38,7 @@ void cb_gem3d_output_mesh (fclaw_domain_t * domain,
                            int this_block_idx, int this_patch_idx,
                            void *user)
 {
-    fclaw2d_global_iterate_t* s = (fclaw2d_global_iterate_t*) user;
+    fclaw_global_iterate_t* s = (fclaw_global_iterate_t*) user;
     fclaw_global_t *glob = (fclaw_global_t*) s->glob;
 
     int patch_num;
@@ -148,7 +148,7 @@ void gem3d_output_mesh(fclaw_global_t* glob,int iframe)
 
     FILE *f;
     f = fopen(matname2,"w");
-    fclaw2d_global_iterate_patches (glob, cb_gem3d_output_mesh, f);
+    fclaw_global_iterate_patches (glob, cb_gem3d_output_mesh, f);
     fclose(f);
 
     fclaw2d_domain_serialization_leave (domain);

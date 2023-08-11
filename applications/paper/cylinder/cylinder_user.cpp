@@ -119,7 +119,7 @@ void cb_cylinder_output_ascii (fclaw_domain_t * domain,
                             int blockno, int patchno,
                             void *user)
 {
-    fclaw2d_global_iterate_t* s = (fclaw2d_global_iterate_t*) user;
+    fclaw_global_iterate_t* s = (fclaw_global_iterate_t*) user;
     fclaw_global_t      *glob = (fclaw_global_t*) s->glob;
 
     const user_options_t *user_opt =  cylinder_get_options(glob);

@@ -52,6 +52,6 @@ void fclaw2d_timeinterp(fclaw_global_t *glob,
                         int level,double alpha)
 {
     /* Store time interpolated data into m_griddata_time_sync. */
-    fclaw2d_global_iterate_level(glob,level,cb_setup_time_interp,
+    fclaw_global_iterate_level(glob,level,cb_setup_time_interp,
                                  (void *) &alpha);
 }

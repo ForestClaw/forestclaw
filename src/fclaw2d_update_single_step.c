@@ -85,16 +85,16 @@ double fclaw2d_update_single_step(fclaw_global_t *glob,
 
     /* If there are not grids at this level, we return CFL = 0 */
 #if defined(_OPENMP)        
-    fclaw2d_global_iterate_level_mthread(glob, level, 
+    fclaw_global_iterate_level_mthread(glob, level, 
                                          cb_single_step,(void *) &ss_data);
 #else
     /* Count number of grids to be updated in this call;  not sure how this
        works in OpenMP.  */
     int count = 0;
-    fclaw2d_global_iterate_level(glob, level, cb_single_step_count,&count);
+    fclaw_global_iterate_level(glob, level, cb_single_step_count,&count);
     ss_data.buffer_data.total_count = count;
 
-    fclaw2d_global_iterate_level(glob, level, 
+    fclaw_global_iterate_level(glob, level, 
                                  cb_single_step,(void *) &ss_data);
 #endif   
  

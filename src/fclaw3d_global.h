@@ -58,26 +58,6 @@ void fclaw3d_global_store_map (fclaw_global_t* glob,
 
 fclaw_map_context_t* fclaw3d_global_get_map(fclaw_global_t* glob);
 
-void fclaw3d_global_iterate_level (fclaw_global_t * glob, int level,
-                                   fclaw_patch_callback_t pcb, void *user);
-
-void fclaw3d_global_iterate_patches (fclaw_global_t * glob,
-                                     fclaw_patch_callback_t pcb, void *user);
-
-void fclaw3d_global_iterate_families (fclaw_global_t * glob,
-                                      fclaw_patch_callback_t pcb, void *user);
-
-void fclaw3d_global_iterate_adapted (fclaw_global_t * glob,
-                                     struct fclaw_domain* new_domain,
-                                     fclaw_match_callback_t mcb, void *user);
-
-void fclaw3d_global_iterate_level_mthread (fclaw_global_t * glob, int level,
-                                           fclaw_patch_callback_t pcb, void *user);
-
-void fclaw3d_global_iterate_partitioned (fclaw_global_t * glob,
-                                         struct fclaw_domain * new_domain,
-                                         fclaw_transfer_callback_t tcb,
-                                         void *user);
 /**
  * @brief Store an options structure in the glob
  * 

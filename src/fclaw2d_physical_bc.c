@@ -105,7 +105,7 @@ void fclaw2d_physical_set_bc(fclaw_global_t *glob,
     fclaw2d_physical_time_info_t t_info;
     t_info.level_time = sync_time;
     t_info.time_interp = time_interp;
-    fclaw2d_global_iterate_level(glob, level,
+    fclaw_global_iterate_level(glob, level,
                                  cb_fclaw2d_physical_set_bc,
                                  (void *) &t_info);
 }
