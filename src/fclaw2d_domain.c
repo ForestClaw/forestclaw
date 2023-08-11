@@ -71,7 +71,6 @@ typedef struct fcd_allocated_patch
 #else
     fclaw3d_patch_data_t pd;
 #endif
-    fclaw_patch_t p;
 }
 fcd_allocated_patch_t;
 
@@ -110,13 +109,12 @@ fclaw_domain_new2d (fclaw2d_domain_t * domain,
             /* hook the new dimension-independent patch into storage */
             ap = (fcd_allocated_patch_t *) sc_mstamp_alloc (&d->pstamp);
             patch = block->patches + j;
-            patch->user = p = &ap->p;
 #ifndef P4_TO_P8
-            p->pd.pd2 = &ap->pd;
-            p->pd.pd2->real_patch = patch;
+            //p->pd.pd2 = &ap->pd;
+            //p->pd.pd2->real_patch = patch;
 #else
-            p->pd.pd3 = &ap->pd;
-            p->pd.pd3->real_patch = patch;
+            //p->pd.pd3 = &ap->pd;
+            //p->pd.pd3->real_patch = patch;
 #endif
             if (init != NULL) {
                 init (d, p, i, j, user);
