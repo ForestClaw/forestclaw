@@ -1488,17 +1488,6 @@ typedef struct fclaw_patch_vtable_d2
 
     /** @} */
 
-    /** @{ @name Time Syncing Functions for Conservation */
-
-    /** @copybrief ::fclaw2d_patch_time_sync_f2c_t */
-    fclaw2d_patch_time_sync_f2c_t         time_sync_f2c;
-    /** @copybrief ::fclaw2d_patch_time_sync_samesize_t */
-    fclaw2d_patch_time_sync_samesize_t    time_sync_samesize;
-    /** @copybrief ::fclaw2d_patch_time_sync_reset_t */
-    fclaw2d_patch_time_sync_reset_t       time_sync_reset;
-
-    /** @} */
-
 } fclaw_patch_vtable_d2_t;
 
 typedef struct fclaw_patch_vtable_d3
@@ -1537,17 +1526,6 @@ typedef struct fclaw_patch_vtable_d3
     fclaw2d_patch_average_corner_t        average_block_corner;
     /** @copybrief ::fclaw2d_patch_interpolate_corner_t */
     fclaw2d_patch_interpolate_corner_t    interpolate_block_corner;
-
-    /** @} */
-
-    /** @{ @name Time Syncing Functions for Conservation */
-
-    /** @copybrief ::fclaw2d_patch_time_sync_f2c_t */
-    fclaw2d_patch_time_sync_f2c_t         time_sync_f2c;
-    /** @copybrief ::fclaw2d_patch_time_sync_samesize_t */
-    fclaw2d_patch_time_sync_samesize_t    time_sync_samesize;
-    /** @copybrief ::fclaw2d_patch_time_sync_reset_t */
-    fclaw2d_patch_time_sync_reset_t     time_sync_reset;
 
     /** @} */
 
@@ -1665,6 +1643,17 @@ struct fclaw_patch_vtable
     fclaw2d_patch_transform_blockface_t        transform_face;
     /** @copybrief ::fclaw2d_patch_transform_blockface_intra_t */
     fclaw2d_patch_transform_blockface_intra_t  transform_face_intra;
+
+    /** @} */
+
+    /** @{ @name Time Syncing Functions for Conservation */
+
+    /** @copybrief ::fclaw2d_patch_time_sync_f2c_t */
+    fclaw2d_patch_time_sync_f2c_t         time_sync_f2c;
+    /** @copybrief ::fclaw2d_patch_time_sync_samesize_t */
+    fclaw2d_patch_time_sync_samesize_t    time_sync_samesize;
+    /** @copybrief ::fclaw2d_patch_time_sync_reset_t */
+    fclaw2d_patch_time_sync_reset_t       time_sync_reset;
 
     /** @} */
 

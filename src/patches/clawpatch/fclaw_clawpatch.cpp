@@ -1556,9 +1556,9 @@ void fclaw_clawpatch_vtable_initialize(int dim, fclaw_global_t* glob,
     if(clawpatch_vt->dim == 2)
     {
         /* Timing syncing module for conservation */
-        patch_vt->d2->time_sync_f2c       = fclaw2d_clawpatch_time_sync_f2c;
-        patch_vt->d2->time_sync_samesize  = fclaw2d_clawpatch_time_sync_samesize;
-        patch_vt->d2->time_sync_reset     = fclaw2d_clawpatch_time_sync_reset;
+        patch_vt->time_sync_f2c       = fclaw2d_clawpatch_time_sync_f2c;
+        patch_vt->time_sync_samesize  = fclaw2d_clawpatch_time_sync_samesize;
+        patch_vt->time_sync_reset     = fclaw2d_clawpatch_time_sync_reset;
     }
 
     /* Transform functions (defined in forestclaw2d */

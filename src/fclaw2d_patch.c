@@ -747,13 +747,13 @@ void fclaw2d_patch_time_sync_f2c(fclaw_global_t* glob,
 								 fclaw_patch_transform_data_t* transform_data)
 {
 	fclaw_patch_vtable_t *patch_vt = fclaw_patch_vt(glob);
-	FCLAW_ASSERT(patch_vt->d2->time_sync_f2c != NULL);
+	FCLAW_ASSERT(patch_vt->time_sync_f2c != NULL);
 
-	patch_vt->d2->time_sync_f2c(glob,coarse_patch,fine_patch,
-	                            coarse_blockno, fine_blockno,
-	                            coarse_patchno, 
-	                            idir, igrid,iface_coarse,time_interp,
-	                            transform_data);    
+	patch_vt->time_sync_f2c(glob,coarse_patch,fine_patch,
+	                        coarse_blockno, fine_blockno,
+	                        coarse_patchno, 
+	                        idir, igrid,iface_coarse,time_interp,
+	                        transform_data);    
 }
 
 /* Correct for metric discontinuities at block boundaries */
@@ -765,10 +765,10 @@ void fclaw2d_patch_time_sync_samesize(fclaw_global_t* glob,
 
 {
 	fclaw_patch_vtable_t *patch_vt = fclaw_patch_vt(glob);
-	FCLAW_ASSERT(patch_vt->d2->time_sync_samesize != NULL);
+	FCLAW_ASSERT(patch_vt->time_sync_samesize != NULL);
 
-	patch_vt->d2->time_sync_samesize(glob,this_patch,neighbor_patch,iface,idir,
-	                                 transform_data);    
+	patch_vt->time_sync_samesize(glob,this_patch,neighbor_patch,iface,idir,
+	                             transform_data);    
 }
 
 void fclaw2d_patch_time_sync_reset(fclaw_global_t* glob,
@@ -777,9 +777,9 @@ void fclaw2d_patch_time_sync_reset(fclaw_global_t* glob,
                                    int reset_mode)
 {
 	fclaw_patch_vtable_t *patch_vt = fclaw_patch_vt(glob);
-	FCLAW_ASSERT(patch_vt->d2->time_sync_reset != NULL);
+	FCLAW_ASSERT(patch_vt->time_sync_reset != NULL);
 
-	patch_vt->d2->time_sync_reset(glob,this_patch,coarse_level, reset_mode);
+	patch_vt->time_sync_reset(glob,this_patch,coarse_level, reset_mode);
 
 }
 
