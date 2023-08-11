@@ -154,7 +154,7 @@ void fclaw2d_domain_reset(fclaw_global_t* glob)
 }
 
 void fclaw2d_domain_iterate_level_mthread (fclaw_domain_t * domain, int level,
-                                           fclaw2d_patch_callback_t pcb, void *user)
+                                           fclaw_patch_callback_t pcb, void *user)
 {
 #if (_OPENMP)
     int i, j;

@@ -87,7 +87,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 typedef struct fclaw2d_ghost_fill_wrap_info
 {
 	fclaw2d_ghost_fill_parallel_mode_t ghost_mode;
-	fclaw2d_patch_callback_t cb_fill;
+	fclaw_patch_callback_t cb_fill;
 	void *user;
 } fclaw2d_ghost_fill_wrap_info_t;
 

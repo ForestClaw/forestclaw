@@ -54,29 +54,29 @@ void fclaw3d_iterate_family_cb
 /* much of the following will move into fclaw_global.h */
 
 void fclaw3d_global_store_map (fclaw_global_t* glob,
-                               fclaw3d_map_context_t * map);
+                               fclaw_map_context_t * map);
 
-fclaw3d_map_context_t* fclaw3d_global_get_map(fclaw_global_t* glob);
+fclaw_map_context_t* fclaw3d_global_get_map(fclaw_global_t* glob);
 
 void fclaw3d_global_iterate_level (fclaw_global_t * glob, int level,
-                                   fclaw3d_patch_callback_t pcb, void *user);
+                                   fclaw_patch_callback_t pcb, void *user);
 
 void fclaw3d_global_iterate_patches (fclaw_global_t * glob,
-                                     fclaw3d_patch_callback_t pcb, void *user);
+                                     fclaw_patch_callback_t pcb, void *user);
 
 void fclaw3d_global_iterate_families (fclaw_global_t * glob,
-                                      fclaw3d_patch_callback_t pcb, void *user);
+                                      fclaw_patch_callback_t pcb, void *user);
 
 void fclaw3d_global_iterate_adapted (fclaw_global_t * glob,
                                      struct fclaw_domain* new_domain,
-                                     fclaw3d_match_callback_t mcb, void *user);
+                                     fclaw_match_callback_t mcb, void *user);
 
 void fclaw3d_global_iterate_level_mthread (fclaw_global_t * glob, int level,
-                                           fclaw3d_patch_callback_t pcb, void *user);
+                                           fclaw_patch_callback_t pcb, void *user);
 
 void fclaw3d_global_iterate_partitioned (fclaw_global_t * glob,
                                          struct fclaw_domain * new_domain,
-                                         fclaw3d_transfer_callback_t tcb,
+                                         fclaw_transfer_callback_t tcb,
                                          void *user);
 /**
  * @brief Store an options structure in the glob

@@ -42,11 +42,11 @@ extern "C"
 #endif
 
 struct fclaw3d_map_context;
-typedef struct fclaw3d_map_context fclaw3d_map_context_t;
+typedef struct fclaw3d_map_context fclaw_map_context_t;
 
 /** Destructor for a fclaw3d_map_context.
 */
-typedef void (*fclaw3d_map_destroy_t) (fclaw3d_map_context_t * cont);
+typedef void (*fclaw3d_map_destroy_t) (fclaw_map_context_t * cont);
 
 /** Mapping context that is interpreted by its query and c2m members.
 * The callbacks are free to define the meaning of the user_* fields.
@@ -63,9 +63,9 @@ struct fclaw3d_map_context
  * \param [in] cont     Mapping context where the \a destroy member is either
  *                      NULL or a valid function that is then called.
  */
-void fclaw3d_map_destroy (fclaw3d_map_context_t * cont);
+void fclaw3d_map_destroy (fclaw_map_context_t * cont);
 
-fclaw3d_map_context_t* fclaw3d_map_new_nomap (void);
+fclaw_map_context_t* fclaw3d_map_new_nomap (void);
 
 #ifdef __cplusplus
 }

@@ -376,7 +376,7 @@ struct fclaw_clawpatch_vtable
     clawpatch_fort_header_ascii_t          fort_header_ascii;
 
     /** Called for every patch when outputing ascii */
-    fclaw2d_patch_callback_t               cb_output_ascii;    
+    fclaw_patch_callback_t               cb_output_ascii;    
 
     /** @} */
 

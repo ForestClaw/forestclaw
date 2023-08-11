@@ -200,7 +200,7 @@ int fclaw3d_patch_is_ghost (const fclaw_patch_t * patch);
  * \param [in] patchno  Patch number within block of processed patch.
  * \param [in,out] user	Data that was passed into the iterator functions.
  */
-typedef void (*fclaw3d_patch_callback_t)
+typedef void (*fclaw_patch_callback_t)
     (fclaw_domain_t * domain, fclaw_patch_t * patch,
      int blockno, int patchno, void *user);
 
@@ -211,7 +211,7 @@ typedef void (*fclaw3d_patch_callback_t)
  * \param [in,out] user	Data is passed to the pcb callback.
  */
 void fclaw3d_domain_iterate_level (fclaw_domain_t * domain, int level,
-                                   fclaw3d_patch_callback_t pcb, void *user);
+                                   fclaw_patch_callback_t pcb, void *user);
 
 /** Iterate over all local patches of all levels.
  * \param [in] domain	General domain structure.
@@ -219,7 +219,7 @@ void fclaw3d_domain_iterate_level (fclaw_domain_t * domain, int level,
  * \param [in,out] user	Data is passed to the pcb callback.
  */
 void fclaw3d_domain_iterate_patches (fclaw_domain_t * domain,
-                                     fclaw3d_patch_callback_t pcb,
+                                     fclaw_patch_callback_t pcb,
                                      void *user);
 
 /** Iterate over all families of local sibling patches.
@@ -231,7 +231,7 @@ void fclaw3d_domain_iterate_patches (fclaw_domain_t * domain,
  * \param [in,out] user	Data is passed to the pcb callback.
  */
 void fclaw3d_domain_iterate_families (fclaw_domain_t * domain,
-                                      fclaw3d_patch_callback_t pcb,
+                                      fclaw_patch_callback_t pcb,
                                       void *user);
 
 ///@}
@@ -612,7 +612,7 @@ void fclaw3d_patch_mark_coarsen (fclaw_domain_t * domain,
  * If coarsened (new patch is DOUBLESIZE), situation is the reverse of refine.
  * We iterate over local patches only.
  */
-typedef void (*fclaw3d_match_callback_t) (fclaw_domain_t * old_domain,
+typedef void (*fclaw_match_callback_t) (fclaw_domain_t * old_domain,
                                           fclaw_patch_t * old_patch,
                                           fclaw_domain_t * new_domain,
                                           fclaw_patch_t * new_patch,
@@ -630,7 +630,7 @@ typedef void (*fclaw3d_match_callback_t) (fclaw_domain_t * old_domain,
  */
 void fclaw3d_domain_iterate_adapted (fclaw_domain_t * old_domain,
                                      fclaw_domain_t * new_domain,
-                                     fclaw3d_match_callback_t mcb,
+                                     fclaw_match_callback_t mcb,
                                      void *user);
 
 ///@}
@@ -682,7 +682,7 @@ void fclaw3d_domain_retrieve_after_partition (fclaw_domain_t * domain,
  * \param [in,out] user         Pointer passed to \ref
  *                              fclaw3d_domain_iterate_partitioned.
  */
-typedef void (*fclaw3d_transfer_callback_t) (fclaw_domain_t * old_domain,
+typedef void (*fclaw_transfer_callback_t) (fclaw_domain_t * old_domain,
                                              fclaw_patch_t * old_patch,
                                              fclaw_domain_t * new_domain,
                                              fclaw_patch_t * new_patch,
@@ -699,7 +699,7 @@ typedef void (*fclaw3d_transfer_callback_t) (fclaw_domain_t * old_domain,
  */
 void fclaw3d_domain_iterate_partitioned (fclaw_domain_t * old_domain,
                                          fclaw_domain_t * new_domain,
-                                         fclaw3d_transfer_callback_t tcb,
+                                         fclaw_transfer_callback_t tcb,
                                          void *user);
 
 /** Free buffers that were used in transfering data during partition.

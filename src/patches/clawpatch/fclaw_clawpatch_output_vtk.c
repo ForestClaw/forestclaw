@@ -447,7 +447,7 @@ write_meqn_cb (fclaw_domain_t * domain, fclaw_patch_t * patch,
 static void
 fclaw2d_vtk_write_field (fclaw_global_t * glob, fclaw2d_vtk_state_t * s,
                          int64_t offset_field, int64_t psize_field,
-                         fclaw2d_patch_callback_t cb)
+                         fclaw_patch_callback_t cb)
 {
     fclaw_domain_t *domain = glob->domain;
 

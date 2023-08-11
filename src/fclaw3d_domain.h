@@ -66,7 +66,7 @@ fclaw3d_domain_data_t* fclaw3d_domain_get_data(struct fclaw_domain *domain);
 
 /* OpenMP iterator (not part of forestclaw3d.h */
 void fclaw3d_domain_iterate_level_mthread (struct fclaw_domain * domain, int level,
-                                           fclaw3d_patch_callback_t pcb, void *user);
+                                           fclaw_patch_callback_t pcb, void *user);
 
 /* below are the functions needed for dimension independence */
 
