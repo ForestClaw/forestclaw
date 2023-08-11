@@ -368,7 +368,7 @@ void fclaw2d_clawpatch_time_sync_f2c(fclaw_global_t* glob,
                                      int igrid,
                                      int iface_coarse,
                                      int time_interp,
-                                     fclaw2d_patch_transform_data_t
+                                     fclaw_patch_transform_data_t
                                      *transform_data)
 {
 	/* We don't correct time interpolated grids, since we assume that the time 
@@ -434,7 +434,7 @@ void fclaw2d_clawpatch_time_sync_samesize (struct fclaw_global* glob,
                                            struct fclaw_patch* this_patch,
                                            struct fclaw_patch* neighbor_patch,
                                            int this_iface,int idir,
-                                           fclaw2d_patch_transform_data_t
+                                           fclaw_patch_transform_data_t
                                            *transform_data)
 {
 	/* We don't correct time interpolated grids, since we assume that the time 

@@ -141,7 +141,7 @@ void get_corner_neighbor(fclaw_global_t *glob,
                          int **ref_flag_ptr,
                          int *block_corner_count,
                          int ftransform[],
-                         fclaw2d_patch_transform_data_t* ftransform_finegrid)
+                         fclaw_patch_transform_data_t* ftransform_finegrid)
 {
     fclaw_domain_t *domain = glob->domain;
     /* See what p4est thinks we have for corners, and consider four cases */
@@ -177,7 +177,7 @@ void get_corner_neighbor(fclaw_global_t *glob,
         interior 'default' transforms. */
         fclaw2d_patch_transform_blockface_intra (glob, ftransform);
         fclaw2d_patch_transform_blockface_intra
-            (glob, ftransform_finegrid->transform);
+            (glob, ftransform_finegrid->d2->transform);
     }
     else if (!has_corner_neighbor && !is_block_corner)
     {
@@ -224,8 +224,8 @@ void get_corner_neighbor(fclaw_global_t *glob,
             int rface1 = rfaceno;
             fclaw2d_patch_face_swap(&iface1,&rface1);
             fclaw2d_patch_transform_blockface(glob, iface1, rface1,
-                                              ftransform_finegrid->transform);
-            ftransform_finegrid->block_iface = iface1;
+                                              ftransform_finegrid->d2->transform);
+            ftransform_finegrid->d2->block_iface = iface1;
         }
         else if (this_block_idx == *corner_block_idx)
         {
@@ -234,7 +234,7 @@ void get_corner_neighbor(fclaw_global_t *glob,
             *block_corner_count = 4;  /* assume four for now */
             fclaw2d_patch_transform_blockface_intra (glob, ftransform);
             fclaw2d_patch_transform_blockface_intra
-                (glob, ftransform_finegrid->transform);
+                (glob, ftransform_finegrid->d2->transform);
 
         }
         else
@@ -364,7 +364,17 @@ void cb_corner_fill(fclaw_domain_t *domain,
     fclaw2d_block_get_block_boundary(s->glob, this_patch, intersects_block);
 
     /* Transform data needed at multi-block boundaries */
-    fclaw2d_patch_transform_data_t transform_data;
+    fclaw_patch_transform_data_t transform_data;
+	transform_data.dim = s->glob->domain->dim;
+
+	fclaw_patch_transform_data_d2_t transform_data_d2;
+	transform_data.d2 = &transform_data_d2;
+#ifndef P4_TO_P8
+	transform_data.d3 = NULL;
+#else
+	transform_data.d2 = NULL;
+#endif
+
     transform_data.glob = s->glob;
     transform_data.based = 1;   // cell-centered data in this routine.
     transform_data.this_patch = this_patch;
@@ -376,7 +386,16 @@ void cb_corner_fill(fclaw_domain_t *domain,
                                       &transform_data);
 
 
-    fclaw2d_patch_transform_data_t transform_data_finegrid;
+    fclaw_patch_transform_data_t transform_data_finegrid;
+	transform_data_finegrid.dim = s->glob->domain->dim;
+
+	fclaw_patch_transform_data_d2_t transform_data_finegrid_d2;
+	transform_data_finegrid.d2 = &transform_data_finegrid_d2;
+#ifndef P4_TO_P8
+	transform_data_finegrid.d3 = NULL;
+#else
+	transform_data_finegrid.d2 = NULL;
+#endif
     transform_data_finegrid.glob = s->glob;
     transform_data_finegrid.based = 1;   // cell-centered data in this routine.
 
@@ -394,9 +413,9 @@ void cb_corner_fill(fclaw_domain_t *domain,
                         intersects_block,
                         &is_interior_corner,
                         &is_block_corner,
-                        &transform_data.block_iface);
+                        &transform_data.d2->block_iface);
 
-        transform_data_finegrid.block_iface = -1;
+        transform_data_finegrid.d2->block_iface = -1;
 
         /* Sets block_corner_count to 0 */
         fclaw2d_patch_set_block_corner_count(s->glob, this_patch,
@@ -412,31 +431,31 @@ void cb_corner_fill(fclaw_domain_t *domain,
             fclaw_patch_t *corner_patch;
             int rcornerno;
 
-            transform_data.icorner = icorner;
+            transform_data.d2->icorner = icorner;
             corner_block_idx = -1;
             get_corner_neighbor(s->glob,
                                 this_block_idx,
                                 this_patch_idx,
                                 this_patch,
                                 icorner,
-                                transform_data.block_iface,
+                                transform_data.d2->block_iface,
                                 is_block_corner,
                                 &corner_block_idx,
                                 &corner_patch,
                                 &rcornerno,
                                 &ref_flag_ptr,
                                 &block_corner_count,
-                                transform_data.transform,
+                                transform_data.d2->transform,
                                 &transform_data_finegrid);
 
             /* This sets value in block_corner_count_array */
             fclaw2d_patch_set_block_corner_count(s->glob, this_patch,
                                                  icorner,block_corner_count);
-            transform_data.is_block_corner = is_block_corner;
+            transform_data.d2->is_block_corner = is_block_corner;
 
             /* Needed for switching the context */
-            transform_data_finegrid.is_block_corner = is_block_corner;
-            transform_data_finegrid.icorner = rcornerno;
+            transform_data_finegrid.d2->is_block_corner = is_block_corner;
+            transform_data_finegrid.d2->icorner = rcornerno;
             transform_data_finegrid.this_patch = corner_patch;
             transform_data_finegrid.neighbor_patch = this_patch;
 
@@ -518,7 +537,7 @@ void cb_corner_fill(fclaw_domain_t *domain,
                        local fine grid patch.  We do not need to average to the 
                        remote patch corners unless corners are used in the 
                        interpolation stencil. */
-                    int coarse_icorner = transform_data_finegrid.icorner;
+                    int coarse_icorner = transform_data_finegrid.d2->icorner;
                     fclaw2d_patch_interpolate_corner(s->glob,
                                                      coarse_patch,
                                                      fine_patch,

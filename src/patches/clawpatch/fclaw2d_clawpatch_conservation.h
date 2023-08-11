@@ -41,7 +41,7 @@ extern "C"
 #endif
 #endif
 
-struct fclaw2d_patch_transform_data;
+struct fclaw_patch_transform_data;
 struct fclaw_global;
 struct fclaw_patch;
 
@@ -125,7 +125,7 @@ typedef void  (*clawpatch_fort_time_sync_f2c_t)(const int* mx,
                         double eff0[], double eff1[],
                         double eff2[], double eff3[],
                         double qfine_dummy[],
-                        struct fclaw2d_patch_transform_data** 
+                        struct fclaw_patch_transform_data** 
                         transform_cptr);
 
 /**
@@ -177,7 +177,7 @@ typedef void  (*clawpatch_fort_time_sync_samesize_t)(const int* mx,
                                                      double efnbr0[], double efnbr1[],
                                                      double efnbr2[], double efnbr3[],
                                                      double qnbr_dummy[],
-                                                     struct fclaw2d_patch_transform_data** 
+                                                     struct fclaw_patch_transform_data** 
                                                      transform_cptr);
 
 
@@ -240,7 +240,7 @@ void fclaw2d_clawpatch_time_sync_f2c(struct fclaw_global* glob,
                                      int igrid,
                                      int iface_coarse,
                                      int time_interp,
-                                     struct fclaw2d_patch_transform_data
+                                     struct fclaw_patch_transform_data
                                      *transform_data);
 	
 /**
@@ -258,7 +258,7 @@ void fclaw2d_clawpatch_time_sync_samesize(struct fclaw_global* glob,
                                           struct fclaw_patch* this_patch,
                                           struct fclaw_patch* neighbor_patch,
                                           int this_iface,int idir,
-                                          struct fclaw2d_patch_transform_data
+                                          struct fclaw_patch_transform_data
                                           *transform_data);
 
 /**

@@ -590,7 +590,7 @@ void geoclaw_average_face(fclaw_global_t *glob,
                           int refratio,
                           int time_interp,
                           int igrid,
-                          fclaw2d_patch_transform_data_t* transform_data)
+                          fclaw_patch_transform_data_t* transform_data)
 {
     int mx,my,mbc;
     double xlower,ylower,dx,dy;
@@ -638,7 +638,7 @@ void geoclaw_interpolate_face(fclaw_global_t *glob,
                               int refratio,
                               int time_interp,
                               int igrid,
-                              fclaw2d_patch_transform_data_t* transform_data)
+                              fclaw_patch_transform_data_t* transform_data)
 {
     int mx,my,mbc;
     double xlower,ylower,dx,dy;
@@ -669,7 +669,7 @@ void geoclaw_average_corner(fclaw_global_t *glob,
                             int fine_blockno,
                             int coarse_corner,
                             int time_interp,
-                            fclaw2d_patch_transform_data_t* transform_data)
+                            fclaw_patch_transform_data_t* transform_data)
 {
     int mx,my,mbc;
     double xlower,ylower,dx,dy;
@@ -714,7 +714,7 @@ void geoclaw_interpolate_corner(fclaw_global_t* glob,
                                 int fine_blockno,
                                 int coarse_corner,
                                 int time_interp,
-                                fclaw2d_patch_transform_data_t* transform_data)
+                                fclaw_patch_transform_data_t* transform_data)
 
 {
     int mx,my,mbc;

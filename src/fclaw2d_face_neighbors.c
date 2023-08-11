@@ -77,7 +77,7 @@ void get_face_neighbors(fclaw_global_t *glob,
 						int **fine_grid_pos_ptr,
 						int **iface_neighbor_ptr,
 						int ftransform[],
-						fclaw2d_patch_transform_data_t* ftransform_finegrid)
+						fclaw_patch_transform_data_t* ftransform_finegrid)
 {
 	fclaw_domain_t *domain = glob->domain;
 	int rproc[FCLAW2D_NUMFACENEIGHBORS];
@@ -131,8 +131,8 @@ void get_face_neighbors(fclaw_global_t *glob,
 		rface1 = rfaceno;
 		fclaw2d_patch_face_swap(&iface1,&rface1);
 		fclaw2d_patch_transform_blockface (glob, iface1, rface1,
-										   ftransform_finegrid->transform);
-		ftransform_finegrid->block_iface = iface1;
+										   ftransform_finegrid->d2->transform);
+		ftransform_finegrid->d2->block_iface = iface1;
 		**iface_neighbor_ptr = iface1;
 
 
@@ -142,7 +142,7 @@ void get_face_neighbors(fclaw_global_t *glob,
 			FCLAW_ASSERT (*neighbor_block_idx == -1);
 			fclaw2d_patch_transform_blockface_intra (glob, ftransform);
 			fclaw2d_patch_transform_blockface_intra
-				(glob, ftransform_finegrid->transform);
+				(glob, ftransform_finegrid->d2->transform);
 		}
 
 		if (neighbor_type == FCLAW_PATCH_SAMESIZE)
@@ -229,7 +229,18 @@ void cb_face_fill(fclaw_domain_t *domain,
 
 
 	/* Transform data needed at block boundaries */
-	fclaw2d_patch_transform_data_t transform_data;
+	fclaw_patch_transform_data_t transform_data;
+
+	transform_data.dim = s->glob->domain->dim;
+
+	fclaw_patch_transform_data_d2_t transform_data_d2;
+	transform_data.d2 = &transform_data_d2;
+#ifndef P4_TO_P8
+	transform_data.d3 = NULL;
+#else
+	transform_data.d2 = NULL;
+#endif
+
 	transform_data.glob = s->glob;
 	transform_data.based = 1;             /* Set by user defined patch routine */
 	transform_data.this_patch = this_patch;
@@ -241,7 +252,18 @@ void cb_face_fill(fclaw_domain_t *domain,
 									  this_patch_idx,
 									  &transform_data);
 
-	fclaw2d_patch_transform_data_t transform_data_finegrid;
+	fclaw_patch_transform_data_t transform_data_finegrid;
+
+	transform_data_finegrid.dim = s->glob->domain->dim;
+
+	fclaw_patch_transform_data_d2_t transform_data_finegrid_d2;
+	transform_data_finegrid.d2 = &transform_data_finegrid_d2;
+#ifndef P4_TO_P8
+	transform_data_finegrid.d3 = NULL;
+#else
+	transform_data_finegrid.d2 = NULL;
+#endif
+
 	transform_data_finegrid.glob = s->glob;
 	transform_data_finegrid.based = 1;   /* cell-centered data in this routine. */
 
@@ -283,7 +305,7 @@ void cb_face_fill(fclaw_domain_t *domain,
 
 			/* Reset this in case it got set in a remote copy */
 			transform_data.this_patch = this_patch;
-			transform_data_finegrid.block_iface = -1;
+			transform_data_finegrid.d2->block_iface = -1;
 
 			/* transform_data.block_iface = iface; */
 			get_face_neighbors(s->glob,
@@ -296,7 +318,7 @@ void cb_face_fill(fclaw_domain_t *domain,
 							   &ref_flag_ptr,
 							   &fine_grid_pos_ptr,
 							   &iface_neighbor_ptr,
-							   transform_data.transform,
+							   transform_data.d2->transform,
 							   &transform_data_finegrid);
 
 			/* Needed for switching the context */
@@ -469,7 +491,18 @@ void fclaw2d_face_neighbor_ghost(fclaw_global_t* glob,
 
 	int min_interp_level = time_interp ? minlevel-1 : minlevel;
 
-	fclaw2d_patch_transform_data_t transform_data;
+	fclaw_patch_transform_data_t transform_data;
+
+	transform_data.dim = domain->dim;
+
+	fclaw_patch_transform_data_d2_t transform_data_d2;
+	transform_data.d2 = &transform_data_d2;
+#ifndef P4_TO_P8
+	transform_data.d3 = NULL;
+#else
+	transform_data.d2 = NULL;
+#endif
+
 	transform_data.glob = glob;
 	transform_data.based = 1;      /* cell-centered data in this routine. */
 
@@ -532,11 +565,11 @@ void fclaw2d_face_neighbor_ghost(fclaw_global_t* glob,
 
 
 				fclaw2d_patch_transform_blockface (glob, iface, rfaceno,
-												   transform_data.transform);
+												   transform_data.d2->transform);
 
 				if (!is_block_face)
 				{
-					fclaw2d_patch_transform_blockface_intra(glob, transform_data.transform);
+					fclaw2d_patch_transform_blockface_intra(glob, transform_data.d2->transform);
 				}
 				if (neighbor_type == FCLAW_PATCH_SAMESIZE)
 				{

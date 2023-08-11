@@ -629,7 +629,7 @@ void clawpatch_copy_face(fclaw_global_t *glob,
                          fclaw_patch_t *neighbor_patch,
                          int iface,
                          int time_interp,
-                         fclaw2d_patch_transform_data_t *transform_data)
+                         fclaw_patch_transform_data_t *transform_data)
 
 {
 
@@ -678,7 +678,7 @@ void clawpatch_average_face(fclaw_global_t *glob,
                             int refratio,
                             int time_interp,
                             int igrid,
-                            fclaw2d_patch_transform_data_t* transform_data)
+                            fclaw_patch_transform_data_t* transform_data)
 {
     int meqn;
     double *qcoarse;
@@ -731,7 +731,7 @@ void clawpatch_interpolate_face(fclaw_global_t *glob,
                                 int refratio,
                                 int time_interp,
                                 int igrid,
-                                fclaw2d_patch_transform_data_t* transform_data)
+                                fclaw_patch_transform_data_t* transform_data)
 {
 
     const fclaw_clawpatch_options_t *clawpatch_opt = fclaw_clawpatch_get_options(glob);
@@ -774,7 +774,7 @@ void clawpatch_copy_corner(fclaw_global_t *glob,
                            int fine_blockno,
                            int icorner,
                            int time_interp,
-                           fclaw2d_patch_transform_data_t *transform_data)
+                           fclaw_patch_transform_data_t *transform_data)
 {
 
     const fclaw_clawpatch_options_t *clawpatch_opt = 
@@ -818,7 +818,7 @@ void clawpatch_average_corner(fclaw_global_t *glob,
                               int fine_blockno,
                               int coarse_corner,
                               int time_interp,
-                              fclaw2d_patch_transform_data_t* transform_data)
+                              fclaw_patch_transform_data_t* transform_data)
 {
     int meqn;
     double *qcoarse;
@@ -874,7 +874,7 @@ void clawpatch_interpolate_corner(fclaw_global_t* glob,
                                   int fine_blockno,
                                   int coarse_corner,
                                   int time_interp,
-                                  fclaw2d_patch_transform_data_t* transform_data)
+                                  fclaw_patch_transform_data_t* transform_data)
 
 {
     const fclaw_clawpatch_options_t *clawpatch_opt = fclaw_clawpatch_get_options(glob);

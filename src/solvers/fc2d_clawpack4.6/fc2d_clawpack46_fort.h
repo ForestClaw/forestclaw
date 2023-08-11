@@ -136,7 +136,7 @@ void  CLAWPACK46_FORT_TIME_SYNC_F2C(const int* mx,const int* my,
 									double eff0[], double eff1[],
 									double eff2[], double eff3[],
 									double qfine_dummy[],
-									struct fclaw2d_patch_transform_data** 
+									struct fclaw_patch_transform_data** 
 									transform_cptr);
 
 
@@ -160,7 +160,7 @@ void  CLAWPACK46_FORT_TIME_SYNC_SAMESIZE(const int* mx,const int* my,
                                          double eff0[], double eff1[],
                                          double eff2[], double eff3[],
                                          double qfine_dummy[],
-                                         struct fclaw2d_patch_transform_data** 
+                                         struct fclaw_patch_transform_data** 
                                          transform_cptr);
 
 /* ------------------------------- Time stepping functions ---------------------------- */

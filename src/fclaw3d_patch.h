@@ -47,8 +47,6 @@ extern "C"
 typedef struct fclaw3d_patch_vtable          fclaw3d_patch_vtable_t;
 /** patch data type */
 typedef struct fclaw3d_patch_data            fclaw3d_patch_data_t;
-/** transform data type */
-typedef struct fclaw3d_patch_transform_data  fclaw3d_patch_transform_data_t;
 
 /**
  * @brief Structure for user patch data
@@ -88,53 +86,6 @@ struct fclaw3d_patch_data
     /** Additional user data */
     void *user_data;
 };
-
-/**
- * @brief Transform data for a neighboring patch's coordinate system
- */
-struct fclaw3d_patch_transform_data
-{
-    /** Pointer to this patch */
-    struct fclaw_patch *this_patch;
-    /** Pointer to the neighbor patch */
-    struct fclaw_patch *neighbor_patch;
-    /**
-     * @brief Transform array
-     * 
-     *          This array holds 9 integers.
-     *  [0,2]   The coordinate axis sequence of the origin face,
-     *          the first referring to the tangential and the second
-     *          to the normal.  A permutation of (0, 1).
-     *  [3,5]   The coordinate axis sequence of the target face.
-     *  [6,8]   Edge reversal flag for tangential axis (boolean);
-     *          face code in [0, 3] for the normal coordinate q:
-     *          0: q' = -q
-     *          1: q' = q + 1
-     *          2: q' = q - 1
-     *          3: q' = 2 - q
-     *          [8] & 4: Both patches are in the same block,
-     *                   the \a ftransform contents are ignored.
-     */
-    int transform[9];
-    /** The corner that the neighboring patch is on. */
-    int icorner;
-    /**
-     * @brief Base index
-     * 
-     * 1 for cell-centered (1 .. mx); 0 for nodes (0 .. mx)
-     */
-    int based;
-    /** True if patch is on a block corner */
-    int is_block_corner;
-    /** -1 for interior faces or block corners */
-    int block_iface;   
-
-    /** Pointer to the glboal context */
-    struct fclaw_global *glob;
-    /** User pointer */
-    void* user;
-};
-
 
 struct fclaw_global;
 struct fclaw_domain;
@@ -329,7 +280,7 @@ void fclaw3d_patch_copy_face(struct fclaw_global* glob,
                              struct fclaw_patch *neighbor_patch,
                              int iface,
                              int time_interp,
-                             struct fclaw3d_patch_transform_data *transform_data);
+                             struct fclaw_patch_transform_data *transform_data);
 
 /**
  * @brief Averages values from a face-neighboring fine grid
@@ -355,7 +306,7 @@ void fclaw3d_patch_average_face(struct fclaw_global* glob,
                                 int refratio,
                                 int time_interp,
                                 int igrid,
-                                struct fclaw3d_patch_transform_data* transform_data);
+                                struct fclaw_patch_transform_data* transform_data);
 
 /**
  * @brief Interpolates values from a face-neighboring coarse grid
@@ -381,7 +332,7 @@ void fclaw3d_patch_interpolate_face(struct fclaw_global* glob,
                                     int refratio,
                                     int time_interp,
                                     int igrid,
-                                    struct fclaw3d_patch_transform_data* transform_data);
+                                    struct fclaw_patch_transform_data* transform_data);
 
 /* Do we want fclaw3d_patch_copy/average/interpolate_edge as well?
  * Feel free to add. */
@@ -407,7 +358,7 @@ void fclaw3d_patch_copy_corner(struct fclaw_global* glob,
                                int is_block_corner,
                                int icorner,
                                int time_interp,
-                               struct fclaw3d_patch_transform_data *transform_data);
+                               struct fclaw_patch_transform_data *transform_data);
 
 /**
  * @brief Averages values from a corner-neighboring fine grid
@@ -430,7 +381,7 @@ void fclaw3d_patch_average_corner(struct fclaw_global* glob,
                                   int is_block_corner,
                                   int coarse_corner,
                                   int time_interp,
-                                  struct fclaw3d_patch_transform_data* transform_data);
+                                  struct fclaw_patch_transform_data* transform_data);
 
 /**
  * @brief Interpolates values from a corner-neighboring coarse grid
@@ -453,7 +404,7 @@ void fclaw3d_patch_interpolate_corner(struct fclaw_global* glob,
                                       int is_block_corner,
                                       int coarse_corner,
                                       int time_interp,
-                                      struct fclaw3d_patch_transform_data* transform_data);
+                                      struct fclaw_patch_transform_data* transform_data);
 
 ///@}
 /**
@@ -487,7 +438,7 @@ void fclaw3d_patch_destroy_user_data(struct fclaw_global* glob,
 void fclaw3d_patch_transform_init_data(struct fclaw_global* glob,
                                        struct fclaw_patch* patch,
                                        int blockno, int patchno,
-                                       struct fclaw3d_patch_transform_data *tdata);
+                                       struct fclaw_patch_transform_data *tdata);
 
 /**
  * @brief Get the transform on a block face
@@ -767,7 +718,7 @@ void fclaw3d_patch_time_sync_f2c(struct fclaw_global* glob,
                                  int igrid,
                                  int iface_coarse,
                                  int time_interp,
-                                 struct fclaw3d_patch_transform_data* transform_data);
+                                 struct fclaw_patch_transform_data* transform_data);
 
 /**
  * @brief Adds corrections to patches that are at the same levle and are at block boundaries.
@@ -784,7 +735,7 @@ void fclaw3d_patch_time_sync_samesize(struct fclaw_global* glob,
                                       struct fclaw_patch *this_patch,
                                       struct fclaw_patch *neighbor_patch,
                                       int this_iface, int idir,
-                                      struct fclaw3d_patch_transform_data *transform_data);
+                                      struct fclaw_patch_transform_data *transform_data);
 
 /**
  * @brief Resets conservation data
@@ -984,7 +935,7 @@ typedef void (*fclaw3d_patch_copy_face_t)(struct fclaw_global* glob,
                                           struct fclaw_patch *neighbor_patch,
                                           int iface,
                                           int time_interp,
-                                          struct fclaw3d_patch_transform_data 
+                                          struct fclaw_patch_transform_data 
                                           *transform_data);
 
 /**
@@ -1011,7 +962,7 @@ typedef void (*fclaw3d_patch_average_face_t)(struct fclaw_global* glob,
                                              int refratio,
                                              int time_interp,
                                              int igrid,
-                                             struct fclaw3d_patch_transform_data
+                                             struct fclaw_patch_transform_data
                                              *transform_data);
 
 /**
@@ -1039,7 +990,7 @@ typedef void (*fclaw3d_patch_interpolate_face_t)(struct fclaw_global* glob,
                                                  int refratio,
                                                  int time_interp,
                                                  int igrid,
-                                                 struct fclaw3d_patch_transform_data
+                                                 struct fclaw_patch_transform_data
                                                  *transform_data);
 
 /* Do we want a fclaw3d_patch_copy/average/interpolate_edge_t as well?
@@ -1064,7 +1015,7 @@ typedef void (*fclaw3d_patch_copy_corner_t)(struct fclaw_global* glob,
                                             int neighbor_blockno,
                                             int icorner,
                                             int time_interp,
-                                            struct fclaw3d_patch_transform_data 
+                                            struct fclaw_patch_transform_data 
                                             *transform_data);
     
 /**
@@ -1086,7 +1037,7 @@ typedef void (*fclaw3d_patch_average_corner_t)(struct fclaw_global* glob,
                                                int fine_blockno,
                                                int icorner,
                                                int time_interp,
-                                               struct fclaw3d_patch_transform_data 
+                                               struct fclaw_patch_transform_data 
                                                *transform_data);
 
 /**
@@ -1108,7 +1059,7 @@ typedef void (*fclaw3d_patch_interpolate_corner_t)(struct fclaw_global* glob,
                                                    int fine_blockno,
                                                    int icorner,
                                                    int time_interp,
-                                                   struct fclaw3d_patch_transform_data 
+                                                   struct fclaw_patch_transform_data 
                                                    *transform_data);
     
 ///@}
@@ -1129,7 +1080,7 @@ typedef void (*fclaw3d_patch_interpolate_corner_t)(struct fclaw_global* glob,
 typedef void (*fclaw3d_patch_transform_init_data_t)(struct fclaw_global* glob,
                                                     struct fclaw_patch* patch,
                                                     int blockno, int patchno,
-                                                    struct fclaw3d_patch_transform_data *tdata);
+                                                    struct fclaw_patch_transform_data *tdata);
 
 /**
  * @brief Gets the transform on a block face
@@ -1337,7 +1288,7 @@ typedef void (*fclaw3d_patch_time_sync_f2c_t)(struct fclaw_global* glob,
                                               int igrid,
                                               int iface_coarse,
                                               int time_interp,
-                                              struct fclaw3d_patch_transform_data
+                                              struct fclaw_patch_transform_data
                                               *transform_data);
 
 /** @copydoc fclaw2d_patch_time_sync_samesize() */
@@ -1345,7 +1296,7 @@ typedef void (*fclaw3d_patch_time_sync_samesize_t)(struct fclaw_global* glob,
                                                    struct fclaw_patch* this_patch,
                                                    struct fclaw_patch* neighbor_patch,
                                                    int this_iface, int idir,
-                                                   struct fclaw3d_patch_transform_data 
+                                                   struct fclaw_patch_transform_data 
                                                    *transform_data);
 
 /** @copydoc fclaw2d_patch_time_sync_reset() */

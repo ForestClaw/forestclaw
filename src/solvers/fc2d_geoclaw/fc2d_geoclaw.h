@@ -40,7 +40,7 @@ extern "C"
 typedef struct fc2d_geoclaw_vtable fc2d_geoclaw_vtable_t;
 
 /* Forward declarations */
-struct fclaw2d_patch_transform_data;
+struct fclaw_patch_transform_data;
 struct fclaw_global;
 struct fclaw_patch;
 struct geoclaw_gauge;

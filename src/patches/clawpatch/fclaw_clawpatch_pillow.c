@@ -39,7 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw_pointer_map.h>
 
-struct fclaw2d_patch_transform_data;  /* Not used here, so we leave it incomplete */
+struct fclaw_patch_transform_data;  /* Not used here, so we leave it incomplete */
 
 static
 void pillow_copy_block_corner(fclaw_global_t* glob,
@@ -49,7 +49,7 @@ void pillow_copy_block_corner(fclaw_global_t* glob,
                               int corner_blockno,
                               int icorner,
                               int time_interp,
-                              struct fclaw2d_patch_transform_data *transform_data)
+                              struct fclaw_patch_transform_data *transform_data)
 {
     int meqn;
     double *qthis;    
@@ -94,7 +94,7 @@ void pillow_average_block_corner(fclaw_global_t *glob,
                                  int fine_blockno,
                                  int icorner_coarse,
                                  int time_interp,
-                                 struct fclaw2d_patch_transform_data* transform_data)
+                                 struct fclaw_patch_transform_data* transform_data)
 {
 
     int refratio = 2;
@@ -146,7 +146,7 @@ void pillow_interpolate_block_corner(fclaw_global_t* glob,
                                      int fine_blockno,
                                      int icoarse_corner,
                                      int time_interp,
-                                     struct fclaw2d_patch_transform_data* transform_data)
+                                     struct fclaw_patch_transform_data* transform_data)
 
 {
     int meqn;
