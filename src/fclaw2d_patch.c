@@ -36,15 +36,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_to_3d.h>
 #define d2 d3
 #define fclaw_patch_vtable_d2_t fclaw_patch_vtable_d3_t
+#define fclaw_patch_data_d2_t fclaw_patch_data_d3_t
 #endif
 
 struct fclaw_patch_transform_data;
 
 /* ------------------------------- static access functions ---------------------------- */
 static
-fclaw2d_patch_data_t* get_patch_data(fclaw_patch_t* patch)
+fclaw_patch_data_t* get_patch_data(fclaw_patch_t* patch)
 {
-	fclaw2d_patch_data_t *pdata = (fclaw2d_patch_data_t*) patch->user;
+	fclaw_patch_data_t *pdata = (fclaw_patch_data_t*) patch->user;
 	FCLAW_ASSERT(pdata != NULL);
 	return pdata;
 }
@@ -52,7 +53,7 @@ fclaw2d_patch_data_t* get_patch_data(fclaw_patch_t* patch)
 static
 void* get_user_patch(fclaw_patch_t* patch)
 {
-	fclaw2d_patch_data_t *pdata = get_patch_data(patch);
+	fclaw_patch_data_t *pdata = get_patch_data(patch);
 	return pdata->user_patch;
 }
 
@@ -68,20 +69,18 @@ void patch_data_new(fclaw_global_t* glob,
 	fclaw_patch_vtable_t *patch_vt = fclaw_patch_vt(glob);
 
 	/* Initialize user data */
-	fclaw2d_patch_data_t *pdata = FCLAW_ALLOC(fclaw2d_patch_data_t, 1);
+	fclaw_patch_data_t *pdata = FCLAW_ALLOC_ZERO(fclaw_patch_data_t, 1);
+	if(glob->domain->dim == 2)
+	{
+		pdata->dim = 2;
+		pdata->d2 = FCLAW_ALLOC_ZERO(fclaw_patch_data_d2_t, 1);
+	}
+	else 
+	{
+		pdata->dim = 3;
+		pdata->d3 = FCLAW_ALLOC_ZERO(fclaw_patch_data_d3_t, 1);
+	}
 	this_patch->user = (void *) pdata;
-
-#if 0   
-    /* This check is dubious, since glob->domain is the old domain */
-#ifdef FCLAW_ENABLE_DEBUG
-    fclaw_block_t *block = &glob->domain->blocks[this_block_idx];
-#endif
-    if (!(0 <= this_patch_idx && this_patch_idx < block->num_patches))
-    {
-    	// fclaw_global_essentialf("patch index is incorrect\n");
-    	// FCLAW_ASSERT (0 <= this_patch_idx && this_patch_idx < block->num_patches);    
-    }
-#endif    
 
 	pdata->patch_idx = this_patch_idx;
 	pdata->block_idx = this_block_idx;
@@ -100,15 +99,8 @@ void fclaw2d_patch_reset_data(fclaw_global_t* glob,
 							  fclaw_patch_t* new_patch,
 							  int blockno,int old_patchno, int new_patchno)
 {
-	fclaw2d_patch_data_t *pdata = (fclaw2d_patch_data_t*) new_patch->user;
+	fclaw_patch_data_t *pdata = (fclaw_patch_data_t*) new_patch->user;
 	pdata->block_idx = blockno;
-#if 0 
-    /* This check may be bogus, since glob->domain is the old domain */
-#ifdef FCLAW_ENABLE_DEBUG
-    fclaw_block_t *block = glob->domain->blocks + blockno;
-#endif
-    FCLAW_ASSERT (0 <= new_patchno && new_patchno < block->num_patches);    
-#endif    
 
 	pdata->patch_idx = new_patchno;
 
@@ -120,7 +112,7 @@ void fclaw2d_patch_data_delete(fclaw_global_t *glob,
 {
 	fclaw_patch_vtable_t *patch_vt = fclaw_patch_vt(glob);
 	FCLAW_ASSERT(patch_vt->patch_delete != NULL);
-	fclaw2d_patch_data_t *pdata = (fclaw2d_patch_data_t*) this_patch->user;
+	fclaw_patch_data_t *pdata = (fclaw_patch_data_t*) this_patch->user;
 
     if (pdata != NULL)
     {
@@ -133,6 +125,14 @@ void fclaw2d_patch_data_delete(fclaw_global_t *glob,
         patch_vt->patch_delete(pdata->user_patch);
         ++ddata->count_delete_patch;
 
+		if(pdata->dim == 2)
+		{
+			FCLAW_FREE(pdata->d2);
+		}
+		else 
+		{
+			FCLAW_FREE(pdata->d3);
+		}
 		FCLAW_FREE(pdata);
 		this_patch->user = NULL;
 	}
@@ -190,7 +190,7 @@ void fclaw2d_patch_build_from_fine(fclaw_global_t *glob,
 
     patch_data_new(glob,coarse_patch,blockno, coarse_patchno);
 
-    fclaw2d_patch_data_t *pdata = get_patch_data(coarse_patch);
+    fclaw_patch_data_t *pdata = get_patch_data(coarse_patch);
     pdata->block_idx = blockno;
 
     patch_vt->build_from_fine(glob,
@@ -211,42 +211,6 @@ void fclaw2d_patch_build_from_fine(fclaw_global_t *glob,
         patch_vt->setup(glob,coarse_patch,blockno,coarse_patchno);
     }
 }
-
-#if 0
-void fclaw2d_patch_create_user_data(fclaw_global_t* glob,
-                                    fclaw_patch_t* patch)
-{
-    fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt(glob);
-    FCLAW_ASSERT(patch_vt->create_user_data != NULL);
-    patch_vt->create_user_data(glob,patch);
-}
-
-void fclaw2d_patch_destroy_user_data(fclaw_global_t* glob,
-                                     fclaw_patch_t* patch)
-{
-    fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt(glob);
-    FCLAW_ASSERT(patch_vt->destroy_user_data != NULL);
-    patch_vt->destroy_user_data(glob,patch);
-}
-#endif
-
-#if 0
-void* fclaw2d_patch_get_user_data(fclaw_global_t* glob,
-                              fclaw_patch_t* this_patch)
-{
-    fclaw2d_patch_data_t *pdata = get_patch_data(this_patch);
-    return pdata->user_data;
-}
-
-void fclaw2d_patch_set_user_data(fclaw_global_t* glob,
-                                 fclaw_patch_t* this_patch, 
-                                 void* user)
-{
-    fclaw2d_patch_data_t *pdata = get_patch_data(this_patch);
-    pdata->user_data = user;
-}
-#endif
-
 
 /* --------------------------- Solver specific functions ------------------------------ */
 
@@ -650,7 +614,7 @@ void fclaw2d_patch_remote_ghost_delete(fclaw_global_t *glob,
 {
 	fclaw_patch_vtable_t *patch_vt = fclaw_patch_vt(glob);
 	
-	fclaw2d_patch_data_t *pdata = get_patch_data(this_patch);
+	fclaw_patch_data_t *pdata = get_patch_data(this_patch);
 
 
 	if (pdata != NULL)
@@ -658,6 +622,14 @@ void fclaw2d_patch_remote_ghost_delete(fclaw_global_t *glob,
 		FCLAW_ASSERT(patch_vt->patch_delete != NULL);
 		patch_vt->remote_ghost_delete(pdata->user_patch);
 
+		if(pdata->dim == 2)
+		{
+			FCLAW_FREE(pdata->d2);
+		}
+		else 
+		{
+			FCLAW_FREE(pdata->d3);
+		}
 		FCLAW_FREE(pdata);
 		this_patch->user = NULL;
 
@@ -860,7 +832,7 @@ void fclaw2d_patch_get_info2(fclaw_domain_t * domain,
 
     /* I don't completely trust this that blockno and patchno are consistent
        with p4est numbering. */
-	fclaw2d_patch_data_t *pdata = (fclaw2d_patch_data_t*) this_patch->user;
+	fclaw_patch_data_t *pdata = (fclaw_patch_data_t*) this_patch->user;
 	*this_patch_idx = pdata->patch_idx;
 	*this_block_idx = pdata->block_idx;
 
@@ -881,7 +853,7 @@ fclaw2d_patch_get_user_patch(fclaw_patch_t* patch)
 	return get_user_patch(patch);
 }
 
-fclaw2d_patch_data_t*
+fclaw_patch_data_t*
 fclaw2d_patch_get_patch_data(fclaw_patch_t* patch)
 {
 	return get_patch_data(patch);
@@ -890,7 +862,7 @@ fclaw2d_patch_get_patch_data(fclaw_patch_t* patch)
 void* fclaw2d_patch_get_user_data(fclaw_global_t* glob,
                                   fclaw_patch_t* this_patch)
 {
-    fclaw2d_patch_data_t *pdata = get_patch_data(this_patch);
+    fclaw_patch_data_t *pdata = get_patch_data(this_patch);
     return pdata->user_data;
 }
 
@@ -898,7 +870,7 @@ void fclaw2d_patch_set_user_data(fclaw_global_t* glob,
                                  fclaw_patch_t* this_patch, 
                                  void* user)
 {
-    fclaw2d_patch_data_t *pdata = get_patch_data(this_patch);
+    fclaw_patch_data_t *pdata = get_patch_data(this_patch);
     pdata->user_data = user;
 }
 
@@ -916,7 +888,7 @@ fclaw2d_patch_get_blockno(fclaw_patch_t* this_patch)
 {
 	/* This is is really only here if we fail to pass in the blockno to a patch 
 	routine.  */
-	fclaw2d_patch_data_t* pdata = get_patch_data(this_patch);
+	fclaw_patch_data_t* pdata = get_patch_data(this_patch);
 	FCLAW_ASSERT(pdata->block_idx >= 0);
 	return pdata->block_idx;
 }
@@ -926,7 +898,7 @@ fclaw2d_patch_get_patchno(fclaw_patch_t* this_patch)
 {
 	/* This is is really only here if we fail to pass in the patchno to a patch 
 	routine.  */
-	fclaw2d_patch_data_t* pdata = get_patch_data(this_patch);
+	fclaw_patch_data_t* pdata = get_patch_data(this_patch);
 	FCLAW_ASSERT(pdata->patch_idx >= 0);
 	return pdata->patch_idx;
 }
@@ -937,47 +909,47 @@ fclaw2d_patch_get_patchno(fclaw_patch_t* this_patch)
 void fclaw2d_patch_set_face_type(fclaw_patch_t *patch,int iface,
 								 fclaw_patch_relation_t face_type)
 {
-	fclaw2d_patch_data_t *pdata = get_patch_data(patch);
-	pdata->face_neighbors[iface] = face_type;
+	fclaw_patch_data_t *pdata = get_patch_data(patch);
+	pdata->d2->face_neighbors[iface] = face_type;
 }
 
 void fclaw2d_patch_set_corner_type(fclaw_patch_t *patch,int icorner,
 								   fclaw_patch_relation_t corner_type)
 {
-	fclaw2d_patch_data_t *pdata = get_patch_data(patch);
-	pdata->corner_neighbors[icorner] = corner_type;
-	pdata->corners[icorner] = 1;
+	fclaw_patch_data_t *pdata = get_patch_data(patch);
+	pdata->d2->corner_neighbors[icorner] = corner_type;
+	pdata->d2->corners[icorner] = 1;
 }
 
 void fclaw2d_patch_set_missing_corner(fclaw_patch_t *patch,int icorner)
 {
-	fclaw2d_patch_data_t *pdata = get_patch_data(patch);
-	pdata->corners[icorner] = 0;
+	fclaw_patch_data_t *pdata = get_patch_data(patch);
+	pdata->d2->corners[icorner] = 0;
 }
 
 fclaw_patch_relation_t fclaw2d_patch_get_face_type(fclaw_patch_t* patch,
 													 int iface)
 {
-	fclaw2d_patch_data_t *pdata = get_patch_data(patch);
+	fclaw_patch_data_t *pdata = get_patch_data(patch);
 	FCLAW_ASSERT(pdata->neighbors_set != 0);
 	FCLAW_ASSERT(0 <= iface && iface < FCLAW2D_NUMFACES);
-	return pdata->face_neighbors[iface];
+	return pdata->d2->face_neighbors[iface];
 }
 
 fclaw_patch_relation_t fclaw2d_patch_get_corner_type(fclaw_patch_t* patch,
 													   int icorner)
 {
-	fclaw2d_patch_data_t *pdata = get_patch_data(patch);
-	FCLAW_ASSERT(pdata->corners[icorner] != 0);
+	fclaw_patch_data_t *pdata = get_patch_data(patch);
+	FCLAW_ASSERT(pdata->d2->corners[icorner] != 0);
 	FCLAW_ASSERT(pdata->neighbors_set != 0);
-	return pdata->corner_neighbors[icorner];
+	return pdata->d2->corner_neighbors[icorner];
 }
 
 int fclaw2d_patch_corner_is_missing(fclaw_patch_t* patch,
 									int icorner)
 {
-	fclaw2d_patch_data_t *pdata = get_patch_data(patch);
-	return !pdata->corners[icorner];
+	fclaw_patch_data_t *pdata = get_patch_data(patch);
+	return !pdata->d2->corners[icorner];
 }
 
 void fclaw2d_patch_neighbors_set(fclaw_patch_t* patch)
@@ -986,7 +958,7 @@ void fclaw2d_patch_neighbors_set(fclaw_patch_t* patch)
 #ifdef P4_TO_P8
 	int iedge;
 #endif
-	fclaw2d_patch_data_t *pdata = get_patch_data(patch);
+	fclaw_patch_data_t *pdata = get_patch_data(patch);
 	FCLAW_ASSERT(pdata->neighbors_set == 0);
 
 	pdata->has_finegrid_neighbors = 0;
@@ -994,7 +966,7 @@ void fclaw2d_patch_neighbors_set(fclaw_patch_t* patch)
 	for (iface = 0; iface < FCLAW2D_NUMFACES; iface++)
 	{
 		fclaw_patch_relation_t nt;
-		nt = pdata->face_neighbors[iface];
+		nt = pdata->d2->face_neighbors[iface];
 		if (nt == FCLAW_PATCH_HALFSIZE || (nt == FCLAW_PATCH_DOUBLESIZE))
 		{
 			pdata->on_coarsefine_interface = 1;
@@ -1009,7 +981,7 @@ void fclaw2d_patch_neighbors_set(fclaw_patch_t* patch)
 	for (iedge = 0; iedge < FCLAW3D_NUMEDGES; iedge++)
 	{
 		fclaw_patch_relation_t nt;
-		nt = pdata->edge_neighbors[iedge];
+		nt = pdata->d3->edge_neighbors[iedge];
 		if (nt == FCLAW_PATCH_HALFSIZE || (nt == FCLAW_PATCH_DOUBLESIZE))
 		{
 			pdata->on_coarsefine_interface = 1;
@@ -1024,10 +996,10 @@ void fclaw2d_patch_neighbors_set(fclaw_patch_t* patch)
 	for (icorner = 0; icorner < FCLAW2D_NUMCORNERS; icorner++)
 	{
 		fclaw_patch_relation_t nt;
-		int has_corner = pdata->corners[icorner];
+		int has_corner = pdata->d2->corners[icorner];
 		if (has_corner)
 		{
-			nt = pdata->corner_neighbors[icorner];
+			nt = pdata->d2->corner_neighbors[icorner];
 			if ((nt == FCLAW_PATCH_HALFSIZE) || (nt == FCLAW_PATCH_DOUBLESIZE))
 			{
 				pdata->on_coarsefine_interface = 1;
@@ -1043,26 +1015,26 @@ void fclaw2d_patch_neighbors_set(fclaw_patch_t* patch)
 
 void fclaw2d_patch_neighbors_reset(fclaw_patch_t* patch)
 {
-	fclaw2d_patch_data_t *pdata = get_patch_data(patch);
+	fclaw_patch_data_t *pdata = get_patch_data(patch);
 	pdata->neighbors_set = 0;
 }
 
 int fclaw2d_patch_neighbor_type_set(fclaw_patch_t* patch)
 {
-	fclaw2d_patch_data_t *pdata = get_patch_data(patch);
+	fclaw_patch_data_t *pdata = get_patch_data(patch);
 	return pdata->neighbors_set;
 }
 
 
 int fclaw2d_patch_has_finegrid_neighbors(fclaw_patch_t *patch)
 {
-	fclaw2d_patch_data_t *pdata = get_patch_data(patch);
+	fclaw_patch_data_t *pdata = get_patch_data(patch);
 	return pdata->has_finegrid_neighbors;
 }
 
 int fclaw2d_patch_on_coarsefine_interface(fclaw_patch_t *patch)
 {
-	fclaw2d_patch_data_t *pdata = get_patch_data(patch);
+	fclaw_patch_data_t *pdata = get_patch_data(patch);
 	return pdata->on_coarsefine_interface;
 }
 
@@ -1075,16 +1047,16 @@ fclaw2d_patch_on_parallel_boundary (const fclaw_patch_t * patch)
 int* fclaw2d_patch_block_corner_count(fclaw_global_t* glob,
 									  fclaw_patch_t* this_patch)
 {
-	fclaw2d_patch_data_t *pdata = get_patch_data(this_patch);
-	return pdata->block_corner_count;
+	fclaw_patch_data_t *pdata = get_patch_data(this_patch);
+	return pdata->d2->block_corner_count;
 }
 
 void fclaw2d_patch_set_block_corner_count(fclaw_global_t* glob,
 										  fclaw_patch_t* this_patch,
 										  int icorner, int block_corner_count)
 {
-	fclaw2d_patch_data_t *pdata = get_patch_data(this_patch);
-	pdata->block_corner_count[icorner] = block_corner_count;
+	fclaw_patch_data_t *pdata = get_patch_data(this_patch);
+	pdata->d2->block_corner_count[icorner] = block_corner_count;
 }
 
 

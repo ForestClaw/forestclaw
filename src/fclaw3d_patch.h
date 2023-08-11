@@ -43,48 +43,6 @@ extern "C"
 #endif
 
 
-/** patch data type */
-typedef struct fclaw3d_patch_data            fclaw3d_patch_data_t;
-
-/**
- * @brief Structure for user patch data
- * 
- * The user patch (clawpatch, for example) is stored in fclaw3d_patch_data.user_patch
- */
-struct fclaw3d_patch_data
-{
-    /** Pointer to the core patch structure in the domain */
-    const fclaw_patch_t *real_patch;
-
-    /** Neighbor relation on each face */
-    fclaw_patch_relation_t face_neighbors[6];
-    /** Neighbor relation on each corner */
-    fclaw_patch_relation_t edge_neighbors[12];
-    /** Neighbor relation on each corner */
-    fclaw_patch_relation_t corner_neighbors[8];
-    /** Edge variables required or not? Feel free to add */
-    /** True if corner has neighbor */
-    int corners[8];
-    /** The number of patches that meet at each corner */
-    int block_corner_count[8];
-    /** True if this patch lies on a coarse-fine interface */
-    int on_coarsefine_interface;
-    /** True if there are finer neighbors */
-    int has_finegrid_neighbors;
-    /** True if neighbor information is set */
-    int neighbors_set;
-
-    /** Patch index */
-    int patch_idx;
-    /** Block index */
-    int block_idx;
-
-    /** User defined patch structure */
-    void *user_patch;
-    /** Additional user data */
-    void *user_data;
-};
-
 struct fclaw_global;
 struct fclaw_domain;
 struct fclaw3d_patch;
@@ -801,7 +759,7 @@ void* fclaw3d_patch_get_user_patch(struct fclaw_patch* patch);
  * @param patch the patch context
  * @return struct fclaw3d_patch_data* pointer to the patch data
  */
-struct fclaw3d_patch_data* fclaw3d_patch_get_patch_data(struct fclaw_patch* patch);
+struct fclaw_patch_data* fclaw3d_patch_get_patch_data(struct fclaw_patch* patch);
 
 /**
  * @brief Get the user data pointer

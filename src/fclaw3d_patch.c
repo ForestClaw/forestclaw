@@ -29,15 +29,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 void fclaw3d_patch_set_edge_type(fclaw_patch_t *patch,int iedge,
 								   fclaw_patch_relation_t edge_type)
 {
-	fclaw2d_patch_data_t *pdata = get_patch_data(patch);
-	pdata->edge_neighbors[iedge] = edge_type;
+	fclaw_patch_data_t *pdata = get_patch_data(patch);
+	pdata->d3->edge_neighbors[iedge] = edge_type;
 }
 
 fclaw_patch_relation_t fclaw3d_patch_get_edge_type(fclaw_patch_t* patch,
 													   int iedge)
 {
-	fclaw2d_patch_data_t *pdata = get_patch_data(patch);
+	fclaw_patch_data_t *pdata = get_patch_data(patch);
 	FCLAW_ASSERT(pdata->neighbors_set != 0);
 	FCLAW_ASSERT(0 <= iedge && iedge < FCLAW3D_NUMEDGES);
-	return pdata->edge_neighbors[iedge];
+	return pdata->d3->edge_neighbors[iedge];
 }

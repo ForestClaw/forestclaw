@@ -234,7 +234,7 @@ void fclaw2d_clawpatch_time_sync_reset(fclaw_global_t *glob,
 	
 	meqn = clawpatch_opt->meqn;
 
-	fclaw2d_patch_data_t* pdata = fclaw2d_patch_get_patch_data(this_patch);
+	fclaw_patch_data_t* pdata = fclaw2d_patch_get_patch_data(this_patch);
 
 	int fine_level = coarse_level+1;
 	int reset_flux;
@@ -247,23 +247,23 @@ void fclaw2d_clawpatch_time_sync_reset(fclaw_global_t *glob,
 		{
 			/* Reset registers at interface between levels 
 			   'coarse_level' and 'fine_level' */
-			int is_coarse = (pdata->face_neighbors[k] == FCLAW_PATCH_HALFSIZE)
+			int is_coarse = (pdata->d2->face_neighbors[k] == FCLAW_PATCH_HALFSIZE)
           			&& (this_patch->level == coarse_level);
-		    int is_fine = (pdata->face_neighbors[k] == FCLAW_PATCH_DOUBLESIZE) &&
+		    int is_fine = (pdata->d2->face_neighbors[k] == FCLAW_PATCH_DOUBLESIZE) &&
 		          (this_patch->level == fine_level);
 		    reset_flux = is_coarse || is_fine;
 		}
 		else if (reset_mode == FCLAW2D_TIME_SYNC_RESET_SAMESIZE)
 		{
 			/* Reset registers at interfaces between same size grids on coarse level */
-			reset_flux = (pdata->face_neighbors[k] == FCLAW_PATCH_SAMESIZE) &&   
+			reset_flux = (pdata->d2->face_neighbors[k] == FCLAW_PATCH_SAMESIZE) &&   
 			      (this_patch->level == coarse_level);
 		}
 		else if (reset_mode == FCLAW2D_TIME_SYNC_RESET_PHYS)
 		{
 			/* Reset flux registers at physical boundaries (not actually used, 
 			   but they are accumulated, so should be cleared out) */
-			reset_flux = pdata->face_neighbors[k] == FCLAW_PATCH_BOUNDARY;
+			reset_flux = pdata->d2->face_neighbors[k] == FCLAW_PATCH_BOUNDARY;
 		}
 
 		if (reset_flux)

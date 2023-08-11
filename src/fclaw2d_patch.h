@@ -45,7 +45,7 @@ extern "C"
 /** vtable type */
 typedef struct fclaw_patch_vtable          fclaw_patch_vtable_t;
 /** patch data type */
-typedef struct fclaw2d_patch_data            fclaw2d_patch_data_t;
+typedef struct fclaw_patch_data            fclaw_patch_data_t;
 /** transform data type */
 typedef struct fclaw_patch_transform_data  fclaw_patch_transform_data_t;
 
@@ -66,16 +66,8 @@ typedef enum
 
 
 
-/**
- * @brief Structure for user patch data
- * 
- * The user patch (clawpatch, for example) is stored in fclaw2d_patch_data.user_patch
- */
-struct fclaw2d_patch_data
+typedef struct fclaw_patch_data_d2
 {
-    /** Pointer to the core patch structure in the domain */
-    const fclaw_patch_t *real_patch;
-
     /** Neighbor relation on each face */
     fclaw_patch_relation_t face_neighbors[4];
     /** Neighbor relation on each corner */
@@ -84,6 +76,37 @@ struct fclaw2d_patch_data
     int corners[4];
     /** The number of patches that meet at each corner */
     int block_corner_count[4];
+} fclaw_patch_data_d2_t;
+
+typedef struct fclaw_patch_data_d3
+{
+    /** Neighbor relation on each face */
+    fclaw_patch_relation_t face_neighbors[6];
+    /** Neighbor relation on each corner */
+    fclaw_patch_relation_t edge_neighbors[12];
+    /** Neighbor relation on each corner */
+    fclaw_patch_relation_t corner_neighbors[8];
+    /** Edge variables required or not? Feel free to add */
+    /** True if corner has neighbor */
+    int corners[8];
+    /** The number of patches that meet at each corner */
+    int block_corner_count[8];
+} fclaw_patch_data_d3_t;
+
+/**
+ * @brief Structure for user patch data
+ * 
+ * The user patch (clawpatch, for example) is stored in fclaw2d_patch_data.user_patch
+ */
+struct fclaw_patch_data
+{
+    int dim;
+    fclaw_patch_data_d2_t* d2;
+    fclaw_patch_data_d3_t* d3;
+
+    /** Pointer to the core patch structure in the domain */
+    const fclaw_patch_t *real_patch;
+
     /** True if this patch lies on a coarse-fine interface */
     int on_coarsefine_interface;
     /** True if there are finer neighbors */
@@ -202,16 +225,6 @@ struct fclaw_patch;
 ///                         @name Creating/Deleting Patches
 /* ------------------------------------------------------------------------------------ */
 ///@{
-
-/**
- * DEPRECATED
- * @deprecated NOT USED
- */
-void fclaw2d_patch_reset_data(struct fclaw_global* glob,
-                              struct fclaw_patch* old_patch,
-                              struct fclaw_patch* new_patch,
-                              int blockno,int old_patchno, int new_patchno);
-
 
 /**
  * @brief Deallocate the user data pointer for a patch
@@ -1733,7 +1746,7 @@ void* fclaw2d_patch_get_user_patch(struct fclaw_patch* patch);
  * @param patch the patch context
  * @return struct fclaw2d_patch_data* pointer to the patch data
  */
-struct fclaw2d_patch_data* fclaw2d_patch_get_patch_data(struct fclaw_patch* patch);
+struct fclaw_patch_data* fclaw2d_patch_get_patch_data(struct fclaw_patch* patch);
 
 /**
  * @brief Get the user data pointer
