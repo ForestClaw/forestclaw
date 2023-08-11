@@ -24,7 +24,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include <fclaw_filesystem.h>
-#include <fclaw_global.h>
 
 #include <fclaw_package.h>
 #include <fclaw_timer.h>
@@ -46,34 +45,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /* figure out dimension-independent diagnostics */
 #include <fclaw3d_map.h>
 #endif
-
-void
-fclaw2d_iterate_patch_cb
-  (fclaw2d_domain_t *domain, fclaw_patch_t *patch,
-   int blockno, int patchno, void *user)
-{
-  fclaw_global_iterate_t *gi = (fclaw_global_iterate_t *) user;
-
-  FCLAW_ASSERT (gi->gpcb != NULL);
-  gi->gpcb (gi->glob, (fclaw_patch_t *) patch->user, blockno, patchno, gi->user);
-}
-
-void
-fclaw2d_iterate_family_cb
-  (fclaw2d_domain_t *domain, fclaw_patch_t *patch,
-   int blockno, int patchno, void *user)
-{
-  fclaw_global_iterate_t *gi = (fclaw_global_iterate_t *) user;
-  fclaw_patch_t *family[FCLAW2D_NUMSIBLINGS];
-  int i;
-
-  for (i = 0; i < FCLAW2D_NUMSIBLINGS; ++i) {
-    family[i] = (fclaw_patch_t *) patch[i].user;
-  }
-
-  FCLAW_ASSERT (gi->gfcb != NULL);
-  gi->gfcb (gi->glob, family, blockno, patchno, gi->user);
-}
 
 /* much of this will eventually move into fclaw_global.c */
 

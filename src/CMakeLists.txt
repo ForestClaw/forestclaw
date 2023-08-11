@@ -51,8 +51,6 @@ add_library(forestclaw_c OBJECT
   fclaw3d_patch.c
   fclaw3d_exchange.c
   fclaw3d_options.c
-  fclaw_domain.c
-  fclaw_global.c
   fp_exception_glibc_extension.c
   mappings/fclaw2d_map_nomap.c
   mappings/fclaw2d_map_nomap_brick.c
@@ -165,8 +163,6 @@ install(FILES
   fclaw3d_options.h
   fclaw3d_include_all.h 
   forestclaw.h
-  fclaw_domain.h
-  fclaw_global.h
   DESTINATION include
 )
 

@@ -23,7 +23,6 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <fclaw_domain.h>
 #ifndef P4_TO_P8
 #include <fclaw2d_domain.h>
 #include <fclaw2d_convenience.h>  /* Contains domain_destroy and others */
@@ -54,16 +53,6 @@ fclaw_domain_get_domain (fclaw_domain_t *d)
 
 #endif
 
-void
-fclaw2d_domain_iterate_cb
-  (fclaw2d_domain_t * d2, fclaw_patch_t * patch,
-   int blockno, int patchno, void *user)
-{
-    fclaw_domain_iterate_t *di = (fclaw_domain_iterate_t *) user;
-    di->iter (di->d, (fclaw_patch_t *) patch->user, blockno, patchno,
-              di->user);
-}
-
 typedef struct fcd_allocated_patch
 {
 #ifndef P4_TO_P8
@@ -73,98 +62,6 @@ typedef struct fcd_allocated_patch
 #endif
 }
 fcd_allocated_patch_t;
-
-fclaw_domain_t *
-fclaw_domain_new2d (fclaw2d_domain_t * domain,
-                    fclaw_domain_callback_t init, void *user)
-{
-    int i, j;
-    fclaw_block_t      *block;
-    fclaw_patch_t      *patch;
-    fclaw_domain_t       *d;
-    fclaw_patch_t        *p;
-    fcd_allocated_patch_t *ap;
-
-    FCLAW_ASSERT (domain != NULL && domain->mpisize > 0);
-
-    /* allocate and set domain itself */
-    d = FCLAW_ALLOC_ZERO (fclaw_domain_t, 1);
-    d->dim = P4EST_DIM;
-#ifndef P4_TO_P8
-    d->d.d2.dmagic2 = FCLAW2D_DOMAIN_MAGIC;
-    d->d.d2.domain2 = domain;
-#else
-    d->d.d3.dmagic3 = FCLAW3D_DOMAIN_MAGIC;
-    d->d.d3.domain3 = domain;
-#endif
-    sc_mstamp_init (&d->pstamp, 4096 - 3 * sizeof (size_t),
-                    sizeof (fcd_allocated_patch_t));
-
-    /* iterate over all patches to initialize */
-    for (i = 0; i < domain->num_blocks; ++i)
-    {
-        block = domain->blocks + i;
-        for (j = 0; j < block->num_patches; ++j)
-        {
-            /* hook the new dimension-independent patch into storage */
-            ap = (fcd_allocated_patch_t *) sc_mstamp_alloc (&d->pstamp);
-            patch = block->patches + j;
-#ifndef P4_TO_P8
-            //p->pd.pd2 = &ap->pd;
-            //p->pd.pd2->real_patch = patch;
-#else
-            //p->pd.pd3 = &ap->pd;
-            //p->pd.pd3->real_patch = patch;
-#endif
-            if (init != NULL) {
-                init (d, p, i, j, user);
-            }
-        }
-    }
-
-    /* domain fully constructed */
-    FCLAW_ASSERT (fclaw_domain_is_valid (d));
-    return d;
-}
-
-void
-fclaw_domain_destroy2d (fclaw_domain_t * d,
-                        fclaw_domain_callback_t dele, void *user)
-{
-    int i, j;
-    fclaw2d_domain_t     *domain;
-    fclaw_block_t      *block;
-    fclaw_patch_t      *patch;
-    fclaw_patch_t        *p;
-
-    FCLAW_ASSERT (d->dim == P4EST_DIM);
-#ifndef P4_TO_P8
-    domain = d->d.d2.domain2;
-#else
-    domain = d->d.d3.domain3;
-#endif
-
-    FCLAW_ASSERT (domain != NULL && domain->mpisize > 0);
-    FCLAW_ASSERT (d->du.count_set_patch == d->du.count_delete_patch);
-
-    /* iterate over all patches to deinitialize */
-    if (dele != NULL) {
-        for (i = 0; i < domain->num_blocks; ++i)
-        {
-            block = domain->blocks + i;
-            for (j = 0; j < block->num_patches; ++j)
-            {
-                /* free the new dimension-independent patch into storage */
-                patch = block->patches + j;
-                p = (fclaw_patch_t *) patch->user;
-                dele (d, p, i, j, user);
-            }
-        }
-    }
-    fclaw2d_domain_destroy (domain);
-    sc_mstamp_reset (&d->pstamp);
-    FCLAW_FREE (d);
-}
 
 /* we're holding back with 3d counterparts
    since much of this will move into fclaw_domain.c */
