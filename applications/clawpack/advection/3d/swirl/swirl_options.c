@@ -64,7 +64,7 @@ swirl_postprocess(user_options_t *user)
 static fclaw_exit_type_t
 swirl_check (user_options_t *user)
 {
-    if (user->example < 0 || user->example > 3) {
+    if (user->example < 0 || user->example > 4) {
         fclaw_global_essentialf ("Option --user:example must be in [0-3]\n");
         return FCLAW_EXIT_QUIET;
     }

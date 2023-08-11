@@ -26,6 +26,7 @@
 #include "swirl_user.h"
 
 #include <fclaw2d_defs.h>
+#include <fclaw3d_convenience.h>
 
 static
 fclaw_domain_t* create_domain(sc_MPI_Comm mpicomm, 
@@ -36,7 +37,7 @@ fclaw_domain_t* create_domain(sc_MPI_Comm mpicomm,
 {
     /* Mapped, multi-block domain */
     p4est_connectivity_t     *conn = NULL;
-    fclaw_domain_t         *domain;
+    fclaw_domain_t         *domain = NULL;
     fclaw2d_map_context_t    *cont = NULL, *brick = NULL;
 
     int mi = fclaw_opt->mi;
@@ -102,18 +103,23 @@ fclaw_domain_t* create_domain(sc_MPI_Comm mpicomm,
                                          fclaw_opt->scale,
                                          fclaw_opt->shift, 
                                          user->center);
+    case 4:
+        domain = fclaw3d_domain_new_unitcube(mpicomm, fclaw_opt->minlevel);
         break;
 
     default:
         SC_ABORT_NOT_REACHED ();
     }
 
-    if (user->example > 0)
-    {
-        swirl_map_extrude(cont,user->maxelev);        
-    }
 
-    domain = fclaw2d_domain_new_conn_map (mpicomm, fclaw_opt->minlevel, conn, cont);
+    if(domain == NULL)
+    {
+        if (user->example > 0)
+        {
+            swirl_map_extrude(cont,user->maxelev);        
+        }
+        domain = fclaw2d_domain_new_conn_map (mpicomm, fclaw_opt->minlevel, conn, cont);
+    }
     fclaw2d_domain_list_levels(domain, FCLAW_VERBOSITY_ESSENTIAL);
     fclaw2d_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);  
     return domain;
