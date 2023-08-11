@@ -27,6 +27,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define FCLAW2D_GLOBAL_H
 
 #include <forestclaw2d.h>  /* Needed to declare callbacks (below) */
+#include <fclaw_global.h>
 #include <fclaw2d_map.h>   /* Needed to store the map context */
 
 #include <fclaw_timer.h>   /* Needed to create statically allocated array of timers */
@@ -52,42 +53,7 @@ void fclaw2d_iterate_family_cb
 
 /* much of the following will move into fclaw_global.h */
 
-typedef struct fclaw2d_global fclaw2d_global_t;
 typedef struct fclaw2d_global_iterate fclaw2d_global_iterate_t;
-
-struct fclaw2d_global
-{
-    int count_amr_advance;
-    int count_ghost_exchange;
-    int count_amr_regrid;
-    int count_amr_new_domain;
-    int count_single_step;
-    int count_elliptic_grids;
-    int count_multiproc_corner;
-    int count_grids_per_proc;
-    int count_grids_remote_boundary;
-    int count_grids_local_boundary;
-    fclaw2d_timer_t timers[FCLAW2D_TIMER_COUNT];
-
-    /* Time at start of each subcycled time step */
-    double curr_time;
-    double curr_dt;
-
-    sc_MPI_Comm mpicomm;
-    int mpisize;              /**< Size of communicator. */
-    int mpirank;              /**< Rank of this process in \b mpicomm. */
-
-    /** Solver packages for internal use. */
-    struct fclaw_package_container *pkg_container;
-
-    struct fclaw_pointer_map *vtables;    /**< Vtables */
-    struct fclaw_pointer_map *options;    /**< options */
-    struct fclaw_pointer_map *attributes;    /**< attributes, things that are not vtables, or options */
-
-    struct fclaw_domain *domain;
-
-    void *user;
-};
 
 struct fclaw2d_global_iterate
 {

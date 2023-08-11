@@ -27,8 +27,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * Dimension-independent wrapper of a forestclaw patch.
  */
 
-#ifndef FCLAW_PATCH_H
-#define FCLAW_PATCH_H
+#ifndef FORESTCLAW_H
+#define FORESTCLAW_H
 
 /*
  * Domain-independent header file should not include domain-specific headers.
@@ -200,4 +200,4 @@ typedef struct fclaw_domain
     void *user; /**< user data pointer */
 } fclaw_domain_t;
 
-#endif /* !FCLAW_PATCH_H */
+#endif /* !FORESTCLAW_H */
