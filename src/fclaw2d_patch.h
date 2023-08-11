@@ -824,14 +824,14 @@ void fclaw2d_patch_time_sync_reset(struct fclaw_global* glob,
  * 
  * @return the newly allocated patch
  */
-typedef void* (*fclaw2d_patch_new_t)();
+typedef void* (*fclaw_patch_new_t)();
 
 /**
  * @brief Deallocates a patch
  * 
  * @param[in] user_patch the patch to deallocate
  */
-typedef void (*fclaw2d_patch_delete_t)(void *user_patch);
+typedef void (*fclaw_patch_delete_t)(void *user_patch);
 
 /**
  * @brief Initializes the data members of a patch
@@ -842,7 +842,7 @@ typedef void (*fclaw2d_patch_delete_t)(void *user_patch);
  * @param[in] patchno patch number
  * @param[in,out] user user data pointer
  */
-typedef void (*fclaw2d_patch_build_t)(struct fclaw_global *glob,
+typedef void (*fclaw_patch_build_t)(struct fclaw_global *glob,
                                       struct fclaw_patch *this_patch,
                                       int blockno,
                                       int patchno,
@@ -859,7 +859,7 @@ typedef void (*fclaw2d_patch_build_t)(struct fclaw_global *glob,
  * @param[in] fine0_patchno first fine patch number
  * @param[in] build_mode the build mode
  */
-typedef void (*fclaw2d_patch_build_from_fine_t)(struct fclaw_global *glob,
+typedef void (*fclaw_patch_build_from_fine_t)(struct fclaw_global *glob,
                                                 struct fclaw_patch *fine_patches,
                                                 struct fclaw_patch *coarse_patch,
                                                 int blockno,
@@ -875,7 +875,7 @@ typedef void (*fclaw2d_patch_build_from_fine_t)(struct fclaw_global *glob,
  * @param[in] blockno the block number
  * @param[in] patchno the patch number
  */
-typedef void (*fclaw2d_patch_setup_t)(struct fclaw_global *glob,
+typedef void (*fclaw_patch_setup_t)(struct fclaw_global *glob,
                                       struct fclaw_patch *this_patch,
                                       int patchno,
                                       int blockno);
@@ -894,7 +894,7 @@ typedef void (*fclaw2d_patch_setup_t)(struct fclaw_global *glob,
  * @param[in] blockno the block number
  * @param[in] patchno the patch number
  */
-typedef void (*fclaw2d_patch_initialize_t)(struct fclaw_global *glob,
+typedef void (*fclaw_patch_initialize_t)(struct fclaw_global *glob,
                                            struct fclaw_patch *this_patch,
                                            int blockno,
                                            int patchno);
@@ -912,7 +912,7 @@ typedef void (*fclaw2d_patch_initialize_t)(struct fclaw_global *glob,
  *                          a physical boundary
  * @param[in] time_interp the patch number
  */
-typedef void (*fclaw2d_patch_physical_bc_t)(struct fclaw_global *glob,
+typedef void (*fclaw_patch_physical_bc_t)(struct fclaw_global *glob,
                                             struct fclaw_patch *this_patch,
                                             int blockno,
                                             int patchno,
@@ -934,7 +934,7 @@ typedef void (*fclaw2d_patch_physical_bc_t)(struct fclaw_global *glob,
  *                            (used in cudaclaw)
  * @return the maxcfl
  */
-typedef double (*fclaw2d_patch_single_step_update_t)(struct fclaw_global *glob,
+typedef double (*fclaw_patch_single_step_update_t)(struct fclaw_global *glob,
                                                      struct fclaw_patch *this_patch,
                                                      int blockno,
                                                      int patchno,
@@ -951,7 +951,7 @@ typedef double (*fclaw2d_patch_single_step_update_t)(struct fclaw_global *glob,
  * @param[in] blockno the block number
  * @param[in] patchno the patch number
  */
-typedef void (*fclaw2d_patch_rhs_t)(struct fclaw_global *glob,
+typedef void (*fclaw_patch_rhs_t)(struct fclaw_global *glob,
                                     struct fclaw_patch *patch,
                                     int blockno,
                                     int patchno);
@@ -963,16 +963,16 @@ typedef void (*fclaw2d_patch_rhs_t)(struct fclaw_global *glob,
 ///@{
 
 /** @copydoc fclaw2d_patch_setup_timeinterp() */
-typedef void (*fclaw2d_patch_setup_timeinterp_t)(struct fclaw_global *glob,
+typedef void (*fclaw_patch_setup_timeinterp_t)(struct fclaw_global *glob,
                                                  struct fclaw_patch *this_patch,
                                                  double alpha);
 
 /** @copydoc fclaw2d_patch_restore_step() */
-typedef void (*fclaw2d_patch_restore_step_t)(struct fclaw_global *glob,
+typedef void (*fclaw_patch_restore_step_t)(struct fclaw_global *glob,
                                              struct fclaw_patch* this_patch);
 
 /** @copydoc fclaw2d_patch_save_step() */
-typedef void (*fclaw2d_patch_save_step_t)(struct fclaw_global *glob,
+typedef void (*fclaw_patch_save_step_t)(struct fclaw_global *glob,
                                           struct fclaw_patch* this_patch);
 
 
@@ -1200,7 +1200,7 @@ typedef void (*fclaw2d_patch_transform_blockface_intra_t)(int ftransform[]);
  * @param[in] initflag true if in init phase
  * @return true if patch should be refined
  */
-typedef int (*fclaw2d_patch_tag4refinement_t)(struct fclaw_global *glob,
+typedef int (*fclaw_patch_tag4refinement_t)(struct fclaw_global *glob,
                                               struct fclaw_patch *this_patch,
                                               int this_blockno, int this_patchno,
                                               int initflag);
@@ -1215,7 +1215,7 @@ typedef int (*fclaw2d_patch_tag4refinement_t)(struct fclaw_global *glob,
  * @param[in] initflag true if in init phase
  * @return true if patch should be coarsened
  */
-typedef int (*fclaw2d_patch_tag4coarsening_t)(struct fclaw_global *glob,
+typedef int (*fclaw_patch_tag4coarsening_t)(struct fclaw_global *glob,
                                               struct fclaw_patch *this_patch,
                                               int this_blockno,
                                               int this_patchno,
@@ -1231,7 +1231,7 @@ typedef int (*fclaw2d_patch_tag4coarsening_t)(struct fclaw_global *glob,
  * @param[in] coarse_patchno the patch number of the coarse patch
  * @param[in] fine_patchno the patch number of the first fine patch
  */
-typedef void (*fclaw2d_patch_interpolate2fine_t)(struct fclaw_global *glob,
+typedef void (*fclaw_patch_interpolate2fine_t)(struct fclaw_global *glob,
                                                  struct fclaw_patch *coarse_patch,
                                                  struct fclaw_patch* fine_patches,
                                                  int blockno, int coarse_patchno,
@@ -1246,7 +1246,7 @@ typedef void (*fclaw2d_patch_interpolate2fine_t)(struct fclaw_global *glob,
  * @param[in] fine_patchno the patch number of the first fine patch
  * @param[in] coarse_patchno the patch number of the coarse patch
  */
-typedef void (*fclaw2d_patch_average2coarse_t)(struct fclaw_global *glob,
+typedef void (*fclaw_patch_average2coarse_t)(struct fclaw_global *glob,
                                                struct fclaw_patch *fine_patches,
                                                struct fclaw_patch *coarse_patch,
                                                int blockno, int fine_patchno,
@@ -1314,18 +1314,18 @@ typedef void (*fclaw2d_patch_remote_ghost_delete_t)(void *user_patch);
 ///@{
 
 /** @copydoc fclaw2d_patch_partition_packsize() */
-typedef size_t (*fclaw2d_patch_partition_packsize_t)(struct fclaw_global* glob);
+typedef size_t (*fclaw_patch_partition_packsize_t)(struct fclaw_global* glob);
 
 
 /** @copydoc fclaw2d_patch_partition_pack() */
-typedef void (*fclaw2d_patch_partition_pack_t)(struct fclaw_global *glob,
+typedef void (*fclaw_patch_partition_pack_t)(struct fclaw_global *glob,
                                                struct fclaw_patch *this_patch,
                                                int blockno,
                                                int patchno,
                                                void *pack_data_here);
 
 /** @copydoc fclaw2d_patch_partition_unpack() */
-typedef void (*fclaw2d_patch_partition_unpack_t)(struct fclaw_global *glob,
+typedef void (*fclaw_patch_partition_unpack_t)(struct fclaw_global *glob,
                                                  struct fclaw_domain *new_domain,
                                                  struct fclaw_patch *this_patch,
                                                  int blockno,
@@ -1340,7 +1340,7 @@ typedef void (*fclaw2d_patch_partition_unpack_t)(struct fclaw_global *glob,
 
 
 /** @copydoc fclaw2d_patch_time_sync_f2c() */
-typedef void (*fclaw2d_patch_time_sync_f2c_t)(struct fclaw_global* glob,
+typedef void (*fclaw_patch_time_sync_f2c_t)(struct fclaw_global* glob,
                                               struct fclaw_patch *coarse_patch,
                                               struct fclaw_patch *fine_patch,
                                               int coarse_blockno, int fine_blockno,
@@ -1353,7 +1353,7 @@ typedef void (*fclaw2d_patch_time_sync_f2c_t)(struct fclaw_global* glob,
                                               *transform_data);
 
 /** @copydoc fclaw2d_patch_time_sync_samesize() */
-typedef void (*fclaw2d_patch_time_sync_samesize_t)(struct fclaw_global* glob,
+typedef void (*fclaw_patch_time_sync_samesize_t)(struct fclaw_global* glob,
                                                    struct fclaw_patch* this_patch,
                                                    struct fclaw_patch* neighbor_patch,
                                                    int this_iface, int idir,
@@ -1361,7 +1361,7 @@ typedef void (*fclaw2d_patch_time_sync_samesize_t)(struct fclaw_global* glob,
                                                    *transform_data);
 
 /** @copydoc fclaw2d_patch_time_sync_reset() */
-typedef void (*fclaw2d_patch_time_sync_reset_t)(struct fclaw_global *glob, 
+typedef void (*fclaw_patch_time_sync_reset_t)(struct fclaw_global *glob, 
                                                 struct fclaw_patch *this_patch,
                                                 int coarse_level,
                                                 int reset_mode);
@@ -1378,7 +1378,7 @@ typedef void (*fclaw2d_patch_time_sync_reset_t)(struct fclaw_global *glob,
  * @param[in] glob the global context
  * @param[in,out] patch the patch context
  */
-typedef void (*fclaw2d_patch_create_user_data_t)(struct fclaw_global *glob, 
+typedef void (*fclaw_patch_create_user_data_t)(struct fclaw_global *glob, 
                                               struct fclaw_patch *patch);
 
 /**
@@ -1387,7 +1387,7 @@ typedef void (*fclaw2d_patch_create_user_data_t)(struct fclaw_global *glob,
  * @param[in] glob the global context
  * @param[in,out] patch the patch context
  */
-typedef void (*fclaw2d_patch_destroy_user_data_t)(struct fclaw_global* glob,
+typedef void (*fclaw_patch_destroy_user_data_t)(struct fclaw_global* glob,
                                                   struct fclaw_patch* patch);
 
 ///@}
@@ -1414,79 +1414,89 @@ struct fclaw2d_patch_vtable
 {
     /** @{ @name Creating/Deleting/Building */
 
-    /** @copybrief ::fclaw2d_patch_new_t */
-    fclaw2d_patch_new_t                   patch_new;
-    /** @copybrief ::fclaw2d_patch_delete_t */
-    fclaw2d_patch_delete_t                patch_delete;
-    /** @copybrief ::fclaw2d_patch_build_t */
-    fclaw2d_patch_build_t                 build;
-    /** @copybrief ::fclaw2d_patch_build_from_fine_t */
-    fclaw2d_patch_build_from_fine_t       build_from_fine;
-    /** @copybrief ::fclaw2d_patch_setup_t */
-    fclaw2d_patch_setup_t                 setup;
+    /** @copybrief ::fclaw_patch_new_t */
+    fclaw_patch_new_t                   patch_new;
+    /** @copybrief ::fclaw_patch_delete_t */
+    fclaw_patch_delete_t                patch_delete;
+    /** @copybrief ::fclaw_patch_build_t */
+    fclaw_patch_build_t                 build;
+    /** @copybrief ::fclaw_patch_build_from_fine_t */
+    fclaw_patch_build_from_fine_t       build_from_fine;
+    /** @copybrief ::fclaw_patch_setup_t */
+    fclaw_patch_setup_t                 setup;
 
     /** @} */
 
-    /** @copybrief ::fclaw2d_patch_metric_patch_t */
-    fclaw2d_patch_metric_patch_t          metric_patch;
-
     /** @{ @name User Data */
 
-    /** @copybrief ::fclaw2d_patch_create_user_data_t */
-    fclaw2d_patch_create_user_data_t      create_user_data;
-    /** @copybrief ::fclaw2d_patch_destroy_user_data_t */
-    fclaw2d_patch_destroy_user_data_t     destroy_user_data;
+    /** @copybrief ::fclaw_patch_create_user_data_t */
+    fclaw_patch_create_user_data_t      create_user_data;
+    /** @copybrief ::fclaw_patch_destroy_user_data_t */
+    fclaw_patch_destroy_user_data_t     destroy_user_data;
 
     /** @} */
 
     /** @{ @name Solver Functions */
 
-    /** @copybrief ::fclaw2d_patch_initialize_t */
-    fclaw2d_patch_initialize_t            initialize;
-    /** @copybrief ::fclaw2d_patch_physical_bc_t */
-    fclaw2d_patch_physical_bc_t           physical_bc;
-    /** @copybrief ::fclaw2d_patch_single_step_update_t */
-    fclaw2d_patch_single_step_update_t    single_step_update;
-    /** @copybrief ::fclaw2d_patch_rhs_t */
-    fclaw2d_patch_rhs_t                   rhs;
+    /** @copybrief ::fclaw_patch_initialize_t */
+    fclaw_patch_initialize_t            initialize;
+    /** @copybrief ::fclaw_patch_physical_bc_t */
+    fclaw_patch_physical_bc_t           physical_bc;
+    /** @copybrief ::fclaw_patch_single_step_update_t */
+    fclaw_patch_single_step_update_t    single_step_update;
+    /** @copybrief ::fclaw_patch_rhs_t */
+    fclaw_patch_rhs_t                   rhs;
 
     /** @} */
 
     /** @{ @name Time Stepping */
 
-    /** @copybrief ::fclaw2d_patch_restore_step_t */
-    fclaw2d_patch_restore_step_t          restore_step;
-    /** @copybrief ::fclaw2d_patch_save_step_t */
-    fclaw2d_patch_save_step_t             save_step;
-    /** @copybrief ::fclaw2d_patch_setup_timeinterp_t */
-    fclaw2d_patch_setup_timeinterp_t      setup_timeinterp;
+    /** @copybrief ::fclaw_patch_restore_step_t */
+    fclaw_patch_restore_step_t          restore_step;
+    /** @copybrief ::fclaw_patch_save_step_t */
+    fclaw_patch_save_step_t             save_step;
+    /** @copybrief ::fclaw_patch_setup_timeinterp_t */
+    fclaw_patch_setup_timeinterp_t      setup_timeinterp;
 
     /** @} */
 
     /** @{ @name Regridding Functions */
 
-    /** @copybrief ::fclaw2d_patch_tag4refinement_t */
-    fclaw2d_patch_tag4refinement_t        tag4refinement;
-    /** @copybrief ::fclaw2d_patch_tag4coarsening_t */
-    fclaw2d_patch_tag4coarsening_t        tag4coarsening;
-    /** @copybrief ::fclaw2d_patch_average2coarse_t */
-    fclaw2d_patch_average2coarse_t        average2coarse;
-    /** @copybrief ::fclaw2d_patch_interpolate2fine_t */
-    fclaw2d_patch_interpolate2fine_t      interpolate2fine;
+    /** @copybrief ::fclaw_patch_tag4refinement_t */
+    fclaw_patch_tag4refinement_t        tag4refinement;
+    /** @copybrief ::fclaw_patch_tag4coarsening_t */
+    fclaw_patch_tag4coarsening_t        tag4coarsening;
+    /** @copybrief ::fclaw_patch_average2coarse_t */
+    fclaw_patch_average2coarse_t        average2coarse;
+    /** @copybrief ::fclaw_patch_interpolate2fine_t */
+    fclaw_patch_interpolate2fine_t      interpolate2fine;
 
     /** @} */
 
     /** @{ @name Time Syncing Functions for Conservation */
 
-    /** @copybrief ::fclaw2d_patch_time_sync_f2c_t */
-    fclaw2d_patch_time_sync_f2c_t         time_sync_f2c;
-    /** @copybrief ::fclaw2d_patch_time_sync_samesize_t */
-    fclaw2d_patch_time_sync_samesize_t    time_sync_samesize;
-    /** @copybrief ::fclaw2d_patch_time_sync_reset_t */
-    fclaw2d_patch_time_sync_reset_t       time_sync_reset;
+    /** @copybrief ::fclaw_patch_time_sync_f2c_t */
+    fclaw_patch_time_sync_f2c_t         time_sync_f2c;
+    /** @copybrief ::fclaw_patch_time_sync_samesize_t */
+    fclaw_patch_time_sync_samesize_t    time_sync_samesize;
+    /** @copybrief ::fclaw_patch_time_sync_reset_t */
+    fclaw_patch_time_sync_reset_t       time_sync_reset;
 
     /** @} */
 
+    /** @{ @name Parallel Load Balancing (partitioning) */
+
+    /** @copybrief ::fclaw_patch_partition_pack_t */
+    fclaw_patch_partition_pack_t         partition_pack;
+    /** @copybrief ::fclaw_patch_partition_unpack_t */
+    fclaw_patch_partition_unpack_t       partition_unpack;
+    /** @copybrief ::fclaw_patch_partition_packsize_t */
+    fclaw_patch_partition_packsize_t     partition_packsize;
+
+    /** @} */
+
+    /** @copybrief ::fclaw2d_patch_metric_patch_t */
+    fclaw2d_patch_metric_patch_t          metric_patch;
 
     /** @{ @name Face Ghost Filling Functions */
 
@@ -1551,17 +1561,6 @@ struct fclaw2d_patch_vtable
     fclaw2d_patch_remote_ghost_unpack_t   remote_ghost_unpack;
     /** @copybrief ::fclaw2d_patch_remote_ghost_delete_t */
     fclaw2d_patch_remote_ghost_delete_t   remote_ghost_delete;
-
-    /** @} */
-
-    /** @{ @name Parallel Load Balancing (partitioning) */
-
-    /** @copybrief ::fclaw2d_patch_partition_pack_t */
-    fclaw2d_patch_partition_pack_t         partition_pack;
-    /** @copybrief ::fclaw2d_patch_partition_unpack_t */
-    fclaw2d_patch_partition_unpack_t       partition_unpack;
-    /** @copybrief ::fclaw2d_patch_partition_packsize_t */
-    fclaw2d_patch_partition_packsize_t     partition_packsize;
 
     /** @} */
 
