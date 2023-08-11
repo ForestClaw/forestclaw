@@ -26,7 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW2D_REGRID_H
 #define FCLAW2D_REGRID_H
 
-#include <forestclaw2d.h>    /* Needed to define fclaw2d_patch_relation_t */
+#include <forestclaw2d.h>    /* Needed to define fclaw_patch_relation_t */
 
 #ifdef __cplusplus
 extern "C"
@@ -57,7 +57,7 @@ void cb_fclaw2d_regrid_repopulate(struct fclaw_domain * old_domain,
                                   struct fclaw_patch * old_patch,
                                   struct fclaw_domain * new_domain,
                                   struct fclaw_patch * new_patch,
-                                  fclaw2d_patch_relation_t newsize,
+                                  fclaw_patch_relation_t newsize,
                                   int blockno,
                                   int old_patchno,
                                   int new_patchno,

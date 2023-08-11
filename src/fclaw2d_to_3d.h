@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define fclaw2d_domain_persist_t        fclaw3d_domain_persist_t
 #define fclaw2d_timer_names_t           fclaw3d_timer_names_t
 #define fclaw2d_patch_callback_t        fclaw3d_patch_callback_t
-#define fclaw2d_patch_relation_t        fclaw3d_patch_relation_t
+#define fclaw_patch_relation_t        fclaw3d_patch_relation_t
 #define fclaw2d_match_callback_t        fclaw3d_match_callback_t
 #define fclaw2d_transfer_callback_t     fclaw3d_transfer_callback_t
 #define fclaw2d_domain_exchange_t       fclaw3d_domain_exchange_t
@@ -110,10 +110,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define FCLAW2D_PATCH_ON_BLOCK_FACE_1   FCLAW3D_PATCH_ON_BLOCK_FACE_1
 #define FCLAW2D_PATCH_ON_BLOCK_FACE_2   FCLAW3D_PATCH_ON_BLOCK_FACE_2
 #define FCLAW2D_PATCH_ON_BLOCK_FACE_3   FCLAW3D_PATCH_ON_BLOCK_FACE_3
-#define FCLAW2D_PATCH_BOUNDARY          FCLAW3D_PATCH_BOUNDARY
-#define FCLAW2D_PATCH_HALFSIZE          FCLAW3D_PATCH_HALFSIZE
-#define FCLAW2D_PATCH_SAMESIZE          FCLAW3D_PATCH_SAMESIZE
-#define FCLAW2D_PATCH_DOUBLESIZE        FCLAW3D_PATCH_DOUBLESIZE
 #define FCLAW2D_BUILD_FOR_GHOST_AREA_COMPUTED FCLAW3D_BUILD_FOR_GHOST_AREA_COMPUTED
 #define FCLAW2D_BUILD_FOR_GHOST_AREA_PACKED FCLAW3D_BUILD_FOR_GHOST_AREA_PACKED
 #define FCLAW2D_BUILD_FOR_UPDATE        FCLAW3D_BUILD_FOR_UPDATE

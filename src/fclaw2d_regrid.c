@@ -115,7 +115,7 @@ void cb_fclaw2d_regrid_repopulate(fclaw_domain_t * old_domain,
 								  fclaw_patch_t * old_patch,
 								  fclaw_domain_t * new_domain,
 								  fclaw_patch_t * new_patch,
-								  fclaw2d_patch_relation_t newsize,
+								  fclaw_patch_relation_t newsize,
 								  int blockno,
 								  int old_patchno,
 								  int new_patchno,
@@ -128,7 +128,7 @@ void cb_fclaw2d_regrid_repopulate(fclaw_domain_t * old_domain,
     fclaw2d_domain_data_t *ddata_new = fclaw2d_domain_get_data (new_domain);
     fclaw2d_build_mode_t build_mode = FCLAW2D_BUILD_FOR_UPDATE;
 
-    if (newsize == FCLAW2D_PATCH_SAMESIZE)
+    if (newsize == FCLAW_PATCH_SAMESIZE)
     {
         FCLAW_ASSERT(0 <= blockno && blockno < new_domain->num_blocks);
         FCLAW_ASSERT(0 <= new_patchno && new_patchno < new_domain->local_num_patches);
@@ -137,7 +137,7 @@ void cb_fclaw2d_regrid_repopulate(fclaw_domain_t * old_domain,
         ++ddata_old->count_delete_patch;
         ++ddata_new->count_set_patch;
     }
-    else if (newsize == FCLAW2D_PATCH_HALFSIZE)
+    else if (newsize == FCLAW_PATCH_HALFSIZE)
     {
         fclaw_patch_t *fine_siblings = new_patch;
         fclaw_patch_t *coarse_patch = old_patch;
@@ -171,7 +171,7 @@ void cb_fclaw2d_regrid_repopulate(fclaw_domain_t * old_domain,
         /* used to pass in old_domain */
         fclaw2d_patch_data_delete(g->glob,coarse_patch);
     }
-    else if (newsize == FCLAW2D_PATCH_DOUBLESIZE)
+    else if (newsize == FCLAW_PATCH_DOUBLESIZE)
     {
 
 #if 0      
@@ -350,7 +350,7 @@ void cb_set_neighbor_types(fclaw_domain_t *domain,
 		int rpatchno[2];
 		int rfaceno;
 
-		fclaw2d_patch_relation_t neighbor_type =
+		fclaw_patch_relation_t neighbor_type =
 		fclaw2d_patch_face_neighbors(domain,
 									 blockno,
 									 patchno,
@@ -369,7 +369,7 @@ void cb_set_neighbor_types(fclaw_domain_t *domain,
 		int cornerpatchno;
 		int cornerblockno;
 		int rcornerno;
-		fclaw2d_patch_relation_t neighbor_type;
+		fclaw_patch_relation_t neighbor_type;
 
 		int has_corner_neighbor =
 		fclaw2d_patch_corner_neighbors(domain,

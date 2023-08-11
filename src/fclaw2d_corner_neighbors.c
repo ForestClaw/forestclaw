@@ -147,7 +147,7 @@ void get_corner_neighbor(fclaw_global_t *glob,
     /* See what p4est thinks we have for corners, and consider four cases */
     int rproc_corner;
     int corner_patch_idx;
-    fclaw2d_patch_relation_t neighbor_type;
+    fclaw_patch_relation_t neighbor_type;
 
     /* Note : Pillowsphere case does not return a block corner neighbor */
     int ispillowsphere = fclaw2d_map_pillowsphere(glob);
@@ -281,7 +281,7 @@ void get_corner_neighbor(fclaw_global_t *glob,
                                              &rfaceno);
 
             int igrid;
-            if (neighbor_type == FCLAW2D_PATCH_HALFSIZE)
+            if (neighbor_type == FCLAW_PATCH_HALFSIZE)
             {
                 /* igrid = 0 at corners 0,1 and (R-1) at corners 2,3,
                    where R = refinement factor */
@@ -315,11 +315,11 @@ void get_corner_neighbor(fclaw_global_t *glob,
         *corner_patch = &neighbor_block->patches[corner_patch_idx];
     }
 
-    if (neighbor_type == FCLAW2D_PATCH_HALFSIZE)
+    if (neighbor_type == FCLAW_PATCH_HALFSIZE)
     {
         **ref_flag_ptr = 1;
     }
-    else if (neighbor_type == FCLAW2D_PATCH_SAMESIZE)
+    else if (neighbor_type == FCLAW_PATCH_SAMESIZE)
     {
         **ref_flag_ptr = 0;
     }

@@ -46,7 +46,7 @@ fclaw3d_patch_edge_neighbors (fclaw_domain_t * domain,
                               int blockno, int patchno, int edgeno,
                               int *rproc, int *rblockno, int *rpatchno,
                               int *redge,
-                              fclaw2d_patch_relation_t * neighbor_size)
+                              fclaw_patch_relation_t * neighbor_size)
 {
     p4est_wrap_t *wrap = (p4est_wrap_t *) domain->pp;
     p4est_t *p4est = wrap->p4est;
@@ -115,7 +115,7 @@ fclaw3d_patch_edge_neighbors (fclaw_domain_t * domain,
     {
         /* The value -1 is expected for an edge on the physical boundary */
         /* Currently we also return this for five- and more-edges */
-        *neighbor_size = FCLAW2D_PATCH_BOUNDARY;
+        *neighbor_size = FCLAW_PATCH_BOUNDARY;
         *redge = -1;
     }
     else
@@ -144,13 +144,13 @@ fclaw3d_patch_edge_neighbors (fclaw_domain_t * domain,
         switch (q->level - block->patches[patchno].level)
         {
         case -1:
-            *neighbor_size = FCLAW2D_PATCH_DOUBLESIZE;
+            *neighbor_size = FCLAW_PATCH_DOUBLESIZE;
             break;
         case 0:
-            *neighbor_size = FCLAW2D_PATCH_SAMESIZE;
+            *neighbor_size = FCLAW_PATCH_SAMESIZE;
             break;
         case 1:
-            *neighbor_size = FCLAW2D_PATCH_HALFSIZE;
+            *neighbor_size = FCLAW_PATCH_HALFSIZE;
             break;
         default:
             SC_ABORT_NOT_REACHED ();
@@ -168,7 +168,7 @@ fclaw3d_patch_edge_neighbors (fclaw_domain_t * domain,
         /* *INDENT-ON* */
     }
 
-    return *neighbor_size != FCLAW2D_PATCH_BOUNDARY;
+    return *neighbor_size != FCLAW_PATCH_BOUNDARY;
 }
 
 void

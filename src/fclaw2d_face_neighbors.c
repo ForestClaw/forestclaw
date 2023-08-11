@@ -93,7 +93,7 @@ void get_face_neighbors(fclaw_global_t *glob,
 	}
 
 	fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_NEIGHBOR_SEARCH]);
-	fclaw2d_patch_relation_t neighbor_type =
+	fclaw_patch_relation_t neighbor_type =
 	fclaw2d_patch_face_neighbors(domain,
 								 this_block_idx,
 								 this_patch_idx,
@@ -113,7 +113,7 @@ void get_face_neighbors(fclaw_global_t *glob,
 	  FCLAW2D_PATCH_DOUBLESIZE
 	  ------------------------------- */
 
-	if (neighbor_type == FCLAW2D_PATCH_BOUNDARY)
+	if (neighbor_type == FCLAW_PATCH_BOUNDARY)
 	{
 		/* This case should be excluded by earlier checks */
 		printf("get_face_neighbors (fclaw2d_face_neighbors.cpp) : No patch " \
@@ -145,19 +145,19 @@ void get_face_neighbors(fclaw_global_t *glob,
 				(glob, ftransform_finegrid->transform);
 		}
 
-		if (neighbor_type == FCLAW2D_PATCH_SAMESIZE)
+		if (neighbor_type == FCLAW_PATCH_SAMESIZE)
 		{
 			**ref_flag_ptr = 0;
 			*fine_grid_pos_ptr = NULL;
 			num_neighbors = 1;
 		}
-		else if (neighbor_type == FCLAW2D_PATCH_DOUBLESIZE)
+		else if (neighbor_type == FCLAW_PATCH_DOUBLESIZE)
 		{
 			**ref_flag_ptr = -1;
 			**fine_grid_pos_ptr = rproc[1];    /* Special storage for fine grid info */
 			num_neighbors = 1;
 		}
-		else if (neighbor_type == FCLAW2D_PATCH_HALFSIZE)
+		else if (neighbor_type == FCLAW_PATCH_HALFSIZE)
 		{
 			/* Patch has two neighbors */
 			**ref_flag_ptr = 1; /* patches are at one level finer */
@@ -512,7 +512,7 @@ void fclaw2d_face_neighbor_ghost(fclaw_global_t* glob,
 			   from different processors, since these will not have
 			   exchange face data before being thrown over proc fence.
 			*/
-			fclaw2d_patch_relation_t neighbor_type =
+			fclaw_patch_relation_t neighbor_type =
 				fclaw2d_domain_indirect_neighbors(domain,
 												  ind,
 												  this_ghost_idx,
@@ -520,7 +520,7 @@ void fclaw2d_face_neighbor_ghost(fclaw_global_t* glob,
 												  &rblockno, rpatchno,
 												  &rfaceno);
 
-			if (neighbor_type != FCLAW2D_PATCH_BOUNDARY)
+			if (neighbor_type != FCLAW_PATCH_BOUNDARY)
 			{
 				/* We have a neighbor ghost patch that came from a
 				   different proc */
@@ -538,7 +538,7 @@ void fclaw2d_face_neighbor_ghost(fclaw_global_t* glob,
 				{
 					fclaw2d_patch_transform_blockface_intra(glob, transform_data.transform);
 				}
-				if (neighbor_type == FCLAW2D_PATCH_SAMESIZE)
+				if (neighbor_type == FCLAW_PATCH_SAMESIZE)
 				{
 					/* Copy from same size neighbor */
 					fclaw_patch_t *neighbor_patch = &domain->ghost_patches[rpatchno[0]];
@@ -548,7 +548,7 @@ void fclaw2d_face_neighbor_ghost(fclaw_global_t* glob,
 
 					++glob->count_multiproc_corner;
 				}
-				else if (neighbor_type == FCLAW2D_PATCH_HALFSIZE)
+				else if (neighbor_type == FCLAW_PATCH_HALFSIZE)
 				{
 					/* Average from fine grid neighbor */
 					for (igrid = 0; igrid < FCLAW2D_NUMFACENEIGHBORS; igrid++)
@@ -567,7 +567,7 @@ void fclaw2d_face_neighbor_ghost(fclaw_global_t* glob,
 					}
 					++glob->count_multiproc_corner;
 				}
-				else if (neighbor_type == FCLAW2D_PATCH_DOUBLESIZE)
+				else if (neighbor_type == FCLAW_PATCH_DOUBLESIZE)
 				{
 					/* Don't do anything; we don't need fine grid ghost cells
 					   on ghost patches.  Proof : Consider the corners of the fine

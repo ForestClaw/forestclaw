@@ -77,9 +77,9 @@ struct fclaw2d_patch_data
     const fclaw_patch_t *real_patch;
 
     /** Neighbor relation on each face */
-    fclaw2d_patch_relation_t face_neighbors[4];
+    fclaw_patch_relation_t face_neighbors[4];
     /** Neighbor relation on each corner */
-    fclaw2d_patch_relation_t corner_neighbors[4];
+    fclaw_patch_relation_t corner_neighbors[4];
     /** True if coner has neighbor */
     int corners[4];
     /** The number of patches that meet at each corner */
@@ -1727,7 +1727,7 @@ int fclaw2d_patch_on_parallel_boundary (const struct fclaw_patch * patch);
  * @param face_type the face type
  */
 void fclaw2d_patch_set_face_type(struct fclaw_patch *patch, int iface,
-                                 fclaw2d_patch_relation_t face_type);
+                                 fclaw_patch_relation_t face_type);
 
 /**
  * @brief Set the corner type for a patch
@@ -1737,7 +1737,7 @@ void fclaw2d_patch_set_face_type(struct fclaw_patch *patch, int iface,
  * @param corner_type the corner type
  */
 void fclaw2d_patch_set_corner_type(struct fclaw_patch *patch, int icorner,
-                                   fclaw2d_patch_relation_t corner_type);
+                                   fclaw_patch_relation_t corner_type);
 
 /**
  * @brief Set the missing corner of a patch
@@ -1752,9 +1752,9 @@ void fclaw2d_patch_set_missing_corner(struct fclaw_patch *patch, int icorner);
  * 
  * @param patch the patch context
  * @param iface the face
- * @return fclaw2d_patch_relation_t the face type
+ * @return fclaw_patch_relation_t the face type
  */
-fclaw2d_patch_relation_t fclaw2d_patch_get_face_type(struct fclaw_patch* patch,
+fclaw_patch_relation_t fclaw2d_patch_get_face_type(struct fclaw_patch* patch,
                                                         int iface);
 
 /**
@@ -1762,9 +1762,9 @@ fclaw2d_patch_relation_t fclaw2d_patch_get_face_type(struct fclaw_patch* patch,
  * 
  * @param patch the patch context
  * @param icorner the corner
- * @return fclaw2d_patch_relation_t the patch relation
+ * @return fclaw_patch_relation_t the patch relation
  */
-fclaw2d_patch_relation_t fclaw2d_patch_get_corner_type(struct fclaw_patch* patch,
+fclaw_patch_relation_t fclaw2d_patch_get_corner_type(struct fclaw_patch* patch,
                                                           int icorner);
 
 /**

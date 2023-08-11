@@ -27,13 +27,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "fclaw2d_patch.c"
 
 void fclaw3d_patch_set_edge_type(fclaw_patch_t *patch,int iedge,
-								   fclaw2d_patch_relation_t edge_type)
+								   fclaw_patch_relation_t edge_type)
 {
 	fclaw2d_patch_data_t *pdata = get_patch_data(patch);
 	pdata->edge_neighbors[iedge] = edge_type;
 }
 
-fclaw2d_patch_relation_t fclaw3d_patch_get_edge_type(fclaw_patch_t* patch,
+fclaw_patch_relation_t fclaw3d_patch_get_edge_type(fclaw_patch_t* patch,
 													   int iedge)
 {
 	fclaw2d_patch_data_t *pdata = get_patch_data(patch);

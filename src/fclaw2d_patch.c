@@ -927,14 +927,14 @@ fclaw2d_patch_get_patchno(fclaw_patch_t* this_patch)
 /* -------------------------- Internal ForestClaw functions --------------------------- */
 
 void fclaw2d_patch_set_face_type(fclaw_patch_t *patch,int iface,
-								 fclaw2d_patch_relation_t face_type)
+								 fclaw_patch_relation_t face_type)
 {
 	fclaw2d_patch_data_t *pdata = get_patch_data(patch);
 	pdata->face_neighbors[iface] = face_type;
 }
 
 void fclaw2d_patch_set_corner_type(fclaw_patch_t *patch,int icorner,
-								   fclaw2d_patch_relation_t corner_type)
+								   fclaw_patch_relation_t corner_type)
 {
 	fclaw2d_patch_data_t *pdata = get_patch_data(patch);
 	pdata->corner_neighbors[icorner] = corner_type;
@@ -947,7 +947,7 @@ void fclaw2d_patch_set_missing_corner(fclaw_patch_t *patch,int icorner)
 	pdata->corners[icorner] = 0;
 }
 
-fclaw2d_patch_relation_t fclaw2d_patch_get_face_type(fclaw_patch_t* patch,
+fclaw_patch_relation_t fclaw2d_patch_get_face_type(fclaw_patch_t* patch,
 													 int iface)
 {
 	fclaw2d_patch_data_t *pdata = get_patch_data(patch);
@@ -956,7 +956,7 @@ fclaw2d_patch_relation_t fclaw2d_patch_get_face_type(fclaw_patch_t* patch,
 	return pdata->face_neighbors[iface];
 }
 
-fclaw2d_patch_relation_t fclaw2d_patch_get_corner_type(fclaw_patch_t* patch,
+fclaw_patch_relation_t fclaw2d_patch_get_corner_type(fclaw_patch_t* patch,
 													   int icorner)
 {
 	fclaw2d_patch_data_t *pdata = get_patch_data(patch);
@@ -985,12 +985,12 @@ void fclaw2d_patch_neighbors_set(fclaw_patch_t* patch)
 	pdata->on_coarsefine_interface = 0;
 	for (iface = 0; iface < FCLAW2D_NUMFACES; iface++)
 	{
-		fclaw2d_patch_relation_t nt;
+		fclaw_patch_relation_t nt;
 		nt = pdata->face_neighbors[iface];
-		if (nt == FCLAW2D_PATCH_HALFSIZE || (nt == FCLAW2D_PATCH_DOUBLESIZE))
+		if (nt == FCLAW_PATCH_HALFSIZE || (nt == FCLAW_PATCH_DOUBLESIZE))
 		{
 			pdata->on_coarsefine_interface = 1;
-			if (nt == FCLAW2D_PATCH_HALFSIZE)
+			if (nt == FCLAW_PATCH_HALFSIZE)
 			{
 				pdata->has_finegrid_neighbors = 1;
 			}
@@ -1000,12 +1000,12 @@ void fclaw2d_patch_neighbors_set(fclaw_patch_t* patch)
 #ifdef P4_TO_P8
 	for (iedge = 0; iedge < FCLAW3D_NUMEDGES; iedge++)
 	{
-		fclaw2d_patch_relation_t nt;
+		fclaw_patch_relation_t nt;
 		nt = pdata->edge_neighbors[iedge];
-		if (nt == FCLAW2D_PATCH_HALFSIZE || (nt == FCLAW2D_PATCH_DOUBLESIZE))
+		if (nt == FCLAW_PATCH_HALFSIZE || (nt == FCLAW_PATCH_DOUBLESIZE))
 		{
 			pdata->on_coarsefine_interface = 1;
-			if (nt == FCLAW2D_PATCH_HALFSIZE)
+			if (nt == FCLAW_PATCH_HALFSIZE)
 			{
 				pdata->has_finegrid_neighbors = 1;
 			}
@@ -1015,15 +1015,15 @@ void fclaw2d_patch_neighbors_set(fclaw_patch_t* patch)
 
 	for (icorner = 0; icorner < FCLAW2D_NUMCORNERS; icorner++)
 	{
-		fclaw2d_patch_relation_t nt;
+		fclaw_patch_relation_t nt;
 		int has_corner = pdata->corners[icorner];
 		if (has_corner)
 		{
 			nt = pdata->corner_neighbors[icorner];
-			if ((nt == FCLAW2D_PATCH_HALFSIZE) || (nt == FCLAW2D_PATCH_DOUBLESIZE))
+			if ((nt == FCLAW_PATCH_HALFSIZE) || (nt == FCLAW_PATCH_DOUBLESIZE))
 			{
 				pdata->on_coarsefine_interface = 1;
-				if (nt == FCLAW2D_PATCH_HALFSIZE)
+				if (nt == FCLAW_PATCH_HALFSIZE)
 				{
 					pdata->has_finegrid_neighbors = 1;
 				}

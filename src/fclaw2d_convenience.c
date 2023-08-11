@@ -537,7 +537,7 @@ fclaw2d_domain_adapt (fclaw_domain_t * domain)
         int level, max_tlevel;
         int exists;
         int k;
-        fclaw2d_patch_relation_t nrel;
+        fclaw_patch_relation_t nrel;
         fclaw_block_t *block;
         fclaw_patch_t *gpatch, *patch, *npatch;
 
@@ -574,7 +574,7 @@ fclaw2d_domain_adapt (fclaw_domain_t * domain)
                                                          npatchno, &nfc);
 
                     /* we refine ourself if the neighbor wants to be finer */
-                    if (nrel == FCLAW2D_PATCH_SAMESIZE)
+                    if (nrel == FCLAW_PATCH_SAMESIZE)
                     {
                         npatch = fclaw2d_domain_get_neighbor_patch (domain,
                                                                     nprocs[0],
@@ -588,7 +588,7 @@ fclaw2d_domain_adapt (fclaw_domain_t * domain)
                             max_tlevel =
                                 SC_MAX (max_tlevel, npatch->target_level);
                     }
-                    else if (nrel == FCLAW2D_PATCH_DOUBLESIZE)
+                    else if (nrel == FCLAW_PATCH_DOUBLESIZE)
                     {
                         npatch = fclaw2d_domain_get_neighbor_patch (domain,
                                                                     nprocs[0],
@@ -600,7 +600,7 @@ fclaw2d_domain_adapt (fclaw_domain_t * domain)
                             max_tlevel =
                                 SC_MAX (max_tlevel, npatch->target_level);
                     }
-                    else if (nrel == FCLAW2D_PATCH_HALFSIZE)
+                    else if (nrel == FCLAW_PATCH_HALFSIZE)
                     {
                         for (k = 0; k < P4EST_HALF; ++k)
                         {
@@ -618,7 +618,7 @@ fclaw2d_domain_adapt (fclaw_domain_t * domain)
                     }
                     else
                     {
-                        FCLAW_ASSERT (nrel == FCLAW2D_PATCH_BOUNDARY);
+                        FCLAW_ASSERT (nrel == FCLAW_PATCH_BOUNDARY);
                     }
                 }
 
@@ -638,7 +638,7 @@ fclaw2d_domain_adapt (fclaw_domain_t * domain)
                                                              &nfc, &nrel);
                     if (exists)
                     {
-                        FCLAW_ASSERT (nrel != FCLAW2D_PATCH_BOUNDARY);
+                        FCLAW_ASSERT (nrel != FCLAW_PATCH_BOUNDARY);
                         npatch =
                             fclaw2d_domain_get_neighbor_patch (domain,
                                                                nprocs[0],
@@ -837,7 +837,7 @@ fclaw2d_domain_list_neighbors_callback (fclaw_domain_t * domain,
 {
     fclaw2d_domain_list_neighbors_t *ln =
         (fclaw2d_domain_list_neighbors_t *) user;
-    fclaw2d_patch_relation_t fnt;
+    fclaw_patch_relation_t fnt;
     int faceno, cornerno, rcorner;
     int rproc[P4EST_FACES], rblockno, rpatchno[P4EST_FACES], rfaceno;
 
@@ -887,7 +887,7 @@ fclaw2d_domain_list_adapted_callback (fclaw_domain_t * old_domain,
                                       fclaw_patch_t * old_patch,
                                       fclaw_domain_t * new_domain,
                                       fclaw_patch_t * new_patch,
-                                      fclaw2d_patch_relation_t newsize,
+                                      fclaw_patch_relation_t newsize,
                                       int blockno,
                                       int old_patchno, int new_patchno,
                                       void *user)
@@ -907,7 +907,7 @@ fclaw2d_domain_list_adapted_callback (fclaw_domain_t * old_domain,
     FCLAW_ASSERT (new_patch ==
                   new_domain->blocks[blockno].patches + new_patchno);
 
-    if (newsize == FCLAW2D_PATCH_HALFSIZE)
+    if (newsize == FCLAW_PATCH_HALFSIZE)
     {
         /* refinement */
         FCLAW_ASSERT (new_patchno + P4EST_CHILDREN <=
@@ -920,7 +920,7 @@ fclaw2d_domain_list_adapted_callback (fclaw_domain_t * old_domain,
         P4EST_LOGF (lp, "Block %d refinement %d to %d\n",
                     blockno, old_patchno, new_patchno);
     }
-    else if (newsize == FCLAW2D_PATCH_DOUBLESIZE)
+    else if (newsize == FCLAW_PATCH_DOUBLESIZE)
     {
         /* coarsening */
         FCLAW_ASSERT (old_patchno + P4EST_CHILDREN <=
@@ -936,7 +936,7 @@ fclaw2d_domain_list_adapted_callback (fclaw_domain_t * old_domain,
     else
     {
         /* noop */
-        FCLAW_ASSERT (newsize == FCLAW2D_PATCH_SAMESIZE);
+        FCLAW_ASSERT (newsize == FCLAW_PATCH_SAMESIZE);
         FCLAW_ASSERT (old_patch->level == new_patch->level);
         FCLAW_ASSERT (fclaw2d_patch_childid (old_patch) ==
                       fclaw2d_patch_childid (new_patch));

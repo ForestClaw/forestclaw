@@ -193,18 +193,6 @@ int fclaw2d_patch_is_ghost (const fclaw_patch_t * patch);
 /* ---------------------------------------------------------------------- */
 ///@{
 
-/** Callback prototype for the patch iterators.
- * We iterate over local patches only.
- * \param [in] domain	General domain structure.
- * \param [in] patch	The local patch currently processed by the iterator.
- * \param [in] blockno  Block number of processed patch.
- * \param [in] patchno  Patch number within block of processed patch.
- * \param [in,out] user	Data that was passed into the iterator functions.
- */
-typedef void (*fclaw_patch_callback_t)
-    (fclaw_domain_t * domain, fclaw_patch_t * patch,
-     int blockno, int patchno, void *user);
-
 /** Iterate over all local patches on a given level.
  * \param [in] domain	General domain structure.
  * \param [in] level	Level to iterate.  Ignore patches of other levels.
@@ -263,22 +251,6 @@ int fclaw2d_patch_boundary_type (fclaw_domain_t * domain,
 int fclaw2d_patch_normal_match (fclaw_domain_t * domain,
                                 int blockno, int patchno, int faceno);
 
-/**
- * @brief The type of face neighbor
- */
-typedef enum fclaw2d_face_neighbor
-{
-    /** Physical boundary */
-    FCLAW2D_PATCH_BOUNDARY,
-    /** Half-size (finer) neighbor */
-    FCLAW2D_PATCH_HALFSIZE,
-    /** Same-size neighbor */
-    FCLAW2D_PATCH_SAMESIZE,
-    /** Double-size (coarser) neighbor */
-    FCLAW2D_PATCH_DOUBLESIZE
-}
-fclaw2d_patch_relation_t;
-
 /** Determine neighbor patch(es) and orientation across a given face.
  * This must ONLY be called for local patches.
  * \param [in] domain   Valid domain structure.
@@ -296,7 +268,7 @@ fclaw2d_patch_relation_t;
  * \param [out] rfaceno Neighbor face number and orientation.
  * \return              The relative patch size of the face neighbor.
  */
-fclaw2d_patch_relation_t fclaw2d_patch_face_neighbors (fclaw_domain_t *
+fclaw_patch_relation_t fclaw2d_patch_face_neighbors (fclaw_domain_t *
                                                        domain, int blockno,
                                                        int patchno,
                                                        int faceno,
@@ -445,7 +417,7 @@ int fclaw2d_patch_corner_neighbors (fclaw_domain_t * domain,
                                     int blockno, int patchno, int cornerno,
                                     int *rproc, int *rblockno, int *rpatchno,
                                     int *rcorner,
-                                    fclaw2d_patch_relation_t * neighbor_size);
+                                    fclaw_patch_relation_t * neighbor_size);
 
 /** Change perspective across a corner neighbor situation.
  * \param [in,out] cornerno     On input, valid corner number for a patch.
@@ -551,24 +523,6 @@ void fclaw2d_patch_mark_refine (fclaw_domain_t * domain,
 void fclaw2d_patch_mark_coarsen (fclaw_domain_t * domain,
                                  int blockno, int patchno);
 
-/** Callback prototype used in fclaw2d_domain_iterate_adapted.
- * The newsize value informs on refine/coarsen/noop status.
- * If refined (new patch is HALFSIZE), the old patch is old_patch[0] and the
- * new patches are given by new_patch[0] through new_patch[3]. The new_patchno
- * numbers are consecutive as well.
- * If noop (new patch is SAMESIZE), only old_patch[0] and new_patch[0] matter.
- * If coarsened (new patch is DOUBLESIZE), situation is the reverse of refine.
- * We iterate over local patches only.
- */
-typedef void (*fclaw_match_callback_t) (fclaw_domain_t * old_domain,
-                                          fclaw_patch_t * old_patch,
-                                          fclaw_domain_t * new_domain,
-                                          fclaw_patch_t * new_patch,
-                                          fclaw2d_patch_relation_t newsize,
-                                          int blockno,
-                                          int old_patchno, int new_patchno,
-                                          void *user);
-
 /** Iterate over the previous and the adapted domain simultaneously.
  * We iterate over local patches only.
  * \param [in,out] old_domain   Domain before adaptation.
@@ -611,32 +565,6 @@ void fclaw2d_domain_allocate_before_partition (fclaw_domain_t * domain,
  */
 void fclaw2d_domain_retrieve_after_partition (fclaw_domain_t * domain,
                                               void ***patch_data);
-
-/** Callback to iterate through the partitions.
- * We traverse every patch in the new partition.  If that patch was already
- * on the local processor before the partition, we identify its memory.
- * We iterate over local patches only.
- * \param [in,out] old_domain   Domain before partition.
- * \param [in,out] old_patch    If the patch stayed local, this is the pointer
- *                              in reference to the old domain and partition.
- *                              Otherwise, this patch pointer is set to NULL.
- * \param [in,out] new_domain   Domain after partition.
- * \param [in,out] new_patch    Patch in the new domain and partition.
- * \param [in] blockno          Number of the current block.
- * \param [in] old_patchno      Number of the patch that stayed local wrt. the
- *                              old domain and partition.  Minus one otherwise.
- * \param [in] new_patchno      Number of the iterated patch wrt. the new
- *                              domain and partition.
- * \param [in,out] user         Pointer passed to \ref
- *                              fclaw2d_domain_iterate_partitioned.
- */
-typedef void (*fclaw_transfer_callback_t) (fclaw_domain_t * old_domain,
-                                             fclaw_patch_t * old_patch,
-                                             fclaw_domain_t * new_domain,
-                                             fclaw_patch_t * new_patch,
-                                             int blockno,
-                                             int old_patchno, int new_patchno,
-                                             void *user);
 
 /** Iterate over the previous and partitioned domain simultaneously.
  * We iterate over local patches only.
@@ -817,7 +745,7 @@ void fclaw2d_domain_indirect_end (fclaw_domain_t * domain,
  *                              neighbor(s).  For all others, we set this to
  *                              \ref FCLAW2D_PATCH_BOUNDARY.
  */
-fclaw2d_patch_relation_t
+fclaw_patch_relation_t
 fclaw2d_domain_indirect_neighbors (fclaw_domain_t * domain,
                                    fclaw2d_domain_indirect_t * ind,
                                    int ghostno, int faceno, int rproc[2],

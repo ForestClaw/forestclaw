@@ -66,7 +66,7 @@ void cb_gem3d_output_mesh (fclaw_domain_t * domain,
         int rblockno;
         int rpatchno[2];
         int rfaceno;
-        fclaw2d_patch_relation_t neighbor_type =
+        fclaw_patch_relation_t neighbor_type =
                       fclaw2d_patch_face_neighbors(domain,
                                                    this_block_idx,
                                                    this_patch_idx,
