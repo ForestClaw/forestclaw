@@ -313,7 +313,7 @@ void outstyle_3(fclaw_global_t *glob)
 
         int time_interp = 0;
         fclaw2d_ghost_update(glob,fclaw_opt->minlevel,fclaw_opt->maxlevel,t_curr,
-                             time_interp,FCLAW2D_TIMER_NONE);
+                             time_interp,FCLAW_TIMER_NONE);
 
 
         double tc = t_curr + dt_step;

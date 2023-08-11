@@ -306,9 +306,9 @@ void outstyle_1(fclaw_global_t *glob)
             {
                 /* If we are taking a variable time step, we have to reduce the 
                    maxcfl so that every processor takes the same size dt */
-                fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_CFL_COMM]);
+                fclaw_timer_start (&glob->timers[FCLAW_TIMER_CFL_COMM]);
                 maxcfl_step = fclaw2d_domain_global_maximum (*domain, maxcfl_step);
-                fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_CFL_COMM]);                
+                fclaw_timer_stop (&glob->timers[FCLAW_TIMER_CFL_COMM]);                
             }
 
 
@@ -511,9 +511,9 @@ void outstyle_3(fclaw_global_t *glob)
         {
             /* If we are taking a variable time step, we have to reduce the 
                maxcfl so that every processor takes the same size dt */
-             fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_CFL_COMM]);
+             fclaw_timer_start (&glob->timers[FCLAW_TIMER_CFL_COMM]);
              maxcfl_step = fclaw2d_domain_global_maximum (*domain, maxcfl_step);
-             fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_CFL_COMM]);     
+             fclaw_timer_stop (&glob->timers[FCLAW_TIMER_CFL_COMM]);     
         }
 
         int level2print = (fclaw_opt->advance_one_step && fclaw_opt->outstyle_uses_maxlevel) ?

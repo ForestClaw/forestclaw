@@ -227,9 +227,9 @@ double advance_level(fclaw_global_t *glob,
 				fclaw_global_infof("Time interpolating level %d using alpha = %5.2f\n",
 								   coarser_level,alpha);
 
-				fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_EXTRA1]);
+				fclaw_timer_start (&glob->timers[FCLAW_TIMER_EXTRA1]);
 				fclaw2d_timeinterp(glob,coarser_level,alpha);
-				fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_EXTRA1]);
+				fclaw_timer_stop (&glob->timers[FCLAW_TIMER_EXTRA1]);
 			}
 		}
 	}
@@ -250,7 +250,7 @@ double fclaw2d_advance_all_levels(fclaw_global_t *glob,
 	fclaw_domain_t* domain = glob->domain;
 
 	int level;
-	fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_ADVANCE]);
+	fclaw_timer_start (&glob->timers[FCLAW_TIMER_ADVANCE]);
 
 	const fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
 	fclaw2d_timestep_counters *ts_counter;
@@ -296,7 +296,7 @@ double fclaw2d_advance_all_levels(fclaw_global_t *glob,
 									 maxlevel,
 									 sync_time,
 									 time_interp,
-									 FCLAW2D_TIMER_ADVANCE);
+									 FCLAW_TIMER_ADVANCE);
 				if (fclaw_opt->time_sync)
 			    {
 			    	fclaw2d_time_sync(glob,time_interp_level+1,maxlevel);
@@ -312,7 +312,7 @@ double fclaw2d_advance_all_levels(fclaw_global_t *glob,
 									 maxlevel,
 									 sync_time,
 									 time_interp,
-									 FCLAW2D_TIMER_ADVANCE);
+									 FCLAW_TIMER_ADVANCE);
 				if (fclaw_opt->time_sync)
 			    {
 				    fclaw2d_time_sync(glob,minlevel,maxlevel);
@@ -332,7 +332,7 @@ double fclaw2d_advance_all_levels(fclaw_global_t *glob,
 	double sync_time =  ts_counter[maxlevel].current_time;
 	int time_interp = 0;
 	fclaw2d_ghost_update(glob,minlevel,maxlevel,sync_time,
-						 time_interp,FCLAW2D_TIMER_ADVANCE);
+						 time_interp,FCLAW_TIMER_ADVANCE);
 
 	if (fclaw_opt->time_sync)
 	{
@@ -343,7 +343,7 @@ double fclaw2d_advance_all_levels(fclaw_global_t *glob,
 	delete_timestep_counters(&ts_counter);
 
 	/* Stop the timer */
-	fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_ADVANCE]);
+	fclaw_timer_stop (&glob->timers[FCLAW_TIMER_ADVANCE]);
 
 	/* Count total grids on this processor */
 	glob->count_grids_per_proc +=  domain->local_num_patches;

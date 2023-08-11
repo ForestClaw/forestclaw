@@ -253,20 +253,20 @@ double cudaclaw5_update(fclaw_global_t *glob,
 
     if (cuclaw5_vt->b4step2 != NULL)
     {
-        fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_ADVANCE_B4STEP2]);       
+        fclaw2d_timer_start (&glob->timers[FCLAW_TIMER_ADVANCE_B4STEP2]);       
         cuclaw5_vt->b4step2(glob,
                             this_patch,
                             this_block_idx,
                             this_patch_idx,t,dt);
-        fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_ADVANCE_B4STEP2]);       
+        fclaw2d_timer_stop (&glob->timers[FCLAW_TIMER_ADVANCE_B4STEP2]);       
     }
-    fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_ADVANCE_STEP2]);       
+    fclaw2d_timer_start (&glob->timers[FCLAW_TIMER_ADVANCE_STEP2]);       
     double maxcfl = cudaclaw5_step2(glob,
                                     this_patch,
                                     this_block_idx,
                                     this_patch_idx,t,dt);
 
-    fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_ADVANCE_STEP2]);       
+    fclaw2d_timer_stop (&glob->timers[FCLAW_TIMER_ADVANCE_STEP2]);       
     
     if (cudaclaw_options->src_term > 0 && cuclaw5_vt->src2 != NULL)
     {

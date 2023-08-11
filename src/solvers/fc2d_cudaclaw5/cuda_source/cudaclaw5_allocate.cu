@@ -32,7 +32,7 @@ void cudaclaw5_allocate_fluxes(struct fclaw_global *glob,
     fluxes->num_bytes_speeds = mwaves*size;
 
     /* Assumption here is that cudaMalloc is a synchronous call */
-    fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_CUDA_ALLOCATE]); 
+    fclaw2d_timer_start (&glob->timers[FCLAW_TIMER_CUDA_ALLOCATE]); 
           
     cudaMalloc((void**)&fluxes->qold_dev,   fluxes->num_bytes);
     cudaMalloc((void**)&fluxes->fm_dev,     fluxes->num_bytes);
@@ -43,7 +43,7 @@ void cudaclaw5_allocate_fluxes(struct fclaw_global *glob,
     cudaMalloc((void**)&fluxes->waves_dev,  fluxes->num_bytes_waves);
     cudaMalloc((void**)&fluxes->speeds_dev, fluxes->num_bytes_speeds);
 
-    fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_CUDA_ALLOCATE]);    
+    fclaw2d_timer_stop (&glob->timers[FCLAW_TIMER_CUDA_ALLOCATE]);    
 
     fclaw2d_patch_set_user_data(glob,patch,fluxes);
 }
@@ -57,7 +57,7 @@ void cudaclaw5_deallocate_fluxes(fclaw_global_t *glob,
     FCLAW_ASSERT(fluxes != NULL);
 
     /* Assumption here is that cudaFree is a synchronous call */
-    fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_CUDA_ALLOCATE]);       
+    fclaw2d_timer_start (&glob->timers[FCLAW_TIMER_CUDA_ALLOCATE]);       
     cudaFree(fluxes->qold_dev);
     cudaFree(fluxes->fm_dev);
     cudaFree(fluxes->fp_dev);
@@ -66,7 +66,7 @@ void cudaclaw5_deallocate_fluxes(fclaw_global_t *glob,
     cudaFree(fluxes->aux_dev);
     cudaFree(fluxes->waves_dev);
     cudaFree(fluxes->speeds_dev);
-    fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_CUDA_ALLOCATE]);    
+    fclaw2d_timer_stop (&glob->timers[FCLAW_TIMER_CUDA_ALLOCATE]);    
 
     FCLAW_FREE((void*) fluxes);
 }

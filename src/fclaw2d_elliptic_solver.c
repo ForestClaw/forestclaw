@@ -110,11 +110,11 @@ void fclaw2d_elliptic_solve(fclaw_global_t *glob)
 
     /* Pass p4est pointer to elliptic solver, solve and transfer solution back. */
     glob->count_elliptic_grids +=  domain->local_num_patches;
-    fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_ELLIPTIC_SOLVE]);    
+    fclaw_timer_start (&glob->timers[FCLAW_TIMER_ELLIPTIC_SOLVE]);    
 
     elliptic_solve(glob);
     
-    fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_ELLIPTIC_SOLVE]);    
+    fclaw_timer_stop (&glob->timers[FCLAW_TIMER_ELLIPTIC_SOLVE]);    
 
 }
 

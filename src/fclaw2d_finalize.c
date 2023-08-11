@@ -185,7 +185,7 @@ void fclaw2d_finalize(fclaw_global_t* glob)
         {
             /* Only call this if we have taken time steps.  For time-independent problems, we
                probably need a different report (no "amr_advance_steps") */
-            fclaw2d_timer_report(glob);
+            fclaw_timer_report(glob);
         }
         else
         {

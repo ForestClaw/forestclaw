@@ -92,7 +92,7 @@ void get_face_neighbors(fclaw_global_t *glob,
 		neighbor_patches[ir] = NULL;
 	}
 
-	fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_NEIGHBOR_SEARCH]);
+	fclaw_timer_start (&glob->timers[FCLAW_TIMER_NEIGHBOR_SEARCH]);
 	fclaw_patch_relation_t neighbor_type =
 	fclaw2d_patch_face_neighbors(domain,
 								 this_block_idx,
@@ -102,7 +102,7 @@ void get_face_neighbors(fclaw_global_t *glob,
 								 &rblockno,
 								 rpatchno,
 								 &rfaceno);
-	fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_NEIGHBOR_SEARCH]);
+	fclaw_timer_stop (&glob->timers[FCLAW_TIMER_NEIGHBOR_SEARCH]);
 
 
 	/* ------------------------------

@@ -158,7 +158,7 @@ void fclaw2d_time_sync(fclaw_global_t *glob, int minlevel, int maxlevel)
 {
 
 
-	fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_TIMESYNC]);
+	fclaw_timer_start (&glob->timers[FCLAW_TIMER_TIMESYNC]);
 
 #if 0
 	int time_interp = 0;
@@ -168,10 +168,10 @@ void fclaw2d_time_sync(fclaw_global_t *glob, int minlevel, int maxlevel)
 		for registers needed for conservation.
 	-----------------------------------------------------------------*/
 	fclaw2d_exchange_ghost_patches_begin(glob,minlevel,maxlevel,time_interp,
-										 FCLAW2D_TIMER_TIMESYNC);
+										 FCLAW_TIMER_TIMESYNC);
 
 	fclaw2d_exchange_ghost_patches_end(glob,minlevel,maxlevel,time_interp,
-									   FCLAW2D_TIMER_TIMESYNC);
+									   FCLAW_TIMER_TIMESYNC);
 
 	/* Three-way corner exchanges */
 	fclaw2d_face_neighbor_ghost(glob,minlevel,maxlevel,time_interp);
@@ -197,7 +197,7 @@ void fclaw2d_time_sync(fclaw_global_t *glob, int minlevel, int maxlevel)
 	correct_coarse_cells(glob,minlevel,read_parallel_patches,parallel_mode);
 
 
-	fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_TIMESYNC]);
+	fclaw_timer_stop (&glob->timers[FCLAW_TIMER_TIMESYNC]);
 
 }
 

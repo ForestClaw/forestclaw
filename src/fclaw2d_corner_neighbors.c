@@ -152,7 +152,7 @@ void get_corner_neighbor(fclaw_global_t *glob,
     /* Note : Pillowsphere case does not return a block corner neighbor */
     int ispillowsphere = fclaw2d_map_pillowsphere(glob);
 
-    fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_NEIGHBOR_SEARCH]);
+    fclaw_timer_start (&glob->timers[FCLAW_TIMER_NEIGHBOR_SEARCH]);
     int has_corner_neighbor =
         fclaw2d_patch_corner_neighbors(domain,
                                        this_block_idx,
@@ -164,7 +164,7 @@ void get_corner_neighbor(fclaw_global_t *glob,
                                        rcornerno,
                                        &neighbor_type);
 
-    fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_NEIGHBOR_SEARCH]);    
+    fclaw_timer_stop (&glob->timers[FCLAW_TIMER_NEIGHBOR_SEARCH]);    
 
     *block_corner_count = 0;  /* Assume we are not at a block corner */
     if (has_corner_neighbor && is_block_corner)

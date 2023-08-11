@@ -55,7 +55,7 @@ struct fclaw_global
     int count_grids_per_proc;
     int count_grids_remote_boundary;
     int count_grids_local_boundary;
-    fclaw2d_timer_t timers[FCLAW2D_TIMER_COUNT];
+    fclaw_timer_t timers[FCLAW_TIMER_COUNT];
 
     /* Time at start of each subcycled time step */
     double curr_time;

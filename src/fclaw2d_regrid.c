@@ -234,11 +234,11 @@ void cb_fclaw2d_regrid_repopulate(fclaw_domain_t * old_domain,
 void fclaw2d_regrid(fclaw_global_t *glob)
 {
     fclaw_domain_t** domain = &glob->domain;
-    fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_REGRID]);
+    fclaw_timer_start (&glob->timers[FCLAW_TIMER_REGRID]);
 
     fclaw_global_infof("Regridding domain\n");
 
-    fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_REGRID_TAGGING]);
+    fclaw_timer_start (&glob->timers[FCLAW_TIMER_REGRID_TAGGING]);
     /* First determine which families should be coarsened. */
     int domain_init = 0;
     fclaw_global_iterate_families(glob, cb_regrid_tag4coarsening,
@@ -247,13 +247,13 @@ void fclaw2d_regrid(fclaw_global_t *glob)
     fclaw_global_iterate_patches(glob, cb_fclaw2d_regrid_tag4refinement,
                                    (void *) &domain_init);
 
-    fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_REGRID_TAGGING]);
+    fclaw_timer_stop (&glob->timers[FCLAW_TIMER_REGRID_TAGGING]);
 
     /* Rebuild domain if necessary */
     /* Will return be NULL if no refining was done */
 
-    fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_REGRID]);
-    fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_ADAPT_COMM]);
+    fclaw_timer_stop (&glob->timers[FCLAW_TIMER_REGRID]);
+    fclaw_timer_start (&glob->timers[FCLAW_TIMER_ADAPT_COMM]);
     fclaw_domain_t *new_domain = fclaw2d_domain_adapt(*domain);
 
     int have_new_refinement = new_domain != NULL;
@@ -266,19 +266,19 @@ void fclaw2d_regrid(fclaw_global_t *glob)
     }
 
     /* Stop the new timer (copied from old timer) */
-    fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_ADAPT_COMM]);
-    fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_REGRID]);
+    fclaw_timer_stop (&glob->timers[FCLAW_TIMER_ADAPT_COMM]);
+    fclaw_timer_start (&glob->timers[FCLAW_TIMER_REGRID]);
 
     if (have_new_refinement)
     {
         fclaw_global_infof(" -- Have new refinement\n");
 
         /* Average to new coarse grids and interpolate to new fine grids */
-        fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_REGRID_BUILD]);
+        fclaw_timer_start (&glob->timers[FCLAW_TIMER_REGRID_BUILD]);
         fclaw_global_iterate_adapted(glob, new_domain,
                                        cb_fclaw2d_regrid_repopulate,
                                        (void *) &domain_init);
-        fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_REGRID_BUILD]);
+        fclaw_timer_stop (&glob->timers[FCLAW_TIMER_REGRID_BUILD]);
 
         /* free memory associated with old domain */
         fclaw2d_domain_reset(glob);
@@ -286,13 +286,13 @@ void fclaw2d_regrid(fclaw_global_t *glob)
         new_domain = NULL;
 
         /* Repartition for load balancing.  Second arg (mode) for vtk output */
-        fclaw2d_partition_domain(glob,FCLAW2D_TIMER_REGRID);
+        fclaw2d_partition_domain(glob,FCLAW_TIMER_REGRID);
 
         /* Set up ghost patches. Communication happens for indirect ghost exchanges. */
 
 
         /* This includes timers for building patches and (exclusive) communication */
-        fclaw2d_exchange_setup(glob,FCLAW2D_TIMER_REGRID);
+        fclaw2d_exchange_setup(glob,FCLAW_TIMER_REGRID);
 
         /* Get new neighbor information.  This is used to short circuit
            ghost filling procedures in some cases */
@@ -310,7 +310,7 @@ void fclaw2d_regrid(fclaw_global_t *glob)
                              maxlevel,
                              sync_time,
                              time_interp,
-                             FCLAW2D_TIMER_REGRID);
+                             FCLAW_TIMER_REGRID);
 
         ++glob->count_amr_new_domain;
     }
@@ -328,7 +328,7 @@ void fclaw2d_regrid(fclaw_global_t *glob)
 
     /* Stop timer.  Be sure to use timers from new grid, if one was
        created */
-    fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_REGRID]);
+    fclaw_timer_stop (&glob->timers[FCLAW_TIMER_REGRID]);
 
     /* Count calls to this function */
     ++glob->count_amr_regrid;
@@ -394,7 +394,7 @@ void cb_set_neighbor_types(fclaw_domain_t *domain,
 /* Set neighbor type : samesize, halfsize, or doublesize */
 void fclaw2d_regrid_set_neighbor_types(fclaw_global_t *glob)
 {
-	fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_NEIGHBOR_SEARCH]);
+	fclaw_timer_start (&glob->timers[FCLAW_TIMER_NEIGHBOR_SEARCH]);
 	fclaw_global_iterate_patches(glob,cb_set_neighbor_types,NULL);
-	fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_NEIGHBOR_SEARCH]);
+	fclaw_timer_stop (&glob->timers[FCLAW_TIMER_NEIGHBOR_SEARCH]);
 }

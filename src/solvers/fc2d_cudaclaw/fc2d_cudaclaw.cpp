@@ -291,17 +291,17 @@ double cudaclaw_update(fclaw_global_t *glob,
 #if 0
     if (cudaclaw_vt->b4step2 != NULL)
     {
-        fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_ADVANCE_B4STEP2]);       
+        fclaw2d_timer_start (&glob->timers[FCLAW_TIMER_ADVANCE_B4STEP2]);       
         cudaclaw_vt->b4step2(glob,
                            this_patch,
                            this_block_idx,
                            this_patch_idx,t,dt);
-        fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_ADVANCE_B4STEP2]);       
+        fclaw2d_timer_stop (&glob->timers[FCLAW_TIMER_ADVANCE_B4STEP2]);       
     }
 #endif
 
     /* -------------------------------- Main update ----------------------------------- */
-    fclaw2d_timer_start_threadsafe (&glob->timers[FCLAW2D_TIMER_ADVANCE_STEP2]);  
+    fclaw2d_timer_start_threadsafe (&glob->timers[FCLAW_TIMER_ADVANCE_STEP2]);  
 
     cuclaw_opt = fc2d_cudaclaw_get_options(glob);
     maxcfl = 0.0;
@@ -354,7 +354,7 @@ double cudaclaw_update(fclaw_global_t *glob,
         FCLAW_FREE(buffer_data->user);                                      
     }
 
-    fclaw2d_timer_stop_threadsafe (&glob->timers[FCLAW2D_TIMER_ADVANCE_STEP2]);       
+    fclaw2d_timer_stop_threadsafe (&glob->timers[FCLAW_TIMER_ADVANCE_STEP2]);       
 
     /* -------------------------------- Source term ----------------------------------- */
     if (cuclaw_opt->src_term > 0)

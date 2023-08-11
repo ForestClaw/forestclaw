@@ -135,7 +135,7 @@ double cudaclaw5_step2(fclaw_global_t *glob,
     cudaEventSynchronize(stop);
     milliseconds = 0;
     cudaEventElapsedTime(&milliseconds, start, stop); 
-    glob->timers[FCLAW2D_TIMER_CUDA_MEMCOPY].cumulative += milliseconds*1e-3;
+    glob->timers[FCLAW_TIMER_CUDA_MEMCOPY].cumulative += milliseconds*1e-3;
 
     {
         dim3 block(32,32);  
@@ -199,7 +199,7 @@ double cudaclaw5_step2(fclaw_global_t *glob,
         cudaEventSynchronize(stop);
         milliseconds = 0;
         cudaEventElapsedTime(&milliseconds, start, stop);
-        glob->timers[FCLAW2D_TIMER_CUDA_KERNEL1].cumulative += milliseconds*1e-3;        
+        glob->timers[FCLAW_TIMER_CUDA_KERNEL1].cumulative += milliseconds*1e-3;        
     }
 
 
@@ -222,7 +222,7 @@ double cudaclaw5_step2(fclaw_global_t *glob,
     cudaEventSynchronize(stop);
     milliseconds = 0;
     cudaEventElapsedTime(&milliseconds, start, stop);
-    glob->timers[FCLAW2D_TIMER_CUDA_KERNEL2].cumulative += milliseconds*1e-3;
+    glob->timers[FCLAW_TIMER_CUDA_KERNEL2].cumulative += milliseconds*1e-3;
 
     code = cudaPeekAtLastError();
     if(code != cudaSuccess)
@@ -239,7 +239,7 @@ double cudaclaw5_step2(fclaw_global_t *glob,
     cudaEventSynchronize(stop);
     milliseconds = 0;
     cudaEventElapsedTime(&milliseconds, start, stop);
-    glob->timers[FCLAW2D_TIMER_CUDA_MEMCOPY].cumulative += milliseconds*1e-3;
+    glob->timers[FCLAW_TIMER_CUDA_MEMCOPY].cumulative += milliseconds*1e-3;
     
     /* ------------------------------ Clean up -----------------------------------------*/ 
     cudaEventDestroy(start);

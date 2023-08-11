@@ -48,7 +48,7 @@ fclaw2d_output_frame (fclaw_global_t * glob, int iframe)
         FCLAW_ASSERT(vt->output_frame != NULL);
 
         /* Record output time */
-        fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_OUTPUT]);
+        fclaw_timer_start (&glob->timers[FCLAW_TIMER_OUTPUT]);
 
         /* User or solver set output file */
         fclaw_global_essentialf("Output Frame %4d  at time %16.8e\n\n",
@@ -56,7 +56,7 @@ fclaw2d_output_frame (fclaw_global_t * glob, int iframe)
         vt->output_frame(glob,iframe);
 
         /* Record output time */
-        fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_OUTPUT]);
+        fclaw_timer_stop (&glob->timers[FCLAW_TIMER_OUTPUT]);
     }
     else
     {

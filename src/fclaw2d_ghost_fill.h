@@ -100,14 +100,14 @@ void fclaw2d_ghost_update(struct fclaw_global* glob,
 						  int coarse_level,
 						  double sync_time,
 						  int time_interp,
-						  fclaw2d_timer_names_t running);
+						  fclaw_timer_names_t running);
 
 void fclaw2d_ghost_update_async(struct fclaw_global* glob,
 								int fine_level,
 								int coarse_level,
 								double sync_time,
 								int time_interp,
-								fclaw2d_timer_names_t running);
+								fclaw_timer_names_t running);
 
 /**
  * <summary>Complete exchange of all ghost patches at all levels.</summary>
@@ -129,7 +129,7 @@ void fclaw2d_ghost_update_nonasync(struct fclaw_global* glob,
 								   int coarse_level,
 								   double sync_time,
 								   int time_interp,
-								   fclaw2d_timer_names_t running);
+								   fclaw_timer_names_t running);
 
 /**
  * <summary>Complete exchange of all ghost patches at all levels.</summary>

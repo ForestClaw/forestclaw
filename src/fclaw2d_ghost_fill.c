@@ -317,7 +317,7 @@ void time_sync(fclaw_global_t* glob,
 			   int read_parallel_patches,
 			   fclaw2d_ghost_fill_parallel_mode_t ghost_mode)
 {
-	fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_GHOSTFILL_COPY]);
+	fclaw2d_timer_start (&glob->timers[FCLAW_TIMER_GHOSTFILL_COPY]);
 	int level;
 
 	/* Copy between grids that are at the same level. */
@@ -333,7 +333,7 @@ void time_sync(fclaw_global_t* glob,
 		time_sync_fine_to_coarse(glob,level,time_interp,
 								read_parallel_patches,ghost_mode);
 	}
-	fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_GHOSTFILL_COPY]);
+	fclaw2d_timer_stop (&glob->timers[FCLAW_TIMER_GHOSTFILL_COPY]);
 }
 #endif
 
@@ -346,7 +346,7 @@ void copy_samelevel(fclaw_global_t* glob,
 					int read_parallel_patches,
 					fclaw2d_ghost_fill_parallel_mode_t ghost_mode)
 {
-	fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_GHOSTFILL_COPY]);
+	fclaw_timer_start (&glob->timers[FCLAW_TIMER_GHOSTFILL_COPY]);
 	int level;
 
 	/* Copy between grids that are at the same level. */
@@ -362,7 +362,7 @@ void copy_samelevel(fclaw_global_t* glob,
 		copy2ghost(glob,time_interp_level,time_interp,
 				   read_parallel_patches,ghost_mode);
 	}
-	fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_GHOSTFILL_COPY]);
+	fclaw_timer_stop (&glob->timers[FCLAW_TIMER_GHOSTFILL_COPY]);
 }
 
 
@@ -377,7 +377,7 @@ void average_fine2coarse_ghost(fclaw_global_t *glob,
 							   int read_parallel_patches,
 							   fclaw2d_ghost_fill_parallel_mode_t ghost_mode)
 {
-	fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_GHOSTFILL_AVERAGE]);
+	fclaw_timer_start (&glob->timers[FCLAW_TIMER_GHOSTFILL_AVERAGE]);
 
 	int level;
 
@@ -397,7 +397,7 @@ void average_fine2coarse_ghost(fclaw_global_t *glob,
 		average2ghost(glob,time_interp_level,time_interp,
 					  read_parallel_patches,ghost_mode);
 	}
-	fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_GHOSTFILL_AVERAGE]);
+	fclaw_timer_stop (&glob->timers[FCLAW_TIMER_GHOSTFILL_AVERAGE]);
 }
 
 static
@@ -408,7 +408,7 @@ void interpolate_coarse2fine_ghost(fclaw_global_t* glob,
 								   int read_parallel_patches,
 								   fclaw2d_ghost_fill_parallel_mode_t ghost_mode)
 {
-	fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_GHOSTFILL_INTERP]);
+	fclaw_timer_start (&glob->timers[FCLAW_TIMER_GHOSTFILL_INTERP]);
 
 	int level;
 
@@ -426,7 +426,7 @@ void interpolate_coarse2fine_ghost(fclaw_global_t* glob,
 		interpolate2ghost(glob,time_interp_level,time_interp,
 						  read_parallel_patches,ghost_mode);
 	}
-	fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_GHOSTFILL_INTERP]);
+	fclaw_timer_stop (&glob->timers[FCLAW_TIMER_GHOSTFILL_INTERP]);
 }
 
 
@@ -438,7 +438,7 @@ void fill_physical_ghost(fclaw_global_t* glob,
 						 int time_interp,
 						 fclaw2d_ghost_fill_parallel_mode_t ghost_mode)
 {
-	fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_GHOSTFILL_PHYSBC]);
+	fclaw_timer_start (&glob->timers[FCLAW_TIMER_GHOSTFILL_PHYSBC]);
 
 	int level;
 
@@ -456,7 +456,7 @@ void fill_physical_ghost(fclaw_global_t* glob,
 					time_interp,
 					ghost_mode);
 	}
-	fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_GHOSTFILL_PHYSBC]);
+	fclaw_timer_stop (&glob->timers[FCLAW_TIMER_GHOSTFILL_PHYSBC]);
 }
 
 /* -----------------------------------------------------------------------
@@ -468,12 +468,12 @@ void fclaw2d_ghost_update_nonasync(fclaw_global_t* glob,
 								   int maxlevel,
 								   double sync_time,
 								   int time_interp,
-								   fclaw2d_timer_names_t running)
+								   fclaw_timer_names_t running)
 {
-	if (running != FCLAW2D_TIMER_NONE) {
-		fclaw2d_timer_stop (&glob->timers[running]);
+	if (running != FCLAW_TIMER_NONE) {
+		fclaw_timer_stop (&glob->timers[running]);
 	}
-	fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_GHOSTFILL]);
+	fclaw_timer_start (&glob->timers[FCLAW_TIMER_GHOSTFILL]);
 
 	fclaw_global_infof("Exchanging ghost patches across all levels\n");
 
@@ -511,7 +511,7 @@ void fclaw2d_ghost_update_nonasync(fclaw_global_t* glob,
         This is needed so that when these boundary patches get sent to other
         processors as ghost patches, they have valid ghost cells if needed
         for interpolation.*/
-    fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_GHOSTFILL_STEP1]);
+    fclaw_timer_start (&glob->timers[FCLAW_TIMER_GHOSTFILL_STEP1]);
 
     fclaw2d_ghost_fill_parallel_mode_t parallel_mode 
                         = FCLAW2D_BOUNDARY_GHOST_ONLY;
@@ -542,16 +542,16 @@ void fclaw2d_ghost_update_nonasync(fclaw_global_t* glob,
                         time_interp,
                         parallel_mode);
 
-    fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_GHOSTFILL_STEP1]);
+    fclaw_timer_stop (&glob->timers[FCLAW_TIMER_GHOSTFILL_STEP1]);
 
 	/* --------------------------------------------------------------
 		Send and receive ghost patches
 	------------------------------------------------------------*/
 	fclaw2d_exchange_ghost_patches_begin(glob,minlevel,maxlevel,time_interp,
-										 FCLAW2D_TIMER_GHOSTFILL);
+										 FCLAW_TIMER_GHOSTFILL);
 
 	fclaw2d_exchange_ghost_patches_end(glob,minlevel,maxlevel,time_interp,
-									   FCLAW2D_TIMER_GHOSTFILL);
+									   FCLAW_TIMER_GHOSTFILL);
 
 	/* -------------------------------------------------------------
 		Indirect neighbor exchange
@@ -563,7 +563,7 @@ void fclaw2d_ghost_update_nonasync(fclaw_global_t* glob,
 		Do everything in one set of sequential steps
 	------------------------------------------------------------- */
 
-	fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_GHOSTFILL_STEP3]);
+	fclaw_timer_start (&glob->timers[FCLAW_TIMER_GHOSTFILL_STEP3]);
 
     read_parallel_patches = 1;
 
@@ -597,13 +597,13 @@ void fclaw2d_ghost_update_nonasync(fclaw_global_t* glob,
 						sync_time,
 						time_interp,
 						FCLAW2D_BOUNDARY_ALL);
-	fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_GHOSTFILL_STEP3]);
+	fclaw_timer_stop (&glob->timers[FCLAW_TIMER_GHOSTFILL_STEP3]);
 
 	// Stop timing
-	fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_GHOSTFILL]);
-	if (running != FCLAW2D_TIMER_NONE)
+	fclaw_timer_stop (&glob->timers[FCLAW_TIMER_GHOSTFILL]);
+	if (running != FCLAW_TIMER_NONE)
 	{
-		fclaw2d_timer_start (&glob->timers[running]);
+		fclaw_timer_start (&glob->timers[running]);
 	}
 }
 
@@ -613,12 +613,12 @@ void fclaw2d_ghost_update_async(fclaw_global_t* glob,
 								int maxlevel,
 								double sync_time,
 								int time_interp,
-								fclaw2d_timer_names_t running)
+								fclaw_timer_names_t running)
 {
-	if (running != FCLAW2D_TIMER_NONE) {
-		fclaw2d_timer_stop (&glob->timers[running]);
+	if (running != FCLAW_TIMER_NONE) {
+		fclaw_timer_stop (&glob->timers[running]);
 	}
-	fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_GHOSTFILL]);
+	fclaw_timer_start (&glob->timers[FCLAW_TIMER_GHOSTFILL]);
 
 	fclaw_global_infof("Exchanging ghost patches across all levels\n");
 
@@ -660,7 +660,7 @@ void fclaw2d_ghost_update_async(fclaw_global_t* glob,
 		This is needed so that when these boundary patches get sent to other
 		processors as ghost patches, they have valid ghost cells if needed
 		for interpolation.*/
-	fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_GHOSTFILL_STEP1]);
+	fclaw_timer_start (&glob->timers[FCLAW_TIMER_GHOSTFILL_STEP1]);
 
 	parallel_mode = FCLAW2D_BOUNDARY_GHOST_ONLY;
 	read_parallel_patches = 0;
@@ -690,19 +690,19 @@ void fclaw2d_ghost_update_async(fclaw_global_t* glob,
 						time_interp,
 						parallel_mode);
 
-	fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_GHOSTFILL_STEP1]);
+	fclaw_timer_stop (&glob->timers[FCLAW_TIMER_GHOSTFILL_STEP1]);
 
 	/* --------------------------------------------------------------
 		Start send ...
 	------------------------------------------------------------*/
 	fclaw2d_exchange_ghost_patches_begin(glob,minlevel,maxlevel,time_interp,
-										 FCLAW2D_TIMER_GHOSTFILL);
+										 FCLAW_TIMER_GHOSTFILL);
 
 	/* --------------------------------------------------------------
 		Finish exchanges in the interior of the grid.
 	------------------------------------------------------------*/
 
-	fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_GHOSTFILL_STEP2]);
+	fclaw_timer_start (&glob->timers[FCLAW_TIMER_GHOSTFILL_STEP2]);
 	parallel_mode = FCLAW2D_BOUNDARY_INTERIOR_ONLY;
 
 	/* Average */
@@ -744,14 +744,14 @@ void fclaw2d_ghost_update_async(fclaw_global_t* glob,
 						time_interp,
 						parallel_mode);
 
-	fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_GHOSTFILL_STEP2]);
+	fclaw_timer_stop (&glob->timers[FCLAW_TIMER_GHOSTFILL_STEP2]);
 
 	/* -------------------------------------------------------------
 		Receive ghost patches ...
 	------------------------------------------------------------- */
 
 	fclaw2d_exchange_ghost_patches_end(glob,minlevel,maxlevel,time_interp,
-									   FCLAW2D_TIMER_GHOSTFILL);
+									   FCLAW_TIMER_GHOSTFILL);
 
 	/* -------------------------------------------------------------
 		Loop over ghost patches to find indirect neighbors and do
@@ -766,7 +766,7 @@ void fclaw2d_ghost_update_async(fclaw_global_t* glob,
 		Repeat above, but now with parallel ghost cells.
 	------------------------------------------------------------- */
 
-	fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_GHOSTFILL_STEP3]);
+	fclaw_timer_start (&glob->timers[FCLAW_TIMER_GHOSTFILL_STEP3]);
 	parallel_mode = FCLAW2D_BOUNDARY_GHOST_ONLY;
 	read_parallel_patches = 1;
 
@@ -819,13 +819,13 @@ void fclaw2d_ghost_update_async(fclaw_global_t* glob,
 						sync_time,
 						time_interp,
 						FCLAW2D_BOUNDARY_ALL);
-	fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_GHOSTFILL_STEP3]);
+	fclaw_timer_stop (&glob->timers[FCLAW_TIMER_GHOSTFILL_STEP3]);
 
 	// Stop timing
-	fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_GHOSTFILL]);
-	if (running != FCLAW2D_TIMER_NONE)
+	fclaw_timer_stop (&glob->timers[FCLAW_TIMER_GHOSTFILL]);
+	if (running != FCLAW_TIMER_NONE)
 	{
-		fclaw2d_timer_start (&glob->timers[running]);
+		fclaw_timer_start (&glob->timers[running]);
 	}
 }
 
@@ -840,7 +840,7 @@ void fclaw2d_ghost_update(fclaw_global_t* glob,
 						  int maxlevel,
 						  double sync_time,
 						  int time_interp,
-						  fclaw2d_timer_names_t running)
+						  fclaw_timer_names_t running)
 {
     
 	int async = 1;

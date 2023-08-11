@@ -134,7 +134,7 @@ void fclaw2d_diagnostics_gather(fclaw_global_t *glob,
     /* -----------------------------------------------------
        Compute diagnostics on all local patches
        ----------------------------------------------------- */
-    fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_DIAGNOSTICS]);
+    fclaw_timer_start (&glob->timers[FCLAW_TIMER_DIAGNOSTICS]);
 
 
     /* Patch diagnostics */
@@ -157,13 +157,13 @@ void fclaw2d_diagnostics_gather(fclaw_global_t *glob,
     if (fclaw_opt->run_user_diagnostics != 0 && diag_vt->user_compute_diagnostics != NULL)
         diag_vt->user_compute_diagnostics(glob,acc->user_accumulator);
 
-    fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_DIAGNOSTICS]);
+    fclaw_timer_stop (&glob->timers[FCLAW_TIMER_DIAGNOSTICS]);
 
 
     /* ---------------------------------------------------------
        Gather all of the statistics (requires communication)
        --------------------------------------------------------- */
-    fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_DIAGNOSTICS_COMM]);
+    fclaw_timer_start (&glob->timers[FCLAW_TIMER_DIAGNOSTICS_COMM]);
 
     if (diag_vt->patch_gather_diagnostics != NULL)
         diag_vt->patch_gather_diagnostics(glob,acc->patch_accumulator,init_flag);
@@ -180,7 +180,7 @@ void fclaw2d_diagnostics_gather(fclaw_global_t *glob,
     if (fclaw_opt->run_user_diagnostics != 0 && diag_vt->user_gather_diagnostics != NULL)
         diag_vt->user_gather_diagnostics(glob,acc->user_accumulator,init_flag);
 
-    fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_DIAGNOSTICS_COMM]);
+    fclaw_timer_stop (&glob->timers[FCLAW_TIMER_DIAGNOSTICS_COMM]);
 
     fclaw2d_diagnostics_reset(glob);
 }
@@ -191,7 +191,7 @@ void fclaw2d_diagnostics_reset(fclaw_global_t *glob)
     const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
     fclaw2d_diagnostics_vtable_t *diag_vt = fclaw2d_diagnostics_vt(glob);
 
-    fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_DIAGNOSTICS]);
+    fclaw_timer_start (&glob->timers[FCLAW_TIMER_DIAGNOSTICS]);
 
     if (diag_vt->patch_reset_diagnostics != NULL)
         diag_vt->patch_reset_diagnostics(glob,acc->patch_accumulator);
@@ -208,7 +208,7 @@ void fclaw2d_diagnostics_reset(fclaw_global_t *glob)
     if (fclaw_opt->run_user_diagnostics != 0 && diag_vt->user_reset_diagnostics != NULL)
         diag_vt->user_reset_diagnostics(glob,acc->user_accumulator);
 
-    fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_DIAGNOSTICS]);
+    fclaw_timer_stop (&glob->timers[FCLAW_TIMER_DIAGNOSTICS]);
 }
 
 void fclaw2d_diagnostics_finalize(fclaw_global_t *glob)
@@ -217,7 +217,7 @@ void fclaw2d_diagnostics_finalize(fclaw_global_t *glob)
     const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
     fclaw2d_diagnostics_vtable_t *diag_vt = fclaw2d_diagnostics_vt(glob);
 
-    fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_DIAGNOSTICS]);
+    fclaw_timer_start (&glob->timers[FCLAW_TIMER_DIAGNOSTICS]);
 
     if (diag_vt->patch_finalize_diagnostics != NULL)
         diag_vt->patch_finalize_diagnostics(glob,&acc->patch_accumulator);
@@ -234,6 +234,6 @@ void fclaw2d_diagnostics_finalize(fclaw_global_t *glob)
     if (fclaw_opt->run_user_diagnostics != 0 && diag_vt->user_finalize_diagnostics != NULL)
         diag_vt->user_finalize_diagnostics(glob,&acc->user_accumulator);
 
-    fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_DIAGNOSTICS]);
+    fclaw_timer_stop (&glob->timers[FCLAW_TIMER_DIAGNOSTICS]);
 }
 
