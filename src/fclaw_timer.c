@@ -29,7 +29,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_partition.h>
 #include <sc_statistics.h>
-#include <fclaw2d_domain.h>
+#include <fclaw_domain.h>
 
 #define  PRIORITY_WALL          FCLAW_TIMER_PRIORITY_WALL
 #define  PRIORITY_EXCLUSIVE1    FCLAW_TIMER_PRIORITY_SUMMARY

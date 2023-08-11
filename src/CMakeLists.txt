@@ -3,6 +3,7 @@
 # -- c library
 add_library(forestclaw_c OBJECT 
   fclaw_base.c 
+  fclaw_domain.c
   fclaw_options.c 
   fclaw_filesystem.cpp
   fclaw_gauges.c 
@@ -12,6 +13,7 @@ add_library(forestclaw_c OBJECT
   fclaw_math.c
   fclaw_timer.c
   fclaw_mpi.c
+
   fclaw2d_block.c
   fclaw2d_options.c
   fclaw2d_forestclaw.c
@@ -30,7 +32,6 @@ add_library(forestclaw_c OBJECT
   fclaw2d_diagnostics.c
   fclaw2d_rays.c
   fclaw2d_update_single_step.c
-  fclaw2d_domain.c
   fclaw2d_regrid.c
   fclaw2d_patch.c
   fclaw2d_partition.c
@@ -44,12 +45,13 @@ add_library(forestclaw_c OBJECT
   fclaw2d_output_tikz.c
   forestclaw2d.c
   forestclaw3d.c
+
   fclaw3d_convenience.c
-  fclaw3d_domain.c
   fclaw3d_map.c
   fclaw3d_patch.c
   fclaw3d_exchange.c
   fclaw3d_options.c
+
   fp_exception_glibc_extension.c
   mappings/fclaw2d_map_nomap.c
   mappings/fclaw2d_map_nomap_brick.c
@@ -110,13 +112,14 @@ target_link_libraries(FORESTCLAW::FORESTCLAW INTERFACE forestclaw)
 
 install(FILES
   fclaw_base.h 
-	fclaw_timer.h 
-	fclaw_package.h 
-	fclaw_pointer_map.h 
-	fclaw_filesystem.h 
-	fclaw_options.h 
+	fclaw_domain.h
 	fclaw_gauges.h 
 	fclaw_global.h 
+	fclaw_filesystem.h 
+	fclaw_options.h 
+	fclaw_package.h 
+	fclaw_pointer_map.h 
+	fclaw_timer.h 
 	fclaw_mpi.h 
 	fclaw_math.h 
 	forestclaw2d.h 
@@ -128,7 +131,6 @@ install(FILES
 	fclaw2d_elliptic_solver.h 
 	fclaw2d_farraybox.hpp 
 	fclaw2d_forestclaw.h
-	fclaw2d_domain.h
 	fclaw2d_block.h
 	fclaw2d_patch.h
 	fclaw2d_vtable.h
@@ -154,7 +156,6 @@ install(FILES
   forestclaw3d.h
   fclaw3d_convenience.h
   fclaw3d_defs.h
-  fclaw3d_domain.h
   fclaw3d_map.h
   fclaw3d_patch.h
   fclaw3d_exchange.h

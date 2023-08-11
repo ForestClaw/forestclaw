@@ -48,7 +48,7 @@ void filament_initialize(fclaw_global_t* glob)
     /* ---------------------------------------------------------------
        Set domain data.
        --------------------------------------------------------------- */
-    fclaw2d_domain_data_new(glob->domain);
+    fclaw_domain_data_new(glob->domain);
 
     /* Initialize virtual table for ForestClaw */
     fclaw2d_vtables_initialize(glob);
@@ -89,7 +89,7 @@ void swirl_initialize(fclaw_global_t* glob)
     /* ---------------------------------------------------------------
        Set domain data.
        --------------------------------------------------------------- */
-    fclaw2d_domain_data_new(glob->domain);
+    fclaw_domain_data_new(glob->domain);
 
     swirl_opt = swirl_get_options(glob);
 

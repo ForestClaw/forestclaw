@@ -93,7 +93,7 @@ int main(int argc, char *argv[])
     return 0;
 }
 
-#include <fclaw2d_domain.h>
+#include <fclaw_domain.h>
 #include <fclaw2d_options.h>
 #include <fclaw2d_p4est.h>
 #include <fclaw2d_convenience.h>

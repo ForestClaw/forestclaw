@@ -38,7 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_options.h>
 #include <fclaw2d_physical_bc.h>
 #include <fclaw2d_regrid.h>
-#include <fclaw2d_domain.h>
+#include <fclaw_domain.h>
 
 
 /* This is used to determine neighbor patch relative level
@@ -457,7 +457,7 @@ void fclaw2d_face_neighbor_ghost(fclaw_global_t* glob,
 {
 	fclaw_domain_t *domain = glob->domain;
 
-	fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data(domain);
+	fclaw2d_domain_data_t *ddata = domain->d2;
 	const fclaw_options_t *gparms = fclaw2d_get_options(glob);
 	int refratio = gparms->refratio;
 

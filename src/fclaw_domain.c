@@ -24,78 +24,63 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include <fclaw_global.h>
+#include <fclaw_domain.h>
 
-#ifndef P4_TO_P8
-#include <fclaw2d_domain.h>
 #include <fclaw2d_convenience.h>  /* Contains domain_destroy and others */
 #include <fclaw2d_patch.h>
 #include <fclaw2d_exchange.h>
-#else
-#include <fclaw3d_domain.h>
+
 #include <fclaw3d_convenience.h>  /* Contains domain_destroy and others */
 #include <fclaw3d_patch.h>
 #include <fclaw3d_exchange.h>
 
-#include <fclaw2d_to_3d.h>
-#endif
-
-/* dimension-independent helper functions first */
-
-#if 0
-
-static fclaw_domain_t *
-fclaw_domain_get_domain (fclaw_domain_t *d)
-{
-#ifndef P4_TO_P8
-    return d->d.d2.domain2;
-#else
-    return d->d.d3.domain3;
-#endif
-}
-
-#endif
-
-typedef struct fcd_allocated_patch
-{
-#ifndef P4_TO_P8
-    fclaw2d_patch_data_t pd;
-#else
-    fclaw3d_patch_data_t pd;
-#endif
-}
-fcd_allocated_patch_t;
 
 /* we're holding back with 3d counterparts
    since much of this will move into fclaw_domain.c */
 /* below follows the previous code unchanged */
 /* edit: do it anyway for now to support p8/swirl */
 
-void fclaw2d_domain_data_new(fclaw_domain_t *domain)
+void fclaw_domain_data_new(fclaw_domain_t *domain)
 {
-    fclaw2d_domain_data_t* ddata = (fclaw2d_domain_data_t*) domain->user;
-    ddata = FCLAW_ALLOC_ZERO (fclaw2d_domain_data_t, 1);
-    domain->user = ddata;
+    if(domain->dim == 2)
+    {
+        fclaw2d_domain_data_t* ddata = (fclaw2d_domain_data_t*) domain->user;
+        ddata = FCLAW_ALLOC_ZERO (fclaw2d_domain_data_t, 1);
+        domain->d2 = ddata;
 
-    ddata->count_set_patch = ddata->count_delete_patch = 0;
+        ddata->count_set_patch = ddata->count_delete_patch = 0;
     
-    ddata->domain_exchange = NULL;
-    ddata->domain_indirect = NULL;
+        ddata->domain_exchange = NULL;
+        ddata->domain_indirect = NULL;
+    }
+    else 
+    {
+        fclaw3d_domain_data_t* ddata = (fclaw3d_domain_data_t*) domain->user;
+        ddata = FCLAW_ALLOC_ZERO (fclaw3d_domain_data_t, 1);
+        domain->d3 = ddata;
+
+        ddata->count_set_patch = ddata->count_delete_patch = 0;
+    
+        ddata->domain_exchange = NULL;
+        ddata->domain_indirect = NULL;
+    }
 }
 
-void fclaw2d_domain_data_delete(fclaw_domain_t* domain)
+void fclaw_domain_data_delete(fclaw_domain_t* domain)
 {
-    fclaw2d_domain_data_t* ddata = (fclaw2d_domain_data_t*) domain->user;
-
-    FCLAW_FREE (ddata);
-    domain->user = NULL;
+    if(domain->dim == 2)
+    {
+        FCLAW_FREE (domain->d2);
+        domain->d2 = NULL;
+    }
+    else 
+    {
+        FCLAW_FREE (domain->d3);
+        domain->d3 = NULL;
+    }
 }
 
-fclaw2d_domain_data_t *fclaw2d_domain_get_data(fclaw_domain_t *domain)
-{
-    return (fclaw2d_domain_data_t *) domain->user;
-}
-
-void fclaw2d_domain_setup(fclaw_global_t* glob,
+void fclaw_domain_setup(fclaw_global_t* glob,
                           fclaw_domain_t* new_domain)
 {
     fclaw_domain_t *old_domain = glob->domain;
@@ -110,15 +95,14 @@ void fclaw2d_domain_setup(fclaw_global_t* glob,
     else
     {
         fclaw_global_infof("Rebuilding  domain\n");
-        fclaw2d_domain_data_new(new_domain);
+        fclaw_domain_data_new(new_domain);
     }
     fclaw_global_infof("Done\n");
 }
 
-void fclaw2d_domain_reset(fclaw_global_t* glob)
+void fclaw_domain_reset(fclaw_global_t* glob)
 {
     fclaw_domain_t** domain = &glob->domain;
-    fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data (*domain);
     int i, j;
 
     for(i = 0; i < (*domain)->num_blocks; i++)
@@ -135,27 +119,47 @@ void fclaw2d_domain_reset(fclaw_global_t* glob)
         block->user = NULL;
     }
 
-    if (ddata->domain_exchange != NULL)
+    if((*domain)->dim == 2)
     {
-        /* TO DO: translate fclaw2d_exchange files */
-        fclaw2d_exchange_delete(glob);
-    }
+        fclaw2d_domain_data_t *ddata = (*domain)->d2;
+        if (ddata->domain_exchange != NULL)
+        {
+            /* TO DO: translate fclaw2d_exchange files */
+            fclaw2d_exchange_delete(glob);
+        }
 
-    /* Output memory discrepancy for the ClawPatch */
-    if (ddata->count_set_patch != ddata->count_delete_patch)
+        /* Output memory discrepancy for the ClawPatch */
+        if (ddata->count_set_patch != ddata->count_delete_patch)
+        {
+            printf ("[%d] This domain had Clawpatch set %d and deleted %d times\n",
+                    (*domain)->mpirank,
+                    ddata->count_set_patch, ddata->count_delete_patch);
+        }
+    }
+    else 
     {
-        printf ("[%d] This domain had Clawpatch set %d and deleted %d times\n",
-                (*domain)->mpirank,
-                ddata->count_set_patch, ddata->count_delete_patch);
-    }
+        fclaw3d_domain_data_t *ddata = (*domain)->d3;
+        if (ddata->domain_exchange != NULL)
+        {
+            /* TO DO: translate fclaw2d_exchange files */
+            fclaw3d_exchange_delete(glob);
+        }
 
-    fclaw2d_domain_data_delete(*domain);  // Delete allocated pointers to set of functions.
+        /* Output memory discrepancy for the ClawPatch */
+        if (ddata->count_set_patch != ddata->count_delete_patch)
+        {
+            printf ("[%d] This domain had Clawpatch set %d and deleted %d times\n",
+                    (*domain)->mpirank,
+                    ddata->count_set_patch, ddata->count_delete_patch);
+        }
+    }
+    fclaw_domain_data_delete(*domain);  // Delete allocated pointers to set of functions.
 
     fclaw2d_domain_destroy(*domain);
     *domain = NULL;
 }
 
-void fclaw2d_domain_iterate_level_mthread (fclaw_domain_t * domain, int level,
+void fclaw_domain_iterate_level_mthread (fclaw_domain_t * domain, int level,
                                            fclaw_patch_callback_t pcb, void *user)
 {
 #if (_OPENMP)

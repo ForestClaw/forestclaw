@@ -64,7 +64,7 @@ void radial_run_program(fclaw_global_t* glob)
 
     fclaw_domain_t    **domain = &glob->domain;
 
-    fclaw2d_domain_data_new(*domain);
+    fclaw_domain_data_new(*domain);
 
     fclaw2d_vtables_initialize(glob);
 

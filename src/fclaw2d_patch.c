@@ -25,16 +25,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw_pointer_map.h>
 #include <fclaw_global.h>
+#include <fclaw_domain.h>
 
 #ifndef P4_TO_P8
 #include <fclaw2d_patch.h>
-#include <fclaw2d_domain.h>
 #include <fclaw2d_defs.h>
 #else
 #include <fclaw3d_patch.h>
-#include <fclaw3d_domain.h>
 #include <fclaw3d_defs.h>
 #include <fclaw2d_to_3d.h>
+#define d2 d3
 #endif
 
 struct fclaw2d_patch_transform_data;
@@ -89,7 +89,7 @@ void patch_data_new(fclaw_global_t* glob,
 	FCLAW_ASSERT(patch_vt->patch_new != NULL);
 	pdata->user_patch = patch_vt->patch_new();
 
-	fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data(glob->domain);
+	fclaw2d_domain_data_t *ddata = glob->domain->d2;
 	++ddata->count_set_patch; //this is now in cb_fclaw2d_regrid_repopulate 
 	pdata->neighbors_set = 0;
 }
@@ -128,7 +128,7 @@ void fclaw2d_patch_data_delete(fclaw_global_t *glob,
             patch_vt->destroy_user_data(glob,this_patch);
         }
 
-        fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data(glob->domain);        
+        fclaw2d_domain_data_t *ddata = glob->domain->d2;
         patch_vt->patch_delete(pdata->user_patch);
         ++ddata->count_delete_patch;
 
@@ -660,7 +660,7 @@ void fclaw2d_patch_remote_ghost_delete(fclaw_global_t *glob,
 		FCLAW_FREE(pdata);
 		this_patch->user = NULL;
 
-		fclaw2d_domain_data_t *ddata = fclaw2d_domain_get_data(glob->domain);
+		fclaw2d_domain_data_t *ddata = glob->domain->d2;
 		++ddata->count_delete_patch;
 	}
 }

@@ -132,6 +132,7 @@ fclaw2d_domain_new (p4est_wrap_t * wrap, sc_keyvalue_t * attributes)
             sizeof (fclaw_patch_t *) * (P4EST_MAXLEVEL + 1));
 #endif
     domain = FCLAW_ALLOC_ZERO (fclaw_domain_t, 1);
+    domain->dim = P4EST_DIM;
     domain->mpicomm = wrap->p4est->mpicomm;
     domain->mpisize = wrap->p4est->mpisize;
     domain->mpirank = wrap->p4est->mpirank;

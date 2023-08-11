@@ -56,7 +56,7 @@ void run_program(fclaw_global_t* glob)
     /* ---------------------------------------------------------------
        Set domain data.
        --------------------------------------------------------------- */
-    fclaw2d_domain_data_new(glob->domain);
+    fclaw_domain_data_new(glob->domain);
 
     user_opt = quadrants_get_options(glob);
 

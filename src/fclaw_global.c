@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_global.h>
 #include <fclaw2d_options.h>
 
-#include <fclaw2d_domain.h>
+#include <fclaw_domain.h>
 #include <fclaw2d_diagnostics.h>
 #include <fclaw2d_map.h>
 #else
@@ -199,7 +199,7 @@ void fclaw_global_iterate_level_mthread (fclaw_global_t * glob, int level,
     fclaw_global_iterate_t g;
     g.glob = glob;
     g.user = user;
-    fclaw2d_domain_iterate_level_mthread (glob->domain, level,pcb,&g);
+    fclaw_domain_iterate_level_mthread (glob->domain, level,pcb,&g);
 }
 
 void fclaw_global_iterate_partitioned (fclaw_global_t * glob,

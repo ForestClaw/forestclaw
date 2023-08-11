@@ -40,7 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_diagnostics.h>
 #include <fclaw2d_map.h>
 #include <fclaw2d_patch.h>
-#include <fclaw2d_domain.h>
+#include <fclaw_domain.h>
 
 #if defined(_OPENMP)
 #include <omp.h>
@@ -122,7 +122,7 @@ void fclaw2d_initialize(fclaw_global_t *glob)
        ------------------------------------------------ */
 
     /* Get an initial domain */
-    fclaw2d_domain_setup(glob,*domain);
+    fclaw_domain_setup(glob,*domain);
 
     /* Initialize patches on uniformly refined level minlevel */
     fclaw_timer_start (&glob->timers[FCLAW_TIMER_REGRID_BUILD]);
@@ -183,7 +183,7 @@ void fclaw2d_initialize(fclaw_global_t *glob)
             if (have_new_refinement)
             {
                 /* Have to get a new ddata */
-                fclaw2d_domain_setup(glob,new_domain);
+                fclaw_domain_setup(glob,new_domain);
             }
 
             fclaw_timer_stop (&glob->timers[FCLAW_TIMER_ADAPT_COMM]);
@@ -203,7 +203,7 @@ void fclaw2d_initialize(fclaw_global_t *glob)
                 fclaw_timer_stop (&glob->timers[FCLAW_TIMER_REGRID_BUILD]);
 
                 /* free all memory associated with old domain */
-                fclaw2d_domain_reset(glob);
+                fclaw_domain_reset(glob);
                 *domain = new_domain;
                 new_domain = NULL;
 

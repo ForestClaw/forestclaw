@@ -74,7 +74,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_patch.h>
 #include <fclaw2d_partition.h>
 #include <fclaw2d_exchange.h>
-#include <fclaw2d_domain.h>
+#include <fclaw_domain.h>
 #include <fclaw2d_physical_bc.h>
 
 

@@ -27,7 +27,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define FCLAW2D_MAP_BRICK_H
 
 #include <fclaw_base.h>
-#include <fclaw2d_domain.h>
+#include <fclaw_domain.h>
 
 #ifdef __cplusplus
 extern "C"

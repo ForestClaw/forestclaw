@@ -28,7 +28,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_convenience.h>  /* p4est domain, patch handling routines */
 
 #include <fclaw_global.h>
-#include <fclaw2d_domain.h>
+#include <fclaw_domain.h>
 #include <fclaw2d_patch.h>
 
 #include <fclaw2d_options.h>
@@ -65,8 +65,8 @@ void  cb_partition_transfer(fclaw_domain_t * old_domain,
 {
     /* Transfer data to new domain */
     fclaw_global_iterate_t *g = (fclaw_global_iterate_t *) user;
-    fclaw2d_domain_data_t *ddata_old = fclaw2d_domain_get_data (old_domain);
-    fclaw2d_domain_data_t *ddata_new = fclaw2d_domain_get_data (new_domain);
+    fclaw2d_domain_data_t *ddata_old = old_domain->d2;
+    fclaw2d_domain_data_t *ddata_new = new_domain->d2;
 
     if (old_patch != NULL)
     {
@@ -153,7 +153,7 @@ void fclaw2d_partition_domain(fclaw_global_t* glob,
     if (have_new_partition)
     {
         /* Do this part so we can get a pointer to the new data */
-        fclaw2d_domain_setup(glob, domain_partitioned);
+        fclaw_domain_setup(glob, domain_partitioned);
     }
 
     /* Stop the communication timer */
@@ -177,7 +177,7 @@ void fclaw2d_partition_domain(fclaw_global_t* glob,
                                            (void*) patch_data);
 
         /* then the old domain is no longer necessary */
-        fclaw2d_domain_reset(glob);
+        fclaw_domain_reset(glob);
         *domain = domain_partitioned;
         domain_partitioned = NULL;
 

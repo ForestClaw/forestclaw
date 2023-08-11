@@ -41,7 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_vtable.h>
 #include <fclaw2d_output.h>
 
-#include <fclaw2d_domain.h>
+#include <fclaw_domain.h>
 
 #include "operators/fc2d_thunderegg_fivepoint.h"
 #include "operators/fc2d_thunderegg_heat.h"

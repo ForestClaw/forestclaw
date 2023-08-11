@@ -26,10 +26,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW2D_TO_3D_H
 #define FCLAW2D_TO_3D_H
 
-#ifdef FORESTCLAW2D_H
-#error "The include files forestclaw2d.h and fclaw2d_to_3d.h cannot be combined"
-#endif
-
 #include <p4est_to_p8est.h>
 
 #define FCLAW2D_SPACEDIM                FCLAW3D_SPACEDIM

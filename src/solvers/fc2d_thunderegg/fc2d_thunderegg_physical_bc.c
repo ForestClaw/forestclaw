@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_elliptic_solver.h>
 
 #include <fclaw_global.h>
-#include <fclaw2d_domain.h>
+#include <fclaw_domain.h>
 #include <fclaw2d_patch.h>
 #include <fclaw_clawpatch.h>
 #include <fclaw2d_physical_bc.h>

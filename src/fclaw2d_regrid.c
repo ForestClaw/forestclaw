@@ -37,7 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_partition.h>
 #include <fclaw2d_exchange.h>
 #include <fclaw2d_vtable.h>
-#include <fclaw2d_domain.h>
+#include <fclaw_domain.h>
 #include <fclaw2d_patch.h>
 
 
@@ -124,8 +124,8 @@ void cb_fclaw2d_regrid_repopulate(fclaw_domain_t * old_domain,
     fclaw_global_iterate_t* g = (fclaw_global_iterate_t*) user;
     int domain_init = *((int*) g->user);
 
-    fclaw2d_domain_data_t *ddata_old = fclaw2d_domain_get_data (old_domain);
-    fclaw2d_domain_data_t *ddata_new = fclaw2d_domain_get_data (new_domain);
+    fclaw2d_domain_data_t *ddata_old = old_domain->d2;
+    fclaw2d_domain_data_t *ddata_new = old_domain->d2;
     fclaw2d_build_mode_t build_mode = FCLAW2D_BUILD_FOR_UPDATE;
 
     if (newsize == FCLAW_PATCH_SAMESIZE)
@@ -262,7 +262,7 @@ void fclaw2d_regrid(fclaw_global_t *glob)
     {
         /* allocate memory for user patch data and user domain data in the new
            domain;  copy data from the old to new the domain. */
-        fclaw2d_domain_setup(glob, new_domain);
+        fclaw_domain_setup(glob, new_domain);
     }
 
     /* Stop the new timer (copied from old timer) */
@@ -281,7 +281,7 @@ void fclaw2d_regrid(fclaw_global_t *glob)
         fclaw_timer_stop (&glob->timers[FCLAW_TIMER_REGRID_BUILD]);
 
         /* free memory associated with old domain */
-        fclaw2d_domain_reset(glob);
+        fclaw_domain_reset(glob);
         *domain = new_domain;
         new_domain = NULL;
 

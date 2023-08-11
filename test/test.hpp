@@ -1,6 +1,6 @@
 #ifndef FCLAW_TEST_HPP
 #define FCLAW_TEST_HPP
-#include <fclaw2d_domain.h>
+#include <fclaw_domain.h>
 #include <fclaw2d_options.h>
 #include <doctest.h>
 #include <csetjmp>

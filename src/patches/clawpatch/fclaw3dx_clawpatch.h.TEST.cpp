@@ -29,7 +29,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw3dx_clawpatch46_fort.h>
 #include <fclaw_clawpatch_output_ascii.h>
 #include <fclaw_global.h>
-#include <fclaw2d_domain.h>
+#include <fclaw_domain.h>
 #include <fclaw2d_patch.h>
 #include <fclaw2d_convenience.h>
 #include <fclaw3d_metric.hpp>
@@ -95,7 +95,7 @@ struct SinglePatchDomain {
         opts->rhs_fields = 1;
         fclaw_clawpatch_options_store(glob, opts);
 
-        fclaw2d_domain_data_new(glob->domain);
+        fclaw_domain_data_new(glob->domain);
     }
     void setup(){
         fclaw2d_build_mode_t build_mode = FCLAW2D_BUILD_FOR_UPDATE;
@@ -143,7 +143,7 @@ struct QuadDomain {
         opts->rhs_fields = 1;
         fclaw_clawpatch_options_store(glob, opts);
 
-        fclaw2d_domain_data_new(glob->domain);
+        fclaw_domain_data_new(glob->domain);
     }
     void setup(){
         fclaw2d_build_mode_t build_mode = FCLAW2D_BUILD_FOR_UPDATE;
@@ -265,7 +265,7 @@ TEST_CASE("fclaw3dx_clawpatch patch_build")
         opts->rhs_fields = rhs_fields;
         fclaw_clawpatch_options_store(glob, opts);
 
-        fclaw2d_domain_data_new(glob->domain);
+        fclaw_domain_data_new(glob->domain);
         CHECK(domain->blocks[0].patches[0].user == nullptr);
         fclaw2d_patch_build(glob, &domain->blocks[0].patches[0], 0, 0, &build_mode);
         CHECK(domain->blocks[0].patches[0].user != nullptr);

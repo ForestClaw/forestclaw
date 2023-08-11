@@ -32,7 +32,7 @@
 #include <fclaw2d_diagnostics.h>
 #include <fclaw2d_forestclaw.h>
 #include <fclaw_global.h>
-#include <fclaw2d_domain.h>
+#include <fclaw_domain.h>
 #include <fclaw2d_patch.h>
 #include <fclaw2d_convenience.h>
 #include <fclaw2d_metric.hpp>
@@ -80,7 +80,7 @@ struct QuadDomain {
         opts->rhs_fields = 1;
         fclaw_clawpatch_options_store(glob, opts);
 
-        fclaw2d_domain_data_new(glob->domain);
+        fclaw_domain_data_new(glob->domain);
 
     }
     void setup(){
@@ -136,7 +136,7 @@ struct QuadDomainBrick {
         opts->rhs_fields = 1;
         fclaw_clawpatch_options_store(glob, opts);
 
-        fclaw2d_domain_data_new(glob->domain);
+        fclaw_domain_data_new(glob->domain);
     }
     void setup(){
         fclaw2d_build_mode_t build_mode = FCLAW2D_BUILD_FOR_UPDATE;

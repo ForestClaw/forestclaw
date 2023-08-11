@@ -27,6 +27,7 @@
 #define FCLAW3D_INCLUDE_ALL_H
 
 #include <fclaw_base.h>
+#include <fclaw_domain.h>
 #include <fclaw_package.h>
 #include <fclaw_options.h>
 #include <fclaw_global.h>
@@ -43,7 +44,6 @@
 #endif /* P8HACK */
 
 #include <fclaw3d_options.h>
-#include <fclaw3d_domain.h>
 #include <fclaw3d_convenience.h>
 
 #ifdef P8HACK

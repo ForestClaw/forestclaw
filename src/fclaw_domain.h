@@ -48,19 +48,17 @@ extern "C"
  */
 struct fclaw_global;
 
-void fclaw2d_domain_data_new(struct fclaw_domain *domain);
+void fclaw_domain_data_new(struct fclaw_domain *domain);
 
-void fclaw2d_domain_data_delete(struct fclaw_domain* domain);
+void fclaw_domain_data_delete(struct fclaw_domain* domain);
 
-void fclaw2d_domain_setup(struct fclaw_global* glob,
+void fclaw_domain_setup(struct fclaw_global* glob,
                           struct fclaw_domain* new_domain);
 
-void fclaw2d_domain_reset(struct fclaw_global* glob);
-
-fclaw2d_domain_data_t* fclaw2d_domain_get_data(struct fclaw_domain *domain);
+void fclaw_domain_reset(struct fclaw_global* glob);
 
 /* OpenMP iterator (not part of forestclaw2d.h */
-void fclaw2d_domain_iterate_level_mthread (struct fclaw_domain * domain, int level,
+void fclaw_domain_iterate_level_mthread (struct fclaw_domain * domain, int level,
                                            fclaw_patch_callback_t pcb, void *user);
 
 /* below are the functions needed for dimension independence */

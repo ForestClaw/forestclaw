@@ -44,7 +44,7 @@ struct fclaw_global;
 
 /* Define struct here to avoid a circular dependency:
 
-    -- fclaw2d_domain.h needs fclaw_timer.h for the definition
+    -- fclaw_domain.h needs fclaw_timer.h for the definition
     of fclaw2d_timer_t.
 
     -- fclaw2d_time.h  references an fclaw_domain_t struct.
