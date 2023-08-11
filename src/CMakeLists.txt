@@ -6,6 +6,7 @@ add_library(forestclaw_c OBJECT
   fclaw_options.c 
   fclaw_filesystem.cpp
   fclaw_gauges.c 
+  fclaw_global.c
   fclaw_package.c 
   fclaw_pointer_map.c
   fclaw_math.c
@@ -13,7 +14,6 @@ add_library(forestclaw_c OBJECT
   fclaw_mpi.c
   fclaw2d_block.c
   fclaw2d_options.c
-  fclaw2d_global.c
   fclaw2d_forestclaw.c
   fclaw2d_vtable.c
   fclaw2d_map.c
@@ -116,6 +116,7 @@ install(FILES
 	fclaw_filesystem.h 
 	fclaw_options.h 
 	fclaw_gauges.h 
+	fclaw_global.h 
 	fclaw_mpi.h 
 	fclaw_math.h 
 	forestclaw2d.h 
@@ -126,7 +127,6 @@ install(FILES
 	fclaw2d_advance.h 
 	fclaw2d_elliptic_solver.h 
 	fclaw2d_farraybox.hpp 
-	fclaw2d_global.h
 	fclaw2d_forestclaw.h
 	fclaw2d_domain.h
 	fclaw2d_block.h
@@ -155,7 +155,6 @@ install(FILES
   fclaw3d_convenience.h
   fclaw3d_defs.h
   fclaw3d_domain.h
-  fclaw3d_global.h
   fclaw3d_map.h
   fclaw3d_patch.h
   fclaw3d_exchange.h
@@ -177,7 +176,7 @@ if(BUILD_TESTING)
       fclaw_pointer_map.h.TEST.cpp
       fclaw2d_elliptic_solver.h.TEST.cpp
       fclaw2d_diagnostics.h.TEST.cpp
-      fclaw2d_global.h.TEST.cpp
+      fclaw_global.h.TEST.cpp
       fclaw2d_options.h.TEST.cpp
       fclaw2d_patch.h.TEST.cpp
       fclaw2d_vtable.h.TEST.cpp

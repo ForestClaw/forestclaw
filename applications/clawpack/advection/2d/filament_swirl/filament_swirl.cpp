@@ -39,7 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_base.h>
 
 #include <fclaw2d_forestclaw.h>
-#include <fclaw2d_global.h>
+#include <fclaw_global.h>
 
 static
 void filament_initialize(fclaw_global_t* glob)

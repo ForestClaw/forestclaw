@@ -9,7 +9,7 @@
 #endif
 
 
-#include<fclaw2d_global.h>
+#include<fclaw_global.h>
 
 #if REFINE_DIM == 2 && PATCH_DIM == 2
 

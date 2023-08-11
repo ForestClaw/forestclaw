@@ -22,7 +22,7 @@ libforestclaw_installed_headers = \
 	src/fclaw2d_advance.h \
 	src/fclaw2d_elliptic_solver.h \
 	src/fclaw2d_farraybox.hpp \
-	src/fclaw2d_global.h \
+	src/fclaw_global.h \
 	src/fclaw2d_forestclaw.h \
 	src/fclaw2d_domain.h \
 	src/fclaw2d_block.h \
@@ -184,7 +184,7 @@ src_forestclaw_TEST_SOURCES = \
     src/fclaw_pointer_map.h.TEST.cpp \
 	src/fclaw2d_elliptic_solver.h.TEST.cpp \
 	src/fclaw2d_diagnostics.h.TEST.cpp \
-	src/fclaw2d_global.h.TEST.cpp \
+	src/fclaw_global.h.TEST.cpp \
 	src/fclaw2d_options.h.TEST.cpp \
 	src/fclaw2d_patch.h.TEST.cpp \
 	src/fclaw2d_vtable.h.TEST.cpp 

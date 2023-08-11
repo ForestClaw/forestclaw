@@ -24,15 +24,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include <fclaw_pointer_map.h>
+#include <fclaw_global.h>
 
 #ifndef P4_TO_P8
 #include <fclaw2d_patch.h>
-#include <fclaw2d_global.h>
 #include <fclaw2d_domain.h>
 #include <fclaw2d_defs.h>
 #else
 #include <fclaw3d_patch.h>
-#include <fclaw3d_global.h>
 #include <fclaw3d_domain.h>
 #include <fclaw3d_defs.h>
 #include <fclaw2d_to_3d.h>

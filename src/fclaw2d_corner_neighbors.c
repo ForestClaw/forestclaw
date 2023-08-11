@@ -30,7 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_map_query.h>
 #include <fclaw2d_options.h>
 #include <fclaw2d_defs.h>
-#include <fclaw2d_global.h>
+#include <fclaw_global.h>
 #include <fclaw2d_physical_bc.h>
 #include <fclaw2d_patch.h>
 

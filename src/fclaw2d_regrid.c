@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw_gauges.h>
 
-#include <fclaw2d_global.h>
+#include <fclaw_global.h>
 #include <fclaw2d_ghost_fill.h>
 #include <fclaw2d_partition.h>
 #include <fclaw2d_exchange.h>

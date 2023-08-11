@@ -31,7 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_ghost_fill.h>
 #include <fclaw2d_update_single_step.h>
 #include <fclaw2d_options.h>
-#include <fclaw2d_global.h>
+#include <fclaw_global.h>
 #include <fclaw2d_vtable.h>
 
 #include <fclaw2d_time_sync.h>

@@ -29,7 +29,7 @@
 #endif
 #endif
 
-#include <fclaw2d_global.h>
+#include <fclaw_global.h>
 
 #include "../fclaw_clawpatch.h"
 

@@ -34,13 +34,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #if PATCH_DIM == 2
 
-#include <fclaw2d_global.h>
+#include <fclaw_global.h>
 #include <fclaw2d_map.h>
 #include <fclaw2d_map_query.h>  /* Needed for pillowsphere query */
 
 #elif PATCH_DIM == 3 && REFINE_DIM == 2
 
-#include <fclaw2d_global.h>
+#include <fclaw_global.h>
 #include <fclaw3dx_map.h>
 //#include <fclaw3d_map_query.h>  /* Needed for pillowsphere query */
 //#include <_fclaw2d_to_fclaw3d.h>

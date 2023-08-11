@@ -28,7 +28,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_defs.h>
 
 #include <fclaw2d_domain.h>
-#include <fclaw2d_global.h>
+#include <fclaw_global.h>
 #include <fclaw2d_patch.h>
 
 void fclaw2d_physical_bc_default(fclaw_global_t *glob,

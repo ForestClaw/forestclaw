@@ -26,7 +26,7 @@
 #include <fclaw_pointer_map.h>
 
 #include <fclaw2d_elliptic_solver.h>
-#include <fclaw2d_global.h>
+#include <fclaw_global.h>
 
 #include <fclaw2d_patch.h>
 

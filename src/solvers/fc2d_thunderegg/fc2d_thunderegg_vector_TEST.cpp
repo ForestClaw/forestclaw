@@ -31,7 +31,7 @@
 #include <fclaw_clawpatch_output_ascii.h>
 #include <fclaw2d_diagnostics.h>
 #include <fclaw2d_forestclaw.h>
-#include <fclaw2d_global.h>
+#include <fclaw_global.h>
 #include <fclaw2d_domain.h>
 #include <fclaw2d_patch.h>
 #include <fclaw2d_convenience.h>

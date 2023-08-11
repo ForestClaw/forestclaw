@@ -24,7 +24,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-#include <fclaw2d_global.h>
+#include <fclaw_global.h>
 #include <fclaw2d_patch.h>
 
 #include <fclaw_clawpatch_pillow.h>

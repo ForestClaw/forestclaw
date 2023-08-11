@@ -26,7 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <test.hpp>
 
 #include <fclaw2d_forestclaw.h>
-#include <fclaw2d_global.h>
+#include <fclaw_global.h>
 
 #include <fclaw_clawpatch.h>
 #include <fclaw_clawpatch_options.h>

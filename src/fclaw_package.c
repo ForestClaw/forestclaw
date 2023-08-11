@@ -24,7 +24,7 @@
 */
 
 #include <fclaw_package.h>
-#include <fclaw2d_global.h>
+#include <fclaw_global.h>
 
 
 #define FCLAW_MAX_PACKAGES 20

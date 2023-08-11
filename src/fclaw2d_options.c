@@ -24,12 +24,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include <fclaw_base.h>
+#include <fclaw_global.h>
 #ifndef P4_TO_P8
 #include <fclaw2d_options.h>
-#include <fclaw2d_global.h>
 #else
 #include <fclaw3d_options.h>
-#include <fclaw3d_global.h>
 #include <fclaw2d_to_3d.h>
 #endif
 

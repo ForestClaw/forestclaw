@@ -2,7 +2,7 @@
 
 #include <fc2d_cudaclaw5_options.h>
 
-#include <fclaw2d_global.h>
+#include <fclaw_global.h>
 #include <fclaw2d_patch.h>
 #include <fclaw_clawpatch.h>
 #include <fclaw_clawpatch_options.h>

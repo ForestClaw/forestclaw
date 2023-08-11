@@ -25,7 +25,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "fc2d_thunderegg_options.h"
 
-#include <fclaw2d_global.h>
+#include <fclaw_global.h>
 #include <fclaw_options.h>
 
 static void*

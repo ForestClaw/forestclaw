@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 #include <fclaw2d_patch.h>
-#include <fclaw2d_global.h>
+#include <fclaw_global.h>
 
 void fclaw2d_clawpatch_transform_init_data(fclaw_global_t* glob, 
                                            fclaw_patch_t* this_patch,

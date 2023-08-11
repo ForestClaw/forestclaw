@@ -24,7 +24,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "fclaw2d_rays.h"
-#include "fclaw2d_global.h"
+#include "fclaw_global.h"
 #include "fclaw2d_options.h"
 #include "fclaw2d_diagnostics.h"
 
