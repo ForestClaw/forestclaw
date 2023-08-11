@@ -24,7 +24,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "metric_user.h"
-#include <fclaw2d_farraybox.hpp>
+#include <fclaw_farraybox.hpp>
 
 static fclaw2d_vtable_t fclaw2d_vt;
 

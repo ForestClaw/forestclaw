@@ -21,7 +21,7 @@ libforestclaw_installed_headers = \
 	src/fclaw_options.h \
 	src/fclaw_advance.h \
 	src/fclaw_elliptic_solver.h \
-	src/fclaw2d_farraybox.hpp \
+	src/fclaw_farraybox.hpp \
 	src/fclaw_global.h \
 	src/fclaw2d_forestclaw.h \
 	src/fclaw_domain.h \

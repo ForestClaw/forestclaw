@@ -43,7 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_elliptic_solver.h>
 
 
-#include <fclaw2d_farraybox.hpp>
+#include <fclaw_farraybox.hpp>
 
 
 static

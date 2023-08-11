@@ -30,7 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * @file 
  * C++ structures for clawpatch
  */
-#include <fclaw2d_farraybox.hpp>  /* Needed for FArray boxes */
+#include <fclaw_farraybox.hpp>  /* Needed for FArray boxes */
 
 struct fclaw_patch;
 struct fclaw_global;

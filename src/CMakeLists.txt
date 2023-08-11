@@ -6,6 +6,7 @@ add_library(forestclaw_c OBJECT
   fclaw_base.c 
   fclaw_domain.c
   fclaw_elliptic_solver.c
+  fclaw_farraybox.cpp
   fclaw_filesystem.cpp
   fclaw_gauges.c 
   fclaw_global.c
@@ -40,7 +41,6 @@ add_library(forestclaw_c OBJECT
   fclaw2d_time_sync.c
   fclaw2d_corner_neighbors.c
   fclaw2d_face_neighbors.c
-  fclaw2d_farraybox.cpp
   fclaw2d_output_tikz.c
   forestclaw2d.c
   forestclaw3d.c
@@ -115,9 +115,10 @@ install(FILES
   fclaw_base.h 
 	fclaw_domain.h
 	fclaw_elliptic_solver.h 
+	fclaw_farraybox.hpp 
+	fclaw_filesystem.h 
 	fclaw_gauges.h 
 	fclaw_global.h 
-	fclaw_filesystem.h 
 	fclaw_options.h 
 	fclaw_output.h
 	fclaw_package.h 
@@ -133,7 +134,6 @@ install(FILES
 
   fclaw2d_include_all.h 
 	fclaw2d_defs.h 
-	fclaw2d_farraybox.hpp 
 	fclaw2d_forestclaw.h
 	fclaw2d_block.h
 	fclaw2d_patch.h

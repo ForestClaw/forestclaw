@@ -26,7 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_defs.h>
 #include <sc.h>
 
-#include <fclaw2d_farraybox.hpp>
+#include <fclaw_farraybox.hpp>
 
 /* Difference in nan values :
    The first one is not trapped; the second one is.
@@ -64,7 +64,7 @@ void set_big_number(double& f)
 }
 
 
-void fclaw2d_farraybox_set_to_nan(double& f)
+void fclaw_farraybox_set_to_nan(double& f)
 {
     set_snan(f);
 }
