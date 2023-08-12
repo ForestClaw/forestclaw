@@ -23,8 +23,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "forestclaw.h"
-#include <fclaw2d_regrid.h>
+#include <fclaw_regrid.h>
 
 #include <fclaw_options.h>
 #include <fclaw_exchange.h>
@@ -43,7 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 /* This is also called from fclaw2d_initialize, so is not made static */
-void cb_fclaw2d_regrid_tag4refinement(fclaw_domain_t *domain,
+void cb_fclaw_regrid_tag4refinement(fclaw_domain_t *domain,
 									  fclaw_patch_t *this_patch,
 									  int this_block_idx,
 									  int this_patch_idx,
@@ -74,7 +73,7 @@ void cb_fclaw2d_regrid_tag4refinement(fclaw_domain_t *domain,
 
 /* Tag family for coarsening */
 
-void cb_regrid_tag4coarsening(fclaw_domain_t *domain,
+void cb_fclaw_regrid_tag4coarsening(fclaw_domain_t *domain,
 							  fclaw_patch_t *fine_patches,
 							  int blockno, int fine0_patchno,
 							  void *user)
@@ -112,7 +111,7 @@ void cb_regrid_tag4coarsening(fclaw_domain_t *domain,
    Public interface
    -------------------------------------------------------------- */
 
-void cb_fclaw2d_regrid_repopulate(fclaw_domain_t * old_domain,
+void cb_fclaw_regrid_repopulate(fclaw_domain_t * old_domain,
 								  fclaw_patch_t * old_patch,
 								  fclaw_domain_t * new_domain,
 								  fclaw_patch_t * new_patch,
@@ -232,7 +231,7 @@ void cb_fclaw2d_regrid_repopulate(fclaw_domain_t * old_domain,
 /* ----------------------------------------------------------------
    Public interface
    -------------------------------------------------------------- */
-void fclaw2d_regrid(fclaw_global_t *glob)
+void fclaw_regrid(fclaw_global_t *glob)
 {
     fclaw_domain_t** domain = &glob->domain;
     fclaw_timer_start (&glob->timers[FCLAW_TIMER_REGRID]);
@@ -242,10 +241,10 @@ void fclaw2d_regrid(fclaw_global_t *glob)
     fclaw_timer_start (&glob->timers[FCLAW_TIMER_REGRID_TAGGING]);
     /* First determine which families should be coarsened. */
     int domain_init = 0;
-    fclaw_global_iterate_families(glob, cb_regrid_tag4coarsening,
+    fclaw_global_iterate_families(glob, cb_fclaw_regrid_tag4coarsening,
                                     (void *) &domain_init);
 
-    fclaw_global_iterate_patches(glob, cb_fclaw2d_regrid_tag4refinement,
+    fclaw_global_iterate_patches(glob, cb_fclaw_regrid_tag4refinement,
                                    (void *) &domain_init);
 
     fclaw_timer_stop (&glob->timers[FCLAW_TIMER_REGRID_TAGGING]);
@@ -277,7 +276,7 @@ void fclaw2d_regrid(fclaw_global_t *glob)
         /* Average to new coarse grids and interpolate to new fine grids */
         fclaw_timer_start (&glob->timers[FCLAW_TIMER_REGRID_BUILD]);
         fclaw_global_iterate_adapted(glob, new_domain,
-                                       cb_fclaw2d_regrid_repopulate,
+                                       cb_fclaw_regrid_repopulate,
                                        (void *) &domain_init);
         fclaw_timer_stop (&glob->timers[FCLAW_TIMER_REGRID_BUILD]);
 
@@ -297,7 +296,7 @@ void fclaw2d_regrid(fclaw_global_t *glob)
 
         /* Get new neighbor information.  This is used to short circuit
            ghost filling procedures in some cases */
-        fclaw2d_regrid_set_neighbor_types(glob);
+        fclaw_regrid_set_neighbor_types(glob);
 
         /* Update ghost cells.  This is needed because we have new coarse or fine
            patches without valid ghost cells.   Time_interp = 0, since we only
@@ -412,7 +411,7 @@ void cb_set_neighbor_types(fclaw_domain_t *domain,
 }
 
 /* Set neighbor type : samesize, halfsize, or doublesize */
-void fclaw2d_regrid_set_neighbor_types(fclaw_global_t *glob)
+void fclaw_regrid_set_neighbor_types(fclaw_global_t *glob)
 {
 	fclaw_timer_start (&glob->timers[FCLAW_TIMER_NEIGHBOR_SEARCH]);
 	fclaw_global_iterate_patches(glob,cb_set_neighbor_types,NULL);

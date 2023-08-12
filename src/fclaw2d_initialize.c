@@ -28,6 +28,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_global.h>
 #include <fclaw_options.h>
 #include <fclaw_exchange.h>
+#include <fclaw_regrid.h>
 
 #include <fclaw2d_convenience.h>
 
@@ -35,7 +36,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_partition.h>
 #include <fclaw2d_physical_bc.h>
-#include <fclaw2d_regrid.h>
 #include <fclaw2d_ghost_fill.h>
 #include <fclaw2d_diagnostics.h>
 #include <fclaw2d_map.h>
@@ -134,7 +134,7 @@ void fclaw2d_initialize(fclaw_global_t *glob)
     fclaw_exchange_setup(glob,FCLAW_TIMER_INIT);
 
     /* This is normally called from regrid */
-    fclaw2d_regrid_set_neighbor_types(glob);
+    fclaw_regrid_set_neighbor_types(glob);
 
     /* We need a user option here to set ghost values after initialization */
     if (fclaw_opt->init_ghostcell)
@@ -165,10 +165,10 @@ void fclaw2d_initialize(fclaw_global_t *glob)
         {
             fclaw_timer_start (&glob->timers[FCLAW_TIMER_REGRID_TAGGING]);
 
-            fclaw_global_iterate_families(glob, cb_regrid_tag4coarsening,
+            fclaw_global_iterate_families(glob, cb_fclaw_regrid_tag4coarsening,
                                             (void*) &domain_init);
 
-            fclaw_global_iterate_patches(glob,cb_fclaw2d_regrid_tag4refinement,
+            fclaw_global_iterate_patches(glob,cb_fclaw_regrid_tag4refinement,
                                          &domain_init);
             
             fclaw_timer_stop (&glob->timers[FCLAW_TIMER_REGRID_TAGGING]);
@@ -197,7 +197,7 @@ void fclaw2d_initialize(fclaw_global_t *glob)
                    interpolation have already been set by initialization */
                 fclaw_timer_start (&glob->timers[FCLAW_TIMER_REGRID_BUILD]);
                 fclaw_global_iterate_adapted(glob, new_domain,
-                                               cb_fclaw2d_regrid_repopulate,
+                                               cb_fclaw_regrid_repopulate,
                                                (void *) &domain_init);
 
                 fclaw_timer_stop (&glob->timers[FCLAW_TIMER_REGRID_BUILD]);
@@ -216,7 +216,7 @@ void fclaw2d_initialize(fclaw_global_t *glob)
                 
                 /* This is normally called from regrid, once the initial domain
                    has been set up */
-                fclaw2d_regrid_set_neighbor_types(glob);
+                fclaw_regrid_set_neighbor_types(glob);
             }
             else
             {

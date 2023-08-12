@@ -26,7 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW2D_REGRID_H
 #define FCLAW2D_REGRID_H
 
-#include <forestclaw2d.h>    /* Needed to define fclaw_patch_relation_t */
+#include <forestclaw.h>    /* Needed to define fclaw_patch_relation_t */
 
 #ifdef __cplusplus
 extern "C"
@@ -41,35 +41,35 @@ struct fclaw_domain;
 struct fclaw_patch;
 
 /* Called from both fclaw2d_initialize and fclaw2d_regrid */
-void cb_fclaw2d_regrid_tag4refinement(struct fclaw_domain *domain,
-                                      struct fclaw_patch *this_patch,
-                                      int this_block_idx,
-                                      int this_patch_idx,
-                                      void *user);
+void cb_fclaw_regrid_tag4refinement(struct fclaw_domain *domain,
+                                    struct fclaw_patch *this_patch,
+                                    int this_block_idx,
+                                    int this_patch_idx,
+                                    void *user);
 
-void cb_regrid_tag4coarsening(fclaw_domain_t *domain,
-                              fclaw_patch_t *fine_patches,
-                              int blockno, int fine0_patchno,
-                              void *user);
+void cb_fclaw_regrid_tag4coarsening(fclaw_domain_t *domain,
+                                   fclaw_patch_t *fine_patches,
+                                   int blockno, int fine0_patchno,
+                                   void *user);
 
 
-void cb_fclaw2d_regrid_repopulate(struct fclaw_domain * old_domain,
-                                  struct fclaw_patch * old_patch,
-                                  struct fclaw_domain * new_domain,
-                                  struct fclaw_patch * new_patch,
-                                  fclaw_patch_relation_t newsize,
-                                  int blockno,
-                                  int old_patchno,
-                                  int new_patchno,
-                                  void *user);
+void cb_fclaw_regrid_repopulate(struct fclaw_domain * old_domain,
+                                struct fclaw_patch * old_patch,
+                                struct fclaw_domain * new_domain,
+                                struct fclaw_patch * new_patch,
+                                fclaw_patch_relation_t newsize,
+                                int blockno,
+                                int old_patchno,
+                                int new_patchno,
+                                void *user);
 
-void fclaw2d_regrid_set_neighbor_types(struct fclaw_global *glob);
+void fclaw_regrid_set_neighbor_types(struct fclaw_global *glob);
 
-void fclaw2d_regrid(struct fclaw_global *glob);
+void fclaw_regrid(struct fclaw_global *glob);
 
 void fclaw_after_regrid(struct fclaw_global *glob);
 
-void fclaw2d_regrid_set_neighbor_types(struct fclaw_global *glob);
+void fclaw_regrid_set_neighbor_types(struct fclaw_global *glob);
 
 
 

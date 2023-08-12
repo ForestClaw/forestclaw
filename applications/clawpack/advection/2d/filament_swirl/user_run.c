@@ -29,7 +29,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_global.h>
 #include <fclaw_options.h>
 #include <fclaw_advance.h>
-#include <fclaw2d_regrid.h>
+#include <fclaw_regrid.h>
 #include <fclaw_output.h>
 #include <fclaw2d_diagnostics.h>
 #include <fclaw_vtable.h>
@@ -287,7 +287,7 @@ double outstyle_1(outstyle_1_context_t* ctx, double t_pause, fclaw_global_t *glo
                 if (ctx->n_inner % fclaw_opt->regrid_interval == 0)
                 {
                     fclaw_global_infof("regridding at step %d\n",ctx->n);
-                    fclaw2d_regrid(glob);
+                    fclaw_regrid(glob);
                 }
             }
         }
@@ -424,7 +424,7 @@ void outstyle_3(fclaw_global_t *glob)
             if (n % nregrid_interval == 0)
             {
                 fclaw_global_infof("regridding at step %d\n",n);
-                fclaw2d_regrid(glob);
+                fclaw_regrid(glob);
             }
         }
 
@@ -488,7 +488,7 @@ void outstyle_4(fclaw_global_t *glob)
             {
                 fclaw_global_infof("regridding at step %d\n",n);
 
-                fclaw2d_regrid(glob);
+                fclaw_regrid(glob);
             }
         }
         else
