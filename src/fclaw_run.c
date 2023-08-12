@@ -513,7 +513,7 @@ void outstyle_4(fclaw_global_t *glob)
    Public interface
    ---------------------------------------------------------------- */
 
-void fclaw2d_run(fclaw_global_t *glob)
+void fclaw_run(fclaw_global_t *glob)
 {
 
     const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);

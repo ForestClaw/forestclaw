@@ -120,7 +120,7 @@ void run_program(fclaw_global_t* glob)
     filament_link_solvers(glob);
 
     fclaw2d_initialize(glob);
-    fclaw2d_run(glob);
+    fclaw_run(glob);
     fclaw_finalize(glob);
 }
 

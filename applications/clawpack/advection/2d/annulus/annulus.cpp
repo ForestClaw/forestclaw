@@ -94,7 +94,7 @@ void run_program(fclaw_global_t* glob)
     annulus_link_solvers(glob);
 
     fclaw2d_initialize(glob);
-    fclaw2d_run(glob);
+    fclaw_run(glob);
     fclaw_finalize(glob);
 }
 

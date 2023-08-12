@@ -26,6 +26,7 @@ add_library(forestclaw_c OBJECT
   fclaw_physical_bc.c
   fclaw_pointer_map.c
   fclaw_regrid.c
+  fclaw_run.c
   fclaw_timer.c
   fclaw_vtable.c
 
@@ -36,7 +37,6 @@ add_library(forestclaw_c OBJECT
   fclaw2d_map_brick.c
   fclaw2d_convenience.c
   fclaw2d_ghost_fill.c
-  fclaw2d_run.c
   fclaw2d_rays.c
   fclaw2d_update_single_step.c
   fclaw2d_partition.c

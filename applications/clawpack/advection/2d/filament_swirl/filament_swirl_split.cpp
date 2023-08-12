@@ -158,7 +158,7 @@ void run_programs(fclaw_global_t* globs[], int nglobs)
     if(split_comms){
         fclaw_set_global_context(globs[glob_index]);
 
-        fclaw2d_run(globs[glob_index]);
+        fclaw_run(globs[glob_index]);
 
         fclaw_clear_global_context(globs[glob_index]);
     }else{
@@ -166,7 +166,7 @@ void run_programs(fclaw_global_t* globs[], int nglobs)
         {
             fclaw_set_global_context(globs[i]);
 
-            fclaw2d_run(globs[i]);
+            fclaw_run(globs[i]);
 
             fclaw_clear_global_context(globs[i]);
         }
