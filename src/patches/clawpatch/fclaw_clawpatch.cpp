@@ -60,7 +60,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_options.h>
 
 #include <fclaw2d_timeinterp.h>
-#include <fclaw2d_diagnostics.h>
+#include <fclaw_diagnostics.h>
 
 #include <fclaw2d_map_query.h>
 

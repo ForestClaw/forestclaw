@@ -26,7 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "fclaw2d_rays.h"
 #include "fclaw_global.h"
 #include "fclaw_options.h"
-#include "fclaw2d_diagnostics.h"
+#include "fclaw_diagnostics.h"
 
 #include "fclaw2d_convenience.h"
 
@@ -302,7 +302,7 @@ fclaw2d_ray_vtable_t* fclaw2d_ray_vt()
 
 void fclaw2d_ray_vtable_initialize(fclaw_global_t *glob)
 {
-    fclaw2d_diagnostics_vtable_t * diag_vt = fclaw2d_diagnostics_vt(glob);
+    fclaw_diagnostics_vtable_t * diag_vt = fclaw_diagnostics_vt(glob);
     diag_vt->ray_init_diagnostics     = ray_initialize;    
     diag_vt->ray_compute_diagnostics  = ray_integrate;
     diag_vt->ray_gather_diagnostics   = ray_gather;

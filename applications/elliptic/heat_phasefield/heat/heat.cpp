@@ -31,7 +31,7 @@
 
 #include <fclaw_output.h>
 #include <fclaw_global.h>
-#include <fclaw2d_diagnostics.h>
+#include <fclaw_diagnostics.h>
 
 #include <fclaw_elliptic_solver.h>
 

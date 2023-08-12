@@ -35,7 +35,7 @@
 #include <fclaw2d_forestclaw.h>
 #include <fclaw_options.h>
 #include <fclaw_domain.h>
-#include <fclaw2d_diagnostics.h>
+#include <fclaw_diagnostics.h>
 #include <fclaw2d_convenience.h>
 #include <fclaw_global.h>
 #include <fclaw_vtable.h>

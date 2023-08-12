@@ -31,7 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_options.h>
 #include <fclaw_global.h>
 #include <fclaw2d_convenience.h>  /* Needed to get search function for gauges */
-#include <fclaw2d_diagnostics.h>
+#include <fclaw_diagnostics.h>
 
 /* Some mapping functions */
 #include <fclaw2d_map_brick.h>
@@ -281,7 +281,7 @@ void fclaw_locate_gauges(fclaw_global_t *glob)
     int i,index,num;
     fclaw_gauge_t *g;
 
-    fclaw2d_diagnostics_accumulator_t* acc = fclaw_global_get_attribute(glob, "acc");
+    fclaw_diagnostics_accumulator_t* acc = fclaw_global_get_attribute(glob, "acc");
     fclaw_gauge_acc_t* gauge_acc = 
               (fclaw_gauge_acc_t*) acc->gauge_accumulator;
     fclaw_gauge_info_t* gauge_info = gauge_acc->info;
@@ -392,7 +392,7 @@ fclaw_gauges_vtable_t* fclaw_gauges_vt(fclaw_global_t* glob)
 
 void fclaw_gauges_vtable_initialize(fclaw_global_t* glob)
 {
-    fclaw2d_diagnostics_vtable_t * diag_vt = fclaw2d_diagnostics_vt(glob);
+    fclaw_diagnostics_vtable_t * diag_vt = fclaw_diagnostics_vt(glob);
 
     fclaw_gauges_vtable_t* gauges_vt = fclaw_gauges_vt_new();
 

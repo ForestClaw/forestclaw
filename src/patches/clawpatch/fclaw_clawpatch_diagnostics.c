@@ -26,7 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_global.h>
 #include <fclaw_options.h>
 #include <fclaw_domain.h>
-#include <fclaw2d_diagnostics.h>
+#include <fclaw_diagnostics.h>
 
 #include <fclaw_clawpatch_diagnostics.h>
 
@@ -217,7 +217,7 @@ void fclaw_clawpatch_diagnostics_finalize(fclaw_global_t *glob,
 void fclaw_clawpatch_diagnostics_vtable_initialize(fclaw_global_t* glob)
 {
     /* diagnostic functions that apply to patches (error, conservation) */
-    fclaw2d_diagnostics_vtable_t *diag_vt = fclaw2d_diagnostics_vt(glob);
+    fclaw_diagnostics_vtable_t *diag_vt = fclaw_diagnostics_vt(glob);
     
     diag_vt->patch_init_diagnostics      = fclaw_clawpatch_diagnostics_initialize;
     diag_vt->patch_compute_diagnostics   = fclaw_clawpatch_diagnostics_compute;

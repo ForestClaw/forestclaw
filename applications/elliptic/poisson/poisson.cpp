@@ -28,7 +28,7 @@
 #include <fclaw2d_include_all.h>
 
 #include <fclaw_output.h>
-#include <fclaw2d_diagnostics.h>
+#include <fclaw_diagnostics.h>
 
 #include <fclaw_elliptic_solver.h>
 
@@ -95,7 +95,7 @@ void run_program(fclaw_global_t* glob)
 
     /* Compute sum of RHS; reset error accumulators */
     int init_flag = 1;  
-    fclaw2d_diagnostics_gather(glob,init_flag);
+    fclaw_diagnostics_gather(glob,init_flag);
     init_flag = 0;
 
     /* Output rhs */
@@ -106,7 +106,7 @@ void run_program(fclaw_global_t* glob)
     fclaw_elliptic_solve(glob);
 
     /* Compute error, compute conservation */
-    fclaw2d_diagnostics_gather(glob, init_flag);                
+    fclaw_diagnostics_gather(glob, init_flag);                
 
     /* Output solution */
     Frame = 1;

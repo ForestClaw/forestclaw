@@ -29,7 +29,7 @@
 #include <fclaw_clawpatch_options.h>
 #include <fclaw2d_clawpatch46_fort.h>
 #include <fclaw_clawpatch_output_ascii.h>
-#include <fclaw2d_diagnostics.h>
+#include <fclaw_diagnostics.h>
 #include <fclaw2d_forestclaw.h>
 #include <fclaw_global.h>
 #include <fclaw_domain.h>

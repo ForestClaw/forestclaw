@@ -6,6 +6,7 @@ add_library(forestclaw_c OBJECT
   fclaw_advance.c
   fclaw_base.c 
   fclaw_convenience.c
+  fclaw_diagnostics.c
   fclaw_domain.c
   fclaw_elliptic_solver.c
   fclaw_exchange.c
@@ -35,7 +36,6 @@ add_library(forestclaw_c OBJECT
   fclaw2d_convenience.c
   fclaw2d_ghost_fill.c
   fclaw2d_run.c
-  fclaw2d_diagnostics.c
   fclaw2d_rays.c
   fclaw2d_update_single_step.c
   fclaw2d_partition.c
@@ -178,7 +178,7 @@ if(BUILD_TESTING)
       fclaw_gauges.h.TEST.cpp
       fclaw_pointer_map.h.TEST.cpp
       fclaw_elliptic_solver.h.TEST.cpp
-      fclaw2d_diagnostics.h.TEST.cpp
+      fclaw_diagnostics.h.TEST.cpp
       fclaw_global.h.TEST.cpp
       fclaw_options.h.TEST.cpp
       fclaw2d_patch.h.TEST.cpp

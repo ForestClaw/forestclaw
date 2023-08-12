@@ -37,7 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_partition.h>
 #include <fclaw_physical_bc.h>
 #include <fclaw2d_ghost_fill.h>
-#include <fclaw2d_diagnostics.h>
+#include <fclaw_diagnostics.h>
 #include <fclaw2d_map.h>
 #include <fclaw_patch.h>
 #include <fclaw_domain.h>
@@ -234,7 +234,7 @@ void fclaw2d_initialize(fclaw_global_t *glob)
                              time_interp,FCLAW_TIMER_INIT);
     }
 
-    fclaw2d_diagnostics_initialize(glob);
+    fclaw_diagnostics_initialize(glob);
     fclaw_locate_gauges(glob);
 
     fclaw_after_regrid(glob);

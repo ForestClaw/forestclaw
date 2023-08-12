@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_advance.h>
 #include <fclaw_regrid.h>
 #include <fclaw_output.h>
-#include <fclaw2d_diagnostics.h>
+#include <fclaw_diagnostics.h>
 #include <fclaw_vtable.h>
 
 #include "fclaw_math.h"
@@ -206,7 +206,7 @@ void outstyle_1(fclaw_global_t *glob)
 
 
     int init_flag = 1;  /* Store anything that needs to be stored */
-    fclaw2d_diagnostics_gather(glob,init_flag);
+    fclaw_diagnostics_gather(glob,init_flag);
     init_flag = 0;
 
     double t0 = 0;
@@ -381,7 +381,7 @@ void outstyle_1(fclaw_global_t *glob)
 
             if (fclaw_opt->advance_one_step)
             {
-                fclaw2d_diagnostics_gather(glob, init_flag);                
+                fclaw_diagnostics_gather(glob, init_flag);                
             }
 
             if (fclaw_opt->regrid_interval > 0)
@@ -395,7 +395,7 @@ void outstyle_1(fclaw_global_t *glob)
         }
 
         /* Output file at every outer loop iteration */
-        fclaw2d_diagnostics_gather(glob, init_flag);
+        fclaw_diagnostics_gather(glob, init_flag);
         glob->curr_time = t_curr;
         iframe++;
         fclaw_output_frame(glob,iframe);
@@ -420,7 +420,7 @@ void outstyle_3(fclaw_global_t *glob)
     fclaw_domain_t** domain = &glob->domain;
 
     int init_flag = 1;
-    fclaw2d_diagnostics_gather(glob,init_flag);
+    fclaw_diagnostics_gather(glob,init_flag);
     init_flag = 0;
 
     int iframe = 0;
@@ -577,7 +577,7 @@ void outstyle_3(fclaw_global_t *glob)
 
         if (fclaw_opt->advance_one_step)
         {
-            fclaw2d_diagnostics_gather(glob,init_flag);
+            fclaw_diagnostics_gather(glob,init_flag);
         }
 
         if (n % nstep_inner == 0)
@@ -599,7 +599,7 @@ void outstyle_4(fclaw_global_t *glob)
     fclaw_output_frame(glob,iframe);
 
     int init_flag = 1;
-    fclaw2d_diagnostics_gather(glob,init_flag);
+    fclaw_diagnostics_gather(glob,init_flag);
     init_flag = 0;
 
     const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
@@ -645,7 +645,7 @@ void outstyle_4(fclaw_global_t *glob)
 
         if (n % nstep_inner == 0)
         {
-            fclaw2d_diagnostics_gather(glob,init_flag);
+            fclaw_diagnostics_gather(glob,init_flag);
             iframe++;
             fclaw_output_frame(glob,iframe);
         }

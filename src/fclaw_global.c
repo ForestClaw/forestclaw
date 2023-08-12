@@ -29,22 +29,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_timer.h>
 #include <fclaw_pointer_map.h>
 
-#ifndef P4_TO_P8
 #include <fclaw2d_defs.h>
 #include <fclaw_global.h>
 #include <fclaw_options.h>
 
 #include <fclaw_domain.h>
-#include <fclaw2d_diagnostics.h>
+#include <fclaw_diagnostics.h>
 #include <fclaw2d_map.h>
-#else
-#include <fclaw3d_defs.h>
-#include <fclaw3d_global.h>
-
-#include <fclaw3d_domain.h>
-/* figure out dimension-independent diagnostics */
-#include <fclaw3d_map.h>
-#endif
 
 /* much of this will eventually move into fclaw_global.c */
 

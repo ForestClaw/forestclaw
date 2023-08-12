@@ -43,7 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "fclaw_options.h"
 #include <fclaw_global.h>
 #include <fclaw_vtable.h>
-#include <fclaw2d_diagnostics.h>
+#include <fclaw_diagnostics.h>
 #include <fclaw2d_defs.h>
 
 /* Some mapping functions */

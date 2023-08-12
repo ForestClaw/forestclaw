@@ -25,7 +25,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw_gauges.h>
 #include <fclaw_global.h>
-#include <fclaw2d_diagnostics.h>
+#include <fclaw_diagnostics.h>
 #include <test.hpp>
 
 TEST_CASE("fclaw_gauges_vtable_initialize stores two seperate vtables in two seperate globs")
@@ -33,10 +33,10 @@ TEST_CASE("fclaw_gauges_vtable_initialize stores two seperate vtables in two sep
 	fclaw_global_t* glob1 = fclaw_global_new();
 	fclaw_global_t* glob2 = fclaw_global_new();
 
-	fclaw2d_diagnostics_vtable_initialize(glob1);
+	fclaw_diagnostics_vtable_initialize(glob1);
 	fclaw_gauges_vtable_initialize(glob1);
 
-	fclaw2d_diagnostics_vtable_initialize(glob2);
+	fclaw_diagnostics_vtable_initialize(glob2);
 	fclaw_gauges_vtable_initialize(glob2);
 
 	CHECK_NE(fclaw_gauges_vt(glob1), fclaw_gauges_vt(glob2));
@@ -49,7 +49,7 @@ TEST_CASE("fclaw_gauges_vtable_initialize sets is_set flag")
 {
 	fclaw_global_t* glob = fclaw_global_new();
 
-	fclaw2d_diagnostics_vtable_initialize(glob);
+	fclaw_diagnostics_vtable_initialize(glob);
 	fclaw_gauges_vtable_initialize(glob);
 
 	CHECK_UNARY(fclaw_gauges_vt(glob)->is_set);
@@ -64,11 +64,11 @@ TEST_CASE("fclaw_guages_vtable_initialize fails if called twice on a glob")
 	fclaw_global_t* glob1 = fclaw_global_new();
 	fclaw_global_t* glob2 = fclaw_global_new();
 
-	fclaw2d_diagnostics_vtable_initialize(glob1);
+	fclaw_diagnostics_vtable_initialize(glob1);
 	fclaw_gauges_vtable_initialize(glob1);
 	CHECK_SC_ABORTED(fclaw_gauges_vtable_initialize(glob1));
 
-	fclaw2d_diagnostics_vtable_initialize(glob2);
+	fclaw_diagnostics_vtable_initialize(glob2);
 	fclaw_gauges_vtable_initialize(glob2);
 	CHECK_SC_ABORTED(fclaw_gauges_vtable_initialize(glob2));
 

@@ -407,7 +407,7 @@ void poisson_link_solvers(fclaw_global_t *glob)
        used for the elliptic problem then for the hyperbolic problem */
     clawpatch_vt->conservation_check = poisson_conservation_check;        
 
-    fclaw2d_diagnostics_vtable_t *diag_vt = fclaw2d_diagnostics_vt(glob);
+    fclaw_diagnostics_vtable_t *diag_vt = fclaw_diagnostics_vt(glob);
     diag_vt->patch_init_diagnostics     = poisson_diagnostics_initialize;
     diag_vt->patch_reset_diagnostics    = poisson_diagnostics_reset;
     diag_vt->patch_compute_diagnostics  = poisson_diagnostics_compute;
