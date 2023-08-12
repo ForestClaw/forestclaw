@@ -159,7 +159,7 @@ fclaw_domain_num_faces (const fclaw_domain_t * domain)
 }
 
 int
-fclaw3d_domain_num_edges (const fclaw_domain_t * domain)
+fclaw_domain_num_edges (const fclaw_domain_t * domain)
 {
     return (domain->dim == 2) ? 0 : P8EST_EDGES;
 }

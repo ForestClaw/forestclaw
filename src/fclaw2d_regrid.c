@@ -23,6 +23,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include "forestclaw.h"
 #include <fclaw2d_regrid.h>
 
 #include <fclaw_options.h>
@@ -143,7 +144,7 @@ void cb_fclaw2d_regrid_repopulate(fclaw_domain_t * old_domain,
         fclaw_patch_t *coarse_patch = old_patch;
 
         int i;
-        for (i = 0; i < 4; i++)
+        for (i = 0; i < fclaw_domain_num_children(old_domain); i++)
         {
             fclaw_patch_t *fine_patch = &fine_siblings[i];
             int fine_patchno = new_patchno + i;
@@ -213,7 +214,7 @@ void cb_fclaw2d_regrid_repopulate(fclaw_domain_t * old_domain,
 
         }
         int i;
-        for(i = 0; i < 4; i++)
+        for(i = 0; i < fclaw_domain_num_children(old_domain); i++)
         {
             fclaw_patch_t* fine_patch = &fine_siblings[i];
             /* used to pass in old_domain */
@@ -341,29 +342,48 @@ void cb_set_neighbor_types(fclaw_domain_t *domain,
 						   int patchno,
 						   void *user)
 {
-	int iface, icorner;
-
-	for (iface = 0; iface < 4; iface++)
+	for (int iface = 0; iface < fclaw_domain_num_faces(domain); iface++)
 	{
-		int rproc[2];
+		int rproc[4]; //allocate for 3d
 		int rblockno;
-		int rpatchno[2];
+		int rpatchno[4];
 		int rfaceno;
 
 		fclaw_patch_relation_t neighbor_type =
 		fclaw_patch_face_neighbors(domain,
-									 blockno,
-									 patchno,
-									 iface,
-									 rproc,
-									 &rblockno,
-									 rpatchno,
-									 &rfaceno);
+								   blockno,
+								   patchno,
+								   iface,
+								   rproc,
+								   &rblockno,
+								   rpatchno,
+								   &rfaceno);
 
 		fclaw_patch_set_face_type(this_patch,iface,neighbor_type);
 	}
 
-	for (icorner = 0; icorner < 4; icorner++)
+    for (int iedge = 0; iedge < fclaw_domain_num_edges(domain); iedge++)
+	{
+		int rproc[2];
+		int rblockno;
+		int rpatchno[2];
+		int redgeno;
+
+		fclaw_patch_relation_t neighbor_type;
+		fclaw_patch_edge_neighbors(domain,
+								   blockno,
+								   patchno,
+								   iedge,
+								   rproc,
+								   &rblockno,
+                                   rpatchno,
+								   &redgeno,
+								   &neighbor_type);
+
+		fclaw_patch_set_edge_type(this_patch,iedge,neighbor_type);
+	}
+
+	for (int icorner = 0; icorner < fclaw_domain_num_corners(domain); icorner++)
 	{
 		int rproc_corner;
 		int cornerpatchno;
