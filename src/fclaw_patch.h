@@ -127,25 +127,6 @@ struct fclaw_patch_data
 
 typedef struct fclaw_patch_transform_data_d2
 {
-    /**
-     * @brief Transform array
-     * 
-     *          This array holds 9 integers.
-     *  [0,2]   The coordinate axis sequence of the origin face,
-     *          the first referring to the tangential and the second
-     *          to the normal.  A permutation of (0, 1).
-     *  [3,5]   The coordinate axis sequence of the target face.
-     *  [6,8]   Edge reversal flag for tangential axis (boolean);
-     *          face code in [0, 3] for the normal coordinate q:
-     *          0: q' = -q
-     *          1: q' = q + 1
-     *          2: q' = q - 1
-     *          3: q' = 2 - q
-     *          [8] & 4: Both patches are in the same block,
-     *                   the \a ftransform contents are ignored.
-     *  [1,4,7] 0 (unused for compatibility with 3D).ftransform 
-     */
-    int transform[9];
     /** The corner that the neighboring patch is on. */
     int icorner;
 
@@ -158,25 +139,6 @@ typedef struct fclaw_patch_transform_data_d2
 
 typedef struct fclaw_patch_transform_data_d3
 {
-    /**
-     * @brief Transform array
-     * 
-     *          This array holds 9 integers.
-     *  [0,2]   The coordinate axis sequence of the origin face,
-     *          the first referring to the tangential and the second
-     *          to the normal.  A permutation of (0, 1).
-     *  [3,5]   The coordinate axis sequence of the target face.
-     *  [6,8]   Edge reversal flag for tangential axis (boolean);
-     *          face code in [0, 3] for the normal coordinate q:
-     *          0: q' = -q
-     *          1: q' = q + 1
-     *          2: q' = q - 1
-     *          3: q' = 2 - q
-     *          [8] & 4: Both patches are in the same block,
-     *                   the \a ftransform contents are ignored.
-     *  [1,4,7] 0 (unused for compatibility with 3D).ftransform 
-     */
-    int transform[9];
     /** The corner that the neighboring patch is on. */
     int icorner;
 
@@ -201,7 +163,30 @@ struct fclaw_patch_transform_data
     struct fclaw_patch *this_patch;
     /** Pointer to the neighbor patch */
     struct fclaw_patch *neighbor_patch;
-    
+    /**
+     * @brief Transform array
+     * 
+     * .        For 2D:
+     * 
+     *          This array holds 9 integers.
+     *  [0,2]   The coordinate axis sequence of the origin face,
+     *          the first referring to the tangential and the second
+     *          to the normal.  A permutation of (0, 1).
+     *  [3,5]   The coordinate axis sequence of the target face.
+     *  [6,8]   Edge reversal flag for tangential axis (boolean);
+     *          face code in [0, 3] for the normal coordinate q:
+     *          0: q' = -q
+     *          1: q' = q + 1
+     *          2: q' = q - 1
+     *          3: q' = 2 - q
+     *          [8] & 4: Both patches are in the same block,
+     *                   the \a ftransform contents are ignored.
+     *  [1,4,7] 0 (unused for compatibility with 3D).ftransform 
+     *
+     * .        For 3D:
+     *
+     */
+    int transform[9];
     /**
      * @brief Base index
      * 

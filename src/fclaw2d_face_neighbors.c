@@ -131,7 +131,7 @@ void get_face_neighbors(fclaw_global_t *glob,
 		rface1 = rfaceno;
 		fclaw2d_patch_face_swap(&iface1,&rface1);
 		fclaw_patch_transform_blockface (glob, iface1, rface1,
-										   ftransform_finegrid->d2->transform);
+										   ftransform_finegrid->transform);
 		ftransform_finegrid->d2->block_iface = iface1;
 		**iface_neighbor_ptr = iface1;
 
@@ -142,7 +142,7 @@ void get_face_neighbors(fclaw_global_t *glob,
 			FCLAW_ASSERT (*neighbor_block_idx == -1);
 			fclaw_patch_transform_blockface_intra (glob, ftransform);
 			fclaw_patch_transform_blockface_intra
-				(glob, ftransform_finegrid->d2->transform);
+				(glob, ftransform_finegrid->transform);
 		}
 
 		if (neighbor_type == FCLAW_PATCH_SAMESIZE)
@@ -318,7 +318,7 @@ void cb_face_fill(fclaw_domain_t *domain,
 							   &ref_flag_ptr,
 							   &fine_grid_pos_ptr,
 							   &iface_neighbor_ptr,
-							   transform_data.d2->transform,
+							   transform_data.transform,
 							   &transform_data_finegrid);
 
 			/* Needed for switching the context */
@@ -565,11 +565,11 @@ void fclaw_face_neighbor_ghost(fclaw_global_t* glob,
 
 
 				fclaw_patch_transform_blockface (glob, iface, rfaceno,
-												   transform_data.d2->transform);
+												   transform_data.transform);
 
 				if (!is_block_face)
 				{
-					fclaw_patch_transform_blockface_intra(glob, transform_data.d2->transform);
+					fclaw_patch_transform_blockface_intra(glob, transform_data.transform);
 				}
 				if (neighbor_type == FCLAW_PATCH_SAMESIZE)
 				{

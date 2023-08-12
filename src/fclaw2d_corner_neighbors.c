@@ -177,7 +177,7 @@ void get_corner_neighbor(fclaw_global_t *glob,
         interior 'default' transforms. */
         fclaw_patch_transform_blockface_intra (glob, ftransform);
         fclaw_patch_transform_blockface_intra
-            (glob, ftransform_finegrid->d2->transform);
+            (glob, ftransform_finegrid->transform);
     }
     else if (!has_corner_neighbor && !is_block_corner)
     {
@@ -224,7 +224,7 @@ void get_corner_neighbor(fclaw_global_t *glob,
             int rface1 = rfaceno;
             fclaw2d_patch_face_swap(&iface1,&rface1);
             fclaw_patch_transform_blockface(glob, iface1, rface1,
-                                              ftransform_finegrid->d2->transform);
+                                              ftransform_finegrid->transform);
             ftransform_finegrid->d2->block_iface = iface1;
         }
         else if (this_block_idx == *corner_block_idx)
@@ -234,7 +234,7 @@ void get_corner_neighbor(fclaw_global_t *glob,
             *block_corner_count = 4;  /* assume four for now */
             fclaw_patch_transform_blockface_intra (glob, ftransform);
             fclaw_patch_transform_blockface_intra
-                (glob, ftransform_finegrid->d2->transform);
+                (glob, ftransform_finegrid->transform);
 
         }
         else
@@ -445,7 +445,7 @@ void cb_corner_fill(fclaw_domain_t *domain,
                                 &rcornerno,
                                 &ref_flag_ptr,
                                 &block_corner_count,
-                                transform_data.d2->transform,
+                                transform_data.transform,
                                 &transform_data_finegrid);
 
             /* This sets value in block_corner_count_array */
