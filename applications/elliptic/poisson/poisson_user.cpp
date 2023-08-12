@@ -181,7 +181,7 @@ void poisson_conservation_check(fclaw_global_t *glob,
     fc2d_thunderegg_vtable_t*  mg_vt = fc2d_thunderegg_vt(glob);
 
     int intersects_bc[4];
-    fclaw2d_physical_get_bc(glob,blockno,patchno,intersects_bc);
+    fclaw_physical_get_bc(glob,blockno,patchno,intersects_bc);
 
     double t = glob->curr_time;
     int cons_check = 1;

@@ -75,7 +75,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_partition.h>
 #include <fclaw_exchange.h>
 #include <fclaw_domain.h>
-#include <fclaw2d_physical_bc.h>
+#include <fclaw_physical_bc.h>
 
 
 /* -------------------------------------------------
@@ -291,14 +291,14 @@ void setphysical(fclaw_global_t *glob,
 {
 	struct fclaw2d_ghost_fill_wrap_info parallel_mode;
 
-	fclaw2d_physical_time_info_t t_info;
+	fclaw_physical_time_info_t t_info;
 	t_info.level_time = sync_time;
 	t_info.time_interp = time_interp;
 
 	parallel_mode.ghost_mode = ghost_mode;
 	parallel_mode.user = (void*) &t_info;
 
-	parallel_mode.cb_fill = cb_fclaw2d_physical_set_bc;
+	parallel_mode.cb_fill = cb_fclaw_physical_set_bc;
 	fclaw_global_iterate_level(glob, level, cb_parallel_wrap,
 								 (void *) &parallel_mode);
 }

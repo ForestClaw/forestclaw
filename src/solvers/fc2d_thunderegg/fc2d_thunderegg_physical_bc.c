@@ -35,7 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_domain.h>
 #include <fclaw_patch.h>
 #include <fclaw_clawpatch.h>
-#include <fclaw2d_physical_bc.h>
+#include <fclaw_physical_bc.h>
 
 void cb_fc2d_thunderegg_physical_bc(fclaw_domain_t *domain,
                                    fclaw_patch_t *patch,
@@ -52,7 +52,7 @@ void cb_fc2d_thunderegg_physical_bc(fclaw_domain_t *domain,
 
     /* Determine which faces are at the physical boundary */
     int intersects_bc[4];
-    fclaw2d_physical_get_bc(s->glob,blockno,patchno,intersects_bc);
+    fclaw_physical_get_bc(s->glob,blockno,patchno,intersects_bc);
 
     int mx, my, mbc;
     double xlower, ylower, dx, dy;

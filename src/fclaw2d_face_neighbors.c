@@ -36,7 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_patch.h>
 #include <fclaw2d_ghost_fill.h>
 #include <fclaw_options.h>
-#include <fclaw2d_physical_bc.h>
+#include <fclaw_physical_bc.h>
 #include <fclaw_regrid.h>
 #include <fclaw_domain.h>
 
@@ -222,7 +222,7 @@ void cb_face_fill(fclaw_domain_t *domain,
 	int intersects_phys_bdry[FCLAW2D_NUMFACES];
 	int intersects_block[FCLAW2D_NUMFACES];
 
-	fclaw2d_physical_get_bc(s->glob,this_block_idx,this_patch_idx,
+	fclaw_physical_get_bc(s->glob,this_block_idx,this_patch_idx,
 							intersects_phys_bdry);
 
 	fclaw2d_block_get_block_boundary(s->glob, this_patch, intersects_block);

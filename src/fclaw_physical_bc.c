@@ -23,15 +23,15 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <fclaw2d_physical_bc.h>
+#include <fclaw_physical_bc.h>
 
-#include <fclaw2d_defs.h>
+#include <fclaw3d_defs.h>
 
 #include <fclaw_domain.h>
 #include <fclaw_global.h>
 #include <fclaw_patch.h>
 
-void fclaw2d_physical_bc_default(fclaw_global_t *glob,
+void fclaw_physical_bc_default(fclaw_global_t *glob,
                                  fclaw_patch_t *this_patch,
                                  int this_block_idx,
                                  int this_patch_idx,
@@ -43,7 +43,7 @@ void fclaw2d_physical_bc_default(fclaw_global_t *glob,
     /* This can be used when no BCs are to be called */
 }
 
-void cb_fclaw2d_physical_set_bc(fclaw_domain_t *domain,
+void cb_fclaw_physical_set_bc(fclaw_domain_t *domain,
                                 fclaw_patch_t *this_patch,
                                 int this_block_idx,
                                 int this_patch_idx,
@@ -51,11 +51,11 @@ void cb_fclaw2d_physical_set_bc(fclaw_domain_t *domain,
 {
     fclaw_global_iterate_t* s = (fclaw_global_iterate_t*) user;
 
-    fclaw2d_physical_time_info_t *t_info;
+    fclaw_physical_time_info_t *t_info;
 
-    t_info = (fclaw2d_physical_time_info_t*) s->user;
+    t_info = (fclaw_physical_time_info_t*) s->user;
 
-    int intersects_bc[FCLAW2D_NUMFACES];
+    int intersects_bc[FCLAW3D_NUMFACES]; //overallocate for 3d
 
     /* Time dt should not be passed in here. If BCs are obtained by 
        evolving an ODE, then we should really evolve the ODE at the same time 
@@ -64,28 +64,28 @@ void cb_fclaw2d_physical_set_bc(fclaw_domain_t *domain,
        could mess up the BC evolution. */
 
     double dt = 1e20;  /* Signals that not a good idea to use dt in this context */
-    fclaw2d_physical_get_bc(s->glob,this_block_idx,this_patch_idx,intersects_bc);
+    fclaw_physical_get_bc(s->glob,this_block_idx,this_patch_idx,intersects_bc);
     fclaw_patch_physical_bc(s->glob,
-                              this_patch,
-                              this_block_idx,
-                              this_patch_idx,
-                              t_info->level_time,
-                              dt,
-                              intersects_bc,
-                              t_info->time_interp);
+                            this_patch,
+                            this_block_idx,
+                            this_patch_idx,
+                            t_info->level_time,
+                            dt,
+                            intersects_bc,
+                            t_info->time_interp);
 }
 
 /* This is needed by other routines, so we don't set it to static. */
-void fclaw2d_physical_get_bc(fclaw_global_t *glob,
-                             int this_block_idx,
-                             int this_patch_idx,
-                             int *intersects_bdry)
+void fclaw_physical_get_bc(fclaw_global_t *glob,
+                           int this_block_idx,
+                           int this_patch_idx,
+                           int *intersects_bdry)
 {
     // const int numfaces = get_faces_per_patch(domain);
-    int bdry[FCLAW2D_NUMFACES];
+    int bdry[FCLAW3D_NUMFACES]; //overallocate for 3d
     fclaw_patch_boundary_type(glob->domain,this_block_idx,this_patch_idx,bdry);
     int i;
-    for(i = 0; i < FCLAW2D_NUMFACES; i++)
+    for(i = 0; i < fclaw_domain_num_faces(glob->domain); i++)
     {
         // Physical boundary conditions
         intersects_bdry[i] = bdry[i] == 1;
@@ -97,15 +97,15 @@ void fclaw2d_physical_get_bc(fclaw_global_t *glob,
    Public interface : Set physical boundary conditions on a patch
    ----------------------------------------------------------------------------- */
 
-void fclaw2d_physical_set_bc(fclaw_global_t *glob,
-                             int level,
-                             double sync_time,
-                             int time_interp)
+void fclaw_physical_set_bc(fclaw_global_t *glob,
+                           int level,
+                           double sync_time,
+                           int time_interp)
 {
-    fclaw2d_physical_time_info_t t_info;
+    fclaw_physical_time_info_t t_info;
     t_info.level_time = sync_time;
     t_info.time_interp = time_interp;
     fclaw_global_iterate_level(glob, level,
-                                 cb_fclaw2d_physical_set_bc,
+                                 cb_fclaw_physical_set_bc,
                                  (void *) &t_info);
 }

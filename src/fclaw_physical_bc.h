@@ -39,40 +39,40 @@ struct fclaw_domain;
 struct fclaw_patch;
 
 
-typedef struct fclaw2d_physical_time_info
+typedef struct fclaw_physical_time_info
 {
     double level_time;
     double dt;
     int time_interp;
-} fclaw2d_physical_time_info_t;
+} fclaw_physical_time_info_t;
 
 
-void cb_fclaw2d_physical_set_bc(struct fclaw_domain *domain,
-                                struct fclaw_patch *this_patch,
-                                int this_block_idx,
-                                int this_patch_idx,
-                                void *user);
+void cb_fclaw_physical_set_bc(struct fclaw_domain *domain,
+                              struct fclaw_patch *this_patch,
+                              int this_block_idx,
+                              int this_patch_idx,
+                              void *user);
 
 
 /* This is needed by other routines, so we don't set it to static. */
-void fclaw2d_physical_get_bc(struct fclaw_global *glob,
-                             int this_block_idx,
-                             int this_patch_idx,
-                             int *intersects_bdry);
+void fclaw_physical_get_bc(struct fclaw_global *glob,
+                           int this_block_idx,
+                           int this_patch_idx,
+                           int *intersects_bdry);
 
-void fclaw2d_physical_set_bc(struct fclaw_global *glob,
-                             int level,
-                             double level_time,
-                             int time_interp);
+void fclaw_physical_set_bc(struct fclaw_global *glob,
+                           int level,
+                           double level_time,
+                           int time_interp);
 
-void fclaw2d_physical_bc_default(struct fclaw_global *glob,
-                                 struct fclaw_patch *this_patch,
-                                 int this_block_idx,
-                                 int this_patch_idx,
-                                 double t,
-                                 double dt,
-                                 int intersects_phys_bdry[],
-                                 int time_interp);
+void fclaw_physical_bc_default(struct fclaw_global *glob,
+                               struct fclaw_patch *this_patch,
+                               int this_block_idx,
+                               int this_patch_idx,
+                               double t,
+                               double dt,
+                               int intersects_phys_bdry[],
+                               int time_interp);
 
 
 

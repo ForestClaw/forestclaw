@@ -35,7 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_gauges.h>
 
 #include <fclaw2d_partition.h>
-#include <fclaw2d_physical_bc.h>
+#include <fclaw_physical_bc.h>
 #include <fclaw2d_ghost_fill.h>
 #include <fclaw2d_diagnostics.h>
 #include <fclaw2d_map.h>

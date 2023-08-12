@@ -40,7 +40,7 @@
 #include <fclaw_global.h>
 #include <fclaw_vtable.h>
 
-#include <fclaw2d_physical_bc.h>
+#include <fclaw_physical_bc.h>
 
 #include <fclaw_gauges.h>
 

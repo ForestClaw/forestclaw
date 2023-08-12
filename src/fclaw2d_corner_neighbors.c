@@ -31,7 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_options.h>
 #include <fclaw2d_defs.h>
 #include <fclaw_global.h>
-#include <fclaw2d_physical_bc.h>
+#include <fclaw_physical_bc.h>
 #include <fclaw_patch.h>
 
 
@@ -358,7 +358,7 @@ void cb_corner_fill(fclaw_domain_t *domain,
 
     int icorner;
 
-    fclaw2d_physical_get_bc(s->glob,this_block_idx,this_patch_idx,
+    fclaw_physical_get_bc(s->glob,this_block_idx,this_patch_idx,
                             intersects_bdry);
 
     fclaw2d_block_get_block_boundary(s->glob, this_patch, intersects_block);
