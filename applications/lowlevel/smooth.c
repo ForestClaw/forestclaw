@@ -156,7 +156,7 @@ mark_patches (fclaw_smooth_t * s)
                 /* we coarsen if we do not overlap */
                 if (patch->level > s->minlevel)
                 {
-                    fclaw2d_patch_mark_coarsen (s->domain, ib, ip);
+                    fclaw_patch_mark_coarsen (s->domain, ib, ip);
                 }
             }
 

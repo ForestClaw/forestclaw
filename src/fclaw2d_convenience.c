@@ -951,7 +951,7 @@ void
 fclaw2d_domain_list_adapted (fclaw_domain_t * old_domain,
                              fclaw_domain_t * new_domain, int log_priority)
 {
-    fclaw2d_domain_iterate_adapted (old_domain, new_domain,
+    fclaw_domain_iterate_adapted (old_domain, new_domain,
                                     fclaw2d_domain_list_adapted_callback,
                                     (void *) &log_priority);
 }

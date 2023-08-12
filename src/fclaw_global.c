@@ -190,7 +190,7 @@ void fclaw_global_iterate_adapted (fclaw_global_t * glob, fclaw_domain_t* new_do
     fclaw_global_iterate_t g;
     g.glob = glob;
     g.user = user;
-    fclaw2d_domain_iterate_adapted (glob->domain, new_domain,mcb,&g);
+    fclaw_domain_iterate_adapted (glob->domain, new_domain,mcb,&g);
 }
 
 void fclaw_global_iterate_level_mthread (fclaw_global_t * glob, int level,

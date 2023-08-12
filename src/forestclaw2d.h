@@ -301,61 +301,6 @@ void fclaw2d_patch_transform_corner2 (fclaw_patch_t * ipatch,
 
 ///@}
 /* ---------------------------------------------------------------------- */
-///                         @name Adaptivity
-/* ---------------------------------------------------------------------- */
-///@{
-
-/** Set parameters of refinement strategy in a domain.
- * This function only needs to be called once, and only for the first domain
- * created in the program.  The values of the parameters are automatically
- * transferred on adaptation and partitioning.
- * \param [in,out] domain       This domain's refinement strategy is set.
- * \param [in] smooth_refine    Activate or deactivete refinement smoothing.
- *                              A newly created domain has this set to false.
- * \param [in] smooth_level     If \b smooth_refine is true, denotes the
- *                              lowest level that activates the smoothing.
- *                              Use zero for smoothing across all levels.
- * \param [in] coarsen_delay    Non-negative number to set the delay for
- *                              coarsening after a patch has been last refined.
- *                              This number is a global threshold that is compared
- *                              against each patch's individual counter.
- */
-void fclaw2d_domain_set_refinement (fclaw_domain_t * domain,
-                                    int smooth_refine, int smooth_level,
-                                    int coarsen_delay);
-
-/** Mark a patch for refinement.
- * This must ONLY be called for local patches.
- * It is safe to call this function from an iterator callback except
- * \ref fclaw2d_domain_iterate_adapted.
- */
-void fclaw2d_patch_mark_refine (fclaw_domain_t * domain,
-                                int blockno, int patchno);
-
-/** Mark a patch for coarsening.
- * This must ONLY be called for local patches.
- * Coarsening will only happen if the patch family is not further refined
- * and all sibling patches are marked as well.
- * It is safe to call this function from an iterator callback except
- * \ref fclaw2d_domain_iterate_adapted.
- */
-void fclaw2d_patch_mark_coarsen (fclaw_domain_t * domain,
-                                 int blockno, int patchno);
-
-/** Iterate over the previous and the adapted domain simultaneously.
- * We iterate over local patches only.
- * \param [in,out] old_domain   Domain before adaptation.
- * \param [in,out] new_domain   Domain after adaptation.
- * \param [in] mcb              Callback.
- * \param [in,out] user         This pointer is passed to the callback.
- */
-void fclaw2d_domain_iterate_adapted (fclaw_domain_t * old_domain,
-                                     fclaw_domain_t * new_domain,
-                                     fclaw_match_callback_t mcb,
-                                     void *user);
-
-///@}
-/* ---------------------------------------------------------------------- */
 ///                         @name Parititon
 /* ---------------------------------------------------------------------- */
 ///@{

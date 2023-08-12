@@ -66,7 +66,7 @@ void cb_fclaw2d_regrid_tag4refinement(fclaw_domain_t *domain,
                                          this_patch_idx, domain_init);
         if (refine_patch == 1)
         {
-            fclaw2d_patch_mark_refine(domain, this_block_idx, this_patch_idx);
+            fclaw_patch_mark_refine(domain, this_block_idx, this_patch_idx);
         }
     }
 }
@@ -100,7 +100,7 @@ void cb_regrid_tag4coarsening(fclaw_domain_t *domain,
             for (igrid = 0; igrid < 4; igrid++)
             {
                 int fine_patchno = fine0_patchno + igrid;
-                fclaw2d_patch_mark_coarsen(domain,blockno, fine_patchno);
+                fclaw_patch_mark_coarsen(domain,blockno, fine_patchno);
             }
         }
     }
