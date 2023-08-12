@@ -209,7 +209,7 @@ void heat_time_header_ascii(fclaw_global_t* glob, int iframe)
     const fclaw_clawpatch_options_t *clawpatch_opt = 
                 fclaw_clawpatch_get_options(glob);
     char matname1[20];
-    sprintf(matname1,"fort.q%04d",iframe);
+    snprintf(matname1,20,"fort.q%04d",iframe);
 
 #if 1
     FILE *f1 = fopen(matname1,"w");
@@ -218,7 +218,7 @@ void heat_time_header_ascii(fclaw_global_t* glob, int iframe)
 
 
     char matname2[20];
-    sprintf(matname2,"fort.t%04d",iframe);
+    snprintf(matname2,20,"fort.t%04d",iframe);
 
     double time = glob->curr_time;
 
