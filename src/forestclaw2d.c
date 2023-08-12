@@ -163,46 +163,6 @@ fclaw2d_patch_is_ghost (const fclaw_patch_t * patch)
     return patch->flags & FCLAW2D_PATCH_IS_GHOST ? 1 : 0;
 }
 
-void
-fclaw2d_domain_attribute_add (fclaw_domain_t * domain,
-                              const char *name, void *attribute)
-{
-    sc_keyvalue_t *a = domain->attributes;
-
-    FCLAW_ASSERT (a != NULL);
-    FCLAW_ASSERT (!sc_keyvalue_exists (a, name));
-    sc_keyvalue_set_pointer (a, name, attribute);
-}
-
-void *
-fclaw2d_domain_attribute_access (fclaw_domain_t * domain,
-                                 const char *name, void *default_attr)
-{
-    sc_keyvalue_t *a = domain->attributes;
-
-    FCLAW_ASSERT (a != NULL);
-    return sc_keyvalue_get_pointer (a, name, default_attr);
-}
-
-void
-fclaw2d_domain_attribute_remove (fclaw_domain_t * domain, const char *name)
-{
-    sc_keyvalue_t *a = domain->attributes;
-#ifdef FCLAW_ENABLE_DEBUG
-    sc_keyvalue_entry_type_t et;
-#endif
-
-    FCLAW_ASSERT (a != NULL);
-    FCLAW_ASSERT (sc_keyvalue_exists (a, name));
-#ifndef FCLAW_ENABLE_DEBUG
-    (void)
-#else
-    et =
-#endif
-        sc_keyvalue_unset (a, name);
-    FCLAW_ASSERT (et == SC_KEYVALUE_ENTRY_POINTER);
-}
-
 static fclaw_patch_t *
 fclaw2d_domain_get_patch (fclaw_domain_t * domain, int blockno, int patchno)
 {

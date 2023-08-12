@@ -2,6 +2,7 @@
 
 # -- c library
 add_library(forestclaw_c OBJECT 
+  forestclaw.c
   fclaw_advance.c
   fclaw_base.c 
   fclaw_convenience.c

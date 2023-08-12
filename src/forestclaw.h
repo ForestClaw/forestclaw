@@ -304,5 +304,38 @@ typedef void (*fclaw_transfer_callback_t) (fclaw_domain_t * old_domain,
                                              int blockno,
                                              int old_patchno, int new_patchno,
                                              void *user);
+///* ---------------------------------------------------------------------- */
+///                      @name Domain Attributes
+/* ---------------------------------------------------------------------- */
+///@{
+
+/** Add a named attribute to the domain.
+ * Attribute names starting with 'fclaw' are reserved.
+ * \param [in] domain   This domain will get a new attribute.
+ * \param [in] name     This name must not yet be used for another attribute.
+ * \param [in] attribute        Arbitrary data stored under \a name.
+ */
+void fclaw_domain_attribute_add (fclaw_domain_t * domain,
+                                 const char *name, void *attribute);
+
+/** Access a named attribute of the domain.
+ * \param [in] domain   The domain may or may not have the queried attribute.
+ * \param [in] name     The attribute by this \a name is retrieved.
+ * \param [in] default_attr     Returned if the attribute does not exist.
+ * \return              The data that was previously stored under \a name,
+ *                      or \a default_attr if the attribute does not exist.
+ */
+void *fclaw_domain_attribute_access (fclaw_domain_t * domain,
+                                     const char *name, void *default_attr);
+
+/** Remove a named attribute from the domain.
+ * It is NOT necessary to call this function before domain destruction.
+ * \param [in] domain   The domain must have the attribute \a name.
+ * \param [in] name     An attribute of this name must exist.
+ */
+void fclaw_domain_attribute_remove (fclaw_domain_t * domain,
+                                    const char *name);
+
+///@}
 
 #endif /* !FORESTCLAW_H */

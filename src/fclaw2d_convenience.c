@@ -443,7 +443,7 @@ fclaw2d_domain_new_conn_map (sc_MPI_Comm mpicomm, int initial_level,
     fclaw_domain_t *domain =
       fclaw2d_domain_new_conn (mpicomm, initial_level, conn);
 
-    fclaw2d_domain_attribute_add (domain, "fclaw_map_context", cont);
+    fclaw_domain_attribute_add (domain, "fclaw_map_context", cont);
 
     return domain;
 }

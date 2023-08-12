@@ -113,7 +113,7 @@ fclaw_global_store_domain (fclaw_global_t* glob, fclaw_domain_t* domain)
 
     /* done for backwards compatibility */
     fclaw2d_map_context_t* map = (fclaw2d_map_context_t*)
-           fclaw2d_domain_attribute_access (glob->domain, "fclaw_map_context", NULL);
+           fclaw_domain_attribute_access (glob->domain, "fclaw_map_context", NULL);
 
     fclaw_global_store_map_2d(glob, map);
 }
