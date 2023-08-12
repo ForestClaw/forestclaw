@@ -8,6 +8,7 @@ add_library(forestclaw_c OBJECT
   fclaw_convenience.c
   fclaw_domain.c
   fclaw_elliptic_solver.c
+  fclaw_exchange.c
   fclaw_farraybox.cpp
   fclaw_filesystem.cpp
   fclaw_gauges.c 
@@ -116,6 +117,7 @@ install(FILES
   fclaw_base.h 
 	fclaw_domain.h
 	fclaw_elliptic_solver.h 
+	fclaw_exchange.h
 	fclaw_farraybox.hpp 
 	fclaw_filesystem.h 
 	fclaw_gauges.h 
@@ -150,7 +152,6 @@ install(FILES
 	fclaw2d_regrid.h
 	fclaw2d_map_brick.h
 	fclaw2d_partition.h
-	fclaw2d_exchange.h
 	fclaw2d_convenience.h
 	fclaw2d_map_query.h
 	fclaw2d_map_query_defs.h
@@ -162,7 +163,6 @@ install(FILES
   fclaw3d_convenience.h
   fclaw3d_defs.h
   fclaw3d_map.h
-  fclaw3d_exchange.h
   fclaw3d_include_all.h 
   DESTINATION include
 )

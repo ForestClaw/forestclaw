@@ -28,11 +28,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_convenience.h>  /* Contains domain_destroy and others */
 #include <fclaw_patch.h>
-#include <fclaw2d_exchange.h>
+#include <fclaw_exchange.h>
 
 #include <fclaw3d_convenience.h>  /* Contains domain_destroy and others */
 #include <fclaw_patch.h>
-#include <fclaw3d_exchange.h>
 
 
 /* we're holding back with 3d counterparts
@@ -125,7 +124,7 @@ void fclaw_domain_reset(fclaw_global_t* glob)
         if (ddata->domain_exchange != NULL)
         {
             /* TO DO: translate fclaw2d_exchange files */
-            fclaw2d_exchange_delete(glob);
+            fclaw_exchange_delete(glob);
         }
 
         /* Output memory discrepancy for the ClawPatch */
@@ -142,7 +141,7 @@ void fclaw_domain_reset(fclaw_global_t* glob)
         if (ddata->domain_exchange != NULL)
         {
             /* TO DO: translate fclaw2d_exchange files */
-            fclaw3d_exchange_delete(glob);
+            fclaw_exchange_delete(glob);
         }
 
         /* Output memory discrepancy for the ClawPatch */

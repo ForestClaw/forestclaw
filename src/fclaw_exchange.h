@@ -23,8 +23,8 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FCLAW3D_EXCHANGE_H
-#define FCLAW3D_EXCHANGE_H
+#ifndef FCLAW2D_EXCHANGE_H
+#define FCLAW2D_EXCHANGE_H
 
 #include <fclaw_timer.h>
 
@@ -38,18 +38,18 @@ extern "C"
 
 struct fclaw_global;
 
-void fclaw3d_exchange_setup(struct fclaw_global* glob,
+void fclaw_exchange_setup(struct fclaw_global* glob,
                             fclaw_timer_names_t running);
 
-void fclaw3d_exchange_delete(struct fclaw_global* glob);
+void fclaw_exchange_delete(struct fclaw_global* glob);
 
-void fclaw3d_exchange_ghost_patches_begin(struct fclaw_global* glob,
+void fclaw_exchange_ghost_patches_begin(struct fclaw_global* glob,
                                           int minlevel,
                                           int maxlevel,
                                           int time_interp,
                                           fclaw_timer_names_t running);
 
-void fclaw3d_exchange_ghost_patches_end(struct fclaw_global* glob,
+void fclaw_exchange_ghost_patches_end(struct fclaw_global* glob,
                                         int minlevel,
                                         int maxlevel,
                                         int time_interp,

@@ -28,15 +28,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_options.h>
 #include <fclaw_patch.h>
 
-#ifndef P4_TO_P8
+#include <fclaw_exchange.h>
 
-#include <fclaw2d_exchange.h>
-
-
-
-#else
-
-#include <fclaw3d_exchange.h>
+#ifdef P4_TO_P8
 
 #include <fclaw3d_convenience.h>
 

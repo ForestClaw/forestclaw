@@ -73,7 +73,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_timer.h>
 #include <fclaw_patch.h>
 #include <fclaw2d_partition.h>
-#include <fclaw2d_exchange.h>
+#include <fclaw_exchange.h>
 #include <fclaw_domain.h>
 #include <fclaw2d_physical_bc.h>
 
@@ -547,10 +547,10 @@ void fclaw2d_ghost_update_nonasync(fclaw_global_t* glob,
 	/* --------------------------------------------------------------
 		Send and receive ghost patches
 	------------------------------------------------------------*/
-	fclaw2d_exchange_ghost_patches_begin(glob,minlevel,maxlevel,time_interp,
+	fclaw_exchange_ghost_patches_begin(glob,minlevel,maxlevel,time_interp,
 										 FCLAW_TIMER_GHOSTFILL);
 
-	fclaw2d_exchange_ghost_patches_end(glob,minlevel,maxlevel,time_interp,
+	fclaw_exchange_ghost_patches_end(glob,minlevel,maxlevel,time_interp,
 									   FCLAW_TIMER_GHOSTFILL);
 
 	/* -------------------------------------------------------------
@@ -695,7 +695,7 @@ void fclaw2d_ghost_update_async(fclaw_global_t* glob,
 	/* --------------------------------------------------------------
 		Start send ...
 	------------------------------------------------------------*/
-	fclaw2d_exchange_ghost_patches_begin(glob,minlevel,maxlevel,time_interp,
+	fclaw_exchange_ghost_patches_begin(glob,minlevel,maxlevel,time_interp,
 										 FCLAW_TIMER_GHOSTFILL);
 
 	/* --------------------------------------------------------------
@@ -750,7 +750,7 @@ void fclaw2d_ghost_update_async(fclaw_global_t* glob,
 		Receive ghost patches ...
 	------------------------------------------------------------- */
 
-	fclaw2d_exchange_ghost_patches_end(glob,minlevel,maxlevel,time_interp,
+	fclaw_exchange_ghost_patches_end(glob,minlevel,maxlevel,time_interp,
 									   FCLAW_TIMER_GHOSTFILL);
 
 	/* -------------------------------------------------------------

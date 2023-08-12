@@ -27,13 +27,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw_global.h>
 #include <fclaw_options.h>
+#include <fclaw_exchange.h>
 
 #include <fclaw2d_convenience.h>
 
 #include <fclaw_gauges.h>
 
 #include <fclaw2d_partition.h>
-#include <fclaw2d_exchange.h>
 #include <fclaw2d_physical_bc.h>
 #include <fclaw2d_regrid.h>
 #include <fclaw2d_ghost_fill.h>
@@ -131,7 +131,7 @@ void fclaw2d_initialize(fclaw_global_t *glob)
     fclaw_timer_stop (&glob->timers[FCLAW_TIMER_REGRID_BUILD]);
 
     /* Set up ghost patches */
-    fclaw2d_exchange_setup(glob,FCLAW_TIMER_INIT);
+    fclaw_exchange_setup(glob,FCLAW_TIMER_INIT);
 
     /* This is normally called from regrid */
     fclaw2d_regrid_set_neighbor_types(glob);
@@ -212,7 +212,7 @@ void fclaw2d_initialize(fclaw_global_t *glob)
 
                 /* Set up ghost patches.  This probably doesn't need to be done
                    each time we add a new level. */
-                fclaw2d_exchange_setup(glob,FCLAW_TIMER_INIT);
+                fclaw_exchange_setup(glob,FCLAW_TIMER_INIT);
                 
                 /* This is normally called from regrid, once the initial domain
                    has been set up */

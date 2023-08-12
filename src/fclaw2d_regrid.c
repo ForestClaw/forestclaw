@@ -26,6 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_regrid.h>
 
 #include <fclaw_options.h>
+#include <fclaw_exchange.h>
 
 #include <fclaw2d_convenience.h>   /* p4est domain, patch handling routines */
 #include <forestclaw2d.h>          /* Needed for patch_relation_t data */
@@ -35,7 +36,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_global.h>
 #include <fclaw2d_ghost_fill.h>
 #include <fclaw2d_partition.h>
-#include <fclaw2d_exchange.h>
 #include <fclaw_vtable.h>
 #include <fclaw_domain.h>
 #include <fclaw_patch.h>
@@ -292,7 +292,7 @@ void fclaw2d_regrid(fclaw_global_t *glob)
 
 
         /* This includes timers for building patches and (exclusive) communication */
-        fclaw2d_exchange_setup(glob,FCLAW_TIMER_REGRID);
+        fclaw_exchange_setup(glob,FCLAW_TIMER_REGRID);
 
         /* Get new neighbor information.  This is used to short circuit
            ghost filling procedures in some cases */
