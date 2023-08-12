@@ -41,7 +41,7 @@ void fclaw2d_vtables_initialize(struct fclaw_global *glob);
 
 void fclaw2d_initialize (struct fclaw_global *glob);
 void fclaw2d_run (struct fclaw_global *glob);
-void fclaw2d_finalize(struct fclaw_global *glob);
+void fclaw_finalize(struct fclaw_global *glob);
 
 #ifdef __cplusplus
 #if 0

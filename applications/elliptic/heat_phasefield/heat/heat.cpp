@@ -97,7 +97,7 @@ void heat_run_program(fclaw_global_t* glob)
     /* ---------------------------------------------------------------
        Finalize
        --------------------------------------------------------------- */
-    fclaw2d_finalize(glob);
+    fclaw_finalize(glob);
 
     fclaw_clear_global_context(glob);
 }

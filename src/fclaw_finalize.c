@@ -167,15 +167,26 @@ output_expected_values(fclaw_global_t* glob, const char* filename)
    Public interface
    ---------------------------------------------------------------- */
 
-void fclaw2d_finalize(fclaw_global_t* glob)
+void fclaw_finalize(fclaw_global_t* glob)
 {
     const fclaw_options_t *gparms = fclaw_get_options(glob);
 
     fclaw_global_essentialf("Finalizing run\n");
     fclaw_diagnostics_finalize(glob);
-    fclaw2d_map_context_t* map = fclaw_global_get_map_2d(glob);
-    if (map != NULL) {
-        fclaw2d_map_destroy(map);
+    if(glob->domain->dim == 2)
+    {
+        fclaw2d_map_context_t* map = fclaw_global_get_map_2d(glob);
+        if (map != NULL) {
+            fclaw2d_map_destroy(map);
+        }
+    }
+    else
+    {
+        fclaw3d_map_context_t* map = fclaw_global_get_map_3d(glob);
+        if (map != NULL) {
+            //TODO
+            //fclaw3d_map_destroy(map);
+        }
     }
     fclaw_domain_barrier (glob->domain);
 

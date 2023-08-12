@@ -81,7 +81,7 @@ void filament_finalize(fclaw_global_t* glob)
     fclaw_set_global_context(glob);
 
     fclaw2d_problem_setup(glob);
-    fclaw2d_finalize(glob);
+    fclaw_finalize(glob);
 
     fclaw_clear_global_context(glob);
 }
@@ -127,7 +127,7 @@ void swirl_finalize(fclaw_global_t* glob)
     fclaw_set_global_context(glob);
 
     fclaw2d_problem_setup(glob);
-    fclaw2d_finalize(glob);
+    fclaw_finalize(glob);
 
     fclaw_clear_global_context(glob);
 }

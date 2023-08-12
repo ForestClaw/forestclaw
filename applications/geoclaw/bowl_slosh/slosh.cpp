@@ -67,7 +67,7 @@ void run_program(fclaw_global_t* glob)
     fclaw2d_initialize(glob);
     fc2d_geoclaw_run(glob);
 
-    fclaw2d_finalize(glob);
+    fclaw_finalize(glob);
 }
 
 int

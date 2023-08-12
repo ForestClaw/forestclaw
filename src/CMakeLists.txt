@@ -14,6 +14,7 @@ add_library(forestclaw_c OBJECT
   fclaw_exchange_3d.c
   fclaw_farraybox.cpp
   fclaw_filesystem.cpp
+  fclaw_finalize.c
   fclaw_gauges.c 
   fclaw_global.c
   fclaw_math.c
@@ -41,7 +42,6 @@ add_library(forestclaw_c OBJECT
   fclaw2d_partition.c
   fclaw2d_timeinterp.c
   fclaw2d_initialize.c
-  fclaw2d_finalize.c
   fclaw2d_time_sync.c
   fclaw2d_corner_neighbors.c
   fclaw2d_face_neighbors.c
