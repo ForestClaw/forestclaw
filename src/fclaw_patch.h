@@ -185,6 +185,17 @@ struct fclaw_patch_transform_data
      *
      * .        For 3D:
      *
+     *  [0]..[2]    The coordinate axis sequence of the origin face,
+     *              the first two referring to the tangentials and the
+     *              third to the normal.  A permutation of (0, 1, 2).
+     *  [3]..[5]    The coordinate axis sequence of the target face.
+     *  [6]..[8]    Edge reversal flags for tangential axes (boolean);
+     *              face code in [0, 3] for the normal coordinate q:
+     *              0: q' = -q
+     *              1: q' = q + 1
+     *              2: q' = q - 1
+     *              3: q' = 2 - q
+     *
      */
     int transform[9];
     /**
