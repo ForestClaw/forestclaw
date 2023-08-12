@@ -210,7 +210,7 @@ void fclaw_global_iterate_partitioned (fclaw_global_t * glob,
     fclaw_global_iterate_t g;
     g.glob = glob;
     g.user = user;
-    fclaw2d_domain_iterate_partitioned (glob->domain,new_domain,tcb,&g);
+    fclaw_domain_iterate_partitioned (glob->domain,new_domain,tcb,&g);
 }
 
 void fclaw_global_options_store (fclaw_global_t* glob, const char* key, void* options)

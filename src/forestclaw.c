@@ -345,3 +345,214 @@ fclaw_domain_serialization_leave (fclaw_domain_t * domain)
         SC_CHECK_MPI (mpiret);
     }
 }
+
+////////////////////////////////////////
+// adaptivity
+///////////////////////////////////////
+
+//definition of dimension specific functions
+
+void fclaw2d_domain_set_refinement (fclaw_domain_t * domain,
+                                    int smooth_refine, int smooth_level,
+                                    int coarsen_delay);
+
+void fclaw2d_patch_mark_refine (fclaw_domain_t * domain,
+                                int blockno, int patchno);
+
+void fclaw2d_patch_mark_coarsen (fclaw_domain_t * domain,
+                                 int blockno, int patchno);
+
+void fclaw2d_domain_iterate_adapted (fclaw_domain_t * old_domain,
+                                     fclaw_domain_t * new_domain,
+                                     fclaw_match_callback_t mcb,
+                                     void *user);
+
+void fclaw3d_domain_set_refinement (fclaw_domain_t * domain,
+                                    int smooth_refine, int smooth_level,
+                                    int coarsen_delay);
+
+void fclaw3d_patch_mark_refine (fclaw_domain_t * domain,
+                                int blockno, int patchno);
+
+void fclaw3d_patch_mark_coarsen (fclaw_domain_t * domain,
+                                 int blockno, int patchno);
+
+void fclaw3d_domain_iterate_adapted (fclaw_domain_t * old_domain,
+                                     fclaw_domain_t * new_domain,
+                                     fclaw_match_callback_t mcb,
+                                     void *user);
+
+// dimension independent functions
+
+void
+fclaw_domain_set_refinement (fclaw_domain_t * domain,
+                             int smooth_refine, int smooth_level,
+                             int coarsen_delay)
+{
+    if(domain->dim == 2)
+    {
+        fclaw2d_domain_set_refinement(domain,smooth_refine,smooth_level,
+                                      coarsen_delay);
+    }
+    else if (domain->dim == 3)
+    {
+        fclaw3d_domain_set_refinement(domain,smooth_refine,smooth_level,
+                                      coarsen_delay);
+    }
+    else
+    {
+        SC_ABORT_NOT_REACHED();
+    }
+}
+
+void
+fclaw_patch_mark_refine(fclaw_domain_t *domain, int blockno, int patchno)
+{
+    if(domain->dim == 2)
+    {
+        fclaw2d_patch_mark_refine(domain,blockno,patchno);
+    }
+    else if (domain->dim == 3)
+    {
+        fclaw3d_patch_mark_refine(domain,blockno,patchno);
+    }
+    else
+    {
+        SC_ABORT_NOT_REACHED();
+    }
+}
+
+void
+fclaw_patch_mark_coarsen(fclaw_domain_t *domain, int blockno, int patchno)
+{
+    if(domain->dim == 2)
+    {
+        fclaw2d_patch_mark_coarsen(domain,blockno,patchno);
+    }
+    else if (domain->dim == 3)
+    {
+        fclaw3d_patch_mark_coarsen(domain,blockno,patchno);
+    }
+    else
+    {
+        SC_ABORT_NOT_REACHED();
+    }
+}
+
+void
+fclaw_domain_iterate_adapted(fclaw_domain_t *old_domain, fclaw_domain_t *new_domain, fclaw_match_callback_t mcb, void *user)
+{
+    if(old_domain->dim == 2)
+    {
+        fclaw2d_domain_iterate_adapted(old_domain,new_domain,mcb,user);
+    }
+    else if (old_domain->dim == 3)
+    {
+        fclaw3d_domain_iterate_adapted(old_domain,new_domain,mcb,user);
+    }
+    else
+    {
+        SC_ABORT_NOT_REACHED();
+    }
+}
+
+////////////////////////////////////////
+// partition
+///////////////////////////////////////
+
+//definition of dimension specific functions
+void fclaw2d_domain_allocate_before_partition (fclaw_domain_t * domain,
+                                               size_t data_size,
+                                               void ***patch_data);
+
+void fclaw2d_domain_retrieve_after_partition (fclaw_domain_t * domain,
+                                              void ***patch_data);
+
+void fclaw2d_domain_iterate_partitioned (fclaw_domain_t * old_domain,
+                                         fclaw_domain_t * new_domain,
+                                         fclaw_transfer_callback_t tcb,
+                                         void *user);
+
+void fclaw2d_domain_free_after_partition (fclaw_domain_t * domain,
+                                          void ***patch_data);
+
+
+void fclaw3d_domain_allocate_before_partition (fclaw_domain_t * domain,
+                                               size_t data_size,
+                                               void ***patch_data);
+
+void fclaw3d_domain_retrieve_after_partition (fclaw_domain_t * domain,
+                                              void ***patch_data);
+
+void fclaw3d_domain_iterate_partitioned (fclaw_domain_t * old_domain,
+                                         fclaw_domain_t * new_domain,
+                                         fclaw_transfer_callback_t tcb,
+                                         void *user);
+
+void fclaw3d_domain_free_after_partition (fclaw_domain_t * domain,
+                                          void ***patch_data);
+
+
+void fclaw_domain_allocate_before_partition(fclaw_domain_t *domain, size_t data_size, void ***patch_data)
+{
+    if(domain->dim == 2)
+    {
+        fclaw2d_domain_allocate_before_partition(domain,data_size,patch_data);
+    }
+    else if (domain->dim == 3)
+    {
+        fclaw3d_domain_allocate_before_partition(domain,data_size,patch_data);
+    }
+    else
+    {
+        SC_ABORT_NOT_REACHED();
+    }
+}
+
+void fclaw_domain_retrieve_after_partition(fclaw_domain_t *domain, void ***patch_data)
+{
+    if(domain->dim == 2)
+    {
+        fclaw2d_domain_retrieve_after_partition(domain,patch_data);
+    }
+    else if (domain->dim == 3)
+    {
+        fclaw3d_domain_retrieve_after_partition(domain,patch_data);
+    }
+    else
+    {
+        SC_ABORT_NOT_REACHED();
+    }
+}
+
+void fclaw_domain_iterate_partitioned(fclaw_domain_t *old_domain, fclaw_domain_t *new_domain, fclaw_transfer_callback_t tcb, void *user)
+{
+    if(old_domain->dim == 2)
+    {
+        fclaw2d_domain_iterate_partitioned(old_domain,new_domain,tcb,user);
+    }
+    else if (old_domain->dim == 3)
+    {
+        fclaw3d_domain_iterate_partitioned(old_domain,new_domain,tcb,user);
+    }
+    else
+    {
+        SC_ABORT_NOT_REACHED();
+    }
+}
+
+void fclaw_domain_free_after_partition(fclaw_domain_t *domain, void ***patch_data)
+{
+    if(domain->dim == 2)
+    {
+        fclaw2d_domain_free_after_partition(domain,patch_data);
+    }
+    else if (domain->dim == 3)
+    {
+        fclaw3d_domain_free_after_partition(domain,patch_data);
+    }
+    else
+    {
+        SC_ABORT_NOT_REACHED();
+    }
+}

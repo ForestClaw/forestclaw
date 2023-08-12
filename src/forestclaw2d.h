@@ -301,57 +301,6 @@ void fclaw2d_patch_transform_corner2 (fclaw_patch_t * ipatch,
 
 ///@}
 /* ---------------------------------------------------------------------- */
-///                         @name Parititon
-/* ---------------------------------------------------------------------- */
-///@{
-
-/** Allocate data buffer for parallel transfer of all patches.
- * \param [in,out] domain       The memory lives inside this domain.
- * \param [in] data_size        Number of bytes per patch to transfer.
- * \param [in,out] patch_data   Address of an array of void pointers.
- *                              Data is allocated by this function.  After the
- *                              call, *patch_data holds one pointer per patch
- *                              that points to exactly data_size bytes of
- *                              memory that can be written to by forestclaw.
- *                              *patch_data must be NULL before the call.
- */
-void fclaw2d_domain_allocate_before_partition (fclaw_domain_t * domain,
-                                               size_t data_size,
-                                               void ***patch_data);
-
-/** Reallocate data buffer to reflect patch data after partition.
- * \param [in,out] domain       The memory lives inside this domain.
- * \param [in,out] patch_data   Address of an array of void pointers.
- *                              Data is reallocated by this function.  After the
- *                              call, *patch_data holds one pointer per patch
- *                              that points to exactly data_size bytes of
- *                              memory that can be read from by forestclaw.
- */
-void fclaw2d_domain_retrieve_after_partition (fclaw_domain_t * domain,
-                                              void ***patch_data);
-
-/** Iterate over the previous and partitioned domain simultaneously.
- * We iterate over local patches only.
- * \param [in,out] old_domain   Domain before partition.
- * \param [in,out] new_domain   Domain after partition.
- * \param [in] tcb              Callback.
- * \param [in,out] user         This pointer is passed to the callback.
- */
-void fclaw2d_domain_iterate_partitioned (fclaw_domain_t * old_domain,
-                                         fclaw_domain_t * new_domain,
-                                         fclaw_transfer_callback_t tcb,
-                                         void *user);
-
-/** Free buffers that were used in transfering data during partition.
- * \param [in,out] domain       The memory lives inside this domain.
- * \param [in,out] patch_data   Address of an array of void pointers to free.
- *                              *patch_data will be NULL after the call.
- */
-void fclaw2d_domain_free_after_partition (fclaw_domain_t * domain,
-                                          void ***patch_data);
-
-///@}
-/* ---------------------------------------------------------------------- */
 ///                         @name Exchange
 /* ---------------------------------------------------------------------- */
 ///@{

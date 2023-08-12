@@ -148,7 +148,7 @@ mark_patches (fclaw_smooth_t * s)
                 /* we overlap and prompt refinement of this patch */
                 if (patch->level < s->maxlevel)
                 {
-                    fclaw2d_patch_mark_refine (s->domain, ib, ip);
+                    fclaw_patch_mark_refine (s->domain, ib, ip);
                 }
             }
             else
@@ -311,8 +311,8 @@ main (int argc, char **argv)
 
     /* create a new domain */
     s->domain = fclaw2d_domain_new_unitsquare (s->mpicomm, s->minlevel);
-    fclaw2d_domain_set_refinement (s->domain, s->smooth_refine,
-                                   s->smooth_level, s->coarsen_delay);
+    fclaw_domain_set_refinement (s->domain, s->smooth_refine,
+                                 s->smooth_level, s->coarsen_delay);
 
     /* run initial refinement loop */
     init_refine (s);
