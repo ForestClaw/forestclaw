@@ -189,7 +189,7 @@ void fclaw_domain_list_levels (fclaw_domain_t * domain, int log_priority)
 {
     if(domain->dim == 2)
     {
-        fclaw_domain_list_levels(domain,log_priority);
+        fclaw2d_domain_list_levels(domain,log_priority);
     }
     else if(domain->dim == 3)
     {
@@ -205,7 +205,7 @@ void fclaw_domain_list_neighbors (fclaw_domain_t * domain, int log_priority)
 {
     if(domain->dim == 2)
     {
-        fclaw_domain_list_neighbors(domain,log_priority);
+        fclaw2d_domain_list_neighbors(domain,log_priority);
     }
     else if(domain->dim == 3)
     {
