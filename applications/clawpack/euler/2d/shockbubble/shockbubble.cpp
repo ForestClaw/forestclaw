@@ -54,8 +54,8 @@ void create_domain_map (fclaw_global_t *glob,
     /* Construct and store domain */
     domain = fclaw2d_domain_new_brick (glob->mpicomm, mi, mj, a, b,
                                       fclaw_opt->minlevel);
-    fclaw2d_domain_list_levels (domain, FCLAW_VERBOSITY_ESSENTIAL);
-    fclaw2d_domain_list_neighbors (domain, FCLAW_VERBOSITY_DEBUG);
+    fclaw_domain_list_levels (domain, FCLAW_VERBOSITY_ESSENTIAL);
+    fclaw_domain_list_neighbors (domain, FCLAW_VERBOSITY_DEBUG);
     fclaw_global_store_domain (glob, domain);
 
     /* Construct and store map */

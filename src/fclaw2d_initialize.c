@@ -176,7 +176,7 @@ void fclaw2d_initialize(fclaw_global_t *glob)
             // Construct new domain based on tagged patches.
             fclaw_timer_stop (&glob->timers[FCLAW_TIMER_INIT]);
             fclaw_timer_start (&glob->timers[FCLAW_TIMER_ADAPT_COMM]);
-            fclaw_domain_t *new_domain = fclaw2d_domain_adapt(*domain);
+            fclaw_domain_t *new_domain = fclaw_domain_adapt(*domain);
 
             int have_new_refinement = new_domain != NULL;
 

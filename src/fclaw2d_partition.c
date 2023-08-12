@@ -147,7 +147,7 @@ void fclaw2d_partition_domain(fclaw_global_t* glob,
     }
     fclaw_timer_start (&glob->timers[FCLAW_TIMER_PARTITION_COMM]);
     fclaw_domain_t *domain_partitioned =
-        fclaw2d_domain_partition (*domain, exponent);
+        fclaw_domain_partition (*domain, exponent);
     int have_new_partition = domain_partitioned != NULL;
 
     if (have_new_partition)
@@ -182,7 +182,7 @@ void fclaw2d_partition_domain(fclaw_global_t* glob,
         domain_partitioned = NULL;
 
         /* internal clean up */
-        fclaw2d_domain_complete(*domain);
+        fclaw_domain_complete(*domain);
         fclaw_timer_stop (&glob->timers[FCLAW_TIMER_PARTITION_BUILD]);
     }
 

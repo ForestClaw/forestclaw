@@ -42,8 +42,8 @@ void create_domain_map (fclaw_global_t *glob,
 {
     fclaw_domain_t         *domain;
     domain = fclaw2d_domain_new_unitsquare (glob->mpicomm, fclaw_opt->minlevel);
-    fclaw2d_domain_list_levels(domain, FCLAW_VERBOSITY_ESSENTIAL);
-    fclaw2d_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);
+    fclaw_domain_list_levels(domain, FCLAW_VERBOSITY_ESSENTIAL);
+    fclaw_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);
     fclaw_global_store_domain (glob, domain);
     fclaw_global_store_map_2d (glob, fclaw2d_map_new_nomap ());
 }

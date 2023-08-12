@@ -154,7 +154,7 @@ void fclaw_domain_reset(fclaw_global_t* glob)
     }
     fclaw_domain_data_delete(*domain);  // Delete allocated pointers to set of functions.
 
-    fclaw2d_domain_destroy(*domain);
+    fclaw_domain_destroy(*domain);
     *domain = NULL;
 }
 

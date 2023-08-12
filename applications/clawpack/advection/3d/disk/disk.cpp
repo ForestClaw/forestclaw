@@ -31,9 +31,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 static
 fclaw_domain_t* create_domain(sc_MPI_Comm mpicomm, 
-                                fclaw_options_t* fclaw_opt, 
-                                user_options_t* user_opt, 
-                               fclaw_clawpatch_options_t *clawpatch_opt)
+                              fclaw_options_t* fclaw_opt, 
+                              user_options_t* user_opt, 
+                              fclaw_clawpatch_options_t *clawpatch_opt)
 {
     /* Mapped, multi-block domain */
     p4est_connectivity_t     *conn = NULL;
@@ -89,8 +89,8 @@ fclaw_domain_t* create_domain(sc_MPI_Comm mpicomm,
     disk_map_extrude(cont,user_opt->maxelev);
 
     domain = fclaw2d_domain_new_conn_map (mpicomm, fclaw_opt->minlevel, conn, cont);
-    fclaw2d_domain_list_levels(domain, FCLAW_VERBOSITY_ESSENTIAL);
-    fclaw2d_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);
+    fclaw_domain_list_levels(domain, FCLAW_VERBOSITY_ESSENTIAL);
+    fclaw_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);
     
     return domain;    
 }
@@ -141,7 +141,7 @@ main (int argc, char **argv)
     /* Options */
     user_options_t              *user_opt;
     fclaw_options_t             *fclaw_opt;
-   fclaw_clawpatch_options_t *clawpatch_opt;
+    fclaw_clawpatch_options_t *clawpatch_opt;
     fc3d_clawpack46_options_t   *claw46_opt;
 
     fclaw_global_t            *glob;

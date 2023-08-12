@@ -34,8 +34,8 @@ void create_domain_map (fclaw_global_t *glob, fclaw_options_t* gparms)
     /* Mapped, multi-block domain */
     fclaw_domain_t         *domain = NULL;
     domain = fclaw2d_domain_new_unitsquare (glob->mpicomm, gparms->minlevel);
-    fclaw2d_domain_list_levels(domain, FCLAW_VERBOSITY_ESSENTIAL);
-    fclaw2d_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);
+    fclaw_domain_list_levels(domain, FCLAW_VERBOSITY_ESSENTIAL);
+    fclaw_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);
     fclaw_global_store_domain (glob, domain);
 
     /* Map unit square to disk using mapc2m_disk.f */

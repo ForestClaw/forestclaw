@@ -179,28 +179,28 @@ init_refine (fclaw_smooth_t * s)
         if (s->write_vtk)
         {
             snprintf (basename, TBUFSIZ, "%s_L%02d", s->prefix, lev);
-            fclaw2d_domain_write_vtk (s->domain, basename);
+            fclaw_domain_write_vtk (s->domain, basename);
         }
 
         /* run refinement indicator for all patches */
         mark_patches (s);
 
         /* run internal mesh refinement */
-        domain = fclaw2d_domain_adapt (s->domain);
+        domain = fclaw_domain_adapt (s->domain);
         FCLAW_ASSERT (domain != s->domain);
         if (domain != NULL)
         {
             FCLAW_ASSERT (domain_match (domain, s->domain));
-            fclaw2d_domain_destroy (s->domain);
+            fclaw_domain_destroy (s->domain);
             s->domain = domain;
-            domain = fclaw2d_domain_partition (s->domain, 0);
+            domain = fclaw_domain_partition (s->domain, 0);
             FCLAW_ASSERT (domain != s->domain);
             if (domain != NULL)
             {
                 FCLAW_ASSERT (domain_match (domain, s->domain));
-                fclaw2d_domain_destroy (s->domain);
+                fclaw_domain_destroy (s->domain);
                 s->domain = domain;
-                fclaw2d_domain_complete (s->domain);
+                fclaw_domain_complete (s->domain);
             }
         }
         else
@@ -213,7 +213,7 @@ init_refine (fclaw_smooth_t * s)
     if (s->write_vtk)
     {
         snprintf (basename, TBUFSIZ, "%s_L%02d", s->prefix, lev);
-        fclaw2d_domain_write_vtk (s->domain, basename);
+        fclaw_domain_write_vtk (s->domain, basename);
     }
 }
 
@@ -231,7 +231,7 @@ run_refine (fclaw_smooth_t * s)
     if (s->write_vtk)
     {
         snprintf (basename, TBUFSIZ, "%s_K%05d", s->prefix, s->k);
-        fclaw2d_domain_write_vtk (s->domain, basename);
+        fclaw_domain_write_vtk (s->domain, basename);
     }
 
     /* run time loop */
@@ -254,21 +254,21 @@ run_refine (fclaw_smooth_t * s)
         mark_patches (s);
 
         /* run internal mesh refinement */
-        domain = fclaw2d_domain_adapt (s->domain);
+        domain = fclaw_domain_adapt (s->domain);
         FCLAW_ASSERT (domain != s->domain);
         if (domain != NULL)
         {
             FCLAW_ASSERT (domain_match (domain, s->domain));
-            fclaw2d_domain_destroy (s->domain);
+            fclaw_domain_destroy (s->domain);
             s->domain = domain;
-            domain = fclaw2d_domain_partition (s->domain, 0);
+            domain = fclaw_domain_partition (s->domain, 0);
             FCLAW_ASSERT (domain != s->domain);
             if (domain != NULL)
             {
                 FCLAW_ASSERT (domain_match (domain, s->domain));
-                fclaw2d_domain_destroy (s->domain);
+                fclaw_domain_destroy (s->domain);
                 s->domain = domain;
-                fclaw2d_domain_complete (s->domain);
+                fclaw_domain_complete (s->domain);
             }
         }
 
@@ -279,7 +279,7 @@ run_refine (fclaw_smooth_t * s)
         if (s->write_vtk)
         {
             snprintf (basename, TBUFSIZ, "%s_K%05d", s->prefix, s->k);
-            fclaw2d_domain_write_vtk (s->domain, basename);
+            fclaw_domain_write_vtk (s->domain, basename);
         }
     }
 }
@@ -321,7 +321,7 @@ main (int argc, char **argv)
     run_refine (s);
 
     /* cleanup */
-    fclaw2d_domain_destroy (s->domain);
+    fclaw_domain_destroy (s->domain);
     fclaw_app_destroy (s->a);
     return 0;
 }

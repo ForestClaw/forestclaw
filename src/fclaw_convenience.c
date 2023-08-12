@@ -26,12 +26,170 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "fclaw2d_convenience.h"
 #include "fclaw3d_convenience.h"
 
+void fclaw2d_domain_destroy (fclaw_domain_t * domain);
+
+fclaw_domain_t *fclaw2d_domain_adapt (fclaw_domain_t * domain);
+
+fclaw_domain_t *fclaw2d_domain_partition (fclaw_domain_t * domain,
+                                            int weight_exponent);
+
+void fclaw2d_domain_partition_unchanged (fclaw_domain_t * domain,
+                                         int *unchanged_first,
+                                         int *unchanged_length,
+                                         int *unchanged_old_first);
+
+void fclaw2d_domain_complete (fclaw_domain_t * domain);
+
+void fclaw2d_domain_write_vtk (fclaw_domain_t * domain,
+                               const char *basename);
+
+void fclaw2d_domain_list_levels (fclaw_domain_t * domain, int log_priority);
+
+void fclaw2d_domain_list_neighbors (fclaw_domain_t * domain,
+                                    int log_priority);
+
+void fclaw2d_domain_list_adapted (fclaw_domain_t * old_domain,
+                                  fclaw_domain_t * new_domain,
+                                  int log_priority);
+
+
+void fclaw3d_domain_destroy (fclaw_domain_t * domain);
+
+fclaw_domain_t *fclaw3d_domain_adapt (fclaw_domain_t * domain);
+
+fclaw_domain_t *fclaw3d_domain_partition (fclaw_domain_t * domain,
+                                            int weight_exponent);
+
+void fclaw3d_domain_partition_unchanged (fclaw_domain_t * domain,
+                                         int *unchanged_first,
+                                         int *unchanged_length,
+                                         int *unchanged_old_first);
+
+void fclaw3d_domain_complete (fclaw_domain_t * domain);
+
+void fclaw3d_domain_write_vtk (fclaw_domain_t * domain,
+                               const char *basename);
+
+void fclaw3d_domain_list_levels (fclaw_domain_t * domain, int log_priority);
+
+void fclaw3d_domain_list_neighbors (fclaw_domain_t * domain,
+                                    int log_priority);
+
+void fclaw3d_domain_list_adapted (fclaw_domain_t * old_domain,
+                                  fclaw_domain_t * new_domain,
+                                  int log_priority);
+
+
+void fclaw_domain_destroy (fclaw_domain_t * domain)
+{
+    if(domain->dim == 2)
+    {
+        fclaw2d_domain_destroy(domain);
+    }
+    else if(domain->dim == 3)
+    {
+        fclaw3d_domain_destroy(domain);
+    }
+    else
+    {
+        SC_ABORT_NOT_REACHED ();
+    }
+}
+
+fclaw_domain_t* fclaw_domain_adapt (fclaw_domain_t * domain)
+{
+    if(domain->dim == 2)
+    {
+        return fclaw2d_domain_adapt(domain);
+    }
+    else if(domain->dim == 3)
+    {
+        return fclaw3d_domain_adapt(domain);
+    }
+    else
+    {
+        SC_ABORT_NOT_REACHED ();
+    }
+}
+
+fclaw_domain_t* fclaw_domain_partition (fclaw_domain_t * domain,
+                                            int weight_exponent)
+{
+    if(domain->dim == 2)
+    {
+        return fclaw2d_domain_partition(domain,weight_exponent);
+    }
+    else if(domain->dim == 3)
+    {
+        return fclaw3d_domain_partition(domain,weight_exponent);
+    }
+    else
+    {
+        SC_ABORT_NOT_REACHED ();
+    }
+}
+
+void fclaw_domain_partition_unchanged (fclaw_domain_t * domain,
+                                         int *unchanged_first,
+                                         int *unchanged_length,
+                                         int *unchanged_old_first)
+{
+    if(domain->dim == 2)
+    {
+        fclaw2d_domain_partition_unchanged(domain,unchanged_first,
+                                           unchanged_length,
+                                           unchanged_old_first);
+    }
+    else if(domain->dim == 3)
+    {
+        fclaw3d_domain_partition_unchanged(domain,unchanged_first,
+                                           unchanged_length,
+                                           unchanged_old_first);
+    }
+    else
+    {
+        SC_ABORT_NOT_REACHED ();
+    }
+}
+
+void fclaw_domain_complete (fclaw_domain_t * domain)
+{
+    if(domain->dim == 2)
+    {
+        fclaw2d_domain_complete(domain);
+    }
+    else if(domain->dim == 3)
+    {
+        fclaw3d_domain_complete(domain);
+    }
+    else
+    {
+        SC_ABORT_NOT_REACHED ();
+    }
+}
+
+void fclaw_domain_write_vtk (fclaw_domain_t * domain,
+                             const char *basename)
+{
+    if(domain->dim == 2)
+    {
+        fclaw2d_domain_write_vtk(domain,basename);
+    }
+    else if(domain->dim == 3)
+    {
+        fclaw3d_domain_write_vtk(domain,basename);
+    }
+    else
+    {
+        SC_ABORT_NOT_REACHED ();
+    }
+}
 
 void fclaw_domain_list_levels (fclaw_domain_t * domain, int log_priority)
 {
     if(domain->dim == 2)
     {
-        fclaw2d_domain_list_levels(domain,log_priority);
+        fclaw_domain_list_levels(domain,log_priority);
     }
     else if(domain->dim == 3)
     {
@@ -47,11 +205,29 @@ void fclaw_domain_list_neighbors (fclaw_domain_t * domain, int log_priority)
 {
     if(domain->dim == 2)
     {
-        fclaw2d_domain_list_neighbors(domain,log_priority);
+        fclaw_domain_list_neighbors(domain,log_priority);
     }
     else if(domain->dim == 3)
     {
         fclaw3d_domain_list_neighbors(domain,log_priority);
+    }
+    else
+    {
+        SC_ABORT_NOT_REACHED ();
+    }
+}
+
+void fclaw_domain_list_adapted (fclaw_domain_t * old_domain,
+                                fclaw_domain_t * new_domain,
+                                int log_priority)
+{
+    if(old_domain->dim == 2)
+    {
+        fclaw2d_domain_list_adapted(old_domain,new_domain,log_priority);
+    }
+    else if(old_domain->dim == 3)
+    {
+        fclaw3d_domain_list_adapted(old_domain,new_domain,log_priority);
     }
     else
     {

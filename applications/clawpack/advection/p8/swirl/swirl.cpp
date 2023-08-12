@@ -132,8 +132,8 @@ fclaw_domain_t* create_domain(sc_MPI_Comm mpicomm,
 #endif /* P8HACK */
 
     domain = fclaw3d_domain_new_conn (mpicomm, fclaw_opt->minlevel, conn);
-    fclaw3d_domain_list_levels(domain, FCLAW_VERBOSITY_ESSENTIAL);
-    fclaw3d_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);
+    fclaw_domain_list_levels(domain, FCLAW_VERBOSITY_ESSENTIAL);
+    fclaw_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);
 
     return domain;
 }
