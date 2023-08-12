@@ -816,7 +816,7 @@ fclaw2d_domain_list_levels (fclaw_domain_t * domain, int lp)
          ++level)
     {
         count = 0;
-        fclaw2d_domain_iterate_level (domain, level,
+        fclaw_domain_iterate_level (domain, level,
                                       fclaw2d_domain_list_level_callback,
                                       &count);
         P4EST_LOGF (lp, "Patches on level %2d: %9d\n", level, count);
@@ -878,7 +878,7 @@ fclaw2d_domain_list_neighbors (fclaw_domain_t * domain, int lp)
 
     ln.lp = lp;
     ln.count = 0;
-    fclaw2d_domain_iterate_patches (domain,
+    fclaw_domain_iterate_patches (domain,
                                     fclaw2d_domain_list_neighbors_callback,
                                     &ln);
     FCLAW_ASSERT (ln.count == domain->local_num_patches);
@@ -917,7 +917,7 @@ fclaw2d_domain_list_adapted_callback (fclaw_domain_t * old_domain,
         for (k = 0; k < P4EST_CHILDREN; ++k)
         {
             FCLAW_ASSERT (new_patch[k].level == old_patch->level + 1);
-            FCLAW_ASSERT (fclaw2d_patch_childid (&new_patch[k]) == k);
+            FCLAW_ASSERT (fclaw_patch_childid (&new_patch[k]) == k);
         }
         P4EST_LOGF (lp, "Block %d refinement %d to %d\n",
                     blockno, old_patchno, new_patchno);
@@ -930,7 +930,7 @@ fclaw2d_domain_list_adapted_callback (fclaw_domain_t * old_domain,
         for (k = 0; k < P4EST_CHILDREN; ++k)
         {
             FCLAW_ASSERT (old_patch[k].level == new_patch->level + 1);
-            FCLAW_ASSERT (fclaw2d_patch_childid (&old_patch[k]) == k);
+            FCLAW_ASSERT (fclaw_patch_childid (&old_patch[k]) == k);
         }
         P4EST_LOGF (lp, "Block %d coarsening %d to %d\n",
                     blockno, old_patchno, new_patchno);
@@ -940,8 +940,8 @@ fclaw2d_domain_list_adapted_callback (fclaw_domain_t * old_domain,
         /* noop */
         FCLAW_ASSERT (newsize == FCLAW_PATCH_SAMESIZE);
         FCLAW_ASSERT (old_patch->level == new_patch->level);
-        FCLAW_ASSERT (fclaw2d_patch_childid (old_patch) ==
-                      fclaw2d_patch_childid (new_patch));
+        FCLAW_ASSERT (fclaw_patch_childid (old_patch) ==
+                      fclaw_patch_childid (new_patch));
         P4EST_LOGF (lp, "Block %d noop patch %d and %d\n",
                     blockno, old_patchno, new_patchno);
     }

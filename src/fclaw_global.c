@@ -163,7 +163,7 @@ void fclaw_global_iterate_level (fclaw_global_t * glob, int level,
     fclaw_global_iterate_t g;
     g.glob = glob;
     g.user = user;
-    fclaw2d_domain_iterate_level (glob->domain, level, pcb, &g);
+    fclaw_domain_iterate_level (glob->domain, level, pcb, &g);
 }
 
 void fclaw_global_iterate_patches (fclaw_global_t * glob,
@@ -172,7 +172,7 @@ void fclaw_global_iterate_patches (fclaw_global_t * glob,
     fclaw_global_iterate_t g;
     g.glob = glob;
     g.user = user;
-    fclaw2d_domain_iterate_patches (glob->domain, pcb, &g);
+    fclaw_domain_iterate_patches (glob->domain, pcb, &g);
 }
 
 void fclaw_global_iterate_families (fclaw_global_t * glob,
@@ -181,7 +181,7 @@ void fclaw_global_iterate_families (fclaw_global_t * glob,
     fclaw_global_iterate_t g;
     g.glob = glob;
     g.user = user;
-    fclaw2d_domain_iterate_families (glob->domain, pcb, &g);
+    fclaw_domain_iterate_families (glob->domain, pcb, &g);
 }
 
 void fclaw_global_iterate_adapted (fclaw_global_t * glob, fclaw_domain_t* new_domain,

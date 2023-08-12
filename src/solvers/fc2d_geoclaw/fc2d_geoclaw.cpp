@@ -194,7 +194,7 @@ void geoclaw_setaux(fclaw_global_t *glob,
     fclaw_clawpatch_aux_data(glob,patch,&aux,&maux);
 
     /* If this is a ghost patch, we only set aux values in ghost cells */
-    int is_ghost = fclaw2d_patch_is_ghost(patch);
+    int is_ghost = fclaw_patch_is_ghost(patch);
     int mint = 2*mbc;
     int nghost = mbc;
 

@@ -230,7 +230,7 @@ void clawpack46_setaux(fclaw_global_t *glob,
 		return;
 	}
 
-	if (fclaw2d_patch_is_ghost(patch))
+	if (fclaw_patch_is_ghost(patch))
 	{
 		/* This is going to be removed at some point */
 		return;

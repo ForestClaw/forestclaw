@@ -231,7 +231,7 @@ void clawpack46_setaux(fclaw_global_t *glob,
 	if (claw46_vt->fort_setaux == NULL)
 		return;
 
-	if (fclaw2d_patch_is_ghost(patch))
+	if (fclaw_patch_is_ghost(patch))
 	{
 		/* This is going to be removed at some point */
 		return;

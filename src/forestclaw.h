@@ -36,6 +36,76 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 #include <fclaw_base.h>
 
+#ifdef __cplusplus
+extern "C"
+{
+#if 0
+}                               /* need this because indent is dumb */
+#endif
+#endif
+
+/* ---------------------------------------------------------------------- */
+///                      @name Data Types
+/* ---------------------------------------------------------------------- */
+///@{
+
+/**
+ * @brief Enum for encoding patch information
+ */
+typedef enum
+{
+    /** Number relative to parent */
+    FCLAW2D_PATCH_CHILDID = 0x7,
+    /** Patch is the first sibling */
+    FCLAW2D_PATCH_FIRST_SIBLING = 0x8,
+    /** Has neighbor on different processor */
+    FCLAW2D_PATCH_ON_PARALLEL_BOUNDARY = 0x10,
+    /** Patch is a ghost patch */
+    FCLAW2D_PATCH_IS_GHOST = 0x20,
+    /** Face 0 is on a block boundary */
+    FCLAW2D_PATCH_ON_BLOCK_FACE_0 = 0x040,
+    /** Face 1 is on a block boundary */
+    FCLAW2D_PATCH_ON_BLOCK_FACE_1 = 0x080,
+    /** Face 2 is on a block boundary */
+    FCLAW2D_PATCH_ON_BLOCK_FACE_2 = 0x100,
+    /** Face 3 is on a block boundary */
+    FCLAW2D_PATCH_ON_BLOCK_FACE_3 = 0x200,
+    /** Patch is on a block boundary */
+    FCLAW2D_PATCH_ON_BLOCK_BOUNDARY = 0xFC0
+}
+fclaw2d_patch_flags_t;
+
+/** For each of the four faces, the corresponding block boundary flag. */
+extern const fclaw2d_patch_flags_t fclaw2d_patch_block_face_flags[4];
+
+typedef enum
+{
+    /** Number relative to parent */
+    FCLAW3D_PATCH_CHILDID = 0x7,
+    /** Patch is the first sibling */
+    FCLAW3D_PATCH_FIRST_SIBLING = 0x8,
+    /** Has neighbor on different processor */
+    FCLAW3D_PATCH_ON_PARALLEL_BOUNDARY = 0x10,
+    /** Patch is a ghost patch */
+    FCLAW3D_PATCH_IS_GHOST = 0x20,
+    /** Face 0 is on a block boundary */
+    FCLAW3D_PATCH_ON_BLOCK_FACE_0 = 0x040,
+    /** Face 1 is on a block boundary */
+    FCLAW3D_PATCH_ON_BLOCK_FACE_1 = 0x080,
+    /** Face 2 is on a block boundary */
+    FCLAW3D_PATCH_ON_BLOCK_FACE_2 = 0x100,
+    /** Face 3 is on a block boundary */
+    FCLAW3D_PATCH_ON_BLOCK_FACE_3 = 0x200,
+    /** Face 4 is on a block boundary */
+    FCLAW3D_PATCH_ON_BLOCK_FACE_4 = 0x400,
+    /** Face 5 is on a block boundary */
+    FCLAW3D_PATCH_ON_BLOCK_FACE_5 = 0x800,
+    /** Patch is on a block boundary */
+    FCLAW3D_PATCH_ON_BLOCK_BOUNDARY = 0xFC0
+}
+fclaw3d_patch_flags_t;
+
+
 typedef struct fclaw_patch fclaw_patch_t;
 typedef struct fclaw_patch_bounds_2d fclaw_patch_bounds_2d_t;
 typedef struct fclaw_patch_bounds_3d fclaw_patch_bounds_3d_t;
@@ -249,6 +319,8 @@ typedef enum fclaw_face_neighbor
 }
 fclaw_patch_relation_t;
 
+///@}
+
 /** Callback prototype for the patch iterators.
  * We iterate over local patches only.
  * \param [in] domain	General domain structure.
@@ -337,5 +409,121 @@ void fclaw_domain_attribute_remove (fclaw_domain_t * domain,
                                     const char *name);
 
 ///@}
+/* ---------------------------------------------------------------------- */
+///                      @name Patch Functions
+/* ---------------------------------------------------------------------- */
+///@{
+
+/** Return the dimension of a corner.
+ * This function is LEGAL to call for both local and ghost patches.
+ * \param [in] patch    A patch with properly set member variables.
+ * \param [in] cornerno A corner number in 0..3.
+ * \return              0 if the corner is always at a fourfold intersection,
+ *                      1 if the corner would end up in the middle of a face
+ *                      when there is a coarser neighbor.
+ */
+int fclaw_patch_corner_dimension (const fclaw_patch_t * patch,
+                                  int cornerno);
+
+/** Return the number of a patch with respect to its parent in the tree.
+ * This function is LEGAL to call for both local and ghost patches.
+ * \param [in] patch    A patch with properly set member variables.
+ * \return              The child id is a number in 0..3.
+ */
+int fclaw_patch_childid (const fclaw_patch_t * patch);
+
+/** Check if a patch is the first in a family of four siblings.
+ * For ghost patches, we always return false.
+ * \param [in] patch    A patch with properly set member variables.
+ * \return              True if patch is the first sibling.
+ */
+int fclaw_patch_is_first_sibling (const fclaw_patch_t * patch);
+
+/** Check whether a patch is a parallel ghost patch.
+ * \param [in] patch    A patch with properly set member variables.
+ * \return              True if patch is off-processor, false if local.
+ */
+int fclaw_patch_is_ghost (const fclaw_patch_t * patch);
+
+///@}
+/* ---------------------------------------------------------------------- */
+///                      @name Patch Iterators
+/* ---------------------------------------------------------------------- */
+///@{
+
+/** Iterate over all local patches on a given level.
+ * \param [in] domain	General domain structure.
+ * \param [in] level	Level to iterate.  Ignore patches of other levels.
+ * \param [in] pcb	Function called for each patch of matching level.
+ * \param [in,out] user	Data is passed to the pcb callback.
+ */
+void fclaw_domain_iterate_level (fclaw_domain_t * domain, int level,
+                                 fclaw_patch_callback_t pcb, void *user);
+
+/** Iterate over all local patches of all levels.
+ * \param [in] domain	General domain structure.
+ * \param [in] pcb	Function called for each patch in the domain.
+ * \param [in,out] user	Data is passed to the pcb callback.
+ */
+void fclaw_domain_iterate_patches (fclaw_domain_t * domain,
+                                   fclaw_patch_callback_t pcb,
+                                   void *user);
+
+/** Iterate over all families of local sibling patches.
+ * \param [in] domain	General domain structure.
+ * \param [in] pcb	Function called for each family in the domain.
+ *                      Its patch argument points to an array of four
+ *                      valid patches that constitute a family of siblings.
+ *                      Their patchnos are consecutive, blockno is the same.
+ * \param [in,out] user	Data is passed to the pcb callback.
+ */
+void fclaw_domain_iterate_families (fclaw_domain_t * domain,
+                                    fclaw_patch_callback_t pcb,
+                                    void *user);
+
+///@}
+/* ---------------------------------------------------------------------- */
+///                  @name Topological Properties
+/* ---------------------------------------------------------------------- */
+///@{
+
+
+/** Return the space dimension. */
+int fclaw_domain_dimension (const fclaw_domain_t * domain);
+
+/** Return number of children in tree: 4 in 2D, 8 in 3D. */
+int fclaw_domain_num_children (const fclaw_domain_t * domain);
+
+/** Return the number of faces of a cube: 4 in 2D, 6 in 3D. */
+int fclaw_domain_num_faces (const fclaw_domain_t * domain);
+
+/** Return the number of edges of a cube: 0 in 2D, 12 in 3D. */
+int fclaw_domain_num_edges (const fclaw_domain_t * domain);
+
+/** Return the number of corners of a cube: 4 in 2D, 8 in 3D.
+ * This is the same as the number of siblings in a refined tree. */
+int fclaw_domain_num_corners (const fclaw_domain_t * domain);
+
+/** Return the number of corners of a cube face: 2 in 2D, 4 in 3D.
+ * This is the same as the number of refined (smaller) face neighbors. */
+int fclaw_domain_num_face_corners (const fclaw_domain_t * domain);
+
+/** Return the number of possible orientations of a cube face.
+ * This is mostly used for internal encodings.
+ */
+int fclaw_domain_num_orientations (const fclaw_domain_t * domain);
+
+/** Find the numbers of faces adjacent to a cube corner: 2 in 2D, 3 in 3D. */
+void fclaw_domain_corner_faces (const fclaw_domain_t * domain,
+                                int icorner, int * faces);
+
+///@}
+
+#ifdef __cplusplus
+#if 0
+{                               /* need this because indent is dumb */
+#endif
+}
+#endif
 
 #endif /* !FORESTCLAW_H */

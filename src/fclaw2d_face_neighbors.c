@@ -336,14 +336,14 @@ void cb_face_fill(fclaw_domain_t *domain,
 
 			/* Parallel distribution keeps siblings on same processor */
 			int remote_neighbor;
-			remote_neighbor = fclaw2d_patch_is_ghost(neighbor_patches[0]);
+			remote_neighbor = fclaw_patch_is_ghost(neighbor_patches[0]);
 			if (is_coarse)
 			{
 				if (neighbor_level == FINER_GRID)
 				{
 					for (igrid = 0; igrid < 2; igrid++)
 					{
-						remote_neighbor = fclaw2d_patch_is_ghost(neighbor_patches[igrid]);
+						remote_neighbor = fclaw_patch_is_ghost(neighbor_patches[igrid]);
 						int valid_remote = read_parallel_patches && remote_neighbor;
 						int local_neighbor = !remote_neighbor;
 						if (!(local_neighbor || valid_remote))
@@ -395,7 +395,7 @@ void cb_face_fill(fclaw_domain_t *domain,
 					if (time_sync_samesize)    // && is_block_face)
 					{
 						/* Correct for metric discontinuities at block boundaries */
-						if (!fclaw2d_patch_is_ghost(this_patch))
+						if (!fclaw_patch_is_ghost(this_patch))
 						{							
 							fclaw_patch_time_sync_samesize(s->glob,this_patch,
 							                                 neighbor_patch,

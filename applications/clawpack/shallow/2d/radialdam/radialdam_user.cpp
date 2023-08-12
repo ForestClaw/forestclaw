@@ -64,7 +64,7 @@ void radialdam_patch_setup(fclaw_global_t *glob,
                            int blockno,
                            int patchno)
 {
-    if (fclaw2d_patch_is_ghost(patch))
+    if (fclaw_patch_is_ghost(patch))
     {
         /* Mapped info is needed only for an update */
         return;

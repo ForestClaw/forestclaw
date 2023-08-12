@@ -59,7 +59,7 @@ void get_corner_type(fclaw_global_t* glob,
 
     // p4est has tons of lookup table like this, can be exposed similarly
     int corner_faces[FCLAW2D_SPACEDIM];
-    fclaw2d_domain_corner_faces(domain, icorner, corner_faces);
+    fclaw_domain_corner_faces(domain, icorner, corner_faces);
 
     /* Both faces are at a physical boundary */
     int is_phys_corner =
@@ -469,7 +469,7 @@ void cb_corner_fill(fclaw_domain_t *domain,
                 continue;
             }
 
-            int remote_neighbor = fclaw2d_patch_is_ghost(corner_patch);
+            int remote_neighbor = fclaw_patch_is_ghost(corner_patch);
             if (is_coarse && ((read_parallel_patches && remote_neighbor) || !remote_neighbor))
             {
                 transform_data.neighbor_patch = corner_patch;

@@ -235,7 +235,7 @@ void create_query_points (overlap_consumer_t * c)
                                           c->domain->local_num_patches *
                                           c->num_cells_in_patch);
     c->cell_idx = 0;
-    fclaw2d_domain_iterate_patches (c->domain, add_cell_centers, c);
+    fclaw_domain_iterate_patches (c->domain, add_cell_centers, c);
 
     /* verify that we created as many query_points as expected */
     FCLAW_ASSERT (c->cell_idx ==

@@ -87,82 +87,6 @@ fclaw2d_domain_barrier (fclaw_domain_t * domain)
     SC_CHECK_MPI (mpiret);
 }
 
-int
-fclaw2d_domain_dimension (const fclaw_domain_t * domain)
-{
-    return P4EST_DIM;           /* space dimension */
-}
-
-int
-fclaw2d_domain_num_faces (const fclaw_domain_t * domain)
-{
-    return P4EST_FACES;         /* 2 * DIM; number of cube faces */
-}
-
-int
-fclaw2d_domain_num_corners (const fclaw_domain_t * domain)
-{
-    return P4EST_CHILDREN;      /* 2 ** DIM; number of cube corners */
-}
-
-int
-fclaw2d_domain_num_face_corners (const fclaw_domain_t * domain)
-{
-    return P4EST_HALF;          /* 2 ** (DIM - 1); corners per face */
-}
-
-int
-fclaw2d_domain_num_orientations (const fclaw_domain_t * domain)
-{
-    return P4EST_FACES * P4EST_HALF;
-}
-
-void
-fclaw2d_domain_corner_faces (const fclaw_domain_t * domain,
-                             int icorner, int faces[P4EST_DIM])
-{
-    FCLAW_ASSERT (0 <= icorner && icorner < P4EST_CHILDREN);
-    faces[0] = p4est_corner_faces[icorner][0];
-    faces[1] = p4est_corner_faces[icorner][1];
-#ifdef P4_TO_P8
-    faces[2] = p8est_corner_faces[icorner][2];
-#endif
-}
-
-int
-fclaw2d_patch_corner_dimension (const fclaw_patch_t * patch, int cornerno)
-{
-    const int childid = fclaw2d_patch_childid (patch);
-
-    FCLAW_ASSERT (0 <= cornerno && cornerno < P4EST_CHILDREN);
-
-    return (patch->level == 0 ||
-            cornerno == childid ||
-            cornerno == P4EST_CHILDREN - 1 - childid) ? 0 : 1;
-}
-
-int
-fclaw2d_patch_childid (const fclaw_patch_t * patch)
-{
-    const int childid = patch->flags & FCLAW2D_PATCH_CHILDID;
-
-    FCLAW_ASSERT (0 <= childid && childid < P4EST_CHILDREN);
-
-    return childid;
-}
-
-int
-fclaw2d_patch_is_first_sibling (const fclaw_patch_t * patch)
-{
-    return patch->flags & FCLAW2D_PATCH_FIRST_SIBLING ? 1 : 0;
-}
-
-int
-fclaw2d_patch_is_ghost (const fclaw_patch_t * patch)
-{
-    return patch->flags & FCLAW2D_PATCH_IS_GHOST ? 1 : 0;
-}
-
 static fclaw_patch_t *
 fclaw2d_domain_get_patch (fclaw_domain_t * domain, int blockno, int patchno)
 {
@@ -183,79 +107,6 @@ fclaw2d_domain_get_patch (fclaw_domain_t * domain, int blockno, int patchno)
 
     FCLAW_ASSERT (0 <= patchno && patchno < block->num_patches);
     return block->patches + patchno;
-}
-
-void
-fclaw2d_domain_iterate_level (fclaw_domain_t * domain, int level,
-                              fclaw_patch_callback_t pcb, void *user)
-{
-    int i, j;
-    fclaw_block_t *block;
-    fclaw_patch_t *patch;
-
-    FCLAW_ASSERT (0 <= level && level <= domain->possible_maxlevel);
-    for (i = 0; i < domain->num_blocks; ++i)
-    {
-        block = domain->blocks + i;
-        for (patch = block->patchbylevel[level];
-             patch != NULL; patch = patch->u.next)
-        {
-            j = (int) (patch - block->patches);
-            FCLAW_ASSERT (0 <= j && j < block->num_patches);
-            FCLAW_ASSERT (patch->level == level);
-            pcb (domain, patch, i, j, user);
-        }
-    }
-}
-
-void
-fclaw2d_domain_iterate_patches (fclaw_domain_t * domain,
-                                fclaw_patch_callback_t pcb, void *user)
-{
-    int i, j;
-    fclaw_block_t *block;
-    fclaw_patch_t *patch;
-
-    for (i = 0; i < domain->num_blocks; i++)
-    {
-        block = domain->blocks + i;
-        for (j = 0; j < block->num_patches; j++)
-        {
-            patch = block->patches + j;
-            pcb (domain, patch, i, j, user);
-        }
-    }
-}
-
-void
-fclaw2d_domain_iterate_families (fclaw_domain_t * domain,
-                                 fclaw_patch_callback_t pcb, void *user)
-{
-    int i, j;
-    fclaw_block_t *block;
-    fclaw_patch_t *patch;
-
-    for (i = 0; i < domain->num_blocks; i++)
-    {
-        block = domain->blocks + i;
-        for (j = 0; j < block->num_patches; j++)
-        {
-            patch = block->patches + j;
-            if (fclaw2d_patch_is_first_sibling (patch))
-            {
-#ifdef FCLAW_ENABLE_DEBUG
-                int k;
-                for (k = 0; k < P4EST_CHILDREN; ++k)
-                {
-                    FCLAW_ASSERT (j + k < block->num_patches);
-                    FCLAW_ASSERT (fclaw2d_patch_childid (patch + k) == k);
-                }
-#endif
-                pcb (domain, patch, i, j, user);
-                j += P4EST_CHILDREN - 1;
-            }
-        }
-    }
 }
 
 int
@@ -332,7 +183,7 @@ fclaw2d_patch_normal_match (fclaw_domain_t * domain,
     p4est_tree_t *tree;
 #ifdef FCLAW_ENABLE_DEBUG
     fclaw_block_t *block;
-    int num_orient = fclaw2d_domain_num_orientations (domain);
+    int num_orient = fclaw_domain_num_orientations (domain);
 #endif
 
     /* are we sane */
@@ -410,7 +261,7 @@ fclaw2d_patch_face_neighbors (fclaw_domain_t * domain,
                               int rproc[P4EST_HALF], int *rblockno,
                               int rpatchno[P4EST_HALF], int *rfaceno)
 {
-    const int num_orientations = fclaw2d_domain_num_orientations (domain);
+    const int num_orientations = fclaw_domain_num_orientations (domain);
     p4est_wrap_t *wrap = (p4est_wrap_t *) domain->pp;
     p4est_t *p4est = wrap->p4est;
     p4est_mesh_t *mesh = wrap->match_aux ? wrap->mesh_aux : wrap->mesh;
