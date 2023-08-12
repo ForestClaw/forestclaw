@@ -659,3 +659,116 @@ void fclaw_domain_free_after_exchange(fclaw_domain_t *domain, fclaw_domain_excha
     FCLAW_FREE (e->patch_data);
     FCLAW_FREE (e);
 }
+
+////////////////////////////////////////
+// neighbors
+///////////////////////////////////////
+
+//definition of dimension specific functions
+
+int fclaw2d_patch_boundary_type (fclaw_domain_t * domain,
+                                 int blockno, int patchno, int boundaries[4]);
+
+int fclaw2d_patch_normal_match (fclaw_domain_t * domain,
+                                int blockno, int patchno, int faceno);
+
+fclaw_patch_relation_t fclaw2d_patch_face_neighbors (fclaw_domain_t *
+                                                       domain, int blockno,
+                                                       int patchno,
+                                                       int faceno,
+                                                       int rproc[2],
+                                                       int *rblockno,
+                                                       int rpatchno[2],
+                                                       int *rfaceno);
+
+int fclaw2d_patch_corner_neighbors (fclaw_domain_t * domain,
+                                    int blockno, int patchno, int cornerno,
+                                    int *rproc, int *rblockno, int *rpatchno,
+                                    int *rcorner,
+                                    fclaw_patch_relation_t * neighbor_size);
+int fclaw3d_patch_boundary_type (fclaw_domain_t * domain,
+                                 int blockno, int patchno, int boundaries[6]);
+
+int fclaw3d_patch_normal_match (fclaw_domain_t * domain,
+                                int blockno, int patchno, int faceno);
+
+
+fclaw_patch_relation_t fclaw3d_patch_face_neighbors (fclaw_domain_t *
+                                                       domain, int blockno,
+                                                       int patchno,
+                                                       int faceno,
+                                                       int rproc[4],
+                                                       int *rblockno,
+                                                       int rpatchno[4],
+                                                       int *rfaceno);
+
+int fclaw3d_patch_corner_neighbors (fclaw_domain_t * domain,
+                                    int blockno, int patchno, int cornerno,
+                                    int *rproc, int *rblockno, int *rpatchno,
+                                    int *rcorner,
+                                    fclaw_patch_relation_t * neighbor_size);
+
+
+int fclaw_patch_boundary_type(fclaw_domain_t *domain, int blockno, int patchno, int boundaries[4])
+{
+    if(domain->dim == 2)
+    {
+        return fclaw2d_patch_boundary_type(domain,blockno,patchno,boundaries);
+    }
+    else if (domain->dim == 3)
+    {
+        return fclaw3d_patch_boundary_type(domain,blockno,patchno,boundaries);
+    }
+    else
+    {
+        SC_ABORT_NOT_REACHED();
+    }
+}
+
+int fclaw_patch_normal_match(fclaw_domain_t *domain, int blockno, int patchno, int faceno)
+{
+    if(domain->dim == 2)
+    {
+        return fclaw2d_patch_normal_match(domain,blockno,patchno,faceno);
+    }
+    else if (domain->dim == 3)
+    {
+        return fclaw3d_patch_normal_match(domain,blockno,patchno,faceno);
+    }
+    else
+    {
+        SC_ABORT_NOT_REACHED();
+    }
+}
+
+fclaw_patch_relation_t fclaw_patch_face_neighbors(fclaw_domain_t *domain, int blockno, int patchno, int faceno, int rproc[2], int *rblockno, int rpatchno[2], int *rfaceno)
+{
+    if(domain->dim == 2)
+    {
+        return fclaw2d_patch_face_neighbors(domain,blockno,patchno,faceno,rproc,rblockno,rpatchno,rfaceno);
+    }
+    else if (domain->dim == 3)
+    {
+        return fclaw3d_patch_face_neighbors(domain,blockno,patchno,faceno,rproc,rblockno,rpatchno,rfaceno);
+    }
+    else
+    {
+        SC_ABORT_NOT_REACHED();
+    }
+}
+
+int fclaw_patch_corner_neighbors(fclaw_domain_t *domain, int blockno, int patchno, int cornerno, int *rproc, int *rblockno, int *rpatchno, int *rcorner, fclaw_patch_relation_t *neighbor_size)
+{
+    if(domain->dim == 2)
+    {
+        return fclaw2d_patch_corner_neighbors(domain,blockno,patchno,cornerno,rproc,rblockno,rpatchno,rcorner,neighbor_size);
+    }
+    else if (domain->dim == 3)
+    {
+        return fclaw3d_patch_corner_neighbors(domain,blockno,patchno,cornerno,rproc,rblockno,rpatchno,rcorner,neighbor_size);
+    }
+    else
+    {
+        SC_ABORT_NOT_REACHED();
+    }
+}

@@ -83,7 +83,7 @@ void fclaw2d_physical_get_bc(fclaw_global_t *glob,
 {
     // const int numfaces = get_faces_per_patch(domain);
     int bdry[FCLAW2D_NUMFACES];
-    fclaw2d_patch_boundary_type(glob->domain,this_block_idx,this_patch_idx,bdry);
+    fclaw_patch_boundary_type(glob->domain,this_block_idx,this_patch_idx,bdry);
     int i;
     for(i = 0; i < FCLAW2D_NUMFACES; i++)
     {

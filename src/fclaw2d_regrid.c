@@ -351,7 +351,7 @@ void cb_set_neighbor_types(fclaw_domain_t *domain,
 		int rfaceno;
 
 		fclaw_patch_relation_t neighbor_type =
-		fclaw2d_patch_face_neighbors(domain,
+		fclaw_patch_face_neighbors(domain,
 									 blockno,
 									 patchno,
 									 iface,
@@ -372,7 +372,7 @@ void cb_set_neighbor_types(fclaw_domain_t *domain,
 		fclaw_patch_relation_t neighbor_type;
 
 		int has_corner_neighbor =
-		fclaw2d_patch_corner_neighbors(domain,
+		fclaw_patch_corner_neighbors(domain,
 									   blockno,
 									   patchno,
 									   icorner,

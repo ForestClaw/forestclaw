@@ -55,12 +55,18 @@ const fclaw3d_patch_flags_t fclaw3d_patch_block_face_flags[6] = {
 };
 
 int
-fclaw3d_patch_edge_neighbors (fclaw_domain_t * domain,
+fclaw_patch_edge_neighbors (fclaw_domain_t * domain,
                               int blockno, int patchno, int edgeno,
                               int *rproc, int *rblockno, int *rpatchno,
                               int *redge,
                               fclaw_patch_relation_t * neighbor_size)
 {
+    if(domain->dim != 3)
+    {
+        fclaw_global_essentialf("fclaw_patch_edge_neighbors is only used for 3d\n");
+        exit(1);
+    }
+
     p4est_wrap_t *wrap = (p4est_wrap_t *) domain->pp;
     p4est_t *p4est = wrap->p4est;
     p4est_ghost_t *ghost = wrap->match_aux ? wrap->ghost_aux : wrap->ghost;

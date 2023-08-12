@@ -571,9 +571,9 @@ fclaw2d_domain_adapt (fclaw_domain_t * domain)
                 for (face = 0; max_tlevel <= level &&
                      face < wrap->p4est_faces; ++face)
                 {
-                    nrel = fclaw2d_patch_face_neighbors (domain, nb, np, face,
-                                                         nprocs, &nblockno,
-                                                         npatchno, &nfc);
+                    nrel = fclaw_patch_face_neighbors (domain, nb, np, face,
+                                                       nprocs, &nblockno,
+                                                       npatchno, &nfc);
 
                     /* we refine ourself if the neighbor wants to be finer */
                     if (nrel == FCLAW_PATCH_SAMESIZE)
@@ -633,11 +633,11 @@ fclaw2d_domain_adapt (fclaw_domain_t * domain)
                 for (corner = 0; max_tlevel <= level &&
                      corner < wrap->p4est_children; ++corner)
                 {
-                    exists = fclaw2d_patch_corner_neighbors (domain, nb, np,
-                                                             corner, nprocs,
-                                                             &nblockno,
-                                                             npatchno,
-                                                             &nfc, &nrel);
+                    exists = fclaw_patch_corner_neighbors (domain, nb, np,
+                                                           corner, nprocs,
+                                                           &nblockno,
+                                                           npatchno,
+                                                           &nfc, &nrel);
                     if (exists)
                     {
                         FCLAW_ASSERT (nrel != FCLAW_PATCH_BOUNDARY);
@@ -850,9 +850,9 @@ fclaw2d_domain_list_neighbors_callback (fclaw_domain_t * domain,
 
     for (faceno = 0; faceno < P4EST_FACES; ++faceno)
     {
-        fnt = fclaw2d_patch_face_neighbors (domain, block_no, patch_no,
-                                            faceno, rproc, &rblockno,
-                                            rpatchno, &rfaceno);
+        fnt = fclaw_patch_face_neighbors (domain, block_no, patch_no,
+                                          faceno, rproc, &rblockno,
+                                          rpatchno, &rfaceno);
         P4EST_LOGF (ln->lp, "Block %d patch %d face %d neighbor %d\n",
                     block_no, patch_no, faceno, (int) fnt);
     }
@@ -861,9 +861,9 @@ fclaw2d_domain_list_neighbors_callback (fclaw_domain_t * domain,
 #endif
     for (cornerno = 0; cornerno < P4EST_CHILDREN; ++cornerno)
     {
-        (void) fclaw2d_patch_corner_neighbors (domain, block_no, patch_no,
-                                               cornerno, rproc, &rblockno,
-                                               rpatchno, &rcorner, &fnt);
+        (void) fclaw_patch_corner_neighbors (domain, block_no, patch_no,
+                                             cornerno, rproc, &rblockno,
+                                             rpatchno, &rcorner, &fnt);
         P4EST_LOGF (ln->lp, "Block %d patch %d corner %d %d neighbor %d\n",
                     block_no, patch_no, cornerno, rcorner, (int) fnt);
     }

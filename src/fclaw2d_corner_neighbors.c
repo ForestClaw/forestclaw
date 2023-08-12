@@ -154,7 +154,7 @@ void get_corner_neighbor(fclaw_global_t *glob,
 
     fclaw_timer_start (&glob->timers[FCLAW_TIMER_NEIGHBOR_SEARCH]);
     int has_corner_neighbor =
-        fclaw2d_patch_corner_neighbors(domain,
+        fclaw_patch_corner_neighbors(domain,
                                        this_block_idx,
                                        this_patch_idx,
                                        icorner,
@@ -203,7 +203,7 @@ void get_corner_neighbor(fclaw_global_t *glob,
             int rproc[FCLAW2D_REFINEFACTOR];
             int rpatchno[FCLAW2D_REFINEFACTOR];
             int rblockno;  /* Should equal *corner_block_idx, above. */
-            fclaw2d_patch_face_neighbors(domain,
+            fclaw_patch_face_neighbors(domain,
                                          this_block_idx,
                                          this_patch_idx,
                                          block_iface,
@@ -271,7 +271,7 @@ void get_corner_neighbor(fclaw_global_t *glob,
             /* Use only faces 0 or 1 to get block data. */
             int iface = icorner % 2;
             neighbor_type =
-                fclaw2d_patch_face_neighbors(domain,
+                fclaw_patch_face_neighbors(domain,
                                              this_block_idx,
                                              this_patch_idx,
                                              iface,

@@ -399,7 +399,7 @@ void fclaw2d_clawpatch_time_sync_f2c(fclaw_global_t* glob,
   	/* create dummy fine grid to handle indexing between blocks */
 	double *qneighbor_dummy = FCLAW_ALLOC_ZERO(double,meqn*(mx+4*mbc)*(my+4*mbc));
 
-	int normal_match = fclaw2d_patch_normal_match(glob->domain, coarse_blockno, 
+	int normal_match = fclaw_patch_normal_match(glob->domain, coarse_blockno, 
 	                                              coarse_patchno, iface_coarse);
 
     fclaw_clawpatch_vtable_t *clawpatch_vt = fclaw_clawpatch_vt(glob);

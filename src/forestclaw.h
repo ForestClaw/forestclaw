@@ -446,6 +446,116 @@ int fclaw_patch_is_ghost (const fclaw_patch_t * patch);
 
 ///@}
 /* ---------------------------------------------------------------------- */
+///                      @name Patch Neighbors
+/* ---------------------------------------------------------------------- */
+///@{
+
+/** Determine physical boundary status as 1, or 0 for neighbor patches.
+ * This must ONLY be called for local patches.
+ * \param [in] domain	Valid domain structure.
+ * \param [in] blockno	Number of the block within the domain.
+ * \param [in] patchno	Number of the patch within the block.
+ * \param [in,out] boundaries	Domain boundary boolean flags.
+ *			The order is left, right, bottom, top.
+ * \return		True if at least one patch face is on a boundary.
+ */
+int fclaw_patch_boundary_type (fclaw_domain_t * domain,
+                               int blockno, int patchno, int boundaries[4]);
+
+/** Determine whether the normal to a face neighbor align.
+ * \param [in] domain	Valid domain structure.
+ * \param [in] blockno	Number of the block within the domain.
+ * \param [in] patchno	Number of the patch within the block.
+ * \param [in] faceno   Number of the face of the patch.
+ * \return		True if normals match, false for mismatch.
+ */
+int fclaw_patch_normal_match (fclaw_domain_t * domain,
+                              int blockno, int patchno, int faceno);
+
+/** Determine neighbor patch(es) and orientation across a given face.
+ * This must ONLY be called for local patches.
+ * \param [in] domain   Valid domain structure.
+ * \param [in] blockno  Number of the block within the domain.
+ * \param [in] patchno  Number of the patch within the block.
+ * \param [in] faceno   Number of the patch face: left, right, bottom, top.
+ * \param [out] rproc   Processor number of neighbor patches.  Exception:
+ *                      If the neighbor is a bigger patch, rproc[1] contains
+ *                      the number of the small patch as one of two half faces.
+ * \param [out] rblockno        Neighbor block number.
+ * \param [out] rpatchno        Neighbor patch numbers for up to 2 neighbors.
+ *                              The patch number is relative to its block.
+ *                              If the neighbor is off-processor, this is not
+ *                              a patch number but in [0, num_ghost_patches[.
+ * \param [out] rfaceno Neighbor face number and orientation.
+ * \return              The relative patch size of the face neighbor.
+ */
+fclaw_patch_relation_t fclaw_patch_face_neighbors (fclaw_domain_t *
+                                                   domain, int blockno,
+                                                   int patchno,
+                                                   int faceno,
+                                                   int rproc[2],
+                                                   int *rblockno,
+                                                   int rpatchno[2],
+                                                   int *rfaceno);
+
+/** Determine neighbor patch(es) and orientation across a given edge.
+ * The current version only supports one neighbor, i.e., no true multi-block.
+ * A query across an edge in the middle of a longer face returns the boundary.
+ * We only return edge neighbors that are not already face neighbors.
+ * Inter-tree edges are only returned if the number of meeting edges is
+ * exactly four.  Five or more are currently not supported.
+ * This must ONLY be called for local patches.
+ * \param [in] domain   Valid domain structure.
+ * \param [in] blockno  Number of the block within the domain.
+ * \param [in] patchno  Number of the patch within the block.
+ * \param [in] edgeno	Number of the patch edge: 4 parallel to x axis,
+                        then 4 parallel to y axis, then 4 parallel to z.
+ * \param [out] rproc   Processor number of neighbor patch.
+ * \param [out] rblockno        Neighbor block number.
+ * \param [out] rpatchno        Neighbor patch number relative to the block.
+ *                              If the neighbor is off-processor, this is not
+ *                              a patch number but in [0, num_ghosts_patches[.
+ * \param [out] redge           Number of the edge from the other neighbor.
+ * \param [out] neighbor_size   The relative patch size of the neighbor.
+ * \return                      True if at least one edge neighbor exists
+ *                              that is not already a face neighbor.
+ */
+int fclaw_patch_edge_neighbors (fclaw_domain_t * domain,
+                                int blockno, int patchno, int edgeno,
+                                int *rproc, int *rblockno, int *rpatchno,
+                                int *redge,
+                                fclaw_patch_relation_t * neighbor_size);
+
+
+/** Determine neighbor patch(es) and orientation across a given corner.
+ * The current version only supports one neighbor, i.e., no true multi-block.
+ * A query across a corner in the middle of a longer face returns the boundary.
+ * We only return corner neighbors that are not already face neighbors.
+ * Inter-tree corners are only returned if the number of meeting corners is
+ * exactly four.  Five or more are currently not supported.
+ * This must ONLY be called for local patches.
+ * \param [in] domain   Valid domain structure.
+ * \param [in] blockno  Number of the block within the domain.
+ * \param [in] patchno  Number of the patch within the block.
+ * \param [in] cornerno	Number of the patch corner: 0=bl, 1=br, 2=tl, 3=tr.
+ * \param [out] rproc   Processor number of neighbor patch.
+ * \param [out] rblockno        Neighbor block number.
+ * \param [out] rpatchno        Neighbor patch number relative to the block.
+ *                              If the neighbor is off-processor, this is not
+ *                              a patch number but in [0, num_ghosts_patches[.
+ * \param [out] rcorner         Number of the corner from the other neigbor.
+ * \param [out] neighbor_size   The relative patch size of the neighbor.
+ * \return                      True if at least one corner neighbor exists
+ *                              that is not already a face neighbor.
+ */
+int fclaw_patch_corner_neighbors (fclaw_domain_t * domain,
+                                  int blockno, int patchno, int cornerno,
+                                  int *rproc, int *rblockno, int *rpatchno,
+                                  int *rcorner,
+                                  fclaw_patch_relation_t * neighbor_size);
+
+///@}
+/* ---------------------------------------------------------------------- */
 ///                      @name Patch Iterators
 /* ---------------------------------------------------------------------- */
 ///@{

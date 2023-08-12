@@ -94,7 +94,7 @@ void get_face_neighbors(fclaw_global_t *glob,
 
 	fclaw_timer_start (&glob->timers[FCLAW_TIMER_NEIGHBOR_SEARCH]);
 	fclaw_patch_relation_t neighbor_type =
-	fclaw2d_patch_face_neighbors(domain,
+	fclaw_patch_face_neighbors(domain,
 								 this_block_idx,
 								 this_patch_idx,
 								 iface,

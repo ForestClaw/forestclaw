@@ -91,7 +91,7 @@ void fc2d_thunderegg_physical_get_bc(fclaw_global_t *glob,
 {
     // const int numfaces = get_faces_per_patch(domain);
     int bdry[4];
-    fclaw2d_patch_boundary_type(glob->domain,blockno,patchno,bdry);
+    fclaw_patch_boundary_type(glob->domain,blockno,patchno,bdry);
     int i;
     for(i = 0; i < 4; i++)
     {
