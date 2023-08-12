@@ -39,7 +39,7 @@ struct fclaw_global;
 void fclaw2d_problem_setup(struct fclaw_global *glob);
 void fclaw2d_vtables_initialize(struct fclaw_global *glob);
 
-void fclaw2d_initialize (struct fclaw_global *glob);
+void fclaw_initialize (struct fclaw_global *glob);
 void fclaw_run (struct fclaw_global *glob);
 void fclaw_finalize(struct fclaw_global *glob);
 

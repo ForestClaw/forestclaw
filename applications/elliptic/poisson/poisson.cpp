@@ -91,7 +91,7 @@ void run_program(fclaw_global_t* glob)
        --------------------------------------------------------------- */
 
     /* Set up grid and RHS */
-    fclaw2d_initialize(glob);
+    fclaw_initialize(glob);
 
     /* Compute sum of RHS; reset error accumulators */
     int init_flag = 1;  

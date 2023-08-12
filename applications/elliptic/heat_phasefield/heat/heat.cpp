@@ -90,7 +90,7 @@ void heat_run_program(fclaw_global_t* glob)
        --------------------------------------------------------------- */
 
     /* Set up initial conditions */
-    fclaw2d_initialize(glob);
+    fclaw_initialize(glob);
 
     heat_run(glob);
 

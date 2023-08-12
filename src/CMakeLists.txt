@@ -18,6 +18,7 @@ add_library(forestclaw_c OBJECT
   fclaw_gauges.c 
   fclaw_ghost_fill.c
   fclaw_global.c
+  fclaw_initialize.c
   fclaw_math.c
   fclaw_mpi.c
   fclaw_options.c 
@@ -42,7 +43,6 @@ add_library(forestclaw_c OBJECT
   fclaw2d_update_single_step.c
   fclaw2d_partition.c
   fclaw2d_timeinterp.c
-  fclaw2d_initialize.c
   fclaw2d_corner_neighbors.c
   fclaw2d_face_neighbors.c
   fclaw2d_output_tikz.c

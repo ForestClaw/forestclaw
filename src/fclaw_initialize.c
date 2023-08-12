@@ -30,7 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_exchange.h>
 #include <fclaw_regrid.h>
 
-#include <fclaw2d_convenience.h>
+#include <fclaw_convenience.h>
 
 #include <fclaw_gauges.h>
 
@@ -72,7 +72,7 @@ void cb_initialize (fclaw_domain_t *domain,
 /* -----------------------------------------------------------------
    Public interface
    ----------------------------------------------------------------- */
-void fclaw2d_initialize(fclaw_global_t *glob)
+void fclaw_initialize(fclaw_global_t *glob)
 {
 	fclaw_domain_t** domain = &glob->domain;
 

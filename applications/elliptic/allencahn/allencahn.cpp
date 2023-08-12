@@ -91,7 +91,7 @@ void run_program(fclaw_global_t* glob)
        --------------------------------------------------------------- */
 
     /* Set up grid and RHS */
-    fclaw2d_initialize(glob);
+    fclaw_initialize(glob);
 
     allencahn_run(glob);
 

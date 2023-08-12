@@ -70,7 +70,7 @@ void filament_initialize(fclaw_global_t* glob)
 
     filament_link_solvers(glob);
 
-    fclaw2d_initialize(glob);
+    fclaw_initialize(glob);
 
     fclaw_clear_global_context(glob);
 }
@@ -117,7 +117,7 @@ void swirl_initialize(fclaw_global_t* glob)
     /* ---------------------------------------------------------------
        Run
        --------------------------------------------------------------- */
-    fclaw2d_initialize(glob);
+    fclaw_initialize(glob);
 
     fclaw_clear_global_context(glob);
 }

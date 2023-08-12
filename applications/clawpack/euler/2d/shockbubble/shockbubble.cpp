@@ -94,7 +94,7 @@ void run_program(fclaw_global_t* glob)
     /* ---------------------------------------------------------------
        Run
        --------------------------------------------------------------- */
-    fclaw2d_initialize(glob);
+    fclaw_initialize(glob);
     fclaw_run(glob);
     fclaw_finalize(glob);
 }

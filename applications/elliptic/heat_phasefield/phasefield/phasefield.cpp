@@ -91,7 +91,7 @@ void phasefield_run_program(fclaw_global_t* glob)
        --------------------------------------------------------------- */
 
     /* Set up grid and RHS */
-    fclaw2d_initialize(glob);
+    fclaw_initialize(glob);
 
     phasefield_run(glob);
 
