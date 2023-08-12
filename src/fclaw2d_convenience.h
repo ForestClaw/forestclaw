@@ -27,6 +27,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define FCLAW2D_CONVENIENCE_H
 
 #include <forestclaw2d.h>
+#include <fclaw_convenience.h>
 #include <fclaw2d_map.h>
 #include <p4est_connectivity.h>
 

@@ -44,6 +44,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 int FCLAW2D_MAP_IS_USED(fclaw2d_map_context_t** pcont)
 {
+    if(*pcont == 0)
+    {
+        return 0;
+    }
     int iresult;
     fclaw2d_map_context_t *cont = *pcont;
     int id = FCLAW2D_MAP_QUERY_IS_USED;

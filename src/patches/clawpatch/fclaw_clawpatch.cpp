@@ -252,7 +252,14 @@ void clawpatch_define(fclaw_global_t* glob,
 
     fclaw2d_map_context_t* cont = fclaw_global_get_map_2d(glob);
 
-    int is_brick = FCLAW2D_MAP_IS_BRICK(&cont);
+    int is_brick;
+    if(glob->domain->dim == 2)
+    {
+        is_brick = FCLAW2D_MAP_IS_BRICK(&cont);
+    }else {
+        //TODO
+        is_brick = 0;
+    }
 
     cp->manifold = fclaw_opt->manifold;
     if (cp->manifold)
@@ -283,10 +290,21 @@ void clawpatch_define(fclaw_global_t* glob,
         double ay = fclaw_opt->ay;
         double by = fclaw_opt->by;
 
-        double xl = patch->d2->xlower;
-        double yl = patch->d2->ylower;
-        double xu = patch->d2->xupper;
-        double yu = patch->d2->yupper;
+        double xl,yl,xu,yu;
+        if(patch->dim == 2)
+        {
+            xl = patch->d2->xlower;
+            yl = patch->d2->ylower;
+            xu = patch->d2->xupper;
+            yu = patch->d2->yupper;
+        }
+        else 
+        {
+            xl = patch->d3->xlower;
+            yl = patch->d3->ylower;
+            xu = patch->d3->xupper;
+            yu = patch->d3->yupper;
+        }
 
         double xlower, ylower, xupper, yupper;
 
@@ -323,6 +341,11 @@ void clawpatch_define(fclaw_global_t* glob,
             double bz = fclaw_opt->bz;
             double zlower = 0;        
             double zupper = 1;
+            if(patch->dim == 3)
+            {
+                zlower = patch->d3->zlower;
+                zupper = patch->d3->zupper;
+            }
             cp->d3->zlower = az + (bz - az)*zlower;
             cp->d3->zupper = az + (bz - az)*zupper;
         }

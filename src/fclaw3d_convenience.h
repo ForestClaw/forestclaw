@@ -26,6 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW3D_CONVENIENCE_H
 #define FCLAW3D_CONVENIENCE_H
 
+#include <fclaw_convenience.h>
 #include <forestclaw3d.h>
 #include <p8est_connectivity.h>
 

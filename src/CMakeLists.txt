@@ -4,6 +4,7 @@
 add_library(forestclaw_c OBJECT 
   fclaw_advance.c
   fclaw_base.c 
+  fclaw_convenience.c
   fclaw_domain.c
   fclaw_elliptic_solver.c
   fclaw_farraybox.cpp
