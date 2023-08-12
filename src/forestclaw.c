@@ -264,3 +264,84 @@ fclaw_patch_is_ghost (const fclaw_patch_t * patch)
         return patch->flags & FCLAW3D_PATCH_IS_GHOST ? 1 : 0;
     }
 }
+
+#define FCLAW2D_DOMAIN_TAG_SERIALIZE 4526
+#define FCLAW3D_DOMAIN_TAG_SERIALIZE 4527
+
+int get_tag(int dim)
+{
+    if(dim == 2)
+    {
+        return FCLAW2D_DOMAIN_TAG_SERIALIZE;
+    }
+    else
+    {
+        return FCLAW3D_DOMAIN_TAG_SERIALIZE;
+    }
+}
+
+double
+fclaw_domain_global_maximum (fclaw_domain_t * domain, double d)
+{
+    int mpiret;
+    double gd;
+
+    mpiret = sc_MPI_Allreduce (&d, &gd, 1, sc_MPI_DOUBLE, sc_MPI_MAX,
+                               domain->mpicomm);
+    SC_CHECK_MPI (mpiret);
+
+    return gd;
+}
+
+double
+fclaw_domain_global_sum (fclaw_domain_t * domain, double d)
+{
+    int mpiret;
+    double gd;
+
+    mpiret = sc_MPI_Allreduce (&d, &gd, 1, sc_MPI_DOUBLE, sc_MPI_SUM,
+                               domain->mpicomm);
+    SC_CHECK_MPI (mpiret);
+
+    return gd;
+}
+
+void
+fclaw_domain_barrier (fclaw_domain_t * domain)
+{
+    int mpiret;
+
+    mpiret = sc_MPI_Barrier (domain->mpicomm);
+    SC_CHECK_MPI (mpiret);
+}
+
+void
+fclaw_domain_serialization_enter (fclaw_domain_t * domain)
+{
+    int mpiret;
+    int i;
+    sc_MPI_Status status;
+
+    if (domain->mpirank > 0)
+    {
+        mpiret = sc_MPI_Recv (&i, 1, sc_MPI_INT, domain->mpirank - 1,
+                              get_tag(domain->dim), domain->mpicomm,
+                              &status);
+        SC_CHECK_MPI (mpiret);
+        FCLAW_ASSERT (i == 0);
+    }
+}
+
+void
+fclaw_domain_serialization_leave (fclaw_domain_t * domain)
+{
+    int mpiret;
+    int i = 0;
+
+    if (domain->mpirank + 1 < domain->mpisize)
+    {
+        mpiret = sc_MPI_Send (&i, 1, sc_MPI_INT, domain->mpirank + 1,
+                              get_tag(domain->dim), domain->mpicomm);
+        SC_CHECK_MPI (mpiret);
+    }
+}

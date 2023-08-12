@@ -38,7 +38,7 @@ void annulus_problem_setup(fclaw_global_t *glob)
     }
 
     /* Make sure node 0 writes 'setprob.data' before proceeding */
-    fclaw2d_domain_barrier (glob->domain);  /* redundant?  */
+    fclaw_domain_barrier (glob->domain);  /* redundant?  */
  
     SETPROB();
 }

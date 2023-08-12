@@ -42,7 +42,7 @@ void sphere_problem_setup(fclaw_global_t* glob)
         fprintf(f,  "%-24d   %s",user->refine_pattern,"\% refinement_pattern\n");
         fclose(f);
     }
-    fclaw2d_domain_barrier (glob->domain);
+    fclaw_domain_barrier (glob->domain);
     SETPROB();
 }
 

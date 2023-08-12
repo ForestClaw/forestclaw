@@ -56,7 +56,7 @@ void shockbubble_problem_setup(fclaw_global_t* glob)
     }
 
     /* We want to make sure node 0 gets here before proceeding */
-    fclaw2d_domain_barrier (glob->domain);  /* redundant?  */
+    fclaw_domain_barrier (glob->domain);  /* redundant?  */
     SETPROB();
 }
 

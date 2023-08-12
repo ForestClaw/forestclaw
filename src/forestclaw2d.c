@@ -52,41 +52,6 @@ const fclaw2d_patch_flags_t fclaw2d_patch_block_face_flags[4] = {
 #define FCLAW2D_DOMAIN_TAG_SERIALIZE 4527
 #endif
 
-double
-fclaw2d_domain_global_maximum (fclaw_domain_t * domain, double d)
-{
-    int mpiret;
-    double gd;
-
-    mpiret = sc_MPI_Allreduce (&d, &gd, 1, sc_MPI_DOUBLE, sc_MPI_MAX,
-                               domain->mpicomm);
-    SC_CHECK_MPI (mpiret);
-
-    return gd;
-}
-
-double
-fclaw2d_domain_global_sum (fclaw_domain_t * domain, double d)
-{
-    int mpiret;
-    double gd;
-
-    mpiret = sc_MPI_Allreduce (&d, &gd, 1, sc_MPI_DOUBLE, sc_MPI_SUM,
-                               domain->mpicomm);
-    SC_CHECK_MPI (mpiret);
-
-    return gd;
-}
-
-void
-fclaw2d_domain_barrier (fclaw_domain_t * domain)
-{
-    int mpiret;
-
-    mpiret = sc_MPI_Barrier (domain->mpicomm);
-    SC_CHECK_MPI (mpiret);
-}
-
 static fclaw_patch_t *
 fclaw2d_domain_get_patch (fclaw_domain_t * domain, int blockno, int patchno)
 {
@@ -2015,37 +1980,6 @@ fclaw2d_domain_indirect_destroy (fclaw_domain_t * domain,
 }
 
 #endif
-
-void
-fclaw2d_domain_serialization_enter (fclaw_domain_t * domain)
-{
-    int mpiret;
-    int i;
-    sc_MPI_Status status;
-
-    if (domain->mpirank > 0)
-    {
-        mpiret = sc_MPI_Recv (&i, 1, sc_MPI_INT, domain->mpirank - 1,
-                              FCLAW2D_DOMAIN_TAG_SERIALIZE, domain->mpicomm,
-                              &status);
-        SC_CHECK_MPI (mpiret);
-        FCLAW_ASSERT (i == 0);
-    }
-}
-
-void
-fclaw2d_domain_serialization_leave (fclaw_domain_t * domain)
-{
-    int mpiret;
-    int i = 0;
-
-    if (domain->mpirank + 1 < domain->mpisize)
-    {
-        mpiret = sc_MPI_Send (&i, 1, sc_MPI_INT, domain->mpirank + 1,
-                              FCLAW2D_DOMAIN_TAG_SERIALIZE, domain->mpicomm);
-        SC_CHECK_MPI (mpiret);
-    }
-}
 
 int
 fclaw2d_domain_is_meta (fclaw_domain_t * domain)

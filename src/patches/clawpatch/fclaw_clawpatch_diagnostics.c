@@ -149,7 +149,7 @@ void fclaw_clawpatch_diagnostics_gather(fclaw_global_t *glob,
 
     if (fclaw_opt->compute_error != 0)
     {
-        double total_area = fclaw2d_domain_global_sum(domain, error_data->area);
+        double total_area = fclaw_domain_global_sum(domain, error_data->area);
         FCLAW_ASSERT(total_area != 0);
 
         double *error_norm = FCLAW_ALLOC_ZERO(double,3*meqn);
@@ -159,14 +159,14 @@ void fclaw_clawpatch_diagnostics_gather(fclaw_global_t *glob,
             int i2 = meqn + m;     /* 2-norm */
             int i3 = 2*meqn + m; /* inf-norm */
 
-            error_norm[i1]  = fclaw2d_domain_global_sum(domain, error_data->local_error[i1]);
+            error_norm[i1]  = fclaw_domain_global_sum(domain, error_data->local_error[i1]);
             error_norm[i1] /= total_area;
 
-            error_norm[i2]  = fclaw2d_domain_global_sum(domain, error_data->local_error[i2]);
+            error_norm[i2]  = fclaw_domain_global_sum(domain, error_data->local_error[i2]);
             error_norm[i2] /= total_area;
             error_norm[i2] = sqrt(error_norm[i2]);
 
-            error_norm[i3] = fclaw2d_domain_global_maximum(domain, 
+            error_norm[i3] = fclaw_domain_global_maximum(domain, 
                                                            error_data->local_error[i3]);
 
             error_data->global_error[i1] = error_norm[i1];
@@ -185,7 +185,7 @@ void fclaw_clawpatch_diagnostics_gather(fclaw_global_t *glob,
         double *total_mass = FCLAW_ALLOC_ZERO(double,meqn);
         for(int m = 0; m < meqn; m++)
         {
-            total_mass[m] = fclaw2d_domain_global_sum(domain, error_data->mass[m]);
+            total_mass[m] = fclaw_domain_global_sum(domain, error_data->mass[m]);
 
             /* Store mass for future checks */
             if (init_flag)

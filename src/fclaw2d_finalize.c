@@ -177,7 +177,7 @@ void fclaw2d_finalize(fclaw_global_t* glob)
     if (map != NULL) {
         fclaw2d_map_destroy(map);
     }
-    fclaw2d_domain_barrier (glob->domain);
+    fclaw_domain_barrier (glob->domain);
 
     if (gparms->report_timing)
     {

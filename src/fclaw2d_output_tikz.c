@@ -243,9 +243,9 @@ void fclaw2d_output_frame_tikz(fclaw_global_t* glob, int iframe)
     fp = fopen(fname,"a"); 
     s_tikz.fp = fp;
 
-    fclaw2d_domain_serialization_enter (domain);
+    fclaw_domain_serialization_enter (domain);
     fclaw_global_iterate_patches (glob, cb_tikz_output, (void *) &s_tikz);
-    fclaw2d_domain_serialization_leave (domain);
+    fclaw_domain_serialization_leave (domain);
 
     fclose(fp);
 

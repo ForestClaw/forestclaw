@@ -63,7 +63,7 @@ double fclaw2d_domain_global_minimum (fclaw_domain_t* domain, double d)
     double neg_d;
     double maxvalue;
     neg_d = -d;
-    maxvalue = fclaw2d_domain_global_maximum(domain,neg_d);
+    maxvalue = fclaw_domain_global_maximum(domain,neg_d);
     return -maxvalue;
 }
 

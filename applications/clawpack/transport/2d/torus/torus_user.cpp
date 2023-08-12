@@ -39,7 +39,7 @@ void torus_problem_setup(fclaw_global_t *glob)
         fprintf(f,  "%-24.6f   %s",user->revs_per_s,"\% revs_per_second\n");
         fclose(f);
     }
-    fclaw2d_domain_barrier (glob->domain);
+    fclaw_domain_barrier (glob->domain);
     SETPROB();
 }
 

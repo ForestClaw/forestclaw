@@ -41,7 +41,7 @@ void latlong_problem_setup(fclaw_global_t *glob)
         fprintf(f,  "%-24.6f %s",user->latitude[1],"\% latitude[1]\n");
         fclose(f);
     }
-    fclaw2d_domain_barrier (glob->domain);
+    fclaw_domain_barrier (glob->domain);
     SETPROB();
 }
 

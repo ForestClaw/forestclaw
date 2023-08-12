@@ -518,6 +518,45 @@ void fclaw_domain_corner_faces (const fclaw_domain_t * domain,
                                 int icorner, int * faces);
 
 ///@}
+/* ---------------------------------------------------------------------- */
+///                     @name Communication
+/* ---------------------------------------------------------------------- */
+///@{
+
+/** Compute and return the maximum over all processors of a double value.
+ * The minimum can be computed by using this function on the negative value.
+ */
+double fclaw_domain_global_maximum (fclaw_domain_t * domain, double d);
+
+/** Compute and return the sum over all processors of a double value.
+ */
+double fclaw_domain_global_sum (fclaw_domain_t * domain, double d);
+
+/** Synchronize all processes.  Avoid using if at all possible.
+ */
+void fclaw_domain_barrier (fclaw_domain_t * domain);
+
+/** Serialize a section of code.
+ * THIS IS NOT SCALABLE.
+ * WILL BE HORRIBLY SLOW FOR LARGE NUMBERS OF PROCESSORS.
+ * A processor returns from this function only after all lower-numbered
+ * processors have called fclaw2d_domain_serialization_leave.
+ * No collective communication routines must be called between the calls
+ * to this function and fclaw2d_domain_serialization_leave.
+ * \param [in] domain           The domain is not modified.
+ */
+void fclaw_domain_serialization_enter (fclaw_domain_t * domain);
+
+/** Serialize a section of code.
+ * THIS IS NOT SCALABLE.
+ * WILL BE HORRIBLY SLOW FOR LARGE NUMBERS OF PROCESSORS.
+ * A processor must call this function to allow all higher-numbered
+ * processors to return from fclaw2d_domain_serialization_enter.
+ * \param [in] domain           The domain is not modified.
+ */
+void fclaw_domain_serialization_leave (fclaw_domain_t * domain);
+
+///@}
 
 #ifdef __cplusplus
 #if 0

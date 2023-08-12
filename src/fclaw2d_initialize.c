@@ -101,7 +101,7 @@ void fclaw2d_initialize(fclaw_global_t *glob)
     }
 
     /* start timing */
-    fclaw2d_domain_barrier (*domain);
+    fclaw_domain_barrier (*domain);
     fclaw_timer_start (&glob->timers[FCLAW_TIMER_WALLTIME]);
     fclaw_timer_start (&glob->timers[FCLAW_TIMER_INIT]);
 

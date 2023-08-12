@@ -203,7 +203,7 @@ void outstyle_1(fclaw_global_t *glob)
                 /* If we are taking a variable time step, we have to reduce the 
                    maxcfl so that every processor takes the same size dt */
                 fclaw_timer_start (&glob->timers[FCLAW_TIMER_CFL_COMM]);
-                maxcfl_step = fclaw2d_domain_global_maximum (*domain, maxcfl_step);
+                maxcfl_step = fclaw_domain_global_maximum (*domain, maxcfl_step);
                 fclaw_timer_stop (&glob->timers[FCLAW_TIMER_CFL_COMM]);                
             }
 
@@ -376,7 +376,7 @@ void outstyle_3(fclaw_global_t *glob)
             /* If we are taking a variable time step, we have to reduce the 
                maxcfl so that every processor takes the same size dt */
             fclaw_timer_start (&glob->timers[FCLAW_TIMER_CFL_COMM]);
-            maxcfl_step = fclaw2d_domain_global_maximum (*domain, maxcfl_step);
+            maxcfl_step = fclaw_domain_global_maximum (*domain, maxcfl_step);
             fclaw_timer_stop (&glob->timers[FCLAW_TIMER_CFL_COMM]);     
         }
 

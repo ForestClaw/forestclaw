@@ -95,7 +95,7 @@ void fc2d_geoclaw_output_ascii(fclaw_global_t* glob,int iframe)
     /* BEGIN NON-SCALABLE CODE */
     /* Write the file contents in serial.
        Use only for small numbers of processors. */
-    fclaw2d_domain_serialization_enter (domain);
+    fclaw_domain_serialization_enter (domain);
 
     if (domain->mpirank == 0)
         geoclaw_header_ascii(glob,iframe);
@@ -103,7 +103,7 @@ void fc2d_geoclaw_output_ascii(fclaw_global_t* glob,int iframe)
     /* Write out each patch to fort.qXXXX */
     fclaw_global_iterate_patches (glob, cb_geoclaw_output_ascii, &iframe);
 
-    fclaw2d_domain_serialization_leave (domain);
+    fclaw_domain_serialization_leave (domain);
     /* END OF NON-SCALABLE CODE */
 }
 

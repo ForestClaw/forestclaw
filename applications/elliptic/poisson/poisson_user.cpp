@@ -68,7 +68,7 @@ void poisson_problem_setup(fclaw_global_t *glob)
 
         fclose(f);
     }
-    fclaw2d_domain_barrier (glob->domain);
+    fclaw_domain_barrier (glob->domain);
     POISSON_SETPROB(); /* This file reads the file just created above */
 }
 
