@@ -42,7 +42,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define fclaw2d_patch_callback_t        fclaw3d_patch_callback_t
 #define fclaw2d_match_callback_t        fclaw3d_match_callback_t
 #define fclaw2d_transfer_callback_t     fclaw3d_transfer_callback_t
-#define fclaw2d_domain_exchange_t       fclaw3d_domain_exchange_t
 #define fclaw2d_integrate_ray_t         fclaw3d_integrate_ray_t
 #define fclaw2d_interpolate_point_t     fclaw3d_interpolate_point_t
 #define fclaw2d_patch_new_t             fclaw3d_patch_new_t
