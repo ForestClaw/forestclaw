@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_global.h>
 #include <fclaw_vtable.h>
 
-#include <fclaw2d_time_sync.h>
+#include <fclaw_time_sync.h>
 
 
 typedef struct fclaw2d_level_data
@@ -299,7 +299,7 @@ double fclaw_advance_all_levels(fclaw_global_t *glob,
 									 FCLAW_TIMER_ADVANCE);
 				if (fclaw_opt->time_sync)
 			    {
-			    	fclaw2d_time_sync(glob,time_interp_level+1,maxlevel);
+			    	fclaw_time_sync(glob,time_interp_level+1,maxlevel);
 			    }
 			}
 			else
@@ -315,7 +315,7 @@ double fclaw_advance_all_levels(fclaw_global_t *glob,
 									 FCLAW_TIMER_ADVANCE);
 				if (fclaw_opt->time_sync)
 			    {
-				    fclaw2d_time_sync(glob,minlevel,maxlevel);
+				    fclaw_time_sync(glob,minlevel,maxlevel);
 			    }
 			}
 		}
@@ -337,7 +337,7 @@ double fclaw_advance_all_levels(fclaw_global_t *glob,
 	if (fclaw_opt->time_sync)
 	{
 	    /* This is the final synchronization not covered in fine_steps loop */
-		fclaw2d_time_sync(glob,minlevel,maxlevel);
+		fclaw_time_sync(glob,minlevel,maxlevel);
 	}
 
 	delete_timestep_counters(&ts_counter);

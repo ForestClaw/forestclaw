@@ -24,7 +24,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-#include <fclaw2d_time_sync.h>
+#include <fclaw_time_sync.h>
 
 #include <fclaw_patch.h>
 #include <fclaw_options.h>
@@ -243,7 +243,7 @@ void fclaw2d_clawpatch_time_sync_reset(fclaw_global_t *glob,
 	{
 		idir = k/2;
 		reset_flux = 0;
-		if (reset_mode == FCLAW2D_TIME_SYNC_RESET_F2C)
+		if (reset_mode == FCLAW_TIME_SYNC_RESET_F2C)
 		{
 			/* Reset registers at interface between levels 
 			   'coarse_level' and 'fine_level' */
@@ -253,13 +253,13 @@ void fclaw2d_clawpatch_time_sync_reset(fclaw_global_t *glob,
 		          (this_patch->level == fine_level);
 		    reset_flux = is_coarse || is_fine;
 		}
-		else if (reset_mode == FCLAW2D_TIME_SYNC_RESET_SAMESIZE)
+		else if (reset_mode == FCLAW_TIME_SYNC_RESET_SAMESIZE)
 		{
 			/* Reset registers at interfaces between same size grids on coarse level */
 			reset_flux = (pdata->d2->face_neighbors[k] == FCLAW_PATCH_SAMESIZE) &&   
 			      (this_patch->level == coarse_level);
 		}
-		else if (reset_mode == FCLAW2D_TIME_SYNC_RESET_PHYS)
+		else if (reset_mode == FCLAW_TIME_SYNC_RESET_PHYS)
 		{
 			/* Reset flux registers at physical boundaries (not actually used, 
 			   but they are accumulated, so should be cleared out) */

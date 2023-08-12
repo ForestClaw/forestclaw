@@ -26,6 +26,7 @@ add_library(forestclaw_c OBJECT
   fclaw_package.c 
   fclaw_physical_bc.c
   fclaw_pointer_map.c
+  fclaw_time_sync.c
   fclaw_regrid.c
   fclaw_run.c
   fclaw_timer.c
@@ -42,7 +43,6 @@ add_library(forestclaw_c OBJECT
   fclaw2d_partition.c
   fclaw2d_timeinterp.c
   fclaw2d_initialize.c
-  fclaw2d_time_sync.c
   fclaw2d_corner_neighbors.c
   fclaw2d_face_neighbors.c
   fclaw2d_output_tikz.c
@@ -130,6 +130,7 @@ install(FILES
 	fclaw_pointer_map.h 
 	fclaw_regrid.h
 	fclaw_timer.h 
+	fclaw_time_sync.h
 	fclaw_mpi.h 
 	fclaw_math.h 
 	fclaw_vtable.h
@@ -142,7 +143,6 @@ install(FILES
 	fclaw2d_defs.h 
 	fclaw2d_forestclaw.h
 	fclaw2d_block.h
-	fclaw2d_time_sync.h
 	fclaw2d_update_single_step.h
 	fclaw2d_rays.h
 	fclaw2d_ghost_fill.h

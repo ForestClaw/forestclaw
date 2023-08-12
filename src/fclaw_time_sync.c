@@ -23,7 +23,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <fclaw2d_time_sync.h>
+#include <fclaw_time_sync.h>
 
 #include <fclaw_global.h>
 #include <fclaw_patch.h>
@@ -75,7 +75,7 @@ void time_sync_reset (fclaw_global_t* glob,
 	fclaw_global_iterate_level(glob, coarse_level, 
 	                             cb_time_sync_reset, &ts_info);
 
-	if (reset_mode == FCLAW2D_TIME_SYNC_RESET_F2C)
+	if (reset_mode == FCLAW_TIME_SYNC_RESET_F2C)
 	{
 		fclaw_global_iterate_level(glob, coarse_level+1, 
 		                             cb_time_sync_reset, &ts_info);
@@ -132,7 +132,7 @@ void correct_coarse_cells(fclaw_global_t *glob,
 		copy_at_blockbdry(glob,level,
 						  read_parallel_patches,ghost_mode);
 
-		time_sync_reset(glob, level, FCLAW2D_TIME_SYNC_RESET_SAMESIZE);
+		time_sync_reset(glob, level, FCLAW_TIME_SYNC_RESET_SAMESIZE);
 
 		/* Correct coarser grids with corrections from coarse/fine grids */
 		if (level < fclaw_opt->maxlevel)
@@ -142,19 +142,19 @@ void correct_coarse_cells(fclaw_global_t *glob,
 			            read_parallel_patches,ghost_mode);
 
 			/* Clear registers at coarse/fine interface */
-			time_sync_reset(glob, level, FCLAW2D_TIME_SYNC_RESET_F2C);
+			time_sync_reset(glob, level, FCLAW_TIME_SYNC_RESET_F2C);
 		}
 	}
 	for(int level = fclaw_opt->maxlevel; level >= minlevel; level--)
 	{
 		/* Clear registers at physical level;  These are not used
      	   in sychronization, but will accumulate throughout simulation.  */
-		time_sync_reset(glob, level, FCLAW2D_TIME_SYNC_RESET_PHYS);		
+		time_sync_reset(glob, level, FCLAW_TIME_SYNC_RESET_PHYS);		
 	}
 }
 
 
-void fclaw2d_time_sync(fclaw_global_t *glob, int minlevel, int maxlevel)
+void fclaw_time_sync(fclaw_global_t *glob, int minlevel, int maxlevel)
 {
 
 
