@@ -31,7 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_forestclaw.h>
 #include <fclaw_global.h>
-#include <fclaw2d_ghost_fill.h>
+#include <fclaw_ghost_fill.h>
 #include <fclaw_options.h>
 #include <fclaw_advance.h>
 #include <fclaw_regrid.h>
@@ -270,7 +270,7 @@ void outstyle_3(fclaw_global_t *glob)
         phasefield_run_update_q(glob);
 
         int time_interp = 0;
-        fclaw2d_ghost_update(glob,fclaw_opt->minlevel,fclaw_opt->maxlevel,t_curr,
+        fclaw_ghost_update(glob,fclaw_opt->minlevel,fclaw_opt->maxlevel,t_curr,
                              time_interp,FCLAW_TIMER_NONE);
 
 

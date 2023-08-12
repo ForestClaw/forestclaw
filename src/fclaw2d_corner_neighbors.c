@@ -26,7 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_corner_neighbors.h>
 
 #include <fclaw2d_block.h>
-#include <fclaw2d_ghost_fill.h>
+#include <fclaw_ghost_fill.h>
 #include <fclaw2d_map_query.h>
 #include <fclaw_options.h>
 #include <fclaw2d_defs.h>
@@ -339,16 +339,16 @@ void cb_corner_fill(fclaw_domain_t *domain,
 {
     fclaw_global_iterate_t* s = (fclaw_global_iterate_t*) user; 
 
-    fclaw2d_exchange_info_t *filltype = (fclaw2d_exchange_info_t*) s->user;
+    fclaw_exchange_info_t *filltype = (fclaw_exchange_info_t*) s->user;
     int time_interp = filltype->time_interp;
-    int is_coarse = filltype->grid_type == FCLAW2D_IS_COARSE;
-    int is_fine = filltype->grid_type == FCLAW2D_IS_FINE;
+    int is_coarse = filltype->grid_type == FCLAW_IS_COARSE;
+    int is_fine = filltype->grid_type == FCLAW_IS_FINE;
 
     int read_parallel_patches = filltype->read_parallel_patches;
 
-    int copy_from_neighbor = filltype->exchange_type == FCLAW2D_COPY;
-    int average_from_neighbor = filltype->exchange_type == FCLAW2D_AVERAGE;
-    int interpolate_to_neighbor = filltype->exchange_type == FCLAW2D_INTERPOLATE;
+    int copy_from_neighbor = filltype->exchange_type == FCLAW_COPY;
+    int average_from_neighbor = filltype->exchange_type == FCLAW_AVERAGE;
+    int interpolate_to_neighbor = filltype->exchange_type == FCLAW_INTERPOLATE;
 
     int intersects_bdry[FCLAW2D_NUMFACES];
     int intersects_block[FCLAW2D_NUMFACES];

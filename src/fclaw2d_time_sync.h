@@ -53,7 +53,7 @@ typedef enum fclaw2d_time_sync_type
     FCLAW2D_TIME_SYNC_RESET_SAMESIZE,  
     /** Reset registers at physical boundary */
     FCLAW2D_TIME_SYNC_RESET_PHYS             
-} fclaw2d_time_sync_type_t;
+} fclaw_time_sync_type_t;
 
 
 /**

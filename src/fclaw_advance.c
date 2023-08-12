@@ -28,7 +28,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_math.h>
 
 #include <fclaw2d_timeinterp.h>
-#include <fclaw2d_ghost_fill.h>
+#include <fclaw_ghost_fill.h>
 #include <fclaw2d_update_single_step.h>
 #include <fclaw_options.h>
 #include <fclaw_global.h>
@@ -291,7 +291,7 @@ double fclaw_advance_all_levels(fclaw_global_t *glob,
 				int time_interp = 1;
 
 				/* Do conservative fix up here */
-				fclaw2d_ghost_update(glob,
+				fclaw_ghost_update(glob,
 									 time_interp_level+1,
 									 maxlevel,
 									 sync_time,
@@ -307,7 +307,7 @@ double fclaw_advance_all_levels(fclaw_global_t *glob,
 				/* End up here is we are doing global time stepping but return from 
 				   advance after 2^(maxlevel-minlevel) time steps. */
 				int time_interp = 0;
-				fclaw2d_ghost_update(glob,
+				fclaw_ghost_update(glob,
 									 minlevel,
 									 maxlevel,
 									 sync_time,
@@ -331,7 +331,7 @@ double fclaw_advance_all_levels(fclaw_global_t *glob,
 
 	double sync_time =  ts_counter[maxlevel].current_time;
 	int time_interp = 0;
-	fclaw2d_ghost_update(glob,minlevel,maxlevel,sync_time,
+	fclaw_ghost_update(glob,minlevel,maxlevel,sync_time,
 						 time_interp,FCLAW_TIMER_ADVANCE);
 
 	if (fclaw_opt->time_sync)

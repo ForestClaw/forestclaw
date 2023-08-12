@@ -16,6 +16,7 @@ add_library(forestclaw_c OBJECT
   fclaw_filesystem.cpp
   fclaw_finalize.c
   fclaw_gauges.c 
+  fclaw_ghost_fill.c
   fclaw_global.c
   fclaw_math.c
   fclaw_mpi.c
@@ -36,7 +37,6 @@ add_library(forestclaw_c OBJECT
   fclaw2d_map_query.c
   fclaw2d_map_brick.c
   fclaw2d_convenience.c
-  fclaw2d_ghost_fill.c
   fclaw2d_rays.c
   fclaw2d_update_single_step.c
   fclaw2d_partition.c

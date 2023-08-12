@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_gauges.h>
 
 #include <fclaw_global.h>
-#include <fclaw2d_ghost_fill.h>
+#include <fclaw_ghost_fill.h>
 #include <fclaw2d_partition.h>
 #include <fclaw_vtable.h>
 #include <fclaw_domain.h>
@@ -305,7 +305,7 @@ void fclaw_regrid(fclaw_global_t *glob)
         int maxlevel = (*domain)->global_maxlevel;
         int time_interp = 0;
         double sync_time = glob->curr_time;
-        fclaw2d_ghost_update(glob,
+        fclaw_ghost_update(glob,
                              minlevel,
                              maxlevel,
                              sync_time,

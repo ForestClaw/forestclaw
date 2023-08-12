@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_block.h>
 #include <fclaw_patch.h>
-#include <fclaw2d_ghost_fill.h>
+#include <fclaw_ghost_fill.h>
 #include <fclaw_options.h>
 #include <fclaw_physical_bc.h>
 #include <fclaw_regrid.h>
@@ -200,21 +200,21 @@ void cb_face_fill(fclaw_domain_t *domain,
 {
 	fclaw_global_iterate_t* s = (fclaw_global_iterate_t*) user; 
 
-	fclaw2d_exchange_info_t *filltype = (fclaw2d_exchange_info_t*) s->user;
+	fclaw_exchange_info_t *filltype = (fclaw_exchange_info_t*) s->user;
 	int time_interp = filltype->time_interp;
-	int is_coarse = filltype->grid_type == FCLAW2D_IS_COARSE;
-	int is_fine = filltype->grid_type == FCLAW2D_IS_FINE;
+	int is_coarse = filltype->grid_type == FCLAW_IS_COARSE;
+	int is_fine = filltype->grid_type == FCLAW_IS_FINE;
 
 	int iface, igrid;
 
 	int read_parallel_patches = filltype->read_parallel_patches;
 
-	int copy_from_neighbor = filltype->exchange_type == FCLAW2D_COPY;
-	int average_from_neighbor = filltype->exchange_type == FCLAW2D_AVERAGE;
-	int interpolate_to_neighbor = filltype->exchange_type == FCLAW2D_INTERPOLATE;
+	int copy_from_neighbor = filltype->exchange_type == FCLAW_COPY;
+	int average_from_neighbor = filltype->exchange_type == FCLAW_AVERAGE;
+	int interpolate_to_neighbor = filltype->exchange_type == FCLAW_INTERPOLATE;
 
-	int time_sync_fine_to_coarse = filltype->exchange_type == FCLAW2D_TIME_SYNC_F2C;
-	int time_sync_samesize = filltype->exchange_type == FCLAW2D_TIME_SYNC_SAMESIZE;
+	int time_sync_fine_to_coarse = filltype->exchange_type == FCLAW_TIME_SYNC_F2C;
+	int time_sync_samesize = filltype->exchange_type == FCLAW_TIME_SYNC_SAMESIZE;
 
 	const fclaw_options_t *gparms = fclaw_get_options(s->glob);
 	const int refratio = gparms->refratio;
@@ -472,7 +472,7 @@ void cb_face_fill(fclaw_domain_t *domain,
 }
 
 
-void fclaw2d_face_neighbor_ghost(fclaw_global_t* glob,
+void fclaw_face_neighbor_ghost(fclaw_global_t* glob,
 								 int minlevel,
 								 int maxlevel,
 								 int time_interp)

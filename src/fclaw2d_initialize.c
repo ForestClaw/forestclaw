@@ -36,7 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_partition.h>
 #include <fclaw_physical_bc.h>
-#include <fclaw2d_ghost_fill.h>
+#include <fclaw_ghost_fill.h>
 #include <fclaw_diagnostics.h>
 #include <fclaw2d_map.h>
 #include <fclaw_patch.h>
@@ -139,7 +139,7 @@ void fclaw2d_initialize(fclaw_global_t *glob)
     /* We need a user option here to set ghost values after initialization */
     if (fclaw_opt->init_ghostcell)
     {
-        fclaw2d_ghost_update(glob,(*domain)->global_minlevel,
+        fclaw_ghost_update(glob,(*domain)->global_minlevel,
                              (*domain)->global_maxlevel,0.0,
                              time_interp,FCLAW_TIMER_INIT);
     }
@@ -229,7 +229,7 @@ void fclaw2d_initialize(fclaw_global_t *glob)
 
     if (fclaw_opt->init_ghostcell)
     {
-        fclaw2d_ghost_update(glob,(*domain)->global_minlevel,
+        fclaw_ghost_update(glob,(*domain)->global_minlevel,
                              (*domain)->global_maxlevel,0.0,
                              time_interp,FCLAW_TIMER_INIT);
     }

@@ -45,7 +45,7 @@ void cb_face_fill(struct fclaw_domain *domain,
                   int this_patch_idx,
                   void *user);
 
-void fclaw2d_face_neighbor_ghost(struct fclaw_global* glob,
+void fclaw_face_neighbor_ghost(struct fclaw_global* glob,
                                  int minlevel,
                                  int maxlevel,
                                  int time_interp);

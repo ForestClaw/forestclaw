@@ -29,12 +29,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_patch.h>
 #include <fclaw_options.h>
 #include <fclaw_exchange.h>
-#include <fclaw2d_ghost_fill.h>
+#include <fclaw_ghost_fill.h>
 
 typedef struct fclaw2d_time_sync_info
 {
     /** The type of reset to perform */
-    fclaw2d_time_sync_type_t reset_mode;
+    fclaw_time_sync_type_t reset_mode;
     /** The type of reset to perform */
     int coarse_level;
     /** The type of reset to perform */
@@ -69,7 +69,7 @@ void time_sync_reset (fclaw_global_t* glob,
 {
 	fclaw2d_time_sync_info_t ts_info;
 
-	ts_info.reset_mode = (fclaw2d_time_sync_type_t) reset_mode;
+	ts_info.reset_mode = (fclaw_time_sync_type_t) reset_mode;
 	ts_info.coarse_level = coarse_level;
 
 	fclaw_global_iterate_level(glob, coarse_level, 
@@ -87,11 +87,11 @@ static
 void copy_at_blockbdry(fclaw_global_t *glob,
 					   int level,
 					   int read_parallel_patches,
-					   fclaw2d_ghost_fill_parallel_mode_t ghost_mode)
+					   fclaw_ghost_fill_parallel_mode_t ghost_mode)
 {
-	fclaw2d_exchange_info_t e_info;
-	e_info.exchange_type = FCLAW2D_TIME_SYNC_SAMESIZE;
-	e_info.grid_type = FCLAW2D_IS_COARSE;
+	fclaw_exchange_info_t e_info;
+	e_info.exchange_type = FCLAW_TIME_SYNC_SAMESIZE;
+	e_info.grid_type = FCLAW_IS_COARSE;
 	e_info.time_interp = 0;
 	e_info.read_parallel_patches = read_parallel_patches;
 
@@ -104,11 +104,11 @@ static
 void fine2coarse(fclaw_global_t *glob,
 				int level,
 				int read_parallel_patches,
-				fclaw2d_ghost_fill_parallel_mode_t ghost_mode)
+				fclaw_ghost_fill_parallel_mode_t ghost_mode)
 {
-	fclaw2d_exchange_info_t e_info;
-	e_info.exchange_type = FCLAW2D_TIME_SYNC_F2C;
-	e_info.grid_type = FCLAW2D_IS_COARSE;
+	fclaw_exchange_info_t e_info;
+	e_info.exchange_type = FCLAW_TIME_SYNC_F2C;
+	e_info.grid_type = FCLAW_IS_COARSE;
 	e_info.time_interp = 0;
 	e_info.read_parallel_patches = read_parallel_patches;
 
@@ -119,7 +119,7 @@ static
 void correct_coarse_cells(fclaw_global_t *glob, 
                           int minlevel, 
                           int read_parallel_patches,
-                          fclaw2d_ghost_fill_parallel_mode_t ghost_mode)
+                          fclaw_ghost_fill_parallel_mode_t ghost_mode)
 
 {
 	fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
@@ -191,8 +191,8 @@ void fclaw2d_time_sync(fclaw_global_t *glob, int minlevel, int maxlevel)
 
 	/* Indicates that we should read only interior, only boundary, or all patches
 	on a local processor */
-	fclaw2d_ghost_fill_parallel_mode_t parallel_mode =
-		   FCLAW2D_BOUNDARY_ALL;    
+	fclaw_ghost_fill_parallel_mode_t parallel_mode =
+		   FCLAW_BOUNDARY_ALL;    
 
 	correct_coarse_cells(glob,minlevel,read_parallel_patches,parallel_mode);
 
