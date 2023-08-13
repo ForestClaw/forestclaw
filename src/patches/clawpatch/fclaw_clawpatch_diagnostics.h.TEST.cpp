@@ -31,7 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifdef FCLAW_ENABLE_DEBUG
 
-TEST_CASE("fclaw2d_clawpatch_diagnostics_vtable_initialize fails if fclaw2d_diagnostics_vtable_initialize is not called first")
+TEST_CASE("2d fclaw_clawpatch_diagnostics_vtable_initialize fails if fclaw2d_diagnostics_vtable_initialize is not called first")
 {
 	fclaw_global_t* glob = fclaw_global_new();
 	CHECK_SC_ABORTED(fclaw_clawpatch_diagnostics_vtable_initialize(glob));

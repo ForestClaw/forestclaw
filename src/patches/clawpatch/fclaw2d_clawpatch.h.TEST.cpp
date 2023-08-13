@@ -29,7 +29,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_convenience.h>
 #include <test.hpp>
 
-TEST_CASE("fclaw2d_clawpatch_vtable_initialize stores two separate vtables in two separate globs")
+TEST_CASE("2d fclaw_clawpatch_vtable_initialize stores two separate vtables in two separate globs")
 {
 	fclaw_domain_t* domain = fclaw2d_domain_new_unitsquare(sc_MPI_COMM_WORLD, 1);
 	fclaw_global_t* glob1 = fclaw_global_new();
@@ -50,7 +50,7 @@ TEST_CASE("fclaw2d_clawpatch_vtable_initialize stores two separate vtables in tw
 	fclaw_global_destroy(glob2);
 }
 
-TEST_CASE("fclaw3dx_clawpatch_vtable_initialize stores two separate vtables in two separate globs")
+TEST_CASE("3dx fclaw_clawpatch_vtable_initialize stores two separate vtables in two separate globs")
 {
 	fclaw_domain_t* domain = fclaw2d_domain_new_unitsquare(sc_MPI_COMM_WORLD, 1);
 	fclaw_global_t* glob1 = fclaw_global_new();
@@ -71,7 +71,7 @@ TEST_CASE("fclaw3dx_clawpatch_vtable_initialize stores two separate vtables in t
 	fclaw_global_destroy(glob2);
 }
 
-TEST_CASE("fclaw2d_clawpatch_vtable_initialize sets is_set flag")
+TEST_CASE("2d fclaw_clawpatch_vtable_initialize sets is_set flag")
 {
 	fclaw_domain_t* domain = fclaw2d_domain_new_unitsquare(sc_MPI_COMM_WORLD, 1);
 	fclaw_global_t* glob = fclaw_global_new();
@@ -87,7 +87,7 @@ TEST_CASE("fclaw2d_clawpatch_vtable_initialize sets is_set flag")
 	fclaw_global_destroy(glob);
 }
 
-TEST_CASE("fclaw3dx_clawpatch_vtable_initialize sets is_set flag")
+TEST_CASE("3dx fclaw_clawpatch_vtable_initialize sets is_set flag")
 {
 	fclaw_domain_t* domain = fclaw2d_domain_new_unitsquare(sc_MPI_COMM_WORLD, 1);
 	fclaw_global_t* glob = fclaw_global_new();
@@ -107,7 +107,7 @@ TEST_CASE("fclaw3dx_clawpatch_vtable_initialize sets is_set flag")
 
 #ifdef FCLAW_ENABLE_DEBUG
 
-TEST_CASE("fclaw2d_clawpatch_vtable_initialize fails if called twice on a glob")
+TEST_CASE("2d fclaw_clawpatch_vtable_initialize fails if called twice on a glob")
 {
 	fclaw_domain_t* domain = fclaw2d_domain_new_unitsquare(sc_MPI_COMM_WORLD, 1);
 	fclaw_global_t* glob1 = fclaw_global_new();
@@ -128,7 +128,7 @@ TEST_CASE("fclaw2d_clawpatch_vtable_initialize fails if called twice on a glob")
 	fclaw_global_destroy(glob2);
 }
 
-TEST_CASE("fclaw3dx_clawpatch_vtable_initialize fails if called twice on a glob")
+TEST_CASE("3dx fclaw_clawpatch_vtable_initialize fails if called twice on a glob")
 {
 	fclaw_domain_t* domain = fclaw2d_domain_new_unitsquare(sc_MPI_COMM_WORLD, 1);
 	fclaw_global_t* glob1 = fclaw_global_new();
