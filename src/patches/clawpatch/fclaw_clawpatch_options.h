@@ -105,7 +105,8 @@ struct fclaw_clawpatch_options
 /**
  * @brief Allocate a new fclaw_clawpatch_options_t structure with the given dimension.
  *
- * This shouldn't have be called by the user
+ * This shouldn't have be called by the user.
+ * Used mainly for testing.
  * 
  * @param dim The dimension of the clawpatch.
  * @return fclaw_clawpatch_options_t* A newly allocated fclaw_clawpatch_options_t structure.
@@ -115,7 +116,8 @@ fclaw_clawpatch_options_t* fclaw_clawpatch_options_new (int dim);
 /**
  * @brief Deallocate the given fclaw_clawpatch_options_t structure.
  * 
- * This shouldn't have be called by the user
+ * This shouldn't have be called by the user.
+ * Used mainly for testing.
  *
  * @param clawpatch_opt The fclaw_clawpatch_options_t structure to deallocate.
  */
