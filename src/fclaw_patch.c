@@ -850,7 +850,8 @@ void fclaw_patch_vtable_initialize(fclaw_global_t* glob)
 
 	patch_vt->is_set = 1;
 
-	FCLAW_ASSERT(fclaw_pointer_map_get(glob->vtables,"fclaw_patch") == NULL);
+	FCLAW_ABORT_IF(fclaw_pointer_map_get(glob->vtables,"fclaw_patch") == NULL, 
+				   "Vtable has already been initialized");
 	fclaw_pointer_map_insert(glob->vtables, "fclaw_patch", patch_vt, patch_vt_destroy);
 }
 
