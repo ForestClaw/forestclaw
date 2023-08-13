@@ -25,6 +25,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw_global.h>
 #include <fclaw_patch.h>
+#include <fclaw2d_convenience.h>
 #include <test.hpp>
 
 TEST_CASE("fclaw_patch_vtable_intialize fails if domain has not been stored in glob")
@@ -37,35 +38,45 @@ TEST_CASE("fclaw_patch_vtable_intialize fails if domain has not been stored in g
 }
 TEST_CASE("fclaw_patch_vtable_intialize fails if called twice")
 {
+	fclaw_domain_t * domain = fclaw2d_domain_new_unitsquare(sc_MPI_COMM_WORLD, 0);
 	fclaw_global_t* glob = fclaw_global_new();
+	fclaw_global_store_domain(glob, domain);
 
 	fclaw_patch_vtable_initialize(glob);
 	CHECK_SC_ABORTED(fclaw_patch_vtable_initialize(glob));
 
+	fclaw_domain_destroy(domain);
 	fclaw_global_destroy(glob);
 }
 TEST_CASE("fclaw_patch_vtable_initialize stores two seperate vtables in two seperate globs")
 {
+	fclaw_domain_t* domain = fclaw2d_domain_new_unitsquare(sc_MPI_COMM_WORLD, 0);
 	fclaw_global_t* glob1 = fclaw_global_new();
+	fclaw_global_store_domain(glob1, domain);
 	fclaw_global_t* glob2 = fclaw_global_new();
+	fclaw_global_store_domain(glob2, domain);
 
 	fclaw_patch_vtable_initialize(glob1);
 	fclaw_patch_vtable_initialize(glob2);
 
 	CHECK_NE(fclaw_patch_vt(glob1), fclaw_patch_vt(glob2));
 
+	fclaw_domain_destroy(domain);
 	fclaw_global_destroy(glob1);
 	fclaw_global_destroy(glob2);
 }
 
 TEST_CASE("fclaw_patch_vtable_initialize sets is_set flag")
 {
+	fclaw_domain_t* domain = fclaw2d_domain_new_unitsquare(sc_MPI_COMM_WORLD, 0);
 	fclaw_global_t* glob = fclaw_global_new();
+	fclaw_global_store_domain(glob, domain);
 
 	fclaw_patch_vtable_initialize(glob);
 
 	CHECK_UNARY(fclaw_patch_vt(glob)->is_set);
 
+	fclaw_domain_destroy(domain);
 	fclaw_global_destroy(glob);
 }
 
@@ -73,14 +84,18 @@ TEST_CASE("fclaw_patch_vtable_initialize sets is_set flag")
 
 TEST_CASE("fclaw2d_patch_vtable_initialize fails if called twice on a glob")
 {
+	fclaw_domain_t* domain = fclaw2d_domain_new_unitsquare(sc_MPI_COMM_WORLD, 0);
 	fclaw_global_t* glob1 = fclaw_global_new();
+	fclaw_global_store_domain(glob1, domain);
 	fclaw_global_t* glob2 = fclaw_global_new();
+	fclaw_global_store_domain(glob2, domain);
 
 	fclaw_patch_vtable_initialize(glob1);
 	CHECK_SC_ABORTED(fclaw_patch_vtable_initialize(glob1));
 	fclaw_patch_vtable_initialize(glob2);
 	CHECK_SC_ABORTED(fclaw_patch_vtable_initialize(glob2));
 
+	fclaw_domain_destroy(domain);
 	fclaw_global_destroy(glob1);
 	fclaw_global_destroy(glob2);
 }

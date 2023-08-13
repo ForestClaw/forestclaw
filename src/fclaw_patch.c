@@ -843,15 +843,21 @@ void patch_vt_destroy(void* vt)
     FCLAW_FREE (patch_vt);
 }
 
-#ifndef P4_TO_P8
 void fclaw_patch_vtable_initialize(fclaw_global_t* glob)
 {
+	FCLAW_ASSERT_MESSAGE(
+		glob->domain != NULL, 
+		"domain needs to be stored in glob before initializing vtables"
+	);
+
 	fclaw_patch_vtable_t *patch_vt = patch_vt_new(2);
 
 	patch_vt->is_set = 1;
 
-	FCLAW_ABORT_IF(fclaw_pointer_map_get(glob->vtables,"fclaw_patch") == NULL, 
-				   "Vtable has already been initialized");
+	FCLAW_ASSERT_MESSAGE(
+		fclaw_pointer_map_get(glob->vtables,"fclaw_patch") == NULL, 
+		"Vtable has already been initialized"
+	);
 	fclaw_pointer_map_insert(glob->vtables, "fclaw_patch", patch_vt, patch_vt_destroy);
 }
 
@@ -865,7 +871,6 @@ fclaw_patch_vtable_t* fclaw_patch_vt(fclaw_global_t* glob)
 	FCLAW_ASSERT(patch_vt->is_set != 0);
 	return patch_vt;
 }
-#endif
 
 
 
