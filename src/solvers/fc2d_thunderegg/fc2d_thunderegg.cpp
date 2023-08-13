@@ -33,6 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_elliptic_solver.h>
 
 #include <fclaw_clawpatch.h>
+#include <fclaw_clawpatch_options.h>
 #include <fclaw_clawpatch_output_ascii.h> 
 #include <fclaw_clawpatch_output_vtk.h>
 
@@ -163,7 +164,12 @@ void thunderegg_vt_destroy(void* vt)
 
 void fc2d_thunderegg_solver_initialize(fclaw_global_t* glob)
 {
-    //TODO check that clawpatch options are 2d
+	FCLAW_ASSERT_MESSAGE(glob->domain->dim == 2,
+			"Domain set to 3d. fc2d_thunderegg is only for 2d");
+
+    fclaw_clawpatch_options_t* clawpatch_opts = fclaw_clawpatch_get_options(glob);
+	FCLAW_ASSERT_MESSAGE(clawpatch_opts->dim == 2,
+			"Clawpatch dimension set to 3d. fc2d_thunderegg is only for 2d");
 
 	int claw_version = 4; /* solution data is organized as (i,j,m) */
 	fclaw_clawpatch_vtable_initialize(glob, claw_version);
