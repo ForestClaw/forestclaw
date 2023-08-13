@@ -27,7 +27,24 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_patch.h>
 #include <test.hpp>
 
-TEST_CASE("fclaw2d_patch_vtable_initialize stores two seperate vtables in two seperate globs")
+TEST_CASE("fclaw_patch_vtable_intialize fails if domain has not been stored in glob")
+{
+	fclaw_global_t* glob = fclaw_global_new();
+
+	CHECK_SC_ABORTED(fclaw_patch_vtable_initialize(glob));
+
+	fclaw_global_destroy(glob);
+}
+TEST_CASE("fclaw_patch_vtable_intialize fails if called twice")
+{
+	fclaw_global_t* glob = fclaw_global_new();
+
+	fclaw_patch_vtable_initialize(glob);
+	CHECK_SC_ABORTED(fclaw_patch_vtable_initialize(glob));
+
+	fclaw_global_destroy(glob);
+}
+TEST_CASE("fclaw_patch_vtable_initialize stores two seperate vtables in two seperate globs")
 {
 	fclaw_global_t* glob1 = fclaw_global_new();
 	fclaw_global_t* glob2 = fclaw_global_new();
@@ -41,7 +58,7 @@ TEST_CASE("fclaw2d_patch_vtable_initialize stores two seperate vtables in two se
 	fclaw_global_destroy(glob2);
 }
 
-TEST_CASE("fclaw2d_patch_vtable_initialize sets is_set flag")
+TEST_CASE("fclaw_patch_vtable_initialize sets is_set flag")
 {
 	fclaw_global_t* glob = fclaw_global_new();
 

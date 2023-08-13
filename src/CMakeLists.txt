@@ -181,7 +181,7 @@ if(BUILD_TESTING)
       fclaw_diagnostics.h.TEST.cpp
       fclaw_global.h.TEST.cpp
       fclaw_options.h.TEST.cpp
-      fclaw2d_patch.h.TEST.cpp
+      fclaw_patch.h.TEST.cpp
       fclaw_vtable.h.TEST.cpp
   )
 
