@@ -846,7 +846,7 @@ void patch_vt_destroy(void* vt)
 #ifndef P4_TO_P8
 void fclaw_patch_vtable_initialize(fclaw_global_t* glob)
 {
-	fclaw_patch_vtable_t *patch_vt = patch_vt_new(glob->domain->dim);
+	fclaw_patch_vtable_t *patch_vt = patch_vt_new(2);
 
 	patch_vt->is_set = 1;
 
