@@ -1534,13 +1534,14 @@ void clawpatch_vt_destroy(void* vt)
     FCLAW_FREE (clawpatch_vt);
 }
 
-static
-void fclaw_clawpatch_vtable_initialize(int dim, fclaw_global_t* glob, 
+void fclaw_clawpatch_vtable_initialize(fclaw_global_t* glob, 
                                        int claw_version)
 {
+    fclaw_clawpatch_options_t * clawpatch_opt = 
+                             fclaw_clawpatch_get_options(glob);
     fclaw_patch_vtable_t *patch_vt = fclaw_patch_vt(glob);
 
-    if(dim == 2)
+    if(clawpatch_opt->dim == 2)
     {
         fclaw2d_metric_vtable_initialize(glob);
     }
@@ -1549,7 +1550,7 @@ void fclaw_clawpatch_vtable_initialize(int dim, fclaw_global_t* glob,
         fclaw3d_metric_vtable_initialize(glob);
     }
 
-    fclaw_clawpatch_vtable_t *clawpatch_vt = clawpatch_vt_new(dim);
+    fclaw_clawpatch_vtable_t *clawpatch_vt = clawpatch_vt_new(clawpatch_opt->dim);
 
     /* Patch setup */
     patch_vt->patch_new             = (clawpatch_vt->dim == 2) ? clawpatch_new_2d : clawpatch_new_3d;
@@ -1763,12 +1764,6 @@ void fclaw_clawpatch_vtable_initialize(int dim, fclaw_global_t* glob,
 
     FCLAW_ASSERT(fclaw_pointer_map_get(glob->vtables, "fclaw_clawpatch") == NULL);
     fclaw_pointer_map_insert(glob->vtables, "fclaw_clawpatch", clawpatch_vt, clawpatch_vt_destroy);
-}
-
-void fclaw_clawpatch_vtable_initialize(fclaw_global_t* glob, 
-                                         int claw_version)
-{
-    fclaw_clawpatch_vtable_initialize(2,glob,claw_version);
 }
 
 /* ------------------------------- Public access functions ---------------------------- */
