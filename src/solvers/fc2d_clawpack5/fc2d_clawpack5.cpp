@@ -444,6 +444,9 @@ void fc2d_clawpack5_solver_initialize(fclaw_global_t* glob)
 	fclaw_clawpatch_options_t* clawpatch_opt = fclaw_clawpatch_get_options(glob);
 	fc2d_clawpack5_options_t* clawopt = fc2d_clawpack5_get_options(glob);
 
+	FCLAW_ASSERT_MESSAGE(clawpatch_opt->dim == 2,
+			"Clawpatch dimension set to 3d. fc2d_clawpack46 is only for 2d");
+
     clawopt->method[6] = clawpatch_opt->maux;
 
     if (clawpatch_opt->maux == 0 && clawopt->mcapa > 0)
