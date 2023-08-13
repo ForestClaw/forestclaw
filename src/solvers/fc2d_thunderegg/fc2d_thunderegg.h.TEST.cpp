@@ -24,6 +24,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include <fclaw_global.h>
+#include <fclaw_clawpatch_options.h>
 #include <fclaw2d_convenience.h>
 #include <fc2d_thunderegg.h>
 #include <fclaw2d_forestclaw.h>
@@ -31,11 +32,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 TEST_CASE("fc2d_thunderegg_solver_initialize stores two seperate vtables in two seperate globs")
 {
-	fclaw_domain_t* domain = fclaw2d_domain_new_unitsquare(sc_MPI_COMM_WORLD, 1);
 	fclaw_global_t* glob1 = fclaw_global_new();
-	fclaw_global_store_domain(glob1, domain);
 	fclaw_global_t* glob2 = fclaw_global_new();
+
+	fclaw_domain_t* domain = fclaw2d_domain_new_unitsquare(sc_MPI_COMM_WORLD, 1);
+	fclaw_global_store_domain(glob1, domain);
 	fclaw_global_store_domain(glob2, domain);
+
+	fclaw_clawpatch_options_t* clawpatch_opt = fclaw_clawpatch_options_new(2);
+	fclaw_clawpatch_options_store(glob1, clawpatch_opt);
+	fclaw_clawpatch_options_store(glob2, clawpatch_opt);
 
 	fclaw2d_vtables_initialize(glob1);
 	fc2d_thunderegg_solver_initialize(glob1);
@@ -52,9 +58,13 @@ TEST_CASE("fc2d_thunderegg_solver_initialize stores two seperate vtables in two 
 
 TEST_CASE("fc2d_thunderegg_solver_initialize sets is_set flag")
 {
-	fclaw_domain_t* domain = fclaw2d_domain_new_unitsquare(sc_MPI_COMM_WORLD, 1);
 	fclaw_global_t* glob = fclaw_global_new();
+
+	fclaw_domain_t* domain = fclaw2d_domain_new_unitsquare(sc_MPI_COMM_WORLD, 1);
 	fclaw_global_store_domain(glob, domain);
+
+	fclaw_clawpatch_options_t* clawpatch_opt = fclaw_clawpatch_options_new(2);
+	fclaw_clawpatch_options_store(glob, clawpatch_opt);
 
 	fclaw2d_vtables_initialize(glob);
 	fc2d_thunderegg_solver_initialize(glob);
@@ -70,11 +80,16 @@ TEST_CASE("fc2d_thunderegg_solver_initialize sets is_set flag")
 
 TEST_CASE("fc2d_thunderegg_vtable_initialize fails if called twice on a glob")
 {
-	fclaw_domain_t* domain = fclaw2d_domain_new_unitsquare(sc_MPI_COMM_WORLD, 1);
 	fclaw_global_t* glob1 = fclaw_global_new();
-	fclaw_global_store_domain(glob1, domain);
 	fclaw_global_t* glob2 = fclaw_global_new();
+	
+	fclaw_domain_t* domain = fclaw2d_domain_new_unitsquare(sc_MPI_COMM_WORLD, 1);
+	fclaw_global_store_domain(glob1, domain);
 	fclaw_global_store_domain(glob2, domain);
+
+	fclaw_clawpatch_options_t* clawpatch_opt = fclaw_clawpatch_options_new(2);
+	fclaw_clawpatch_options_store(glob1, clawpatch_opt);
+	fclaw_clawpatch_options_store(glob2, clawpatch_opt);
 
 	fclaw2d_vtables_initialize(glob1);
 	fc2d_thunderegg_solver_initialize(glob1);

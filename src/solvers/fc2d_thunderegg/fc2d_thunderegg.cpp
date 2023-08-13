@@ -163,6 +163,8 @@ void thunderegg_vt_destroy(void* vt)
 
 void fc2d_thunderegg_solver_initialize(fclaw_global_t* glob)
 {
+    //TODO check that clawpatch options are 2d
+
 	int claw_version = 4; /* solution data is organized as (i,j,m) */
 	fclaw_clawpatch_vtable_initialize(glob, claw_version);
 
