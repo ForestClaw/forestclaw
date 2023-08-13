@@ -492,7 +492,7 @@ void fc3d_clawpack46_solver_initialize(fclaw_global_t* glob)
     }
 
 	int claw_version = 4;
-	fclaw3d_clawpatch_vtable_initialize(glob, claw_version);
+	fclaw_clawpatch_vtable_initialize(glob, claw_version);
     //fclaw_clawpatch_vtable_t*      clawpatch_vt = fclaw_clawpatch_vt();
 
 	fclaw_vtable_t*                fc_vt = fclaw_vt(glob);

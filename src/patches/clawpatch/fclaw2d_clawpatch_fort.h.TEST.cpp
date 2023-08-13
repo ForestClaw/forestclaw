@@ -68,7 +68,7 @@ TEST_CASE("FCLAW2D_CLAWPATCH_EXCEEDS_THRESHOLD calls user function")
     fclaw_global_store_domain(glob, domain);
 
     fclaw2d_vtables_initialize(glob);
-    fclaw2d_clawpatch_vtable_initialize(glob, 4);
+    fclaw_clawpatch_vtable_initialize(glob, 4);
 
     fclaw_clawpatch_vt(glob)->d2->fort_user_exceeds_threshold = 
         [](const int *blockno,
@@ -138,7 +138,7 @@ TEST_CASE("FCLAW3DX_CLAWPATCH_EXCEEDS_THRESHOLD calls user function")
     fclaw_global_store_domain(glob, domain);
 
     fclaw2d_vtables_initialize(glob);
-    fclaw3d_clawpatch_vtable_initialize(glob, 4);
+    fclaw_clawpatch_vtable_initialize(glob, 4);
 
     fclaw_clawpatch_vt(glob)->d3->fort_user_exceeds_threshold = 
         [](const int *blockno,

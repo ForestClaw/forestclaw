@@ -40,8 +40,8 @@ TEST_CASE("fclaw2d_clawpatch_vtable_initialize stores two separate vtables in tw
 	fclaw2d_vtables_initialize(glob1);
 	fclaw2d_vtables_initialize(glob2);
 
-	fclaw2d_clawpatch_vtable_initialize(glob1,4);
-	fclaw2d_clawpatch_vtable_initialize(glob2,4);
+	fclaw_clawpatch_vtable_initialize(glob1,4);
+	fclaw_clawpatch_vtable_initialize(glob2,4);
 
 	CHECK_NE(fclaw_clawpatch_vt(glob1), fclaw_clawpatch_vt(glob2));
 
@@ -61,8 +61,8 @@ TEST_CASE("fclaw3dx_clawpatch_vtable_initialize stores two separate vtables in t
 	fclaw2d_vtables_initialize(glob1);
 	fclaw2d_vtables_initialize(glob2);
 
-	fclaw3d_clawpatch_vtable_initialize(glob1,4);
-	fclaw3d_clawpatch_vtable_initialize(glob2,4);
+	fclaw_clawpatch_vtable_initialize(glob1,4);
+	fclaw_clawpatch_vtable_initialize(glob2,4);
 
 	CHECK_NE(fclaw_clawpatch_vt(glob1), fclaw_clawpatch_vt(glob2));
 
@@ -79,7 +79,7 @@ TEST_CASE("fclaw2d_clawpatch_vtable_initialize sets is_set flag")
 
 	fclaw2d_vtables_initialize(glob);
 
-	fclaw2d_clawpatch_vtable_initialize(glob, 4);
+	fclaw_clawpatch_vtable_initialize(glob, 4);
 
 	CHECK_UNARY(fclaw_clawpatch_vt(glob)->is_set);
 
@@ -95,7 +95,7 @@ TEST_CASE("fclaw3dx_clawpatch_vtable_initialize sets is_set flag")
 
 	fclaw2d_vtables_initialize(glob);
 
-	fclaw3d_clawpatch_vtable_initialize(glob, 4);
+	fclaw_clawpatch_vtable_initialize(glob, 4);
 
 	CHECK_UNARY(fclaw_clawpatch_vt(glob)->is_set);
 
@@ -118,10 +118,10 @@ TEST_CASE("fclaw2d_clawpatch_vtable_initialize fails if called twice on a glob")
 	fclaw2d_vtables_initialize(glob1);
 	fclaw2d_vtables_initialize(glob2);
 
-	fclaw2d_clawpatch_vtable_initialize(glob1,4);
-	CHECK_SC_ABORTED(fclaw2d_clawpatch_vtable_initialize(glob1,4));
-	fclaw2d_clawpatch_vtable_initialize(glob2,4);
-	CHECK_SC_ABORTED(fclaw2d_clawpatch_vtable_initialize(glob2,4));
+	fclaw_clawpatch_vtable_initialize(glob1,4);
+	CHECK_SC_ABORTED(fclaw_clawpatch_vtable_initialize(glob1,4));
+	fclaw_clawpatch_vtable_initialize(glob2,4);
+	CHECK_SC_ABORTED(fclaw_clawpatch_vtable_initialize(glob2,4));
 
 	fclaw_domain_destroy(domain);
 	fclaw_global_destroy(glob1);
@@ -139,10 +139,10 @@ TEST_CASE("fclaw3dx_clawpatch_vtable_initialize fails if called twice on a glob"
 	fclaw2d_vtables_initialize(glob1);
 	fclaw2d_vtables_initialize(glob2);
 
-	fclaw3d_clawpatch_vtable_initialize(glob1,4);
-	CHECK_SC_ABORTED(fclaw3d_clawpatch_vtable_initialize(glob1,4));
-	fclaw3d_clawpatch_vtable_initialize(glob2,4);
-	CHECK_SC_ABORTED(fclaw3d_clawpatch_vtable_initialize(glob2,4));
+	fclaw_clawpatch_vtable_initialize(glob1,4);
+	CHECK_SC_ABORTED(fclaw_clawpatch_vtable_initialize(glob1,4));
+	fclaw_clawpatch_vtable_initialize(glob2,4);
+	CHECK_SC_ABORTED(fclaw_clawpatch_vtable_initialize(glob2,4));
 
 	fclaw_domain_destroy(domain);
 	fclaw_global_destroy(glob1);

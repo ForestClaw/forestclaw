@@ -164,7 +164,7 @@ void thunderegg_vt_destroy(void* vt)
 void fc2d_thunderegg_solver_initialize(fclaw_global_t* glob)
 {
 	int claw_version = 4; /* solution data is organized as (i,j,m) */
-	fclaw2d_clawpatch_vtable_initialize(glob, claw_version);
+	fclaw_clawpatch_vtable_initialize(glob, claw_version);
 
 
     //fclaw_clawpatch_vtable_t*      clawpatch_vt = fclaw_clawpatch_vt(glob);

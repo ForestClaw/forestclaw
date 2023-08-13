@@ -82,7 +82,7 @@ struct QuadDomain {
         fclaw_global_store_map_2d(glob,map);
 
         fclaw2d_vtables_initialize(glob);
-        fclaw2d_clawpatch_vtable_initialize(glob, 4);
+        fclaw_clawpatch_vtable_initialize(glob, 4);
 
         fclaw_domain_data_new(glob->domain);
 
@@ -145,7 +145,7 @@ struct QuadDomainBrick {
         fclaw_global_store_map_2d(glob, map);
 
         fclaw2d_vtables_initialize(glob);
-        fclaw2d_clawpatch_vtable_initialize(glob, 4);
+        fclaw_clawpatch_vtable_initialize(glob, 4);
     
         fclaw_domain_data_new(glob->domain);
     }

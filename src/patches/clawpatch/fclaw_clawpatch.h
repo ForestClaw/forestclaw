@@ -168,17 +168,13 @@ typedef void (*clawpatch_diagnostics_error_t)(struct fclaw_global *glob,
 /**
  * @brief Initialize the clawpatch vtable global variable
  * 
- * @param claw_version the version of clawpack (4 for 4.6, 5 for 5)
- */
-void fclaw2d_clawpatch_vtable_initialize(struct fclaw_global *global,
-                                         int claw_version);
-
-/**
- * @brief Initialize the clawpatch vtable global variable
+ * Vtable will be initialize to the correct dimension (2d, 3dx, 3d) based on the
+ * the dimension of the fclaw_patch_vtable and the dimension of the fclaw_clawpatch_options
  * 
  * @param claw_version the version of clawpack (4 for 4.6, 5 for 5)
  */
-void fclaw3d_clawpatch_vtable_initialize(struct fclaw_global *glob, int claw_version);
+void fclaw_clawpatch_vtable_initialize(struct fclaw_global *global,
+                                       int claw_version);
 
 /**
  * @brief Get a pointer to a clawpatch vtable global variable

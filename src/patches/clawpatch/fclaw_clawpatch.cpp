@@ -1765,16 +1765,10 @@ void fclaw_clawpatch_vtable_initialize(int dim, fclaw_global_t* glob,
     fclaw_pointer_map_insert(glob->vtables, "fclaw_clawpatch", clawpatch_vt, clawpatch_vt_destroy);
 }
 
-void fclaw2d_clawpatch_vtable_initialize(fclaw_global_t* glob, 
+void fclaw_clawpatch_vtable_initialize(fclaw_global_t* glob, 
                                          int claw_version)
 {
     fclaw_clawpatch_vtable_initialize(2,glob,claw_version);
-}
-
-void fclaw3d_clawpatch_vtable_initialize(fclaw_global_t* glob, 
-                                         int claw_version)
-{
-    fclaw_clawpatch_vtable_initialize(3,glob,claw_version);
 }
 
 /* ------------------------------- Public access functions ---------------------------- */

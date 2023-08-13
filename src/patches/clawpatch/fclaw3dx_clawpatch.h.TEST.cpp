@@ -98,7 +98,7 @@ struct SinglePatchDomain {
         fclaw_global_store_map_2d(glob, map);
 
         fclaw2d_vtables_initialize(glob);
-        fclaw3d_clawpatch_vtable_initialize(glob, 4);
+        fclaw_clawpatch_vtable_initialize(glob, 4);
 
         fclaw_domain_data_new(glob->domain);
     }
@@ -153,7 +153,7 @@ struct QuadDomain {
         fclaw_global_store_map_2d(glob, map);
 
         fclaw2d_vtables_initialize(glob);
-        fclaw3d_clawpatch_vtable_initialize(glob, 4);
+        fclaw_clawpatch_vtable_initialize(glob, 4);
 
         fclaw_domain_data_new(glob->domain);
     }
@@ -184,7 +184,7 @@ TEST_CASE("fclaw3dx_clawpatch_vtable_initialize")
 
     fclaw2d_vtables_initialize(glob);
 
-    fclaw3d_clawpatch_vtable_initialize(glob, 4);
+    fclaw_clawpatch_vtable_initialize(glob, 4);
 
     fclaw_clawpatch_vtable_t * clawpatch_vt = fclaw_clawpatch_vt(glob);
 
@@ -277,7 +277,7 @@ TEST_CASE("fclaw3dx_clawpatch patch_build")
 
         fclaw2d_vtables_initialize(glob);
 
-        fclaw3d_clawpatch_vtable_initialize(glob, 4);
+        fclaw_clawpatch_vtable_initialize(glob, 4);
 
         fclaw_clawpatch_options_t* opts = fclaw_clawpatch_options_new(3);
         opts->d3->mx     = mx;
