@@ -26,6 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <test.hpp>
 
 #include <fclaw2d_forestclaw.h>
+#include <fclaw2d_convenience.h>
 #include <fclaw_global.h>
 
 #include <fclaw_clawpatch.h>
@@ -62,7 +63,9 @@ TEST_CASE("FCLAW2D_CLAWPATCH_EXCEEDS_THRESHOLD calls user function")
     global_exceeds_test_parameters = exceeds_test_parameters();
     exceeds_test_parameters& params = global_exceeds_test_parameters;
 
+    fclaw_domain_t* domain = fclaw2d_domain_new_unitsquare(sc_MPI_COMM_WORLD, 1);
 	fclaw_global_t* glob = fclaw_global_new();
+    fclaw_global_store_domain(glob, domain);
 
     fclaw2d_vtables_initialize(glob);
     fclaw2d_clawpatch_vtable_initialize(glob, 4);
@@ -122,6 +125,7 @@ TEST_CASE("FCLAW2D_CLAWPATCH_EXCEEDS_THRESHOLD calls user function")
 
     CHECK_EQ(ret, params.return_value);
 
+    fclaw_domain_destroy(domain);
     fclaw_global_destroy(glob);
 }
 TEST_CASE("FCLAW3DX_CLAWPATCH_EXCEEDS_THRESHOLD calls user function")
@@ -129,7 +133,9 @@ TEST_CASE("FCLAW3DX_CLAWPATCH_EXCEEDS_THRESHOLD calls user function")
     global_exceeds_test_parameters = exceeds_test_parameters();
     exceeds_test_parameters& params = global_exceeds_test_parameters;
 
+    fclaw_domain_t* domain = fclaw2d_domain_new_unitsquare(sc_MPI_COMM_WORLD, 1);
 	fclaw_global_t* glob = fclaw_global_new();
+    fclaw_global_store_domain(glob, domain);
 
     fclaw2d_vtables_initialize(glob);
     fclaw3d_clawpatch_vtable_initialize(glob, 4);
@@ -195,5 +201,6 @@ TEST_CASE("FCLAW3DX_CLAWPATCH_EXCEEDS_THRESHOLD calls user function")
 
     CHECK_EQ(ret, params.return_value);
 
+    fclaw_domain_destroy(domain);
     fclaw_global_destroy(glob);
 }
