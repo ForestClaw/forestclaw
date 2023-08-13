@@ -182,6 +182,9 @@ TEST_CASE("3dx fclaw_clawpatch_vtable_initialize")
     fclaw_global_t* glob = fclaw_global_new();
 	fclaw_global_store_domain(glob, domain);
 
+    fclaw_clawpatch_options_t* opts = fclaw_clawpatch_options_new(3);
+    fclaw_clawpatch_options_store(glob, opts);
+
     fclaw2d_vtables_initialize(glob);
 
     fclaw_clawpatch_vtable_initialize(glob, 4);
@@ -266,18 +269,7 @@ TEST_CASE("3dx fclaw_clawpatch patch_build")
         fopts.bz = 3;
         fopts.compute_error = compute_error;
         fopts.subcycle = subcycle;
-
         fclaw_options_store(glob, &fopts);
-
-	    fclaw_domain_t* domain = fclaw2d_domain_new_unitsquare(sc_MPI_COMM_WORLD, 0);
-	    fclaw_global_store_domain(glob, domain);
-
-        fclaw2d_map_context_t* map = fclaw2d_map_new_nomap();
-        fclaw_global_store_map_2d(glob, map);
-
-        fclaw2d_vtables_initialize(glob);
-
-        fclaw_clawpatch_vtable_initialize(glob, 4);
 
         fclaw_clawpatch_options_t* opts = fclaw_clawpatch_options_new(3);
         opts->d3->mx     = mx;
@@ -288,6 +280,15 @@ TEST_CASE("3dx fclaw_clawpatch patch_build")
         opts->maux       = maux;
         opts->rhs_fields = rhs_fields;
         fclaw_clawpatch_options_store(glob, opts);
+
+	    fclaw_domain_t* domain = fclaw2d_domain_new_unitsquare(sc_MPI_COMM_WORLD, 0);
+	    fclaw_global_store_domain(glob, domain);
+
+        fclaw2d_map_context_t* map = fclaw2d_map_new_nomap();
+        fclaw_global_store_map_2d(glob, map);
+
+        fclaw2d_vtables_initialize(glob);
+        fclaw_clawpatch_vtable_initialize(glob, 4);
 
         fclaw_domain_data_new(glob->domain);
         CHECK(domain->blocks[0].patches[0].user == nullptr);

@@ -483,6 +483,7 @@ void clawpack46_vt_destroy(void* vt)
 void fc2d_clawpack46_solver_initialize(fclaw_global_t* glob)
 {
 	fclaw_clawpatch_options_t* clawpatch_opt = fclaw_clawpatch_get_options(glob);
+	//TODO check that clawpatch options are 2d
 	fc2d_clawpack46_options_t* clawopt = fc2d_clawpack46_get_options(glob);
     clawopt->method[6] = clawpatch_opt->maux;
 

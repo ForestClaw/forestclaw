@@ -67,6 +67,10 @@ TEST_CASE("FCLAW2D_CLAWPATCH_EXCEEDS_THRESHOLD calls user function")
 	fclaw_global_t* glob = fclaw_global_new();
     fclaw_global_store_domain(glob, domain);
 
+    fclaw_clawpatch_options_t* clawpatch_opts = fclaw_clawpatch_options_new(2);
+    clawpatch_opts->refinement_criteria = FCLAW_REFINE_CRITERIA_USER;
+    fclaw_clawpatch_options_store(glob, clawpatch_opts);
+
     fclaw2d_vtables_initialize(glob);
     fclaw_clawpatch_vtable_initialize(glob, 4);
 
@@ -104,9 +108,6 @@ TEST_CASE("FCLAW2D_CLAWPATCH_EXCEEDS_THRESHOLD calls user function")
             return params.return_value;
         };
 
-	fclaw_clawpatch_options_t opts;
-    opts.refinement_criteria = FCLAW_REFINE_CRITERIA_USER;
-    fclaw_clawpatch_options_store(glob, &opts);
 
     fclaw_global_set_static(glob);
     int ret = FCLAW2D_CLAWPATCH_TAG_CRITERIA(params.blockno,
@@ -125,6 +126,7 @@ TEST_CASE("FCLAW2D_CLAWPATCH_EXCEEDS_THRESHOLD calls user function")
 
     CHECK_EQ(ret, params.return_value);
 
+    fclaw_clawpatch_options_destroy(clawpatch_opts);
     fclaw_domain_destroy(domain);
     fclaw_global_destroy(glob);
 }
@@ -136,6 +138,11 @@ TEST_CASE("FCLAW3DX_CLAWPATCH_EXCEEDS_THRESHOLD calls user function")
     fclaw_domain_t* domain = fclaw2d_domain_new_unitsquare(sc_MPI_COMM_WORLD, 1);
 	fclaw_global_t* glob = fclaw_global_new();
     fclaw_global_store_domain(glob, domain);
+
+	fclaw_clawpatch_options_t* opts = fclaw_clawpatch_options_new(3);
+    opts->refinement_criteria = FCLAW_REFINE_CRITERIA_USER;
+    fclaw_clawpatch_options_store(glob, opts);
+
 
     fclaw2d_vtables_initialize(glob);
     fclaw_clawpatch_vtable_initialize(glob, 4);
@@ -178,10 +185,6 @@ TEST_CASE("FCLAW3DX_CLAWPATCH_EXCEEDS_THRESHOLD calls user function")
             return params.return_value;
         };
 
-	fclaw_clawpatch_options_t opts;
-    opts.refinement_criteria = FCLAW_REFINE_CRITERIA_USER;
-    fclaw_clawpatch_options_store(glob, &opts);
-
     fclaw_global_set_static(glob);
     int ret = FCLAW3DX_CLAWPATCH_TAG_CRITERIA(params.blockno,
                                                    params.qval,
@@ -201,6 +204,7 @@ TEST_CASE("FCLAW3DX_CLAWPATCH_EXCEEDS_THRESHOLD calls user function")
 
     CHECK_EQ(ret, params.return_value);
 
+    fclaw_clawpatch_options_destroy(opts);
     fclaw_domain_destroy(domain);
     fclaw_global_destroy(glob);
 }
