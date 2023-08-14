@@ -43,6 +43,9 @@ if(TARGET MPI::MPI_C)
     list(APPEND FCLAW_TEST_ENVIRONMENT "FCLAW_MPI_TEST_FLAGS=${MPIEXEC_NUMPROC_FLAG} ${MPIEXEC_MAX_NUMPROCS}")
 endif()
 
+#needed for regressions
+include(add_regressions)
+
 # --------------------------------------------
 # Clawpack 4.6 and 5.0 examples
 # --------------------------------------------
