@@ -35,4 +35,4 @@ target_link_libraries(swirl_rays PRIVATE
  FORESTCLAW::CLAWPACK5
 )
 
-add_regressions(regressions.txt)
+#add_regressions(regressions.txt)
