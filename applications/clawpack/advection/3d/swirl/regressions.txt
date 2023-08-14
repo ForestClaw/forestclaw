@@ -1,8 +1,8 @@
-./swirl -F regression.ini     --user:example=0  --regression-check=regression_values_0.csv
+./swirl -F regression.ini --user:example=0  --regression-check=regression_values_0.csv 
 
-./swirl -F regression_map.ini --user:example=1  --regression-check=regression_values_1.csv
+./swirl -F regression_map.ini --user:example=1  --regression-check=regression_values_1.csv 
 
 # Crashes latest CI on Linux
-#./swirl -F regression_map.ini --user:example=2  --regression-check=regression_values_2.csv
+# ./swirl -F regression_map.ini --user:example=2  --regression-check=regression_values_2.csv 
 
-./swirl -F regression_map.ini --user:example=3  --regression-check=regression_values_3.csv
+./swirl -F regression_map.ini --user:example=3  --regression-check=regression_values_3.csv 

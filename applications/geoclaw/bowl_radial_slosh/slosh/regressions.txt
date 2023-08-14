@@ -1,0 +1,1 @@
+./slosh -F regression.ini 

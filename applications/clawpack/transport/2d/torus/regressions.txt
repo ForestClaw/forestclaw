@@ -1,0 +1,4 @@
+./torus -F regression.ini --user:claw-version=4  --regression-check=regression_values_0.csv 
+
+# Version 5 not yet implemented.
+./torus -F regression.ini --user:claw-version=5  --regression-check=regression_values_1.csv 
