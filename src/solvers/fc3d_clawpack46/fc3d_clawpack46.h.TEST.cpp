@@ -28,8 +28,27 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fc3d_clawpack46_options.h>
 #include <fclaw2d_forestclaw.h>
 #include <fclaw2d_convenience.h>
+#include <fclaw3d_convenience.h>
 #include <fclaw_clawpatch_options.h>
 #include <test.hpp>
+
+TEST_CASE("fc3d_clawpack46_solver_initialize fails with 2d clawpatch options")
+{
+	fclaw_domain_t* domain = fclaw2d_domain_new_unitsquare(sc_MPI_COMM_WORLD, 0);
+	fclaw_global_t* glob = fclaw_global_new();
+	fclaw_global_store_domain(glob, domain);
+
+	/* create some empty options structures */
+	fclaw_clawpatch_options_t* clawpatch_opts = fclaw_clawpatch_options_new(2);
+	fclaw_clawpatch_options_store(glob, clawpatch_opts);
+	fc3d_clawpack46_options_store(glob, FCLAW_ALLOC_ZERO(fc3d_clawpack46_options_t,1));
+
+	fclaw2d_vtables_initialize(glob);
+	CHECK_SC_ABORTED(fc3d_clawpack46_solver_initialize(glob));
+
+	fclaw_domain_destroy(domain);
+	fclaw_global_destroy(glob);
+}
 
 TEST_CASE("fc3d_clawpack46_solver_initialize stores two seperate vtables in two seperate globs")
 {
