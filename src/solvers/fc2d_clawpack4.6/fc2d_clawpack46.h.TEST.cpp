@@ -70,10 +70,11 @@ TEST_CASE("fc2d_clawpack46_solver_initialize fails with 3d clawpatch options")
 
 TEST_CASE("fc2d_clawpack46_solver_initialize stores two seperate vtables in two seperate globs")
 {
-	fclaw_domain_t* domain = fclaw2d_domain_new_unitsquare(sc_MPI_COMM_WORLD, 0);
 	fclaw_global_t* glob1 = fclaw_global_new();
-	fclaw_global_store_domain(glob1, domain);
 	fclaw_global_t* glob2 = fclaw_global_new();
+
+	fclaw_domain_t* domain = fclaw2d_domain_new_unitsquare(sc_MPI_COMM_WORLD, 0);
+	fclaw_global_store_domain(glob1, domain);
 	fclaw_global_store_domain(glob2, domain);
 
 	/* create some empty options structures */
@@ -122,10 +123,11 @@ TEST_CASE("fc2d_clawpack46_solver_initialize sets is_set flag")
 
 TEST_CASE("fc2d_clawpack46_vt fails if not intialized")
 {
-	fclaw_domain_t* domain = fclaw2d_domain_new_unitsquare(sc_MPI_COMM_WORLD, 0);
 	fclaw_global_t* glob1 = fclaw_global_new();
-	fclaw_global_store_domain(glob1, domain);
 	fclaw_global_t* glob2 = fclaw_global_new();
+
+	fclaw_domain_t* domain = fclaw2d_domain_new_unitsquare(sc_MPI_COMM_WORLD, 0);
+	fclaw_global_store_domain(glob1, domain);
 	fclaw_global_store_domain(glob2, domain);
 
 	CHECK_SC_ABORTED(fc2d_clawpack46_vt(glob1));
@@ -139,10 +141,11 @@ TEST_CASE("fc2d_clawpack46_vt fails if not intialized")
 
 TEST_CASE("fc2d_clawpack46_vtable_initialize fails if called twice on a glob")
 {
-	fclaw_domain_t* domain = fclaw2d_domain_new_unitsquare(sc_MPI_COMM_WORLD, 0);
 	fclaw_global_t* glob1 = fclaw_global_new();
-	fclaw_global_store_domain(glob1, domain);
 	fclaw_global_t* glob2 = fclaw_global_new();
+
+	fclaw_domain_t* domain = fclaw2d_domain_new_unitsquare(sc_MPI_COMM_WORLD, 0);
+	fclaw_global_store_domain(glob1, domain);
 	fclaw_global_store_domain(glob2, domain);
 
 	/* create some empty options structures */
