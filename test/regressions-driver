@@ -104,12 +104,12 @@ IFS='
 '
 a_test_failed=no
 
-# resolve full path of log and trs
-regressions=`readlink -f $@`
-log_file=`readlink -f $log_file`
-trs_file=`readlink -f $trs_file`
+# resolve full paths
+regressions=`pwd`/$@
+log_file=$FCLAW_BUILD_DIR/$log_file
+trs_file=$FCLAW_BUILD_DIR/$trs_file
 
-# change directory to source directory
+# change directory to source directory of regression
 cd `dirname $@`
 
 error=$?
@@ -146,7 +146,7 @@ if test $error -eq 0; then
 
 
     # test name to show to console and logs
-    test_name=`echo $relative_dir: $line`
+    test_name="$relative_dir: $line"
     # full command to execute
     full_cmd="$FCLAW_BUILD_DIR/applications/$relative_dir/$line"
   
