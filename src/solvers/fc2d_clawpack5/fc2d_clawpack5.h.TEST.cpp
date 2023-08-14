@@ -39,7 +39,7 @@ TEST_CASE("fc2d_clawpack5_solver_initialize fails with 3d domain")
 	fclaw_global_store_domain(glob, domain);
 
 	/* create some empty options structures */
-	fclaw_clawpatch_options_t* clawpatch_opts = fclaw_clawpatch_options_new(3);
+	fclaw_clawpatch_options_t* clawpatch_opts = fclaw_clawpatch_options_new(2);
 	fclaw_clawpatch_options_store(glob, clawpatch_opts);
 	fc2d_clawpack5_options_store(glob, FCLAW_ALLOC_ZERO(fc2d_clawpack5_options_t,1));
 
