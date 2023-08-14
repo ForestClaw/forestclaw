@@ -116,12 +116,14 @@ install(FILES
 
   fclaw_advance.h 
   fclaw_base.h 
+  fclaw_diagnostics.h
   fclaw_domain.h
   fclaw_elliptic_solver.h 
   fclaw_exchange.h
   fclaw_farraybox.hpp 
   fclaw_filesystem.h 
   fclaw_gauges.h 
+  fclaw_ghost_fill.h
   fclaw_global.h 
   fclaw_options.h 
   fclaw_output.h
@@ -142,10 +144,8 @@ install(FILES
   fclaw2d_convenience.h
   fclaw2d_corner_neighbors.h
   fclaw2d_defs.h 
-  fclaw2d_diagnostics.h
   fclaw2d_face_neighbors.h
   fclaw2d_forestclaw.h
-  fclaw2d_ghost_fill.h
   fclaw2d_include_all.h 
   fclaw2d_map.h
   fclaw2d_map_brick.h
