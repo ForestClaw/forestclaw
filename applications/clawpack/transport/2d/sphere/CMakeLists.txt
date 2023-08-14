@@ -36,6 +36,8 @@ add_executable(sphere_transport
   $<TARGET_OBJECTS:sphere_transport_f>
 )
 
+set_target_properties(sphere_transport PROPERTIES OUTPUT_NAME sphere)
+
 target_include_directories(sphere_transport PRIVATE 
   ${CMAKE_CURRENT_SOURCE_DIR} 
   ${all}

@@ -33,6 +33,8 @@ add_executable(torus_transport
   $<TARGET_OBJECTS:torus_transport_f>
 )
 
+set_target_properties(torus_transport PROPERTIES OUTPUT_NAME torus)
+
 target_include_directories(torus_transport PRIVATE 
   ${CMAKE_CURRENT_SOURCE_DIR} 
   ${all}
