@@ -142,7 +142,6 @@ void FCLAW2D_MAP_BRICK2C (fclaw2d_map_context_t ** pcont, int *blockno,
     }
 }
 
-#endif /* !P4_TO_P8 */
 
 /* This function is expected to be called from C or C++. */
 void
@@ -163,6 +162,8 @@ fclaw2d_map_destroy (fclaw2d_map_context_t * cont)
         cont->destroy (cont);
     }
 }
+
+#endif /* !P4_TO_P8 */
 
 #ifndef P4_TO_P8
 
