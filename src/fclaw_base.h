@@ -250,8 +250,10 @@ fclaw_app_options_vtable_t;
 #define FCLAW_EXECUTE_ASSERT_TRUE(expression) \
   do { (void) (expression); } while (0)
 #endif
-#define FCLAW_ASSERT_MESSAGE(assertion, error_message) \
-        SC_CHECK_ABORT((assertion), #error_message); 
+#define FCLAW_ASSERT_MESSAGE(expression, error_message)                 \
+  do { int _fclaw_i = (int) (expression);                               \
+       SC_CHECK_ABORT(_fclaw_i, error_message);                         \
+  } while (0)
 
 /** Query the package identity for use with libsc functions.
  * This is -1 until fclaw_init or fclaw_app_new has been called.
