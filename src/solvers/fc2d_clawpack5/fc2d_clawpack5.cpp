@@ -441,6 +441,9 @@ void fc2d_clawpack5_vt_destroy(void* vt)
 /* This is called from the user application. */
 void fc2d_clawpack5_solver_initialize(fclaw_global_t* glob)
 {
+	FCLAW_ASSERT_MESSAGE(glob->domain->dim == 2,
+			"Domain set to 3d. fc2d_clawpack5 is only for 2d");
+
 	fclaw_clawpatch_options_t* clawpatch_opt = fclaw_clawpatch_get_options(glob);
 	fc2d_clawpack5_options_t* clawopt = fc2d_clawpack5_get_options(glob);
 

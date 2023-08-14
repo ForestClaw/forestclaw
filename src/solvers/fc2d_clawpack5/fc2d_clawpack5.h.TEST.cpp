@@ -25,11 +25,30 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw_global.h>
 #include <fclaw2d_convenience.h>
+#include <fclaw3d_convenience.h>
 #include <fclaw_clawpatch_options.h>
 #include <fc2d_clawpack5.h>
 #include <fc2d_clawpack5_options.h>
 #include <fclaw2d_forestclaw.h>
 #include <test.hpp>
+
+TEST_CASE("fc2d_clawpack5_solver_initialize fails with 3d domain")
+{
+	fclaw_domain_t* domain = fclaw3d_domain_new_unitcube(sc_MPI_COMM_WORLD, 0);
+	fclaw_global_t* glob = fclaw_global_new();
+	fclaw_global_store_domain(glob, domain);
+
+	/* create some empty options structures */
+	fclaw_clawpatch_options_t* clawpatch_opts = fclaw_clawpatch_options_new(3);
+	fclaw_clawpatch_options_store(glob, clawpatch_opts);
+	fc2d_clawpack5_options_store(glob, FCLAW_ALLOC_ZERO(fc2d_clawpack5_options_t,1));
+
+	fclaw2d_vtables_initialize(glob);
+	CHECK_SC_ABORTED(fc2d_clawpack5_solver_initialize(glob));
+
+	fclaw_domain_destroy(domain);
+	fclaw_global_destroy(glob);
+}
 
 TEST_CASE("fc2d_clawpack5_solver_initialize fails with 3d clawpatch options")
 {
