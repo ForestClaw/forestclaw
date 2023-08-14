@@ -41,13 +41,25 @@ function(add_regressions filename)
         string(REGEX REPLACE "^.*applications/" "" test_name "${CMAKE_CURRENT_SOURCE_DIR}")
         set(test_name "${test_name}: ./${test}")
 
-        message(STATUS "test         ${test}")
-        message(STATUS "test_command ${test_command}")
-        message(STATUS "test_args    ${args}")
-        message(STATUS "test_name    ${test_name}")
+        #message(STATUS "test         ${test}")
+        #message(STATUS "test_command ${test_command}")
+        #message(STATUS "test_args    ${args}")
+        #message(STATUS "test_name    ${test_name}")
 
         # Add the test
-        add_test(NAME ${test_name} COMMAND ${test_command} ${test_args} WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}" COMMAND_EXPAND_LISTS)
+        add_test(
+            NAME 
+                ${test_name} 
+            COMMAND 
+                ${MPIEXEC_EXECUTABLE} 
+                ${MPIEXEC_NUMPROC_FLAG}
+                ${MPIEXEC_MAX_NUMPROCS}
+                ${test_command} 
+                ${test_args} 
+            WORKING_DIRECTORY 
+                "${CMAKE_CURRENT_SOURCE_DIR}" 
+            COMMAND_EXPAND_LISTS
+        )
 
     endforeach()
 
