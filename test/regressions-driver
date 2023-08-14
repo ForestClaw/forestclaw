@@ -102,52 +102,82 @@ trap "st=143; $do_exit" 15
 
 IFS='
 '
-STARTED=false
 a_test_failed=no
-test_cases=`$@ -ltc -nc`
+
+# resolve full path of log and trs
+regressions=`readlink -f $@`
+log_file=`readlink -f $log_file`
+trs_file=`readlink -f $trs_file`
+
+# change directory to source directory
+cd `dirname $@`
+
 error=$?
 if test $error -eq 0; then
-  for test_case in $test_cases; do 
-    if test x"$test_case" = x"==============================================================================="; then
-      if test x"$STARTED" = x"true"; then
-        break
-      fi
-      STARTED=true
+  #read regression.txt file line by line
+  while IFS= read -r line
+  do
+    # strip leading "line: "
+    line=`echo $line | sed -e "s|^line: ||"`
+    # strip leading and trailing whitespace
+    line=`echo $line | sed -e "s|^[ \t]*||" -e "s|[ \t]*$||"`
+
+    # if line starts with "#" skip
+    if test x"`echo $line | cut -c1-1`" = x"#"; then
       continue
     fi
-  
-    if test x"$STARTED" = x"true"; then
-      # Individual test cases run here
-      test_args="--test-case=\"${test_case}\""
-  
-      echo "$@ $test_args" >> $log_file
-  
-      eval "$@ $test_args" >> $log_file 2>&1
-      estatus=$?
-      
-      #doctest only has pass/fail state
-      #expect_failure means at least one of the tests should fail
-      case $estatus:$expect_failure in
-        0:*)   col=$grn res=PASS                   ;;
-        *:yes) col=$lgn res=XFAIL a_test_failed=yes;;
-        *:*)   col=$red res=FAIL  a_test_failed=yes;;
-      esac
-      
-      # Report the test outcome and exit status in the logs, so that one can
-      # know whether the test passed or failed simply by looking at the '.log'
-      # file, without the need of also peaking into the corresponding '.trs'
-      # file (automake bug#11814).
-      echo "$res $test_name $test_args (exit status: $estatus)" >> $log_file
-      echo >> $log_file
-      
-      # Report outcome to console.
-      echo "${col}${res}${std}: ${test_name} ${test_args}"
-      
-      # Register the test result, and other relevant metadata.
-      echo ":test-result: $res ${test_name} ${test_args}" >> $trs_file
-  
+
+    # if empty line, skip
+    if test x"$line" = x; then
+      continue
     fi
-  done
+
+    # if line starts with "cd " execute line
+    if test x"`echo $line | cut -c1-3`" = x"cd "; then
+      `$line`
+      continue
+    fi
+
+    # the directory relative to applications
+    # remove FCLAW_SRC_DIR from the beginning of the path
+    relative_dir=`pwd | sed -e "s|^$FCLAW_SRC_DIR||"`
+    # remove leading slash
+    relative_dir=`echo $relative_dir | sed -e "s|^/applications/||"`
+
+
+    # test name to show to console and logs
+    test_name=`echo $relative_dir: $line`
+    # full command to execute
+    full_cmd="$FCLAW_BUILD_DIR/applications/$relative_dir/$line"
+  
+    # Individual test cases run here
+    echo "$test_name" >> $log_file
+  
+    eval "$full_cmd" >> $log_file 2>&1
+    estatus=$?
+    
+    #doctest only has pass/fail state
+    #expect_failure means at least one of the tests should fail
+    case $estatus:$expect_failure in
+      0:*)   col=$grn res=PASS                   ;;
+      *:yes) col=$lgn res=XFAIL a_test_failed=yes;;
+      *:*)   col=$red res=FAIL  a_test_failed=yes;;
+    esac
+    
+    # Report the test outcome and exit status in the logs, so that one can
+    # know whether the test passed or failed simply by looking at the '.log'
+    # file, without the need of also peaking into the corresponding '.trs'
+    # file (automake bug#11814).
+    echo "$res $test_name (exit status: $estatus)" >> $log_file
+    echo >> $log_file
+    
+    # Report outcome to console.
+    echo "${col}${res}${std}: ${test_name}"
+    
+    # Register the test result, and other relevant metadata.
+    echo ":test-result: $res ${test_name}" >> $trs_file
+  
+  done < "$regressions"
 fi
 
 # the global test result can be pass/fail/xpass/xfail

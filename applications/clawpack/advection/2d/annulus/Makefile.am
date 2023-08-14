@@ -40,4 +40,4 @@ applications_clawpack_advection_2d_annulus_annulus_LDADD = \
 	    $(FCLAW_CLAWPATCH_LDADD) \
         $(FCLAW_LDADD)
 
-TESTS += applications/clawpack/advection/2d/annulus/regressions.sh
+TESTS += applications/clawpack/advection/2d/annulus/regressions.txt
