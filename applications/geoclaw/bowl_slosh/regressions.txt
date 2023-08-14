@@ -1,1 +1,2 @@
-./bowl_slosh -F regression.ini  --regression-check=regression_values_0.csv 
+cd regression
+../bowl_slosh -F regression.ini  --regression-check=regression_values_0.csv 

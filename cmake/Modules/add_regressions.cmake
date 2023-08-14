@@ -19,8 +19,7 @@ function(read_file_lines filepath out_list)
 
         # Check if the line is not empty and doesn't start with #
         if(NOT "${trimmed_line}" STREQUAL "" AND NOT "${trimmed_line}" MATCHES "^#.*")
-            # Strip leading ./ before adding to the list
-            string(REGEX REPLACE "^\\./" "" trimmed_line "${trimmed_line}")
+            # remove everything including / before adding to the list
             list(APPEND non_empty_lines "${trimmed_line}")
         endif()
     endforeach()
@@ -31,35 +30,46 @@ endfunction()
 
 function(add_regressions filename)
     read_file_lines(${filename} tests) 
+
+    set(working_directory "${CMAKE_CURRENT_SOURCE_DIR}")
     # Loop through each test
     foreach(test IN LISTS tests)
-        set(test_command "${CMAKE_CURRENT_BINARY_DIR}/${test}")
-        # esperate test into list by whitespace
-        string(REGEX REPLACE " " ";" test_command "${test_command}")
+        string(REGEX REPLACE " " ";" argv "${test}")
+        list(GET argv 0 executable)
+        if(executable STREQUAL "cd")
+            list(GET argv 1 directory)
 
-        # remove everyting up to and including applications/ from source dir
-        string(REGEX REPLACE "^.*applications/" "" test_name "${CMAKE_CURRENT_SOURCE_DIR}")
-        set(test_name "${test_name}: ./${test}")
+            cmake_path(APPEND working_directory "${directory}")
+            cmake_path(SET working_directory NORMALIZE "${working_directory}")
 
-        #message(STATUS "test         ${test}")
-        #message(STATUS "test_command ${test_command}")
-        #message(STATUS "test_args    ${args}")
-        #message(STATUS "test_name    ${test_name}")
+            message(STATUS "${working_directory}")
+        else()
+            string(REGEX REPLACE "^.*applications/" "" relative_source_directory "${working_directory}")
+            set(test_name "${relative_source_directory}: ${test}")
 
-        # Add the test
-        add_test(
-            NAME 
-                ${test_name} 
-            COMMAND 
-                ${MPIEXEC_EXECUTABLE} 
-                ${MPIEXEC_NUMPROC_FLAG}
-                ${MPIEXEC_MAX_NUMPROCS}
-                ${test_command} 
-                ${test_args} 
-            WORKING_DIRECTORY 
-                "${CMAKE_CURRENT_SOURCE_DIR}" 
-            COMMAND_EXPAND_LISTS
-        )
+            string(REGEX REPLACE "^\.*/" "" executable "${executable}")
+            cmake_path(APPEND CMAKE_CURRENT_BINARY_DIR "${executable}" OUTPUT_VARIABLE executable)
+
+            list(REMOVE_AT argv 0)
+            list(INSERT argv 0 "${executable}")
+
+
+            message(STATUS "${argv}")
+
+            # Add the test
+            add_test(
+                NAME 
+                    ${test_name} 
+                COMMAND 
+                    ${MPIEXEC_EXECUTABLE} 
+                    ${MPIEXEC_NUMPROC_FLAG}
+                    ${MPIEXEC_MAX_NUMPROCS}
+                    ${argv} 
+                WORKING_DIRECTORY 
+                    "${working_directory}" 
+                COMMAND_EXPAND_LISTS
+            )
+        endif()
 
     endforeach()
 
