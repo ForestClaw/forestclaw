@@ -33,5 +33,4 @@ target_link_libraries(annulus PRIVATE
  FORESTCLAW::CLAWPACK5
 )
 
-add_test(NAME clawpack_advection_2d_annulus COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/regressions.sh WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-set_tests_properties(clawpack_advection_2d_annulus PROPERTIES ENVIRONMENT "${FCLAW_TEST_ENVIRONMENT}")
+add_regressions(regressions.txt)

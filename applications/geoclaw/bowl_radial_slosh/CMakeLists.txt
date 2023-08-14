@@ -15,5 +15,5 @@ target_link_libraries(bowl_radial_slosh PRIVATE
   FORESTCLAW::GEOCLAW
 )
 
-add_test(NAME geoclaw_bowl_radial_slosh COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/regressions.sh WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-set_tests_properties(geoclaw_bowl_radial_slosh PROPERTIES ENVIRONMENT "${FCLAW_TEST_ENVIRONMENT}")
+add_regressions(regressions.txt)
+

@@ -27,5 +27,4 @@ target_link_libraries(quadrants PRIVATE
  FORESTCLAW::CLAWPACK5
 )
 
-add_test(NAME clawpack_euler_2d_quadrants COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/regressions.sh WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-set_tests_properties(clawpack_euler_2d_quadrants PROPERTIES ENVIRONMENT "${FCLAW_TEST_ENVIRONMENT}")
+add_regressions(regressions.txt)

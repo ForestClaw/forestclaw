@@ -38,5 +38,4 @@ target_link_libraries(shockbubble PRIVATE
  FORESTCLAW::CLAWPACK5
 )
 
-add_test(NAME clawpack_euler_2d_shockbubble COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/regressions.sh WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-set_tests_properties(clawpack_euler_2d_shockbubble PROPERTIES ENVIRONMENT "${FCLAW_TEST_ENVIRONMENT}")
+add_regressions(regressions.txt)
