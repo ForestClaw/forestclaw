@@ -104,6 +104,11 @@ IFS='
 '
 a_test_failed=no
 
+# resolve paths of FCLAW_SRC_DIR and FCLAW_BUILD_DIR since they may be relative
+# to the current working directory
+FCLAW_SRC_DIR=`cd $FCLAW_SRC_DIR; pwd`
+FCLAW_BUILD_DIR=`cd $FCLAW_BUILD_DIR; pwd`
+
 # resolve full paths
 regressions=`pwd`/$@
 log_file=$FCLAW_BUILD_DIR/$log_file
