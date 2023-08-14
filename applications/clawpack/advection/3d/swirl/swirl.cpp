@@ -103,6 +103,7 @@ fclaw_domain_t* create_domain(sc_MPI_Comm mpicomm,
                                          fclaw_opt->scale,
                                          fclaw_opt->shift, 
                                          user->center);
+        break;
     case 4:
         domain = fclaw3d_domain_new_unitcube(mpicomm, fclaw_opt->minlevel);
         break;
