@@ -180,10 +180,10 @@ src_forestclaw_TEST_SOURCES = \
     src/fclaw_gauges.h.TEST.cpp \
     src/fclaw_pointer_map.h.TEST.cpp \
 	src/fclaw_elliptic_solver.h.TEST.cpp \
-	src/fclaw2d_diagnostics.h.TEST.cpp \
+	src/fclaw_diagnostics.h.TEST.cpp \
 	src/fclaw_global.h.TEST.cpp \
 	src/fclaw_options.h.TEST.cpp \
-	src/fclaw2d_patch.h.TEST.cpp \
+	src/fclaw_patch.h.TEST.cpp \
 	src/fclaw_vtable.h.TEST.cpp 
 
 src_forestclaw_TEST_CPPFLAGS = \
