@@ -202,23 +202,23 @@ TEST_CASE("3dx fclaw_clawpatch_vtable_initialize")
     CHECK(clawpatch_vt->d3->fort_interpolate_corner     == &FCLAW3DX_CLAWPATCH46_FORT_INTERPOLATE_CORNER);
 
     //regridding
-    CHECK(clawpatch_vt->d3->fort_tag4refinement         == &FCLAW3DX_CLAWPATCH46_FORT_TAG4REFINEMENT);
-    CHECK(clawpatch_vt->d3->fort_tag4coarsening         == &FCLAW3DX_CLAWPATCH46_FORT_TAG4COARSENING);
+    CHECK(clawpatch_vt->d3->fort_tag4refinement         == &FCLAW3D_CLAWPATCH46_FORT_TAG4REFINEMENT);
+    CHECK(clawpatch_vt->d3->fort_tag4coarsening         == &FCLAW3D_CLAWPATCH46_FORT_TAG4COARSENING);
     CHECK(clawpatch_vt->d3->fort_user_exceeds_threshold == NULL);
     CHECK(clawpatch_vt->d3->fort_interpolate2fine       == &FCLAW3DX_CLAWPATCH46_FORT_INTERPOLATE2FINE);
     CHECK(clawpatch_vt->d3->fort_average2coarse         == &FCLAW3DX_CLAWPATCH46_FORT_AVERAGE2COARSE);
 
     //ascii output
     CHECK(clawpatch_vt->time_header_ascii               == &fclaw_clawpatch_time_header_ascii);
-    CHECK(clawpatch_vt->fort_header_ascii               == &FCLAW3DX_CLAWPATCH46_FORT_HEADER_ASCII);
+    CHECK(clawpatch_vt->fort_header_ascii               == &FCLAW3D_CLAWPATCH46_FORT_HEADER_ASCII);
     CHECK(clawpatch_vt->cb_output_ascii                 == &cb_clawpatch_output_ascii);
-    CHECK(clawpatch_vt->d3->fort_output_ascii           == &FCLAW3DX_CLAWPATCH46_FORT_OUTPUT_ASCII);
+    CHECK(clawpatch_vt->d3->fort_output_ascii           == &FCLAW3D_CLAWPATCH46_FORT_OUTPUT_ASCII);
 
     //time interpolation
-    CHECK(clawpatch_vt->d3->fort_timeinterp             == &FCLAW3DX_CLAWPATCH46_FORT_TIMEINTERP);
+    CHECK(clawpatch_vt->d3->fort_timeinterp             == &FCLAW3D_CLAWPATCH46_FORT_TIMEINTERP);
 
     //ghot packing
-    CHECK(clawpatch_vt->d3->fort_local_ghost_pack       == &FCLAW3DX_CLAWPATCH46_FORT_LOCAL_GHOST_PACK);
+    CHECK(clawpatch_vt->d3->fort_local_ghost_pack       == &FCLAW3D_CLAWPATCH46_FORT_LOCAL_GHOST_PACK);
     CHECK(clawpatch_vt->local_ghost_pack_aux            == NULL);
 
     //diagnostics

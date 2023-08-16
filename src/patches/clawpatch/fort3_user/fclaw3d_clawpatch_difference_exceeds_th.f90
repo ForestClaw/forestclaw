@@ -2,8 +2,7 @@
 !! check to see if value exceeds threshold
 
 !  --------------------------------------------------------------
-!> @brief Check if the difference between min and max 
-!! exceeds the threshold
+!> @brief Check if the difference exceeds the threshold
 !!
 !! @param[in] blockno the block number
 !! @param[in] qval the 
@@ -17,10 +16,10 @@
 !! @param[in] is_ghost true if cell is a ghost cell
 !! @return 1 if exceeds threshold, 0 if not, -1 if inconclusive.
 !  --------------------------------------------------------------
-integer function fclaw3dx_clawpatch_minmax_exceeds_th(blockno, meqn, & 
+integer function fclaw3d_clawpatch_difference_exceeds_th(blockno, meqn, & 
                                      qval,qmin,qmax,quad, & 
-                                     dx,dy,dz, xc,yc,zc, ivar_threshold, & 
-                                     threshold, init_flag, is_ghost)
+                                     dx,dy,dz,xc,yc,zc,ivar_threshold, threshold,&
+                                     init_flag, is_ghost)
     implicit none
     
     integer :: meqn, ivar_threshold
@@ -30,18 +29,28 @@ integer function fclaw3dx_clawpatch_minmax_exceeds_th(blockno, meqn, &
     integer :: blockno, init_flag
     logical(kind=4) :: is_ghost
 
+    double precision :: dqx, dqy, dqz, dq
+    integer :: refine
     integer :: mq
 
-    integer :: refine
+    if (is_ghost) then
+!!      # quad may have uninitialized values;  test inconclusive
+        fclaw3d_clawpatch_difference_exceeds_th = -1
+        return
+    endif
 
     mq = ivar_threshold
 
-    refine = 0
+    dqx = abs(quad(1,0,0,mq) - quad(-1,0,0,mq))
+    dqy = abs(quad(0,1,0,mq) - quad(0,-1,0,mq))
+    dqz = abs(quad(0,0,1,mq) - quad(0,0,-1,mq))
+    dq  = max(dqx, dqy, dqz)
 
-    if (qmax(mq)-qmin(mq) .gt. threshold) then
+    refine = 0
+    if (dq .gt. threshold) then
         refine = 1
     endif
 
-    fclaw3dx_clawpatch_minmax_exceeds_th = refine
+    fclaw3d_clawpatch_difference_exceeds_th = refine
 
-end function fclaw3dx_clawpatch_minmax_exceeds_th
+end function fclaw3d_clawpatch_difference_exceeds_th

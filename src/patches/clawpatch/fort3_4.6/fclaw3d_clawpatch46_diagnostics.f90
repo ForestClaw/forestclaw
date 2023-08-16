@@ -1,7 +1,7 @@
 !! # ----------------------------------------------------------------------------------
 !! # Output and diagnostics
 !! # ----------------------------------------------------------------------------------
-subroutine fclaw3dx_clawpatch46_fort_conservation_check(mx,my,mz, & 
+subroutine fclaw3d_clawpatch46_fort_conservation_check(mx,my,mz, & 
     mbc,mfields,dx,dy,dz,area,q,sum,c_kahan)
     implicit none
 
@@ -43,10 +43,10 @@ subroutine fclaw3dx_clawpatch46_fort_conservation_check(mx,my,mz, &
             enddo
         end do
     end do
-end subroutine fclaw3dx_clawpatch46_fort_conservation_check
+end subroutine fclaw3d_clawpatch46_fort_conservation_check
 
 !! # Compute area of a patch
-double precision function fclaw3dx_clawpatch46_fort_compute_patch_area( & 
+double precision function fclaw3d_clawpatch46_fort_compute_patch_area( & 
          mx,my, mz, mbc,dx,dy,dz, area)
     implicit none
 
@@ -72,12 +72,12 @@ double precision function fclaw3dx_clawpatch46_fort_compute_patch_area( &
         sum = dx*dy*mx*my
     endif
 
-    fclaw3dx_clawpatch46_fort_compute_patch_area = sum
+    fclaw3d_clawpatch46_fort_compute_patch_area = sum
 
-end function fclaw3dx_clawpatch46_fort_compute_patch_area
+end function fclaw3d_clawpatch46_fort_compute_patch_area
 
 
-subroutine fclaw3dx_clawpatch46_fort_compute_error_norm( & 
+subroutine fclaw3d_clawpatch46_fort_compute_error_norm( & 
      blockno, mx,my,mz,mbc,mfields,dx,dy,dz,area,error,error_norm)
     implicit none
 
@@ -128,4 +128,4 @@ subroutine fclaw3dx_clawpatch46_fort_compute_error_norm( &
         endif
     end do
 
-end subroutine fclaw3dx_clawpatch46_fort_compute_error_norm
+end subroutine fclaw3d_clawpatch46_fort_compute_error_norm

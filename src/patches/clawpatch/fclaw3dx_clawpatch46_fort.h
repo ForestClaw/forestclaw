@@ -45,78 +45,96 @@ struct fclaw_patch_transform_data;  /* Should be replaced by long int?  */
 /** @{ @name Time Stepping Functions *//*---------------------------------------------- */
 
 /** Fortran subroutine name */
-#define FCLAW3DX_CLAWPATCH46_FORT_TIMEINTERP \
-            FCLAW_F77_FUNC (fclaw3dx_clawpatch46_fort_timeinterp, \
-                            FCLAW3DX_CLAWPATCH46_FORT_TIMEINTERP)
+#define FCLAW3D_CLAWPATCH46_FORT_TIMEINTERP \
+            FCLAW_F77_FUNC (fclaw3d_clawpatch46_fort_timeinterp, \
+                            FCLAW3D_CLAWPATCH46_FORT_TIMEINTERP)
 
-/** @copydoc fclaw3dx_clawpatch46_fort_timeinterp() */
-void FCLAW3DX_CLAWPATCH46_FORT_TIMEINTERP(const int *mx, 
-                                          const int* my, 
-                                          const int* mz, 
-                                          const int* mbc,
-                                          const int *meqn, 
-                                          const int* psize,
-                                          double qcurr[], 
-                                          double qlast[],
-                                          double qinterp[],
-                                          const double* alpha,
-                                          const int* ierror);
+/** @copydoc fclaw3d_clawpatch46_fort_timeinterp() */
+void FCLAW3D_CLAWPATCH46_FORT_TIMEINTERP(const int *mx, 
+                                         const int* my, 
+                                         const int* mz, 
+                                         const int* mbc,
+                                         const int *meqn, 
+                                         const int* psize,
+                                         double qcurr[], 
+                                         double qlast[],
+                                         double qinterp[],
+                                         const double* alpha,
+                                         const int* ierror);
 
 /** @} */
 
 /** @{ @name Regridding Functions *//*------------------------------------------------- */
 
 /** Fortran subroutine name */
-#define FCLAW3DX_CLAWPATCH46_FORT_TAG4REFINEMENT \
-           FCLAW_F77_FUNC(fclaw3dx_clawpatch46_fort_tag4refinement, \
-                          FCLAW3DX_CLAWPATCH46_FORT_TAG4REFINEMENT)
+#define FCLAW3D_CLAWPATCH46_FORT_TAG4REFINEMENT \
+           FCLAW_F77_FUNC(fclaw3d_clawpatch46_fort_tag4refinement, \
+                          FCLAW3D_CLAWPATCH46_FORT_TAG4REFINEMENT)
 
-/** @copydoc fclaw3dx_clawpatch46_fort_tag4refinement() */
-void FCLAW3DX_CLAWPATCH46_FORT_TAG4REFINEMENT(const int* mx,
-                                              const int* my, 
-                                              const int* mz,
-                                              const int* mbc,
-                                              const int* meqn,
-                                              const double* xlower, 
-                                              const double* ylower, 
-                                              const double* zlower,
-                                              const double* dx, 
-                                              const double* dy, 
-                                              const double* dz,
-                                              const int* blockno,
-                                              double q[],
-                                              const double* tag_threshold,
-                                              const int* init_flag,
-                                              int* tag_patch);
+/** @copydoc fclaw3d_clawpatch46_fort_tag4refinement() */
+void FCLAW3D_CLAWPATCH46_FORT_TAG4REFINEMENT(const int* mx,
+                                             const int* my, 
+                                             const int* mz,
+                                             const int* mbc,
+                                             const int* meqn,
+                                             const double* xlower, 
+                                             const double* ylower, 
+                                             const double* zlower,
+                                             const double* dx, 
+                                             const double* dy, 
+                                             const double* dz,
+                                             const int* blockno,
+                                             double q[],
+                                             const double* tag_threshold,
+                                             const int* init_flag,
+                                             int* tag_patch);
 
 
 
 /** Fortran subroutine name */
-#define FCLAW3DX_CLAWPATCH46_FORT_TAG4COARSENING \
-           FCLAW_F77_FUNC(fclaw3dx_clawpatch46_fort_tag4coarsening, \
-                          FCLAW3DX_CLAWPATCH46_FORT_TAG4COARSENING)
+#define FCLAW3D_CLAWPATCH46_FORT_TAG4COARSENING \
+           FCLAW_F77_FUNC(fclaw3d_clawpatch46_fort_tag4coarsening, \
+                          FCLAW3D_CLAWPATCH46_FORT_TAG4COARSENING)
 
-/** @copydoc fclaw3dx_clawpatch46_fort_tag4coarsening() */
-void FCLAW3DX_CLAWPATCH46_FORT_TAG4COARSENING(const int* mx, 
-                                              const int* my, 
-                                              const int* mz,
-                                              const int* mbc, 
-                                              const int* meqn,
-                                              double xlower[], 
-                                              double ylower[], 
-                                              double zlower[],
-                                              const double* dx, 
-                                              const double* dy, 
-                                              const double* dz,
-                                              const int* blockno,
-                                              double q0[],
-                                              double q1[],
-                                              double q2[],
-                                              double q3[],
-                                              const double* tag_threshold,
-                                              const int* initflag,
-                                              int* tag_patch);
+/** @copydoc fclaw3d_clawpatch46_fort_tag4coarsening() */
+void FCLAW3D_CLAWPATCH46_FORT_TAG4COARSENING(const int* mx, 
+                                             const int* my, 
+                                             const int* mz,
+                                             const int* mbc, 
+                                             const int* meqn,
+                                             double xlower[], 
+                                             double ylower[], 
+                                             double zlower[],
+                                             const double* dx, 
+                                             const double* dy, 
+                                             const double* dz,
+                                             const int* blockno,
+                                             double q0[],
+                                             double q1[],
+                                             double q2[],
+                                             double q3[],
+                                             const double* tag_threshold,
+                                             const int* initflag,
+                                             int* tag_patch);
 
+/** Fortran subroutine name */
+#define FCLAW3D_CLAWPATCH46_FORT_INTERPOLATE2FINE \
+           FCLAW_F77_FUNC(fclaw3d_clawpatch46_fort_interpolate2fine, \
+                          FCLAW3D_CLAWPATCH46_FORT_INTERPOLATE2FINE)
+
+/** @copydoc fclaw3d_clawpatch46_fort_interpolate2fine() */
+void FCLAW3D_CLAWPATCH46_FORT_INTERPOLATE2FINE(const int* mx,
+                                               const int* my, 
+                                               const int* mz,
+                                               const int* mbc, 
+                                               const int* meqn,
+                                               double qcoarse[], 
+                                               double qfine[],
+                                               double areacoarse[], 
+                                               double areafine[],
+                                               const int* igrid, 
+                                               const int* manifold);
+ 
 /** Fortran subroutine name */
 #define FCLAW3DX_CLAWPATCH46_FORT_INTERPOLATE2FINE \
            FCLAW_F77_FUNC(fclaw3dx_clawpatch46_fort_interpolate2fine, \
@@ -134,7 +152,26 @@ void FCLAW3DX_CLAWPATCH46_FORT_INTERPOLATE2FINE(const int* mx,
                                                 double areafine[],
                                                 const int* igrid, 
                                                 const int* manifold);
-  
+
+ /** Fortran subroutine name */
+#define FCLAW3D_CLAWPATCH46_FORT_AVERAGE2COARSE \
+      FCLAW_F77_FUNC(fclaw3d_clawpatch46_fort_average2coarse, \
+                     FCLAW3D_CLAWPATCH46_FORT_AVERAGE2COARSE)
+
+/** @copydoc fclaw3d_clawpatch46_fort_average2coarse() */
+void FCLAW3D_CLAWPATCH46_FORT_AVERAGE2COARSE(const int* mx, 
+                                             const int* my, 
+                                             const int* mz,
+                                             const int* mbc, 
+                                             const int* meqn,
+                                             double qcoarse[],
+                                             double qfine[],
+                                             double areacoarse[],
+                                             double areafine[],
+                                             const int* igrid, 
+                                             const int* manifold);
+
+ 
 /** Fortran subroutine name */
 #define FCLAW3DX_CLAWPATCH46_FORT_AVERAGE2COARSE \
       FCLAW_F77_FUNC(fclaw3dx_clawpatch46_fort_average2coarse, \
@@ -160,11 +197,28 @@ void FCLAW3DX_CLAWPATCH46_FORT_AVERAGE2COARSE(const int* mx,
 /** @{ @name Ghost Filling *//*-------------------------------------------------------- */
 
 /** Fortran subroutine name */
+#define FCLAW3D_CLAWPATCH46_FORT_COPY_FACE \
+         FCLAW_F77_FUNC(fclaw3d_clawpatch46_fort_copy_face, \
+                        FCLAW3D_CLAWPATCH46_FORT_COPY_FACE)
+
+/** @copydoc fclaw3d_clawpatch46_fort_copy_face() */
+void FCLAW3D_CLAWPATCH46_FORT_COPY_FACE(const int* mx, 
+                                        const int* my, 
+                                        const int* mz, 
+                                        const int* mbc, 
+                                        const int* meqn,
+                                        double qthis[],
+                                        double qneighbor[], 
+                                        const int* a_idir,
+                                        struct fclaw_patch_transform_data** 
+                                        transform_cptr);
+
+/** Fortran subroutine name */
 #define FCLAW3DX_CLAWPATCH46_FORT_COPY_FACE \
          FCLAW_F77_FUNC(fclaw3dx_clawpatch46_fort_copy_face, \
-                        FCLAW3DX_CLAWPATCH46_FORT_COPY_FACE)
+                        FCLAW3Dx_CLAWPATCH46_FORT_COPY_FACE)
 
-/** @copydoc fclaw3dx_clawpatch46_fort_copy_face() */
+/** @copydoc fclaw3d_clawpatch46_fort_copy_face() */
 void FCLAW3DX_CLAWPATCH46_FORT_COPY_FACE(const int* mx, 
                                          const int* my, 
                                          const int* mz, 
@@ -177,6 +231,29 @@ void FCLAW3DX_CLAWPATCH46_FORT_COPY_FACE(const int* mx,
                                          transform_cptr);
 
 
+/** Fortran subroutine name */
+#define FCLAW3D_CLAWPATCH46_FORT_AVERAGE_FACE \
+             FCLAW_F77_FUNC(fclaw3d_clawpatch46_fort_average_face, \
+                            FCLAW3D_CLAWPATCH46_FORT_AVERAGE_FACE)
+/** @copydoc fclaw3d_clawpatch46_fort_average_face() */
+void FCLAW3D_CLAWPATCH46_FORT_AVERAGE_FACE(const int* mx, 
+                                           const int* my, 
+                                           const int* mz, 
+                                           const int* mbc,
+                                           const int* meqn,
+                                           double qcoarse[],
+                                           double qfine[],
+                                           double areacoarse[], 
+                                           double areafine[],
+                                           const int* idir, 
+                                           const int* iside,
+                                           const int* num_neighbors,
+                                           const int* refratio, 
+                                           const int* igrid,
+                                           const int* manifold, 
+                                           struct fclaw_patch_transform_data** 
+                                           transform_cptr);
+ 
 /** Fortran subroutine name */
 #define FCLAW3DX_CLAWPATCH46_FORT_AVERAGE_FACE \
              FCLAW_F77_FUNC(fclaw3dx_clawpatch46_fort_average_face, \
@@ -199,7 +276,27 @@ void FCLAW3DX_CLAWPATCH46_FORT_AVERAGE_FACE(const int* mx,
                                             const int* manifold, 
                                             struct fclaw_patch_transform_data** 
                                             transform_cptr);
-  
+ /** Fortran subroutine name */
+#define FCLAW3D_CLAWPATCH46_FORT_INTERPOLATE_FACE \
+              FCLAW_F77_FUNC(fclaw3d_clawpatch46_fort_interpolate_face, \
+                             FCLAW3D_CLAWPATCH46_FORT_INTERPOLATE_FACE)
+/** @copydoc fclaw3d_clawpatch46_fort_interpolate_face() */
+void FCLAW3D_CLAWPATCH46_FORT_INTERPOLATE_FACE(const int* mx, 
+                                                const int* my, 
+                                                const int* mz,
+                                                const int* mbc,
+                                                const int* meqn,
+                                                double qcoarse[],
+                                                double qfine[],
+                                                const int* idir, 
+                                                const int* iside,
+                                                const int* num_neighbors,
+                                                const int* refratio, 
+                                                const int* igrid,
+                                                struct fclaw_patch_transform_data** 
+                                                transform_cptr);
+
+ 
 /** Fortran subroutine name */
 #define FCLAW3DX_CLAWPATCH46_FORT_INTERPOLATE_FACE \
               FCLAW_F77_FUNC(fclaw3dx_clawpatch46_fort_interpolate_face, \
@@ -219,6 +316,22 @@ void FCLAW3DX_CLAWPATCH46_FORT_INTERPOLATE_FACE(const int* mx,
                                                 const int* igrid,
                                                 struct fclaw_patch_transform_data** 
                                                 transform_cptr);
+/** Fortran subroutine name */
+#define FCLAW3D_CLAWPATCH46_FORT_COPY_CORNER \
+             FCLAW_F77_FUNC(fclaw3d_clawpatch46_fort_copy_corner, \
+                            FCLAW3D_CLAWPATCH46_FORT_COPY_CORNER)
+/** @copydoc fclaw3d_clawpatch46_fort_copy_corner() */
+void FCLAW3D_CLAWPATCH46_FORT_COPY_CORNER(const int* mx, 
+                                          const int* my, 
+                                          const int* mz, 
+                                          const int* mbc,
+                                          const int* meqn, 
+                                          double this_q[],
+                                          double neighbor_q[],
+                                          const int* a_corner,
+                                          struct fclaw_patch_transform_data** 
+                                          transform_cptr);
+
 
 /** Fortran subroutine name */
 #define FCLAW3DX_CLAWPATCH46_FORT_COPY_CORNER \
@@ -236,6 +349,26 @@ void FCLAW3DX_CLAWPATCH46_FORT_COPY_CORNER(const int* mx,
                                            struct fclaw_patch_transform_data** 
                                            transform_cptr);
 
+/** Fortran subroutine name */
+#define FCLAW3D_CLAWPATCH46_FORT_AVERAGE_CORNER \
+      FCLAW_F77_FUNC(fclaw3d_clawpatch46_fort_average_corner, \
+                     FCLAW3D_CLAWPATCH46_FORT_AVERAGE_CORNER)
+/** @copydoc fclaw3d_clawpatch46_fort_average_corner() */
+void FCLAW3D_CLAWPATCH46_FORT_AVERAGE_CORNER(const int* mx, 
+                                             const int* my, 
+                                             const int* mz, 
+                                             const int* mbc,
+                                             const int* meqn, 
+                                             const int* a_refratio,
+                                             double qcoarse[], 
+                                             double qfine[],
+                                             double areacoarse[], 
+                                             double areafine[],
+                                             const int* manifold,
+                                             const int* a_corner, 
+                                             struct fclaw_patch_transform_data** 
+                                             transform_cptr);
+ 
 /** Fortran subroutine name */
 #define FCLAW3DX_CLAWPATCH46_FORT_AVERAGE_CORNER \
       FCLAW_F77_FUNC(fclaw3dx_clawpatch46_fort_average_corner, \
@@ -255,7 +388,25 @@ void FCLAW3DX_CLAWPATCH46_FORT_AVERAGE_CORNER(const int* mx,
                                               const int* a_corner, 
                                               struct fclaw_patch_transform_data** 
                                               transform_cptr);
-  
+
+/** Fortran subroutine name */
+#define FCLAW3D_CLAWPATCH46_FORT_INTERPOLATE_CORNER \
+      FCLAW_F77_FUNC(fclaw3d_clawpatch46_fort_interpolate_corner, \
+                     FCLAW3D_CLAWPATCH46_FORT_INTERPOLATE_CORNER)
+/** @copydoc fclaw3d_clawpatch46_fort_interpolate_corner() */
+void FCLAW3D_CLAWPATCH46_FORT_INTERPOLATE_CORNER(const int* mx, 
+                                                 const int* my, 
+                                                 const int* mz,
+                                                 const int* mbc,
+                                                 const int* meqn, 
+                                                 const int* a_refratio, 
+                                                 double this_q[],
+                                                 double neighbor_q[], 
+                                                 const int* a_corner,
+                                                 struct fclaw_patch_transform_data** 
+                                                 transform_cptr);
+
+ 
 /** Fortran subroutine name */
 #define FCLAW3DX_CLAWPATCH46_FORT_INTERPOLATE_CORNER \
       FCLAW_F77_FUNC(fclaw3dx_clawpatch46_fort_interpolate_corner, \
@@ -336,115 +487,115 @@ void  FCLAW3DX_PILLOW46_INTERPOLATE_BLOCK_CORNER(int* mx,
 /* ------------------------------------ Output functions ------------------------------ */
 
 /** Fortran subroutine name */
-#define  FCLAW3DX_CLAWPATCH46_FORT_OUTPUT_ASCII \
-           FCLAW_F77_FUNC(fclaw3dx_clawpatch46_fort_output_ascii, \
-                          FCLAW3DX_CLAWPATCH46_FORT_OUTPUT_ASCII)
-/** @copydoc fclaw3dx_clawpatch46_fort_output_ascii() */
-void FCLAW3DX_CLAWPATCH46_FORT_OUTPUT_ASCII(char* matname1,
-                                            int* mx,        
-                                            int* my, 
-                                            int* mz,
-                                            int* meqn,      
-                                            int* mbc,
-                                            double* xlower, 
-                                            double* ylower, 
-                                            double* zlower,
-                                            double* dx,     
-                                            double* dy, 
-                                            double* dz,
-                                            double q[],
-                                            int* patch_num, 
-                                            int* level,
-                                            int* blockno,   
-                                            int* mpirank);
+#define  FCLAW3D_CLAWPATCH46_FORT_OUTPUT_ASCII \
+           FCLAW_F77_FUNC(fclaw3d_clawpatch46_fort_output_ascii, \
+                          FCLAW3D_CLAWPATCH46_FORT_OUTPUT_ASCII)
+/** @copydoc fclaw3d_clawpatch46_fort_output_ascii() */
+void FCLAW3D_CLAWPATCH46_FORT_OUTPUT_ASCII(char* matname1,
+                                           int* mx,        
+                                           int* my, 
+                                           int* mz,
+                                           int* meqn,      
+                                           int* mbc,
+                                           double* xlower, 
+                                           double* ylower, 
+                                           double* zlower,
+                                           double* dx,     
+                                           double* dy, 
+                                           double* dz,
+                                           double q[],
+                                           int* patch_num, 
+                                           int* level,
+                                           int* blockno,   
+                                           int* mpirank);
 
 /** Fortran subroutine name */
-#define FCLAW3DX_CLAWPATCH46_FORT_HEADER_ASCII \
-         FCLAW_F77_FUNC(fclaw3dx_clawpatch46_fort_header_ascii, \
-                        FCLAW3DX_CLAWPATCH46_FORT_HEADER_ASCII)
-/** @copydoc fclaw3dx_clawpatch46_fort_header_ascii() */
-void FCLAW3DX_CLAWPATCH46_FORT_HEADER_ASCII(const char* matname1, 
-                                            const char* matname2,
-                                            const double* time, 
-                                            const int* meqn, 
-                                            const int* maux, 
-                                            const int* ngrids);
+#define FCLAW3D_CLAWPATCH46_FORT_HEADER_ASCII \
+         FCLAW_F77_FUNC(fclaw3d_clawpatch46_fort_header_ascii, \
+                        FCLAW3D_CLAWPATCH46_FORT_HEADER_ASCII)
+/** @copydoc fclaw3d_clawpatch46_fort_header_ascii() */
+void FCLAW3D_CLAWPATCH46_FORT_HEADER_ASCII(const char* matname1, 
+                                           const char* matname2,
+                                           const double* time, 
+                                           const int* meqn, 
+                                           const int* maux, 
+                                           const int* ngrids);
 
 /* ----------------------------- Diagnostics functions -------------------------------- */
 
 
 /** Fortran subroutine name */
-#define FCLAW3DX_CLAWPATCH46_FORT_CONSERVATION_CHECK \
-          FCLAW_F77_FUNC(fclaw3dx_clawpatch46_fort_conservation_check, \
-                         FCLAW3DX_CLAWPATCH46_FORT_CONSERVATION_CHECK)
-/** @copydoc fclaw3dx_clawpatch46_fort_conservation_check() */
-void FCLAW3DX_CLAWPATCH46_FORT_CONSERVATION_CHECK(int *mx, 
-                                                  int *my, 
-                                                  int* mz, 
-                                                  int* mbc, 
-                                                  int* meqn,
-                                                  double *dx, 
-                                                  double *dy, 
-                                                  double* dz,
-                                                  double* area, 
-                                                  double *q, 
-                                                  double* sum,
-                                                  double* c_kahan);
+#define FCLAW3D_CLAWPATCH46_FORT_CONSERVATION_CHECK \
+          FCLAW_F77_FUNC(fclaw3d_clawpatch46_fort_conservation_check, \
+                         FCLAW3D_CLAWPATCH46_FORT_CONSERVATION_CHECK)
+/** @copydoc fclaw3d_clawpatch46_fort_conservation_check() */
+void FCLAW3D_CLAWPATCH46_FORT_CONSERVATION_CHECK(int *mx, 
+                                                 int *my, 
+                                                 int* mz, 
+                                                 int* mbc, 
+                                                 int* meqn,
+                                                 double *dx, 
+                                                 double *dy, 
+                                                 double* dz,
+                                                 double* area, 
+                                                 double *q, 
+                                                 double* sum,
+                                                 double* c_kahan);
 
 /** Fortran subroutine name */
-#define FCLAW3DX_CLAWPATCH46_FORT_COMPUTE_PATCH_AREA \
-          FCLAW_F77_FUNC(fclaw3dx_clawpatch46_fort_compute_patch_area, \
-                         FCLAW3DX_CLAWPATCH46_FORT_COMPUTE_PATCH_AREA)
+#define FCLAW3D_CLAWPATCH46_FORT_COMPUTE_PATCH_AREA \
+          FCLAW_F77_FUNC(fclaw3d_clawpatch46_fort_compute_patch_area, \
+                         FCLAW3D_CLAWPATCH46_FORT_COMPUTE_PATCH_AREA)
 
-/** @copydoc fclaw3dx_clawpatch46_fort_compute_patch_area() */
-double FCLAW3DX_CLAWPATCH46_FORT_COMPUTE_PATCH_AREA(int *mx, 
-                                                    int* my, 
-                                                    int* mz, 
-                                                    int*mbc, 
-                                                    double* dx, 
-                                                    double* dy, 
-                                                    double* dz,
-                                                    double area[]);
-
-/** Fortran subroutine name */
-#define FCLAW3DX_CLAWPATCH46_FORT_COMPUTE_ERROR_NORM \
-           FCLAW_F77_FUNC(fclaw3dx_clawpatch46_fort_compute_error_norm, \
-                          FCLAW3DX_CLAWPATCH46_FORT_COMPUTE_ERROR_NORM)
-
-/** @copydoc fclaw3dx_clawpatch46_fort_compute_error_norm() */
-void FCLAW3DX_CLAWPATCH46_FORT_COMPUTE_ERROR_NORM (int* blockno, 
-                                                   int* mx,
+/** @copydoc fclaw3d_clawpatch46_fort_compute_patch_area() */
+double FCLAW3D_CLAWPATCH46_FORT_COMPUTE_PATCH_AREA(int *mx, 
                                                    int* my, 
-                                                   int* mz,
-                                                   int* mbc,
-                                                   int* meqn,
+                                                   int* mz, 
+                                                   int*mbc, 
                                                    double* dx, 
                                                    double* dy, 
                                                    double* dz,
-                                                   double area[], 
-                                                   double error[],
-                                                   double* error_norm);
+                                                   double area[]);
+
+/** Fortran subroutine name */
+#define FCLAW3D_CLAWPATCH46_FORT_COMPUTE_ERROR_NORM \
+           FCLAW_F77_FUNC(fclaw3d_clawpatch46_fort_compute_error_norm, \
+                          FCLAW3D_CLAWPATCH46_FORT_COMPUTE_ERROR_NORM)
+
+/** @copydoc fclaw3d_clawpatch46_fort_compute_error_norm() */
+void FCLAW3D_CLAWPATCH46_FORT_COMPUTE_ERROR_NORM (int* blockno, 
+                                                  int* mx,
+                                                  int* my, 
+                                                  int* mz,
+                                                  int* mbc,
+                                                  int* meqn,
+                                                  double* dx, 
+                                                  double* dy, 
+                                                  double* dz,
+                                                  double area[], 
+                                                  double error[],
+                                                  double* error_norm);
 
 /* ----------------------------- Parallel ghost patches  ------------------------------ */
 
 
 /** Fortran subroutine name */
-#define FCLAW3DX_CLAWPATCH46_FORT_LOCAL_GHOST_PACK \
-          FCLAW_F77_FUNC(fclaw3dx_clawpatch46_fort_local_ghost_pack, \
-                         FCLAW3DX_CLAWPATCH46_FORT_LOCAL_GHOST_PACK)
-/** @copydoc fclaw3dx_clawpatch46_fort_local_ghost_pack() */
-void FCLAW3DX_CLAWPATCH46_FORT_LOCAL_GHOST_PACK(const int *mx, 
-                                                const int *my, 
-                                                const int* mz,
-                                                const int *mbc,
-                                                const int *meqn, 
-                                                const int *mint,
-                                                double qdata[], 
-                                                double area[],
-                                                double qpack[], 
-                                                const int *psize,
-                                                const int *packmode, 
-                                                int *ierror);
+#define FCLAW3D_CLAWPATCH46_FORT_LOCAL_GHOST_PACK \
+          FCLAW_F77_FUNC(fclaw3d_clawpatch46_fort_local_ghost_pack, \
+                         FCLAW3D_CLAWPATCH46_FORT_LOCAL_GHOST_PACK)
+/** @copydoc fclaw3d_clawpatch46_fort_local_ghost_pack() */
+void FCLAW3D_CLAWPATCH46_FORT_LOCAL_GHOST_PACK(const int *mx, 
+                                               const int *my, 
+                                               const int* mz,
+                                               const int *mbc,
+                                               const int *meqn, 
+                                               const int *mint,
+                                               double qdata[], 
+                                               double area[],
+                                               double qpack[], 
+                                               const int *psize,
+                                               const int *packmode, 
+                                               int *ierror);
 
 
 

@@ -1718,12 +1718,12 @@ void fclaw_clawpatch_vtable_initialize(fclaw_global_t* glob,
         clawpatch_vt->d3->fort_average2coarse        = FCLAW3DX_CLAWPATCH46_FORT_AVERAGE2COARSE;
         clawpatch_vt->d3->fort_interpolate2fine      = FCLAW3DX_CLAWPATCH46_FORT_INTERPOLATE2FINE;
 
-        clawpatch_vt->d3->fort_tag4refinement        = FCLAW3DX_CLAWPATCH46_FORT_TAG4REFINEMENT;
-        clawpatch_vt->d3->fort_tag4coarsening        = FCLAW3DX_CLAWPATCH46_FORT_TAG4COARSENING;
+        clawpatch_vt->d3->fort_tag4refinement        = FCLAW3D_CLAWPATCH46_FORT_TAG4REFINEMENT;
+        clawpatch_vt->d3->fort_tag4coarsening        = FCLAW3D_CLAWPATCH46_FORT_TAG4COARSENING;
 
         /* output functions */
-        clawpatch_vt->fort_header_ascii              = FCLAW3DX_CLAWPATCH46_FORT_HEADER_ASCII;
-        clawpatch_vt->d3->fort_output_ascii          = FCLAW3DX_CLAWPATCH46_FORT_OUTPUT_ASCII;
+        clawpatch_vt->fort_header_ascii              = FCLAW3D_CLAWPATCH46_FORT_HEADER_ASCII;
+        clawpatch_vt->d3->fort_output_ascii          = FCLAW3D_CLAWPATCH46_FORT_OUTPUT_ASCII;
 
         /* Ghost cell exchange functions */
         clawpatch_vt->d3->fort_copy_face             = FCLAW3DX_CLAWPATCH46_FORT_COPY_FACE;
@@ -1735,9 +1735,9 @@ void fclaw_clawpatch_vtable_initialize(fclaw_global_t* glob,
         clawpatch_vt->d3->fort_interpolate_corner    = FCLAW3DX_CLAWPATCH46_FORT_INTERPOLATE_CORNER;
 
         clawpatch_vt->local_ghost_pack_aux           = NULL;
-        clawpatch_vt->d3->fort_local_ghost_pack      = FCLAW3DX_CLAWPATCH46_FORT_LOCAL_GHOST_PACK;
+        clawpatch_vt->d3->fort_local_ghost_pack      = FCLAW3D_CLAWPATCH46_FORT_LOCAL_GHOST_PACK;
 
-        clawpatch_vt->d3->fort_timeinterp            = FCLAW3DX_CLAWPATCH46_FORT_TIMEINTERP;
+        clawpatch_vt->d3->fort_timeinterp            = FCLAW3D_CLAWPATCH46_FORT_TIMEINTERP;
 
     }
     else if (clawpatch_vt->dim == 3 && claw_version == 5)

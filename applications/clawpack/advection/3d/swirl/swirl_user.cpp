@@ -85,7 +85,7 @@ void swirl_link_solvers(fclaw_global_t *glob)
 
     /* example of how to set up a user defined criteria */
     fclaw_clawpatch_vtable_t *clawpatch_vt = fclaw_clawpatch_vt(glob);
-    clawpatch_vt->d3->fort_user_exceeds_threshold = &FCLAW3DX_USER_EXCEEDS_TH;
+    clawpatch_vt->d3->fort_user_exceeds_threshold = &FCLAW3D_USER_EXCEEDS_TH;
 
     fclaw_options_t* fclaw_opt = fclaw_get_options(glob);
 

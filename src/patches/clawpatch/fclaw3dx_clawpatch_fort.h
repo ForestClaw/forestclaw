@@ -61,15 +61,15 @@ struct fclaw_patch_transform_data;  /* Should be replaced by long int?  */
  * @param[in]     iface the interface that the neighbor is on
  * @param[in]     transform_ptr Encoding for indices at block boundaries (C only).
  */
-typedef void (*fclaw3dx_clawpatch_fort_copy_face_t)(const int* mx, 
-                                                    const int* my, 
-                                                    const int* mz,
-                                                    const int* mbc, 
-                                                    const int* meqn,
-                                                    double qthis[],
-                                                    double qneighbor[], 
-                                                    const int* iface,
-                                                    struct fclaw_patch_transform_data** transform_ptr);
+typedef void (*fclaw3d_clawpatch_fort_copy_face_t)(const int* mx, 
+                                                   const int* my, 
+                                                   const int* mz,
+                                                   const int* mbc, 
+                                                   const int* meqn,
+                                                   double qthis[],
+                                                   double qneighbor[], 
+                                                   const int* iface,
+                                                   struct fclaw_patch_transform_data** transform_ptr);
 
 /**
  * @brief Averages values from a face-neighboring fine grid
@@ -89,22 +89,22 @@ typedef void (*fclaw3dx_clawpatch_fort_copy_face_t)(const int* mx,
  * @param[in]     manifold true if using mainifold
  * @param[in]     transform_ptr Encoding for indices at block boundaries (C only).
  */
-typedef void (*fclaw3dx_clawpatch_fort_average_face_t)(const int* mx, 
-                                                       const int* my, 
-                                                       const int* mz,
-                                                       const int* mbc,    
-                                                       const int* meqn,
-                                                       double qcoarse[],
-                                                       double qfine[],
-                                                       double areacoarse[], 
-                                                       double areafine[],
-                                                       const int* idir, 
-                                                       const int* iside,
-                                                       const int* num_neighbors,
-                                                       const int* refratio, 
-                                                       const int* igrid,
-                                                       const int* manifold, 
-                                                       struct fclaw_patch_transform_data** transform_ptr);
+typedef void (*fclaw3d_clawpatch_fort_average_face_t)(const int* mx, 
+                                                      const int* my, 
+                                                      const int* mz,
+                                                      const int* mbc,    
+                                                      const int* meqn,
+                                                      double qcoarse[],
+                                                      double qfine[],
+                                                      double areacoarse[], 
+                                                      double areafine[],
+                                                      const int* idir, 
+                                                      const int* iside,
+                                                      const int* num_neighbors,
+                                                      const int* refratio, 
+                                                      const int* igrid,
+                                                      const int* manifold, 
+                                                      struct fclaw_patch_transform_data** transform_ptr);
 /**
  * @brief Interpolates values from a face-neighboring coarse grid
  * 
@@ -122,20 +122,20 @@ typedef void (*fclaw3dx_clawpatch_fort_average_face_t)(const int* mx,
  * @param[in]     igrid the index of this patch in the child array
  * @param[in]     transform_ptr Encoding for indices at block boundaries (C only).
  */
-typedef void (*fclaw3dx_clawpatch_fort_interpolate_face_t)(const int* mx, 
-                                                           const int* my, 
-                                                           const int* mz,
-                                                           const int* mbc,
-                                                           const int* meqn,
-                                                           double qcoarse[], 
-                                                           double qfine[],
-                                                           const int* idir, 
-                                                           const int* iface_coarse,
-                                                           const int* num_neighbors,
-                                                           const int* refratio, 
-                                                           const int* igrid,
-                                                           struct fclaw_patch_transform_data** transform_ptr);
-	
+typedef void (*fclaw3d_clawpatch_fort_interpolate_face_t)(const int* mx, 
+                                                          const int* my, 
+                                                          const int* mz,
+                                                          const int* mbc,
+                                                          const int* meqn,
+                                                          double qcoarse[], 
+                                                          double qfine[],
+                                                          const int* idir, 
+                                                          const int* iface_coarse,
+                                                          const int* num_neighbors,
+                                                          const int* refratio, 
+                                                          const int* igrid,
+                                                          struct fclaw_patch_transform_data** transform_ptr);
+    
 /**
  * @brief Copies ghost data from a corner-neighboring grid on the same level
  * 
@@ -147,15 +147,15 @@ typedef void (*fclaw3dx_clawpatch_fort_interpolate_face_t)(const int* mx,
  * @param[in]     icorner_coarse the corner of the coarse patch to copy from
  * @param[in]     transform_ptr Encoding for indices at block boundaries (C only).
  */
-typedef void (*fclaw3dx_clawpatch_fort_copy_corner_t)(const int* mx, 
-                                                      const int* my, 
-                                                      const int* mz,
-                                                      const int* mbc,
-                                                      const int* meqn, 
-                                                      double qthis[],
-                                                      double qneighbor[],
-                                                      const int* icorner_coarse,
-                                                      struct fclaw_patch_transform_data** transform_ptr);
+typedef void (*fclaw3d_clawpatch_fort_copy_corner_t)(const int* mx, 
+                                                     const int* my, 
+                                                     const int* mz,
+                                                     const int* mbc,
+                                                     const int* meqn, 
+                                                     double qthis[],
+                                                     double qneighbor[],
+                                                     const int* icorner_coarse,
+                                                     struct fclaw_patch_transform_data** transform_ptr);
 
 /**
  * @brief Averages values from a corner neighboring fine grid
@@ -171,19 +171,19 @@ typedef void (*fclaw3dx_clawpatch_fort_copy_corner_t)(const int* mx,
  * @param[in]     a_corner the corner that the neighbor is on
  * @param[in]     transform_ptr Encoding for indices at block boundaries (C only).
  */
-typedef void (*fclaw3dx_clawpatch_fort_average_corner_t)(const int* mx, 
-                                                         const int* my, 
-                                                         const int* mz,
-                                                         const int* mbc,
-                                                         const int* meqn, 
-                                                         const int* a_refratio,
-                                                         double qcoarse[], 
-                                                         double qfine[],
-                                                         double areacoarse[], 
-                                                         double areafine[],
-                                                         const int* manifold,
-                                                         const int* a_corner, 
-                                                         struct fclaw_patch_transform_data** transform_ptr);
+typedef void (*fclaw3d_clawpatch_fort_average_corner_t)(const int* mx, 
+                                                        const int* my, 
+                                                        const int* mz,
+                                                        const int* mbc,
+                                                        const int* meqn, 
+                                                        const int* a_refratio,
+                                                        double qcoarse[], 
+                                                        double qfine[],
+                                                        double areacoarse[], 
+                                                        double areafine[],
+                                                        const int* manifold,
+                                                        const int* a_corner, 
+                                                        struct fclaw_patch_transform_data** transform_ptr);
 
 /**
  * @brief Interpolates values form a corner-neighboring coarse grid
@@ -197,17 +197,17 @@ typedef void (*fclaw3dx_clawpatch_fort_average_corner_t)(const int* mx,
  * @param[in]     icorner_coarse the corner of the coarse neighbor that to interpolate from
  * @param[in]     transform_ptr Encoding for indices at block boundaries (C only).
  */
-typedef void (*fclaw3dx_clawpatch_fort_interpolate_corner_t)(const int* mx, 
-                                                             const int* my, 
-                                                             const int* mz,
-                                                             const int* mbc,
-                                                             const int* meqn, 
-                                                             const int* refratio, 
-                                                             double qcoarse[],
-                                                             double qfine[], 
-                                                             const int* icorner_coarse,
-                                                             struct fclaw_patch_transform_data** transform_ptr);
-	
+typedef void (*fclaw3d_clawpatch_fort_interpolate_corner_t)(const int* mx, 
+                                                            const int* my, 
+                                                            const int* mz,
+                                                            const int* mbc,
+                                                            const int* meqn, 
+                                                            const int* refratio, 
+                                                            double qcoarse[],
+                                                            double qfine[], 
+                                                            const int* icorner_coarse,
+                                                            struct fclaw_patch_transform_data** transform_ptr);
+    
 /** @} */
 
 /** @{ @name Regridding Functions *//*--------------------------------------------------*/
@@ -226,22 +226,22 @@ typedef void (*fclaw3dx_clawpatch_fort_interpolate_corner_t)(const int* mx,
  * @param[in]  init_flag true if in initialization stage
  * @param[out] tag_patch true if patch should be refined
  */
-typedef void (*fclaw3dx_clawpatch_fort_tag4refinement_t)(const int* mx,
-                                                         const int* my, 
-                                                         const int* mz,
-                                                         const int* mbc,
-                                                         const int* meqn,
-                                                         const double* xlower, 
-                                                         const double* ylower, 
-                                                         const double* zlower,
-                                                         const double* dx, 
-                                                         const double* dy, 
-                                                         const double* dz,
-                                                         const int* blockno,
-                                                         double q[],
-                                                         const double* tag_threshold,
-                                                         const int* init_flag,
-                                                         int* tag_patch);
+typedef void (*fclaw3d_clawpatch_fort_tag4refinement_t)(const int* mx,
+                                                        const int* my, 
+                                                        const int* mz,
+                                                        const int* mbc,
+                                                        const int* meqn,
+                                                        const double* xlower, 
+                                                        const double* ylower, 
+                                                        const double* zlower,
+                                                        const double* dx, 
+                                                        const double* dy, 
+                                                        const double* dz,
+                                                        const int* blockno,
+                                                        double q[],
+                                                        const double* tag_threshold,
+                                                        const int* init_flag,
+                                                        int* tag_patch);
 /**
  * @brief Tags a quad of patches for coarsening.
  * 
@@ -256,45 +256,45 @@ typedef void (*fclaw3dx_clawpatch_fort_tag4refinement_t)(const int* mx,
  * @param[in]  init_flag true if in initialization stage
  * @param[out] tag_patch true if patches should be coarsened 
  */
-typedef void (*fclaw3dx_clawpatch_fort_tag4coarsening_t)(const int* mx, 
-                                                         const int* my, 
-                                                         const int* mz,
-                                                         const int* mbc, 
-                                                         const int* meqn,
-                                                         double xlower[], 
-                                                         double ylower[],
-                                                         double zlower[],
-                                                         const double* dx, 
-                                                         const double* dy, 
-                                                         const double* dz,
-                                                         const int* blockno,
-                                                         double q0[],
-                                                         double q1[],
-                                                         double q2[],
-                                                         double q3[],
-                                                         const double* tag_threshold,
-                                                         const int* init_flag,
-                                                         int* tag_patch);
+typedef void (*fclaw3d_clawpatch_fort_tag4coarsening_t)(const int* mx, 
+                                                        const int* my, 
+                                                        const int* mz,
+                                                        const int* mbc, 
+                                                        const int* meqn,
+                                                        double xlower[], 
+                                                        double ylower[],
+                                                        double zlower[],
+                                                        const double* dx, 
+                                                        const double* dy, 
+                                                        const double* dz,
+                                                        const int* blockno,
+                                                        double q0[],
+                                                        double q1[],
+                                                        double q2[],
+                                                        double q3[],
+                                                        const double* tag_threshold,
+                                                        const int* init_flag,
+                                                        int* tag_patch);
 
 /** 
  * @deprecated Checks if solution exceeds a threshold
  */
-typedef int (*fclaw3dx_clawpatch_fort_exceeds_threshold_t)(const int *blockno,
-                                                           const int* meqn,
-                                                           const double *qval, 
-                                                           const double *qmin, 
-                                                           const double *qmax,
-                                                           const double quad[], 
-                                                           const double *dx, 
-                                                           const double *dy, 
-                                                           const double *dz, 
-                                                           const double *xc, 
-                                                           const double *yc, 
-                                                           const double *zc,
-                                                           const int* ivar_variable,
-                                                           const double *tag_threshold,
-                                                           const int *init_flag,
-                                                           const int *is_ghost);
+typedef int (*fclaw3d_clawpatch_fort_exceeds_threshold_t)(const int *blockno,
+                                                          const int* meqn,
+                                                          const double *qval, 
+                                                          const double *qmin, 
+                                                          const double *qmax,
+                                                          const double quad[], 
+                                                          const double *dx, 
+                                                          const double *dy, 
+                                                          const double *dz, 
+                                                          const double *xc, 
+                                                          const double *yc, 
+                                                          const double *zc,
+                                                          const int* ivar_variable,
+                                                          const double *tag_threshold,
+                                                          const int *init_flag,
+                                                          const int *is_ghost);
 
 /** 
  * @brief Averages a fine patch to a coarse patch
@@ -309,18 +309,18 @@ typedef int (*fclaw3dx_clawpatch_fort_exceeds_threshold_t)(const int *blockno,
  * @param[in]  igrid the index of the fine patch in the siblings array
  * @param[in]  manifold true if using manifold
  */
-typedef void (*fclaw3dx_clawpatch_fort_interpolate2fine_t)(const int* mx, 
-                                                           const int* my, 
-                                                           const int* mz,
-                                                           const int* mbc, 
-                                                           const int* meqn,
-                                                           double qcoarse[], 
-                                                           double qfine[],
-                                                           double areacoarse[], 
-                                                           double areafine[],
-                                                           const int* igrid, 
-                                                           const int* manifold);
-	
+typedef void (*fclaw3d_clawpatch_fort_interpolate2fine_t)(const int* mx, 
+                                                          const int* my, 
+                                                          const int* mz,
+                                                          const int* mbc, 
+                                                          const int* meqn,
+                                                          double qcoarse[], 
+                                                          double qfine[],
+                                                          double areacoarse[], 
+                                                          double areafine[],
+                                                          const int* igrid, 
+                                                          const int* manifold);
+    
 /** 
  * @brief Interpolates from a coarse patch to a fine patche
  * 
@@ -334,18 +334,18 @@ typedef void (*fclaw3dx_clawpatch_fort_interpolate2fine_t)(const int* mx,
  * @param[in]  igrid the index of the fine patch in the siblings array
  * @param[in]  manifold true if using manifold
  */
-typedef void (*fclaw3dx_clawpatch_fort_average2coarse_t)(const int* mx, 
-                                                         const int* my, 
-                                                         const int* mz,
-                                                         const int* mbc, 
-                                                         const int* meqn,
-                                                         double qcoarse[],
-                                                         double qfine[],
-                                                         double areacoarse[],
-                                                         double areafine[],
-                                                         const int* igrid, 
-                                                         const int* manifold);
-	
+typedef void (*fclaw3d_clawpatch_fort_average2coarse_t)(const int* mx, 
+                                                        const int* my, 
+                                                        const int* mz,
+                                                        const int* mbc, 
+                                                        const int* meqn,
+                                                        double qcoarse[],
+                                                        double qfine[],
+                                                        double areacoarse[],
+                                                        double areafine[],
+                                                        const int* igrid, 
+                                                        const int* manifold);
+    
 
 /** @} */
 
@@ -360,25 +360,25 @@ typedef void (*fclaw3dx_clawpatch_fort_average2coarse_t)(const int* mx,
  * @param[in]     mx, my, mz the number cells in the x, y, and z directions, excluding ghost
  * @param[in]     mbc the number of ghost cells
  * @param[in]     meqn the number of equations
- * @param[in]     psize	the total number cells that should be interpolated 
+ * @param[in]     psize    the total number cells that should be interpolated 
  * @param[in]     qcurr the current q
  * @param[in]     qlast the previous q
  * @param[out]    qinterp the inerpolated q
  * @param[in]     alpha where to interpolate between qlast and qcurr
  * @param[out]    ierror error value
  */
-typedef void (*fclaw3dx_clawpatch_fort_timeinterp_t)(const int *mx, 
-                                                     const int* my, 
-                                                     const int* mz,
-                                                     const int* mbc,
-                                                     const int *meqn, 
-                                                     const int* psize,
-                                                     double qcurr[], 
-                                                     double qlast[],
-                                                     double qinterp[],
-                                                     const double* alpha,
-                                                     const int* ierror);
-	
+typedef void (*fclaw3d_clawpatch_fort_timeinterp_t)(const int *mx, 
+                                                    const int* my, 
+                                                    const int* mz,
+                                                    const int* mbc,
+                                                    const int *meqn, 
+                                                    const int* psize,
+                                                    double qcurr[], 
+                                                    double qlast[],
+                                                    double qinterp[],
+                                                    const double* alpha,
+                                                    const int* ierror);
+    
 /** @} */
 
 /** @{ @name Parallel ghost patches *//*------------------------------------------------*/
@@ -398,18 +398,18 @@ typedef void (*fclaw3dx_clawpatch_fort_timeinterp_t)(const int *mx,
  *                2 for packing q and area, and 3 for unpacking q and area) 
  * @param[out]    ierror the error value
  */
-typedef void (*fclaw3dx_clawpatch_fort_local_ghost_pack_t)(const int *mx, 
-                                                           const int *my, 
-                                                           const int *mz, 
-                                                           const int *mbc,
-                                                           const int *meqn, 
-                                                           const int *mint,
-                                                           double qdata[], 
-                                                           double area[],
-                                                           double qpack[], 
-                                                           const int *psize,
-                                                           const int *packmode, 
-                                                           int *ierror);
+typedef void (*fclaw3d_clawpatch_fort_local_ghost_pack_t)(const int *mx, 
+                                                          const int *my, 
+                                                          const int *mz, 
+                                                          const int *mbc,
+                                                          const int *meqn, 
+                                                          const int *mint,
+                                                          double qdata[], 
+                                                          double area[],
+                                                          double qpack[], 
+                                                          const int *psize,
+                                                          const int *packmode, 
+                                                          int *ierror);
     
 /** @} */
 
@@ -449,23 +449,23 @@ typedef void  (*fclaw_clawpatch_fort_header_ascii_t)(const char* matname1,
  * @param[in] blockno the block number
  * @param[in] mpirank the mpi rank of the patch
  */
-typedef void (*fclaw3dx_clawpatch_fort_output_ascii_t)(char* matname1,
-											  int* mx,        
-                                              int* my, 
-                                              int* mz,
-											  int* meqn,      
-                                              int* mbc,
-											  double* xlower, 
-                                              double* ylower, 
-                                              double* zlower,
-											  double* dx,     
-                                              double* dy, 
-                                              double* dz,
-											  double q[],
-											  int* patch_num, 
-                                              int* level,
-											  int* blockno,   
-                                              int* mpirank);
+typedef void (*fclaw3d_clawpatch_fort_output_ascii_t)(char* matname1,
+                                                      int* mx,        
+                                                      int* my, 
+                                                      int* mz,
+                                                      int* meqn,      
+                                                      int* mbc,
+                                                      double* xlower, 
+                                                      double* ylower, 
+                                                      double* zlower,
+                                                      double* dx,     
+                                                      double* dy, 
+                                                      double* dz,
+                                                      double q[],
+                                                      int* patch_num, 
+                                                      int* level,
+                                                      int* blockno,   
+                                                      int* mpirank);
 
 
 /** @} */
@@ -485,22 +485,22 @@ typedef void (*fclaw3dx_clawpatch_fort_output_ascii_t)(char* matname1,
  * @param[out] error the error for each meqn in each cell
  * @param[in] soln the exact solution
  */
-typedef void (*fclaw3dx_clawpatch_fort_error_t)(int* blockno, 
-                                                int *mx, 
-                                                int *my, 
-                                                int* mz, 
-                                                int *mbc,
-                                                int *meqn,
-                                                double *dx, 
-                                                double *dy, 
-                                                double* dz, 
-                                                double *xlower, 
-                                                double *ylower, 
-                                                double *zlower,
-                                                double *t, 
-                                                double q[],
-                                                double error[], 
-                                                double soln[]);
+typedef void (*fclaw3d_clawpatch_fort_error_t)(int* blockno, 
+                                               int *mx, 
+                                               int *my, 
+                                               int* mz, 
+                                               int *mbc,
+                                               int *meqn,
+                                               double *dx, 
+                                               double *dy, 
+                                               double* dz, 
+                                               double *xlower, 
+                                               double *ylower, 
+                                               double *zlower,
+                                               double *t, 
+                                               double q[],
+                                               double error[], 
+                                               double soln[]);
 /**
  * @brief Calculates a sum for each equation
  * 
@@ -513,18 +513,18 @@ typedef void (*fclaw3dx_clawpatch_fort_error_t)(int* blockno,
  * @param[in,out] sum the current sum for each equaiton
  * @param[in,out] c_kahan the the current c values for the Kahan summation algorithm
  */
-typedef void (*fclaw3dx_clawpatch_fort_conscheck_t)(int *mx, 
-                                                    int *my, 
-                                                    int *mz, 
-                                                    int* mbc, 
-                                                    int* meqn,
-										            double *dx, 
-                                                    double *dy, 
-                                                    double* dz,
-										            double area[], 
-                                                    double q[], 
-                                                    double sum[],
-                                                    double *c_kahan);
+typedef void (*fclaw3d_clawpatch_fort_conscheck_t)(int *mx, 
+                                                   int *my, 
+                                                   int *mz, 
+                                                   int* mbc, 
+                                                   int* meqn,
+                                                   double *dx, 
+                                                   double *dy, 
+                                                   double* dz,
+                                                   double area[], 
+                                                   double q[], 
+                                                   double sum[],
+                                                   double *c_kahan);
 
 /**
  * @brief Calculates the area of a patch
@@ -535,14 +535,14 @@ typedef void (*fclaw3dx_clawpatch_fort_conscheck_t)(int *mx,
  * @param[in] area array of area values for cells
  * @return the total area of the patch
  */
-typedef double (*fclaw3dx_clawpatch_fort_area_t)(int *mx, 
-                                                 int* my, 
-                                                 int* mz, 
-                                                 int *mbc, 
-                                                 double *dx, 
-                                                 double** dy, 
-                                                 double *dz, 
-                                                 double area[]);
+typedef double (*fclaw3d_clawpatch_fort_area_t)(int *mx, 
+                                                int* my, 
+                                                int* mz, 
+                                                int *mbc, 
+                                                double *dx, 
+                                                double** dy, 
+                                                double *dz, 
+                                                double area[]);
 
 /**
  * @brief Calculates the error norms for a patch
@@ -556,58 +556,58 @@ typedef double (*fclaw3dx_clawpatch_fort_area_t)(int *mx,
  * @param[in] error error array
  * @param[out] error_norm a 2d array of  l1, l2, and inf norms for each eqn
  */
-typedef void (*fclaw3dx_clawpatch_fort_norm_t)(int* blockno, 
-                                               int *mx, 
-                                               int *my, 
-                                               int* mz,
-                                               int *mbc, 
-                                               int *meqn,
-									           double *dx, 
-                                               double *dy, 
-                                               double *dz,
-                                               double area[],
-									           double error[], 
-                                               double error_norm[]);
+typedef void (*fclaw3d_clawpatch_fort_norm_t)(int* blockno, 
+                                              int *mx, 
+                                              int *my, 
+                                              int* mz,
+                                              int *mbc, 
+                                              int *meqn,
+                                              double *dx, 
+                                              double *dy, 
+                                              double *dz,
+                                              double area[],
+                                              double error[], 
+                                              double error_norm[]);
 
 /** @} */
 
 /** 
  * @brief Checks if solution exceeds a threshold
  */
-typedef int (*fclaw3dx_fort_exceeds_threshold_t)(const int *blockno,
-                                                 const int* meqn, 
-                                                 const double *qval, 
-                                                 const double *qmin, 
-                                                 const double *qmax,
-                                                 const double quad[], 
-                                                 const double *dx, 
-                                                 const double *dy, 
-                                                 const double *dz,
-                                                 const double *xc, 
-                                                 const double *yc,
-                                                 const double *zc, 
-                                                 const int* ivar_threshold,
-                                                 const double *tag_threshold,
-                                                 const int    *init_flag,
-                                                 const int    *is_ghost);
+typedef int (*fclaw3d_fort_exceeds_threshold_t)(const int *blockno,
+                                                const int* meqn, 
+                                                const double *qval, 
+                                                const double *qmin, 
+                                                const double *qmax,
+                                                const double quad[], 
+                                                const double *dx, 
+                                                const double *dy, 
+                                                const double *dz,
+                                                const double *xc, 
+                                                const double *yc,
+                                                const double *zc, 
+                                                const int* ivar_threshold,
+                                                const double *tag_threshold,
+                                                const int    *init_flag,
+                                                const int    *is_ghost);
 
 
 /** @{ @name Fortran Headers *//*-------------------------------------------------------*/
 
 /** @brief Fortran subroutine name */
-#define FCLAW3DX_CLAWPATCH_GET_REFINEMENT_CRITERIA \
-                  FCLAW_F77_FUNC(fclaw3dx_clawpatch_get_refinement_criteria, \
-                                 FCLAW3DX_CLAWPATCH_GET_REFINEMENT_CRITERIA)
-/** @brief C declaration of fclaw3dx_clawpatch_get_refinement_critera() subroutine */
-int FCLAW3DX_CLAWPATCH_GET_REFINEMENT_CRITERIA();
+#define FCLAW3D_CLAWPATCH_GET_REFINEMENT_CRITERIA \
+                  FCLAW_F77_FUNC(fclaw3d_clawpatch_get_refinement_criteria, \
+                                 FCLAW3D_CLAWPATCH_GET_REFINEMENT_CRITERIA)
+/** @brief C declaration of fclaw3d_clawpatch_get_refinement_critera() subroutine */
+int FCLAW3D_CLAWPATCH_GET_REFINEMENT_CRITERIA();
 
 
 /* ------------------------------- General threshold ---------------------------------- */
 
 /** Fortran subroutine name */
-#define FCLAW3DX_CLAWPATCH_TAG_CRITERIA \
-                  FCLAW_F77_FUNC(fclaw3dx_clawpatch_tag_criteria, \
-                                  FCLAW3DX_CLAWPATCH_TAG_CRITERIA)
+#define FCLAW3D_CLAWPATCH_TAG_CRITERIA \
+                  FCLAW_F77_FUNC(fclaw3d_clawpatch_tag_criteria, \
+                                  FCLAW3D_CLAWPATCH_TAG_CRITERIA)
 
 /**
  * @brief Check if the refinment threshold is exceeded
@@ -624,20 +624,20 @@ int FCLAW3DX_CLAWPATCH_GET_REFINEMENT_CRITERIA();
  * @param[in] is_ghost true if cell is a ghost cell
  * @return 1 if exceeds threshold, 0 if not, -1 if inconclusive.
  */
-int FCLAW3DX_CLAWPATCH_TAG_CRITERIA(const int *blockno,
-                                        const double *qval, 
-                                        const double *qmin, 
-                                        const double *qmax,
-                                        const double quad[], 
-                                        const double *dx, 
-                                        const double *dy, 
-                                        const double *dz,
-                                        const double *xc, 
-                                        const double *yc,
-                                        const double *zc, 
-                                        const double *tag_threshold,
-                                        const int *init_flag,
-                                        const int *is_ghost);
+int FCLAW3D_CLAWPATCH_TAG_CRITERIA(const int *blockno,
+                                   const double *qval, 
+                                   const double *qmin, 
+                                   const double *qmax,
+                                   const double quad[], 
+                                   const double *dx, 
+                                   const double *dy, 
+                                   const double *dz,
+                                   const double *xc, 
+                                   const double *yc,
+                                   const double *zc, 
+                                   const double *tag_threshold,
+                                   const int *init_flag,
+                                   const int *is_ghost);
 
 /** Fortran subroutine name */
 #define FCLAW3DX_CLAWPATCH_EXCEEDS_THRESHOLD \
@@ -659,8 +659,8 @@ int FCLAW3DX_CLAWPATCH_TAG_CRITERIA(const int *blockno,
  * @param[in] is_ghost true if cell is a ghost cell
  * @return 1 if exceeds threshold, 0 if not, -1 if inconclusive.
  */
-int FCLAW3DX_CLAWPATCH_EXCEEDS_THRESHOLD(const int *blockno,
-                                         const int* meqn, 
+int FCLAW3D_CLAWPATCH_EXCEEDS_THRESHOLD(const int *blockno,
+                                        const int* meqn, 
                                         const double *qval, 
                                         const double *qmin, 
                                         const double *qmax,
@@ -679,13 +679,13 @@ int FCLAW3DX_CLAWPATCH_EXCEEDS_THRESHOLD(const int *blockno,
 
 /* ----------------------------- Value threshold -------------------------------------- */
 /** @brief C declaration of fclaw2d_clawpatch_value_exceeds_th() subroutine */
-#define FCLAW3DX_CLAWPATCH_VALUE_EXCEEDS_TH \
-                  FCLAW_F77_FUNC(fclaw3dx_clawpatch_value_exceeds_th, \
-                                 FCLAW3DX_CLAWPATCH_VALUE_EXCEEDS_TH)
+#define FCLAW3D_CLAWPATCH_VALUE_EXCEEDS_TH \
+                  FCLAW_F77_FUNC(fclaw3d_clawpatch_value_exceeds_th, \
+                                 FCLAW3D_CLAWPATCH_VALUE_EXCEEDS_TH)
     
 /** @brief C declaration of fclaw3dx_clawpatch_value_exceeds_th() subroutine */
-int FCLAW3DX_CLAWPATCH_VALUE_EXCEEDS_TH(const int* blockno,
-                                        const int* meqn, 
+int FCLAW3D_CLAWPATCH_VALUE_EXCEEDS_TH(const int* blockno,
+                                       const int* meqn, 
                                        const double *qval, 
                                        const double* qmin, 
                                        const double *qmax,
@@ -704,13 +704,13 @@ int FCLAW3DX_CLAWPATCH_VALUE_EXCEEDS_TH(const int* blockno,
 /* ----------------------------- difference threshold --------------------------------- */
 
 /** @brief C declaration of fclaw3dx_clawpatch_difference_exceeds_th() subroutine */
-#define FCLAW3DX_CLAWPATCH_DIFFERENCE_EXCEEDS_TH \
-                  FCLAW_F77_FUNC(fclaw3dx_clawpatch_difference_exceeds_th, \
-                                 FCLAW3DX_CLAWPATCH_DIFFERENCE_EXCEEDS_TH)
+#define FCLAW3D_CLAWPATCH_DIFFERENCE_EXCEEDS_TH \
+                  FCLAW_F77_FUNC(fclaw3d_clawpatch_difference_exceeds_th, \
+                                 FCLAW3D_CLAWPATCH_DIFFERENCE_EXCEEDS_TH)
 
-/** @brief C declaration of fclaw3dx_clawpatch_difference_exceeds_th() subroutine */
-int FCLAW3DX_CLAWPATCH_DIFFERENCE_EXCEEDS_TH(const int *blockno,
-                                             const int *meqn,
+/** @brief C declaration of fclaw3d_clawpatch_difference_exceeds_th() subroutine */
+int FCLAW3D_CLAWPATCH_DIFFERENCE_EXCEEDS_TH(const int *blockno,
+                                            const int *meqn,
                                             const double *qval, 
                                             const double *qmin, 
                                             const double *qmax,
@@ -729,170 +729,170 @@ int FCLAW3DX_CLAWPATCH_DIFFERENCE_EXCEEDS_TH(const int *blockno,
 /* --------------------------------- minmax threshold --------------------------------- */
 
 /** @brief C declaration of fclaw3dx_clawpatch_minmax_exceeds_th() subroutine */
-#define FCLAW3DX_CLAWPATCH_MINMAX_EXCEEDS_TH \
-                  FCLAW_F77_FUNC(fclaw3dx_clawpatch_minmax_exceeds_th, \
-                                 FCLAW3DX_CLAWPATCH_MINMAX_EXCEEDS_TH)
+#define FCLAW3D_CLAWPATCH_MINMAX_EXCEEDS_TH \
+                  FCLAW_F77_FUNC(fclaw3d_clawpatch_minmax_exceeds_th, \
+                                 FCLAW3D_CLAWPATCH_MINMAX_EXCEEDS_TH)
 
 /** @brief C declaration of fclaw3dx_clawpatch_minmax_exceeds_th() subroutine */
-int FCLAW3DX_CLAWPATCH_MINMAX_EXCEEDS_TH(const int *blockno,
-                                         const int* meqn,
-                                         const double *qval, 
-                                         const double* qmin, 
-                                         const double *qmax,
-                                         const double quad[], 
-                                         const double *dx, 
-                                         const double *dy, 
-                                         const double *dz,
-                                         const double *xc, 
-                                         const double *yc,
-                                         const double *zc, 
-                                         const int* ivar_variable,
-                                         const double *tag_threshold,                        
-                                         const int *init_flag,
-                                         const int *is_ghost);
+int FCLAW3D_CLAWPATCH_MINMAX_EXCEEDS_TH(const int *blockno,
+                                        const int* meqn,
+                                        const double *qval, 
+                                        const double* qmin, 
+                                        const double *qmax,
+                                        const double quad[], 
+                                        const double *dx, 
+                                        const double *dy, 
+                                        const double *dz,
+                                        const double *xc, 
+                                        const double *yc,
+                                        const double *zc, 
+                                        const int* ivar_variable,
+                                        const double *tag_threshold,                        
+                                        const int *init_flag,
+                                        const int *is_ghost);
 
 /* ------------------------------- gradient threshold --------------------------------- */
 /** @brief C declaration of fclaw3dx_clawpatch_gradient_exceeds_th() subroutine */
-#define FCLAW3DX_CLAWPATCH_GRADIENT_EXCEEDS_TH \
-                  FCLAW_F77_FUNC(fclaw3dx_clawpatch_gradient_exceeds_th, \
-                                 FCLAW3DX_CLAWPATCH_GRADIENT_EXCEEDS_TH)
+#define FCLAW3D_CLAWPATCH_GRADIENT_EXCEEDS_TH \
+                  FCLAW_F77_FUNC(fclaw3d_clawpatch_gradient_exceeds_th, \
+                                 FCLAW3D_CLAWPATCH_GRADIENT_EXCEEDS_TH)
 
 /** @brief C declaration of fclaw3dx_clawpatch_gradient_exceeds_th() subroutine */
-int FCLAW3DX_CLAWPATCH_GRADIENT_EXCEEDS_TH(const int *blockno,
-                                           const int* meqn,
-                                           const double *qval, 
-                                           const double* qmin, 
-                                           const double *qmax,
-                                           const double quad[], 
-                                           const double *dx, 
-                                           const double *dy, 
-                                           const double *dz,
-                                           const double *xc, 
-                                           const double *yc,
-                                           const double *zc, 
-                                           const int* ivar_variable,
-                                           const double *tag_threshold,
-                                           const int *init_flag,
-                                           const int *is_ghost);
+int FCLAW3D_CLAWPATCH_GRADIENT_EXCEEDS_TH(const int *blockno,
+                                          const int* meqn,
+                                          const double *qval, 
+                                          const double* qmin, 
+                                          const double *qmax,
+                                          const double quad[], 
+                                          const double *dx, 
+                                          const double *dy, 
+                                          const double *dz,
+                                          const double *xc, 
+                                          const double *yc,
+                                          const double *zc, 
+                                          const int* ivar_variable,
+                                          const double *tag_threshold,
+                                          const int *init_flag,
+                                          const int *is_ghost);
     
 
 /* ------------------------------- user threshold --------------------------------- */
 /** Fortran subroutine name */
-#define FCLAW3DX_USER_EXCEEDS_TH FCLAW_F77_FUNC( \
-                             fclaw3dx_user_exceeds_th, \
-                             FCLAW3DX_USER_EXCEEDS_TH)
+#define FCLAW3D_USER_EXCEEDS_TH FCLAW_F77_FUNC( \
+                             fclaw3d_user_exceeds_th, \
+                             FCLAW3D_USER_EXCEEDS_TH)
 
 /** @brief C declaration of user_exceeds_th() subroutine */
-int FCLAW3DX_USER_EXCEEDS_TH(const int *blockno,
-                             const int* meqn,
-                             const double *qval, 
-                             const double* qmin, 
-                             const double *qmax,
-                             const double quad[], 
-                             const double *dx, 
-                             const double *dy, 
-                             const double *dz,
-                             const double *xc, 
-                             const double *yc,
-                             const double *zc, 
-                             const int* ivar_variable,
-                             const double *tag_threshold,
-                             const int *init_flag,
-                             const int *is_ghost);
+int FCLAW3D_USER_EXCEEDS_TH(const int *blockno,
+                            const int* meqn,
+                            const double *qval, 
+                            const double* qmin, 
+                            const double *qmax,
+                            const double quad[], 
+                            const double *dx, 
+                            const double *dy, 
+                            const double *dz,
+                            const double *xc, 
+                            const double *yc,
+                            const double *zc, 
+                            const int* ivar_variable,
+                            const double *tag_threshold,
+                            const int *init_flag,
+                            const int *is_ghost);
 
 /* -------------------------- User convenience headers -------------------------------- */
 
 /** Fortran subroutine name */
-#define FCLAW3DX_USER_TAG4REFINEMENT FCLAW_F77_FUNC( \
-                 fclaw3dx_user_tag4refinement, FCLAW3DX_USER_TAG4REFINEMENT)
+#define FCLAW3D_USER_TAG4REFINEMENT FCLAW_F77_FUNC( \
+                 fclaw3d_user_tag4refinement, FCLAW3D_USER_TAG4REFINEMENT)
 /** 
  * @brief C declaration of user defined tag4refinement subroutine, see 
  * ::clawpatch_fort_tag4refinement_t
  */
-void FCLAW3DX_USER_TAG4REFINEMENT(const int* mx,
-                                  const int* my,
-                                  const int* mz,
-                                  const int* mbc,
-                                  const int* meqn,
-                                  const double* xlower, 
-                                  const double* ylower,
-                                  const double* zlower,
-                                  const double* dx, 
-                                  const double* dy,
-                                  const double* dz,
-                                  const int* blockno,
-                                  double q[],
-                                  const double* tag_threshold,
-                                  const int* init_flag,
-                                  int* tag_patch);
+void FCLAW3D_USER_TAG4REFINEMENT(const int* mx,
+                                 const int* my,
+                                 const int* mz,
+                                 const int* mbc,
+                                 const int* meqn,
+                                 const double* xlower, 
+                                 const double* ylower,
+                                 const double* zlower,
+                                 const double* dx, 
+                                 const double* dy,
+                                 const double* dz,
+                                 const int* blockno,
+                                 double q[],
+                                 const double* tag_threshold,
+                                 const int* init_flag,
+                                 int* tag_patch);
 
 /** Fortran subroutine name */
-#define FCLAW3DX_USER_TAG4COARSENING FCLAW_F77_FUNC( \
-            fclaw3dx_user_tag4coarsening, FCLAW3DX_USER_TAG4COARSENING)
+#define FCLAW3D_USER_TAG4COARSENING FCLAW_F77_FUNC( \
+            fclaw3d_user_tag4coarsening, FCLAW3D_USER_TAG4COARSENING)
 /** 
  * @brief C declaration of user defined tag4coarsening subroutine, see 
  * ::clawpatch_fort_tag4coarsening_t
  */
-void FCLAW3DX_USER_TAG4COARSENING(const int* mx, 
-                                  const int* my,
-                                  const int* mz,
-                                  const int* mbc, 
-                                  const int* meqn,
-                                  const double* xlower, 
-                                  const double* ylower,
-                                  const double* zlower,
-                                  const double* dx, 
-                                  const double* dy,
-                                  const double* dz,
-                                  const int* blockno,
-                                  double q0[],
-                                  double q1[],
-                                  double q2[],
-                                  double q3[],
-                                  const double* tag_threshold,
-                                  const int* initflag,
-                                  int* tag_patch);
+void FCLAW3D_USER_TAG4COARSENING(const int* mx, 
+                                 const int* my,
+                                 const int* mz,
+                                 const int* mbc, 
+                                 const int* meqn,
+                                 const double* xlower, 
+                                 const double* ylower,
+                                 const double* zlower,
+                                 const double* dx, 
+                                 const double* dy,
+                                 const double* dz,
+                                 const int* blockno,
+                                 double q0[],
+                                 double q1[],
+                                 double q2[],
+                                 double q3[],
+                                 const double* tag_threshold,
+                                 const int* initflag,
+                                 int* tag_patch);
     
 
 /* ----------------------------- interpolation/coarsening ----------------------------- */
 
 /** Fortran subroutine name */
-#define FCLAW3DX_USER_INTERPOLATE2FINE FCLAW_F77_FUNC(\
-                  fclaw3dx_user_interpolate2fine, FCLAW3DX_USER_INTERPOLATE2FINE)
+#define FCLAW3D_USER_INTERPOLATE2FINE FCLAW_F77_FUNC(\
+                  fclaw3d_user_interpolate2fine, FCLAW3D_USER_INTERPOLATE2FINE)
 /**
  * @brief C declaration of user defined interpolate2fine subroutine,
  * see ::clawpatch_fort_interpolate2fine_t
  */
-void FCLAW3DX_USER_INTERPOLATE2FINE(const int* mx,
-                                    const int* my,
-                                    const int* mz,
-                                    const int* mbc,
-                                    const int* meqn, 
-                                    double qcoarse[], 
-                                    double qfine[],
-                                    double areacoarse[], 
-                                    double areafine[],
-                                    const int* igrid,
-                                    const int* manifold);
+void FCLAW3D_USER_INTERPOLATE2FINE(const int* mx,
+                                   const int* my,
+                                   const int* mz,
+                                   const int* mbc,
+                                   const int* meqn, 
+                                   double qcoarse[], 
+                                   double qfine[],
+                                   double areacoarse[], 
+                                   double areafine[],
+                                   const int* igrid,
+                                   const int* manifold);
 
 /** Fortran subroutine name */
-#define FCLAW3DX_USER_AVERAGE2COARSE FCLAW_F77_FUNC(\
-             fclaw3dx_user_average2coarse, FCLAW3DX_USER_AVERAGE2COARSE)
+#define FCLAW3D_USER_AVERAGE2COARSE FCLAW_F77_FUNC(\
+             fclaw3d_user_average2coarse, FCLAW3D_USER_AVERAGE2COARSE)
 /**
  * @brief C declaration of user defined average2coarse subroutine,
  * see ::clawpatch_fort_average2coarse_t
  */
-void FCLAW3DX_USER_AVERAGE2COARSE(const int* mx,
-                                  const int* my,
-                                  const int* mz,
-                                  const int* mbc,
-                                  const int* meqn,
-                                  double qcoarse[],
-                                  double qfine[],
-                                  double areacoarse[],
-                                  double areafine[],
-                                  const int* igrid, 
-                                  const int* manifold);
+void FCLAW3D_USER_AVERAGE2COARSE(const int* mx,
+                                 const int* my,
+                                 const int* mz,
+                                 const int* mbc,
+                                 const int* meqn,
+                                 double qcoarse[],
+                                 double qfine[],
+                                 double areacoarse[],
+                                 double areafine[],
+                                 const int* igrid, 
+                                 const int* manifold);
     
 /** @} */
 

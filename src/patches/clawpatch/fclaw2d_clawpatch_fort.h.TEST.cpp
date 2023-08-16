@@ -186,20 +186,20 @@ TEST_CASE("FCLAW3DX_CLAWPATCH_EXCEEDS_THRESHOLD calls user function")
         };
 
     fclaw_global_set_static(glob);
-    int ret = FCLAW3DX_CLAWPATCH_TAG_CRITERIA(params.blockno,
-                                                   params.qval,
-                                                   params.qmin,
-                                                   params.qmax,
-                                                   params.quad,
-                                                   params.dx,
-                                                   params.dy,
-                                                   params.dz,
-                                                   params.xc,
-                                                   params.yc,
-                                                   params.zc,
-                                                   params.tag_threshold,
-                                                   params.init_flag,
-                                                   params.is_ghost);
+    int ret = FCLAW3D_CLAWPATCH_TAG_CRITERIA(params.blockno,
+                                             params.qval,
+                                             params.qmin,
+                                             params.qmax,
+                                             params.quad,
+                                             params.dx,
+                                             params.dy,
+                                             params.dz,
+                                             params.xc,
+                                             params.yc,
+                                             params.zc,
+                                             params.tag_threshold,
+                                             params.init_flag,
+                                             params.is_ghost);
     fclaw_global_clear_static();
 
     CHECK_EQ(ret, params.return_value);

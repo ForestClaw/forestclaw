@@ -244,7 +244,7 @@ struct fclaw_clawpatch_vtable_2d
 
     /** @{ @name Time interpolation functions */
 
-    /** Interpolates q between timesteps */
+    /** Interpolates q between time steps */
     clawpatch_fort_timeinterp_t            fort_timeinterp;
 
     /** @} */
@@ -279,67 +279,67 @@ struct fclaw_clawpatch_vtable_3d
     /** @{ @name Ghost Filling Functions */
 
     /** Copies ghost data from a face neighboring grid on the same level */
-    fclaw3dx_clawpatch_fort_copy_face_t             fort_copy_face;
+    fclaw3d_clawpatch_fort_copy_face_t             fort_copy_face;
     /** Averages values from a face neighboring fine grid */
-    fclaw3dx_clawpatch_fort_average_face_t          fort_average_face;
+    fclaw3d_clawpatch_fort_average_face_t          fort_average_face;
     /** Interpolates values form a face neighboring coarse grid */
-    fclaw3dx_clawpatch_fort_interpolate_face_t      fort_interpolate_face;
+    fclaw3d_clawpatch_fort_interpolate_face_t      fort_interpolate_face;
     /** Copies ghost data from a corner neighboring grid on the same level */
-    fclaw3dx_clawpatch_fort_copy_corner_t           fort_copy_corner;
+    fclaw3d_clawpatch_fort_copy_corner_t           fort_copy_corner;
     /** Averages values from a corner neighboring fine grid */
-    fclaw3dx_clawpatch_fort_average_corner_t        fort_average_corner;
+    fclaw3d_clawpatch_fort_average_corner_t        fort_average_corner;
     /** Interpolates values form a corner neighboring coarse grid */
-    fclaw3dx_clawpatch_fort_interpolate_corner_t    fort_interpolate_corner;
+    fclaw3d_clawpatch_fort_interpolate_corner_t    fort_interpolate_corner;
 
     /** @} */
 
     /** @{ @name Regridding Functions */
 
     /** Tags a patch for refinement. */
-    fclaw3dx_clawpatch_fort_tag4refinement_t        fort_tag4refinement;
+    fclaw3d_clawpatch_fort_tag4refinement_t        fort_tag4refinement;
     /** Tags a quad of patches for coarsening. */
-    fclaw3dx_clawpatch_fort_tag4coarsening_t        fort_tag4coarsening;
+    fclaw3d_clawpatch_fort_tag4coarsening_t        fort_tag4coarsening;
     /** @deprecated Checks if solution exceeds a threshold */
-    fclaw3dx_clawpatch_fort_exceeds_threshold_t     fort_user_exceeds_threshold;
+    fclaw3d_clawpatch_fort_exceeds_threshold_t     fort_user_exceeds_threshold;
 
     /** Averages a fine patches to a coarse patch */
-    fclaw3dx_clawpatch_fort_average2coarse_t        fort_average2coarse;
+    fclaw3d_clawpatch_fort_average2coarse_t        fort_average2coarse;
     /** Interpolates from a coarse patch to a fine patche */
-    fclaw3dx_clawpatch_fort_interpolate2fine_t      fort_interpolate2fine;
+    fclaw3d_clawpatch_fort_interpolate2fine_t      fort_interpolate2fine;
 
     /** @} */
 
     /** @{ @name Output Functions (ascii) */
 
     /** Outputs patch data in ascii */
-    fclaw3dx_clawpatch_fort_output_ascii_t          fort_output_ascii;
+    fclaw3d_clawpatch_fort_output_ascii_t          fort_output_ascii;
 
     /** @} */
 
     /** @{ @name Time interpolation functions */
 
     /** Interpolates q between timesteps */
-    fclaw3dx_clawpatch_fort_timeinterp_t            fort_timeinterp;
+    fclaw3d_clawpatch_fort_timeinterp_t            fort_timeinterp;
 
     /** @} */
 
     /** @{ @name Ghost Patch Functions */
     
     /** Packs/Unpacks ghost cell data */
-    fclaw3dx_clawpatch_fort_local_ghost_pack_t      fort_local_ghost_pack;
+    fclaw3d_clawpatch_fort_local_ghost_pack_t      fort_local_ghost_pack;
 
     /** @} */
 
     /** @{ @name Diagnostic Functions */
 
     /** Calculates the error for cells in a patch */
-    fclaw3dx_clawpatch_fort_error_t                 fort_compute_patch_error;
+    fclaw3d_clawpatch_fort_error_t                 fort_compute_patch_error;
     /** Calculates a sum for each equation */
-    fclaw3dx_clawpatch_fort_conscheck_t             fort_conservation_check;
+    fclaw3d_clawpatch_fort_conscheck_t             fort_conservation_check;
     /** Calculates the error norms for a patch */
-    fclaw3dx_clawpatch_fort_norm_t                  fort_compute_error_norm;
+    fclaw3d_clawpatch_fort_norm_t                  fort_compute_error_norm;
     /** Calculates the area of a patch */
-    fclaw3dx_clawpatch_fort_area_t                  fort_compute_patch_area;
+    fclaw3d_clawpatch_fort_area_t                  fort_compute_patch_area;
 
     /** @} */
 };

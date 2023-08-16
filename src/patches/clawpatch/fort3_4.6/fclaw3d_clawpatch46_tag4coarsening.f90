@@ -1,4 +1,4 @@
-subroutine fclaw3dx_clawpatch46_fort_tag4coarsening(mx,my,mz, mbc,meqn, & 
+subroutine fclaw3d_clawpatch46_fort_tag4coarsening(mx,my,mz, mbc,meqn, & 
            xlower,ylower,zlower,dx,dy, dz, blockno, q0, q1, q2, q3, &
            coarsen_threshold, initflag, tag_patch)
     implicit none
@@ -30,28 +30,28 @@ subroutine fclaw3dx_clawpatch46_fort_tag4coarsening(mx,my,mz, mbc,meqn, &
         qmax(mq) = q0(1,1,1,mq)
     end do
 
-    call fclaw3dx_clawpatch46_test_refine3(blockno,mx,my,mz,mbc,meqn, & 
+    call fclaw3d_clawpatch46_test_refine3(blockno,mx,my,mz,mbc,meqn, & 
            q0,qmin,qmax, dx,dy,dz,xlower(0), ylower(0),zlower,  &
            coarsen_threshold,initflag, tag_patch)
     if (tag_patch == 0) return
 
-    call fclaw3dx_clawpatch46_test_refine3(blockno,mx,my,mz,mbc,meqn, & 
+    call fclaw3d_clawpatch46_test_refine3(blockno,mx,my,mz,mbc,meqn, & 
            q1,qmin,qmax,dx,dy,dz,xlower(1), ylower(1),  zlower, & 
            coarsen_threshold,initflag, tag_patch)
     if (tag_patch == 0) return
 
-    call fclaw3dx_clawpatch46_test_refine3(blockno,mx,my,mz,mbc,meqn, & 
+    call fclaw3d_clawpatch46_test_refine3(blockno,mx,my,mz,mbc,meqn, & 
            q2,qmin,qmax,dx,dy,dz,xlower(2), ylower(2),zlower,  &
            coarsen_threshold,initflag, tag_patch)
     if (tag_patch == 0) return
 
-    call fclaw3dx_clawpatch46_test_refine3(blockno,mx,my,mz,mbc,meqn, &
+    call fclaw3d_clawpatch46_test_refine3(blockno,mx,my,mz,mbc,meqn, &
            q3,qmin,qmax,dx,dy,dz,xlower(3), ylower(3),zlower, &
            coarsen_threshold,initflag, tag_patch)
 
-end subroutine fclaw3dx_clawpatch46_fort_tag4coarsening
+end subroutine fclaw3d_clawpatch46_fort_tag4coarsening
 
-subroutine fclaw3dx_clawpatch46_test_refine3(blockno,mx,my,mz,mbc, & 
+subroutine fclaw3d_clawpatch46_test_refine3(blockno,mx,my,mz,mbc, & 
       meqn,q, qmin,qmax,dx,dy,dz,xlower,ylower,zlower, &
       coarsen_threshold,init_flag,tag_patch)
 
@@ -67,7 +67,7 @@ subroutine fclaw3dx_clawpatch46_test_refine3(blockno,mx,my,mz,mbc, &
 
     integer i,j, k, ii, jj,kk, mq
 
-    integer :: exceeds_th, fclaw3dx_clawpatch_tag_criteria
+    integer :: exceeds_th, fclaw3d_clawpatch_tag_criteria
     logical(kind=4) :: is_ghost, clawpatch3_is_ghost
 
 
@@ -94,7 +94,7 @@ subroutine fclaw3dx_clawpatch46_test_refine3(blockno,mx,my,mz,mbc, &
                         end do
                     end do
                 endif
-                exceeds_th = fclaw3dx_clawpatch_tag_criteria( & 
+                exceeds_th = fclaw3d_clawpatch_tag_criteria( & 
                     blockno, qval,qmin,qmax,quad, dx,dy,dz,xc,yc,zc,  &
                     coarsen_threshold, init_flag, is_ghost)
             
@@ -112,4 +112,4 @@ subroutine fclaw3dx_clawpatch46_test_refine3(blockno,mx,my,mz,mbc, &
         end do
     end do
 
-end subroutine fclaw3dx_clawpatch46_test_refine3
+end subroutine fclaw3d_clawpatch46_test_refine3

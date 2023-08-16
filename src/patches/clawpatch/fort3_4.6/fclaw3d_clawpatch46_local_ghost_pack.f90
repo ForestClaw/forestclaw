@@ -1,4 +1,4 @@
-subroutine fclaw3dx_clawpatch46_fort_local_ghost_pack (mx,my,mz, mbc, & 
+subroutine fclaw3d_clawpatch46_fort_local_ghost_pack (mx,my,mz, mbc, & 
     meqn, mint,qdata,volume,qpack,psize, packmode,ierror)
 
     implicit none
@@ -148,7 +148,7 @@ subroutine fclaw3dx_clawpatch46_fort_local_ghost_pack (mx,my,mz, mbc, &
        ierror = 2
    endif
 
-end subroutine fclaw3dx_clawpatch46_fort_local_ghost_pack
+end subroutine fclaw3d_clawpatch46_fort_local_ghost_pack
 
 
 
