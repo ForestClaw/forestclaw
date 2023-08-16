@@ -259,3 +259,101 @@ fclaw3d_patch_transform_edge (fclaw2d_patch_t * ipatch,
     *k +=
         (int) ((ipatch->zlower - opatch->zlower + xyzshift[2]) * Rmxmymz[2]);
 }
+
+void
+fclaw3d_patch_transform_edge2 (fclaw3d_patch_t * ipatch,
+                               fclaw3d_patch_t * opatch,
+                               int iedge, int is_block_boundary,
+                               int mx, int my, int mz, int based,
+                               int i[], int j[], int k[])
+{
+    FCLAW_ASSERT (ipatch->level + 1 == opatch->level);
+    FCLAW_ASSERT (0 <= ipatch->level && opatch->level < P4EST_MAXLEVEL);
+    FCLAW_ASSERT (ipatch->xlower >= 0. && ipatch->xlower < 1.);
+    FCLAW_ASSERT (opatch->xlower >= 0. && opatch->xlower < 1.);
+    FCLAW_ASSERT (ipatch->ylower >= 0. && ipatch->ylower < 1.);
+    FCLAW_ASSERT (opatch->ylower >= 0. && opatch->ylower < 1.);
+    FCLAW_ASSERT (ipatch->zlower >= 0. && ipatch->zlower < 1.);
+    FCLAW_ASSERT (opatch->zlower >= 0. && opatch->zlower < 1.);
+
+    FCLAW_ASSERT (mx >= 1 && my >= 1 && mz >= 1);
+    FCLAW_ASSERT (based == 0 || based == 1);
+
+    int kt, kn, ks;
+    int di, dj, dk;
+    double Rmxmymz[P4EST_DIM], xyzshift[3];
+    int shiftinds[2];
+    Rmxmymz[0] = (double) (1 << opatch->level) * (double) mx;
+    Rmxmymz[1] = (double) (1 << opatch->level) * (double) my;
+    Rmxmymz[2] = (double) (1 << opatch->level) * (double) mz;
+
+    xyzshift[0] = xyzshift[1] = xyzshift[2] = 0.;
+    if (is_block_boundary)
+    {
+        /* We need to add/substract the shift due to translation of one block. */
+        /* determine in which dimensions we need to shift */
+        if ((iedge & 12) == 0)
+        {
+            /* This edge is parallel to the x-axis */
+            shiftinds[0] = 1;   /* first shift is in y-dimension */
+            shiftinds[1] = 2;   /* second shift is in z-dimension */
+        }
+        else if ((iedge & 12) == 4)
+        {
+            /* This edge is parallel to the y-axis */
+            shiftinds[0] = 0;   /* first shift is in x-dimension */
+            shiftinds[1] = 2;   /* second shift is in z-dimension */
+        }
+        else
+        {
+            /* This edge is parallel to the z-axis */
+            FCLAW_ASSERT ((iedge & 12) == 8);
+            shiftinds[0] = 0;   /* first shift is in x-dimension */
+            shiftinds[1] = 1;   /* second shift is in y-dimension */
+        }
+
+        /* shift in previously determined dimensions based on edge number */
+        if ((iedge & 1) == 0)
+        {
+            xyzshift[shiftinds[0]] = +1;
+        }
+        else
+        {
+            xyzshift[shiftinds[0]] = -1;
+        }
+        if ((iedge & 2) == 0)
+        {
+            xyzshift[shiftinds[1]] = +1;
+        }
+        else
+        {
+            xyzshift[shiftinds[1]] = -1;
+        }
+    }
+
+    /* The two patches are in the same block, or in a different block
+     * that has a coordinate system with the same orientation */
+    di = based +
+        (int) ((ipatch->xlower - opatch->xlower + xyzshift[0]) * Rmxmymz[0] +
+               2. * (*i - based));
+    dj = based +
+        (int) ((ipatch->ylower - opatch->ylower + xyzshift[1]) * Rmxmymz[1] +
+               2. * (*j - based));
+    dk = based +
+        (int) ((ipatch->zlower - opatch->zlower + xyzshift[2]) * Rmxmymz[2] +
+               2. * (*k - based));
+
+    /* Without any rotation, the order of child cells is canonical */
+    for (ks = 0; ks < 2; ++ks)
+    {
+        for (kt = 0; kt < 2; ++kt)
+        {
+            for (kn = 0; kn < 2; ++kn)
+            {
+                i[4 * ks + 2 * kt + kn] = di + kn;
+                j[4 * ks + 2 * kt + kn] = dj + kt;
+                k[4 * ks + 2 * kt + kn] = dk + ks;
+            }
+        }
+    }
+}
