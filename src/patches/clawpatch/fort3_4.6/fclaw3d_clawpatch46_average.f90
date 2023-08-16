@@ -194,6 +194,9 @@ subroutine fclaw3d_clawpatch46_fort_average_corner(mx,my,mz,mbc,meqn, &
     INTEGER :: i1,j1,m, k
     DOUBLE PRECISION :: vf_sum, kc
 
+    !! exit with error
+    STOP 'NOT IMPLIMENTED'
+
     r2 = refratio*refratio
     if (r2 .ne. rr2) then
         write(6,*) 'average_corner_ghost (claw2d_utils.f) ', & 
@@ -279,6 +282,9 @@ subroutine fclaw3d_clawpatch46_fort_average2coarse(mx,my,mz,mbc,meqn, &
     INTEGER :: rfactor, refratio, igrid
     LOGICAL :: is_manifold
     DOUBLE PRECISION :: sum, kf, qf, vf_sum
+
+    !! exit with error
+    STOP 'NOT IMPLIMENTED'
 
     !! Not sure why there are two different variables here.  Isn't 
     !! rfactor == refratio? 

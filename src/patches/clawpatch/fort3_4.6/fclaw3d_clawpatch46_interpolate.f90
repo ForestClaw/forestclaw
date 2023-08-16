@@ -52,6 +52,9 @@ subroutine fclaw3d_clawpatch46_fort_interpolate_face &
     integer :: ii,jj,dc(2),df(2,0:rr2-1),iff,jff
     double precision :: shiftx(0:rr2-1),shifty(0:rr2-1)
 
+    !! exit with error
+    STOP 'NOT IMPLIMENTED'
+
     mth = 5
     r2 = refratio*refratio
     if (r2 .ne. rr2) then
@@ -211,6 +214,9 @@ subroutine fclaw3d_clawpatch46_fort_interpolate_corner &
     integer ii,jj,iff,jff,dc(2),df(2,0:rr2-1)
     double precision shiftx(0:rr2-1), shifty(0:rr2-1)
 
+    !! exit with error
+    STOP 'NOT IMPLIMENTED'
+
     r2 = refratio*refratio
     if (r2 .ne. rr2) then
         write(6,*) 'average_corner_ghost (claw2d_utils.f) ', & 
@@ -317,6 +323,9 @@ subroutine fclaw3d_clawpatch46_fort_interpolate2fine &
     double precision :: fclaw2d_clawpatch_compute_slopes
 
     integer :: p4est_refineFactor,refratio
+
+    !! exit with error
+    STOP 'NOT IMPLIMENTED'
 
     p4est_refineFactor = 2
     refratio = 2
