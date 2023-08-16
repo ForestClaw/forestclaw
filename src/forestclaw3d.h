@@ -601,6 +601,30 @@ int fclaw3d_patch_edge_neighbors (fclaw3d_domain_t * domain,
  */
 void fclaw3d_patch_edge_swap (int *edgeno, int *redgeno);
 
+/** Transform a patch coordinate into a neighbor patch's coordinate system.
+ * This function assumes that the two patches are of the SAME size and that the
+ * patches lie in coordinate systems with the same orientation.
+ * It is LEGAL to call this function for both local and ghost patches.
+ * \param [in] ipatch       The patch that the input coordinates are relative to.
+ * \param [in] opatch       The patch that the output coordinates are relative to.
+ * \param [in] iedge        Edge number of this patch to transform across.
+ *                          This function assumes oedge == iedge ^ 3, so
+ *                          oedge is the edge opposite of iedge.
+ * \param [in] is_block_boundary      Set to true for a block edge.
+ * \param [in] mx           Number of cells along x direction of patch.
+ * \param [in] my           Number of cells along y direction of patch.
+ * \param [in] mz           Number of cells along z direction of patch.
+ * \param [in] based        Indices are 0-based for corners and 1-based for cells.
+ * \param [in,out] i        Integer coordinate along x-axis in \a based .. \a mx.
+ * \param [in,out] j        Integer coordinate along y-axis in \a based .. \a my.
+ * \param [in,out] k        Integer coordinate along z-axis in \a based .. \a mz.
+ */
+void fclaw3d_patch_transform_edge (fclaw3d_patch_t * ipatch,
+                                   fclaw3d_patch_t * opatch,
+                                   int iedge, int is_block_boundary,
+                                   int mx, int my, int mz,
+                                   int based, int *i, int *j, int *k);
+
 /** Determine neighbor patch(es) and orientation across a given corner.
  * The current version only supports one neighbor, i.e., no true multi-block.
  * A query across a corner in the middle of a longer face returns the boundary.
