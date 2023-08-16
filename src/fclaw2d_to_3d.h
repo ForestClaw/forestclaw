@@ -302,6 +302,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define fclaw2d_global_store_domain     fclaw3d_global_store_domain
 #define fclaw2d_global_store_map        fclaw3d_global_store_map
 #define fclaw2d_global_unpack           fclaw3d_global_unpack
+#define fclaw2d_file_write_global_opt   fclaw3d_file_write_global_opt
+#define fclaw2d_file_read_global_opt    fclaw3d_file_read_global_opt
+#define fclaw2d_file_write_global       fclaw3d_file_write_global
+#define fclaw2d_file_read_global        fclaw3d_file_read_global
 #define fclaw2d_global_pack             fclaw3d_global_pack
 #define fclaw2d_global_packsize         fclaw3d_global_packsize
 #define fclaw2d_global_iterate_level    fclaw3d_global_iterate_level
