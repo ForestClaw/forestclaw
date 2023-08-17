@@ -189,6 +189,15 @@ fclaw_domain_num_orientations (const fclaw_domain_t * domain)
 }
 
 void
+fclaw_domain_edge_faces (const fclaw_domain_t * domain,
+                         int iedge, int faces[P4EST_DIM])
+{
+    FCLAW_ASSERT (0 <= iedge && iedge < fclaw_domain_num_edges(domain));
+    faces[0] = p8est_edge_faces[iedge][0];
+    faces[1] = p8est_edge_faces[iedge][1];
+}
+
+void
 fclaw_domain_corner_faces (const fclaw_domain_t * domain,
                              int icorner, int faces[P4EST_DIM])
 {
