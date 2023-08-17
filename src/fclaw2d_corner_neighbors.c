@@ -25,7 +25,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_corner_neighbors.h>
 
-#include <fclaw2d_block.h>
+#include <fclaw_block.h>
 #include <fclaw_ghost_fill.h>
 #include <fclaw2d_map_query.h>
 #include <fclaw_options.h>
@@ -386,7 +386,7 @@ void cb_corner_fill(fclaw_domain_t *domain,
     fclaw_physical_get_bc(s->glob,this_block_idx,this_patch_idx,
                             intersects_bdry);
 
-    fclaw2d_block_get_block_boundary(s->glob, this_patch, intersects_block);
+    fclaw_block_get_block_boundary(s->glob, this_patch, intersects_block);
 
     /* Transform data needed at multi-block boundaries */
     fclaw_patch_transform_data_t transform_data;

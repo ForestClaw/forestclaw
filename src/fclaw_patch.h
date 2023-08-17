@@ -216,7 +216,27 @@ struct fclaw_global;
 struct fclaw_domain;
 struct fclaw_patch;
 
+/* ------------------------------------------------------------------------------------ */
+///                   @name Allocating Destroying Patch Transforms
+/* ------------------------------------------------------------------------------------ */
+///@{
 
+/**
+ * @brief Allocate a transform data structure
+ * 
+ * @param[in] dim the dimension
+ * @return        the transform data structure
+ */
+fclaw_patch_transform_data_t* fclaw_patch_transform_data_new(int dim);
+
+/**
+ * @brief Free a transform data structure
+ * 
+ * @param[in] tdata the transform data structure
+ */ 
+void fclaw_patch_transform_data_destroy(fclaw_patch_transform_data_t *tdata);
+
+///@}
 /* ------------------------------------------------------------------------------------ */
 ///                         @name Creating/Deleting Patches
 /* ------------------------------------------------------------------------------------ */

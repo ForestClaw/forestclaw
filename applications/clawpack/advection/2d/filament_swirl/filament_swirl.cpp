@@ -308,7 +308,7 @@ int overlap_interpolate (fclaw_domain_t * domain, fclaw_patch_t * patch,
     op = (overlap_point_t *) point;
 
     /* Assert that we got passed a valid overlap_geometry_t.
-     * We have to pass the fclaw2d_blocks_t array via the user pointer, because
+     * We have to pass the fclaw_blocks_t array via the user pointer, because
      * the input domain to this callback is not equal to the filament_domain
      * passed to fclaw2d_exchange. Whenever the input domain is artificial
      * (domain_is_meta(domain) evaluates to true), domain->blocks is NULL. */

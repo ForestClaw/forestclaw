@@ -4,6 +4,7 @@
 add_library(forestclaw_c OBJECT 
   fclaw_advance.c
   fclaw_base.c 
+  fclaw_block.c
   fclaw_convenience.c
   fclaw_diagnostics.c
   fclaw_domain.c
@@ -32,7 +33,6 @@ add_library(forestclaw_c OBJECT
   fclaw_timer.c
   fclaw_vtable.c
 
-  fclaw2d_block.c
   fclaw2d_convenience.c
   fclaw2d_corner_neighbors.c
   fclaw2d_face_neighbors.c
@@ -116,6 +116,7 @@ install(FILES
 
   fclaw_advance.h 
   fclaw_base.h 
+  fclaw_block.h
   fclaw_diagnostics.h
   fclaw_domain.h
   fclaw_elliptic_solver.h 
@@ -140,7 +141,6 @@ install(FILES
 
   fp_exception_glibc_extension.h 
 
-  fclaw2d_block.h
   fclaw2d_convenience.h
   fclaw2d_corner_neighbors.h
   fclaw2d_defs.h 

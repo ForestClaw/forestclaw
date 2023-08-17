@@ -1668,6 +1668,63 @@ void initialize_3d_claw46_fort_vt(fclaw_clawpatch_vtable_t* clawpatch_vt)
     clawpatch_vt->d3->fort_timeinterp            = FCLAW3D_CLAWPATCH46_FORT_TIMEINTERP;
 }
 
+static
+void initialize_2d_patch_vt(fclaw_patch_vtable_t* patch_vt)
+{
+    /* Ghost filling */
+    patch_vt->d2->copy_face            = clawpatch_copy_face;
+    patch_vt->d2->average_face         = clawpatch_average_face;
+    patch_vt->d2->interpolate_face     = clawpatch_interpolate_face;
+
+    patch_vt->d2->copy_corner          = clawpatch_copy_corner;
+    patch_vt->d2->average_corner       = clawpatch_average_corner;
+    patch_vt->d2->interpolate_corner   = clawpatch_interpolate_corner;
+
+    /* Assume regular block corners;  Change by calling 'fclaw2d_clawpatch_use_pillowsphere' */    
+    patch_vt->d2->copy_block_corner          = clawpatch_copy_corner;
+    patch_vt->d2->average_block_corner       = clawpatch_average_corner;
+    patch_vt->d2->interpolate_block_corner   = clawpatch_interpolate_corner;
+
+    if(patch_vt->dim == 2)
+    {
+        /* Timing syncing module for conservation */
+        patch_vt->time_sync_f2c       = fclaw2d_clawpatch_time_sync_f2c;
+        patch_vt->time_sync_samesize  = fclaw2d_clawpatch_time_sync_samesize;
+        patch_vt->time_sync_reset     = fclaw2d_clawpatch_time_sync_reset;
+    }
+
+    patch_vt->transform_init_data  = fclaw2d_clawpatch_transform_init_data;
+    patch_vt->transform_face       = fclaw2d_clawpatch_face_transformation;
+    patch_vt->transform_face_intra = fclaw2d_clawpatch_face_transformation_intra;
+    
+    patch_vt->metric_patch = clawpatch_get_metric_patch_2d;
+
+}
+
+static
+void initialize_3d_patch_vt(fclaw_patch_vtable_t* patch_vt)
+{
+    /* Ghost filling */
+    patch_vt->d3->copy_face            = clawpatch_copy_face;
+    patch_vt->d3->average_face         = clawpatch_average_face;
+    patch_vt->d3->interpolate_face     = clawpatch_interpolate_face;
+
+    patch_vt->d3->copy_corner          = clawpatch_copy_corner;
+    patch_vt->d3->average_corner       = clawpatch_average_corner;
+    patch_vt->d3->interpolate_corner   = clawpatch_interpolate_corner;
+
+    /* Assume regular block corners;  Change by calling 'fclaw2d_clawpatch_use_pillowsphere' */    
+    patch_vt->d3->copy_block_corner          = clawpatch_copy_corner;
+    patch_vt->d3->average_block_corner       = clawpatch_average_corner;
+    patch_vt->d3->interpolate_block_corner   = clawpatch_interpolate_corner;
+
+    patch_vt->transform_init_data  = fclaw3d_clawpatch_transform_init_data;
+    patch_vt->transform_face       = fclaw3d_clawpatch_face_transformation;
+    patch_vt->transform_face_intra = fclaw3d_clawpatch_face_transformation_intra;
+
+    patch_vt->metric_patch = clawpatch_get_metric_patch_3d;
+}
+
 void fclaw_clawpatch_vtable_initialize(fclaw_global_t* glob, 
                                        int claw_version)
 {
@@ -1698,41 +1755,14 @@ void fclaw_clawpatch_vtable_initialize(fclaw_global_t* glob,
     patch_vt->save_step             = clawpatch_save_step;
     patch_vt->setup_timeinterp      = clawpatch_setup_timeinterp;
 
-    /* Ghost filling */
-    patch_vt->d2->copy_face            = clawpatch_copy_face;
-    patch_vt->d2->average_face         = clawpatch_average_face;
-    patch_vt->d2->interpolate_face     = clawpatch_interpolate_face;
-
-    patch_vt->d2->copy_corner          = clawpatch_copy_corner;
-    patch_vt->d2->average_corner       = clawpatch_average_corner;
-    patch_vt->d2->interpolate_corner   = clawpatch_interpolate_corner;
-
-    /* Assume regular block corners;  Change by calling 'fclaw2d_clawpatch_use_pillowsphere' */    
-    patch_vt->d2->copy_block_corner          = clawpatch_copy_corner;
-    patch_vt->d2->average_block_corner       = clawpatch_average_corner;
-    patch_vt->d2->interpolate_block_corner   = clawpatch_interpolate_corner;
-
-    if(clawpatch_vt->dim == 2)
+    if(patch_vt->dim == 2)
     {
-        /* Timing syncing module for conservation */
-        patch_vt->time_sync_f2c       = fclaw2d_clawpatch_time_sync_f2c;
-        patch_vt->time_sync_samesize  = fclaw2d_clawpatch_time_sync_samesize;
-        patch_vt->time_sync_reset     = fclaw2d_clawpatch_time_sync_reset;
+        initialize_2d_patch_vt(patch_vt);
     }
-
-    /* Transform functions (defined in forestclaw2d */
-    if(domain->dim == 2)
+    else 
     {
-        patch_vt->transform_init_data  = fclaw2d_clawpatch_transform_init_data;
-        patch_vt->transform_face       = fclaw2d_clawpatch_face_transformation;       /* forestclaw2d.c */
-        patch_vt->transform_face_intra = fclaw2d_clawpatch_face_transformation_intra; /* forestclaw2d.c */
+        initialize_3d_patch_vt(patch_vt);
     }
-    else {
-        patch_vt->transform_init_data  = fclaw3d_clawpatch_transform_init_data;
-        patch_vt->transform_face       = fclaw3d_clawpatch_face_transformation;       /* forestclaw2d.c */
-        patch_vt->transform_face_intra = fclaw3d_clawpatch_face_transformation_intra; /* forestclaw2d.c */
-    }
-
 
     /* Regridding  functions */
     patch_vt->tag4refinement       = clawpatch_tag4refinement;
@@ -1758,17 +1788,7 @@ void fclaw_clawpatch_vtable_initialize(fclaw_global_t* glob,
     clawpatch_vt->time_header_ascii  = fclaw_clawpatch_time_header_ascii;
     clawpatch_vt->cb_output_ascii    = cb_clawpatch_output_ascii; 
 
-    /* Metric access */
-    if(clawpatch_vt->dim == 2)
-    {
-        patch_vt->metric_patch = clawpatch_get_metric_patch_2d;
-    }
-    else
-    {
-        patch_vt->metric_patch = clawpatch_get_metric_patch_3d;
-    }
-
-    if(clawpatch_vt->dim == 2)
+    if(clawpatch_opt->dim == 2)
     {
         /* Ghost pack for registers (doesn't depend on clawpack version) */
         clawpatch_vt->time_sync_pack_registers = fclaw2d_clawpatch_time_sync_pack_registers;

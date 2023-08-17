@@ -73,14 +73,14 @@ typedef void (*fclaw2d_ray_create_files_t)(struct fclaw_global *glob,
                                            int num_rays);
 
 typedef void (*fclaw2d_ray_normalize_t)(struct fclaw_global *glob, 
-                                       struct fclaw2d_block *block,
+                                       struct fclaw_block *block,
                                        int blockno, 
                                        struct fclaw2d_ray *g,
                                        double *xc, double *yc);
 
 
 typedef void (*fclaw2d_ray_update_t)(struct fclaw_global* glob, 
-                                     struct fclaw2d_block* block,
+                                     struct fclaw_block* block,
                                      struct fclaw2d_patch* patch, 
                                      int blockno, int patchno,
                                      double tcurr, struct fclaw2d_ray *g);

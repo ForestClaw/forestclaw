@@ -241,6 +241,10 @@ TEST_CASE("3d clawpatch ghost filling on uniform cube")
                 int i_start, i_stop, j_start, j_stop, k_start, k_stop;
                 get_bounds_with_ghost(clawpatch, intersects_bc,&i_start,&i_stop,&j_start,&j_stop,&k_start,&k_stop);
 
+                //clear error q
+                int size = fclaw_clawpatch_size(cube_output->glob);
+                memset(error_q, 0, sizeof(double)*size);
+
                 //loop over all cells
                 for(int m = 0; m < opts->meqn; m++)
                 for(int k = k_start; k < k_stop; k++)

@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_clawpatch.h>
 #include <fclaw2d_clawpatch_fort.h>  /* headers for tag2refinement, tag4coarsening  */
 
-#include <fclaw2d_block.h>
+#include <fclaw_block.h>
 
 static
 void sphere_problem_setup(fclaw_global_t* glob)

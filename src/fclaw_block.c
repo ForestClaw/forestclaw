@@ -23,20 +23,20 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <fclaw2d_block.h>
+#include <fclaw_block.h>
 #include <fclaw_global.h>
 #include <fclaw2d_defs.h>
 
 #include <fclaw_patch.h>
 
 
-void fclaw2d_block_get_block_boundary(fclaw_global_t * glob,
+void fclaw_block_get_block_boundary(fclaw_global_t * glob,
                                       fclaw_patch_t * patch,
                                       int *intersects_block)
 {
     int iside;
 
-    for (iside = 0; iside < FCLAW2D_NUMFACES; iside++)
+    for (iside = 0; iside < fclaw_domain_num_faces(glob->domain); iside++)
     {
         int iface_flags = fclaw2d_patch_block_face_flags[iside];
         int is_block_face = (patch->flags & iface_flags) != 0;

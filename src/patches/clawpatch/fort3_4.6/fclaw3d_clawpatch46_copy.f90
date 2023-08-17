@@ -32,7 +32,7 @@ subroutine fclaw3d_clawpatch46_fort_copy_face(mx,my,mz,mbc, &
             do j = 1,my
                do i = 1-mbc,0
                   ! Lower side
-                  qthis(i,j,k,mq) = qneighbor(i-mx,j,k,mq);
+                  qthis(i,j,k,mq) = qneighbor(i+mx,j,k,mq);
                enddo
             enddo
           enddo
@@ -43,7 +43,7 @@ subroutine fclaw3d_clawpatch46_fort_copy_face(mx,my,mz,mbc, &
             do j = 1,my
                do i = mx+1,mx+mbc
                   ! Upper side
-                  qthis(i,j,k,mq) = qneighbor(i+mx,j,k,mq);
+                  qthis(i,j,k,mq) = qneighbor(i-mx,j,k,mq);
                enddo
             enddo
           enddo
@@ -54,7 +54,7 @@ subroutine fclaw3d_clawpatch46_fort_copy_face(mx,my,mz,mbc, &
             do j = 1-mbc,0
                do i = 1,mx
                   ! left side
-                  qthis(i,j,k,mq) = qneighbor(i,j-my,k,mq);
+                  qthis(i,j,k,mq) = qneighbor(i,j+my,k,mq);
                enddo
             enddo
           enddo
@@ -65,7 +65,29 @@ subroutine fclaw3d_clawpatch46_fort_copy_face(mx,my,mz,mbc, &
             do j = my+1,my+mbc
                do i = 1,mx
                   ! right side
-                  qthis(i,j,k,mq) = qneighbor(i,j+my,k,mq);
+                  qthis(i,j,k,mq) = qneighbor(i,j-my,k,mq);
+               enddo
+            enddo
+          enddo
+       enddo
+    else if (iface .eq. 4) then
+       do mq = 1,meqn
+          do k = 1-mbc,0,mz
+            do j = 1,my
+               do i = 1,mx
+                  ! bottom
+                  qthis(i,j,k,mq) = qneighbor(i,j,k+mz,mq);
+               enddo
+            enddo
+          enddo
+       enddo
+    else if (iface .eq. 5) then
+       do mq = 1,meqn
+          do k = mz+1,mz+mbc
+            do j = 1,my
+               do i = 1,mx
+                  ! top
+                  qthis(i,j,k,mq) = qneighbor(i,j,k-mz,mq);
                enddo
             enddo
           enddo

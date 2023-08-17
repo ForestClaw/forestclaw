@@ -7,6 +7,7 @@ libforestclaw_generated_headers = src/fclaw_config.h
 libforestclaw_installed_headers = \
 	src/fclaw_advance.h \
 	src/fclaw_base.h \
+	src/fclaw_block.h \
 	src/fclaw_diagnostics.h \
 	src/fclaw_domain.h \
 	src/fclaw_elliptic_solver.h \
@@ -31,7 +32,6 @@ libforestclaw_installed_headers = \
 	\
 	src/fp_exception_glibc_extension.h \
 	\
-	src/fclaw2d_block.h \
 	src/fclaw2d_convenience.h \
 	src/fclaw2d_corner_neighbors.h \
 	src/fclaw2d_defs.h \
@@ -94,7 +94,7 @@ libforestclaw_compiled_sources = \
 	src/fclaw_timer.c \
 	src/fclaw_vtable.c \
 	\
-	src/fclaw2d_block.c \
+	src/fclaw_block.c \
 	src/fclaw2d_convenience.c \
 	src/fclaw2d_corner_neighbors.c \
 	src/fclaw2d_face_neighbors.c \

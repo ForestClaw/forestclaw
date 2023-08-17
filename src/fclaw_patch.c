@@ -34,6 +34,34 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 struct fclaw_patch_transform_data;
 
+fclaw_patch_transform_data_t* fclaw_patch_transform_data_new(int dim)
+{
+	fclaw_patch_transform_data_t* tdata = FCLAW_ALLOC_ZERO(fclaw_patch_transform_data_t,1);
+	tdata->dim = dim;
+	if(dim == 2)
+	{
+		tdata->d2 = FCLAW_ALLOC_ZERO(fclaw_patch_transform_data_d2_t,1);
+	}
+	else 
+	{
+		tdata->d3 = FCLAW_ALLOC_ZERO(fclaw_patch_transform_data_d3_t,1);
+	}
+	return tdata;
+}
+
+void fclaw_patch_transform_data_destroy(fclaw_patch_transform_data_t *tdata)
+{
+	if(tdata->dim == 2)
+	{
+		FCLAW_FREE(tdata->d2);
+	}
+	else 
+	{
+		FCLAW_FREE(tdata->d3);
+	}
+	FCLAW_FREE(tdata);
+}
+
 /* ------------------------------- static access functions ---------------------------- */
 static
 fclaw_patch_data_t* get_patch_data(fclaw_patch_t* patch)
@@ -322,7 +350,6 @@ void fclaw_patch_copy_face(fclaw_global_t* glob,
 							 fclaw_patch_transform_data_t *transform_data)
 {
 	fclaw_patch_vtable_t *patch_vt = fclaw_patch_vt(glob);
-	FCLAW_ASSERT(patch_vt->d2->copy_face != NULL);
 
 	if(patch_vt->dim == 2)
 	{
@@ -432,7 +459,7 @@ void fclaw_patch_copy_corner(fclaw_global_t* glob,
 		if (!is_block_corner)
 		{
 			FCLAW_ASSERT(patch_vt->d3->copy_corner != NULL);        
-			patch_vt->d2->copy_corner(glob,this_patch,corner_patch,
+			patch_vt->d3->copy_corner(glob,this_patch,corner_patch,
 								      coarse_blockno,fine_blockno,
 								      icorner,time_interp,transform_data);
 		}
@@ -831,7 +858,14 @@ fclaw_patch_vtable_t* patch_vt_new(int dim)
 {
     fclaw_patch_vtable_t* vt = FCLAW_ALLOC_ZERO (fclaw_patch_vtable_t, 1);
 	vt->dim = dim;
-	vt->d2 = FCLAW_ALLOC_ZERO (fclaw_patch_vtable_d2_t, 1);
+	if(dim == 2)
+	{
+		vt->d2 = FCLAW_ALLOC_ZERO (fclaw_patch_vtable_d2_t, 1);
+	}
+	else 
+	{
+		vt->d3 = FCLAW_ALLOC_ZERO (fclaw_patch_vtable_d3_t, 1);
+	}
     return vt;
 }
 
@@ -839,7 +873,14 @@ static
 void patch_vt_destroy(void* vt)
 {
 	fclaw_patch_vtable_t* patch_vt = (fclaw_patch_vtable_t*) vt;
-	FCLAW_FREE (patch_vt->d2);
+	if(patch_vt->dim == 2)
+	{
+		FCLAW_FREE (patch_vt->d2);
+	}
+	else
+	{
+		FCLAW_FREE (patch_vt->d3);
+	}
     FCLAW_FREE (patch_vt);
 }
 
@@ -850,7 +891,7 @@ void fclaw_patch_vtable_initialize(fclaw_global_t* glob)
 		"domain needs to be stored in glob before initializing vtables"
 	);
 
-	fclaw_patch_vtable_t *patch_vt = patch_vt_new(2);
+	fclaw_patch_vtable_t *patch_vt = patch_vt_new(glob->domain->dim);
 
 	patch_vt->is_set = 1;
 
