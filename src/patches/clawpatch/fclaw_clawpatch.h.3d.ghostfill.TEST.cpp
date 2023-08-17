@@ -270,7 +270,7 @@ TEST_CASE("3d clawpatch ghost filling on uniform cube")
         CHECK_EQ(cube_output.num_incorrect_cells, 0);
 
         //if not write output
-        if(cube_output.num_incorrect_cells > 0)
+        if(test_output_vtk() && cube_output.num_incorrect_cells > 0)
         {
             std::string filename = "3d_ghost_fill_uniform_cube"+std::to_string(test_no);
             INFO("Test failed output error to " << filename << ".vtu");

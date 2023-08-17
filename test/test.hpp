@@ -1,10 +1,9 @@
 #ifndef FCLAW_TEST_HPP
 #define FCLAW_TEST_HPP
-#include <fclaw_domain.h>
-#include <fclaw_options.h>
 #include <doctest.h>
 #include <csetjmp>
-fclaw_domain_t* create_test_domain(sc_MPI_Comm mpicomm, fclaw_options_t* fclaw_opt);
+
+bool test_output_vtk();
 
 void fclaw_test_expect_abort();
 void fclaw_test_clear_expect_abort();

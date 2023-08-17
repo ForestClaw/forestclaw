@@ -6,6 +6,13 @@
 #include <exception>
 #include <csetjmp>
 
+static bool output_vtk=false;
+
+bool test_output_vtk()
+{
+    return output_vtk;
+}
+
 static bool expect_abort=false;
 
 std::jmp_buf jump_buffer;
@@ -37,6 +44,12 @@ std::jmp_buf& fclaw_test_get_jump_buffer()
 int main(int argc, char *argv[])
 {
     bool listing = false;
+    //add vtk option to output vtk files
+    for (int i = 0; i < argc; i++) {
+        output_vtk = strcmp(argv[i], "--vtk") == 0;
+        if (output_vtk)
+            break;
+    }
     for (int i = 0; i < argc; i++) {
         listing = strcmp(argv[i], "--list-test-cases") == 0;
         if (listing)
@@ -91,33 +104,4 @@ int main(int argc, char *argv[])
     }
 
     return 0;
-}
-
-#include <fclaw_domain.h>
-#include <fclaw_options.h>
-#include <fclaw2d_p4est.h>
-#include <fclaw2d_convenience.h>
-
-fclaw_domain_t* create_test_domain(sc_MPI_Comm mpicomm, fclaw_options_t* fclaw_opt)
-{
-    /* Mapped, multi-block domain */
-    p4est_connectivity_t     *conn = NULL;
-    fclaw_domain_t         *domain;
-    fclaw2d_map_context_t    *cont = NULL, *brick = NULL;
-    
-    int mi = fclaw_opt->mi;
-    int mj = fclaw_opt->mj;    
-    int a = 0; /* non-periodic */
-    int b = 0;
-
-    /* Square brick domain */
-    conn = p4est_connectivity_new_brick(mi,mj,a,b);
-    brick = fclaw2d_map_new_brick_conn (conn,mi,mj);
-    cont = fclaw2d_map_new_nomap_brick(brick);
-    
-    domain = fclaw2d_domain_new_conn_map (mpicomm, fclaw_opt->minlevel, conn, cont);
-    fclaw_domain_list_levels(domain, FCLAW_VERBOSITY_ESSENTIAL);
-    fclaw_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);
-    
-    return domain;    
 }
