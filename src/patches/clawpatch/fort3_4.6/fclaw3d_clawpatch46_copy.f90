@@ -102,42 +102,27 @@ subroutine fclaw3d_clawpatch46_fort_get_corner_start( &
             icorner,mx,my,mz,mbc, &
             i1, j1, k1)
     implicit none
-    integer mx, my, mz, mbc, meqn, icorner
+    integer mx, my, mz, mbc, icorner
     integer i1, j1, k1
 
-    if (icorner .eq. 0) then
-         i1 = 1-mbc
-         j1 = 1-mbc
-         k1 = 1-mbc
-    elseif (icorner .eq. 1) then
+    if (btest(icorner,0)) then
          i1 = mx+1
-         j1 = 1-mbc
-         k1 = 1-mbc
-    elseif (icorner .eq. 2) then
+    else
          i1 = 1-mbc
-         j1 = my+1
-         k1 = 1-mbc
-    elseif (icorner .eq. 3) then
-         i1 = mx+1
-         j1 = my+1
-         k1 = 1-mbc
-    elseif (icorner .eq. 4) then
-         i1 = 1-mbc
-         j1 = 1-mbc
-         k1 = mz+1
-    elseif (icorner .eq. 5) then
-         i1 = mx+1
-         j1 = 1-mbc
-         k1 = mz+1
-    elseif (icorner .eq. 6) then
-         i1 = 1-mbc
-         j1 = my+1
-         k1 = mz+1
-    elseif (icorner .eq. 7) then
-         i1 = mx+1
-         j1 = my+1
-         k1 = mz+1
     endif
+
+    if (btest(icorner,1)) then
+         j1 = my+1
+    else
+         j1 = 1-mbc
+    endif
+
+    if (btest(icorner,2)) then
+         k1 = mz+1
+    else
+         k1 = 1-mbc
+    endif
+
 end subroutine fclaw3d_clawpatch46_fort_get_corner_start
 
 subroutine fclaw3d_clawpatch46_fort_copy_corner(mx,my,mz,mbc,meqn, &

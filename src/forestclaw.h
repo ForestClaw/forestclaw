@@ -105,6 +105,9 @@ typedef enum
 }
 fclaw3d_patch_flags_t;
 
+/** For each of the 6 faces, the corresponding block boundary flag. */
+extern const fclaw3d_patch_flags_t fclaw3d_patch_block_face_flags[6];
+
 
 typedef struct fclaw_patch fclaw_patch_t;
 typedef struct fclaw_patch_bounds_2d fclaw_patch_bounds_2d_t;

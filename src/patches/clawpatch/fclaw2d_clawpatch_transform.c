@@ -31,6 +31,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define PATCH_DIM 2
 #endif
 
+#include <forestclaw2d.h>
+#include <fclaw_patch.h>
+#include <fclaw_global.h>
+
 #if REFINE_DIM == 2 && PATCH_DIM == 2
 
 #include <fclaw2d_clawpatch_transform.h>
@@ -49,8 +53,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #endif
 
-#include <fclaw_patch.h>
-#include <fclaw_global.h>
 
 void fclaw2d_clawpatch_transform_init_data(fclaw_global_t* glob, 
                                            fclaw_patch_t* this_patch,
