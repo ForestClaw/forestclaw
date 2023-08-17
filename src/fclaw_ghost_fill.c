@@ -822,13 +822,13 @@ void fclaw_ghost_update_async(fclaw_global_t* glob,
 						time_interp,
 						FCLAW_BOUNDARY_ALL);
 	fclaw_timer_stop (&glob->timers[FCLAW_TIMER_GHOSTFILL_STEP3]);
+	}
 
 	// Stop timing
 	fclaw_timer_stop (&glob->timers[FCLAW_TIMER_GHOSTFILL]);
 	if (running != FCLAW_TIMER_NONE)
 	{
 		fclaw_timer_start (&glob->timers[running]);
-	}
 	}
 }
 

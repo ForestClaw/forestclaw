@@ -239,7 +239,7 @@ fclaw_patch_childid (const fclaw_patch_t * patch)
     else 
     {
         childid = patch->flags & FCLAW3D_PATCH_CHILDID;
-        FCLAW_ASSERT (0 <= childid && childid < P4EST_CHILDREN);
+        FCLAW_ASSERT (0 <= childid && childid < P8EST_CHILDREN);
     }
 
     return childid;

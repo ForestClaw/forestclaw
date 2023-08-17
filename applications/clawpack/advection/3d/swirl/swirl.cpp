@@ -171,7 +171,7 @@ main (int argc, char **argv)
     /* Options */
     user_options_t               *user_opt;
     fclaw_options_t              *fclaw_opt;
-   fclaw_clawpatch_options_t *clawpatch_opt;
+    fclaw_clawpatch_options_t    *clawpatch_opt;
     fc3d_clawpack46_options_t    *claw46_opt;
 
     fclaw_global_t            *glob;
