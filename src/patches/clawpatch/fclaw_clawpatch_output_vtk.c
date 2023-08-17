@@ -906,18 +906,15 @@ fclaw2d_output_write_vtk_debug (fclaw_global_t * glob, const char *basename)
     Public interface
     --------------------------------------------------------------------------- */
 
-void fclaw_clawpatch_output_vtk (fclaw_global_t * glob, int iframe)
+void fclaw_clawpatch_output_vtk_to_file (fclaw_global_t * glob, const char* filename)
 {
     const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
     const fclaw_clawpatch_options_t *clawpatch_opt = fclaw_clawpatch_get_options(glob);
 
 
-    char basename[BUFSIZ];
-    snprintf (basename, BUFSIZ, "%s_frame_%04d", fclaw_opt->prefix, iframe);
-
     if(clawpatch_opt->dim == 2)
     {
-        fclaw2d_vtk_write_file (glob, basename,
+        fclaw2d_vtk_write_file (glob, filename,
                                 clawpatch_opt->d2->mx, 
                                 clawpatch_opt->d2->my,
                                 clawpatch_opt->meqn,
@@ -928,7 +925,7 @@ void fclaw_clawpatch_output_vtk (fclaw_global_t * glob, int iframe)
     }
     else 
     {
-        fclaw3d_vtk_write_file (glob, basename,
+        fclaw3d_vtk_write_file (glob, filename,
                                 clawpatch_opt->d3->mx, 
                                 clawpatch_opt->d3->my, 
                                 clawpatch_opt->d3->mz,
@@ -938,5 +935,15 @@ void fclaw_clawpatch_output_vtk (fclaw_global_t * glob, int iframe)
                                 fclaw3d_output_vtk_value_cb);
     }
 }
+void fclaw_clawpatch_output_vtk (fclaw_global_t * glob, int iframe)
+{
+    const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
+
+    char basename[BUFSIZ];
+    snprintf (basename, BUFSIZ, "%s_frame_%04d", fclaw_opt->prefix, iframe);
+
+    fclaw_clawpatch_output_vtk_to_file(glob,basename);
+}
+
 
 

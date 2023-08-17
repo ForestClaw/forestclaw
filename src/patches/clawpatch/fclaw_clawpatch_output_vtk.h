@@ -108,6 +108,14 @@ fclaw3d_vtk_write_file (struct fclaw_global * glob, const char *basename,
                         fclaw_vtk_patch_data_t coordinate_cb,
                         fclaw_vtk_patch_data_t value_cb);
 
+/**
+ * @brief Output vtu file
+ * 
+ * @param glob the global context
+ * @param filename the filename to output to
+ */
+void fclaw_clawpatch_output_vtk_to_file (struct fclaw_global* glob, const char* filename);
+
 
 /**
  * @brief Output vtu file
