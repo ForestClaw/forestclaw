@@ -126,7 +126,7 @@ FCLAW3D_CLAWPATCH_TRANSFORM_CORNER (const int *i1, const int *j1, const int *k1,
     *i2 = *i1;
     *j2 = *j1;
     *k2 = *k1;
-    if (tdata->d2->block_iface >= 0)
+    if (tdata->d3->block_iface >= 0)
     {
         /* block-face but not a block-corner */
 #if 0
@@ -142,10 +142,10 @@ FCLAW3D_CLAWPATCH_TRANSFORM_CORNER (const int *i1, const int *j1, const int *k1,
         /* Corner within a block or a block-block corner. For block-block
          * corners, we assume both patches lie in coordinate systems with the
          * same orientation. */
-        FCLAW_ASSERT (tdata->d2->block_iface == -1);
+        FCLAW_ASSERT (tdata->d3->block_iface == -1);
         fclaw3d_patch_transform_corner (tdata->this_patch,
                                         tdata->neighbor_patch,
-                                        tdata->d2->icorner, tdata->d2->is_block_corner,
+                                        tdata->d3->icorner, tdata->d3->is_block_corner,
                                         mx, my, mz,
                                         tdata->based, i2, j2, k2);
     }
@@ -167,7 +167,7 @@ FCLAW3D_CLAWPATCH_TRANSFORM_CORNER_HALF (const int *i1, const int *j1, const int
     i2[0] = *i1;
     j2[0] = *j1;
     k2[0] = *k1;
-    if (tdata->d2->block_iface >= 0)
+    if (tdata->d3->block_iface >= 0)
     {
         /* block-face but not a block-corner. */
         fclaw3d_patch_transform_face2 (tdata->this_patch,
@@ -181,10 +181,10 @@ FCLAW3D_CLAWPATCH_TRANSFORM_CORNER_HALF (const int *i1, const int *j1, const int
         /* Corner within a block or a block-block corner. For block-block
          * corners, we assume both patches lie in coordinate systems with the
          * same orientation. */
-        FCLAW_ASSERT (tdata->d2->block_iface == -1);
+        FCLAW_ASSERT (tdata->d3->block_iface == -1);
         fclaw3d_patch_transform_corner2 (tdata->this_patch,
                                          tdata->neighbor_patch,
-                                         tdata->d2->icorner, tdata->d2->is_block_corner,
+                                         tdata->d3->icorner, tdata->d3->is_block_corner,
                                          mx, my, mz,
                                          tdata->based, i2, j2, k2);
     }

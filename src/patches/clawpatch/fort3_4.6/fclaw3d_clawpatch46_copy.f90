@@ -98,6 +98,48 @@ subroutine fclaw3d_clawpatch46_fort_copy_face(mx,my,mz,mbc, &
 
 end subroutine fclaw3d_clawpatch46_fort_copy_face
 
+subroutine fclaw3d_clawpatch46_fort_get_corner_start( &
+            icorner,mx,my,mz,mbc, &
+            i1, j1, k1)
+    implicit none
+    integer mx, my, mz, mbc, meqn, icorner
+    integer i1, j1, k1
+
+    if (icorner .eq. 0) then
+         i1 = 1-mbc
+         j1 = 1-mbc
+         k1 = 1-mbc
+    elseif (icorner .eq. 1) then
+         i1 = mx+1
+         j1 = 1-mbc
+         k1 = 1-mbc
+    elseif (icorner .eq. 2) then
+         i1 = 1-mbc
+         j1 = my+1
+         k1 = 1-mbc
+    elseif (icorner .eq. 3) then
+         i1 = mx+1
+         j1 = my+1
+         k1 = 1-mbc
+    elseif (icorner .eq. 4) then
+         i1 = 1-mbc
+         j1 = 1-mbc
+         k1 = mz+1
+    elseif (icorner .eq. 5) then
+         i1 = mx+1
+         j1 = 1-mbc
+         k1 = mz+1
+    elseif (icorner .eq. 6) then
+         i1 = 1-mbc
+         j1 = my+1
+         k1 = mz+1
+    elseif (icorner .eq. 7) then
+         i1 = mx+1
+         j1 = my+1
+         k1 = mz+1
+    endif
+end subroutine fclaw3d_clawpatch46_fort_get_corner_start
+
 subroutine fclaw3d_clawpatch46_fort_copy_corner(mx,my,mz,mbc,meqn, &
     qthis, qneighbor, this_icorner,transform_ptr)
     implicit none
@@ -107,36 +149,23 @@ subroutine fclaw3d_clawpatch46_fort_copy_corner(mx,my,mz,mbc,meqn, &
     double precision     qthis(1-mbc:mx+mbc,1-mbc:my+mbc,1-mbc:mz+mbc,meqn)
     double precision qneighbor(1-mbc:mx+mbc,1-mbc:my+mbc,1-mbc:mz+mbc,meqn)
 
-    integer mq, ibc, jbc
-    integer i1, j1, i2, j2, k
+    integer mq
+    integer i_start, j_start, k_start
+    integer i1,i2, j1,j2, k1,k2
+    call fclaw3d_clawpatch46_fort_get_corner_start(this_icorner, &
+                mx,my,mz,mbc, &
+                i_start,j_start,k_start)
 
     !! # Do exchanges for all corners
     mq_loop : do mq = 1,meqn
-        k_loop : do k = 1,mz
-            do ibc = 1,mbc
-                do jbc = 1,mbc
-                    if (this_icorner .eq. 0) then
-                        i1 = 1-ibc
-                        j1 = 1-jbc
-                    elseif (this_icorner .eq. 1) then
-                        i1 = mx+ibc
-                        j1 = 1-jbc
-                    elseif (this_icorner .eq. 2) then
-                        i1 = 1 -ibc
-                        j1 = my+jbc
-                    else
-                        i1 = mx+ibc
-                        j1 = my+jbc
-                    endif
-
-                    !! # this routine is not yet complete, but the complete one
-                    !! # can now be dropped in.
-                    !! TODO 3D
-                    !!call fclaw3d_clawpatch_transform_corner(i1,j1,i2,j2, transform_ptr)
-                    !!qthis(i1,j1,k,mq) = qneighbor(i2,j2,k,mq)
+         do k1 = k_start,k_start+mbc-1
+             do j1 = j_start,j_start+mbc-1
+                do i1 = i_start,i_start+mbc-1
+                    call fclaw3d_clawpatch_transform_corner(i1,j1,k1,i2,j2,k2, transform_ptr)
+                    qthis(i1,j1,k1,mq) = qneighbor(i2,j2,k2,mq)
                 end do
             end do
-        end do k_loop
+        end do
     end do mq_loop
 
 end subroutine fclaw3d_clawpatch46_fort_copy_corner
