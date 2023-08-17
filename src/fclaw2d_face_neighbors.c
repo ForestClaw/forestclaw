@@ -31,6 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw_global.h>
 #include <fclaw2d_defs.h>
+#include <fclaw3d_defs.h>
 
 #include <fclaw2d_block.h>
 #include <fclaw_patch.h>
@@ -80,14 +81,14 @@ void get_face_neighbors(fclaw_global_t *glob,
 						fclaw_patch_transform_data_t* ftransform_finegrid)
 {
 	fclaw_domain_t *domain = glob->domain;
-	int rproc[FCLAW2D_NUMFACENEIGHBORS];
+	int rproc[FCLAW3D_NUMFACENEIGHBORS]; //overallocate for 3d
 	int rblockno;
-	int rpatchno[FCLAW2D_NUMFACENEIGHBORS];
+	int rpatchno[FCLAW3D_NUMFACENEIGHBORS];
 	int rfaceno;
 	int num_neighbors;
 	int ir;
 
-	for(ir = 0; ir < FCLAW2D_NUMFACENEIGHBORS; ir++)
+	for(ir = 0; ir < FCLAW3D_NUMFACENEIGHBORS; ir++)
 	{
 		neighbor_patches[ir] = NULL;
 	}
@@ -162,7 +163,7 @@ void get_face_neighbors(fclaw_global_t *glob,
 			/* Patch has two neighbors */
 			**ref_flag_ptr = 1; /* patches are at one level finer */
 			*fine_grid_pos_ptr = NULL;
-			num_neighbors = FCLAW2D_NUMFACENEIGHBORS;
+			num_neighbors = fclaw_domain_num_children(domain)/2;
 		}
 		else
 		{
