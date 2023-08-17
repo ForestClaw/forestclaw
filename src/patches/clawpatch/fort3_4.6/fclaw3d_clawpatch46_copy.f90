@@ -20,21 +20,19 @@ subroutine fclaw3d_clawpatch46_fort_copy_face(mx,my,mz,mbc, &
     double precision qneighbor(1-mbc:mx+mbc,1-mbc:my+mbc,1-mbc:mz+mbc,meqn)
 
     integer mq, k
-    integer i1,j1, i2, j2
+    integer i,j
 
     integer a(2,2), f(2)
 
-    call fclaw3d_clawpatch_build_transform_same(transform_ptr, a, f)
+    !!call fclaw3d_clawpatch_build_transform_same(transform_ptr, a, f)
 
     if (iface .eq. 0) then
        do mq = 1,meqn
           do k = 1,mz
-            do j1 = 1,my
-               do i1 = 1-mbc,0
+            do j = 1,my
+               do i = 1-mbc,0
                   ! Lower side
-                  i2 = a(1,1)*i1 + a(1,2)*j1 + f(1)
-                  j2 = a(2,1)*i1 + a(2,2)*j1 + f(2)
-                  qthis(i1,j1,k,mq) = qneighbor(i2,j2,k,mq)
+                  qthis(i,j,k,mq) = qneighbor(i-mx,j,k,mq);
                enddo
             enddo
           enddo
@@ -42,12 +40,10 @@ subroutine fclaw3d_clawpatch46_fort_copy_face(mx,my,mz,mbc, &
     else if (iface .eq. 1) then
        do mq = 1,meqn
           do k = 1,mz
-            do j1 = 1,my
-               do i1 = mx+1,mx+mbc
+            do j = 1,my
+               do i = mx+1,mx+mbc
                   ! Upper side
-                  i2 = a(1,1)*i1 + a(1,2)*j1 + f(1)
-                  j2 = a(2,1)*i1 + a(2,2)*j1 + f(2)
-                  qthis(i1,j1,k,mq) = qneighbor(i2,j2,k,mq)
+                  qthis(i,j,k,mq) = qneighbor(i+mx,j,k,mq);
                enddo
             enddo
           enddo
@@ -55,12 +51,10 @@ subroutine fclaw3d_clawpatch46_fort_copy_face(mx,my,mz,mbc, &
     else if (iface .eq. 2) then
        do mq = 1,meqn
           do k = 1,mz
-            do j1 = 1-mbc,0
-               do i1 = 1,mx
+            do j = 1-mbc,0
+               do i = 1,mx
                   ! left side
-                  i2 = a(1,1)*i1 + a(1,2)*j1 + f(1)
-                  j2 = a(2,1)*i1 + a(2,2)*j1 + f(2)
-                  qthis(i1,j1,k,mq) = qneighbor(i2,j2,k,mq)
+                  qthis(i,j,k,mq) = qneighbor(i,j-my,k,mq);
                enddo
             enddo
           enddo
@@ -68,12 +62,10 @@ subroutine fclaw3d_clawpatch46_fort_copy_face(mx,my,mz,mbc, &
     else if (iface .eq. 3) then
        do mq = 1,meqn
           do k = 1,mz
-            do j1 = my+1,my+mbc
-               do i1 = 1,mx
+            do j = my+1,my+mbc
+               do i = 1,mx
                   ! right side
-                  i2 = a(1,1)*i1 + a(1,2)*j1 + f(1)
-                  j2 = a(2,1)*i1 + a(2,2)*j1 + f(2)
-                  qthis(i1,j1,k,mq) = qneighbor(i2,j2,k,mq)
+                  qthis(i,j,k,mq) = qneighbor(i,j+my,k,mq);
                enddo
             enddo
           enddo
@@ -117,8 +109,9 @@ subroutine fclaw3d_clawpatch46_fort_copy_corner(mx,my,mz,mbc,meqn, &
 
                     !! # this routine is not yet complete, but the complete one
                     !! # can now be dropped in.
-                    call fclaw3d_clawpatch_transform_corner(i1,j1,i2,j2, transform_ptr)
-                    qthis(i1,j1,k,mq) = qneighbor(i2,j2,k,mq)
+                    !! TODO 3D
+                    !!call fclaw3d_clawpatch_transform_corner(i1,j1,i2,j2, transform_ptr)
+                    !!qthis(i1,j1,k,mq) = qneighbor(i2,j2,k,mq)
                 end do
             end do
         end do k_loop

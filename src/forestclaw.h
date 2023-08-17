@@ -450,6 +450,18 @@ int fclaw_patch_is_ghost (const fclaw_patch_t * patch);
 /* ---------------------------------------------------------------------- */
 ///@{
 
+/** Change perspective across a face neighbor situation.
+ * \param [in]     dim      The space dimension.
+ * \param [in,out] faceno   On input, valid face number for a patch.
+ *                          On output, valid face number seen from
+ *                          faceno's neighbor patch.
+ * \param [in,out] rfaceno  On input, encoded neighbor face number as returned
+ *                          by fclaw2d_patch_face_neighbors.
+ *                          On output, encoded neighbor face number seen from
+ *                          faceno's neighbor patch.
+ */
+void fclaw_patch_face_swap (int dim, int *faceno, int *rfaceno);
+
 /** Determine physical boundary status as 1, or 0 for neighbor patches.
  * This must ONLY be called for local patches.
  * \param [in] domain	Valid domain structure.
@@ -599,6 +611,9 @@ void fclaw_domain_iterate_families (fclaw_domain_t * domain,
 
 /** Return the space dimension. */
 int fclaw_domain_dimension (const fclaw_domain_t * domain);
+
+/** Return refine factor in tree: 2 in 2D, 4 in 3D. */
+int fclaw_domain_refine_factor (const fclaw_domain_t * domain);
 
 /** Return number of children in tree: 4 in 2D, 8 in 3D. */
 int fclaw_domain_num_children (const fclaw_domain_t * domain);

@@ -30,6 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_map_query.h>
 #include <fclaw_options.h>
 #include <fclaw2d_defs.h>
+#include <fclaw3d_defs.h>
 #include <fclaw_global.h>
 #include <fclaw_physical_bc.h>
 #include <fclaw_patch.h>
@@ -47,6 +48,35 @@ enum
 
 
 static
+int get_num_intersections(int dim,int intersects[], int faces[])
+{
+    int num_intersections = 0;
+    int i;
+    for (i = 0; i < dim; i++)
+    {
+        if (intersects[faces[i]])
+        {
+            num_intersections++;
+        }
+    }
+    return num_intersections;
+}
+
+static
+int find_face(int dim, int intersects[], int faces[])
+{
+    int i;
+    for (i = 0; i < dim; i++)
+    {
+        if (intersects[faces[i]])
+        {
+            return faces[i];
+        }
+    }
+    return -1;
+}
+
+static
 void get_corner_type(fclaw_global_t* glob,
                      int icorner,
                      int intersects_bdry[],
@@ -58,40 +88,29 @@ void get_corner_type(fclaw_global_t* glob,
     fclaw_domain_t *domain = glob->domain;
 
     // p4est has tons of lookup table like this, can be exposed similarly
-    int corner_faces[FCLAW2D_SPACEDIM];
+    int corner_faces[FCLAW3D_SPACEDIM]; //overallocate for 3d
     fclaw_domain_corner_faces(domain, icorner, corner_faces);
 
     /* Both faces are at a physical boundary */
-    int is_phys_corner =
-        intersects_bdry[corner_faces[0]] && intersects_bdry[corner_faces[1]];
-
-    /* Corner lies in interior of physical boundary edge. */
-    int corner_on_phys_face = !is_phys_corner &&
-             (intersects_bdry[corner_faces[0]] || intersects_bdry[corner_faces[1]]);
+    int num_phys_faces = get_num_intersections(domain->dim, 
+                                               intersects_bdry,
+                                               corner_faces);
 
     /* Either a corner is at a block boundary (but not a physical boundary),
        or internal to a block.  L-shaped domains are excluded for now
        (i.e. no reentrant corners). */
-    *interior_corner = !corner_on_phys_face && !is_phys_corner;
+    *interior_corner = num_phys_faces == 0;
 
+    int num_block_faces = get_num_intersections(domain->dim, 
+                                                intersects_block,
+                                                corner_faces);
     /* Both faces are at a block boundary, physical or not */
-    *is_block_corner =
-        intersects_block[corner_faces[0]] && intersects_block[corner_faces[1]];
+    *is_block_corner = num_block_faces == domain->dim;
 
     *block_iface = -1;
-    if (!*is_block_corner)
+    if (num_block_faces == 1)
     {
-        /* At most one of these is true if corner is not a block corner */
-        if (intersects_block[corner_faces[0]])
-        {
-            /* Corner is on a block face. */
-            *block_iface = corner_faces[0];
-        }
-        else if (intersects_block[corner_faces[1]])
-        {
-            /* Corner is on a block face. */
-            *block_iface = corner_faces[1];
-        }
+        *block_iface = find_face(domain->dim, intersects_block, corner_faces);
     }
 }
 
@@ -148,9 +167,15 @@ void get_corner_neighbor(fclaw_global_t *glob,
     int rproc_corner;
     int corner_patch_idx;
     fclaw_patch_relation_t neighbor_type;
+    const int refine_factor = fclaw_domain_refine_factor(domain);
 
     /* Note : Pillowsphere case does not return a block corner neighbor */
-    int ispillowsphere = fclaw2d_map_pillowsphere(glob);
+    int ispillowsphere = 0;
+    if(domain->dim == 2)
+    {
+        //TODO 3d
+        fclaw2d_map_pillowsphere(glob);
+    }
 
     fclaw_timer_start (&glob->timers[FCLAW_TIMER_NEIGHBOR_SEARCH]);
     int has_corner_neighbor =
@@ -200,8 +225,8 @@ void get_corner_neighbor(fclaw_global_t *glob,
                remote face number.  The remote face number encodes the
                orientation, so we have 0 <= rfaceno < 8 */
             int rfaceno;
-            int rproc[FCLAW2D_REFINEFACTOR];
-            int rpatchno[FCLAW2D_REFINEFACTOR];
+            int rproc[refine_factor];
+            int rpatchno[refine_factor];
             int rblockno;  /* Should equal *corner_block_idx, above. */
             fclaw_patch_face_neighbors(domain,
                                          this_block_idx,
@@ -222,7 +247,7 @@ void get_corner_neighbor(fclaw_global_t *glob,
                interpolation routines can be re-used. */
             int iface1 = block_iface;
             int rface1 = rfaceno;
-            fclaw2d_patch_face_swap(&iface1,&rface1);
+            fclaw_patch_face_swap(domain->dim, &iface1, &rface1);
             fclaw_patch_transform_blockface(glob, iface1, rface1,
                                               ftransform_finegrid->transform);
             ftransform_finegrid->d2->block_iface = iface1;
@@ -264,8 +289,8 @@ void get_corner_neighbor(fclaw_global_t *glob,
         {
             *block_corner_count = 2;
             has_corner_neighbor = 1;
-            int rpatchno[FCLAW2D_REFINEFACTOR];
-            int rproc[FCLAW2D_REFINEFACTOR];
+            int rpatchno[refine_factor];
+            int rproc[refine_factor];
             int rfaceno;
 
             /* Use only faces 0 or 1 to get block data. */
@@ -285,7 +310,7 @@ void get_corner_neighbor(fclaw_global_t *glob,
             {
                 /* igrid = 0 at corners 0,1 and (R-1) at corners 2,3,
                    where R = refinement factor */
-                igrid = (icorner/2)*(FCLAW2D_REFINEFACTOR - 1);
+                igrid = (icorner/2)*(refine_factor - 1);
             }
             else
             {
@@ -350,8 +375,8 @@ void cb_corner_fill(fclaw_domain_t *domain,
     int average_from_neighbor = filltype->exchange_type == FCLAW_AVERAGE;
     int interpolate_to_neighbor = filltype->exchange_type == FCLAW_INTERPOLATE;
 
-    int intersects_bdry[FCLAW2D_NUMFACES];
-    int intersects_block[FCLAW2D_NUMFACES];
+    int intersects_bdry[FCLAW3D_NUMFACES]; //overallocate for 3d
+    int intersects_block[FCLAW3D_NUMFACES];
     int is_block_corner;
     int is_interior_corner;
     int block_corner_count;

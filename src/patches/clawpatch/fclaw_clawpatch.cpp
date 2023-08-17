@@ -46,6 +46,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw3dx_clawpatch_fort.h>
 #include <fclaw3dx_clawpatch_transform.h>
 
+#include <fclaw3d_clawpatch_transform.h>
+
 #include <fclaw3dx_clawpatch46_fort.h>
 
 #include <fclaw3d_metric.h>
@@ -1719,9 +1721,18 @@ void fclaw_clawpatch_vtable_initialize(fclaw_global_t* glob,
     }
 
     /* Transform functions (defined in forestclaw2d */
-    patch_vt->transform_init_data  = fclaw2d_clawpatch_transform_init_data;
-    patch_vt->transform_face       = fclaw2d_clawpatch_face_transformation;       /* forestclaw2d.c */
-    patch_vt->transform_face_intra = fclaw2d_clawpatch_face_transformation_intra; /* forestclaw2d.c */
+    if(domain->dim == 2)
+    {
+        patch_vt->transform_init_data  = fclaw2d_clawpatch_transform_init_data;
+        patch_vt->transform_face       = fclaw2d_clawpatch_face_transformation;       /* forestclaw2d.c */
+        patch_vt->transform_face_intra = fclaw2d_clawpatch_face_transformation_intra; /* forestclaw2d.c */
+    }
+    else {
+        patch_vt->transform_init_data  = fclaw3d_clawpatch_transform_init_data;
+        patch_vt->transform_face       = fclaw3d_clawpatch_face_transformation;       /* forestclaw2d.c */
+        patch_vt->transform_face_intra = fclaw3d_clawpatch_face_transformation_intra; /* forestclaw2d.c */
+    }
+
 
     /* Regridding  functions */
     patch_vt->tag4refinement       = clawpatch_tag4refinement;

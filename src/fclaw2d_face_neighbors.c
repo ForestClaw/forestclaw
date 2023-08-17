@@ -130,7 +130,7 @@ void get_face_neighbors(fclaw_global_t *glob,
 		int iface1, rface1;
 		iface1 = iface;
 		rface1 = rfaceno;
-		fclaw2d_patch_face_swap(&iface1,&rface1);
+		fclaw_patch_face_swap(domain->dim, &iface1,&rface1);
 		fclaw_patch_transform_blockface (glob, iface1, rface1,
 										   ftransform_finegrid->transform);
 		ftransform_finegrid->d2->block_iface = iface1;
@@ -220,8 +220,8 @@ void cb_face_fill(fclaw_domain_t *domain,
 	const fclaw_options_t *gparms = fclaw_get_options(s->glob);
 	const int refratio = gparms->refratio;
 
-	int intersects_phys_bdry[FCLAW2D_NUMFACES];
-	int intersects_block[FCLAW2D_NUMFACES];
+	int intersects_phys_bdry[FCLAW3D_NUMFACES]; //overallocate for 3d
+	int intersects_block[FCLAW3D_NUMFACES];
 
 	fclaw_physical_get_bc(s->glob,this_block_idx,this_patch_idx,
 							intersects_phys_bdry);

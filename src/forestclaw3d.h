@@ -48,17 +48,6 @@ extern "C"
 /* ---------------------------------------------------------------------- */
 ///@{
 
-/** Change perspective across a face neighbor situation.
- * \param [in,out] faceno   On input, valid face number for a patch.
- *                          On output, valid face number seen from
- *                          faceno's neighbor patch.
- * \param [in,out] rfaceno  On input, encoded neighbor face number as returned
- *                          by fclaw3d_patch_face_neighbors.
- *                          On output, encoded neighbor face number seen from
- *                          faceno's neighbor patch.
- */
-void fclaw3d_patch_face_swap (int *faceno, int *rfaceno);
-
 /** Fill an array with the axis combination of a face neighbor transform.
  * \param [in]  faceno      The number of the originating face.
  * \param [in]  rfaceno     Encoded as rfaceno = r * 6 + nf, where nf = 0..5 is

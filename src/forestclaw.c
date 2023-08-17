@@ -147,6 +147,12 @@ fclaw_domain_dimension (const fclaw_domain_t * domain)
 }
 
 int
+fclaw_domain_refine_factor (const fclaw_domain_t * domain)
+{
+    return (domain->dim == 2) ? P4EST_CHILDREN/2 : P8EST_CHILDREN/2;
+}
+
+int
 fclaw_domain_num_children (const fclaw_domain_t * domain)
 {
     return (domain->dim == 2) ? P4EST_CHILDREN : P8EST_CHILDREN;
@@ -665,6 +671,25 @@ void fclaw_domain_free_after_exchange(fclaw_domain_t *domain, fclaw_domain_excha
 ///////////////////////////////////////
 
 //definition of dimension specific functions
+
+void fclaw2d_patch_face_swap (int *faceno, int *rfaceno);
+void fclaw3d_patch_face_swap (int *faceno, int *rfaceno);
+
+void fclaw_patch_face_swap(int dim, int *faceno, int *rfaceno)
+{
+    if(dim == 2)
+    {
+        fclaw2d_patch_face_swap(faceno,rfaceno);
+    }
+    else if (dim == 3)
+    {
+        fclaw3d_patch_face_swap(faceno,rfaceno);
+    }
+    else
+    {
+        SC_ABORT_NOT_REACHED();
+    }
+}
 
 int fclaw2d_patch_boundary_type (fclaw_domain_t * domain,
                                  int blockno, int patchno, int boundaries[4]);
