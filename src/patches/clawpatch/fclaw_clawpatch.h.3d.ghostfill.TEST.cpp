@@ -207,7 +207,7 @@ TEST_CASE("3d clawpatch ghost filling on uniform cube")
             nullptr
         );
 
-        //fclaw_ghost_update_nonasync(cube.glob, 1, 1, 0, 0, FCLAW_TIMER_NONE);
+        fclaw_ghost_update(cube.glob, 2, 2, 0, 0, FCLAW_TIMER_NONE);
 
         //check ghost cells
         //fill output domain with error
