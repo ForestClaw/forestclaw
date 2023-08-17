@@ -753,6 +753,8 @@ void fclaw_ghost_update_async(fclaw_global_t* glob,
 	fclaw_exchange_ghost_patches_end(glob,minlevel,maxlevel,time_interp,
 									   FCLAW_TIMER_GHOSTFILL);
 
+	if(glob->domain->dim == 2) //TODO 3d
+	{
 	/* -------------------------------------------------------------
 		Loop over ghost patches to find indirect neighbors and do
 		any necessary face exchanges.
@@ -826,6 +828,7 @@ void fclaw_ghost_update_async(fclaw_global_t* glob,
 	if (running != FCLAW_TIMER_NONE)
 	{
 		fclaw_timer_start (&glob->timers[running]);
+	}
 	}
 }
 
