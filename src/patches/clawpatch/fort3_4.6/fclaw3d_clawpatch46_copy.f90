@@ -72,7 +72,7 @@ subroutine fclaw3d_clawpatch46_fort_copy_face(mx,my,mz,mbc, &
        enddo
     else if (iface .eq. 4) then
        do mq = 1,meqn
-          do k = 1-mbc,0,mz
+          do k = 1-mbc,0
             do j = 1,my
                do i = 1,mx
                   ! bottom
