@@ -13,12 +13,14 @@ bool test_output_vtk()
     return output_vtk;
 }
 
+static bool has_aborted=true;
 static bool expect_abort=false;
 
 std::jmp_buf jump_buffer;
 
 void throw_exception()
 {
+    has_aborted = true;
     if(expect_abort)
     {
         expect_abort=false;
@@ -48,7 +50,10 @@ int main(int argc, char *argv[])
     for (int i = 0; i < argc; i++) {
         output_vtk = strcmp(argv[i], "--vtk") == 0;
         if (output_vtk)
+        {
+            std::cout << "outputting vtk files" << std::endl;
             break;
+        }
     }
     for (int i = 0; i < argc; i++) {
         listing = strcmp(argv[i], "--list-test-cases") == 0;

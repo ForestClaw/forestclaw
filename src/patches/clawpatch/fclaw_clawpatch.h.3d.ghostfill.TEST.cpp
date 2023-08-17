@@ -238,14 +238,14 @@ TEST_CASE("3d clawpatch ghost filling on uniform cube")
                     fclaw_patch_relation_t type = fclaw_patch_get_face_type(patch, i);
                     intersects_bc[i] = type == FCLAW_PATCH_BOUNDARY;
                 }
-                int i_start, i_stop, j_start, j_stop, k_start, k_stop;
-                get_bounds_with_ghost(clawpatch, intersects_bc,&i_start,&i_stop,&j_start,&j_stop,&k_start,&k_stop);
 
                 //clear error q
                 int size = fclaw_clawpatch_size(cube_output->glob);
                 memset(error_q, 0, sizeof(double)*size);
 
                 //loop over all cells
+                int i_start, i_stop, j_start, j_stop, k_start, k_stop;
+                get_bounds_with_ghost(clawpatch, intersects_bc,&i_start,&i_stop,&j_start,&j_stop,&k_start,&k_stop);
                 for(int m = 0; m < opts->meqn; m++)
                 for(int k = k_start; k < k_stop; k++)
                 for(int j = j_start; j < j_stop; j++)
@@ -272,7 +272,9 @@ TEST_CASE("3d clawpatch ghost filling on uniform cube")
         //if not write output
         if(test_output_vtk() && cube_output.num_incorrect_cells > 0)
         {
-            std::string filename = "3d_ghost_fill_uniform_cube"+std::to_string(test_no);
+            char test_no_str[5];
+            snprintf(test_no_str, 5, "%04d", test_no);
+            std::string filename = "3d_ghost_fill_uniform_cube_"+std::string(test_no_str);
             INFO("Test failed output error to " << filename << ".vtu");
             fclaw_clawpatch_output_vtk_to_file(cube_output.glob,filename.c_str());
         }
