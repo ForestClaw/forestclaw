@@ -97,7 +97,7 @@ void cb_fclaw_regrid_tag4coarsening(fclaw_domain_t *domain,
         if (family_coarsened == 1)
         {
             int igrid;
-            for (igrid = 0; igrid < 4; igrid++)
+            for (igrid = 0; igrid < fclaw_domain_num_children(domain); igrid++)
             {
                 int fine_patchno = fine0_patchno + igrid;
                 fclaw_patch_mark_coarsen(domain,blockno, fine_patchno);
