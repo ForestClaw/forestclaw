@@ -131,7 +131,7 @@ double fill_function(fclaw_clawpatch_t* clawpatch, int i, int j, int k, int m)
 }// end anonymous namespace
 
 
-TEST_CASE("3d_clawpatch_average")
+TEST_CASE("3d clawpatch average")
 {
     int test_no= 0;
     for(int mx   : {8})
