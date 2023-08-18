@@ -476,6 +476,29 @@ void fclaw_patch_interpolate_face(struct fclaw_global* glob,
                                   struct fclaw_patch_transform_data* transform_data);
 
 /**
+ * @brief Copies values from a edge-neighboring grid
+ * 
+ * @param[in]     glob the global context
+ * @param[in,out] this_patch this patch context
+ * @param[in]     neighbor_patch the neighbor patch context
+ * @param[in]     this_blockno the block number of this patch
+ * @param[in]     neighbor_blockno the block number of the neighbor patch
+ * @param[in]     is_block_corner true if corner is on the corner of a block
+ * @param[in]     iedge the edge that the neighboring patch is on
+ * @param[in]     time_interp true if ghost filling for time interpolated level (non-global update)
+ * @param[in]     tranform_data the tranform data for the neighbor's coordinate system
+ */
+void fclaw_patch_copy_edge(struct fclaw_global* glob,
+                           struct fclaw_patch *this_patch,
+                           struct fclaw_patch *neighbor_patch,
+                           int this_blockno,
+                           int neighbor_blockno,
+                           int iedge,
+                           int time_interp,
+                           struct fclaw_patch_transform_data *transform_data);
+
+
+/**
  * @brief Copies values from a corner-neighboring grid
  * 
  * @param[in]     glob the global context
@@ -1121,6 +1144,29 @@ typedef void (*fclaw2d_patch_interpolate_face_t)(struct fclaw_global* glob,
                                                  *transform_data);
 
 /**
+ * @brief Copies values from a edge-neighboring grid
+ * 
+ * @param[in]     glob the global context
+ * @param[in,out] this_patch this patch context
+ * @param[in]     neighbor_patch the neighbor patch context
+ * @param[in]     this_blockno the block number of this patch
+ * @param[in]     neighbor_blockno the block number of the neighbor patch
+ * @param[in]     iedge the edge that the neighboring patch is on
+ * @param[in]     time_interp true if ghost filling for time interpolated level (non-global update)
+ * @param[in]     tranform_data the tranform data for the neighbor's coordinate system
+ */
+typedef void (*fclaw2d_patch_copy_edge_t)(struct fclaw_global* glob,
+                                          struct fclaw_patch *this_patch,
+                                          struct fclaw_patch *neighbor_patch,
+                                          int this_blockno,
+                                          int neighbor_blockno,
+                                          int iedge,
+                                          int time_interp,
+                                          struct fclaw_patch_transform_data 
+                                          *transform_data);
+    
+
+/**
  * @brief Copies values from a corner-neighboring grid
  * 
  * @param[in]     glob the global context
@@ -1524,10 +1570,13 @@ typedef struct fclaw_patch_vtable_d3
     /** @copybrief ::fclaw2d_patch_interpolate_face_t */
     fclaw2d_patch_interpolate_face_t      interpolate_face;
 
-    /** @} */
 
-    /* Do we want to include a fclaw3d_patch_copy/average/interpolate_edge_t?
-     * Feel free to add. */
+    /** @{ @name Edge Ghost Filling Functions */
+
+    /** @copybrief ::fclaw2d_patch_copy_edge_t */
+    fclaw2d_patch_copy_edge_t              copy_edge;
+
+    /** @} */
 
     /** @{ @name Block Face and Interior Corner Ghost Filling Functions */
 

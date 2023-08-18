@@ -187,7 +187,7 @@ void get_edge_neighbor(fclaw_global_t *glob,
 
     fclaw_timer_stop (&glob->timers[FCLAW_TIMER_NEIGHBOR_SEARCH]);    
 
-    *block_edge_count = 0;  /* Assume we are not at a block corner */
+    *block_edge_count = 0;  /* Assume we are not at a block edge */
     if (has_edge_neighbor && is_block_edge)
     {
         /* Case 1 : 4 or more patches meet at a block corner.
@@ -258,7 +258,7 @@ void get_edge_neighbor(fclaw_global_t *glob,
         {
             /* Both patches are in the same block, so we set the transform to
                a default transform.  This could be the case for periodic boundaries. */
-            *block_edge_count = 4;  /* assume four for now */
+            *block_edge_count = fclaw_domain_num_edges(domain);  /* assume four for now */
             fclaw_patch_transform_blockface_intra (glob, ftransform);
             fclaw_patch_transform_blockface_intra
                 (glob, ftransform_finegrid->transform);
@@ -425,8 +425,7 @@ void cb_edge_fill(fclaw_domain_t *domain,
                         intersects_block,
                         &is_interior_edge,
                         &is_block_edge,
-                        (domain->dim == 2) ?
-                            &transform_data->d2->block_iface : &transform_data->d3->block_iface);
+                        &transform_data->d3->block_iface);
 
         transform_data_finegrid->d3->block_iface = -1;
 
@@ -471,8 +470,8 @@ void cb_edge_fill(fclaw_domain_t *domain,
             transform_data->d3->is_block_edge = is_block_edge;
 
             /* Needed for switching the context */
-            transform_data_finegrid->d3->is_block_corner = is_block_edge;
-            transform_data_finegrid->d3->icorner = rcornerno;
+            transform_data_finegrid->d3->is_block_edge = is_block_edge;
+            transform_data_finegrid->d3->iedge = rcornerno;
             transform_data_finegrid->this_patch = edge_patch;
             transform_data_finegrid->neighbor_patch = this_patch;
 
@@ -523,13 +522,13 @@ void cb_edge_fill(fclaw_domain_t *domain,
                 }
                 else if (neighbor_level == SAMESIZE_GRID && copy_from_neighbor)
                 {
-                    //fclaw_patch_copy_edge(s->glob,
-                    //                      this_patch,
-                    //                      corner_patch,
-                    //                      this_block_idx,
-                    //                      corner_block_idx,
-                    //                      icorner, time_interp,
-                    //                      transform_data);
+                    fclaw_patch_copy_edge(s->glob,
+                                          this_patch,
+                                          edge_patch,
+                                          this_block_idx,
+                                          edge_block_idx,
+                                          iedge, time_interp,
+                                          transform_data);
                 }
 
             }  /* End of non-parallel patch case */
