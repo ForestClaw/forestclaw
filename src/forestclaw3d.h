@@ -170,6 +170,34 @@ void fclaw3d_patch_transform_face2 (fclaw_patch_t * ipatch,
  */
 void fclaw3d_patch_edge_swap (int *edgeno, int *redgeno);
 
+/** Transform a patch coordinate into a neighbor patch's coordinate system.
+ * This function assumes that the two patches are of the SAME size.
+ * If the neighbor patch is in the same block we must set (ftransform[8] & 4).
+ * Else we have an input patch in one block and on output patch across an edge.
+ * It is LEGAL to call this function for both local and ghost patches.
+ * \param [in] ipatch       The patch that the input coordinates are relative to.
+ * \param [in] opatch       The patch that the output coordinates are relative to.
+ * \param [in] ftransform   It must have room for NINE (9) integers and be
+ *                          computed by \a fclaw3d_patch_edge_transformation.
+ *                          If \a ipatch and \a opatch are in the same block,
+ *                          we require \a ftransform[8] |= 4.
+ * \param [in] mx           Number of cells along x direction of patch.
+ * \param [in] my           Number of cells along y direction of patch.
+ * \param [in] mz           Number of cells along z direction of patch.
+ *                          The number of cells must match according to the edge
+ *                          transformation.
+ * \param [in] based        Indices are 0-based for corners and 1-based for cells.
+ * \param [in,out] i        Integer coordinate along x-axis in \a based .. \a mx.
+ * \param [in,out] j        Integer coordinate along y-axis in \a based .. \a my.
+ * \param [in,out] k        Integer coordinate along z-axis in \a based .. \a mz.
+ */
+void fclaw3d_patch_transform_edge (fclaw_patch_t * ipatch,
+                                   fclaw_patch_t * opatch,
+                                   const int ftransform[],
+                                   int mx, int my, int mz, int based,
+                                   int *i, int *j, int *k);
+
+
 /** Change perspective across a corner neighbor situation.
  * \param [in,out] cornerno     On input, valid corner number for a patch.
  *                              On output, corner number seen from

@@ -199,3 +199,21 @@ fclaw2d_patch_edge_swap (int *edgeno, int *redgeno)
     *edgeno = *redgeno;
     *redgeno = swap;
 }
+void
+fclaw3d_patch_transform_edge (fclaw_patch_t * ipatch,
+                              fclaw_patch_t * opatch,
+                              const int ftransform[],
+                              int mx, int my, int mz,
+                              int based, int *i, int *j, int* k
+                             )
+{
+    //TODO actually implement this
+}
+
+#if 0
+#ifndef P4_TO_P8
+    printf ("Test O: IP %g %g IJ %d %d\n",
+            opatch->xlower, opatch->ylower, *i, *j);
+#endif
+#endif
+}
