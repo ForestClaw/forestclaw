@@ -534,7 +534,6 @@ fclaw2d_domain_adapt (fclaw_domain_t * domain)
     if (domain->p.smooth_refine)
     {
         int ng, nb, np;
-        int face, corner;
         int nprocs[P4EST_HALF], nblockno, npatchno[P4EST_HALF], nfc;
         int level, max_tlevel;
         int exists;
@@ -568,7 +567,7 @@ fclaw2d_domain_adapt (fclaw_domain_t * domain)
                 max_tlevel = patch->target_level;
 
                 /* loop through face neighbors of this patch */
-                for (face = 0; max_tlevel <= level &&
+                for (int face = 0; max_tlevel <= level &&
                      face < wrap->p4est_faces; ++face)
                 {
                     nrel = fclaw_patch_face_neighbors (domain, nb, np, face,
@@ -626,11 +625,65 @@ fclaw2d_domain_adapt (fclaw_domain_t * domain)
 
 #ifdef P4_TO_P8
                 /* loop through edge neighbors of this patch */
-                /* to be implemented */
+                for (int edge = 0; max_tlevel <= level &&
+                     edge < P8EST_EDGES; ++edge)
+                {
+                    fclaw_patch_edge_neighbors (domain, nb, np, edge,
+                                                nprocs, &nblockno,
+                                                npatchno, &nfc, &nrel);
+
+                    /* we refine ourself if the neighbor wants to be finer */
+                    if (nrel == FCLAW_PATCH_SAMESIZE)
+                    {
+                        npatch = fclaw2d_domain_get_neighbor_patch (domain,
+                                                                    nprocs[0],
+                                                                    nblockno,
+                                                                    npatchno
+                                                                    [0]);
+                        P4EST_ASSERT (npatch->level == level);
+                        if (npatch->level >= domain->p.smooth_level)
+                            /* Match target level only if we are in a level that
+                               should be refined */
+                            max_tlevel =
+                                SC_MAX (max_tlevel, npatch->target_level);
+                    }
+                    else if (nrel == FCLAW_PATCH_DOUBLESIZE)
+                    {
+                        npatch = fclaw2d_domain_get_neighbor_patch (domain,
+                                                                    nprocs[0],
+                                                                    nblockno,
+                                                                    npatchno
+                                                                    [0]);
+                        P4EST_ASSERT (npatch->level == level - 1);
+                        if (npatch->level >= domain->p.smooth_level)
+                            max_tlevel =
+                                SC_MAX (max_tlevel, npatch->target_level);
+                    }
+                    else if (nrel == FCLAW_PATCH_HALFSIZE)
+                    {
+                        for (k = 0; k < 2; ++k)
+                        {
+                            npatch =
+                                fclaw2d_domain_get_neighbor_patch (domain,
+                                                                   nprocs[k],
+                                                                   nblockno,
+                                                                   npatchno
+                                                                   [k]);
+                            P4EST_ASSERT (npatch->level == level + 1);
+                            if (npatch->level >= domain->p.smooth_level)
+                                max_tlevel =
+                                    SC_MAX (max_tlevel, npatch->target_level);
+                        }
+                    }
+                    else
+                    {
+                        FCLAW_ASSERT (nrel == FCLAW_PATCH_BOUNDARY);
+                    }
+                }
 #endif
 
                 /* loop through corner neighbors of this patch */
-                for (corner = 0; max_tlevel <= level &&
+                for (int corner = 0; max_tlevel <= level &&
                      corner < wrap->p4est_children; ++corner)
                 {
                     exists = fclaw_patch_corner_neighbors (domain, nb, np,
