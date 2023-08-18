@@ -77,9 +77,9 @@ typedef struct fclaw2d_file_context fclaw2d_file_context_t;
  * \return                 Newly allocated context to continue writing and
  *                         eventually closing the file. NULL in case of error.
  */
-fclaw2d_file_context_t *fclaw2d_file_open_write  (const char *filename,
+fclaw2d_file_context_t *fclaw2d_file_open_write (const char *filename,
                                                  const char *user_string,
-                                                 fclaw2d_domain_t * domain,
+                                                 fclaw2d_domain_t *domain,
                                                  int *errcode);
 
 /** Open a file for reading and read the stored domain.
@@ -215,10 +215,10 @@ fclaw2d_file_context_t *fclaw2d_file_write_block (fclaw2d_file_context_t *
  *                            and \b fc is freed.
  */
 fclaw2d_file_context_t *fclaw2d_file_read_block (fclaw2d_file_context_t *
-                                                  fc, char *user_string,
-                                                  size_t block_size,
-                                                  sc_array_t *block_data,
-                                                  int *errcode);
+                                                 fc, char *user_string,
+                                                 size_t block_size,
+                                                 sc_array_t *block_data,
+                                                 int *errcode);
 
 /** Write per-patch data to a parallel output file.
  *
