@@ -316,6 +316,25 @@ void FCLAW3DX_CLAWPATCH46_FORT_INTERPOLATE_FACE(const int* mx,
                                                 const int* igrid,
                                                 struct fclaw_patch_transform_data** 
                                                 transform_cptr);
+
+/** Fortran subroutine name */
+#define FCLAW3D_CLAWPATCH46_FORT_COPY_EDGE \
+         FCLAW_F77_FUNC(fclaw3d_clawpatch46_fort_copy_edge, \
+                        FCLAW3D_CLAWPATCH46_FORT_COPY_EDGE)
+
+/** @copydoc fclaw3d_clawpatch46_fort_copy_face() */
+void FCLAW3D_CLAWPATCH46_FORT_COPY_EDGE(const int* mx, 
+                                        const int* my, 
+                                        const int* mz, 
+                                        const int* mbc, 
+                                        const int* meqn,
+                                        double qthis[],
+                                        double qneighbor[], 
+                                        const int* iedge,
+                                        struct fclaw_patch_transform_data** 
+                                        transform_cptr);
+
+
 /** Fortran subroutine name */
 #define FCLAW3D_CLAWPATCH46_FORT_COPY_CORNER \
              FCLAW_F77_FUNC(fclaw3d_clawpatch46_fort_copy_corner, \

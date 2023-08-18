@@ -98,6 +98,49 @@ subroutine fclaw3d_clawpatch46_fort_copy_face(mx,my,mz,mbc, &
 
 end subroutine fclaw3d_clawpatch46_fort_copy_face
 
+subroutine fclaw3d_clawpatch46_fort_get_edge_bounds( &
+            icorner,mx,my,mz,mbc, &
+            i_start, j_start, k_start, &
+            i_end,   j_end,   k_end)
+    implicit none
+    integer mx, my, mz, mbc, icorner
+    integer i_start, j_start, k_start
+    integer i_end,   j_end,   k_end
+
+end subroutine fclaw3d_clawpatch46_fort_get_edge_bounds
+
+subroutine fclaw3d_clawpatch46_fort_copy_edge(mx,my,mz,mbc,meqn, &
+    qthis, qneighbor, this_icorner,transform_ptr)
+    implicit none
+
+    integer mx, my, mz, mbc, meqn, this_icorner
+    integer*8 transform_ptr
+    double precision     qthis(1-mbc:mx+mbc,1-mbc:my+mbc,1-mbc:mz+mbc,meqn)
+    double precision qneighbor(1-mbc:mx+mbc,1-mbc:my+mbc,1-mbc:mz+mbc,meqn)
+
+    integer mq
+    integer i_start, j_start, k_start
+    integer i_end,   j_end,   k_end
+    integer i1,i2, j1,j2, k1,k2
+    call fclaw3d_clawpatch46_fort_get_edge_bounds(this_icorner, &
+                mx,my,mz,mbc, &
+                i_start,j_start,k_start, &
+                i_end,  j_end,  k_end)
+
+    !! # Do exchanges for all corners
+    mq_loop : do mq = 1,meqn
+         do k1 = k_start,k_end
+             do j1 = j_start,j_end
+                do i1 = i_start,i_end
+                    !!call fclaw3d_clawpatch_transform_edge(i1,j1,k1,i2,j2,k2, transform_ptr)
+                    qthis(i1,j1,k1,mq) = qneighbor(i2,j2,k2,mq)
+                end do
+            end do
+        end do
+    end do mq_loop
+
+end subroutine fclaw3d_clawpatch46_fort_copy_edge
+
 subroutine fclaw3d_clawpatch46_fort_get_corner_start( &
             icorner,mx,my,mz,mbc, &
             i1, j1, k1)
