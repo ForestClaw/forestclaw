@@ -62,9 +62,6 @@ typedef struct fclaw2d_file_context fclaw2d_file_context_t;
  * Without MPI I/O the function may abort on file system dependent
  * errors.
  *
- * \param [in]   domain    The underlying p4est is used for the metadata of the
- *                         the created file and the \b domain is written to the
- *                         file.
  * \param [in] filename    Path to parallel file that is to be created.
  * \param [in] user_string A user string that is written to the file header.
  *                         Only \ref FCLAW2D_FILE_USER_STRING_BYTES
@@ -72,14 +69,17 @@ typedef struct fclaw2d_file_context fclaw2d_file_context_t;
  *                         written to the file. If the user gives less
  *                         bytes the user_string in the file header is padded
  *                         by spaces.
+ * \param [in]   domain    The underlying p4est is used for the metadata of the
+ *                         the created file and the \b domain is written to the
+ *                         file.
  * \param [out] errcode    An errcode that can be interpreted by
  *                         \ref fclaw2d_file_error_string.
  * \return                 Newly allocated context to continue writing and
  *                         eventually closing the file. NULL in case of error.
  */
-fclaw2d_file_context_t *fclaw2d_file_open_write  (fclaw2d_domain_t * domain,
-                                                 const char *filename,
+fclaw2d_file_context_t *fclaw2d_file_open_write  (const char *filename,
                                                  const char *user_string,
+                                                 fclaw2d_domain_t * domain,
                                                  int *errcode);
 
 /** Open a file for reading and read the stored domain.
@@ -104,12 +104,12 @@ fclaw2d_file_context_t *fclaw2d_file_open_write  (fclaw2d_domain_t * domain,
  * \param [in]  mpicomm       MPI communicator that is used to read the file and
  *                            is used for potential other reading operations of
  *                            MPI communicator dependent objects.
- * \param [out] domain        Newly allocated domain that is read from the file.
  * \param [in]  filename      The path to the file that is opened.
  * \param [out] user_string   At least \ref FCLAW2D_FILE_USER_STRING_BYTES
  *                            bytes. The user string is written
  *                            to the passed array including padding spaces
  *                            and a trailing NUL-termination.
+ * \param [out] domain        Newly allocated domain that is read from the file.
  * \param [out] errcode       An errcode that can be interpreted by
  *                            \ref fclaw2d_file_error_string.
  * \return                    Newly allocated context to continue reading
@@ -117,9 +117,9 @@ fclaw2d_file_context_t *fclaw2d_file_open_write  (fclaw2d_domain_t * domain,
  *                            case of error.
  */
 fclaw2d_file_context_t *fclaw2d_file_open_read (sc_MPI_Comm mpicomm,
-                                                fclaw2d_domain_t **domain,
                                                 const char *filename,
                                                 char *user_string,
+                                                fclaw2d_domain_t **domain,
                                                 int *errcode);
 
 /** Write a serial data block to an opened parallel file.
