@@ -234,20 +234,36 @@ fclaw3d_patch_transform_edge (fclaw2d_patch_t * ipatch,
         /* shift in previously determined dimensions based on edge number */
         if ((iedge & 1) == 0)
         {
-            xyzshift[shiftinds[0]] = +1;
+            xyzshift[shiftinds[0]] = +1.;
         }
         else
         {
-            xyzshift[shiftinds[0]] = -1;
+            xyzshift[shiftinds[0]] = -1.;
         }
         if ((iedge & 2) == 0)
         {
-            xyzshift[shiftinds[1]] = +1;
+            xyzshift[shiftinds[1]] = +1.;
         }
         else
         {
-            xyzshift[shiftinds[1]] = -1;
+            xyzshift[shiftinds[1]] = -1.;
         }
+        /* verify the blocks are edge-neighbors */
+        FCLAW_ASSERT ((xyzshift[0] == 0.) ||
+                      (xyzshift[0] == 1.
+                       && fabs (opatch->xupper - 1.) < SC_1000_EPS)
+                      || (xyzshift[0] == -1.
+                          && fabs (opatch->xlower) < SC_1000_EPS));
+        FCLAW_ASSERT ((xyzshift[1] == 0.)
+                      || (xyzshift[1] == 1.
+                          && fabs (opatch->yupper - 1.) < SC_1000_EPS)
+                      || (xyzshift[1] == -1.
+                          && fabs (opatch->ylower) < SC_1000_EPS));
+        FCLAW_ASSERT ((xyzshift[2] == 0.)
+                      || (xyzshift[2] == 1.
+                          && fabs (opatch->zupper - 1.) < SC_1000_EPS)
+                      || (xyzshift[2] == -1.
+                          && fabs (opatch->zlower) < SC_1000_EPS));
     }
 
     /* The two patches are in the same block, or in a different block
@@ -315,20 +331,36 @@ fclaw3d_patch_transform_edge2 (fclaw3d_patch_t * ipatch,
         /* shift in previously determined dimensions based on edge number */
         if ((iedge & 1) == 0)
         {
-            xyzshift[shiftinds[0]] = +1;
+            xyzshift[shiftinds[0]] = +1.;
         }
         else
         {
-            xyzshift[shiftinds[0]] = -1;
+            xyzshift[shiftinds[0]] = -1.;
         }
         if ((iedge & 2) == 0)
         {
-            xyzshift[shiftinds[1]] = +1;
+            xyzshift[shiftinds[1]] = +1.;
         }
         else
         {
-            xyzshift[shiftinds[1]] = -1;
+            xyzshift[shiftinds[1]] = -1.;
         }
+        /* verify the blocks are edge-neighbors */
+        FCLAW_ASSERT ((xyzshift[0] == 0.) ||
+                      (xyzshift[0] == 1.
+                       && fabs (opatch->xupper - 1.) < SC_1000_EPS)
+                      || (xyzshift[0] == -1.
+                          && fabs (opatch->xlower) < SC_1000_EPS));
+        FCLAW_ASSERT ((xyzshift[1] == 0.)
+                      || (xyzshift[1] == 1.
+                          && fabs (opatch->yupper - 1.) < SC_1000_EPS)
+                      || (xyzshift[1] == -1.
+                          && fabs (opatch->ylower) < SC_1000_EPS));
+        FCLAW_ASSERT ((xyzshift[2] == 0.)
+                      || (xyzshift[2] == 1.
+                          && fabs (opatch->zupper - 1.) < SC_1000_EPS)
+                      || (xyzshift[2] == -1.
+                          && fabs (opatch->zlower) < SC_1000_EPS));
     }
 
     /* The two patches are in the same block, or in a different block

@@ -605,6 +605,8 @@ void fclaw3d_patch_edge_swap (int *edgeno, int *redgeno);
  * This function assumes that the two patches are of the SAME size and that the
  * patches lie in coordinate systems with the same orientation.
  * It is LEGAL to call this function for both local and ghost patches.
+ * It is ILLEGAL to call this function for patches from face-neighboring blocks.
+ * Use \ref fclaw3d_patch_transform_face for such patches instead.
  * \param [in] ipatch       The patch that the input coordinates are relative to.
  * \param [in] opatch       The patch that the output coordinates are relative to.
  * \param [in] iedge        Edge number of this patch to transform across.
@@ -629,6 +631,8 @@ void fclaw3d_patch_transform_edge (fclaw3d_patch_t * ipatch,
  * This function assumes that the neighbor patch is smaller (HALF size) and that
  * the patches lie in coordinate systems with the same orientation.
  * It is LEGAL to call this function for both local and ghost patches.
+ * It is ILLEGAL to call this function for patches from face-neighboring blocks.
+ * Use \ref fclaw3d_patch_transform_face for such patches instead.
  * \param [in] ipatch       The patch that the input coordinates are relative to.
  * \param [in] opatch       The patch that the output coordinates are relative to.
  * \param [in] iedge        Edge number of this patch to transform across.
