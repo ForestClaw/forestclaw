@@ -317,61 +317,113 @@ subroutine fclaw3d_clawpatch46_fort_interpolate2fine &
     double precision :: volcoarse(-mbc:mx+mbc+1,-mbc:my+mbc+1,-mbc:mz+mbc+1)
     double precision ::   volfine(-mbc:mx+mbc+1,-mbc:my+mbc+1,-mbc:mz+mbc+1)
 
-    integer :: ii, jj, i,j, i1, i2, j1, j2, ig, jg, mq, mth, k
-    integer :: ic,jc,ic_add, jc_add, ifine, jfine
-    double precision :: qc, shiftx, shifty, sl, sr, gradx, grady
+    integer :: ii, jj, kk, i,j,k, i1, i2, j1, j2, k1, k2, ig, jg, kg, mq, mth
+    integer :: ic,jc,kc,ic_add, jc_add, kc_add, ifine, jfine, kfine
+    integer :: i_start_fine, j_start_fine, k_start_fine
+    double precision :: qc, shiftx, shifty, shiftz, sl, sr, gradx, grady, gradz
     double precision :: fclaw2d_clawpatch_compute_slopes
 
-    integer :: p4est_refineFactor,refratio
+    logical :: lower_x, lower_y, lower_z
 
-    !! exit with error
-    STOP 'NOT IMPLIMENTED'
+    integer :: p8est_refineFactor,refratio
 
-    p4est_refineFactor = 2
+    p8est_refineFactor = 4
     refratio = 2
 
     !! # Use limiting done in AMRClaw.
     mth = 5
 
-    !! # Get (ig,jg) for grid from linear (igrid) coordinates
-    ig = mod(igrid,refratio)
-    jg = (igrid-ig)/refratio
+    lower_x = btest(igrid,0)
+    lower_y = btest(igrid,1)
+    lower_z = btest(igrid,2)
+    if (lower_x) then
+        i1 = 1;
+        i2 = mx/p8est_refineFactor-1;
+    else
+        i1 = mx/p8est_refineFactor;
+        i2 = mx;
+    endif
+    if (lower_y) then
+        j1 = 1;
+        j2 = my/p8est_refineFactor-1;
+    else
+        j1 = my/p8est_refineFactor;
+        j2 = my;
+    endif
+    if (lower_z) then
+        k1 = 1;
+        k2 = mz/p8est_refineFactor-1;
+    else
+        k1 = mz/p8est_refineFactor;
+        k2 = mz;
+    endif
 
-    i1 = 1-ig
-    i2 = mx/p4est_refineFactor + (1-ig)
-    ic_add = ig*mx/p4est_refineFactor
+    !!print *, 'interpolate2fine : ig =     ',ig,    ' jg =      ',jg,     ' kg =      ',kg
+    !!print *, 'interpolate2fine : mx =     ',mx,    ' my =      ',my,     ' mz =      ',mz
+    !!print *, 'interpolate2fine : i1 =     ',i1,    ' j1 =      ',j1,     ' k1 =      ',k1
+    !!print *, 'interpolate2fine : i2 =     ',i2,    ' j2 =      ',j2,     ' k2 =      ',k2
+    !!print *, 'interpolate2fine : ic_add = ',ic_add,' jc_add =  ',jc_add, ' kc_add =  ',kc_add
 
-    j1 = 1-jg
-    j2 = my/p4est_refineFactor + (1-jg)
-    jc_add = jg*my/p4est_refineFactor
-
+    !!iterate of part of coarse patch that we are intepolating from
     mq_loop : do mq = 1,meqn
-        k_loop : do k = 1,mz
-            do j = j1,j2
-                do i = i1,i2
-                    ic = i + ic_add
-                    jc = j + jc_add
-                    qc = qcoarse(ic,jc,k,mq)
+        k_loop : do kc = k1,k2
+            do jc = j1,j2
+                do ic = i1,i2
+                    !!ic = i + ic_add
+                    !!jc = j + jc_add
+                    !!kc = k + kc_add
+                    print *, 'interpolate2fine : ic =     ',ic,    ' jc =      ',jc,     ' kc =      ',kc
+                    qc = qcoarse(ic,jc,kc,mq)
 
                     !! # Compute limited slopes in both x and y. Note we are not
                     !! # really computing slopes, but rather just differences.
                     !! # Scaling is accounted for in 'shiftx' and 'shifty', below.
-                    sl = (qc - qcoarse(ic-1,jc,k,mq))
-                    sr = (qcoarse(ic+1,jc,k,mq) - qc)
+                    sl = (qc - qcoarse(ic-1,jc,kc,mq))
+                    sr = (qcoarse(ic+1,jc,kc,mq) - qc)
                     gradx = fclaw2d_clawpatch_compute_slopes(sl,sr,mth)
 
-                    sl = (qc - qcoarse(ic,jc-1,k,mq))
-                    sr = (qcoarse(ic,jc+1,k,mq) - qc)
+                    sl = (qc - qcoarse(ic,jc-1,kc,mq))
+                    sr = (qcoarse(ic,jc+1,kc,mq) - qc)
                     grady = fclaw2d_clawpatch_compute_slopes(sl,sr,mth)
 
-                    !! # Fill in refined values on coarse grid cell (ic,jc)
+                    sl = (qc - qcoarse(ic,jc,kc-1,mq))
+                    sr = (qcoarse(ic,jc,kc+1,mq) - qc)
+                    gradz = fclaw2d_clawpatch_compute_slopes(sl,sr,mth)
+
+                    !! # Fill in refined values on coarse grid cell (ic,jc,kc)
+                    i_start_fine = (ic+i1)/refratio;
+                    j_start_fine = (jc+j1)/refratio;
+                    k_start_fine = (kc+k1)/refratio;
                     do ii = 1,refratio
                         do jj = 1,refratio
-                            shiftx = (ii - refratio/2.d0 - 0.5d0)/refratio
-                            shifty = (jj - refratio/2.d0 - 0.5d0)/refratio
-                            ifine = (i-1)*refratio + ii
-                            jfine = (j-1)*refratio + jj  
-                            qfine(ifine,jfine,k,mq) = qc + shiftx*gradx + shifty*grady
+                            do kk = 1,refratio
+                                shiftx = (ii - refratio/2.d0 - 0.5d0)/refratio
+                                shifty = (jj - refratio/2.d0 - 0.5d0)/refratio
+                                shiftz = (kk - refratio/2.d0 - 0.5d0)/refratio
+                                ifine = i_start_fine + ii
+                                jfine = j_start_fine + jj  
+                                kfine = k_start_fine + kk  
+                                if ((ic .le. -1) .or. (ic .ge. mx+2)) then
+                                    stop "ic out of bounds"
+                                endif
+                                if ((jc .le. -1) .or. (jc .ge. mx+2)) then
+                                    stop "jc out of bounds"
+                                endif
+                                if ((kc .le. -1) .or. (kc .ge. mx+2)) then
+                                    stop "kc out of bounds"
+                                endif
+                                if ((ifine .le. -1) .or. (ifine .ge. mx+2)) then
+                                    stop "ifine out of bounds"
+                                endif
+                                if ((jfine .le. -1) .or. (jfine .ge. mx+2)) then
+                                    stop "jfine out of bounds"
+                                endif
+                                if ((kfine .le. -1) .or. (kfine .ge. mx+2)) then
+                                    stop "kfine out of bounds"
+                                endif
+                                qfine(ifine,jfine,kfine,mq) = qc + shiftx*gradx + shifty*grady + shiftz*gradz
+                                qfine(ifine,jfine,kfine,mq) = qc + shiftx*gradx + shifty*grady + shiftz*gradz
+                            end do
                         end do
                     end do
                 end do  !! i_loop

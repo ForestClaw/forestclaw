@@ -1103,7 +1103,7 @@ void clawpatch_interpolate2fine(fclaw_global_t* glob,
     int meqn = clawpatch_opt->meqn;
 
     /* Loop over four siblings (z-ordering) */
-    for (int igrid = 0; igrid < FCLAW2D_NUMSIBLINGS; igrid++)
+    for (int igrid = 0; igrid < fclaw_domain_num_children(glob->domain); igrid++)
     {
         fclaw_patch_t *fine_patch = &fine_patches[igrid];
         double *qfine = fclaw_clawpatch_get_q(glob,fine_patch);

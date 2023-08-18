@@ -266,7 +266,6 @@ TEST_CASE("3d clawpatch interpolate")
                     if(q[idx] != doctest::Approx(expected))
                     {
                         iterate->num_incorrect_interior_cells++;
-                        SC_ABORT_NOT_REACHED();
                     }
                 }
 
@@ -283,7 +282,7 @@ TEST_CASE("3d clawpatch interpolate")
         {
             char test_no_str[5];
             snprintf(test_no_str, 5, "%04d", test_no);
-            std::string filename = "3d_ghost_fill_uniform_cube_"+std::string(test_no_str);
+            std::string filename = "3d_clawpatch_interpolate_"+std::string(test_no_str);
             INFO("Test failed output error to " << filename << ".vtu");
             fclaw_clawpatch_output_vtk_to_file(cube_output.glob,filename.c_str());
         }
