@@ -141,10 +141,16 @@ typedef struct fclaw_patch_transform_data_d3
 {
     /** The corner that the neighboring patch is on. */
     int icorner;
+    /** The edge that the neighboring patch is on. */
+    int iedge;
 
     /** True if patch is on a block corner */
     int is_block_corner;
-    /** -1 for interior faces or block corners */
+    /** True if patch is on a block edge */
+    int is_block_edge;
+    /** -1 for unless on block edge and not on block corner */
+    int block_iedge;   
+    /** -1 for unless on block face and not block edge or block corner */
     int block_iface;   
 
 } fclaw_patch_transform_data_d3_t;

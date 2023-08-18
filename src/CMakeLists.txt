@@ -8,6 +8,7 @@ add_library(forestclaw_c OBJECT
   fclaw_convenience.c
   fclaw_diagnostics.c
   fclaw_domain.c
+  fclaw_edge_neighbors.c
   fclaw_elliptic_solver.c
   fclaw_exchange.c
   fclaw_exchange_2d.c
@@ -119,6 +120,7 @@ install(FILES
   fclaw_block.h
   fclaw_diagnostics.h
   fclaw_domain.h
+  fclaw_edge_neighbors.h
   fclaw_elliptic_solver.h 
   fclaw_exchange.h
   fclaw_farraybox.hpp 
