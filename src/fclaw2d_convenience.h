@@ -102,15 +102,16 @@ fclaw2d_file_context_t *fclaw2d_file_open_write  (fclaw2d_domain_t * domain,
  * errors.
  *
  * \param [in]  mpicomm       MPI communicator that is used to read the file and
- *                            must be used for potentially later read domain
- *                            and potential other IO operations of MPI
- *                            communicator dependent objects.
+ *                            is used for potential other reading operations of
+ *                            MPI communicator dependent objects.
  * \param [out] domain        Newly allocated domain that is read from the file.
  * \param [in]  filename      The path to the file that is opened.
  * \param [out] user_string   At least \ref FCLAW2D_FILE_USER_STRING_BYTES
  *                            bytes. The user string is written
  *                            to the passed array including padding spaces
  *                            and a trailing NUL-termination.
+ * \param [out] errcode       An errcode that can be interpreted by
+ *                            \ref fclaw2d_file_error_string.
  * \return                    Newly allocated context to continue reading
  *                            and eventually closing the file. NULL in
  *                            case of error.
@@ -135,7 +136,7 @@ fclaw2d_file_context_t *fclaw2d_file_open_read (sc_MPI_Comm mpicomm,
  * errors.
  *
  * \param [in, out] fc          Context previously created by \ref
- *                              fclaw2d_file_open_create.  It keeps track
+ *                              fclaw2d_file_open_write.  It keeps track
  *                              of the data sets written one after another.
  * \param [in]      user_string A user string that is written to the file.
  *                              Only \ref FCLAW2D_FILE_USER_STRING_BYTES
@@ -162,7 +163,7 @@ fclaw2d_file_context_t *fclaw2d_file_open_read (sc_MPI_Comm mpicomm,
  *                              and \b fc is freed.
  */
 fclaw2d_file_context_t *fclaw2d_file_write_block (fclaw2d_file_context_t *
-                                                  fc, char *user_string,
+                                                  fc, const char *user_string,
                                                   size_t block_size,
                                                   sc_array_t *block_data,
                                                   int *errcode);
@@ -223,7 +224,7 @@ fclaw2d_file_context_t *fclaw2d_file_read_block (fclaw2d_file_context_t *
  *
  * This is a collective function.
  * This function writes the per-patch data with respect the domain that was passed
- * to the \ref fclaw2d_file_open_create for opening the file.
+ * to the \ref fclaw2d_file_open_write for opening the file.
  *
  * The per-patch data is written in parallel according to the partition of the
  * domain and the underlying p4est, respectively.
@@ -234,7 +235,7 @@ fclaw2d_file_context_t *fclaw2d_file_read_block (fclaw2d_file_context_t *
  * errors.
  *
  * \param [in, out] fc          Context previously created by \ref
- *                              fclaw2d_file_open_create.  It keeps track
+ *                              fclaw2d_file_open_write.  It keeps track
  *                              of the data sets written one after another.
  * \param [in]      user_string A user string that is written to the file.
  *                              Only \ref FCLAW2D_FILE_USER_STRING_BYTES
@@ -266,7 +267,7 @@ fclaw2d_file_context_t *fclaw2d_file_read_block (fclaw2d_file_context_t *
  *                              and \b fc is freed.
  */
 fclaw2d_file_context_t *fclaw2d_file_write_field (fclaw2d_file_context_t *
-                                                  fc, char *user_string,
+                                                  fc, const char *user_string,
                                                   size_t patch_size,
                                                   sc_array_t *patch_data,
                                                   int *errcode);
@@ -336,7 +337,7 @@ fclaw2d_file_context_t *fclaw2d_file_read_field (fclaw2d_file_context_t *
  * errors.
  *
  * \param [in,out] fc       Context previously created by \ref
- *                          fclaw2d_file_open_create or \ref
+ *                          fclaw2d_file_open_write or \ref
  *                          fclaw2d_file_open_read.  Is freed.
  * \param [out] errcode     An errcode that can be interpreted by \ref
  *                          fclaw2d_file_error_string.

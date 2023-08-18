@@ -167,7 +167,7 @@ size_t fclaw2d_global_unpack(char* buffer, fclaw2d_global_t** glob);
  * errors.
  *
  * \param [in, out] fc         Context previously created by \ref
- *                             fclaw2d_file_open_create.  It keeps track
+ *                             fclaw2d_file_open_write.  It keeps track
  *                             of the data sets written one after another.
  * \param [in]     user_string A user string that is written to the file.
  *                             Only \ref FCLAW2D_FILE_USER_STRING_BYTES
@@ -233,7 +233,7 @@ fclaw2d_file_context_t * fclaw2d_file_read_global_opt (fclaw2d_file_context_t *f
  * errors.
  *
  * \param [in, out] fc          Context previously created by \ref
- *                              fclaw2d_file_open_create.  It keeps track
+ *                              fclaw2d_file_open_write.  It keeps track
  *                              of the data sets written one after another.
  * \param [in]       global     The global structure that is written to the file.
  *                              \b global->domain must coincide with the domain
