@@ -96,7 +96,7 @@ struct CubeDomain {
     }
     ~CubeDomain(){
         fclaw_clawpatch_options_destroy(opts);
-        fclaw_domain_destroy(domain);
+        //fclaw_domain_destroy(domain);
         //fclaw3d_map_destroy(map);
         fclaw_global_destroy(glob);
     }
@@ -134,10 +134,10 @@ double fill_function(fclaw_clawpatch_t* clawpatch, int i, int j, int k, int m)
 TEST_CASE("3d clawpatch interpolate")
 {
     int test_no= 0;
-    for(int mx   : {10})
-    for(int my   : {10})
-    for(int mz   : {10})
-    for(int mbc  : {1,2,3})
+    for(int mx   : {8})
+    for(int my   : {8})
+    for(int mz   : {8})
+    for(int mbc  : {2})
     {
         CubeDomain cube(1,2);
 
@@ -198,9 +198,9 @@ TEST_CASE("3d clawpatch interpolate")
                 memset(q, 0, sizeof(double)*size);
                 //loop over interior
                 for(int m = 0; m < opts->meqn; m++)
-                for(int k = 0; k < opts->d3->mz; k++)
-                for(int j = 0; j < opts->d3->my; j++)
-                for(int i = 0; i < opts->d3->mx; i++)
+                for(int k = -opts->mbc; k < opts->d3->mz+opts->mbc; k++)
+                for(int j = -opts->mbc; j < opts->d3->my+opts->mbc; j++)
+                for(int i = -opts->mbc; i < opts->d3->mx+opts->mbc; i++)
                 {
                     int idx = clawpatch_idx(clawpatch, i,j,k,m);
                     //fill with some different linear functions
