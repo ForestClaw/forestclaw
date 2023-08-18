@@ -65,8 +65,8 @@ void  cb_partition_transfer(fclaw_domain_t * old_domain,
 {
     /* Transfer data to new domain */
     fclaw_global_iterate_t *g = (fclaw_global_iterate_t *) user;
-    fclaw2d_domain_data_t *ddata_old = old_domain->d2;
-    fclaw2d_domain_data_t *ddata_new = new_domain->d2;
+    fclaw_domain_data_t *ddata_old = old_domain->domain_data;
+    fclaw_domain_data_t *ddata_new = new_domain->domain_data;
 
     if (old_patch != NULL)
     {

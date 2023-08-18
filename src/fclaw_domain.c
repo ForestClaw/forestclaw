@@ -41,27 +41,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 void fclaw_domain_data_new(fclaw_domain_t *domain)
 {
+    fclaw_domain_data_t* ddata = (fclaw_domain_data_t*) domain->user;
+    ddata = FCLAW_ALLOC_ZERO (fclaw_domain_data_t, 1);
+    domain->domain_data = ddata;
     if(domain->dim == 2)
     {
-        fclaw2d_domain_data_t* ddata = (fclaw2d_domain_data_t*) domain->user;
-        ddata = FCLAW_ALLOC_ZERO (fclaw2d_domain_data_t, 1);
-        domain->d2 = ddata;
-
-        ddata->count_set_patch = ddata->count_delete_patch = 0;
-    
-        ddata->domain_exchange = NULL;
-        ddata->domain_indirect = NULL;
+        ddata->d2 = FCLAW_ALLOC_ZERO (fclaw2d_domain_data_t, 1);
     }
     else 
     {
-        fclaw3d_domain_data_t* ddata = (fclaw3d_domain_data_t*) domain->user;
-        ddata = FCLAW_ALLOC_ZERO (fclaw3d_domain_data_t, 1);
-        domain->d3 = ddata;
-
-        ddata->count_set_patch = ddata->count_delete_patch = 0;
-    
-        ddata->domain_exchange = NULL;
-        ddata->domain_indirect = NULL;
+        ddata->d3 = FCLAW_ALLOC_ZERO (fclaw3d_domain_data_t, 1);
     }
 }
 
@@ -69,14 +58,13 @@ void fclaw_domain_data_delete(fclaw_domain_t* domain)
 {
     if(domain->dim == 2)
     {
-        FCLAW_FREE (domain->d2);
-        domain->d2 = NULL;
+        FCLAW_FREE (domain->domain_data->d2);
     }
     else 
     {
-        FCLAW_FREE (domain->d3);
-        domain->d3 = NULL;
+        FCLAW_FREE (domain->domain_data->d3);
     }
+    FCLAW_FREE (domain->domain_data);
 }
 
 void fclaw_domain_setup(fclaw_global_t* glob,
@@ -118,10 +106,10 @@ void fclaw_domain_reset(fclaw_global_t* glob)
         block->user = NULL;
     }
 
+    fclaw_domain_data_t *ddata = (*domain)->domain_data;
     if((*domain)->dim == 2)
     {
-        fclaw2d_domain_data_t *ddata = (*domain)->d2;
-        if (ddata->domain_exchange != NULL)
+        if (ddata->d2->domain_exchange != NULL)
         {
             /* TO DO: translate fclaw2d_exchange files */
             fclaw_exchange_delete(glob);
@@ -137,8 +125,7 @@ void fclaw_domain_reset(fclaw_global_t* glob)
     }
     else 
     {
-        fclaw3d_domain_data_t *ddata = (*domain)->d3;
-        if (ddata->domain_exchange != NULL)
+        if (ddata->d3->domain_exchange != NULL)
         {
             /* TO DO: translate fclaw2d_exchange files */
             fclaw_exchange_delete(glob);

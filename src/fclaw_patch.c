@@ -110,16 +110,8 @@ void patch_data_new(fclaw_global_t* glob,
     FCLAW_ASSERT(patch_vt->patch_new != NULL);
     pdata->user_patch = patch_vt->patch_new();
 
-    if(glob->domain->dim == 2)
-    {
-        fclaw2d_domain_data_t *ddata = glob->domain->d2;
-        ++ddata->count_set_patch; //this is now in cb_fclaw_regrid_repopulate 
-    }
-    else 
-    {
-        fclaw3d_domain_data_t *ddata = glob->domain->d3;
-        ++ddata->count_set_patch; //this is now in cb_fclaw_regrid_repopulate 
-    }
+    fclaw_domain_data_t *ddata = glob->domain->domain_data;
+    ++ddata->count_set_patch; //this is now in cb_fclaw_regrid_repopulate 
     pdata->neighbors_set = 0;
 }
 
@@ -151,16 +143,8 @@ void fclaw_patch_data_delete(fclaw_global_t *glob,
         }
 
         patch_vt->patch_delete(pdata->user_patch);
-        if(glob->domain->dim == 2)
-        {
-            fclaw2d_domain_data_t *ddata = glob->domain->d2;
-            ++ddata->count_delete_patch;
-        }
-        else 
-        {
-            fclaw3d_domain_data_t *ddata = glob->domain->d3;
-            ++ddata->count_delete_patch;
-        }
+        fclaw_domain_data_t *ddata = glob->domain->domain_data;
+        ++ddata->count_delete_patch;
 
         if(pdata->dim == 2)
         {
@@ -737,16 +721,8 @@ void fclaw_patch_remote_ghost_delete(fclaw_global_t *glob,
         FCLAW_FREE(pdata);
         this_patch->user = NULL;
 
-        if(glob->domain->dim == 2)
-        {
-            fclaw2d_domain_data_t *ddata = glob->domain->d2;
-            ++ddata->count_delete_patch;
-        }
-        else 
-        {
-            fclaw3d_domain_data_t *ddata = glob->domain->d3;
-            ++ddata->count_delete_patch;
-        }
+        fclaw_domain_data_t *ddata = glob->domain->domain_data;
+        ++ddata->count_delete_patch;
     }
 }
 

@@ -46,8 +46,8 @@ static
 fclaw_domain_exchange_t*
     get_exchange_data(fclaw_global_t* glob)
 {
-    fclaw2d_domain_data_t *ddata = glob->domain->d2;
-    return ddata->domain_exchange;
+    fclaw_domain_data_t *ddata = glob->domain->domain_data;
+    return ddata->d2->domain_exchange;
 }
 
 /* Should these be access functions in domain?  */
@@ -55,24 +55,24 @@ static
 void set_exchange_data(fclaw_global_t* glob,
                        fclaw_domain_exchange_t *e)
 {
-    fclaw2d_domain_data_t *ddata = glob->domain->d2;
-    ddata->domain_exchange = e;
+    fclaw_domain_data_t *ddata = glob->domain->domain_data;
+    ddata->d2->domain_exchange = e;
 }
 
 static
 fclaw2d_domain_indirect_t*
     get_indirect_data(fclaw_global_t* glob)
 {
-    fclaw2d_domain_data_t *ddata = glob->domain->d2;
-    return ddata->domain_indirect;
+    fclaw_domain_data_t *ddata = glob->domain->domain_data;
+    return ddata->d2->domain_indirect;
 }
 
 static
 void set_indirect_data(fclaw_global_t* glob,
                        fclaw2d_domain_indirect_t *ind)
 {
-    fclaw2d_domain_data_t *ddata = glob->domain->d2;
-    ddata->domain_indirect = ind;
+    fclaw_domain_data_t *ddata = glob->domain->domain_data;
+    ddata->d2->domain_indirect = ind;
 }
 
 static
