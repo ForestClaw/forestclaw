@@ -591,6 +591,8 @@ void fclaw2d_patch_corner_swap (int *cornerno, int *rcornerno);
  * This function assumes that the two patches are of the SAME size and that the
  * patches lie in coordinate systems with the same orientation.
  * It is LEGAL to call this function for both local and ghost patches.
+ * It is ILLEGAL to call this function for patches from face-neighboring blocks.
+ * Use \ref fclaw2d_patch_transform_face for such patches instead.
  * \param [in] ipatch       The patch that the input coordinates are relative to.
  * \param [in] opatch       The patch that the output coordinates are relative to.
  * \param [in] icorner      Corner number of this patch to transform across.
@@ -613,6 +615,8 @@ void fclaw2d_patch_transform_corner (fclaw2d_patch_t * ipatch,
  * This function assumes that the neighbor patch is smaller (HALF size) and that
  * the patches lie in coordinate systems with the same orientation.
  * It is LEGAL to call this function for both local and ghost patches.
+ * It is ILLEGAL to call this function for patches from face-neighboring blocks.
+ * Use \ref fclaw2d_patch_transform_face2 for such patches instead.
  * \param [in] ipatch       The patch that the input coordinates are relative to.
  * \param [in] opatch       The patch that the output coordinates are relative to.
  * \param [in] icorner      Corner number of this patch to transform across.
