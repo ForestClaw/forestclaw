@@ -271,79 +271,83 @@ subroutine fclaw3d_clawpatch46_fort_average2coarse(mx,my,mz,mbc,meqn, &
     DOUBLE PRECISION :: volcoarse(-mbc:mx+mbc+1,-mbc:my+mbc+1,-mbc:mz+mbc+1)
     DOUBLE PRECISION ::   volfine(-mbc:mx+mbc+1,-mbc:my+mbc+1,-mbc:mz+mbc+1)
 
-    !! # This should be refratio*refratio.
-    INTEGER :: rr2
-    PARAMETER(rr2 = 4)
-    INTEGER :: i2(0:rr2-1),j2(0:rr2-1)
+    !! # This should be refratio**3
+    INTEGER :: rr3
+    PARAMETER(rr3 = 8)
+    INTEGER :: ifine(0:rr3-1),jfine(0:rr3-1),kfine(0:rr3-1)
 
 
-    INTEGER :: i,j,k,mq, ii,jj, i1, j1, r2, m
-    INTEGER :: ig, jg, ic_add, jc_add
-    INTEGER :: rfactor, refratio, igrid
+    INTEGER :: i,j,k,mq, ii,jj,kk, ic, jc, kc, r3, m
+    INTEGER :: ig, jg, kg, ic_add, jc_add, kc_add
+    INTEGER :: refratio, igrid
     LOGICAL :: is_manifold
     DOUBLE PRECISION :: sum, kf, qf, vf_sum
 
-    !! exit with error
-    STOP 'NOT IMPLIMENTED'
-
-    !! Not sure why there are two different variables here.  Isn't 
-    !! rfactor == refratio? 
-    rfactor = 2
     refratio = 2
 
     is_manifold = manifold .eq. 1
 
     !! # 'iface' is relative to the coarse grid
 
-    r2 = refratio*refratio
-    if (r2 .ne. rr2) then
+    r3 = refratio**3
+    if (r3 .ne. rr3) then
          write(6,*) 'average_face_ghost (claw2d_utils.f) ', & 
          '  Refratio**2 is not equal to rr2'
         stop
     endif
 
 
-    !! # Get (ig,jg) for grid from linear (igrid) coordinates
+    !! Get (ig,jg,kg) for grid from linear (igrid) coordinates
+    !! igrid = ig + refratio*jg + refratio*refratio*kg
     ig = mod(igrid,refratio)
-    jg = (igrid-ig)/refratio
+    jg = mod((igrid-ig)/refratio,refratio)
+    kg = (igrid-ig-refratio*jg)/(refratio**2)
 
-    !! # Get rectangle in coarse grid for fine grid.
-    ic_add = ig*mx/rfactor
-    jc_add = jg*mx/rfactor
+    !! Get rectangle in coarse grid for fine grid.
+    ic_add = ig*mx/refratio
+    jc_add = jg*my/refratio
+    kc_add = kg*mz/refratio
 
-    r2 = refratio*refratio
+    r3 = refratio**3
+    !! this assumes mz,my,mz are divisible by refratio
+    !! should probably add a check to clawpatch_options
     meqn_loop : do mq = 1,meqn
-        k_loop : do k = 1,mz
-            j_loop : do j = 1,my/rfactor
-                i_loop : do i = 1,mx/rfactor
-                    i1 = i+ic_add
-                    j1 = j+jc_add
+        k_loop : do k = 1,mz/refratio
+            j_loop : do j = 1,my/refratio
+                i_loop : do i = 1,mx/refratio
+                    ic = i+ic_add
+                    jc = j+jc_add
+                    kc = k+kc_add
                     m = 0
-                    do jj = 1,refratio
-                        do ii = 1,refratio
-                           i2(m) = (i-1)*refratio + ii
-                           j2(m) = (j-1)*refratio + jj
-                           m = m + 1
+                    do kk = 1,refratio
+                        do jj = 1,refratio
+                            do ii = 1,refratio
+                               ifine(m) = (i-1)*refratio + ii
+                               jfine(m) = (j-1)*refratio + jj
+                               kfine(m) = (k-1)*refratio + kk
+                               m = m + 1
+                            enddo
                         enddo
                     enddo
+                    print *,''
                     if (is_manifold) then
                         sum = 0
                         vf_sum = 0
-                        do m = 0,r2-1
-                            qf = qfine(i2(m),j2(m),k,mq)
-                            kf = volfine(i2(m),j2(m),k)
+                        do m = 0,r3-1
+                            qf = qfine(ifine(m),jfine(m),kfine(m),mq)
+                            kf = volfine(ifine(m),jfine(m),kfine(m))
                             sum = sum + kf*qf
                             vf_sum = vf_sum + kf
                         enddo
-                        !!kc = volcoarse(i1,j1,k)
-                        qcoarse(i1,j1,k,mq) = sum/vf_sum
+                        !!vc = volcoarse(ic,jc,kc)
+                        qcoarse(ic,jc,kc,mq) = sum/vf_sum
                     else
                         sum = 0
-                        do m = 0,r2-1
-                           qf = qfine(i2(m),j2(m),k,mq)
+                        do m = 0,r3-1
+                           qf = qfine(ifine(m),jfine(m),kfine(m),mq)
                            sum = sum + qf
                         enddo
-                        qcoarse(i1,j1,k,mq) = sum/r2
+                        qcoarse(ic,jc,kc,mq) = sum/r3
                     endif 
                 end do i_loop
             enddo j_loop

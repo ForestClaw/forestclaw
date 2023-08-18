@@ -294,13 +294,12 @@ TEST_CASE("3d_clawpatch_average")
         //check that patch was filled correctly
         CHECK_EQ(iterate.num_incorrect_interior_cells, 0);
 
-        int num_incorrect_cells = iterate.num_incorrect_interior_cells;
         //if not write output
-        if(test_output_vtk() && num_incorrect_cells >0)
+        if(test_output_vtk())
         {
             char test_no_str[5];
             snprintf(test_no_str, 5, "%04d", test_no);
-            std::string filename = "3d_clawpatch_interpolate_"+std::string(test_no_str);
+            std::string filename = "3d_clawpatch_average_"+std::string(test_no_str);
             INFO("Test failed output error to " << filename << ".vtu");
             fclaw_clawpatch_output_vtk_to_file(cube_output.glob,filename.c_str());
         }
