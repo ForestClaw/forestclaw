@@ -198,6 +198,9 @@ TEST_CASE("3d fclaw_clawpatch_vtable_initialize")
     CHECK(clawpatch_vt->d3->fort_copy_face              == &FCLAW3D_CLAWPATCH46_FORT_COPY_FACE);
     CHECK(clawpatch_vt->d3->fort_average_face           == &FCLAW3D_CLAWPATCH46_FORT_AVERAGE_FACE);
     CHECK(clawpatch_vt->d3->fort_interpolate_face       == &FCLAW3D_CLAWPATCH46_FORT_INTERPOLATE_FACE);
+
+    CHECK(clawpatch_vt->d3->fort_copy_edge              == &FCLAW3D_CLAWPATCH46_FORT_COPY_EDGE);
+
     CHECK(clawpatch_vt->d3->fort_copy_corner            == &FCLAW3D_CLAWPATCH46_FORT_COPY_CORNER);
     CHECK(clawpatch_vt->d3->fort_average_corner         == &FCLAW3D_CLAWPATCH46_FORT_AVERAGE_CORNER);
     CHECK(clawpatch_vt->d3->fort_interpolate_corner     == &FCLAW3D_CLAWPATCH46_FORT_INTERPOLATE_CORNER);
@@ -239,6 +242,9 @@ TEST_CASE("3d fclaw_clawpatch_vtable_initialize")
     CHECK(patch_vt->build                          != NULL);
     CHECK(patch_vt->build_from_fine                != NULL);
     CHECK(patch_vt->setup                          == NULL);
+
+    //ghost filling
+    CHECK(patch_vt->d3->copy_edge                != NULL);
 
     fclaw_domain_destroy(domain);
     fclaw_global_destroy(glob);

@@ -792,6 +792,40 @@ void clawpatch_interpolate_face(fclaw_global_t *glob,
 }
 
 static
+void clawpatch_copy_edge(fclaw_global_t *glob,
+                         fclaw_patch_t *patch,
+                         fclaw_patch_t *edge_patch,
+                         int coarse_blockno,
+                         int fine_blockno,
+                         int iedge,
+                         int time_interp,
+                         fclaw_patch_transform_data_t *transform_data)
+{
+
+    const fclaw_clawpatch_options_t *clawpatch_opt = 
+                 fclaw_clawpatch_get_options(glob);
+    int mbc = clawpatch_opt->mbc;
+
+    int meqn;
+    double *qthis;
+    fclaw_clawpatch_timesync_data(glob,patch,time_interp,&qthis,&meqn);
+
+    double *qedge;
+    fclaw_clawpatch_timesync_data(glob,edge_patch,time_interp,&qedge,&meqn);
+
+    if (fill_ghost(glob,time_interp))
+    {
+        fclaw_clawpatch_vtable_t* clawpatch_vt = fclaw_clawpatch_vt(glob);
+        FCLAW_ASSERT(clawpatch_opt->dim == 3);
+        int mx = clawpatch_opt->d3->mx;
+        int my = clawpatch_opt->d3->my;
+        int mz = clawpatch_opt->d3->mz;
+        clawpatch_vt->d3->fort_copy_edge(&mx,&my,&mz, &mbc,&meqn,qthis,qedge,
+                                         &iedge, &transform_data);
+    }
+}
+
+static
 void clawpatch_copy_corner(fclaw_global_t *glob,
                            fclaw_patch_t *patch,
                            fclaw_patch_t *corner_patch,
@@ -1658,6 +1692,8 @@ void initialize_3d_claw46_fort_vt(fclaw_clawpatch_vtable_t* clawpatch_vt)
     clawpatch_vt->d3->fort_average_face          = FCLAW3D_CLAWPATCH46_FORT_AVERAGE_FACE;
     clawpatch_vt->d3->fort_interpolate_face      = FCLAW3D_CLAWPATCH46_FORT_INTERPOLATE_FACE;
 
+    clawpatch_vt->d3->fort_copy_edge             = FCLAW3D_CLAWPATCH46_FORT_COPY_EDGE;
+
     clawpatch_vt->d3->fort_copy_corner           = FCLAW3D_CLAWPATCH46_FORT_COPY_CORNER;
     clawpatch_vt->d3->fort_average_corner        = FCLAW3D_CLAWPATCH46_FORT_AVERAGE_CORNER;
     clawpatch_vt->d3->fort_interpolate_corner    = FCLAW3D_CLAWPATCH46_FORT_INTERPOLATE_CORNER;
@@ -1708,6 +1744,8 @@ void initialize_3d_patch_vt(fclaw_patch_vtable_t* patch_vt)
     patch_vt->d3->copy_face            = clawpatch_copy_face;
     patch_vt->d3->average_face         = clawpatch_average_face;
     patch_vt->d3->interpolate_face     = clawpatch_interpolate_face;
+
+    patch_vt->d3->copy_edge            = clawpatch_copy_edge;
 
     patch_vt->d3->copy_corner          = clawpatch_copy_corner;
     patch_vt->d3->average_corner       = clawpatch_average_corner;

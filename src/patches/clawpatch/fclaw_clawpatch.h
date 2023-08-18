@@ -286,6 +286,8 @@ struct fclaw_clawpatch_vtable_3d
     fclaw3d_clawpatch_fort_interpolate_face_t      fort_interpolate_face;
     /** Copies ghost data from a corner neighboring grid on the same level */
     fclaw3d_clawpatch_fort_copy_corner_t           fort_copy_corner;
+    /** Copies ghost data from a face neighboring grid on the same level */
+    fclaw3d_clawpatch_fort_copy_edge_t             fort_copy_edge;
     /** Averages values from a corner neighboring fine grid */
     fclaw3d_clawpatch_fort_average_corner_t        fort_average_corner;
     /** Interpolates values form a corner neighboring coarse grid */
