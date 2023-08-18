@@ -245,10 +245,15 @@ fclaw2d_file_context_t *fclaw2d_file_read_block (fclaw2d_file_context_t *
  * \param [in]      patch_size  The number of bytes per patch. This number
  *                              must coincide with \b patch_data->elem_size.
  * \param [in]      patch_data  An array of the length number of local patches
- *                              with the element size equal to number of bytes
- *                              written per patch. The patch data is expected
- *                              to be stored according to the Morton order of
- *                              the patches. For \b patch_data->elem_size == 0
+ *                              with the element size equal to sizeof (sc_array_t).
+ *                              This means each element of \b patch_data must be
+ *                              a sc_array. These sc_arrays must have an element
+ *                              size of \b patch_size and store the actual
+ *                              patch data. This memory layout enables the user
+ *                              to write by indirect addressing, i.e. to write
+ *                              non-contigous patch data. The patch data is
+ *                              expected to be stored according to the Morton
+ *                              order of the patches. For \b patch_size == 0
  *                              the function writes an empty field. The section
  *                              header and the padding is still written.
  *                              In this case errcode is set to \ref
@@ -294,18 +299,21 @@ fclaw2d_file_context_t *fclaw2d_file_write_field (fclaw2d_file_context_t *
  * \param [in] patch_size     The number of bytes per patch. This number
  *                            must coincide with \b patch_data->elem_size.
  * \param [in,out] patch_data An array of the length number of local patches
- *                            with the element size equal to number of bytes
- *                            read per patch. The patch data is read
- *                            according to the Morton order of the patches.
- *                            \b patch_data->elem_size must coincide with
- *                            the section data size in the file.
- *                            \b patch_data == NULL means that the data is
- *                            skipped and the internal file pointer is incremented.
- *                            In the case of skipping \b patch_size is still
- *                            checked using the corresponding value read from
- *                            the file. The data is read using the partition of
- *                            patches given by the domain that is associated
- *                            to \b fc.
+ *                            with the element size equal to sizeof (sc_array_t).
+ *                            This means each element of \b patch_data must be
+ *                            a sc_array. These sc_arrays must have an element
+ *                            size of \b patch_size. This memory layout enables
+ *                            the user to read by indirect addressing, i.e. to
+ *                            read into non-contigous patch data. The patch data
+ *                            is read according to the Morton order of the patches.
+ *                            \b patch_size must coincide with the section data
+ *                            size in the file. \b patch_data == NULL means that
+ *                            the data is skipped and the internal file pointer
+ *                            is incremented. In the case of skipping
+ *                            \b patch_size is still checked using the
+ *                            corresponding value read from the file. The data
+ *                            is read using the partition of patches given by the
+ *                            domain that is associated to \b fc.
  * \param [out]     errcode   An errcode that can be interpreted by
  *                            \ref fclaw2d_file_error_string.
  * \return                    Return a pointer to input context or NULL in case
