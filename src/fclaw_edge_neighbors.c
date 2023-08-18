@@ -417,6 +417,8 @@ void cb_edge_fill(fclaw_domain_t *domain,
 
     for (int iedge = 0; iedge < num_edges; iedge++)
     {
+        transform_data->d3->iedge = iedge;
+
         int is_block_edge;
         int is_interior_edge;
         int block_edge_count = 0;

@@ -111,6 +111,93 @@ FCLAW3D_CLAWPATCH_TRANSFORM_FACE_HALF (const int *i1, const int *j1, const int* 
 
 
 void
+FCLAW3D_CLAWPATCH_TRANSFORM_EDGE (const int *i1, const int *j1, const int *k1,
+                                  int *i2, int *j2, int *k2,
+                                  fclaw_patch_transform_data_t** ptdata)
+{
+    fclaw_patch_transform_data_t *tdata = *ptdata;
+    const fclaw_clawpatch_options_t *clawpatch_opt = 
+        (fclaw_clawpatch_options_t*) tdata->user;
+
+    int mx = clawpatch_opt->d3->mx;
+    int my = clawpatch_opt->d3->my;
+    int mz = clawpatch_opt->d3->mz;
+
+    //TODO call fclaw3d_patch_transform_edge
+
+    // axis that edge lies along
+    int axis = tdata->d3->iedge/4;
+    if(axis == 0)
+    {
+        //x axis
+        *i2 = *i1;
+        int upper_y = tdata->d3->iedge & 0x1;
+        if(upper_y)
+        {
+            *j2 = *j1-my;
+        }
+        else
+        {
+            *j2 = *j1+my;
+        }
+        int upper_z = tdata->d3->iedge & 0x2;
+        if(upper_z)
+        {
+            *k2 = *k1-mz;
+        }
+        else
+        {
+            *k2 = *k1+mz;
+        }
+    }
+    else if(axis == 1)
+    {
+        //y axis
+        *j2 = *j1;
+        int upper_x = tdata->d3->iedge & 0x1;
+        if(upper_x)
+        {
+            *i2 = *i1-mx;
+        }
+        else
+        {
+            *i2 = *i1+mx;
+        }
+        int upper_z = tdata->d3->iedge & 0x2;
+        if(upper_z)
+        {
+            *k2 = *k1-mz;
+        }
+        else
+        {
+            *k2 = *k1+mz;
+        }
+    }
+    else if(axis == 2)
+    {
+        //z axis
+        *k2 = *k1;
+        int upper_x = tdata->d3->iedge & 0x1;
+        if(upper_x)
+        {
+            *i2 = *i1-mx;
+        }
+        else
+        {
+            *i2 = *i1+mx;
+        }
+        int upper_y = tdata->d3->iedge & 0x2;
+        if(upper_y)
+        {
+            *j2 = *j1-my;
+        }
+        else
+        {
+            *j2 = *j1+my;
+        }
+    }
+}
+void
 FCLAW3D_CLAWPATCH_TRANSFORM_CORNER (const int *i1, const int *j1, const int *k1,
                                     int *i2, int *j2, int *k2,
                                     fclaw_patch_transform_data_t** ptdata)

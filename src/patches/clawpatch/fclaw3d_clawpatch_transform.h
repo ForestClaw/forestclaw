@@ -99,6 +99,22 @@ void FCLAW3D_CLAWPATCH_TRANSFORM_FACE_HALF (const int *i1, const int *j1, const 
                                             struct fclaw_patch_transform_data** ptdata);
 
 /** Fortran subroutine name */
+#define FCLAW3D_CLAWPATCH_TRANSFORM_EDGE FCLAW_F77_FUNC_(fclaw3d_clawpatch_transform_edge, \
+                                                         FCLAW3D_CLAWPATCH_TRANSFORM_EDGE)
+/**
+ * @brief Tranform an index for a edge-neighboring patch's coordinate system
+ * 
+ * @param[in] i1, j1, k1 the input index 
+ * @param[out] i2, j2, k2 the transformed equivalent index in the neighboring patch
+ * @param[in] ptdata the transform data
+ */
+void FCLAW3D_CLAWPATCH_TRANSFORM_EDGE (const int *i1, const int *j1, const int *k1,
+                                       int *i2, int *j2, int *k2,
+                                       struct fclaw_patch_transform_data** ptdata);
+
+
+
+/** Fortran subroutine name */
 #define FCLAW3D_CLAWPATCH_TRANSFORM_CORNER FCLAW_F77_FUNC_(fclaw3d_clawpatch_transform_corner, \
                                                            FCLAW3D_CLAWPATCH_TRANSFORM_CORNER)
 /**

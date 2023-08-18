@@ -316,6 +316,9 @@ TEST_CASE("3d clawpatch ghost filling on uniform cube")
                         {
                             iterate->num_incorrect_corner_ghost_cells++;
                         }
+                        else{
+                            SC_ABORT_NOT_REACHED();
+                        }
                     }
                 }
 
