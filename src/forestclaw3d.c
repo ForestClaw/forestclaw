@@ -72,7 +72,6 @@ fclaw_patch_edge_neighbors (fclaw_domain_t * domain,
     p4est_ghost_t *ghost = wrap->match_aux ? wrap->ghost_aux : wrap->ghost;
     p4est_mesh_t *mesh = wrap->match_aux ? wrap->mesh_aux : wrap->mesh;
     p4est_locidx_t local_num, qid;
-    p4est_locidx_t edgeid, cstart, cend;
     const p4est_quadrant_t *q;
     p4est_tree_t *rtree;
     fclaw_block_t *block;
@@ -100,27 +99,48 @@ fclaw_patch_edge_neighbors (fclaw_domain_t * domain,
         FCLAW_ASSERT (0 <= qid);
         if (qid >= mesh->local_num_quadrants + mesh->ghost_num_quadrants)
         {
-            /* This is an inter-tree (face or edge) edge neighbor */
-            edgeid =
+            /* This is an inter-tree (face or edge) edge neighbor 
+               or half/double sized neighbor */
+            p4est_locidx_t edge_offset_i =
                 qid - (mesh->local_num_quadrants + mesh->ghost_num_quadrants);
-            FCLAW_ASSERT (edgeid < mesh->local_num_edges);
-            cstart =
-                fclaw2d_array_index_locidx (mesh->edge_offset, edgeid);
-            cend =
-                fclaw2d_array_index_locidx (mesh->edge_offset, edgeid + 1);
-            if (cstart + 1 < cend)
+            FCLAW_ASSERT (edge_offset_i < mesh->local_num_edges);
+
+            p4est_locidx_t cstart, cend;
+            cstart = fclaw2d_array_index_locidx (mesh->edge_offset, edge_offset_i);
+            cend = fclaw2d_array_index_locidx (mesh->edge_offset, edge_offset_i + 1);
+
+            /* get value in edge_edge array */
+            int e = *(int8_t *) sc_array_index_int (mesh->edge_edge,
+                                                    (int) cstart);
+            if ((e >= 0 && cstart + 1 < cend) || cstart + 2 < cend)
             {
                 /* At least a five-edge, which is currently not supported */
                 qid = -1;
             }
             else
             {
-                FCLAW_ASSERT (cstart + 1 == cend);
+                /* decode */
+                if(e < 0)
+                {
+                    /* half sized neighbor */
+                    *neighbor_size = FCLAW_PATCH_HALFSIZE;
+                    redge[0] = (e + 24)%12;
+                    redge[1] = redge[0];
+                }
+                else if (e > 23)
+                {
+                    /* double sized neighbor */
+                    *neighbor_size = FCLAW_PATCH_DOUBLESIZE;
+                    redge[0] = (e - 24)%12;
+                }
+                else 
+                {
+                    /* same sized neighbor inter-tree */
+                    *neighbor_size = FCLAW_PATCH_SAMESIZE;
+                    redge[0] = e%12;
+                }
                 qid = fclaw2d_array_index_locidx (mesh->edge_quad, cstart);
-                *redge = (int)
-                    *(int8_t *) sc_array_index_int (mesh->edge_edge,
-                                                    (int) cstart);
-                FCLAW_ASSERT (0 <= *redge && *redge < P8EST_EDGES);
+                FCLAW_ASSERT (0 <= redge[0] && redge[0] < P8EST_EDGES);
             }
         }
         else
