@@ -52,7 +52,6 @@ struct CubeDomain {
     fclaw_domain_t *domain;
     fclaw3d_map_context_t* map;
     fclaw_clawpatch_options_t* opts;
-    int num_incorrect_cells = 0;
 
     CubeDomain(int level){
         glob = fclaw_global_new();
@@ -146,6 +145,40 @@ void get_bounds_with_ghost(fclaw_clawpatch_t* clawpatch,
     *k_stop  = intersects_bc[5] ? clawpatch->d3->mz : clawpatch->d3->mz + clawpatch->mbc;
 }
 
+bool interior_cell(fclaw_clawpatch_t* clawpatch, int i, int j, int k, int m)
+{
+    int mx = clawpatch->d3->mx;
+    int my = clawpatch->d3->my;
+    int mz = clawpatch->d3->mz;
+    return i >= 0 && i < mx && j >= 0 && j < my && k >= 0 && k < mz;
+}
+bool face_ghost_cell(fclaw_clawpatch_t* clawpatch, int i, int j, int k, int m)
+{
+    int mx = clawpatch->d3->mx;
+    int my = clawpatch->d3->my;
+    int mz = clawpatch->d3->mz;
+    return ((i < 0 || i >= mx) && j >= 0 && j < my && k >= 0 && k < mz) ||
+           (i >= 0 && i < mx && (j < 0 || j >= my) && k >= 0 && k < mz) ||
+           (i >= 0 && i < mx && j >= 0 && j < my && (k < 0 || k >= mz));
+}
+bool edge_ghost_cell(fclaw_clawpatch_t* clawpatch, int i, int j, int k, int m)
+{
+    int mx = clawpatch->d3->mx;
+    int my = clawpatch->d3->my;
+    int mz = clawpatch->d3->mz;
+    return ((i < 0 || i >= mx) && (j < 0 || j >= my) && k >= 0 && k < mz) ||
+           ((i < 0 || i >= mx) && j >= 0 && j < my && (k < 0 || k >= mz)) ||
+           (i >= 0 && i < mx && (j < 0 || j >= my) && (k < 0 || k >= mz));
+}
+bool corner_ghost_cell(fclaw_clawpatch_t* clawpatch, int i, int j, int k, int m)
+{
+    int mx = clawpatch->d3->mx;
+    int my = clawpatch->d3->my;
+    int mz = clawpatch->d3->mz;
+    return (i < 0 || i >= mx) && (j < 0 || j >= my) && (k < 0 || k >= mz);
+}
+
+
 }// end anonymous namespace
 
 
@@ -179,6 +212,7 @@ TEST_CASE("3d clawpatch ghost filling on uniform cube")
 
         cube_output.setup();
 
+        
         //initialize patches
         fclaw_global_iterate_patches(
             cube.glob, 
@@ -211,15 +245,23 @@ TEST_CASE("3d clawpatch ghost filling on uniform cube")
 
         //check ghost cells
         //fill output domain with error
+        struct iterate_t {
+            fclaw_global_t* error_glob;
+            int num_incorrect_interior_cells;
+            int num_incorrect_face_ghost_cells;
+            int num_incorrect_edge_ghost_cells;
+            int num_incorrect_corner_ghost_cells;
+        };
+        iterate_t iterate = {cube_output.glob, 0, 0, 0, 0};
         fclaw_global_iterate_patches(
             cube.glob, 
             [](fclaw_domain_t * domain, fclaw_patch_t * patch,
                 int blockno, int patchno, void *user)
             {
                 fclaw_global_iterate_t* g = (fclaw_global_iterate_t*)user;
-                CubeDomain* cube_output = (CubeDomain*)g->user;
+                iterate_t* iterate = (iterate_t*)g->user;
                 //clawpatch to store error in
-                fclaw_patch_t* error_patch = &cube_output->domain->blocks[blockno].patches[patchno];  
+                fclaw_patch_t* error_patch = &iterate->error_glob->domain->blocks[blockno].patches[patchno];  
                 fclaw_clawpatch_t* error_clawpatch = fclaw2d_clawpatch_get_clawpatch(error_patch);
                 int mbc = error_clawpatch->mbc;
 
@@ -229,7 +271,7 @@ TEST_CASE("3d clawpatch ghost filling on uniform cube")
 
                 // get q
                 double* q = fclaw_clawpatch_get_q(g->glob, patch);
-                double* error_q = fclaw_clawpatch_get_q(cube_output->glob, error_patch);
+                double* error_q = fclaw_clawpatch_get_q(iterate->error_glob, error_patch);
 
                 //get physical boundaries
                 int intersects_bc[fclaw_domain_num_faces(domain)];
@@ -240,7 +282,7 @@ TEST_CASE("3d clawpatch ghost filling on uniform cube")
                 }
 
                 //clear error q
-                int size = fclaw_clawpatch_size(cube_output->glob);
+                int size = fclaw_clawpatch_size(iterate->error_glob);
                 memset(error_q, 0, sizeof(double)*size);
 
                 //loop over all cells
@@ -258,19 +300,41 @@ TEST_CASE("3d clawpatch ghost filling on uniform cube")
                     error_q[error_idx] = expected - q[idx];
                     if(q[idx] != doctest::Approx(expected))
                     {
-                        cube_output->num_incorrect_cells++;
+                        if(interior_cell(clawpatch, i,j,k,m))
+                        {
+                            iterate->num_incorrect_interior_cells++;
+                        }
+                        else if(face_ghost_cell(clawpatch, i,j,k,m))
+                        {
+                            iterate->num_incorrect_face_ghost_cells++;
+                        }
+                        else if(edge_ghost_cell(clawpatch, i,j,k,m))
+                        {
+                            iterate->num_incorrect_edge_ghost_cells++;
+                        }
+                        else if(corner_ghost_cell(clawpatch, i,j,k,m))
+                        {
+                            iterate->num_incorrect_corner_ghost_cells++;
+                        }
                     }
                 }
 
             }, 
-            &cube_output
+            &iterate
         );
 
         //check that patch was filled correctly
-        CHECK_EQ(cube_output.num_incorrect_cells, 0);
+        CHECK_EQ(iterate.num_incorrect_interior_cells, 0);
+        CHECK_EQ(iterate.num_incorrect_face_ghost_cells, 0);
+        CHECK_EQ(iterate.num_incorrect_edge_ghost_cells, 0);
+        CHECK_EQ(iterate.num_incorrect_corner_ghost_cells, 0);
 
+        int num_incorrect_cells = iterate.num_incorrect_interior_cells 
+                                + iterate.num_incorrect_face_ghost_cells 
+                                + iterate.num_incorrect_edge_ghost_cells 
+                                + iterate.num_incorrect_corner_ghost_cells;
         //if not write output
-        if(test_output_vtk() && cube_output.num_incorrect_cells > 0)
+        if(test_output_vtk() && num_incorrect_cells >0)
         {
             char test_no_str[5];
             snprintf(test_no_str, 5, "%04d", test_no);
