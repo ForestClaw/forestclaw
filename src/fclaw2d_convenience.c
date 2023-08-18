@@ -30,28 +30,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <p4est_search.h>
 #include <p4est_vtk.h>
 #include <p4est_wrap.h>
-#include <p4est_io.h>
-#include <p4est_algorithms.h>
 #else
 #include <fclaw3d_convenience.h>
 #include <p8est_bits.h>
 #include <p8est_search.h>
 #include <p8est_vtk.h>
 #include <p8est_wrap.h>
-#include <p8est_io.h>
-#include <p8est_algorithms.h>
 #endif
 
-#define FCLAW_WRAP_PARAM_SIZE (2 * sizeof (uint64_t))
-
 const double fclaw2d_smallest_h = 1. / (double) P4EST_ROOT_LEN;
-
-typedef struct fclaw2d_file_context
-{
-    fclaw2d_domain_t *domain;
-    p4est_file_context_t *fc;
-}
-fclaw2d_file_context_t;
 
 static void
 fclaw2d_patch_set_boundary_xylower (fclaw2d_patch_t * patch,

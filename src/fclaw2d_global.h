@@ -28,7 +28,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <forestclaw2d.h>  /* Needed to declare callbacks (below) */
 #include <fclaw2d_map.h>   /* Needed to store the map context */
-#include <fclaw2d_convenience.h> /* Needed for the file context */
 
 #include <fclaw_timer.h>   /* Needed to create statically allocated array of timers */
 
@@ -153,70 +152,6 @@ size_t fclaw2d_global_packsize(const fclaw2d_global_t * glob);
  * @return size_t number of bytes read
  */
 size_t fclaw2d_global_unpack(char* buffer, fclaw2d_global_t** glob);
-
-/** Write the global struct to an opened file such that it can be used to restart.
- *
- * This is a collective function.
- * The data is written in so-called file sections according to a prescribed
- * convention for storing data in ForestClaw.
- * TODO: Explicitly specify and document this convention.
- * TODO: Currently we do not store the diagnostcs and accumulator.
- *
- * This function does not abort on MPI I/O errors but returns NULL.
- * Without MPI I/O the function may abort on file system dependent
- * errors.
- *
- * \param [in, out] fc          Context previously created by \ref
- *                              fclaw2d_file_open_write.  It keeps track
- *                              of the data sets written one after another.
- * \param [in]       user_string  A user string that is written to the file.
- *                              Only \ref FCLAW2D_FILE_USER_STRING_BYTES
- *                              bytes without NUL-termination are
- *                              written to the file. If the user gives less
- *                              bytes, the user_string in the file header is
- *                              padded by spaces.
- * \param [in]       global     The global structure that is written to the file.
- *                              \b global->domain must coincide with the domain
- *                              that was used to open the file.
- * \param [out]       errcode   An errcode that can be interpreted by
- *                              \ref fclaw2d_file_error_string.
- * \return                      Return a pointer to input context or NULL in case
- *                              of errors that does not abort the program.
- *                              In case of error the file is tried to close
- *                              and \b fc is freed.
- */
-fclaw2d_file_context_t * fclaw2d_global_write_global (fclaw2d_file_context_t *fc,
-                                                      const char *user_string,
-                                                      fclaw2d_global_t *global,
-                                                      int *errcode);
-
-/** Read a global struct to an opened file such that it can be used to restart.
- *
- * This is a collective function.
- *
- * This function does not abort on MPI I/O errors but returns NULL.
- * Without MPI I/O the function may abort on file system dependent
- * errors.
- *
- * \param [in]  fc            Context previously created by \ref
- *                            fclaw2d_file_open_read.  It keeps track
- *                            of the data sets read one after another.
- * \param [out] user_string   At least \ref FCLAW2D_FILE_USER_STRING_BYTES
- *                            bytes. The user string is written
- *                            to the passed array including padding spaces
- *                            and a trailing NUL-termination.
- * \param [out] global        Newly allocated global that is read from the file.
- * \param [out] errcode       An errcode that can be interpreted by
- *                            \ref fclaw2d_file_error_string.
- * \return                    Return a pointer to input context or NULL in case
- *                            of errors that does not abort the program.
- *                            In case of error the file is tried to close
- *                            and fc is freed.
- */
-fclaw2d_file_context_t * fclaw2d_global_read_global (fclaw2d_file_context_t *fc,
-                                                     char *user_string,
-                                                     fclaw2d_global_t **global,
-                                                     int *errcode);
 
 void fclaw2d_global_iterate_level (fclaw2d_global_t * glob, int level,
                                    fclaw2d_patch_callback_t pcb, void *user);
