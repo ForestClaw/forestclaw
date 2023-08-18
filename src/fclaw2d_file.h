@@ -48,6 +48,7 @@ extern "C"
 #define FCLAW2D_FILE_MAX_BLOCK_SIZE P4EST_FILE_MAX_BLOCK_SIZE
 #define FCLAW2D_FILE_ERR_SUCCESS P4EST_FILE_ERR_SUCCESS
 #define FCLAW2D_FILE_ERR_FORMAT P4EST_FILE_ERR_FORMAT
+#define FCLAW2D_FILE_ERR_NOT_IMPLEMENTED (P4EST_FILE_ERR_LASTCODE + 1)
 
 /** Opaque context used for writing a fclaw2d data file. */
 typedef struct fclaw2d_file_context fclaw2d_file_context_t;

@@ -48,6 +48,7 @@ extern "C"
 #define FCLAW3D_FILE_MAX_BLOCK_SIZE P8EST_FILE_MAX_BLOCK_SIZE
 #define FCLAW3D_FILE_ERR_SUCCESS P8EST_FILE_ERR_SUCCESS
 #define FCLAW3D_FILE_ERR_FORMAT P8EST_FILE_ERR_FORMAT
+#define FCLAW3D_FILE_ERR_NOT_IMPLEMENTED (P8EST_FILE_ERR_LASTCODE + 1)
 
 /** Opaque context used for writing a fclaw3d data file. */
 typedef struct fclaw3d_file_context fclaw3d_file_context_t;
