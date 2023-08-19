@@ -201,105 +201,101 @@ subroutine fclaw3d_clawpatch46_fort_interpolate_corner &
     double precision qcoarse(1-mbc:mx+mbc,1-mbc:my+mbc,1-mbc:mz+mbc,meqn)
     double precision   qfine(1-mbc:mx+mbc,1-mbc:my+mbc,1-mbc:mz+mbc,meqn)
 
-    integer ic, jc, mq, ibc,jbc, mth, k
-    double precision qc, sl, sr, gradx, grady
+    integer mq, ic,jc,kc, mth
+    double precision qc, sl, sr, gradx, grady, gradz
     double precision fclaw2d_clawpatch_compute_slopes, value
+    integer i_start, j_start, k_start
 
     !! # This should be refratio*refratio.
-    integer i1,j1,m, r2
-    integer rr2
-    parameter(rr2 = 4)
-    integer i2(0:rr2-1),j2(0:rr2-1)
+    integer m, r3
+    integer rr3
+    parameter(rr3 = 8)
+    integer i2(0:rr3-1),j2(0:rr3-1),k2(0:rr3-1)
 
-    integer a(2,2), f(2)
-    integer ii,jj,iff,jff,dc(2),df(2,0:rr2-1)
-    double precision shiftx(0:rr2-1), shifty(0:rr2-1)
+    integer a(3,3), f(3)
+    integer ii,jj,kk,iff,jff,kff,dc(3),df(3,0:rr3-1)
+    double precision shiftx(0:rr3-1), shifty(0:rr3-1), shiftz(0:rr3-1)
 
-    !! exit with error
-    return;
-    STOP 'NOT IMPLIMENTED'
-
-    r2 = refratio*refratio
-    if (r2 .ne. rr2) then
+    r3 = refratio**3
+    if (r3 .ne. rr3) then
         write(6,*) 'average_corner_ghost (claw2d_utils.f) ', & 
-                  '  Refratio**2 is not equal to rr2'
+                  '  Refratio**3 is not equal to rr3'
         stop
     endif
 
     call fclaw3d_clawpatch_build_transform(transform_ptr,a,f)
 
     m = 0
-    do jj = 0,1
-        do ii = 0,1
-            !! # Direction on coarse grid
-            dc(1) = ii
-            dc(2) = jj
+    do kk = 0,1
+        do jj = 0,1
+            do ii = 0,1
+                !! # Direction on coarse grid
+                dc(1) = ii
+                dc(2) = jj
+                dc(3) = kk
 
-            !! # Direction on fine grid (converted using metric). Divide
-            !! # by 2 (refratio) to scale length to unit vector
-            df(1,m) = (a(1,1)*dc(1) + a(1,2)*dc(2))/2
-            df(2,m) = (a(2,1)*dc(1) + a(2,2)*dc(2))/2
+                !! # Direction on fine grid (converted using metric). Divide
+                !! # by 2 (refratio) to scale length to unit vector
+                df(1,m) = (a(1,1)*dc(1) + a(1,2)*dc(2) + a(1,3)*dc(3))/2
+                df(2,m) = (a(2,1)*dc(1) + a(2,2)*dc(2) + a(2,3)*dc(3))/2
+                df(3,m) = (a(3,1)*dc(1) + a(3,2)*dc(2) + a(3,3)*dc(3))/2
 
-            !! # Map (0,1) to (-1/4,1/4) (locations of fine grid points)
-            shiftx(m) = (ii-0.5d0)/2.d0
-            shifty(m) = (jj-0.5d0)/2.d0
-            m = m + 1
+                !! # Map (0,1) to (-1/4,1/4) (locations of fine grid points)
+                shiftx(m) = (ii-0.5d0)/2.d0
+                shifty(m) = (jj-0.5d0)/2.d0
+                shiftz(m) = (kk-0.5d0)/2.d0
+                m = m + 1
+            enddo
         enddo
     enddo
 
 
     mth = 5
 
-    do ibc = 1,mbc/2
-        do jbc = 1,mbc/2
-            if (icorner_coarse .eq. 0) then
-                ic = ibc
-                jc = jbc
-            elseif (icorner_coarse .eq. 1) then
-                ic = mx - ibc + 1
-                jc = jbc
-            elseif (icorner_coarse .eq. 2) then
-                ic = ibc
-                jc = my - jbc + 1
-            elseif (icorner_coarse .eq. 3) then
-                ic = mx - ibc + 1
-                jc = my - jbc + 1
-            else
-                write(6,*) "interpolate : Problem with icorner_coarse"
-                write(6,*) "icorner_coarse = ", icorner_coarse
-                stop                
-            endif
+    !! get lower-bottom-left corner of coarse ghost cells that 
+    !! we are interpolating from
+    call fclaw3d_clawpatch46_fort_get_corner_start_coarse_to_fine( &
+            icorner_coarse,refratio, &
+            mx,my,mz,mbc, &
+            i_start,j_start,k_start)
 
-            !! # Interpolate coarse grid corners to fine grid corner ghost cells
-            i1 = ic
-            j1 = jc
-            call fclaw3d_clawpatch_transform_corner_half(i1,j1,i2,j2, transform_ptr)
+    print *,'i_start,j_start,k_start = ',i_start,j_start,k_start
+    print *,'mbc/2-1',mbc/2-1
+    mq_loop : do mq = 1,meqn
+        kc_loop : do kc = k_start,k_start+mbc/2-1
+            jc_loop : do jc = j_start,j_start+mbc/2-1
+                ic_loop : do ic = i_start,i_start+mbc/2-1
+                    !! # Interpolate coarse grid corners to fine grid corner ghost cells
+                    call fclaw3d_clawpatch_transform_corner_half(ic,jc,kc,i2,j2,k2, transform_ptr)
 
-            mq_loop : do mq = 1,meqn
-                k_loop : do k = 1,mz
-                    qc = qcoarse(ic,jc,k,mq)
+                    qc = qcoarse(ic,jc,kc,mq)
 
                     !! # Compute limited slopes in both x and y. Note we are not
                     !! # really computing slopes, but rather just differences.
                     !! # Scaling is accounted for in 'shiftx' and 'shifty', below.
-                    sl = (qc - qcoarse(ic-1,jc,k,mq))
-                    sr = (qcoarse(ic+1,jc,k,mq) - qc)
+                    sl = (qc - qcoarse(ic-1,jc,kc,mq))
+                    sr = (qcoarse(ic+1,jc,kc,mq) - qc)
                     gradx = fclaw2d_clawpatch_compute_slopes(sl,sr,mth)
 
-                    sl = (qc - qcoarse(ic,jc-1,k,mq))
-                    sr = (qcoarse(ic,jc+1,k,mq) - qc)
+                    sl = (qc - qcoarse(ic,jc-1,kc,mq))
+                    sr = (qcoarse(ic,jc+1,kc,mq) - qc)
                     grady = fclaw2d_clawpatch_compute_slopes(sl,sr,mth)
 
-                    do m = 0,rr2-1
+                    sl = (qc - qcoarse(ic,jc,kc-1,mq))
+                    sr = (qcoarse(ic,jc,kc+1,mq) - qc)
+                    gradz = fclaw2d_clawpatch_compute_slopes(sl,sr,mth)
+
+                    do m = 0,rr3-1
                         iff = i2(0) + df(1,m)
                         jff = j2(0) + df(2,m)
-                        value = qc + gradx*shiftx(m) + grady*shifty(m)
-                        qfine(iff,jff,k,mq) = value
+                        kff = k2(0) + df(3,m)
+                        value = qc + gradx*shiftx(m) + grady*shifty(m) + gradz*shiftz(m)
+                        qfine(iff,jff,kff,mq) = value
                     end do
-                end do k_loop
-            end do mq_loop
-        end do !! jbc_loop
-    end do !! ibc_loop
+                end do ic_loop
+            end do jc_loop
+        end do kc_loop
+    end do mq_loop
 
 end subroutine fclaw3d_clawpatch46_fort_interpolate_corner
 

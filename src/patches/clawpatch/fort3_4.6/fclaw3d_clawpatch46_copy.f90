@@ -227,6 +227,34 @@ subroutine fclaw3d_clawpatch46_fort_get_corner_start( &
 
 end subroutine fclaw3d_clawpatch46_fort_get_corner_start
 
+
+subroutine fclaw3d_clawpatch46_fort_get_corner_start_coarse_to_fine( &
+            icorner,refratio,mx,my,mz,mbc, &
+            i1, j1, k1)
+    implicit none
+    integer mx, my, mz, mbc, icorner,refratio
+    integer i1, j1, k1
+
+    if (btest(icorner,0)) then
+         i1 = mx+1-mbc/refratio
+    else
+         i1 = 1
+    endif
+
+    if (btest(icorner,1)) then
+         j1 = my+1-mbc/refratio
+    else
+         j1 = 1
+    endif
+
+    if (btest(icorner,2)) then
+         k1 = mz+1-mbc/refratio
+    else
+         k1 = 1
+    endif
+
+end subroutine fclaw3d_clawpatch46_fort_get_corner_start_coarse_to_fine
+
 subroutine fclaw3d_clawpatch46_fort_copy_corner(mx,my,mz,mbc,meqn, &
     qthis, qneighbor, this_icorner,transform_ptr)
     implicit none
