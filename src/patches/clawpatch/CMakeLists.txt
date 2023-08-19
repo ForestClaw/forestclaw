@@ -4,7 +4,7 @@ set(metric ${PROJECT_SOURCE_DIR}/src/patches/metric)
 
 add_library(clawpatch_f OBJECT
   fclaw2d_clawpatch_utils.f
-  fclaw3d_clawpatch_utils.f
+  fclaw3d_clawpatch_utils.f90
   fclaw3dx_clawpatch_utils.f
 
   fort_user/fclaw2d_clawpatch_difference_exceeds_th.f90
