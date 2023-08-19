@@ -38,27 +38,11 @@ fclaw_patch_transform_data_t* fclaw_patch_transform_data_new(int dim)
 {
     fclaw_patch_transform_data_t* tdata = FCLAW_ALLOC_ZERO(fclaw_patch_transform_data_t,1);
     tdata->dim = dim;
-    if(dim == 2)
-    {
-        tdata->d2 = FCLAW_ALLOC_ZERO(fclaw_patch_transform_data_d2_t,1);
-    }
-    else 
-    {
-        tdata->d3 = FCLAW_ALLOC_ZERO(fclaw_patch_transform_data_d3_t,1);
-    }
     return tdata;
 }
 
 void fclaw_patch_transform_data_destroy(fclaw_patch_transform_data_t *tdata)
 {
-    if(tdata->dim == 2)
-    {
-        FCLAW_FREE(tdata->d2);
-    }
-    else 
-    {
-        FCLAW_FREE(tdata->d3);
-    }
     FCLAW_FREE(tdata);
 }
 

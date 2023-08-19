@@ -135,14 +135,8 @@ void get_face_neighbors(fclaw_global_t *glob,
 		fclaw_patch_face_swap(domain->dim, &iface1,&rface1);
 		fclaw_patch_transform_blockface (glob, iface1, rface1,
 										   ftransform_finegrid->transform);
-		if(domain->dim == 2)
-		{
-			ftransform_finegrid->d2->block_iface = iface1;
-		}
-		else 
-		{
-			ftransform_finegrid->d3->block_iface = iface1;
-		}
+
+		ftransform_finegrid->block_iface = iface1;
 		**iface_neighbor_ptr = iface1;
 
 
@@ -299,14 +293,7 @@ void cb_face_fill(fclaw_domain_t *domain,
 
 			/* Reset this in case it got set in a remote copy */
 			transform_data->this_patch = this_patch;
-			if(domain->dim == 2)
-			{
-				transform_data->d2->block_iface = -1;
-			}
-			else
-			{
-				transform_data->d3->block_iface = -1;
-			}
+			transform_data->block_iface = -1;
 
 			/* transform_data.block_iface = iface; */
 			get_face_neighbors(s->glob,
@@ -498,15 +485,6 @@ void fclaw_face_neighbor_ghost(fclaw_global_t* glob,
 	fclaw_patch_transform_data_t transform_data;
 
 	transform_data.dim = domain->dim;
-
-	fclaw_patch_transform_data_d2_t transform_data_d2;
-	transform_data.d2 = &transform_data_d2;
-#ifndef P4_TO_P8
-	transform_data.d3 = NULL;
-#else
-	transform_data.d2 = NULL;
-#endif
-
 	transform_data.glob = glob;
 	transform_data.based = 1;      /* cell-centered data in this routine. */
 

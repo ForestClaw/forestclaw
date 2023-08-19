@@ -126,12 +126,12 @@ FCLAW3D_CLAWPATCH_TRANSFORM_EDGE (const int *i1, const int *j1, const int *k1,
     //TODO call fclaw3d_patch_transform_edge
 
     // axis that edge lies along
-    int axis = tdata->d3->iedge/4;
+    int axis = tdata->iedge/4;
     if(axis == 0)
     {
         //x axis
         *i2 = *i1;
-        int upper_y = tdata->d3->iedge & 0x1;
+        int upper_y = tdata->iedge & 0x1;
         if(upper_y)
         {
             *j2 = *j1-my;
@@ -140,7 +140,7 @@ FCLAW3D_CLAWPATCH_TRANSFORM_EDGE (const int *i1, const int *j1, const int *k1,
         {
             *j2 = *j1+my;
         }
-        int upper_z = tdata->d3->iedge & 0x2;
+        int upper_z = tdata->iedge & 0x2;
         if(upper_z)
         {
             *k2 = *k1-mz;
@@ -154,7 +154,7 @@ FCLAW3D_CLAWPATCH_TRANSFORM_EDGE (const int *i1, const int *j1, const int *k1,
     {
         //y axis
         *j2 = *j1;
-        int upper_x = tdata->d3->iedge & 0x1;
+        int upper_x = tdata->iedge & 0x1;
         if(upper_x)
         {
             *i2 = *i1-mx;
@@ -163,7 +163,7 @@ FCLAW3D_CLAWPATCH_TRANSFORM_EDGE (const int *i1, const int *j1, const int *k1,
         {
             *i2 = *i1+mx;
         }
-        int upper_z = tdata->d3->iedge & 0x2;
+        int upper_z = tdata->iedge & 0x2;
         if(upper_z)
         {
             *k2 = *k1-mz;
@@ -177,7 +177,7 @@ FCLAW3D_CLAWPATCH_TRANSFORM_EDGE (const int *i1, const int *j1, const int *k1,
     {
         //z axis
         *k2 = *k1;
-        int upper_x = tdata->d3->iedge & 0x1;
+        int upper_x = tdata->iedge & 0x1;
         if(upper_x)
         {
             *i2 = *i1-mx;
@@ -186,7 +186,7 @@ FCLAW3D_CLAWPATCH_TRANSFORM_EDGE (const int *i1, const int *j1, const int *k1,
         {
             *i2 = *i1+mx;
         }
-        int upper_y = tdata->d3->iedge & 0x2;
+        int upper_y = tdata->iedge & 0x2;
         if(upper_y)
         {
             *j2 = *j1-my;
@@ -213,7 +213,7 @@ FCLAW3D_CLAWPATCH_TRANSFORM_CORNER (const int *i1, const int *j1, const int *k1,
     *i2 = *i1;
     *j2 = *j1;
     *k2 = *k1;
-    if (tdata->d3->block_iface >= 0)
+    if (tdata->block_iface >= 0)
     {
         /* block-face but not a block-corner */
 #if 0
@@ -232,7 +232,7 @@ FCLAW3D_CLAWPATCH_TRANSFORM_CORNER (const int *i1, const int *j1, const int *k1,
         FCLAW_ASSERT (tdata->d3->block_iface == -1);
         fclaw3d_patch_transform_corner (tdata->this_patch,
                                         tdata->neighbor_patch,
-                                        tdata->d3->icorner, tdata->d3->is_block_corner,
+                                        tdata->icorner, tdata->is_block_corner,
                                         mx, my, mz,
                                         tdata->based, i2, j2, k2);
     }
@@ -254,7 +254,7 @@ FCLAW3D_CLAWPATCH_TRANSFORM_CORNER_HALF (const int *i1, const int *j1, const int
     i2[0] = *i1;
     j2[0] = *j1;
     k2[0] = *k1;
-    if (tdata->d3->block_iface >= 0)
+    if (tdata->block_iface >= 0)
     {
         /* block-face but not a block-corner. */
         fclaw3d_patch_transform_face2 (tdata->this_patch,
@@ -271,7 +271,7 @@ FCLAW3D_CLAWPATCH_TRANSFORM_CORNER_HALF (const int *i1, const int *j1, const int
         FCLAW_ASSERT (tdata->d3->block_iface == -1);
         fclaw3d_patch_transform_corner2 (tdata->this_patch,
                                          tdata->neighbor_patch,
-                                         tdata->d3->icorner, tdata->d3->is_block_corner,
+                                         tdata->icorner, tdata->is_block_corner,
                                          mx, my, mz,
                                          tdata->based, i2, j2, k2);
     }

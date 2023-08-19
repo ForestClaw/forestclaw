@@ -125,45 +125,12 @@ struct fclaw_patch_data
     void *user_data;
 };
 
-typedef struct fclaw_patch_transform_data_d2
-{
-    /** The corner that the neighboring patch is on. */
-    int icorner;
-
-    /** True if patch is on a block corner */
-    int is_block_corner;
-    /** -1 for interior faces or block corners */
-    int block_iface;   
-
-} fclaw_patch_transform_data_d2_t;
-
-typedef struct fclaw_patch_transform_data_d3
-{
-    /** The corner that the neighboring patch is on. */
-    int icorner;
-    /** The edge that the neighboring patch is on. */
-    int iedge;
-
-    /** True if patch is on a block corner */
-    int is_block_corner;
-    /** True if patch is on a block edge */
-    int is_block_edge;
-    /** -1 for unless on block edge and not on block corner */
-    int block_iedge;   
-    /** -1 for unless on block face and not block edge or block corner */
-    int block_iface;   
-
-} fclaw_patch_transform_data_d3_t;
-
-
 /**
  * @brief Transform data for a neighboring patch's coordinate system
  */
 struct fclaw_patch_transform_data
 {
     int dim;
-    fclaw_patch_transform_data_d2_t* d2;
-    fclaw_patch_transform_data_d3_t* d3;
 
     /** Pointer to this patch */
     struct fclaw_patch *this_patch;
@@ -210,6 +177,20 @@ struct fclaw_patch_transform_data
      * 1 for cell-centered (1 .. mx); 0 for nodes (0 .. mx)
      */
     int based;
+
+    /** The corner that the neighboring patch is on. */
+    int icorner;
+    /** The edge that the neighboring patch is on. */
+    int iedge;
+
+    /** True if patch is on a block corner */
+    int is_block_corner;
+    /** True if patch is on a block edge */
+    int is_block_edge;
+    /** -1 for unless on block edge and not on block corner */
+    int block_iedge;   
+    /** -1 for unless on block face and not block edge or block corner */
+    int block_iface; 
 
     /** Pointer to the glboal context */
     struct fclaw_global *glob;

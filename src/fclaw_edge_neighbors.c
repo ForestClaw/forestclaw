@@ -253,14 +253,8 @@ void get_edge_neighbors(fclaw_global_t *glob,
             fclaw_patch_face_swap(domain->dim, &iface1, &rface1);
             fclaw_patch_transform_blockface(glob, iface1, rface1,
                                               ftransform_finegrid->transform);
-            if(domain->dim == 2)
-            {
-                ftransform_finegrid->d2->block_iface = iface1;
-            }
-            else 
-            {
-                ftransform_finegrid->d3->block_iface = iface1;
-            }
+
+            ftransform_finegrid->block_iface = iface1;
         }
         else if (this_block_idx == *edge_block_idx)
         {
@@ -436,7 +430,7 @@ void cb_edge_fill(fclaw_domain_t *domain,
 
     for (int iedge = 0; iedge < num_edges; iedge++)
     {
-        transform_data->d3->iedge = iedge;
+        transform_data->iedge = iedge;
 
         int is_block_edge;
         int is_interior_edge;
@@ -446,9 +440,9 @@ void cb_edge_fill(fclaw_domain_t *domain,
                         intersects_block,
                         &is_interior_edge,
                         &is_block_edge,
-                        &transform_data->d3->block_iface);
+                        &transform_data->block_iface);
 
-        transform_data_finegrid->d3->block_iface = -1;
+        transform_data_finegrid->block_iface = -1;
 
         /* Sets block_corner_count to 0 */
         // TODO is this necessary?
@@ -465,8 +459,8 @@ void cb_edge_fill(fclaw_domain_t *domain,
             fclaw_patch_t* edge_patches[2];
             int redgeno;
 
-            int block_iface = transform_data->d3->block_iface;
-            transform_data->d3->is_block_edge = is_block_edge;
+            int block_iface = transform_data->block_iface;
+            transform_data->is_block_edge = is_block_edge;
             edge_block_idx = -1;
             get_edge_neighbors(s->glob,
                               this_block_idx,
@@ -488,11 +482,11 @@ void cb_edge_fill(fclaw_domain_t *domain,
             //fclaw_patch_set_block_corner_count(s->glob, this_patch,
             //                                     icorner,block_corner_count);
 
-            transform_data->d3->is_block_edge = is_block_edge;
+            transform_data->is_block_edge = is_block_edge;
 
             /* Needed for switching the context */
-            transform_data_finegrid->d3->is_block_edge = is_block_edge;
-            transform_data_finegrid->d3->iedge = redgeno;
+            transform_data_finegrid->is_block_edge = is_block_edge;
+            transform_data_finegrid->iedge = redgeno;
             transform_data_finegrid->this_patch = edge_patches[0];
             transform_data_finegrid->neighbor_patch = this_patch;
 
@@ -573,7 +567,7 @@ void cb_edge_fill(fclaw_domain_t *domain,
                        local fine grid patch.  We do not need to average to the 
                        remote patch corners unless corners are used in the 
                        interpolation stencil. */
-                    int coarse_iedge = transform_data_finegrid->d3->iedge;
+                    int coarse_iedge = transform_data_finegrid->iedge;
 
                     //fclaw_patch_interpolate_edge(s->glob,
                     //                             coarse_patch,

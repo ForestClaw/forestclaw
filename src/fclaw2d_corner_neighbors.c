@@ -248,14 +248,8 @@ void get_corner_neighbor(fclaw_global_t *glob,
             fclaw_patch_face_swap(domain->dim, &iface1, &rface1);
             fclaw_patch_transform_blockface(glob, iface1, rface1,
                                               ftransform_finegrid->transform);
-            if(domain->dim == 2)
-            {
-                ftransform_finegrid->d2->block_iface = iface1;
-            }
-            else 
-            {
-                ftransform_finegrid->d3->block_iface = iface1;
-            }
+
+            ftransform_finegrid->block_iface = iface1;
         }
         else if (this_block_idx == *corner_block_idx)
         {
@@ -431,17 +425,9 @@ void cb_corner_fill(fclaw_domain_t *domain,
                         intersects_block,
                         &is_interior_corner,
                         &is_block_corner,
-                        (domain->dim == 2) ?
-                            &transform_data->d2->block_iface : &transform_data->d3->block_iface);
+                        &transform_data->block_iface);
 
-        if(domain->dim == 2)
-        {
-            transform_data_finegrid->d2->block_iface = -1;
-        }
-        else 
-        {
-            transform_data_finegrid->d3->block_iface = -1;
-        }
+        transform_data_finegrid->block_iface = -1;
 
         /* Sets block_corner_count to 0 */
         fclaw_patch_set_block_corner_count(s->glob, this_patch,
@@ -457,17 +443,9 @@ void cb_corner_fill(fclaw_domain_t *domain,
             fclaw_patch_t *corner_patch;
             int rcornerno;
 
-            int block_iface;
-            if(domain->dim == 2)
-            {
-                block_iface = transform_data->d2->block_iface;
-                transform_data->d2->is_block_corner = is_block_corner;
-            }
-            else 
-            {
-                block_iface = transform_data->d3->block_iface;
-                transform_data->d3->is_block_corner = is_block_corner;
-            }
+            int  block_iface = transform_data->block_iface;
+            transform_data->is_block_corner = is_block_corner;
+
             corner_block_idx = -1;
             get_corner_neighbor(s->glob,
                                 this_block_idx,
@@ -487,26 +465,12 @@ void cb_corner_fill(fclaw_domain_t *domain,
             /* This sets value in block_corner_count_array */
             fclaw_patch_set_block_corner_count(s->glob, this_patch,
                                                  icorner,block_corner_count);
-            if(domain->dim == 2)
-            {
-                transform_data->d2->is_block_corner = is_block_corner;
-            }
-            else 
-            {
-                transform_data->d3->is_block_corner = is_block_corner;
-            }
+
+            transform_data->is_block_corner = is_block_corner;
 
             /* Needed for switching the context */
-            if(domain->dim == 2)
-            {
-                transform_data_finegrid->d2->is_block_corner = is_block_corner;
-                transform_data_finegrid->d2->icorner = rcornerno;
-            }
-            else 
-            {
-                transform_data_finegrid->d3->is_block_corner = is_block_corner;
-                transform_data_finegrid->d3->icorner = rcornerno;
-            }
+            transform_data_finegrid->is_block_corner = is_block_corner;
+            transform_data_finegrid->icorner = rcornerno;
             transform_data_finegrid->this_patch = corner_patch;
             transform_data_finegrid->neighbor_patch = this_patch;
 
@@ -588,15 +552,7 @@ void cb_corner_fill(fclaw_domain_t *domain,
                        local fine grid patch.  We do not need to average to the 
                        remote patch corners unless corners are used in the 
                        interpolation stencil. */
-                    int coarse_icorner;
-                    if(domain->dim == 2)
-                    {
-                        coarse_icorner = transform_data_finegrid->d2->icorner;
-                    }
-                    else
-                    {
-                        coarse_icorner =transform_data_finegrid->d3->icorner;
-                    }
+                    int coarse_icorner = transform_data->icorner
 
                     fclaw_patch_interpolate_corner(s->glob,
                                                    coarse_patch,
