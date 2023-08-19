@@ -402,35 +402,33 @@ void cb_edge_fill(fclaw_domain_t *domain,
     fclaw_block_get_block_boundary(s->glob, this_patch, intersects_block);
 
     /* Transform data needed at multi-block boundaries */
-    fclaw_patch_transform_data_t* transform_data = 
-            fclaw_patch_transform_data_new(domain->dim);
+    fclaw_patch_transform_data_t transform_data;
 
-    transform_data->glob = s->glob;
-    transform_data->based = 1;   // cell-centered data in this routine.
-    transform_data->this_patch = this_patch;
-    transform_data->neighbor_patch = NULL;  // gets filled in below.
-
-    fclaw_patch_transform_init_data(s->glob,this_patch,
-                                      this_block_idx,
-                                      this_patch_idx,
-                                      transform_data);
-
-
-    fclaw_patch_transform_data_t* transform_data_finegrid =
-            fclaw_patch_transform_data_new(domain->dim);
-
-    transform_data_finegrid->glob = s->glob;
-    transform_data_finegrid->based = 1;   // cell-centered data in this routine.
+    transform_data.glob = s->glob;
+    transform_data.based = 1;   // cell-centered data in this routine.
+    transform_data.this_patch = this_patch;
+    transform_data.neighbor_patch = NULL;  // gets filled in below.
 
     fclaw_patch_transform_init_data(s->glob,this_patch,
                                       this_block_idx,
                                       this_patch_idx,
-                                      transform_data_finegrid);
+                                      &transform_data);
+
+
+    fclaw_patch_transform_data_t transform_data_finegrid;
+
+    transform_data_finegrid.glob = s->glob;
+    transform_data_finegrid.based = 1;   // cell-centered data in this routine.
+
+    fclaw_patch_transform_init_data(s->glob,this_patch,
+                                      this_block_idx,
+                                      this_patch_idx,
+                                      &transform_data_finegrid);
 
 
     for (int iedge = 0; iedge < num_edges; iedge++)
     {
-        transform_data->iedge = iedge;
+        transform_data.iedge = iedge;
 
         int is_block_edge;
         int is_interior_edge;
@@ -440,9 +438,9 @@ void cb_edge_fill(fclaw_domain_t *domain,
                         intersects_block,
                         &is_interior_edge,
                         &is_block_edge,
-                        &transform_data->block_iface);
+                        &transform_data.block_iface);
 
-        transform_data_finegrid->block_iface = -1;
+        transform_data_finegrid.block_iface = -1;
 
         /* Sets block_corner_count to 0 */
         // TODO is this necessary?
@@ -459,8 +457,8 @@ void cb_edge_fill(fclaw_domain_t *domain,
             fclaw_patch_t* edge_patches[2];
             int redgeno;
 
-            int block_iface = transform_data->block_iface;
-            transform_data->is_block_edge = is_block_edge;
+            int block_iface = transform_data.block_iface;
+            transform_data.is_block_edge = is_block_edge;
             edge_block_idx = -1;
             get_edge_neighbors(s->glob,
                               this_block_idx,
@@ -474,21 +472,21 @@ void cb_edge_fill(fclaw_domain_t *domain,
                               &redgeno,
                               &ref_flag_ptr,
                               &block_edge_count,
-                              transform_data->transform,
-                              transform_data_finegrid);
+                              transform_data.transform,
+                              &transform_data_finegrid);
 
             /* This sets value in block_corner_count_array */
             //TODO is this necessary?
             //fclaw_patch_set_block_corner_count(s->glob, this_patch,
             //                                     icorner,block_corner_count);
 
-            transform_data->is_block_edge = is_block_edge;
+            transform_data.is_block_edge = is_block_edge;
 
             /* Needed for switching the context */
-            transform_data_finegrid->is_block_edge = is_block_edge;
-            transform_data_finegrid->iedge = redgeno;
-            transform_data_finegrid->this_patch = edge_patches[0];
-            transform_data_finegrid->neighbor_patch = this_patch;
+            transform_data_finegrid.is_block_edge = is_block_edge;
+            transform_data_finegrid.iedge = redgeno;
+            transform_data_finegrid.this_patch = edge_patches[0];
+            transform_data_finegrid.neighbor_patch = this_patch;
 
 
             if (ref_flag_ptr == NULL)
@@ -503,7 +501,7 @@ void cb_edge_fill(fclaw_domain_t *domain,
             int remote_neighbor = fclaw_patch_is_ghost(edge_patches[0]);
             if (is_coarse && ((read_parallel_patches && remote_neighbor) || !remote_neighbor))
             {
-                transform_data->neighbor_patch = edge_patches[0];
+                transform_data.neighbor_patch = edge_patches[0];
                 if (neighbor_level == FINER_GRID)
                 {
                     fclaw_patch_t* coarse_patch = this_patch;
@@ -528,12 +526,12 @@ void cb_edge_fill(fclaw_domain_t *domain,
                             /* Average even if neighbor is a remote neighbor */
                             fclaw_patch_t* coarse_patch = this_patch;
                             fclaw_patch_t* fine_patch = edge_patches[i];
-                            transform_data->neighbor_patch = fine_patch;
+                            transform_data.neighbor_patch = fine_patch;
                             fclaw_patch_average_edge(s->glob,
                                                      coarse_patch,
                                                      fine_patch,
                                                      iedge,time_interp,
-                                                     transform_data);                        
+                                                     &transform_data);                        
                         }
                     }
                 }
@@ -545,7 +543,7 @@ void cb_edge_fill(fclaw_domain_t *domain,
                                           this_block_idx,
                                           edge_block_idx,
                                           iedge, time_interp,
-                                          transform_data);
+                                          &transform_data);
                 }
 
             }  /* End of non-parallel patch case */
@@ -567,7 +565,7 @@ void cb_edge_fill(fclaw_domain_t *domain,
                        local fine grid patch.  We do not need to average to the 
                        remote patch corners unless corners are used in the 
                        interpolation stencil. */
-                    int coarse_iedge = transform_data_finegrid->iedge;
+                    int coarse_iedge = transform_data_finegrid.iedge;
 
                     //fclaw_patch_interpolate_edge(s->glob,
                     //                             coarse_patch,
@@ -582,7 +580,4 @@ void cb_edge_fill(fclaw_domain_t *domain,
             } /* End of parallel case */
         }  /* End of 'interior_edge' */
     }  /* End of iedge loop */
-
-    fclaw_patch_transform_data_destroy(transform_data_finegrid);
-    fclaw_patch_transform_data_destroy(transform_data);
 }

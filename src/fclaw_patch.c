@@ -32,20 +32,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_defs.h>
 #include <fclaw3d_defs.h>
 
-struct fclaw_patch_transform_data;
-
-fclaw_patch_transform_data_t* fclaw_patch_transform_data_new(int dim)
-{
-    fclaw_patch_transform_data_t* tdata = FCLAW_ALLOC_ZERO(fclaw_patch_transform_data_t,1);
-    tdata->dim = dim;
-    return tdata;
-}
-
-void fclaw_patch_transform_data_destroy(fclaw_patch_transform_data_t *tdata)
-{
-    FCLAW_FREE(tdata);
-}
-
 /* ------------------------------- static access functions ---------------------------- */
 static
 fclaw_patch_data_t* get_patch_data(fclaw_patch_t* patch)

@@ -235,31 +235,29 @@ void cb_face_fill(fclaw_domain_t *domain,
 
 
 	/* Transform data needed at block boundaries */
-	fclaw_patch_transform_data_t* transform_data =
-				fclaw_patch_transform_data_new(domain->dim);
+	fclaw_patch_transform_data_t transform_data;
 
-	transform_data->glob = s->glob;
-	transform_data->based = 1;             /* Set by user defined patch routine */
-	transform_data->this_patch = this_patch;
-	transform_data->neighbor_patch = NULL;     /* gets filled in below. */
+	transform_data.glob = s->glob;
+	transform_data.based = 1;             /* Set by user defined patch routine */
+	transform_data.this_patch = this_patch;
+	transform_data.neighbor_patch = NULL;     /* gets filled in below. */
 
 	/* This calls a patch-specific initialization routine  - does nothing yet. */
 	fclaw_patch_transform_init_data(s->glob,this_patch,
 									  this_block_idx,
 									  this_patch_idx,
-									  transform_data);
+									  &transform_data);
 
-	fclaw_patch_transform_data_t* transform_data_finegrid =
-				fclaw_patch_transform_data_new(domain->dim);
+	fclaw_patch_transform_data_t transform_data_finegrid;
 
-	transform_data_finegrid->glob = s->glob;
-	transform_data_finegrid->based = 1;   /* cell-centered data in this routine. */
+	transform_data_finegrid.glob = s->glob;
+	transform_data_finegrid.based = 1;   /* cell-centered data in this routine. */
 
 	/* This calls a patch-specific initialization routine - does nothing yet. */
 	fclaw_patch_transform_init_data(s->glob,this_patch,
 									  this_block_idx,
 									  this_patch_idx,
-									  transform_data_finegrid);
+									  &transform_data_finegrid);
 
 	for (iface = 0; iface < num_faces; iface++)
 	{
@@ -292,8 +290,8 @@ void cb_face_fill(fclaw_domain_t *domain,
 			fclaw_patch_t* neighbor_patches[num_faces];
 
 			/* Reset this in case it got set in a remote copy */
-			transform_data->this_patch = this_patch;
-			transform_data->block_iface = -1;
+			transform_data.this_patch = this_patch;
+			transform_data.block_iface = -1;
 
 			/* transform_data.block_iface = iface; */
 			get_face_neighbors(s->glob,
@@ -306,12 +304,12 @@ void cb_face_fill(fclaw_domain_t *domain,
 							   &ref_flag_ptr,
 							   &fine_grid_pos_ptr,
 							   &iface_neighbor_ptr,
-							   transform_data->transform,
-							   transform_data_finegrid);
+							   transform_data.transform,
+							   &transform_data_finegrid);
 
 			/* Needed for switching the context */
-			transform_data_finegrid->this_patch = neighbor_patches[0];
-			transform_data_finegrid->neighbor_patch = this_patch;
+			transform_data_finegrid.this_patch = neighbor_patches[0];
+			transform_data_finegrid.neighbor_patch = this_patch;
 
 
 			/* int block_boundary = (neighbor_block_idx >= 0); */
@@ -340,7 +338,7 @@ void cb_face_fill(fclaw_domain_t *domain,
 						}
 						fclaw_patch_t* fine_patch = neighbor_patches[igrid];
 						fclaw_patch_t *coarse_patch = this_patch;
-						transform_data->neighbor_patch = neighbor_patches[igrid];
+						transform_data.neighbor_patch = neighbor_patches[igrid];
 						if (time_sync_fine_to_coarse)
 						{
 							int coarse_patchno = this_patch_idx;
@@ -353,7 +351,7 @@ void cb_face_fill(fclaw_domain_t *domain,
 							                            coarse_patchno,
 							                            idir,igrid,
 							                            iface,time_interp,
-							                            transform_data);
+							                            &transform_data);
 						}
 						else if (interpolate_to_neighbor && !remote_neighbor)
 						{
@@ -361,7 +359,7 @@ void cb_face_fill(fclaw_domain_t *domain,
 							fclaw_patch_interpolate_face(s->glob,this_patch,fine_patch,
 														   idir,iface,FCLAW2D_REFINEFACTOR,
 														   refratio,time_interp,igrid,
-														   transform_data);
+														   &transform_data);
 						}
 						else if (average_from_neighbor)
 						{
@@ -369,7 +367,7 @@ void cb_face_fill(fclaw_domain_t *domain,
 							fclaw_patch_average_face(s->glob,coarse_patch,fine_patch,idir,
 													   iface,FCLAW2D_REFINEFACTOR,
 													   refratio,time_interp,igrid,
-													   transform_data);
+													   &transform_data);
 						}
 					}
 				}
@@ -378,7 +376,7 @@ void cb_face_fill(fclaw_domain_t *domain,
 				{
 					/* Copy to same size patch */
 					fclaw_patch_t *neighbor_patch = neighbor_patches[0];
-					transform_data->neighbor_patch = neighbor_patch;
+					transform_data.neighbor_patch = neighbor_patch;
 
 					if (time_sync_samesize)    // && is_block_face)
 					{
@@ -388,13 +386,13 @@ void cb_face_fill(fclaw_domain_t *domain,
 							fclaw_patch_time_sync_samesize(s->glob,this_patch,
 							                                 neighbor_patch,
 							                                 iface,idir,
-							                                 transform_data);
+							                                 &transform_data);
 						}
 					}
 					else
 					{                        
 						fclaw_patch_copy_face(s->glob,this_patch,neighbor_patch,iface,
-												time_interp,transform_data);
+												time_interp,&transform_data);
 					}
 
 					/* We also need to copy _to_ the remote neighbor; switch contexts, but
@@ -412,13 +410,13 @@ void cb_face_fill(fclaw_domain_t *domain,
 							interpolate to local grids. */
 							fclaw_patch_time_sync_samesize(s->glob,neighbor_patch,this_patch,
 							                                 this_iface,idir,
-							                                 transform_data_finegrid);                            
+							                                 &transform_data_finegrid);                            
 						}
 						else
 						{
 							fclaw_patch_copy_face(s->glob,neighbor_patch,this_patch,
 													this_iface, time_interp,
-													transform_data_finegrid);                            
+													&transform_data_finegrid);                            
 						}
 					}
 				}
@@ -443,7 +441,7 @@ void cb_face_fill(fclaw_domain_t *domain,
 											   idir_coarse,iface_coarse,
 											   FCLAW2D_REFINEFACTOR,refratio,
 											   time_interp,igrid,
-											   transform_data_finegrid);
+											   &transform_data_finegrid);
 				}
 				else if (interpolate_to_neighbor)
 				{
@@ -452,14 +450,11 @@ void cb_face_fill(fclaw_domain_t *domain,
 												   idir_coarse,iface_coarse,
 												   FCLAW2D_REFINEFACTOR,refratio,
 												   time_interp,
-												   igrid,transform_data_finegrid);
+												   igrid,&transform_data_finegrid);
 				}
 			}
 		}  /* End of interior face */
 	} /* End of iface loop */
-
-	fclaw_patch_transform_data_destroy(transform_data);
-	fclaw_patch_transform_data_destroy(transform_data_finegrid);
 }
 
 
