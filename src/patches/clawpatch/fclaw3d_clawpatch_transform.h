@@ -91,7 +91,7 @@ void FCLAW3D_CLAWPATCH_TRANSFORM_FACE (const int *i1, const int *j1, const int *
  * @brief Tranform an index for a face-neighboring finer patch's coordinate system
  * 
  * @param[in] i1, j1, k1 the input index 
- * @param[out] i2, j2, k2 the four equivalent indexes in the finer patch
+ * @param[out] i2, j2, k2 the eight equivalent indexes in the finer patch
  * @param[in] ptdata the transform data
  */
 void FCLAW3D_CLAWPATCH_TRANSFORM_FACE_HALF (const int *i1, const int *j1, const int *k1,

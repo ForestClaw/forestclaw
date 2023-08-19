@@ -84,3 +84,25 @@ c     # calls to T.
       a(2,2) = mj(1) - f(2)
 
       end
+c --------------------------------------------------------------------
+c> @brief checks if the index is valid for averaging
+c>
+c> @param[in] i, j the idnex to check
+c> @param[in] mx, my the number of cells in the x and y directions
+c> @return true if the index is valid
+c --------------------------------------------------------------------
+      logical function fclaw3d_clawpatch_is_valid_average(i,j,k,
+     1                                                mx,my,mz)
+      implicit none
+
+      integer i,j,k,mx,my,mz
+      logical i1, j1, k1
+
+      i1 = 1 .le. i .and. i .le. mx
+      j1 = 1 .le. j .and. j .le. my
+      k1 = 1 .le. k .and. k .le. mz
+
+      fclaw3d_clawpatch_is_valid_average = i1 .and. j1 .and. k1
+
+      end
+

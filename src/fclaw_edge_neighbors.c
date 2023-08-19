@@ -93,7 +93,7 @@ void get_edge_type(fclaw_global_t* glob,
     int num_phys_faces = get_num_intersections(intersects_bdry,
                                                edge_faces);
 
-    /* Either a corner is at a block boundary (but not a physical boundary),
+    /* Either a edge is at a block boundary (but not a physical boundary),
        or internal to a block.  L-shaped domains are excluded for now
        (i.e. no reentrant corners). */
     *interior_edge = num_phys_faces == 0;
@@ -206,6 +206,7 @@ void get_edge_neighbor(fclaw_global_t *glob,
         /* We do not return valid transformation objects! */
         *ref_flag_ptr = NULL;
         *edge_patch = NULL;
+        return;
     }
     else if (has_edge_neighbor && !is_block_edge)
     {

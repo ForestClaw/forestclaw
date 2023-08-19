@@ -166,10 +166,6 @@ subroutine fclaw3d_clawpatch46_fort_get_edge_bounds( &
         j_end = 0;
       endif
    endif
-
-       
-
-
 end subroutine fclaw3d_clawpatch46_fort_get_edge_bounds
 
 subroutine fclaw3d_clawpatch46_fort_copy_edge(mx,my,mz,mbc,meqn, &

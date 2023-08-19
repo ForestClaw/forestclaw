@@ -361,7 +361,6 @@ void fclaw_patch_average_face(fclaw_global_t* glob,
                                 fclaw_patch_transform_data_t* transform_data)
 {
     fclaw_patch_vtable_t *patch_vt = fclaw_patch_vt(glob);
-    FCLAW_ASSERT(patch_vt->d2->average_face != NULL);
 
     if(patch_vt->dim == 2)
     {
@@ -484,6 +483,8 @@ void fclaw_patch_average_corner(fclaw_global_t* glob,
                                   fclaw_patch_transform_data_t* transform_data)
 {
     fclaw_patch_vtable_t *patch_vt = fclaw_patch_vt(glob);
+    if(patch_vt->dim == 3)
+        return;
     if (!is_block_corner)
     {
         FCLAW_ASSERT(patch_vt->d2->average_corner != NULL);
@@ -514,6 +515,8 @@ void fclaw_patch_interpolate_corner(fclaw_global_t* glob,
                                       *transform_data)
 {
     fclaw_patch_vtable_t *patch_vt = fclaw_patch_vt(glob);
+    if(patch_vt->dim == 3)
+        return;
     if (!is_block_corner)
     {
         FCLAW_ASSERT(patch_vt->d2->interpolate_corner != NULL);

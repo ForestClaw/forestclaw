@@ -342,7 +342,7 @@ void cb_face_fill(fclaw_domain_t *domain,
 			{
 				if (neighbor_level == FINER_GRID)
 				{
-					for (igrid = 0; igrid < 2; igrid++)
+					for (igrid = 0; igrid < fclaw_domain_num_children(domain)/2; igrid++)
 					{
 						remote_neighbor = fclaw_patch_is_ghost(neighbor_patches[igrid]);
 						int valid_remote = read_parallel_patches && remote_neighbor;

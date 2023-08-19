@@ -53,6 +53,7 @@ subroutine fclaw3d_clawpatch46_fort_interpolate_face &
     double precision :: shiftx(0:rr2-1),shifty(0:rr2-1)
 
     !! exit with error
+    return;
     STOP 'NOT IMPLIMENTED'
 
     mth = 5
@@ -215,6 +216,7 @@ subroutine fclaw3d_clawpatch46_fort_interpolate_corner &
     double precision shiftx(0:rr2-1), shifty(0:rr2-1)
 
     !! exit with error
+    return;
     STOP 'NOT IMPLIMENTED'
 
     r2 = refratio*refratio

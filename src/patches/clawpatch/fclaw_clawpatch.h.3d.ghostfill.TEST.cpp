@@ -63,6 +63,7 @@ struct CubeDomain {
         fopts.minlevel=minlevel;
         fopts.maxlevel=maxlevel;
         fopts.manifold=false;
+        fopts.refratio=2;
         fopts.bx = 1;
         fopts.by = 1;
         fopts.bz = 1;
@@ -411,6 +412,20 @@ TEST_CASE("3d ghost fill on cube with refinement")
               {
                 //do nothing
               };
+        fclaw_patch_vt(cube.glob)->physical_bc
+            = [](struct fclaw_global *glob,
+                 struct fclaw_patch *this_patch,
+                 int blockno,
+                 int patchno,
+                 double t,
+                 double dt,
+                 int *intersects_bc,
+                 int time_interp)
+                 {
+                    //do nothing
+                 };
+
+
 
 
         fclaw_patch_vt(cube.glob)->tag4refinement = tag4refinement;
@@ -420,7 +435,7 @@ TEST_CASE("3d ghost fill on cube with refinement")
 
         CHECK_EQ(cube.glob->domain->global_num_patches, 64);
         cube.setup();
-        CHECK_EQ(cube.glob->domain->global_num_patches, 88);
+        CHECK_EQ(cube.glob->domain->global_num_patches, 120);
 
         //create output domain with bigger size, so that we can see ghost cells
         //in the vtk output
@@ -436,7 +451,9 @@ TEST_CASE("3d ghost fill on cube with refinement")
         fclaw_patch_vt(cube_output.glob)->tag4coarsening = tag4coarsening;
         // don't want to test interpolation
         fclaw_clawpatch_vt(cube_output.glob)->d3->fort_interpolate2fine = fort_interpolate2fine;
+        CHECK_EQ(cube_output.glob->domain->global_num_patches, 64);
         cube_output.setup();
+        CHECK_EQ(cube_output.glob->domain->global_num_patches, 120);
 
         //initialize patches
         fclaw_global_iterate_patches(
@@ -453,9 +470,9 @@ TEST_CASE("3d ghost fill on cube with refinement")
                 memset(q, 0, sizeof(double)*size);
                 //loop over interior
                 for(int m = 0; m < opts->meqn; m++)
-                for(int k = -opts->mbc; k < opts->d3->mz+opts->mbc; k++)
-                for(int j = -opts->mbc; j < opts->d3->my+opts->mbc; j++)
-                for(int i = -opts->mbc; i < opts->d3->mx+opts->mbc; i++)
+                for(int k = 0; k < opts->d3->mz; k++)
+                for(int j = 0; j < opts->d3->my; j++)
+                for(int i = 0; i < opts->d3->mx; i++)
                 {
                     int idx = clawpatch_idx(clawpatch, i,j,k,m);
                     //fill with some different linear functions
@@ -466,15 +483,20 @@ TEST_CASE("3d ghost fill on cube with refinement")
             nullptr
         );
 
+        CHECK_EQ(cube.glob->domain->global_num_patches, 120);
         fclaw_ghost_update(cube.glob, 2, 3, 0, 0, FCLAW_TIMER_NONE);
+        CHECK_EQ(cube.glob->domain->global_num_patches, 120);
 
         //check ghost cells
         //fill output domain with error
         struct iterate_t {
             fclaw_global_t* error_glob;
             int num_incorrect_interior_cells;
+            int num_incorrect_face_ghost_cells;
+            int num_incorrect_edge_ghost_cells;
+            int num_incorrect_corner_ghost_cells;
         };
-        iterate_t iterate = {cube_output.glob, 0};
+        iterate_t iterate = {cube_output.glob, 0, 0, 0, 0};
         fclaw_global_iterate_patches(
             cube.glob, 
             [](fclaw_domain_t * domain, fclaw_patch_t * patch,
@@ -507,10 +529,13 @@ TEST_CASE("3d ghost fill on cube with refinement")
                 int size = fclaw_clawpatch_size(iterate->error_glob);
                 memset(error_q, 0, sizeof(double)*size);
 
+                //loop over all cells
+                int i_start, i_stop, j_start, j_stop, k_start, k_stop;
+                get_bounds_with_ghost(clawpatch, intersects_bc,&i_start,&i_stop,&j_start,&j_stop,&k_start,&k_stop);
                 for(int m = 0; m < opts->meqn; m++)
-                for(int k = 0; k < clawpatch->d3->mz; k++)
-                for(int j = 0; j < clawpatch->d3->my; j++)
-                for(int i = 0; i < clawpatch->d3->mx; i++)
+                for(int k = k_start; k < k_stop; k++)
+                for(int j = j_start; j < j_stop; j++)
+                for(int i = i_start; i < i_stop; i++)
                 {
                     int idx = clawpatch_idx(clawpatch, i,j,k,m);
                     int error_idx = clawpatch_idx(error_clawpatch, i+mbc,j+mbc,k+mbc,m);
@@ -519,7 +544,25 @@ TEST_CASE("3d ghost fill on cube with refinement")
                     error_q[error_idx] = expected - q[idx];
                     if(q[idx] != doctest::Approx(expected))
                     {
-                        iterate->num_incorrect_interior_cells++;
+                        if(interior_cell(clawpatch, i,j,k,m))
+                        {
+                            iterate->num_incorrect_interior_cells++;
+                        }
+                        else if(face_ghost_cell(clawpatch, i,j,k,m))
+                        {
+                            iterate->num_incorrect_face_ghost_cells++;
+                        }
+                        else if(edge_ghost_cell(clawpatch, i,j,k,m))
+                        {
+                            iterate->num_incorrect_edge_ghost_cells++;
+                        }
+                        else if(corner_ghost_cell(clawpatch, i,j,k,m))
+                        {
+                            iterate->num_incorrect_corner_ghost_cells++;
+                        }
+                        else{
+                            SC_ABORT_NOT_REACHED();
+                        }
                     }
                 }
 
@@ -529,13 +572,16 @@ TEST_CASE("3d ghost fill on cube with refinement")
 
         //check that patch was filled correctly
         CHECK_EQ(iterate.num_incorrect_interior_cells, 0);
+        CHECK_EQ(iterate.num_incorrect_face_ghost_cells, 0);
+        CHECK_EQ(iterate.num_incorrect_edge_ghost_cells, 0);
+        CHECK_EQ(iterate.num_incorrect_corner_ghost_cells, 0);
 
         //if not write output
         if(test_output_vtk())
         {
             char test_no_str[5];
             snprintf(test_no_str, 5, "%04d", test_no);
-            std::string filename = "3d_clawpatch_average_"+std::string(test_no_str);
+            std::string filename = "3d_clawpatch_ghost_fill_on_cube_with_refinement_"+std::string(test_no_str);
             INFO("Test failed output error to " << filename << ".vtu");
             fclaw_clawpatch_output_vtk_to_file(cube_output.glob,filename.c_str());
         }

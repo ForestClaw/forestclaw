@@ -25,7 +25,61 @@
 !!>
 !!> Average fine grid interior values to neighboring ghost cell values of
 !!> the coarse grid.
-      
+subroutine fclaw3d_clawpatch_face_ghost_bounds( &
+            iface,mx,my,mz,mbc, &
+            i_start, j_start, k_start, &
+            i_end,   j_end,   k_end)
+    implicit none
+    integer mx, my, mz, mbc, iface
+    integer i_start, j_start, k_start
+    integer i_end,   j_end,   k_end
+    integer axis
+    logical upper
+
+    axis = iface/2
+    upper= btest(iface,0)
+    
+    
+    if (axis .eq. 0) then
+        if (upper) then
+            i_start = mx+1
+            i_end = mx+mbc
+        else
+            i_start = 1-mbc
+            i_end = 0
+        endif
+        j_start = 1
+        j_end = my
+        k_start = 1
+        k_end = mz
+    else if(axis .eq. 1) then
+        i_start = 0
+        i_end = mx
+        if (upper) then
+            j_start = my+1
+            j_end = my+mbc
+        else
+            j_start = 1-mbc
+            j_end = 0
+        endif
+        k_start = 1
+        k_end = mz
+    else if(axis .eq. 2) then
+        i_start = 1
+        i_end = mx
+        j_start = 1
+        j_end = my
+        if (upper) then
+            k_start = mz+1
+            k_end = mz+mbc
+        else
+            k_start = 1-mbc
+            k_end = 0
+        endif
+    endif
+end subroutine fclaw3d_clawpatch_face_ghost_bounds
+
+    
 SUBROUTINE fclaw3d_clawpatch46_fort_average_face(mx,my,mz,mbc,meqn, & 
            qcoarse,qfine,volcoarse, volfine, & 
            idir,iface_coarse,num_neighbors,refratio,igrid, & 
@@ -43,16 +97,17 @@ SUBROUTINE fclaw3d_clawpatch46_fort_average_face(mx,my,mz,mbc,meqn, &
     DOUBLE PRECISION :: volcoarse(-mbc:mx+mbc+1,-mbc:my+mbc+1,-mbc:mz+mbc+1)
     DOUBLE PRECISION ::   volfine(-mbc:mx+mbc+1,-mbc:my+mbc+1,-mbc:mz+mbc+1)
 
-    INTEGER :: mq,r2, m
-    INTEGER :: ic, ibc, jc, jbc, k
+    INTEGER :: mq,r3, m
+    INTEGER :: ic, jc, kc
+    INTEGER :: i_start, i_end, j_start, j_end, k_start, k_end
 
     !! # For the extruded mesh, this is still only rr2
-    INTEGER :: rr2
-    PARAMETER(rr2 = 4)
-    INTEGER, DIMENSION(0:rr2-1) :: i2, j2
+    INTEGER :: rr3
+    PARAMETER(rr3 = 8)
+    INTEGER, DIMENSION(0:rr3-1) :: i2, j2, k2
     !! DOUBLE PRECISION :: kc
 
-    LOGICAL :: fclaw2d_clawpatch_is_valid_average, skip_this_grid
+    LOGICAL :: fclaw3d_clawpatch_is_valid_average, skip_this_grid
     DOUBLE PRECISION :: vf_sum
     DOUBLE PRECISION :: sum, qf, kf
     LOGICAL :: is_manifold
@@ -60,30 +115,26 @@ SUBROUTINE fclaw3d_clawpatch46_fort_average_face(mx,my,mz,mbc,meqn, &
 
     is_manifold = manifold .eq. 1
 
-    !! # 'iface' is relative to the coarse grid
-
-    r2 = refratio**2    
-    if (r2 .ne. rr2) then
+    r3 = refratio**3    
+    if (r3 .ne. rr3) then
         write(6,*) 'average_face_ghost (fclaw3d_clawpatch46_average.f90) ', & 
-             '  Refratio**2 is not equal to rr2'
+             '  Refratio**3 is not equal to rr3'
         stop
     endif
 
     !! # Average fine grid onto coarse grid
-    meqn_loop : do mq = 1,meqn
-        k_loop : do k = 1,mz
-            if (idir .eq. 0) then
-                do jc = 1,my
-                    do ibc = 1,mbc
-                        !! # ibc = 1 corresponds to first layer of ghost cells, and
-                        !! # ibc = 2 corresponds to the second layer
+    call fclaw3d_clawpatch_face_ghost_bounds( &
+        iface_coarse,mx,my,mz,mbc, &
+        i_start, j_start, k_start, &
+        i_end,   j_end,   k_end)
 
-                        if (iface_coarse .eq. 0) then
-                            ic = 1-ibc
-                        elseif (iface_coarse .eq. 1) then
-                            ic = mx+ibc
-                        endif
-                        call fclaw3d_clawpatch_transform_face_half(ic,jc,i2,j2,transform_cptr)
+    print *,'i_start, i_end, j_start, j_end, k_start, k_end = ', &
+        i_start, i_end, j_start, j_end, k_start, k_end
+    meqn_loop : do mq = 1,meqn
+        k_loop : do kc = k_start,k_end
+            j_loop : do jc = j_start,j_end
+                i_loop : do ic = i_start,i_end
+                        call fclaw3d_clawpatch_transform_face_half(ic,jc,kc,i2,j2,k2,transform_cptr)
                         !! # ---------------------------------------------
                         !! # Two 'half-size' neighbors will be passed into
                         !! # this routine.  Only half of the coarse grid ghost
@@ -93,8 +144,8 @@ SUBROUTINE fclaw3d_clawpatch46_fort_average_face(mx,my,mz,mbc,meqn, &
                         !! # grid.
                         !! # ---------------------------------------------
                         skip_this_grid = .false.
-                        do m = 0,r2-1
-                            if (.not. fclaw2d_clawpatch_is_valid_average(i2(m),j2(m),mx,my)) then
+                        do m = 0,r3-1
+                            if (.not. fclaw3d_clawpatch_is_valid_average(i2(m),j2(m),k2(m),mx,my,mz)) then
                                 skip_this_grid = .true.
                                 exit 
                             endif
@@ -103,63 +154,24 @@ SUBROUTINE fclaw3d_clawpatch46_fort_average_face(mx,my,mz,mbc,meqn, &
                             if (is_manifold) then
                                 sum = 0
                                 vf_sum = 0
-                                do m = 0,r2-1
-                                    qf = qfine(i2(m),j2(m),k,mq)
-                                    kf = volfine(i2(m),j2(m),k)
+                                do m = 0,r3-1
+                                    qf = qfine(i2(m),j2(m),k2(m),mq)
+                                    kf = volfine(i2(m),j2(m),k2(m))
                                     sum = sum + qf*kf
                                     vf_sum = vf_sum + kf
                                 end do
                                 !! # Use vols of the fine grid mesh cells instead.
-                                qcoarse(ic,jc,k,mq) = sum/vf_sum
+                                qcoarse(ic,jc,kc,mq) = sum/vf_sum
                             else
                                 sum = 0
-                                do m = 0,r2-1
-                                    sum = sum + qfine(i2(m),j2(m),k,mq)
+                                do m = 0,r3-1
+                                    sum = sum + qfine(i2(m),j2(m),k2(m),mq)
                                 end do
-                                qcoarse(ic,jc,k,mq) = sum/dble(r2)                            
+                                qcoarse(ic,jc,kc,mq) = sum/dble(r3)                            
                             endif
                         endif
-                    enddo
-                end do
-            else
-                !! # idir = 1 (faces 2,3)
-                do jbc = 1,mbc
-                    do ic = 1,mx
-                        if (iface_coarse .eq. 2) then
-                            jc = 1-jbc
-                        elseif (iface_coarse .eq. 3) then
-                            jc = my+jbc
-                        endif
-
-                        call fclaw3d_clawpatch_transform_face_half(ic,jc,i2,j2, transform_cptr)
-                        skip_this_grid = .false.
-                        do m = 0,r2-1
-                            if (.not. fclaw2d_clawpatch_is_valid_average(i2(m),j2(m),mx,my)) then
-                                skip_this_grid = .true.
-                            endif
-                        end do
-                        if (.not. skip_this_grid) then
-                            if (is_manifold) then
-                                sum = 0
-                                vf_sum = 0
-                                do m = 0,r2-1
-                                    qf = qfine(i2(m),j2(m),k, mq)
-                                    kf = volfine(i2(m),j2(m),k)
-                                    sum = sum + qf*kf
-                                    vf_sum = vf_sum + kf
-                                end do
-                                qcoarse(ic,jc,k,mq) = sum/vf_sum
-                            else
-                                sum = 0
-                                do m = 0,r2-1
-                                    sum = sum + qfine(i2(m),j2(m),k,mq)
-                                end do
-                                qcoarse(ic,jc,k,mq) = sum/dble(r2)
-                            endif            
-                        endif               
-                    enddo  !! i loop
-                enddo  !! jbc loop
-            endif  !! idir conditonal
+                enddo i_loop
+            end do j_loop
         end do k_loop
     end do meqn_loop
 end subroutine  fclaw3d_clawpatch46_fort_average_face
@@ -194,8 +206,7 @@ subroutine fclaw3d_clawpatch46_fort_average_corner(mx,my,mz,mbc,meqn, &
     INTEGER :: i1,j1,m, k
     DOUBLE PRECISION :: vf_sum, kc
 
-    !! exit with error
-    STOP 'NOT IMPLIMENTED'
+    return
 
     r2 = refratio*refratio
     if (r2 .ne. rr2) then

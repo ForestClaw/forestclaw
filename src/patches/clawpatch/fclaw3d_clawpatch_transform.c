@@ -106,7 +106,7 @@ FCLAW3D_CLAWPATCH_TRANSFORM_FACE_HALF (const int *i1, const int *j1, const int* 
                                    tdata->neighbor_patch,
                                    tdata->transform, 
                                    mx, my, mz,
-                                   tdata->based, i2, j2, j2);
+                                   tdata->based, i2, j2, k2);
 }
 
 
