@@ -205,6 +205,8 @@ subroutine fclaw3d_clawpatch46_fort_average_edge(mx,my,mz,mbc,meqn, &
     INTEGER :: i_start, j_start, k_start, i_end, j_end, k_end
     DOUBLE PRECISION :: vf_sum
 
+    LOGICAL :: fclaw3d_clawpatch_is_valid_average, skip_this_grid
+
 
     print *,'average_edge_ghost (claw2d_utils.f) :  iedge_coarse = ',iedge_coarse
     r3 = refratio**3
@@ -228,6 +230,13 @@ subroutine fclaw3d_clawpatch46_fort_average_edge(mx,my,mz,mbc,meqn, &
                 ibc_loop : do ibc = i_start,i_end
                     !! # Average fine grid corners onto coarse grid ghost corners
                     call fclaw3d_clawpatch_transform_edge_half(ibc,jbc,kbc,i2,j2,k2, transform_cptr)
+                    skip_this_grid = .false.
+                    do m = 0,r3-1
+                        if (.not. fclaw3d_clawpatch_is_valid_average(i2(m),j2(m),k2(m),mx,my,mz)) then
+                            skip_this_grid = .true.
+                            exit 
+                        endif
+                    end do
                     if (is_manifold) then
                         sum = 0
                         vf_sum = 0
