@@ -57,9 +57,10 @@ const fclaw3d_patch_flags_t fclaw3d_patch_block_face_flags[6] = {
 int
 fclaw_patch_edge_neighbors (fclaw_domain_t * domain,
                               int blockno, int patchno, int edgeno,
-                              int rprocs[], int *rblockno, int rpatchnos[],
-                              int *redge,
-                              fclaw_patch_relation_t * neighbor_size)
+                              int rprocs_out[], int *rblockno_out,
+                              int rpatchnos_out[],
+                              int *redge_out,
+                              fclaw_patch_relation_t * neighbor_size_out)
 {
     if(domain->dim != 3)
     {
@@ -95,6 +96,8 @@ fclaw_patch_edge_neighbors (fclaw_domain_t * domain,
      * than four blocks meet at an edge */
     int num_neighbors = 0;
     p4est_locidx_t quad_ids[2];
+    fclaw_patch_relation_t neighbor_size;
+    int redge;
     if (quad_to_edge >= 0)
     {
         /* has neighbor. process and get neighbors */
@@ -126,8 +129,8 @@ fclaw_patch_edge_neighbors (fclaw_domain_t * domain,
                 {
                     /* half sized neighbor */
                     num_neighbors = 2;
-                    *neighbor_size = FCLAW_PATCH_HALFSIZE;
-                    *redge = (e + 24)%12;
+                    neighbor_size = FCLAW_PATCH_HALFSIZE;
+                    redge = (e + 24)%12;
                     /* get the second neighbor */
                     quad_ids[1] = fclaw2d_array_index_locidx (mesh->edge_quad, cstart+1);
                 }
@@ -135,37 +138,40 @@ fclaw_patch_edge_neighbors (fclaw_domain_t * domain,
                 {
                     /* double sized neighbor */
                     num_neighbors = 1;
-                    *neighbor_size = FCLAW_PATCH_DOUBLESIZE;
-                    *redge = (e - 24)%12;
+                    neighbor_size = FCLAW_PATCH_DOUBLESIZE;
+                    redge = (e - 24)%12;
                 }
                 else 
                 {
                     /* same sized neighbor inter-tree */
                     num_neighbors = 1;
-                    *neighbor_size = FCLAW_PATCH_SAMESIZE;
-                    *redge = e%12;
+                    neighbor_size = FCLAW_PATCH_SAMESIZE;
+                    redge = e%12;
                 }
-                FCLAW_ASSERT (0 <= *redge && *redge < P8EST_EDGES);
+                FCLAW_ASSERT (0 <= redge && redge < P8EST_EDGES);
             }
         }
         else
         {
             /* for same size intra-tree edges we take the edge is opposite */
             num_neighbors = 1;
-            *neighbor_size = FCLAW_PATCH_SAMESIZE;
+            neighbor_size = FCLAW_PATCH_SAMESIZE;
             quad_ids[0] = quad_to_edge;
-            *redge = edgeno ^ 3;
+            redge = edgeno ^ 3;
         }
     }
     else
     {
         /* The value -1 is expected for an edge on the physical boundary */
         /* Currently we also return this for five- and more-edges */
-        *neighbor_size = FCLAW_PATCH_BOUNDARY;
-        *redge = -1;
+        neighbor_size = FCLAW_PATCH_BOUNDARY;
+        redge = -1;
     }
 
     /* get rproc and rpatchno for each neighbor */
+    int rprocs[2];
+    int rblockno;
+    int rpatchnos[2];
     for(int i=0; i < num_neighbors; i++)
     {
         p4est_locidx_t qid = quad_ids[i];
@@ -173,9 +179,9 @@ fclaw_patch_edge_neighbors (fclaw_domain_t * domain,
         {
             /* local quadrant may be in a different tree */
             rprocs[i] = domain->mpirank;
-            *rblockno = (int) mesh->quad_to_tree[qid];
+            rblockno = (int) mesh->quad_to_tree[qid];
             rtree = p4est_tree_array_index (p4est->trees,
-                                            (p4est_topidx_t) * rblockno);
+                                            (p4est_topidx_t) rblockno);
             FCLAW_ASSERT (rtree->quadrants_offset <= qid);
             qid -= rtree->quadrants_offset;     /* relative to tree */
             q = p4est_quadrant_array_index (&rtree->quadrants, qid);
@@ -187,7 +193,7 @@ fclaw_patch_edge_neighbors (fclaw_domain_t * domain,
             rprocs[i] = mesh->ghost_to_proc[qid];
             FCLAW_ASSERT (rprocs[i] != domain->mpirank);
             q = p4est_quadrant_array_index (&ghost->ghosts, qid);
-            *rblockno = (int) q->p.piggy3.which_tree;
+            rblockno = (int) q->p.piggy3.which_tree;
         }
         rpatchnos[i] = (int) qid;
 
@@ -196,14 +202,27 @@ fclaw_patch_edge_neighbors (fclaw_domain_t * domain,
                       || (rpatchnos[0] >= 0
                           && rpatchnos[0] < mesh->ghost_num_quadrants));
         FCLAW_ASSERT (rprocs[i] != domain->mpirank
-                      || (*rblockno >= 0 && *rblockno < domain->num_blocks
+                      || (rblockno >= 0 && rblockno < domain->num_blocks
                           && rpatchnos[0] >= 0
                           && rpatchnos[0] <
-                             domain->blocks[*rblockno].num_patches));
+                             domain->blocks[rblockno].num_patches));
         /* *INDENT-ON* */
     }
 
-    return *neighbor_size != FCLAW_PATCH_BOUNDARY;
+    /* set output variables
+       compiler may warn about uninitialized variables, 
+       and Valgrind will warn about uninitialized access.
+       makes debugging easier */
+    *rblockno_out = rblockno;
+    *redge_out = redge;
+    *neighbor_size_out = neighbor_size;
+    for(int i=0; i < num_neighbors; i++)
+    {
+        rprocs_out[i] = rprocs[i];
+        rpatchnos_out[i] = rpatchnos[i];
+    }
+
+    return neighbor_size != FCLAW_PATCH_BOUNDARY;
 }
 
 void
