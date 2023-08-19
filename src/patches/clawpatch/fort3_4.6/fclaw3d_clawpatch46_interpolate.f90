@@ -17,6 +17,60 @@
 !! # more important.)
 !! # ----------------------------------------------------------
 
+subroutine fclaw3d_clawpatch_face_bounds( &
+            iface,mx,my,mz,mbc, &
+            i_start, j_start, k_start, &
+            i_end,   j_end,   k_end)
+    implicit none
+    integer mx, my, mz, mbc, iface
+    integer i_start, j_start, k_start
+    integer i_end,   j_end,   k_end
+    integer axis
+    logical upper
+
+    axis = iface/2
+    upper= btest(iface,0)
+    
+    
+    if (axis .eq. 0) then
+        if (upper) then
+            i_start = mx-mbc
+            i_end = mx
+        else
+            i_start = 1
+            i_end = mbc
+        endif
+        j_start = 1
+        j_end = my
+        k_start = 1
+        k_end = mz
+    else if(axis .eq. 1) then
+        i_start = 0
+        i_end = mx
+        if (upper) then
+            j_start = my-mbc
+            j_end = my
+        else
+            j_start = 1
+            j_end = mbc
+        endif
+        k_start = 1
+        k_end = mz
+    else if(axis .eq. 2) then
+        i_start = 1
+        i_end = mx
+        j_start = 1
+        j_end = my
+        if (upper) then
+            k_start = mz-mbc
+            k_end = mz
+        else
+            k_start = 1
+            k_end = mbc
+        endif
+    endif
+end subroutine fclaw3d_clawpatch_face_bounds
+
 
 !! # ----------------------------------------------------------
 !! # This routine is used for both mapped and non-mapped
@@ -34,31 +88,26 @@ subroutine fclaw3d_clawpatch46_fort_interpolate_face &
     double precision ::   qfine(1-mbc:mx+mbc,1-mbc:my+mbc,1-mbc:mz+mbc,meqn)
     double precision :: qcoarse(1-mbc:mx+mbc,1-mbc:my+mbc,1-mbc:mz+mbc,meqn)
 
-    integer :: mq,r2, m, k
-    integer :: ibc, i1
-    integer :: jbc, j1
-    integer :: ic, jc, mth
-    double precision :: gradx, grady, qc, sl, sr, value
+    integer :: mq,r3, m
+    integer :: ic, jc, kc,  mth
+    integer :: i_start, j_start, k_start, i_end, j_end, k_end
+    double precision :: gradx, grady, gradz, qc, sl, sr, value
     double precision :: fclaw2d_clawpatch_compute_slopes
 
     !! # This should be refratio*refratio.
-    integer :: rr2
-    parameter(rr2 = 4)
-    integer :: i2(0:rr2-1),j2(0:rr2-1)
-    logical :: fclaw2d_clawpatch_is_valid_interp
+    integer :: rr3
+    parameter(rr3 = 8)
+    integer :: i2(0:rr3-1),j2(0:rr3-1),k2(0:rr3-1)
+    logical :: fclaw3d_clawpatch_is_valid_interp
     logical :: skip_this_grid
 
-    integer :: a(2,2), f(2)
-    integer :: ii,jj,dc(2),df(2,0:rr2-1),iff,jff
-    double precision :: shiftx(0:rr2-1),shifty(0:rr2-1)
-
-    !! exit with error
-    return;
-    STOP 'NOT IMPLIMENTED'
+    integer :: a(3,3), f(3)
+    integer :: ii,jj,kk,dc(3),df(3,0:rr3-1),iff,jff,kff
+    double precision :: shiftx(0:rr3-1),shifty(0:rr3-1),shiftz(0:rr3-1)
 
     mth = 5
-    r2 = refratio*refratio
-    if (r2 .ne. rr2) then
+    r3 = refratio**3
+    if (r3 .ne. rr3) then
         write(6,*) 'average_face_ghost (claw2d_utils.f) ', & 
         '  Refratio**2 is not equal to rr2'
         stop
@@ -68,124 +117,75 @@ subroutine fclaw3d_clawpatch46_fort_interpolate_face &
 
     !! # This needs to be written for refratios .ne. 2.
     m = 0
-    do jj = 0,1
-        do ii = 0,1
-            !! # Direction on coarse grid
-            dc(1) = ii
-            dc(2) = jj
+    do kk = 0,1
+        do jj = 0,1
+            do ii = 0,1
+                !! # Direction on coarse grid
+                dc(1) = ii
+                dc(2) = jj
+                dc(3) = kk
 
-            !! # Direction on fine grid (converted using metric). Divide
-            !! # by refratio to scale length to unit vector
-            df(1,m) = (a(1,1)*dc(1) + a(1,2)*dc(2))/refratio
-            df(2,m) = (a(2,1)*dc(1) + a(2,2)*dc(2))/refratio
+                !! # Direction on fine grid (converted using metric). Divide
+                !! # by refratio to scale length to unit vector
+                df(1,m) = (a(1,1)*dc(1) + a(1,2)*dc(2) + a(1,3)*dc(3))/refratio
+                df(2,m) = (a(2,1)*dc(1) + a(2,2)*dc(2) + a(2,3)*dc(3))/refratio
+                df(3,m) = (a(3,1)*dc(1) + a(3,2)*dc(2) + a(3,3)*dc(3))/refratio
 
-            !! # Map (0,1) to (-1/4,1/4) (locations of fine grid points)
-            shiftx(m) = (ii-0.5d0)/2.d0
-            shifty(m) = (jj-0.5d0)/2.d0
-            m = m + 1
+                !! # Map (0,1) to (-1/4,1/4) (locations of fine grid points)
+                shiftx(m) = (ii-0.5d0)/2.d0
+                shifty(m) = (jj-0.5d0)/2.d0
+                shiftz(m) = (kk-0.5d0)/2.d0
+                m = m + 1
+            enddo
         enddo
     enddo
     !! # Create map :
 
+    !! loop over coarse iface interior
+    call fclaw3d_clawpatch_face_bounds( &
+        iface_coarse,mx,my,mz,mbc, &
+        i_start, j_start, k_start, &
+        i_end,   j_end,   k_end)
+
     mq_loop : do mq = 1,meqn
-        k_loop : do k = 1,mz
-            if (idir .eq. 0) then
-                !! # this ensures that we get 'hanging' corners        
-                do ibc = 1,mbc/2
-                    if (iface_coarse .eq. 0) then
-                        ic = ibc
-                    elseif (iface_coarse .eq. 1) then
-                        ic = mx - ibc + 1
-                    else
-                        write(6,*) 'interpolate : Problem with iface_coarse'
-                        write(6,*) 'iface_coarse = ', iface_coarse
-                        stop               
-                    endif
-                    do jc = 1,mx
-                        i1 = ic
-                        j1 = jc
-                        call fclaw3d_clawpatch_transform_face_half(i1,j1,i2,j2,transform_ptr)
+        k_loop : do kc = k_start,k_end
+            j_loop : do jc = j_start,j_end
+                i_loop : do ic = i_start,i_end 
+                        call fclaw3d_clawpatch_transform_face_half(ic,jc,kc,i2,j2,k2,transform_ptr)
                         skip_this_grid = .false.
-                        do m = 0,r2-1
-                            if (.not. fclaw2d_clawpatch_is_valid_interp(i2(m),j2(m),mx,my,mbc)) then
+                        do m = 0,r3-1
+                            if (.not. fclaw3d_clawpatch_is_valid_interp(i2(m),j2(m),k2(m),mx,my,mz,mbc)) then
                                 skip_this_grid = .true.
                                 exit
                             endif
                         enddo
                         if (.not. skip_this_grid) then
-                            qc = qcoarse(ic,jc,k, mq)
+                            qc = qcoarse(ic,jc,kc, mq)
                             !! # Compute limited slopes in both x and y. Note we are not
                             !! # really computing slopes, but rather just differences.
                             !! # Scaling is accounted for in 'shiftx' and 'shifty', below.
-                            sl = (qc - qcoarse(ic-1,jc,k,mq))
-                            sr = (qcoarse(ic+1,jc,k,mq) - qc)
+                            sl = (qc - qcoarse(ic-1,jc,kc,mq))
+                            sr = (qcoarse(ic+1,jc,kc,mq) - qc)
                             gradx = fclaw2d_clawpatch_compute_slopes(sl,sr,mth)
 
-                            sl = (qc - qcoarse(ic,jc-1,k,mq))
-                            sr = (qcoarse(ic,jc+1,k,mq) - qc)
+                            sl = (qc - qcoarse(ic,jc-1,kc,mq))
+                            sr = (qcoarse(ic,jc+1,kc,mq) - qc)
                             grady = fclaw2d_clawpatch_compute_slopes(sl,sr,mth)
 
-                            do m = 0,rr2-1
+                            sl = (qc - qcoarse(ic,jc,kc-1,mq))
+                            sr = (qcoarse(ic,jc,kc+1,mq) - qc)
+                            gradz = fclaw2d_clawpatch_compute_slopes(sl,sr,mth)
+
+                            do m = 0,rr3-1
                                 iff = i2(0) + df(1,m)
                                 jff = j2(0) + df(2,m)
-                                value = qc + gradx*shiftx(m) + grady*shifty(m)
-                                qfine(iff,jff,k,mq) = value
+                                kff = k2(0) + df(3,m)
+                                value = qc + gradx*shiftx(m) + grady*shifty(m) + gradz*shiftz(m)
+                                qfine(iff,jff,kff,mq) = value
                             enddo
                         endif
-                    enddo !! jc loop
-                enddo !! ibc loop            
-            else
-                do jbc = 1,mbc/2
-                    if (iface_coarse .eq. 2) then
-                        jc = jbc
-                    elseif (iface_coarse .eq. 3) then
-                        !! # iface_coarse = 3
-                        jc = my - jbc + 1
-                    else
-                        write(6,*) 'interpolate : Problem with iface_coarse'
-                        write(6,*) 'iface_coarse = ', iface_coarse
-                        stop
-                    endif
-                    do ic = 1,mx
-                        i1 = ic
-                        j1 = jc
-                        call fclaw3d_clawpatch_transform_face_half(i1,j1,i2,j2, transform_ptr)
-                        !! # ---------------------------------------------
-                        !! # Two 'half-size' neighbors will be passed into
-                        !! # this routine.  Only half of the coarse grid ghost
-                        !! # indices will be valid for the particular grid
-                        !! # passed in.  We skip those ghost cells that will
-                        !! # have to be filled in by the other half-size
-                        !! # grid.
-                        !! # ---------------------------------------------
-                        skip_this_grid = .false.
-                        do m = 0,r2-1
-                            if (.not. fclaw2d_clawpatch_is_valid_interp(i2(m),j2(m),mx,my,mbc)) then
-                               skip_this_grid = .true.
-                               exit
-                            endif
-                        enddo
-                        if (.not. skip_this_grid) then
-                            qc = qcoarse(ic,jc,k,mq)
-
-                            sl = (qc - qcoarse(ic-1,jc,k,mq))
-                            sr = (qcoarse(ic+1,jc,k,mq) - qc)
-                            gradx = fclaw2d_clawpatch_compute_slopes(sl,sr,mth)
-
-                            sl = (qc - qcoarse(ic,jc-1,k,mq))
-                            sr = (qcoarse(ic,jc+1,k,mq) - qc)
-                            grady = fclaw2d_clawpatch_compute_slopes(sl,sr,mth)
-
-                            do m = 0,rr2-1
-                                iff = i2(0) + df(1,m)
-                                jff = j2(0) + df(2,m)
-                                value = qc + gradx*shiftx(m) + grady*shifty(m)
-                                qfine(iff,jff,k,mq) = value                                
-                            enddo
-                        endif                    
-                    enddo  !! ic loop
-                enddo !! jbc loop
-            endif !! end idir branch
+                enddo i_loop
+            enddo j_loop
         enddo k_loop
     enddo mq_loop
 

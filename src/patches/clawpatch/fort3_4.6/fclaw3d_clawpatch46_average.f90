@@ -25,6 +25,7 @@
 !!>
 !!> Average fine grid interior values to neighboring ghost cell values of
 !!> the coarse grid.
+
 subroutine fclaw3d_clawpatch_face_ghost_bounds( &
             iface,mx,my,mz,mbc, &
             i_start, j_start, k_start, &
@@ -128,8 +129,6 @@ SUBROUTINE fclaw3d_clawpatch46_fort_average_face(mx,my,mz,mbc,meqn, &
         i_start, j_start, k_start, &
         i_end,   j_end,   k_end)
 
-    print *,'i_start, i_end, j_start, j_end, k_start, k_end = ', &
-        i_start, i_end, j_start, j_end, k_start, k_end
     meqn_loop : do mq = 1,meqn
         k_loop : do kc = k_start,k_end
             j_loop : do jc = j_start,j_end

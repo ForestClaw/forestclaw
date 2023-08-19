@@ -12,11 +12,11 @@ c     ---------------------------------------------------------------
       subroutine fclaw3d_clawpatch_build_transform(transform_ptr,a,f)
       implicit none
 
-      integer a(2,2)
+      integer a(3,3)
       integer*8 transform_ptr
-      integer f(2)
-      integer mi(4),mj(4)
-      integer i1,j1
+      integer f(3)
+      integer mi(8),mj(8),mk(8)
+      integer i1,j1,k1
 
 c     # Assume index mapping fclaw2d_transform_face_half has the
 c     # the form
@@ -31,24 +31,39 @@ c     # calls to T.
 
       i1 = 0
       j1 = 0
-      call fclaw3d_clawpatch_transform_face_half(i1,j1,mi,mj,
+      k1 = 0
+      call fclaw3d_clawpatch_transform_face_half(i1,j1,k1,mi,mj,mk,
      &      transform_ptr)
       f(1) = mi(1)
       f(2) = mj(1)
+      f(3) = mk(1)
 
       i1 = 1
       j1 = 0
-      call fclaw3d_clawpatch_transform_face_half(i1,j1,mi,mj,
+      k1 = 0
+      call fclaw3d_clawpatch_transform_face_half(i1,j1,k1,mi,mj,mk,
      &      transform_ptr)
       a(1,1) = mi(1) - f(1)
       a(2,1) = mj(1) - f(2)
+      a(3,1) = mk(1) - f(3)
 
       i1 = 0
       j1 = 1
-      call fclaw3d_clawpatch_transform_face_half(i1,j1,mi,mj,
+      k1 = 0
+      call fclaw3d_clawpatch_transform_face_half(i1,j1,k1,mi,mj,mk,
      &      transform_ptr)
       a(1,2) = mi(1) - f(1)
       a(2,2) = mj(1) - f(2)
+      a(3,2) = mk(1) - f(3)
+
+      i1 = 0
+      j1 = 0
+      k1 = 1
+      call fclaw3d_clawpatch_transform_face_half(i1,j1,k1,mi,mj,mk,
+     &      transform_ptr)
+      a(1,3) = mi(1) - f(1)
+      a(2,3) = mj(1) - f(2)
+      a(3,3) = mk(1) - f(3)
 
       end
 
@@ -87,8 +102,8 @@ c     # calls to T.
 c --------------------------------------------------------------------
 c> @brief checks if the index is valid for averaging
 c>
-c> @param[in] i, j the idnex to check
-c> @param[in] mx, my the number of cells in the x and y directions
+c> @param[in] i, j, k the idnex to check
+c> @param[in] mx, my, mz the number of cells in the x, y, z directions
 c> @return true if the index is valid
 c --------------------------------------------------------------------
       logical function fclaw3d_clawpatch_is_valid_average(i,j,k,
@@ -105,4 +120,20 @@ c --------------------------------------------------------------------
       fclaw3d_clawpatch_is_valid_average = i1 .and. j1 .and. k1
 
       end
+
+      logical function fclaw3d_clawpatch_is_valid_interp(i,j,k,
+     1                                         mx,my,mz,mbc)
+      implicit none
+
+      integer i,j,k,mx,my,mz,mbc
+      logical i1, j1, k1
+
+      i1 = 1-mbc .le. i .and. i .le. mx+mbc
+      j1 = 1-mbc .le. j .and. j .le. my+mbc
+      k1 = 1-mbc .le. k .and. k .le. mz+mbc
+
+      fclaw3d_clawpatch_is_valid_interp = i1 .and. j1 .and. k1
+
+      end
+
 
