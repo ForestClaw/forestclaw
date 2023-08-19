@@ -202,6 +202,14 @@ void average2ghost(fclaw_global_t *glob,
     parallel_mode.cb_fill = cb_face_fill;
     fclaw_global_iterate_level(glob, coarse_level,
                    cb_interface_wrap, (void *) &parallel_mode);
+    
+    if(glob->domain->dim ==3)
+    {
+        /* Edge average */
+        parallel_mode.cb_fill = cb_edge_fill;
+        fclaw_global_iterate_level(glob, coarse_level, cb_interface_wrap,
+                       (void *) &parallel_mode);
+    }
 
     /* Corner average */
     parallel_mode.cb_fill = cb_corner_fill;

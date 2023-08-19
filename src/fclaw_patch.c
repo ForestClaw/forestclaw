@@ -350,15 +350,15 @@ void fclaw_patch_copy_face(fclaw_global_t* glob,
 }
 
 void fclaw_patch_average_face(fclaw_global_t* glob,
-                                fclaw_patch_t *coarse_patch,
-                                fclaw_patch_t *fine_patch,
-                                int idir,
-                                int iface_coarse,
-                                int RefineFactor,
-                                int refratio,
-                                int time_interp,
-                                int igrid,
-                                fclaw_patch_transform_data_t* transform_data)
+                              fclaw_patch_t *coarse_patch,
+                              fclaw_patch_t *fine_patch,
+                              int idir,
+                              int iface_coarse,
+                              int RefineFactor,
+                              int refratio,
+                              int time_interp,
+                              int igrid,
+                              fclaw_patch_transform_data_t* transform_data)
 {
     fclaw_patch_vtable_t *patch_vt = fclaw_patch_vt(glob);
 
@@ -423,6 +423,22 @@ void fclaw_patch_copy_edge(fclaw_global_t* glob,
     patch_vt->d3->copy_edge(glob,this_patch,edge_patch,
                             coarse_blockno,fine_blockno,
                             icorner,time_interp,transform_data);
+}
+
+void fclaw_patch_average_edge(fclaw_global_t* glob,
+                              fclaw_patch_t *coarse_patch,
+                              fclaw_patch_t *fine_patch,
+                              int iedge_coarse,
+                              int time_interp,
+                              fclaw_patch_transform_data_t* transform_data)
+{
+    fclaw_patch_vtable_t *patch_vt = fclaw_patch_vt(glob);
+	FCLAW_ASSERT(patch_vt->dim == 3);
+    FCLAW_ASSERT(patch_vt->d3->copy_edge != NULL);        
+    patch_vt->d3->average_edge(glob,coarse_patch,fine_patch,
+                               iedge_coarse,
+                               time_interp,transform_data);
+
 }
 
 void fclaw_patch_copy_corner(fclaw_global_t* glob,

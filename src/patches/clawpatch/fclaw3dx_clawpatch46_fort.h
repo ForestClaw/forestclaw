@@ -334,7 +334,26 @@ void FCLAW3D_CLAWPATCH46_FORT_COPY_EDGE(const int* mx,
                                         struct fclaw_patch_transform_data** 
                                         transform_cptr);
 
-
+/** Fortran subroutine name */
+#define FCLAW3D_CLAWPATCH46_FORT_AVERAGE_EDGE \
+      FCLAW_F77_FUNC(fclaw3d_clawpatch46_fort_average_edge, \
+                     FCLAW3D_CLAWPATCH46_FORT_AVERAGE_EDGE)
+/** @copydoc fclaw3d_clawpatch46_fort_average_corner() */
+void FCLAW3D_CLAWPATCH46_FORT_AVERAGE_EDGE(const int* mx, 
+                                           const int* my, 
+                                           const int* mz, 
+                                           const int* mbc,
+                                           const int* meqn, 
+                                           const int* a_refratio,
+                                           double qcoarse[], 
+                                           double qfine[],
+                                           double areacoarse[], 
+                                           double areafine[],
+                                           const int* manifold,
+                                           const int* a_corner, 
+                                           struct fclaw_patch_transform_data** 
+                                           transform_cptr);
+ 
 /** Fortran subroutine name */
 #define FCLAW3D_CLAWPATCH46_FORT_COPY_CORNER \
              FCLAW_F77_FUNC(fclaw3d_clawpatch46_fort_copy_corner, \

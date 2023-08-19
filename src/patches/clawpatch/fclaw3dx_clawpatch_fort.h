@@ -158,6 +158,35 @@ typedef void (*fclaw3d_clawpatch_fort_copy_edge_t)(const int* mx,
                                                    struct fclaw_patch_transform_data** transform_ptr);
 
 /**
+ * @brief Averages values from a edge neighboring fine grid
+ * 
+ * @param[in]     mx, my, mz the number cells in the x, y, and z directions, excluding ghost
+ * @param[in]     mbc the number of ghost cells
+ * @param[in]     meqn the number of equations
+ * @param[in,out] qcoarse the solution of this patch
+ * @param[in]     qfine the solution of the fine neighbor patch
+ * @param[in]     areacoarse the area of cells in this patch
+ * @param[in]     arefine the area of cells in the fine neighbor patch
+ * @param[in]     manifold true if using mainifold
+ * @param[in]     a_edge the edge that the fine neighbor is on
+ * @param[in]     transform_ptr Encoding for indices at block boundaries (C only).
+ */
+typedef void (*fclaw3d_clawpatch_fort_average_edge_t)(const int* mx, 
+                                                        const int* my, 
+                                                        const int* mz,
+                                                        const int* mbc,
+                                                        const int* meqn, 
+                                                        const int* a_refratio,
+                                                        double qcoarse[], 
+                                                        double qfine[],
+                                                        double areacoarse[], 
+                                                        double areafine[],
+                                                        const int* manifold,
+                                                        const int* a_corner, 
+                                                        struct fclaw_patch_transform_data** transform_ptr);
+
+
+/**
  * @brief Copies ghost data from a corner-neighboring grid on the same level
  * 
  * @param[in]     mx, my, mz the number cells in the x, y, and z directions, excluding ghost

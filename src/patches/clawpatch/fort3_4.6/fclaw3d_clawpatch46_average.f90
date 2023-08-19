@@ -175,6 +175,85 @@ SUBROUTINE fclaw3d_clawpatch46_fort_average_face(mx,my,mz,mbc,meqn, &
     end do meqn_loop
 end subroutine  fclaw3d_clawpatch46_fort_average_face
 
+!!> \ingroup Averaging
+!!> Average across edge.
+
+subroutine fclaw3d_clawpatch46_fort_average_edge(mx,my,mz,mbc,meqn, &
+    refratio,qcoarse,qfine,volcoarse,volfine, & 
+    manifold,iedge_coarse,transform_cptr)
+    IMPLICIT NONE
+
+    INTEGER :: mx,my,mz,mbc,meqn,refratio,iedge_coarse, manifold
+    INTEGER*8 :: transform_cptr
+    DOUBLE PRECISION :: qcoarse(1-mbc:mx+mbc,1-mbc:my+mbc,1-mbc:mz+mbc,meqn)
+    DOUBLE PRECISION ::   qfine(1-mbc:mx+mbc,1-mbc:my+mbc,1-mbc:mz+mbc,meqn)
+
+    !! # these will be empty if we are not on a manifold.
+    DOUBLE PRECISION :: volcoarse(-mbc:mx+mbc+1,-mbc:my+mbc+1,-mbc:mz+mbc+1)
+    DOUBLE PRECISION ::   volfine(-mbc:mx+mbc+1,-mbc:my+mbc+1,-mbc:mz+mbc+1)
+
+    INTEGER :: ibc,jbc,kbc,mq,r3
+    LOGICAL :: is_manifold
+    DOUBLE PRECISION :: qf,kf, sum
+
+    !! # This should be refratio*refratio.
+    INTEGER :: rr3
+    PARAMETER(rr3 = 8)
+    INTEGER :: i2(0:rr3-1),j2(0:rr3-1),k2(0:rr3-1)
+
+    INTEGER :: m
+    INTEGER :: i_start, j_start, k_start, i_end, j_end, k_end
+    DOUBLE PRECISION :: vf_sum
+
+
+    print *,'average_edge_ghost (claw2d_utils.f) :  iedge_coarse = ',iedge_coarse
+    r3 = refratio**3
+    if (r3 .ne. rr3) then
+        write(6,*) 'average_corner_ghost (claw2d_utils.f) ', & 
+        '  Refratio**3 is not equal to rr3'
+        stop
+    endif
+
+    is_manifold = manifold .eq. 1
+
+    !! get lower-bottom-left corner of coarse ghost cells
+    call fclaw3d_clawpatch46_fort_get_edge_bounds(iedge_coarse, &
+                mx,my,mz,mbc, &
+                i_start,j_start,k_start, &
+                i_end,  j_end,  k_end)
+
+    meqn_loop : do mq = 1,meqn
+        kbc_loop : do kbc = k_start,k_end
+            jbc_loop : do jbc = j_start,j_end
+                ibc_loop : do ibc = i_start,i_end
+                    !! # Average fine grid corners onto coarse grid ghost corners
+                    call fclaw3d_clawpatch_transform_edge_half(ibc,jbc,kbc,i2,j2,k2, transform_cptr)
+                    if (is_manifold) then
+                        sum = 0
+                        vf_sum = 0
+                        do m = 0,r3-1
+                            qf = qfine(i2(m),j2(m),k2(m),mq)
+                            kf = volfine(i2(m),j2(m),k2(m))
+                            sum = sum + kf*qf
+                            vf_sum = vf_sum + kf
+                        enddo
+                        qcoarse(ibc,jbc,kbc,mq) = sum/vf_sum
+                    else
+                        sum = 0
+                        do m = 0,r3-1
+                            qf = qfine(i2(m),j2(m),k2(m),mq)
+                            sum = sum + qf
+                        end do
+                        qcoarse(ibc,jbc,kbc,mq) = sum/dble(r3)
+                    endif
+                enddo ibc_loop
+            enddo jbc_loop
+        enddo kbc_loop
+    end do meqn_loop
+
+end subroutine fclaw3d_clawpatch46_fort_average_edge
+
+
 
 !!> \ingroup Averaging
 !!> Average across corners.

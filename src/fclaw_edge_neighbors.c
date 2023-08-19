@@ -143,26 +143,32 @@ void get_edge_type(fclaw_global_t* glob,
    ------------------------------------------------------ */
 
 static
-void get_edge_neighbor(fclaw_global_t *glob,
-                       int this_block_idx,
-                       int this_patch_idx,
-                       fclaw_patch_t* this_patch,
-                       int icorner,
-                       int block_iface,
-                       int is_block_edge,
-                       int *edge_block_idx,
-                       fclaw_patch_t** edge_patch,
-                       int *rcornerno,
-                       int **ref_flag_ptr,
-                       int *block_edge_count,
-                       int ftransform[],
-                       fclaw_patch_transform_data_t* ftransform_finegrid)
+void get_edge_neighbors(fclaw_global_t *glob,
+                        int this_block_idx,
+                        int this_patch_idx,
+                        fclaw_patch_t* this_patch,
+                        int icorner,
+                        int block_iface,
+                        int is_block_edge,
+                        int *edge_block_idx,
+                        fclaw_patch_t* edge_patches[],
+                        int *rcornerno,
+                        int **ref_flag_ptr,
+                        int *block_edge_count,
+                        int ftransform[],
+                        fclaw_patch_transform_data_t* ftransform_finegrid)
 {
     fclaw_domain_t *domain = glob->domain;
-    /* See what p4est thinks we have for corners, and consider four cases */
-    fclaw_patch_relation_t neighbor_type;
-    const int refine_factor = fclaw_domain_refine_factor(domain);
+    const int num_face_neighbors = fclaw_domain_num_children(domain)/2;
 
+    for(int i=0; i<2; i++)
+    {
+        edge_patches[i] = NULL;
+    }
+
+    fclaw_timer_start (&glob->timers[FCLAW_TIMER_NEIGHBOR_SEARCH]);
+
+#if 0
     /* Note : Pillowsphere case does not return a block corner neighbor */
     int ispillowsphere = 0;
     if(domain->dim == 2)
@@ -170,18 +176,20 @@ void get_edge_neighbor(fclaw_global_t *glob,
         //TODO 3d
         fclaw2d_map_pillowsphere(glob);
     }
+#endif
 
-    fclaw_timer_start (&glob->timers[FCLAW_TIMER_NEIGHBOR_SEARCH]);
-    int rproc_edge;
-    int edge_patch_idx;
+    /* See what p4est thinks we have for edges, and consider four cases */
+    int rproc_edge[2];
+    int edge_patch_idx[2];
+    fclaw_patch_relation_t neighbor_type;
     int has_edge_neighbor =
         fclaw_patch_edge_neighbors(domain,
                                    this_block_idx,
                                    this_patch_idx,
                                    icorner,
-                                   &rproc_edge,
+                                   rproc_edge,
                                    edge_block_idx,
-                                   &edge_patch_idx,
+                                   edge_patch_idx,
                                    rcornerno,
                                    &neighbor_type);
 
@@ -205,7 +213,6 @@ void get_edge_neighbor(fclaw_global_t *glob,
         /* Case 2 : 'iedge' is a hanging node */
         /* We do not return valid transformation objects! */
         *ref_flag_ptr = NULL;
-        *edge_patch = NULL;
         return;
     }
     else if (has_edge_neighbor && !is_block_edge)
@@ -216,13 +223,13 @@ void get_edge_neighbor(fclaw_global_t *glob,
         /* block_iface is the block number at the of the neighbor? */
         if (block_iface >= 0)
         {
-            /* The corner is on a block edge (but is not a block corner).
+            /* The corner is on a block face (but is not a block edge).
                Compute a transform between blocks. First, get the
                remote face number.  The remote face number encodes the
                orientation, so we have 0 <= rfaceno < 8 */
             int rfaceno;
-            int rproc[refine_factor];
-            int rpatchno[refine_factor];
+            int rproc[num_face_neighbors];
+            int rpatchno[num_face_neighbors];
             int rblockno;  /* Should equal *corner_block_idx, above. */
             fclaw_patch_face_neighbors(domain,
                                        this_block_idx,
@@ -278,6 +285,7 @@ void get_edge_neighbor(fclaw_global_t *glob,
     else if (!has_edge_neighbor && is_block_edge)
     {
         /* Case 4 : Pillow sphere case or cubed sphere  */
+#if 0
         if (!ispillowsphere)
         {
             *block_edge_count = 3;
@@ -325,6 +333,7 @@ void get_edge_neighbor(fclaw_global_t *glob,
             edge_patch_idx = rpatchno[igrid];
             rproc_edge = rproc[igrid];
         }
+#endif
     }
 
     /* ---------------------------------------------------------------------
@@ -333,27 +342,36 @@ void get_edge_neighbor(fclaw_global_t *glob,
        and the relative level (-1,0,1).
        --------------------------------------------------------------------- */
 
-    if (domain->mpirank != rproc_edge)
-    {
-        *edge_patch = &domain->ghost_patches[edge_patch_idx];
-    }
-    else
-    {
-        fclaw_block_t *neighbor_block = &domain->blocks[*edge_block_idx];
-        *edge_patch = &neighbor_block->patches[edge_patch_idx];
-    }
+    
 
+    int num_neighbors;
     if (neighbor_type == FCLAW_PATCH_HALFSIZE)
     {
+        num_neighbors = 2;
         **ref_flag_ptr = 1;
     }
     else if (neighbor_type == FCLAW_PATCH_SAMESIZE)
     {
+        num_neighbors = 1;
         **ref_flag_ptr = 0;
     }
     else /* FCLAW2D_PATCH_DOUBLESIZE */
     {
+        num_neighbors = 1;
         **ref_flag_ptr = -1;
+    }
+
+    for(int i=0; i < num_neighbors; i++)
+    {
+        if (domain->mpirank != rproc_edge[i])
+        {
+            edge_patches[i] = &domain->ghost_patches[edge_patch_idx[i]];
+        }
+        else
+        {
+            fclaw_block_t *neighbor_block = &domain->blocks[*edge_block_idx];
+            edge_patches[i] = &neighbor_block->patches[edge_patch_idx[i]];
+        }
     }
 }
 
@@ -444,13 +462,13 @@ void cb_edge_fill(fclaw_domain_t *domain,
             int edge_block_idx;
             int neighbor_level;
             int *ref_flag_ptr = &neighbor_level;
-            fclaw_patch_t *edge_patch;
-            int rcornerno;
+            fclaw_patch_t* edge_patches[2];
+            int redgeno;
 
             int block_iface = transform_data->d3->block_iface;
             transform_data->d3->is_block_edge = is_block_edge;
             edge_block_idx = -1;
-            get_edge_neighbor(s->glob,
+            get_edge_neighbors(s->glob,
                               this_block_idx,
                               this_patch_idx,
                               this_patch,
@@ -458,8 +476,8 @@ void cb_edge_fill(fclaw_domain_t *domain,
                               block_iface,
                               is_block_edge,
                               &edge_block_idx,
-                              &edge_patch,
-                              &rcornerno,
+                              edge_patches,
+                              &redgeno,
                               &ref_flag_ptr,
                               &block_edge_count,
                               transform_data->transform,
@@ -474,8 +492,8 @@ void cb_edge_fill(fclaw_domain_t *domain,
 
             /* Needed for switching the context */
             transform_data_finegrid->d3->is_block_edge = is_block_edge;
-            transform_data_finegrid->d3->iedge = rcornerno;
-            transform_data_finegrid->this_patch = edge_patch;
+            transform_data_finegrid->d3->iedge = redgeno;
+            transform_data_finegrid->this_patch = edge_patches[0];
             transform_data_finegrid->neighbor_patch = this_patch;
 
 
@@ -488,14 +506,14 @@ void cb_edge_fill(fclaw_domain_t *domain,
                 continue;
             }
 
-            int remote_neighbor = fclaw_patch_is_ghost(edge_patch);
+            int remote_neighbor = fclaw_patch_is_ghost(edge_patches[0]);
             if (is_coarse && ((read_parallel_patches && remote_neighbor) || !remote_neighbor))
             {
-                transform_data->neighbor_patch = edge_patch;
+                transform_data->neighbor_patch = edge_patches[0];
                 if (neighbor_level == FINER_GRID)
                 {
                     fclaw_patch_t* coarse_patch = this_patch;
-                    fclaw_patch_t* fine_patch = edge_patch;
+                    fclaw_patch_t* fine_patch = edge_patches[0];
                     int coarse_blockno = this_block_idx;
                     int fine_blockno = edge_block_idx;
                     if (interpolate_to_neighbor && !remote_neighbor)
@@ -511,23 +529,24 @@ void cb_edge_fill(fclaw_domain_t *domain,
                     }
                     else if (average_from_neighbor)
                     {
-                        ///* Average even if neighbor is a remote neighbor */
-                        //fclaw_patch_t* coarse_patch = this_patch;
-                        //fclaw_patch_t* fine_patch = edge_patch;
-                        //fclaw_patch_average_edge(s->glob,
-                        //                         coarse_patch,
-                        //                         fine_patch,
-                        //                         coarse_blockno,
-                        //                         fine_blockno,
-                        //                         iedge,time_interp,
-                        //                         transform_data);                        
+                        for(int i=0; i < 2; i++)
+                        {
+                            /* Average even if neighbor is a remote neighbor */
+                            fclaw_patch_t* coarse_patch = this_patch;
+                            fclaw_patch_t* fine_patch = edge_patches[i];
+                            fclaw_patch_average_edge(s->glob,
+                                                     coarse_patch,
+                                                     fine_patch,
+                                                     iedge,time_interp,
+                                                     transform_data);                        
+                        }
                     }
                 }
                 else if (neighbor_level == SAMESIZE_GRID && copy_from_neighbor)
                 {
                     fclaw_patch_copy_edge(s->glob,
                                           this_patch,
-                                          edge_patch,
+                                          edge_patches[0],
                                           this_block_idx,
                                           edge_block_idx,
                                           iedge, time_interp,
@@ -542,7 +561,7 @@ void cb_edge_fill(fclaw_domain_t *domain,
                 call same routines above, but with remote patch as the "coarse" 
                 grid */
                 
-                fclaw_patch_t* coarse_patch = edge_patch;
+                fclaw_patch_t* coarse_patch = edge_patches[0];
                 fclaw_patch_t* fine_patch = this_patch;
                 int coarse_blockno = edge_block_idx;
                 int fine_blockno = this_patch_idx;

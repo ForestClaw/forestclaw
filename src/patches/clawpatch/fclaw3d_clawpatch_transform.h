@@ -112,6 +112,22 @@ void FCLAW3D_CLAWPATCH_TRANSFORM_EDGE (const int *i1, const int *j1, const int *
                                        int *i2, int *j2, int *k2,
                                        struct fclaw_patch_transform_data** ptdata);
 
+/** Fortran subroutine name */
+#define FCLAW3D_CLAWPATCH_TRANSFORM_EDGE_HALF FCLAW_F77_FUNC_(fclaw3d_clawpatch_transform_edge_half, \
+                                                              FCLAW3D_CLAWPATCH_TRANSFORM_EDGE_HALF)
+
+/**
+ * @brief Tranform an index for a edge-neighboring finer patch's coordinate system
+ * 
+ * @param[in] i1, j1, k1 the input index 
+ * @param[out] i2, j2, k2 the 8 transformed equivalent index in the neighboring patch
+ * @param[in] ptdata the transform data
+ */
+void FCLAW3D_CLAWPATCH_TRANSFORM_EDGE_HALF (const int *i1, const int *j1, const int *k1,
+                                            int *i2, int *j2, int *k2,
+                                            struct fclaw_patch_transform_data** ptdata);
+
+
 
 
 /** Fortran subroutine name */

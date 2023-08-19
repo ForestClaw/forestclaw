@@ -259,8 +259,6 @@ subroutine fclaw3d_clawpatch46_fort_interpolate_corner &
             mx,my,mz,mbc, &
             i_start,j_start,k_start)
 
-    print *,'i_start,j_start,k_start = ',i_start,j_start,k_start
-    print *,'mbc/2-1',mbc/2-1
     mq_loop : do mq = 1,meqn
         kc_loop : do kc = k_start,k_start+mbc/2-1
             jc_loop : do jc = j_start,j_start+mbc/2-1

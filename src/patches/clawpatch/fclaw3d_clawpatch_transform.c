@@ -276,3 +276,27 @@ FCLAW3D_CLAWPATCH_TRANSFORM_CORNER_HALF (const int *i1, const int *j1, const int
                                          tdata->based, i2, j2, k2);
     }
 }
+
+void
+FCLAW3D_CLAWPATCH_TRANSFORM_EDGE_HALF (const int *i1, const int *j1, const int* k1,
+                                       int *i2, int *j2, int *k2,
+                                       fclaw_patch_transform_data_t** ptdata)
+{
+    fclaw_patch_transform_data_t *tdata = *ptdata;
+    const fclaw_clawpatch_options_t *clawpatch_opt = 
+        (fclaw_clawpatch_options_t*) tdata->user;
+
+    int mx = clawpatch_opt->d3->mx;
+    int my = clawpatch_opt->d3->my;
+    int mz = clawpatch_opt->d3->mz;
+
+    i2[0] = *i1;
+    j2[0] = *j1;
+    k2[0] = *k1;
+    //intra block transform for now
+    fclaw3d_patch_transform_face2 (tdata->this_patch,
+                                   tdata->neighbor_patch,
+                                   tdata->transform, 
+                                   mx, my, mz,
+                                   tdata->based, i2, j2, k2);
+}
