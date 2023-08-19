@@ -483,23 +483,39 @@ void fclaw_patch_average_corner(fclaw_global_t* glob,
                                   fclaw_patch_transform_data_t* transform_data)
 {
     fclaw_patch_vtable_t *patch_vt = fclaw_patch_vt(glob);
-    if(patch_vt->dim == 3)
-        return;
-    if (!is_block_corner)
+    if(patch_vt->dim == 2)
     {
-        FCLAW_ASSERT(patch_vt->d2->average_corner != NULL);
-        patch_vt->d2->average_corner(glob,coarse_patch,fine_patch,
-                                     coarse_blockno,fine_blockno,
-                                     coarse_corner,
-                                     time_interp,transform_data);
+        if (!is_block_corner)
+        {
+            FCLAW_ASSERT(patch_vt->d2->copy_corner != NULL);        
+            patch_vt->d2->average_corner(glob,coarse_patch,fine_patch,
+                                      coarse_blockno,fine_blockno,
+                                      coarse_corner,time_interp,transform_data);
+        }
+        else
+        {
+            FCLAW_ASSERT(patch_vt->d2->copy_block_corner != NULL);        
+            patch_vt->d2->average_block_corner(glob,coarse_patch,fine_patch,
+                                               coarse_blockno,fine_blockno,
+                                               coarse_corner,time_interp,transform_data);        
+        }
     }
-    else
+    else 
     {
-        FCLAW_ASSERT(patch_vt->d2->average_block_corner != NULL);
-        patch_vt->d2->average_block_corner(glob,coarse_patch,fine_patch,
-                                           coarse_blockno,fine_blockno,
-                                           coarse_corner,
-                                           time_interp,transform_data);        
+        if (!is_block_corner)
+        {
+            FCLAW_ASSERT(patch_vt->d3->copy_corner != NULL);        
+            patch_vt->d3->average_corner(glob,coarse_patch,fine_patch,
+                                         coarse_blockno,fine_blockno,
+                                         coarse_corner,time_interp,transform_data);
+        }
+        else
+        {
+            FCLAW_ASSERT(patch_vt->d3->copy_block_corner != NULL);        
+            patch_vt->d3->average_block_corner(glob,coarse_patch,fine_patch,
+                                               coarse_blockno,fine_blockno,
+                                               coarse_corner,time_interp,transform_data);        
+        }
     }
 }
 

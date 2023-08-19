@@ -193,73 +193,64 @@ subroutine fclaw3d_clawpatch46_fort_average_corner(mx,my,mz,mbc,meqn, &
     DOUBLE PRECISION :: volcoarse(-mbc:mx+mbc+1,-mbc:my+mbc+1,-mbc:mz+mbc+1)
     DOUBLE PRECISION ::   volfine(-mbc:mx+mbc+1,-mbc:my+mbc+1,-mbc:mz+mbc+1)
 
-    INTEGER :: ibc,jbc,mq,r2
+    INTEGER :: ibc,jbc,kbc,mq,r3
     LOGICAL :: is_manifold
     DOUBLE PRECISION :: qf,kf, sum
 
     !! # This should be refratio*refratio.
-    INTEGER :: rr2
-    PARAMETER(rr2 = 4)
-    INTEGER :: i2(0:rr2-1),j2(0:rr2-1)
+    INTEGER :: rr3
+    PARAMETER(rr3 = 8)
+    INTEGER :: i2(0:rr3-1),j2(0:rr3-1),k2(0:rr3-1)
 
-    INTEGER :: i1,j1,m, k
-    DOUBLE PRECISION :: vf_sum, kc
+    INTEGER :: m
+    INTEGER :: i_start, j_start, k_start
+    DOUBLE PRECISION :: vf_sum
 
-    return
 
-    r2 = refratio*refratio
-    if (r2 .ne. rr2) then
+    r3 = refratio**3
+    if (r3 .ne. rr3) then
         write(6,*) 'average_corner_ghost (claw2d_utils.f) ', & 
-        '  Refratio**2 is not equal to rr2'
+        '  Refratio**3 is not equal to rr3'
         stop
     endif
 
     is_manifold = manifold .eq. 1
 
     refratio = 2
-    r2 = refratio*refratio
-    !! # Loop over four corner cells on coarse grid
-    meqn_loop : do mq = 1,meqn
-        k_loop : do k = 1,mz
-            ibc_loop : do ibc = 1,mbc
-                jbc_loop : do jbc = 1,mbc
-                    !! # Average fine grid corners onto coarse grid ghost corners
-                    if (icorner_coarse .eq. 0) then
-                        i1 = 1-ibc
-                        j1 = 1-jbc
-                    else if (icorner_coarse .eq. 1) then
-                        i1 = mx+ibc
-                        j1 = 1-jbc
-                    else if (icorner_coarse .eq. 2) then
-                        i1 = 1-ibc
-                        j1 = my+jbc
-                    else if (icorner_coarse .eq. 3) then
-                        i1 = mx+ibc
-                        j1 = my+jbc
-                    endif
+    r3 = refratio*refratio
 
-                    call fclaw3d_clawpatch_transform_corner_half(i1,j1,i2,j2, transform_cptr)
+    !! get lower-bottom-left corner of coarse ghost cells
+    call fclaw3d_clawpatch46_fort_get_corner_start(icorner_coarse, &
+                mx,my,mz,mbc, &
+                i_start,j_start,k_start)
+
+    meqn_loop : do mq = 1,meqn
+        ibk_loop : do kbc = k_start,k_start+mbc-1
+            jbc_loop : do jbc = j_start,j_start+mbc-1
+                ibc_loop : do ibc = i_start,i_start+mbc-1
+                    !! # Average fine grid corners onto coarse grid ghost corners
+                    call fclaw3d_clawpatch_transform_corner_half(ibc,jbc,kbc,i2,j2,k2, transform_cptr)
                     if (is_manifold) then
                         sum = 0
                         vf_sum = 0
-                        do m = 0,r2-1
-                            qf = qfine(i2(m),j2(m),k,mq)
-                            kf = volfine(i2(m),j2(m),k)
+                        do m = 0,r3-1
+                            qf = qfine(i2(m),j2(m),k2(m),mq)
+                            kf = volfine(i2(m),j2(m),k2(m))
                             sum = sum + kf*qf
                             vf_sum = vf_sum + kf
                         enddo
-                        qcoarse(i1,j1,k,mq) = sum/vf_sum
+                        qcoarse(ibc,jbc,kbc,mq) = sum/vf_sum
                     else
                         sum = 0
-                        do m = 0,r2-1
-                            qf = qfine(i2(m),j2(m),k,mq)
+                        do m = 0,r3-1
+                            qf = qfine(i2(m),j2(m),k2(m),mq)
                             sum = sum + qf
                         end do
-                        qcoarse(i1,j1,k,mq) = sum/dble(r2)
+                        qcoarse(ibc,jbc,kbc,mq) = sum/dble(r3)
                     endif
-                enddo jbc_loop
-            enddo ibc_loop
-        enddo k_loop
+                enddo ibc_loop
+            enddo jbc_loop
+        enddo ibk_loop
     end do meqn_loop
 
 end subroutine fclaw3d_clawpatch46_fort_average_corner
