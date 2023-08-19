@@ -208,7 +208,6 @@ subroutine fclaw3d_clawpatch46_fort_average_edge(mx,my,mz,mbc,meqn, &
     LOGICAL :: fclaw3d_clawpatch_is_valid_average, skip_this_grid
 
 
-    print *,'average_edge_ghost (claw2d_utils.f) :  iedge_coarse = ',iedge_coarse
     r3 = refratio**3
     if (r3 .ne. rr3) then
         write(6,*) 'average_corner_ghost (claw2d_utils.f) ', & 
@@ -237,23 +236,25 @@ subroutine fclaw3d_clawpatch46_fort_average_edge(mx,my,mz,mbc,meqn, &
                             exit 
                         endif
                     end do
-                    if (is_manifold) then
-                        sum = 0
-                        vf_sum = 0
-                        do m = 0,r3-1
-                            qf = qfine(i2(m),j2(m),k2(m),mq)
-                            kf = volfine(i2(m),j2(m),k2(m))
-                            sum = sum + kf*qf
-                            vf_sum = vf_sum + kf
-                        enddo
-                        qcoarse(ibc,jbc,kbc,mq) = sum/vf_sum
-                    else
-                        sum = 0
-                        do m = 0,r3-1
-                            qf = qfine(i2(m),j2(m),k2(m),mq)
-                            sum = sum + qf
-                        end do
-                        qcoarse(ibc,jbc,kbc,mq) = sum/dble(r3)
+                    if (.not. skip_this_grid) then
+                        if (is_manifold) then
+                            sum = 0
+                            vf_sum = 0
+                            do m = 0,r3-1
+                                qf = qfine(i2(m),j2(m),k2(m),mq)
+                                kf = volfine(i2(m),j2(m),k2(m))
+                                sum = sum + kf*qf
+                                vf_sum = vf_sum + kf
+                            enddo
+                            qcoarse(ibc,jbc,kbc,mq) = sum/vf_sum
+                        else
+                            sum = 0
+                            do m = 0,r3-1
+                                qf = qfine(i2(m),j2(m),k2(m),mq)
+                                sum = sum + qf
+                            end do
+                            qcoarse(ibc,jbc,kbc,mq) = sum/dble(r3)
+                        endif
                     endif
                 enddo ibc_loop
             enddo jbc_loop

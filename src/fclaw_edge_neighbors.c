@@ -534,6 +534,7 @@ void cb_edge_fill(fclaw_domain_t *domain,
                             /* Average even if neighbor is a remote neighbor */
                             fclaw_patch_t* coarse_patch = this_patch;
                             fclaw_patch_t* fine_patch = edge_patches[i];
+                            transform_data->neighbor_patch = fine_patch;
                             fclaw_patch_average_edge(s->glob,
                                                      coarse_patch,
                                                      fine_patch,
