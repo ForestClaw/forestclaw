@@ -157,7 +157,7 @@ void get_corner_neighbor(fclaw_global_t *glob,
                          int *rcornerno,
                          int **ref_flag_ptr,
                          int *block_corner_count,
-                         int ftransform[],
+                         fclaw_patch_transform_data_t* ftransform,
                          fclaw_patch_transform_data_t* ftransform_finegrid)
 {
     fclaw_domain_t *domain = glob->domain;
@@ -198,7 +198,7 @@ void get_corner_neighbor(fclaw_global_t *glob,
 
         /* No block corner transforms yet, so we use the 
         interior 'default' transforms. */
-        fclaw_patch_transform_blockface_intra (glob, ftransform);
+        fclaw_patch_transform_blockface_intra (glob, ftransform->transform);
         fclaw_patch_transform_blockface_intra
             (glob, ftransform_finegrid->transform);
     }
@@ -238,7 +238,7 @@ void get_corner_neighbor(fclaw_global_t *glob,
             FCLAW_ASSERT(rblockno == *corner_block_idx);
 
             /* Get encoding of transforming a neighbor coordinate across a face */
-            fclaw_patch_transform_blockface (glob, block_iface, rfaceno, ftransform);
+            fclaw_patch_transform_blockface (glob, block_iface, rfaceno, ftransform->transform);
 
             /* Get transform needed to swap parallel ghost patch with fine
                grid on-proc patch.  This is done so that averaging and
@@ -262,7 +262,7 @@ void get_corner_neighbor(fclaw_global_t *glob,
             /* Both patches are in the same block, so we set the transform to
                a default transform.  This could be the case for periodic boundaries. */
             *block_corner_count = 4;  /* assume four for now */
-            fclaw_patch_transform_blockface_intra (glob, ftransform);
+            fclaw_patch_transform_blockface_intra (glob, ftransform->transform);
             fclaw_patch_transform_blockface_intra
                 (glob, ftransform_finegrid->transform);
 
@@ -481,7 +481,7 @@ void cb_corner_fill(fclaw_domain_t *domain,
                                 &rcornerno,
                                 &ref_flag_ptr,
                                 &block_corner_count,
-                                transform_data->transform,
+                                transform_data,
                                 transform_data_finegrid);
 
             /* This sets value in block_corner_count_array */
