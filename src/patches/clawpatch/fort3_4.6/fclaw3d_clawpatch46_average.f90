@@ -216,16 +216,13 @@ subroutine fclaw3d_clawpatch46_fort_average_corner(mx,my,mz,mbc,meqn, &
 
     is_manifold = manifold .eq. 1
 
-    refratio = 2
-    r3 = refratio*refratio
-
     !! get lower-bottom-left corner of coarse ghost cells
     call fclaw3d_clawpatch46_fort_get_corner_start(icorner_coarse, &
                 mx,my,mz,mbc, &
                 i_start,j_start,k_start)
 
     meqn_loop : do mq = 1,meqn
-        ibk_loop : do kbc = k_start,k_start+mbc-1
+        kbc_loop : do kbc = k_start,k_start+mbc-1
             jbc_loop : do jbc = j_start,j_start+mbc-1
                 ibc_loop : do ibc = i_start,i_start+mbc-1
                     !! # Average fine grid corners onto coarse grid ghost corners
@@ -250,7 +247,7 @@ subroutine fclaw3d_clawpatch46_fort_average_corner(mx,my,mz,mbc,meqn, &
                     endif
                 enddo ibc_loop
             enddo jbc_loop
-        enddo ibk_loop
+        enddo kbc_loop
     end do meqn_loop
 
 end subroutine fclaw3d_clawpatch46_fort_average_corner
