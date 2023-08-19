@@ -128,4 +128,60 @@ contains
             is_valid_interp = i1 .and. j1 .and. k1
 
       end function is_valid_interp
+
+      subroutine interior_face_bounds( &
+                  iface,mx,my,mz,mbc, &
+                  i_start, j_start, k_start, &
+                  i_end,   j_end,   k_end)
+            implicit none
+            integer mx, my, mz, mbc, iface
+            integer i_start, j_start, k_start
+            integer i_end,   j_end,   k_end
+            integer axis
+            logical upper
+
+            axis = iface/2
+            upper= btest(iface,0)
+    
+    
+            if (axis .eq. 0) then
+                if (upper) then
+                    i_start = mx-mbc+1
+                    i_end = mx
+                else
+                    i_start = 1
+                    i_end = mbc
+                endif
+                j_start = 1
+                j_end = my
+                k_start = 1
+                k_end = mz
+            else if(axis .eq. 1) then
+                i_start = 1
+                i_end = mx
+                if (upper) then
+                    j_start = my-mbc+1
+                    j_end = my
+                else
+                    j_start = 1
+                    j_end = mbc
+                endif
+                k_start = 1
+                k_end = mz
+            else if(axis .eq. 2) then
+                i_start = 1
+                i_end = mx
+                j_start = 1
+                j_end = my
+                if (upper) then
+                    k_start = mz-mbc+1
+                    k_end = mz
+                else
+                    k_start = 1
+                    k_end = mbc
+                endif
+            endif
+      end subroutine interior_face_bounds
+
+
 end module fclaw3d_clawpatch_utils
