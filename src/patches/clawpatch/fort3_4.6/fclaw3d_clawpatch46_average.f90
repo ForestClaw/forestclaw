@@ -85,6 +85,7 @@ SUBROUTINE fclaw3d_clawpatch46_fort_average_face(mx,my,mz,mbc,meqn, &
            qcoarse,qfine,volcoarse, volfine, & 
            idir,iface_coarse,num_neighbors,refratio,igrid, & 
            manifold, transform_cptr)
+    USE fclaw3d_clawpatch_utils
     IMPLICIT NONE
 
     INTEGER :: mx,my,mz,mbc,meqn,refratio,igrid,idir,iface_coarse
@@ -108,7 +109,7 @@ SUBROUTINE fclaw3d_clawpatch46_fort_average_face(mx,my,mz,mbc,meqn, &
     INTEGER, DIMENSION(0:rr3-1) :: i2, j2, k2
     !! DOUBLE PRECISION :: kc
 
-    LOGICAL :: fclaw3d_clawpatch_is_valid_average, skip_this_grid
+    LOGICAL :: skip_this_grid
     DOUBLE PRECISION :: vf_sum
     DOUBLE PRECISION :: sum, qf, kf
     LOGICAL :: is_manifold
@@ -144,7 +145,7 @@ SUBROUTINE fclaw3d_clawpatch46_fort_average_face(mx,my,mz,mbc,meqn, &
                         !! # ---------------------------------------------
                         skip_this_grid = .false.
                         do m = 0,r3-1
-                            if (.not. fclaw3d_clawpatch_is_valid_average(i2(m),j2(m),k2(m),mx,my,mz)) then
+                            if (.not. is_valid_average(i2(m),j2(m),k2(m),mx,my,mz)) then
                                 skip_this_grid = .true.
                                 exit 
                             endif
@@ -181,6 +182,7 @@ end subroutine  fclaw3d_clawpatch46_fort_average_face
 subroutine fclaw3d_clawpatch46_fort_average_edge(mx,my,mz,mbc,meqn, &
     refratio,qcoarse,qfine,volcoarse,volfine, & 
     manifold,iedge_coarse,transform_cptr)
+    USE fclaw3d_clawpatch_utils
     IMPLICIT NONE
 
     INTEGER :: mx,my,mz,mbc,meqn,refratio,iedge_coarse, manifold
@@ -205,7 +207,7 @@ subroutine fclaw3d_clawpatch46_fort_average_edge(mx,my,mz,mbc,meqn, &
     INTEGER :: i_start, j_start, k_start, i_end, j_end, k_end
     DOUBLE PRECISION :: vf_sum
 
-    LOGICAL :: fclaw3d_clawpatch_is_valid_average, skip_this_grid
+    LOGICAL :: skip_this_grid
 
 
     r3 = refratio**3
@@ -231,7 +233,7 @@ subroutine fclaw3d_clawpatch46_fort_average_edge(mx,my,mz,mbc,meqn, &
                     call fclaw3d_clawpatch_transform_edge_half(ibc,jbc,kbc,i2,j2,k2, transform_cptr)
                     skip_this_grid = .false.
                     do m = 0,r3-1
-                        if (.not. fclaw3d_clawpatch_is_valid_average(i2(m),j2(m),k2(m),mx,my,mz)) then
+                        if (.not. is_valid_average(i2(m),j2(m),k2(m),mx,my,mz)) then
                             skip_this_grid = .true.
                             exit 
                         endif

@@ -64,7 +64,7 @@ target_include_directories(clawpatch_f PRIVATE
 
 set_target_properties(clawpatch_f PROPERTIES Fortran_MODULE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/include)
 
-target_include_directories(clawpatch_f INTERFACE
+target_include_directories(clawpatch_f PUBLIC
   ${CMAKE_CURRENT_BINARY_DIR}/include
 )
 

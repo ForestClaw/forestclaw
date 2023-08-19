@@ -80,6 +80,7 @@ subroutine fclaw3d_clawpatch46_fort_interpolate_face &
     (mx,my,mz,mbc,meqn,qcoarse,qfine, & 
      idir,iface_coarse,num_neighbors,refratio,igrid, & 
      transform_ptr)
+    use fclaw3d_clawpatch_utils
 
     implicit none
     integer :: mx,my,mz,mbc,meqn,refratio,igrid,idir,iface_coarse
@@ -113,7 +114,7 @@ subroutine fclaw3d_clawpatch46_fort_interpolate_face &
         stop
     endif
 
-    call fclaw3d_clawpatch_build_transform(transform_ptr,a,f)
+    call build_transform(transform_ptr,a,f)
 
     !! # This needs to be written for refratios .ne. 2.
     m = 0
@@ -154,7 +155,7 @@ subroutine fclaw3d_clawpatch46_fort_interpolate_face &
                         call fclaw3d_clawpatch_transform_face_half(ic,jc,kc,i2,j2,k2,transform_ptr)
                         skip_this_grid = .false.
                         do m = 0,r3-1
-                            if (.not. fclaw3d_clawpatch_is_valid_interp(i2(m),j2(m),k2(m),mx,my,mz,mbc)) then
+                            if (.not. is_valid_interp(i2(m),j2(m),k2(m),mx,my,mz,mbc)) then
                                 skip_this_grid = .true.
                                 exit
                             endif
@@ -194,6 +195,7 @@ end subroutine fclaw3d_clawpatch46_fort_interpolate_face
 subroutine fclaw3d_clawpatch46_fort_interpolate_corner & 
            (mx,my,mz, mbc,meqn,refratio, & 
            qcoarse,qfine,icorner_coarse,transform_ptr)
+    use fclaw3d_clawpatch_utils
     implicit none
 
     integer mx,my,mz,mbc,meqn,icorner_coarse,refratio
@@ -223,7 +225,7 @@ subroutine fclaw3d_clawpatch46_fort_interpolate_corner &
         stop
     endif
 
-    call fclaw3d_clawpatch_build_transform(transform_ptr,a,f)
+    call build_transform(transform_ptr,a,f)
 
     m = 0
     do kk = 0,1
