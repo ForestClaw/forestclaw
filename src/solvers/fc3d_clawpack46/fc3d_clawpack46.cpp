@@ -121,15 +121,28 @@ void clawpack46_bc3(fclaw_global_t *glob,
 
 	/* Set a local copy of mthbc that can be used for a patch. */
 	int mthbc[6];
-	for(int i = 0; i < 6; i++)
+	if(glob->domain->dim == 2)
 	{
-		if (i < 4)			
+		for(int i = 0; i < 6; i++)
+		{
+			if (i < 4)			
+				if (intersects_phys_bdry[i])
+					mthbc[i] = block_mthbc[i];
+				else
+					mthbc[i] = -1;
+			else
+				mthbc[i] = block_mthbc[i];
+		}
+	}
+	else 
+	{
+		for(int i = 0; i < 6; i++)
+		{
 			if (intersects_phys_bdry[i])
 				mthbc[i] = block_mthbc[i];
 			else
 				mthbc[i] = -1;
-		else
-			mthbc[i] = block_mthbc[i];
+		}
 	}
 
 	/*
