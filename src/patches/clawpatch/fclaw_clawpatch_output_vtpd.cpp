@@ -121,17 +121,20 @@ void WriteVTPDFile(const string &file_name, const fclaw_global_t *glob)
 	file.close();
 }
 } // namespace
-void fclaw_clawpatch_output_vtpd (fclaw_global_t * glob, int iframe)
+void fclaw_clawpatch_output_vtpd_to_file (fclaw_global_t * glob, const char* basename)
 {
-    const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
-    char basename[BUFSIZ];
-    snprintf (basename, BUFSIZ, "%s_frame_%04d", fclaw_opt->prefix, iframe);
-
 	int rank = glob->mpirank;
 	if (rank == 0) {
 		WriteVTPDFile(basename, glob);
 		filesystem::create_directory(basename);
 	}
 	sc_MPI_Barrier(glob->mpicomm);
-	fclaw_global_iterate_patches(glob, WriteVTIFile, basename);
+	fclaw_global_iterate_patches(glob, WriteVTIFile,(void*) basename);
+}
+void fclaw_clawpatch_output_vtpd (fclaw_global_t * glob, int iframe)
+{
+    const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
+    char basename[BUFSIZ];
+    snprintf (basename, BUFSIZ, "%s_frame_%04d", fclaw_opt->prefix, iframe);
+	fclaw_clawpatch_output_vtpd_to_file(glob, basename);
 }

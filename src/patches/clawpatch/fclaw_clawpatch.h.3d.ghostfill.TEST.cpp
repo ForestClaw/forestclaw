@@ -27,7 +27,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_clawpatch.h>
 #include <fclaw_ghost_fill.h>
 #include <fclaw_clawpatch_options.h>
-#include <fclaw_clawpatch_output_vtk.h>
+#include <fclaw_clawpatch_output_vtpd.h>
 #include <fclaw3dx_clawpatch46_fort.h>
 #include <fclaw_clawpatch_output_ascii.h>
 #include <fclaw_global.h>
@@ -344,8 +344,8 @@ TEST_CASE("3d clawpatch ghost filling on uniform cube")
             char test_no_str[5];
             snprintf(test_no_str, 5, "%04d", test_no);
             std::string filename = "3d_ghost_fill_uniform_cube_"+std::string(test_no_str);
-            INFO("Test failed output error to " << filename << ".vtu");
-            fclaw_clawpatch_output_vtk_to_file(cube_output.glob,filename.c_str());
+            INFO("Test failed output error to " << filename << ".vtpd");
+            fclaw_clawpatch_output_vtpd_to_file(cube_output.glob,filename.c_str());
         }
         test_no++;
 
@@ -361,7 +361,7 @@ TEST_CASE("3d ghost fill on cube with refinement")
     for(int mz   : {8})
     for(int mbc  : {2})
     {
-        CubeDomain cube(2,3);
+        CubeDomain cube(2,4);
 
         cube.opts->d3->mx   = mx;
         cube.opts->d3->my   = my;
@@ -377,16 +377,16 @@ TEST_CASE("3d ghost fill on cube with refinement")
                int patchno,
                int initflag)
         {
-            bool is_interior = true;
-            for(int iface = 0; iface < 6; iface++)
+            if(patch->d3->xlower == doctest::Approx(0.5)&&
+               patch->d3->ylower == doctest::Approx(0.5)&&
+               patch->d3->zlower == doctest::Approx(0.5))
             {
-                if(fclaw_patch_get_face_type(patch,iface)==FCLAW_PATCH_BOUNDARY)
-                {
-                    is_interior = false;
-                    break;
-                }
+                return 1;
             }
-            return int(is_interior);
+            else 
+            {
+                return 0;
+            }
         };
         auto tag4coarsening
           = [](fclaw_global_t* glob,
@@ -435,11 +435,11 @@ TEST_CASE("3d ghost fill on cube with refinement")
 
         CHECK_EQ(cube.glob->domain->global_num_patches, 64);
         cube.setup();
-        CHECK_EQ(cube.glob->domain->global_num_patches, 120);
+        CHECK_EQ(cube.glob->domain->global_num_patches, 127);
 
         //create output domain with bigger size, so that we can see ghost cells
         //in the vtk output
-        CubeDomain cube_output(2,3);
+        CubeDomain cube_output(2,4);
 
         cube_output.opts->d3->mx   = mx+2*mbc;
         cube_output.opts->d3->my   = my+2*mbc;
@@ -453,7 +453,7 @@ TEST_CASE("3d ghost fill on cube with refinement")
         fclaw_clawpatch_vt(cube_output.glob)->d3->fort_interpolate2fine = fort_interpolate2fine;
         CHECK_EQ(cube_output.glob->domain->global_num_patches, 64);
         cube_output.setup();
-        CHECK_EQ(cube_output.glob->domain->global_num_patches, 120);
+        CHECK_EQ(cube_output.glob->domain->global_num_patches, 127);
 
         //initialize patches
         fclaw_global_iterate_patches(
@@ -483,9 +483,9 @@ TEST_CASE("3d ghost fill on cube with refinement")
             nullptr
         );
 
-        CHECK_EQ(cube.glob->domain->global_num_patches, 120);
-        fclaw_ghost_update(cube.glob, 2, 3, 0, 0, FCLAW_TIMER_NONE);
-        CHECK_EQ(cube.glob->domain->global_num_patches, 120);
+        CHECK_EQ(cube.glob->domain->global_num_patches, 127);
+        fclaw_ghost_update(cube.glob, 2, 4, 0, 0, FCLAW_TIMER_NONE);
+        CHECK_EQ(cube.glob->domain->global_num_patches, 127);
 
         //check ghost cells
         //fill output domain with error
@@ -583,7 +583,7 @@ TEST_CASE("3d ghost fill on cube with refinement")
             snprintf(test_no_str, 5, "%04d", test_no);
             std::string filename = "3d_clawpatch_ghost_fill_on_cube_with_refinement_"+std::string(test_no_str);
             INFO("Test failed output error to " << filename << ".vtu");
-            fclaw_clawpatch_output_vtk_to_file(cube_output.glob,filename.c_str());
+            fclaw_clawpatch_output_vtpd_to_file(cube_output.glob,filename.c_str());
         }
         test_no++;
 
