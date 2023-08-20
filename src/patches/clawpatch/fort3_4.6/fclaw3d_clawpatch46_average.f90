@@ -418,7 +418,6 @@ subroutine fclaw3d_clawpatch46_fort_average2coarse(mx,my,mz,mbc,meqn, &
                             enddo
                         enddo
                     enddo
-                    print *,''
                     if (is_manifold) then
                         sum = 0
                         vf_sum = 0
