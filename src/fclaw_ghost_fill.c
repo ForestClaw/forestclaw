@@ -272,6 +272,14 @@ void interpolate2ghost(fclaw_global_t *glob,
     fclaw_global_iterate_level(glob,coarse_level, cb_interface_wrap,
                                          (void *) &parallel_mode);
 
+    if(glob->domain->dim ==3)
+    {
+        /* Edge interpolate */
+        parallel_mode.cb_fill = cb_edge_fill;
+        fclaw_global_iterate_level(glob, coarse_level, cb_interface_wrap,
+                                  (void *) &parallel_mode);
+    }
+     
     /* Corner interpolate */
     parallel_mode.cb_fill = cb_corner_fill;
     fclaw_global_iterate_level(glob,coarse_level, cb_interface_wrap,

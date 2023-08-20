@@ -183,5 +183,89 @@ contains
             endif
       end subroutine interior_face_bounds
 
+    subroutine interior_edge_bounds( &
+            iedge,refratio,mx,my,mz,mbc, &
+            i_start, j_start, k_start, &
+            i_end,   j_end,   k_end)
+        implicit none
+        integer mx, my, mz, mbc, iedge, refratio
+        integer i_start, j_start, k_start
+        integer i_end,   j_end,   k_end
+        integer axis, cmbc
+        logical upper_1, upper_2
+
+        axis = iedge/4;
+        upper_1 = btest(iedge,0);
+        upper_2 = btest(iedge,1);
+
+        cmbc = mbc/refratio
+    
+    
+        if (axis .eq. 0) then
+
+            i_start = 1;
+            i_end = mx;
+
+            if(upper_1) then
+                j_start = my-cmbc+1;
+                j_end = my;
+            else
+                j_start = 1
+                j_end = cmbc;
+            endif
+
+            if(upper_2) then
+                k_start = mz-cmbc+1;
+                k_end = mz;
+            else
+                k_start = 1
+                k_end = cmbc;
+            endif
+
+        else if(axis .eq. 1) then
+
+            if(upper_1) then
+                i_start = mx-cmbc+1;
+                i_end = mx;
+            else
+                i_start = 1;
+                i_end = cmbc;
+            endif
+
+            j_start = 1;
+            j_end = my;
+
+            if(upper_2) then
+                k_start = mz-cmbc+1;
+                k_end = mz;
+            else
+                k_start = 1;
+                k_end = cmbc;
+            endif
+
+        else if(axis .eq. 2) then
+
+            if(upper_1) then
+                i_start = mx-cmbc+1;
+                i_end = mx;
+            else
+                i_start = 1;
+                i_end = cmbc;
+            endif
+
+            if(upper_2) then
+                j_start = my-cmbc+1;
+                j_end = my;
+            else
+                j_start = 1;
+                j_end = cmbc;
+            endif
+
+            k_start = 1;
+            k_end = mz;
+
+        endif
+    end subroutine interior_edge_bounds
+
 
 end module fclaw3d_clawpatch_utils

@@ -185,6 +185,29 @@ typedef void (*fclaw3d_clawpatch_fort_average_edge_t)(const int* mx,
                                                         const int* a_corner, 
                                                         struct fclaw_patch_transform_data** transform_ptr);
 
+/**
+ * @brief Interpolates values form a edge-neighboring coarse grid
+ * 
+ * @param[in]     mx, my, mz the number cells in the x, y, and z directions, excluding ghost
+ * @param[in]     mbc the number of ghost cells
+ * @param[in]     meqn the number of equations
+ * @param[in]     refratio the refinement ratio
+ * @param[in]     qcoarse the solution of the coarse patch
+ * @param[in,out] qfine the solution of the fine patch
+ * @param[in]     iedge_coarse the edge of the coarse neighbor that to interpolate from
+ * @param[in]     transform_ptr Encoding for indices at block boundaries (C only).
+ */
+typedef void (*fclaw3d_clawpatch_fort_interpolate_edge_t)(const int* mx, 
+                                                          const int* my, 
+                                                          const int* mz,
+                                                          const int* mbc,
+                                                          const int* meqn, 
+                                                          const int* refratio, 
+                                                          double qcoarse[],
+                                                          double qfine[], 
+                                                          const int* iedge_coarse,
+                                                          struct fclaw_patch_transform_data** transform_ptr);
+ 
 
 /**
  * @brief Copies ghost data from a corner-neighboring grid on the same level

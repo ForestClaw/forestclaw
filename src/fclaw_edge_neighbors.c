@@ -504,20 +504,20 @@ void cb_edge_fill(fclaw_domain_t *domain,
                 transform_data.neighbor_patch = edge_patches[0];
                 if (neighbor_level == FINER_GRID)
                 {
-                    fclaw_patch_t* coarse_patch = this_patch;
-                    fclaw_patch_t* fine_patch = edge_patches[0];
-                    int coarse_blockno = this_block_idx;
-                    int fine_blockno = edge_block_idx;
                     if (interpolate_to_neighbor && !remote_neighbor)
                     {
-                        ///* No need to interpolate to remote ghost patches. */
-                        //fclaw_patch_interpolate_edge(s->glob,
-                        //                             coarse_patch,
-                        //                             fine_patch,
-                        //                             coarse_blockno,
-                        //                             fine_blockno,
-                        //                             iedge,time_interp,
-                        //                             transform_data);
+                        for(int i=0; i < 2; i++)
+                        {
+                            fclaw_patch_t* coarse_patch = this_patch;
+                            fclaw_patch_t* fine_patch = edge_patches[i];
+                            transform_data.neighbor_patch = fine_patch;
+                            /* No need to interpolate to remote ghost patches. */
+                            fclaw_patch_interpolate_edge(s->glob,
+                                                         coarse_patch,
+                                                         fine_patch,
+                                                         iedge,time_interp,
+                                                         &transform_data);
+                        }
                     }
                     else if (average_from_neighbor)
                     {
@@ -567,14 +567,12 @@ void cb_edge_fill(fclaw_domain_t *domain,
                        interpolation stencil. */
                     int coarse_iedge = transform_data_finegrid.iedge;
 
-                    //fclaw_patch_interpolate_edge(s->glob,
-                    //                             coarse_patch,
-                    //                             fine_patch,
-                    //                             coarse_blockno,
-                    //                             fine_blockno,
-                    //                             is_block_corner,
-                    //                             coarse_icorner,time_interp,
-                    //                             transform_data_finegrid);
+                    fclaw_patch_interpolate_edge(s->glob,
+                                                 coarse_patch,
+                                                 fine_patch,
+                                                 fine_blockno,
+                                                 time_interp,
+                                                 &transform_data_finegrid);
 
                 }
             } /* End of parallel case */

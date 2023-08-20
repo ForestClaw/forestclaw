@@ -474,6 +474,24 @@ void fclaw_patch_average_edge(struct fclaw_global* glob,
                               int time_interp,
                               struct fclaw_patch_transform_data* transform_data);
 
+/**
+ * @brief Interpolates values from a edge-neighboring coarse grid
+ * 
+ * @param[in]     glob the global context
+ * @param[in]     coarse_patch the coarse patch context
+ * @param[in,out] fine_patch the fine patch context
+ * @param[in]     iedge the edge of the coarse patch that the fine patch is on
+ * @param[in]     time_interp true if ghost filling for time interpolated level (non-global update)
+ * @param[in]     tranform_data the tranform data for the neighbor's coordinate system
+ */
+void fclaw_patch_interpolate_edge(struct fclaw_global* glob,
+                                    struct fclaw_patch* coarse_patch,
+                                    struct fclaw_patch* fine_patch,
+                                    int iedge,
+                                    int time_interp,
+                                    struct fclaw_patch_transform_data* transform_data);
+
+
 
 /**
  * @brief Copies values from a corner-neighboring grid
@@ -1160,6 +1178,24 @@ typedef void (*fclaw2d_patch_average_edge_t)(struct fclaw_global* glob,
                                              struct fclaw_patch_transform_data 
                                              *transform_data);
 
+/**
+ * @brief Interpolates values from a edge-neighboring coarse grid
+ * 
+ * @param[in]     glob the global context
+ * @param[in]     coarse_patch the coarse patch context
+ * @param[in,out] fine_patch the fine patch context
+ * @param[in]     iedge the edge of the coarse patch that the fine patch is on
+ * @param[in]     time_interp true if ghost filling for time interpolated level (non-global update)
+ * @param[in]     tranform_data the tranform data for the neighbor's coordinate system
+ */   
+typedef void (*fclaw2d_patch_interpolate_edge_t)(struct fclaw_global* glob,
+                                                 struct fclaw_patch *coarse_patch,
+                                                 struct fclaw_patch *fine_patch,
+                                                 int iedge,
+                                                 int time_interp,
+                                                 struct fclaw_patch_transform_data 
+                                                 *transform_data);
+ 
 
 /**
  * @brief Copies values from a corner-neighboring grid
@@ -1572,6 +1608,8 @@ typedef struct fclaw_patch_vtable_d3
     fclaw2d_patch_copy_edge_t              copy_edge;
     /** @copybrief ::fclaw2d_patch_average_edge_t */
     fclaw2d_patch_average_edge_t           average_edge;
+    /** @copybrief ::fclaw2d_patch_average_edge_t */
+    fclaw2d_patch_interpolate_edge_t       interpolate_edge;
 
     /** @} */
 
