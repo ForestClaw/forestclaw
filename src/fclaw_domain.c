@@ -115,13 +115,6 @@ void fclaw_domain_reset(fclaw_global_t* glob)
             fclaw_exchange_delete(glob);
         }
 
-        /* Output memory discrepancy for the ClawPatch */
-        if (ddata->count_set_patch != ddata->count_delete_patch)
-        {
-            printf ("[%d] This domain had Clawpatch set %d and deleted %d times\n",
-                    (*domain)->mpirank,
-                    ddata->count_set_patch, ddata->count_delete_patch);
-        }
     }
     else 
     {
@@ -131,14 +124,10 @@ void fclaw_domain_reset(fclaw_global_t* glob)
             fclaw_exchange_delete(glob);
         }
 
-        /* Output memory discrepancy for the ClawPatch */
-        if (ddata->count_set_patch != ddata->count_delete_patch)
-        {
-            printf ("[%d] This domain had Clawpatch set %d and deleted %d times\n",
-                    (*domain)->mpirank,
-                    ddata->count_set_patch, ddata->count_delete_patch);
-        }
     }
+
+    FCLAW_ASSERT(ddata->count_set_patch == ddata->count_delete_patch);
+
     fclaw_domain_data_delete(*domain);  // Delete allocated pointers to set of functions.
 
     fclaw_domain_destroy(*domain);
