@@ -216,7 +216,7 @@ subroutine fclaw3d_clawpatch46_fort_interpolate_edge &
             jc_loop : do jc = j_start,j_end
                 ic_loop : do ic = i_start,i_end
                     !! # Interpolate coarse grid corners to fine grid corner ghost cells
-                    call fclaw3d_clawpatch_transform_corner_half(ic,jc,kc,i2,j2,k2, transform_ptr)
+                    call fclaw3d_clawpatch_transform_edge_half(ic,jc,kc,i2,j2,k2, transform_ptr)
                     skip_this_grid = .false.
                     do m = 0,r3-1
                         if (.not. is_valid_interp(i2(m),j2(m),k2(m),mx,my,mz,mbc)) then
