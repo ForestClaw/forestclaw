@@ -1806,8 +1806,6 @@ void initialize_2d_patch_vt(fclaw_patch_vtable_t* patch_vt)
     patch_vt->transform_face       = fclaw2d_clawpatch_face_transformation;
     patch_vt->transform_face_intra = fclaw2d_clawpatch_face_transformation_intra;
     
-    patch_vt->metric_patch = clawpatch_get_metric_patch_2d;
-
 }
 
 static
@@ -1835,7 +1833,6 @@ void initialize_3d_patch_vt(fclaw_patch_vtable_t* patch_vt)
     patch_vt->transform_face       = fclaw3d_clawpatch_face_transformation;
     patch_vt->transform_face_intra = fclaw3d_clawpatch_face_transformation_intra;
 
-    patch_vt->metric_patch = clawpatch_get_metric_patch_3d;
 }
 
 void fclaw_clawpatch_vtable_initialize(fclaw_global_t* glob, 
@@ -1853,6 +1850,7 @@ void fclaw_clawpatch_vtable_initialize(fclaw_global_t* glob,
     else 
     {
         fclaw3d_metric_vtable_initialize(glob);
+
     }
 
     fclaw_clawpatch_vtable_t *clawpatch_vt = clawpatch_vt_new(clawpatch_opt->dim);
@@ -1875,6 +1873,14 @@ void fclaw_clawpatch_vtable_initialize(fclaw_global_t* glob,
     else 
     {
         initialize_3d_patch_vt(patch_vt);
+    }
+    if(clawpatch_opt->dim == 2)
+    {
+        patch_vt->metric_patch = clawpatch_get_metric_patch_2d;
+    }
+    else 
+    {
+        patch_vt->metric_patch = clawpatch_get_metric_patch_3d;
     }
 
     /* Regridding  functions */
