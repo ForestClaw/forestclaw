@@ -54,7 +54,7 @@ subroutine fclaw3d_clawpatch_face_ghost_bounds( &
         k_start = 1
         k_end = mz
     else if(axis .eq. 1) then
-        i_start = 0
+        i_start = 1
         i_end = mx
         if (upper) then
             j_start = my+1
