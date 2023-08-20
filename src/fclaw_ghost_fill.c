@@ -693,12 +693,14 @@ void fclaw_ghost_update_async(fclaw_global_t* glob,
 
 
     /* Average */
+    if(glob->domain->dim==2)
     average_fine2coarse_ghost(glob,mincoarse,maxcoarse,
                               time_interp,
                               read_parallel_patches,
                               parallel_mode);
 
     /* Copy */
+    if(glob->domain->dim==2)
     copy_samelevel(glob,minlevel,maxlevel,time_interp,
                    read_parallel_patches,parallel_mode);
 
@@ -721,6 +723,7 @@ void fclaw_ghost_update_async(fclaw_global_t* glob,
     /* --------------------------------------------------------------
         Start send ...
     ------------------------------------------------------------*/
+    if(glob->domain->dim==2)
     fclaw_exchange_ghost_patches_begin(glob,minlevel,maxlevel,time_interp,
                                          FCLAW_TIMER_GHOSTFILL);
 
@@ -775,12 +778,12 @@ void fclaw_ghost_update_async(fclaw_global_t* glob,
     /* -------------------------------------------------------------
         Receive ghost patches ...
     ------------------------------------------------------------- */
+    if(glob->domain->dim == 2) //TODO 3d
+    {
 
     fclaw_exchange_ghost_patches_end(glob,minlevel,maxlevel,time_interp,
                                        FCLAW_TIMER_GHOSTFILL);
 
-    if(glob->domain->dim == 2) //TODO 3d
-    {
     /* -------------------------------------------------------------
         Loop over ghost patches to find indirect neighbors and do
         any necessary face exchanges.
