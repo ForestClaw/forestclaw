@@ -169,7 +169,7 @@ FCLAW2D_CLAWPATCH_TRANSFORM_CORNER (const int *i1, const int *j1,
         /* Corner within a block or a block-block corner. For block-block
          * corners, we assume both patches lie in coordinate systems with the
          * same orientation. */
-        FCLAW_ASSERT (tdata->d2->block_iface == -1);
+        FCLAW_ASSERT (tdata->block_iface == -1);
         fclaw2d_patch_transform_corner (tdata->this_patch,
                                         tdata->neighbor_patch,
                                         tdata->icorner, tdata->is_block_corner,
@@ -211,7 +211,7 @@ FCLAW2D_CLAWPATCH_TRANSFORM_CORNER_HALF (const int *i1, const int *j1,
         /* Corner within a block or a block-block corner. For block-block
          * corners, we assume both patches lie in coordinate systems with the
          * same orientation. */
-        FCLAW_ASSERT (tdata->d2->block_iface == -1);
+        FCLAW_ASSERT (tdata->block_iface == -1);
         fclaw2d_patch_transform_corner2 (tdata->this_patch,
                                          tdata->neighbor_patch,
                                          tdata->icorner, tdata->is_block_corner,
