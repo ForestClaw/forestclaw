@@ -63,7 +63,10 @@ clawpack_register (fc3d_clawpack46_options_t* clawopt, sc_options_t * opt)
                            "Output ASCII formatted data [F]");
 
     sc_options_add_bool (opt, 0, "vtk-out", &clawopt->vtk_out, 0,
-                           "Output VTK formatted data [F]");
+                           "Output VTK (vtu) formatted data [F]");
+
+    sc_options_add_bool (opt, 0, "vtpd-out", &clawopt->vtpd_out, 0,
+                           "Output VTK (vtpd) formatted data [F]");
 
 
     clawopt->is_registered = 1;
