@@ -43,6 +43,7 @@ add_library(forestclaw_c OBJECT
   fclaw2d_face_neighbors.c
   fclaw2d_farraybox.cpp
   fclaw2d_output_tikz.c
+  fclaw2d_file.c
   forestclaw2d.c
   forestclaw3d.c
   fclaw3d_convenience.c
@@ -52,6 +53,7 @@ add_library(forestclaw_c OBJECT
   fclaw3d_patch.c
   fclaw3d_exchange.c
   fclaw3d_options.c
+  fclaw3d_file.c
   fclaw_domain.c
   fclaw_global.c
   fp_exception_glibc_extension.c
@@ -155,6 +157,7 @@ install(FILES
 	fclaw2d_map_query.h
 	fclaw2d_map_query_defs.h
 	fclaw2d_diagnostics.h
+  fclaw2d_file.h
   fclaw2d_to_3d.h
   forestclaw3d.h
   fclaw3d_convenience.h
@@ -166,6 +169,7 @@ install(FILES
   fclaw3d_exchange.h
   fclaw3d_options.h
   fclaw3d_include_all.h 
+  fclaw3d_file.h
   fclaw_patch.h
   fclaw_domain.h
   fclaw_global.h
