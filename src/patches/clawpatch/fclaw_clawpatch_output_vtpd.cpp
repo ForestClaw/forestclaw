@@ -67,7 +67,7 @@ WriteVTIFile(fclaw_domain_t * domain, fclaw_patch_t * patch,
 		for(int j = 0; j < my; j++)
 		for(int i = 0; i < my; i++)
 		{
-			double val = q[mbc + i + (j+mbc) * stride_j + (k+mbc) * stride_k];
+			double val = q[i+mbc + (j+mbc) * stride_j + (k+mbc) * stride_k];
 			min_val = min(min_val, val);
 			max_val = max(max_val, val);
 		}
@@ -96,7 +96,7 @@ WriteVTIFile(fclaw_domain_t * domain, fclaw_patch_t * patch,
 		for(int j = 0; j < my; j++)
 		for(int i = 0; i < my; i++)
 		{
-			double val = q[mbc + i + (j+mbc) * stride_j + (k+mbc) * stride_k];
+			double val = q[i+mbc + (j+mbc) * stride_j + (k+mbc) * stride_k];
 			file.write(reinterpret_cast<const char *>(&val), sizeof(double));
 		}
 	}

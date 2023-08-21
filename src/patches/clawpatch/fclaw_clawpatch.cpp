@@ -1051,6 +1051,10 @@ int clawpatch_tag4refinement(fclaw_global_t *glob,
                              int blockno, int patchno,
                              int initflag)
 {
+    if(!initflag)
+    {
+        return 0;
+    }
     int meqn;
     double *q;
     fclaw_clawpatch_soln_data(glob,patch,&q,&meqn);
@@ -1109,6 +1113,7 @@ int clawpatch_tag4coarsening(fclaw_global_t *glob,
                              int patchno,
                              int initflag)
 {
+    return 0;
     const int num_children = fclaw_domain_num_children(glob->domain);
     fclaw_clawpatch_vtable_t* clawpatch_vt = fclaw_clawpatch_vt(glob);
     int mx,my,mz,mbc,meqn;
@@ -1733,7 +1738,7 @@ void initialize_3dx_claw46_fort_vt(fclaw_clawpatch_vtable_t* clawpatch_vt)
     clawpatch_vt->d3->fort_interpolate2fine      = FCLAW3DX_CLAWPATCH46_FORT_INTERPOLATE2FINE;
 
     clawpatch_vt->d3->fort_tag4refinement        = FCLAW3D_CLAWPATCH46_FORT_TAG4REFINEMENT;
-    clawpatch_vt->d3->fort_tag4coarsening_3dx        = FCLAW3DX_CLAWPATCH46_FORT_TAG4COARSENING;
+    clawpatch_vt->d3->fort_tag4coarsening_3dx    = FCLAW3DX_CLAWPATCH46_FORT_TAG4COARSENING;
 
     /* output functions */
     clawpatch_vt->fort_header_ascii              = FCLAW3D_CLAWPATCH46_FORT_HEADER_ASCII;
@@ -1762,7 +1767,7 @@ void initialize_3d_claw46_fort_vt(fclaw_clawpatch_vtable_t* clawpatch_vt)
     clawpatch_vt->d3->fort_interpolate2fine      = FCLAW3D_CLAWPATCH46_FORT_INTERPOLATE2FINE;
 
     clawpatch_vt->d3->fort_tag4refinement        = FCLAW3D_CLAWPATCH46_FORT_TAG4REFINEMENT;
-    clawpatch_vt->d3->fort_tag4coarsening_3dx        = FCLAW3DX_CLAWPATCH46_FORT_TAG4COARSENING;
+    clawpatch_vt->d3->fort_tag4coarsening        = FCLAW3D_CLAWPATCH46_FORT_TAG4COARSENING;
 
     /* output functions */
     clawpatch_vt->fort_header_ascii              = FCLAW3D_CLAWPATCH46_FORT_HEADER_ASCII;
