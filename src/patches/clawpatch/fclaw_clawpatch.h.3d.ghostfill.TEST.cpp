@@ -311,17 +311,81 @@ void get_face_ghost_bounds(fclaw_global_t* glob,
     {
         modify_face_ghost_bounds_for_doublesize(glob,patch,blockno,patchno,iface,
                                                 i_start,i_stop,j_start,j_stop,k_start,k_stop);
-        
     }
 }
-void get_edge_ghost_bounds(fclaw_patch_t* patch, 
-                          int iedge,
-                          int *i_start,
-                          int *i_stop,
-                          int *j_start,
-                          int *j_stop,
-                          int *k_start,
-                          int *k_stop)
+void modify_edge_ghost_bounds_for_doublesize(fclaw_global_t* glob,
+                           fclaw_patch_t* patch, 
+                           int blockno,
+                           int patchno,
+                           int iedge,
+                           int* i_start,
+                           int* i_stop,
+                           int* j_start,
+                           int* j_stop,
+                           int* k_start,
+                           int* k_stop)
+{
+    fclaw_clawpatch_t* clawpatch = fclaw2d_clawpatch_get_clawpatch(patch);
+    //get neighbor patch
+    int rproc[2];
+    int rblockno;
+    int rpatchno[2];
+    int rfaceno;
+    fclaw_patch_relation_t type;
+    fclaw_patch_edge_neighbors(glob->domain,blockno,patchno,iedge,rproc,&rblockno,rpatchno,&rfaceno,&type);
+    fclaw_patch_t* neighbor_patch = &glob->domain->blocks[rblockno].patches[rpatchno[0]];
+
+    //determine spacial relation of finer patch to coarser patch
+    bool lower_x = patch->d3->xupper < neighbor_patch->d3->xupper;
+    bool lower_y = patch->d3->yupper < neighbor_patch->d3->yupper;
+    bool lower_z = patch->d3->zupper < neighbor_patch->d3->zupper;
+
+    int axis = iedge/4;
+    if(axis == 0)
+    {
+        if(lower_x)
+        {
+            *i_stop += clawpatch->mbc;
+        }
+        else 
+        {
+            *i_start -= clawpatch->mbc;
+        }
+    }
+    else if(axis == 1)
+    {
+        if(lower_y)
+        {
+            *j_stop += clawpatch->mbc;
+        }
+        else 
+        {
+            *j_start -= clawpatch->mbc;
+        }
+    }
+    else if(axis == 2)
+    {
+        if(lower_z)
+        {
+            *k_stop += clawpatch->mbc;
+        }
+        else 
+        {
+            *k_start -= clawpatch->mbc;
+        }
+    }
+}
+void get_edge_ghost_bounds(fclaw_global_t* glob,
+                            fclaw_patch_t* patch, 
+                            int blockno,
+                            int patchno,
+                            int iedge,
+                            int *i_start,
+                            int *i_stop,
+                            int *j_start,
+                            int *j_stop,
+                            int *k_start,
+                            int *k_stop)
 {
     fclaw_clawpatch_t* clawpatch = fclaw2d_clawpatch_get_clawpatch(patch);
     int axis = iedge/4;
@@ -401,6 +465,11 @@ void get_edge_ghost_bounds(fclaw_patch_t* patch,
             *j_start = -clawpatch->mbc;
             *j_stop  = 0;
         }
+    }
+    if(fclaw_patch_get_edge_type(patch, iedge) == FCLAW_PATCH_DOUBLESIZE)
+    {
+        modify_edge_ghost_bounds_for_doublesize(glob,patch,blockno,patchno,iedge,
+                                                i_start,i_stop,j_start,j_stop,k_start,k_stop);
     }
 }
 
@@ -886,11 +955,12 @@ void run_tests(iterate_t* iterate)
                         }
                     }
                 }
-                for(int iedge = 0; iedge < 0; iedge++)
+                for(int iedge = 0; iedge < 12; iedge++)
                 {
                     fclaw_patch_relation_t type = fclaw_patch_get_edge_type(patch, iedge);
                     int i_start, i_stop, j_start, j_stop, k_start, k_stop;
-                    get_edge_ghost_bounds(patch,iedge,&i_start,&i_stop,&j_start,&j_stop,&k_start,&k_stop);
+                    get_edge_ghost_bounds(g->glob,patch,blockno,patchno,iedge,
+                                          &i_start,&i_stop,&j_start,&j_stop,&k_start,&k_stop);
                     for(int m = 0; m < opts->meqn; m++)
                     for(int k = k_start; k < k_stop; k++)
                     for(int j = j_start; j < j_stop; j++)
@@ -1081,5 +1151,29 @@ TEST_CASE("3d clawpatch ghost fill interpolate face")
     iterate_t iterate;
     iterate.output_name = "3d_clawpatch_ghost_fill_interpolate_face";
     iterate.test_face_interpolate = true;
+    run_tests(&iterate);
+}
+
+TEST_CASE("3d clawpatch ghost fill copy edge")
+{
+    iterate_t iterate;
+    iterate.output_name = "3d_clawpatch_ghost_fill_copy_edge";
+    iterate.test_edge_copy = true;
+    run_tests(&iterate);
+}
+
+TEST_CASE("3d clawpatch ghost fill average edge")
+{
+    iterate_t iterate;
+    iterate.output_name = "3d_clawpatch_ghost_fill_average_edge";
+    iterate.test_edge_average = true;
+    run_tests(&iterate);
+}
+
+TEST_CASE("3d clawpatch ghost fill interpolate edge")
+{
+    iterate_t iterate;
+    iterate.output_name = "3d_clawpatch_ghost_fill_interpolate_edge";
+    iterate.test_edge_interpolate = true;
     run_tests(&iterate);
 }
