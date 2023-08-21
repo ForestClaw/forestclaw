@@ -91,7 +91,7 @@ subroutine fclaw3d_clawpatch46_fort_interpolate_face &
 
     !! loop over coarse iface interior
     call interior_face_bounds( &
-        iface_coarse,mx,my,mz,mbc, &
+        iface_coarse,refratio,mx,my,mz,mbc, &
         i_start, j_start, k_start, &
         i_end,   j_end,   k_end)
 
@@ -399,9 +399,11 @@ subroutine fclaw3d_clawpatch46_fort_interpolate2fine &
     !! # Use limiting done in AMRClaw.
     mth = 5
 
-    ig = merge(1,0,btest(igrid,0))
-    jg = merge(1,0,btest(igrid,1))
-    kg = merge(1,0,btest(igrid,2))
+    !! Get (ig,jg,kg) for grid from linear (igrid) coordinates
+    !! igrid = ig + refratio*jg + refratio*refratio*kg
+    ig = mod(igrid,refratio)
+    jg = mod((igrid-ig)/refratio,refratio)
+    kg = (igrid-ig-refratio*jg)/(refratio**2)
 
     i1 = 1-ig
     i2 = mx/p8est_refineFactor + (1-ig)

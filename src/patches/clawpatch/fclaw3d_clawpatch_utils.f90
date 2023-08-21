@@ -130,27 +130,28 @@ contains
       end function is_valid_interp
 
       subroutine interior_face_bounds( &
-                  iface,mx,my,mz,mbc, &
+                  iface,refratio,mx,my,mz,mbc, &
                   i_start, j_start, k_start, &
                   i_end,   j_end,   k_end)
             implicit none
             integer mx, my, mz, mbc, iface
             integer i_start, j_start, k_start
             integer i_end,   j_end,   k_end
-            integer axis
+            integer axis, refratio, cmbc
             logical upper
 
             axis = iface/2
             upper= btest(iface,0)
-    
+
+            cmbc = mbc/refratio
     
             if (axis .eq. 0) then
                 if (upper) then
-                    i_start = mx-mbc+1
+                    i_start = mx-cmbc+1
                     i_end = mx
                 else
                     i_start = 1
-                    i_end = mbc
+                    i_end = cmbc
                 endif
                 j_start = 1
                 j_end = my
@@ -160,11 +161,11 @@ contains
                 i_start = 1
                 i_end = mx
                 if (upper) then
-                    j_start = my-mbc+1
+                    j_start = my-cmbc+1
                     j_end = my
                 else
                     j_start = 1
-                    j_end = mbc
+                    j_end = cmbc
                 endif
                 k_start = 1
                 k_end = mz
@@ -174,11 +175,11 @@ contains
                 j_start = 1
                 j_end = my
                 if (upper) then
-                    k_start = mz-mbc+1
+                    k_start = mz-cmbc+1
                     k_end = mz
                 else
                     k_start = 1
-                    k_end = mbc
+                    k_end = cmbc
                 endif
             endif
       end subroutine interior_face_bounds
