@@ -129,6 +129,15 @@ subroutine fclaw3d_clawpatch46_fort_interpolate_face &
                                 jff = j2(0) + df(2,m)
                                 kff = k2(0) + df(3,m)
                                 value = qc + gradx*shiftx(m) + grady*shifty(m) + gradz*shiftz(m)
+                                if(iff .ge. 1 .and. iff .le. mx) then
+                                    stop "invalid i"
+                                endif
+                                if(jff .ge. 1 .and. jff .le. my) then
+                                    stop "invalid j"
+                                endif
+                                if(kff .ge. 1 .and. kff .le. mz) then
+                                    stop "invalid k"
+                                endif
                                 qfine(iff,jff,kff,mq) = value
                             enddo
                         endif

@@ -132,32 +132,6 @@ double fill_function(fclaw_patch_t* patch, int i, int j, int k, int m)
     }
     return 0;
 }
-int corner_touches_boundary(fclaw_global_t* glob, int blockno, int patchno, int icorner)
-{       
-    int faces[3];
-    fclaw_domain_corner_faces(glob->domain, icorner, faces);
-    int intersects_bdry[6];
-    fclaw_physical_get_bc(glob,blockno,patchno,
-                        intersects_bdry);
-    int touches_boundary;
-    for(int i=0; i<3 ;i++)
-    {
-        touches_boundary = intersects_bdry[faces[i]];
-        if(touches_boundary)
-        {
-            break;
-        }
-    }
-    return touches_boundary;
-}
-bool corner_is_on_face(int icorner, int iface)
-{
-    int axis = iface/2;
-    bool face_upper_axis = iface&0b1;
-    bool corner_uppper_axis = icorner&(0b1<<axis);
-    bool corner_is_on_face = corner_uppper_axis == face_upper_axis;
-    return corner_is_on_face;
-}
 void modify_face_ghost_bounds_for_doublesize(fclaw_global_t* glob,
                            fclaw_patch_t* patch, 
                            int blockno,
@@ -243,6 +217,82 @@ void modify_face_ghost_bounds_for_doublesize(fclaw_global_t* glob,
         }
     }
 }
+void get_face_ghost_bounds_boundary(
+                           fclaw_patch_t* patch, 
+                           int iface,
+                           int *i_start,
+                           int *i_stop,
+                           int *j_start,
+                           int *j_stop,
+                           int *k_start,
+                           int *k_stop)
+{
+    fclaw_clawpatch_t* clawpatch = fclaw2d_clawpatch_get_clawpatch(patch);
+    switch(iface)
+    {
+        case 0:
+            *i_start = -clawpatch->mbc;
+            *i_stop  = 0;
+
+            *j_start = -clawpatch->mbc;
+            *j_stop  = clawpatch->d3->my+clawpatch->mbc;
+
+            *k_start = -clawpatch->mbc;
+            *k_stop  = clawpatch->d3->mz+clawpatch->mbc;
+            break;
+        case 1:
+            *i_start = clawpatch->d3->mx;
+            *i_stop  = clawpatch->d3->mx + clawpatch->mbc;
+            
+            *j_start = -clawpatch->mbc;
+            *j_stop  = clawpatch->d3->my+clawpatch->mbc;
+            
+            *k_start = -clawpatch->mbc;
+            *k_stop  = clawpatch->d3->mz+clawpatch->mbc;
+            break;
+        case 2:
+            *i_start = -clawpatch->mbc;
+            *i_stop  = clawpatch->d3->mx+clawpatch->mbc;
+
+            *j_start = -clawpatch->mbc;
+            *j_stop  = 0;
+
+            *k_start = -clawpatch->mbc;
+            *k_stop  = clawpatch->d3->mz+clawpatch->mbc;
+            break;
+        case 3:
+            *i_start = -clawpatch->mbc;
+            *i_stop  = clawpatch->d3->mx+clawpatch->mbc;
+
+            *j_start = clawpatch->d3->my;
+            *j_stop  = clawpatch->d3->my + clawpatch->mbc;
+
+            *k_start = -clawpatch->mbc;
+            *k_stop  = clawpatch->d3->mz+clawpatch->mbc;
+            break;
+        case 4:
+            *i_start = -clawpatch->mbc;
+            *i_stop  = clawpatch->d3->mx+clawpatch->mbc;
+
+            *j_start = -clawpatch->mbc;
+            *j_stop  = clawpatch->d3->my+clawpatch->mbc;
+
+            *k_start = -clawpatch->mbc;
+            *k_stop  = 0;
+            break;
+        case 5:
+            *i_start = -clawpatch->mbc;
+            *i_stop  = clawpatch->d3->mx+clawpatch->mbc;
+
+            *j_start = -clawpatch->mbc;
+            *j_stop  = clawpatch->d3->my+clawpatch->mbc;
+            
+            *k_start = clawpatch->d3->mz;
+            *k_stop  = clawpatch->d3->mz + clawpatch->mbc;
+            break;
+    }
+}
+ 
 void get_face_ghost_bounds(fclaw_global_t* glob,
                            fclaw_patch_t* patch, 
                            int blockno,
@@ -387,6 +437,20 @@ void get_edge_ghost_bounds(fclaw_global_t* glob,
                             int *k_start,
                             int *k_stop)
 {
+    fclaw_patch_relation_t type = fclaw_patch_get_edge_type(patch, iedge);
+    if(type == FCLAW_PATCH_BOUNDARY)
+    {
+        //covered by other check
+        *i_start=0;
+        *i_stop=0;
+        *j_start=0;
+        *j_stop=0;
+        *k_start=0;
+        *k_stop=0;
+        return;
+    }
+
+
     fclaw_clawpatch_t* clawpatch = fclaw2d_clawpatch_get_clawpatch(patch);
     int axis = iedge/4;
     int upper_1 = iedge&0b1;
@@ -466,7 +530,7 @@ void get_edge_ghost_bounds(fclaw_global_t* glob,
             *j_stop  = 0;
         }
     }
-    if(fclaw_patch_get_edge_type(patch, iedge) == FCLAW_PATCH_DOUBLESIZE)
+    if(type == FCLAW_PATCH_DOUBLESIZE)
     {
         modify_edge_ghost_bounds_for_doublesize(glob,patch,blockno,patchno,iedge,
                                                 i_start,i_stop,j_start,j_stop,k_start,k_stop);
@@ -485,28 +549,26 @@ void get_corner_ghost_bounds(fclaw_global_t* glob,
                              int *k_start,
                              int *k_stop)
 {
-    fclaw_clawpatch_t* clawpatch = fclaw2d_clawpatch_get_clawpatch(patch);
     fclaw_patch_relation_t type = fclaw_patch_get_corner_type(patch, icorner);
     if(type == FCLAW_PATCH_BOUNDARY)
     {
-        //if corner is a boundary, then we need to determine if it touches an
-        //actual boundary
-        if(!corner_touches_boundary(glob, blockno, patchno, icorner))
-        {
-            //ghost_cells will be checked by face_interpolate or edge_interpolate
-            *i_start=0;
-            *i_stop=0;
-            *j_start=0;
-            *j_stop=0;
-            *k_start=0;
-            *k_stop=0;
-            return;
-        }
-        
+        //if corner is a boundary corner, don't loop over
+        //covered by other check
+        *i_start=0;
+        *i_stop=0;
+        *j_start=0;
+        *j_stop=0;
+        *k_start=0;
+        *k_stop=0;
+        return;
     }
+
+    fclaw_clawpatch_t* clawpatch = fclaw2d_clawpatch_get_clawpatch(patch);
+
     int upper_x = icorner&0b1;
     int upper_y = icorner&0b10;
     int upper_z = icorner&0b100;
+
     if(upper_x)
     {
         *i_start = clawpatch->d3->mx;
@@ -545,16 +607,15 @@ struct iterate_t {
             int num_incorrect_interior_cells=0;
 
             int num_incorrect_boundary_face_ghost_cells=0;
+
             int num_incorrect_copied_face_ghost_cells=0;
             int num_incorrect_averaged_face_ghost_cells=0;
             int num_incorrect_interpolated_face_ghost_cells=0;
 
-            int num_incorrect_boundary_edge_ghost_cells=0;
             int num_incorrect_copied_edge_ghost_cells=0;
             int num_incorrect_averaged_edge_ghost_cells=0;
             int num_incorrect_interpolated_edge_ghost_cells=0;
 
-            int num_incorrect_boundary_corner_ghost_cells=0;
             int num_incorrect_copied_corner_ghost_cells=0;
             int num_incorrect_averaged_corner_ghost_cells=0;
             int num_incorrect_interpolated_corner_ghost_cells=0;
@@ -570,16 +631,15 @@ struct iterate_t {
             bool test_corner_interpolate=false;
             void reset_counters(){
             num_incorrect_boundary_face_ghost_cells=0;
+
             num_incorrect_copied_face_ghost_cells=0;
             num_incorrect_averaged_face_ghost_cells=0;
             num_incorrect_interpolated_face_ghost_cells=0;
 
-            num_incorrect_boundary_edge_ghost_cells=0;
             num_incorrect_copied_edge_ghost_cells=0;
             num_incorrect_averaged_edge_ghost_cells=0;
             num_incorrect_interpolated_edge_ghost_cells=0;
 
-            num_incorrect_boundary_corner_ghost_cells=0;
             num_incorrect_copied_corner_ghost_cells=0;
             num_incorrect_averaged_corner_ghost_cells=0;
             num_incorrect_interpolated_corner_ghost_cells=0;
@@ -968,16 +1028,7 @@ void run_tests(iterate_t* iterate)
                     {
                         double fill_val = fill_function(patch, i, j, k, m);
                         double val = fclaw_clawpatch_get_q(g->glob, patch)[clawpatch_idx(patch, i,j,k,m)];
-                        if(type == FCLAW_PATCH_BOUNDARY)
-                        {
-                            //should be exactly zero
-                            error_q[clawpatch_idx(error_patch, i+mbc,j+mbc,k+mbc,m)] = 0-val;
-                            if(val != 0)
-                            {
-                                iterate->num_incorrect_boundary_edge_ghost_cells++;
-                            }
-                        }
-                        else if(type == FCLAW_PATCH_SAMESIZE)
+                        if(type == FCLAW_PATCH_SAMESIZE)
                         {
                             double error = 0;
                             if(iterate->test_edge_copy && val != doctest::Approx(fill_val))
@@ -1022,6 +1073,10 @@ void run_tests(iterate_t* iterate)
                             }
                             error_q[clawpatch_idx(error_patch, i+mbc,j+mbc,k+mbc,m)] = error;
                         }
+                        else 
+                        {
+                            SC_ABORT_NOT_REACHED();
+                        }
                     }
                 }
                 for(int icorner = 0; icorner < 8; icorner++)
@@ -1036,16 +1091,7 @@ void run_tests(iterate_t* iterate)
                     {
                         double fill_val = fill_function(patch, i, j, k, m);
                         double val = fclaw_clawpatch_get_q(g->glob, patch)[clawpatch_idx(patch, i,j,k,m)];
-                        if(type == FCLAW_PATCH_BOUNDARY)
-                        {
-                            //should be exactly zero
-                            error_q[clawpatch_idx(error_patch, i+mbc,j+mbc,k+mbc,m)] = abs(0-val);
-                            if(val != 0)
-                            {
-                                iterate->num_incorrect_boundary_corner_ghost_cells++;
-                            }
-                        }
-                        else if(type == FCLAW_PATCH_SAMESIZE)
+                        if(type == FCLAW_PATCH_SAMESIZE)
                         {
                             double error = 0;
                             if(iterate->test_corner_copy && val != doctest::Approx(fill_val))
@@ -1090,6 +1136,10 @@ void run_tests(iterate_t* iterate)
                             }
                             error_q[clawpatch_idx(error_patch, i+mbc,j+mbc,k+mbc,m)] = error;
                         }
+                        else 
+                        {
+                            SC_ABORT_NOT_REACHED();
+                        }
                     }
                 }
 
@@ -1101,16 +1151,15 @@ void run_tests(iterate_t* iterate)
         CHECK_EQ(iterate->num_incorrect_interior_cells, 0);
 
         CHECK_EQ(iterate->num_incorrect_boundary_face_ghost_cells, 0);
+
         CHECK_EQ(iterate->num_incorrect_copied_face_ghost_cells, 0);
         CHECK_EQ(iterate->num_incorrect_averaged_face_ghost_cells, 0);
         CHECK_EQ(iterate->num_incorrect_interpolated_face_ghost_cells, 0);
 
-        CHECK_EQ(iterate->num_incorrect_boundary_edge_ghost_cells, 0);
         CHECK_EQ(iterate->num_incorrect_copied_edge_ghost_cells, 0);
         CHECK_EQ(iterate->num_incorrect_averaged_edge_ghost_cells, 0);
         CHECK_EQ(iterate->num_incorrect_interpolated_edge_ghost_cells, 0);
 
-        CHECK_EQ(iterate->num_incorrect_boundary_corner_ghost_cells, 0);
         CHECK_EQ(iterate->num_incorrect_copied_corner_ghost_cells, 0);
         CHECK_EQ(iterate->num_incorrect_averaged_corner_ghost_cells, 0);
         CHECK_EQ(iterate->num_incorrect_interpolated_corner_ghost_cells, 0);
