@@ -65,11 +65,12 @@ WriteVTIFile(fclaw_domain_t * domain, fclaw_patch_t * patch,
 		double min_val = numeric_limits<double>::infinity();
 		double max_val = -numeric_limits<double>::infinity();
 
+		for(int m = 0; m < meqn; m++)
 		for(int k = 0; k < mz; k++)
 		for(int j = 0; j < my; j++)
 		for(int i = 0; i < my; i++)
 		{
-			double val = q[mbc + i + (j+mbc) * stride_j + (k+mbc) * stride_k];
+			double val = q[mbc + i + (j+mbc) * stride_j + (k+mbc) * stride_k+m*stride_m];
 			min_val = min(min_val, val);
 			max_val = max(max_val, val);
 		}
