@@ -377,7 +377,6 @@ void cb_edge_fill(fclaw_domain_t *domain,
                   int this_patch_idx,
                   void *user)
 {
-    return;
     const int num_faces = fclaw_domain_num_faces(domain);
     const int num_edges = fclaw_domain_num_edges(domain);
 

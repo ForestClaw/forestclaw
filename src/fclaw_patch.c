@@ -1106,6 +1106,7 @@ fclaw_patch_relation_t fclaw_patch_get_corner_type(fclaw_patch_t* patch,
                                                        int icorner)
 {
     fclaw_patch_data_t *pdata = get_patch_data(patch);
+    FCLAW_ASSERT(pdata->d2->corners[icorner] != 0);
     FCLAW_ASSERT(pdata->neighbors_set != 0);
     if(patch->dim == 2){
         return pdata->d2->corner_neighbors[icorner];
