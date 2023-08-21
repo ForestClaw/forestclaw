@@ -726,7 +726,7 @@ void run_tests(iterate_t* iterate)
 
 
         fclaw_patch_vtable_t* patch_vt = fclaw_patch_vt(cube.glob);
-        if(true||!iterate->test_face_copy)
+        if(!iterate->test_face_copy)
         {
             patch_vt->d3->copy_face 
                 = [](fclaw_global_t*,
@@ -739,7 +739,7 @@ void run_tests(iterate_t* iterate)
                         //do nothing
                      };
         }
-        if(true||!iterate->test_face_average)
+        if(!iterate->test_face_average)
         {
             patch_vt->d3->average_face
                 = [](fclaw_global_t*,
@@ -752,7 +752,7 @@ void run_tests(iterate_t* iterate)
                         //do nothing
                      };
         }
-        if(true||!iterate->test_face_interpolate)
+        if(!iterate->test_face_interpolate)
         {
             patch_vt->d3->interpolate_face
                 = [](fclaw_global_t*,
@@ -765,7 +765,7 @@ void run_tests(iterate_t* iterate)
                         //do nothing
                      };
         }
-        if(true||!iterate->test_edge_copy)
+        if(!iterate->test_edge_copy)
         {
             patch_vt->d3->copy_edge 
                 = [](fclaw_global_t*,
@@ -791,7 +791,7 @@ void run_tests(iterate_t* iterate)
                         //do nothing
                      };
         }
-        if(true||!iterate->test_edge_interpolate)
+        if(!iterate->test_edge_interpolate)
         {
             patch_vt->d3->interpolate_edge
                 = [](fclaw_global_t*,
@@ -804,7 +804,7 @@ void run_tests(iterate_t* iterate)
                         //do nothing
                      };
         }
-        if(true||!iterate->test_corner_copy)
+        if(!iterate->test_corner_copy)
         {
             patch_vt->d3->copy_corner 
                 = [](fclaw_global_t*,
@@ -817,7 +817,7 @@ void run_tests(iterate_t* iterate)
                         //do nothing
                      };
         }
-        if(true||!iterate->test_corner_average)
+        if(!iterate->test_corner_average)
         {
             patch_vt->d3->average_corner
                 = [](fclaw_global_t*,
@@ -830,7 +830,7 @@ void run_tests(iterate_t* iterate)
                         //do nothing
                      };
         }
-        if(true||!iterate->test_corner_interpolate)
+        if(!iterate->test_corner_interpolate)
         {
             patch_vt->d3->interpolate_corner
                 = [](fclaw_global_t*,
@@ -1024,7 +1024,7 @@ void run_tests(iterate_t* iterate)
                         }
                     }
                 }
-                for(int icorner = 0; icorner < 0; icorner++)
+                for(int icorner = 0; icorner < 8; icorner++)
                 {
                     fclaw_patch_relation_t type = fclaw_patch_get_corner_type(patch, icorner);
                     int i_start, i_stop, j_start, j_stop, k_start, k_stop;
@@ -1175,5 +1175,29 @@ TEST_CASE("3d clawpatch ghost fill interpolate edge")
     iterate_t iterate;
     iterate.output_name = "3d_clawpatch_ghost_fill_interpolate_edge";
     iterate.test_edge_interpolate = true;
+    run_tests(&iterate);
+}
+
+TEST_CASE("3d clawpatch ghost fill copy corner")
+{
+    iterate_t iterate;
+    iterate.output_name = "3d_clawpatch_ghost_fill_copy_corner";
+    iterate.test_corner_copy = true;
+    run_tests(&iterate);
+}
+
+TEST_CASE("3d clawpatch ghost fill average corner")
+{
+    iterate_t iterate;
+    iterate.output_name = "3d_clawpatch_ghost_fill_average_corner";
+    iterate.test_corner_average = true;
+    run_tests(&iterate);
+}
+
+TEST_CASE("3d clawpatch ghost fill interpolate corner")
+{
+    iterate_t iterate;
+    iterate.output_name = "3d_clawpatch_ghost_fill_interpolate_corner";
+    iterate.test_corner_interpolate = true;
     run_tests(&iterate);
 }
