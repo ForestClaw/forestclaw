@@ -55,44 +55,10 @@ fclaw2d_file_open_write (const char *filename,
 }
 
 fclaw2d_file_context_t *
-fclaw2d_file_open_read (sc_MPI_Comm mpicomm,
-                        const char *filename,
-                        char *user_string,
-                        fclaw2d_domain_t ** domain, int *errcode)
-{
-    FCLAW_ASSERT (filename != NULL);
-    FCLAW_ASSERT (user_string != NULL);
-    FCLAW_ASSERT (domain != NULL);
-    FCLAW_ASSERT (errcode != NULL);
-
-    /* The functionality must be still implemented. */
-    *errcode = FCLAW2D_FILE_ERR_NOT_IMPLEMENTED;
-
-    return NULL;
-}
-
-fclaw2d_file_context_t *
 fclaw2d_file_write_block (fclaw2d_file_context_t *
                           fc, const char *user_string,
                           size_t block_size,
                           sc_array_t * block_data, int *errcode)
-{
-    FCLAW_ASSERT (fc != NULL);
-    FCLAW_ASSERT (user_string != NULL);
-    FCLAW_ASSERT (block_data != NULL);
-    FCLAW_ASSERT (errcode != NULL);
-
-    /* The functionality must be still implemented. */
-    *errcode = FCLAW2D_FILE_ERR_NOT_IMPLEMENTED;
-
-    return NULL;
-}
-
-fclaw2d_file_context_t *
-fclaw2d_file_read_block (fclaw2d_file_context_t *
-                         fc, char *user_string,
-                         size_t block_size,
-                         sc_array_t * block_data, int *errcode)
 {
     FCLAW_ASSERT (fc != NULL);
     FCLAW_ASSERT (user_string != NULL);
@@ -114,6 +80,40 @@ fclaw2d_file_write_field (fclaw2d_file_context_t *
     FCLAW_ASSERT (fc != NULL);
     FCLAW_ASSERT (user_string != NULL);
     FCLAW_ASSERT (patch_data != NULL);
+    FCLAW_ASSERT (errcode != NULL);
+
+    /* The functionality must be still implemented. */
+    *errcode = FCLAW2D_FILE_ERR_NOT_IMPLEMENTED;
+
+    return NULL;
+}
+
+fclaw2d_file_context_t *
+fclaw2d_file_open_read (sc_MPI_Comm mpicomm,
+                        const char *filename,
+                        char *user_string,
+                        fclaw2d_domain_t ** domain, int *errcode)
+{
+    FCLAW_ASSERT (filename != NULL);
+    FCLAW_ASSERT (user_string != NULL);
+    FCLAW_ASSERT (domain != NULL);
+    FCLAW_ASSERT (errcode != NULL);
+
+    /* The functionality must be still implemented. */
+    *errcode = FCLAW2D_FILE_ERR_NOT_IMPLEMENTED;
+
+    return NULL;
+}
+
+fclaw2d_file_context_t *
+fclaw2d_file_read_block (fclaw2d_file_context_t *
+                         fc, char *user_string,
+                         size_t block_size,
+                         sc_array_t * block_data, int *errcode)
+{
+    FCLAW_ASSERT (fc != NULL);
+    FCLAW_ASSERT (user_string != NULL);
+    FCLAW_ASSERT (block_data != NULL);
     FCLAW_ASSERT (errcode != NULL);
 
     /* The functionality must be still implemented. */
