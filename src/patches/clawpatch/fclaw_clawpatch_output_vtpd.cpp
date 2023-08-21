@@ -34,6 +34,7 @@ WriteVTIFile(fclaw_domain_t * domain, fclaw_patch_t * patch,
 
 	ofstream file(file_name);
 
+	int meqn = fclaw_clawpatch_get_options(glob)->meqn;
 	int mx, my, mz, mbc;
 	double xlower, ylower, zlower, dx, dy, dz;
 	fclaw3d_clawpatch_grid_data(glob, patch, 
@@ -44,6 +45,7 @@ WriteVTIFile(fclaw_domain_t * domain, fclaw_patch_t * patch,
 	int start = (mx+2*mbc)*mbc + mbc;
 	int stride_j = mx + 2 * mbc;
 	int stride_k = stride_j * (my + 2 * mbc);
+	int stride_m = stride_k * (mz + 2 * mbc);
 
 	int appended_data_stride = sizeof(uint32_t) + mx * my * mz * sizeof(double);
 
@@ -73,7 +75,7 @@ WriteVTIFile(fclaw_domain_t * domain, fclaw_patch_t * patch,
 		}
 
 		int offset = appended_data_stride * index;
-		file << "\t\t\t\t<DataArray type=\"Float64\" Name=\"" << name << "\" format=\"appended\" RangeMin=\"" << min_val << "\" RangeMax=\"" << max_val << "\" offset=\"" << offset << "\">" << endl;
+		file << "\t\t\t\t<DataArray type=\"Float64\" Name=\"" << name << "\" NumberOfComponents=\"" << meqn << "\" format=\"appended\" RangeMin=\"" << min_val << "\" RangeMax=\"" << max_val << "\" offset=\"" << offset << "\">" << endl;
 		file << "\t\t\t\t</DataArray>" << endl;
 		index++;
 	}
@@ -83,7 +85,7 @@ WriteVTIFile(fclaw_domain_t * domain, fclaw_patch_t * patch,
 	file << "\t<AppendedData encoding=\"raw\">" << endl;
 	file << "\t\t_";
 
-	uint32_t size = mx * my * mz * sizeof(double);
+	uint32_t size = mx * my * mz * meqn * sizeof(double);
 
 	for(int i=0; i<1; i++)
 	{
@@ -95,8 +97,9 @@ WriteVTIFile(fclaw_domain_t * domain, fclaw_patch_t * patch,
 		for(int k = 0; k < mz; k++)
 		for(int j = 0; j < my; j++)
 		for(int i = 0; i < my; i++)
+		for(int m = 0; m < meqn; m++)
 		{
-			double val = q[i+mbc + (j+mbc) * stride_j + (k+mbc) * stride_k];
+			double val = q[i+mbc + (j+mbc) * stride_j + (k+mbc) * stride_k + m * stride_m];
 			file.write(reinterpret_cast<const char *>(&val), sizeof(double));
 		}
 	}
