@@ -1109,12 +1109,14 @@ int clawpatch_tag4coarsening(fclaw_global_t *glob,
                              int patchno,
                              int initflag)
 {
+    const int num_children = fclaw_domain_num_children(glob->domain);
     fclaw_clawpatch_vtable_t* clawpatch_vt = fclaw_clawpatch_vt(glob);
     int mx,my,mz,mbc,meqn;
-    double xlower[4],ylower[4],zlower,dx,dy,dz;
+    double xlower[num_children],ylower[num_children],zlower[num_children];
+    double dx,dy,dz;
 
-    double *q[4];  /* Only need four grids, even for extruded mesh case */
-    for (int igrid = 0; igrid < 4; igrid++)
+    double *q[num_children];
+    for (int igrid = 0; igrid < num_children; igrid++)
     {
         fclaw_clawpatch_soln_data(glob,&fine_patches[igrid],&q[igrid],&meqn);
         if(clawpatch_vt->dim == 2)
@@ -1126,7 +1128,7 @@ int clawpatch_tag4coarsening(fclaw_global_t *glob,
         {
             /* For extruded meshes, zlower is the same for all patches. */
             fclaw3d_clawpatch_grid_data(glob,&fine_patches[igrid],&mx,&my,&mz,&mbc,
-                                        &xlower[igrid],&ylower[igrid],&zlower,&dx,&dy,&dz);
+                                        &xlower[igrid],&ylower[igrid],&zlower[igrid],&dx,&dy,&dz);
         }
     }
 
@@ -1145,11 +1147,19 @@ int clawpatch_tag4coarsening(fclaw_global_t *glob,
                                                   &blockno, q[0],q[1],q[2],q[3],
                                                   &coarsen_threshold,&initflag,&tag_patch);
         }
+        else if(glob->domain->dim == 2)
+        {
+            clawpatch_vt->d3->fort_tag4coarsening_3dx(&mx,&my,&mz,&mbc,&meqn,
+                                                  xlower,ylower,zlower,&dx,&dy,&dz,
+                                                  &blockno, q[0],q[1],q[2],q[3],
+                                                  &coarsen_threshold,&initflag,&tag_patch);
+        }
         else
         {
             clawpatch_vt->d3->fort_tag4coarsening(&mx,&my,&mz,&mbc,&meqn,
-                                                  xlower,ylower,&zlower,&dx,&dy,&dz,
+                                                  xlower,ylower,zlower,&dx,&dy,&dz,
                                                   &blockno, q[0],q[1],q[2],q[3],
+                                                  q[4],q[5],q[6],q[7],
                                                   &coarsen_threshold,&initflag,&tag_patch);
         }
         fclaw_global_clear_static();
@@ -1723,7 +1733,7 @@ void initialize_3dx_claw46_fort_vt(fclaw_clawpatch_vtable_t* clawpatch_vt)
     clawpatch_vt->d3->fort_interpolate2fine      = FCLAW3DX_CLAWPATCH46_FORT_INTERPOLATE2FINE;
 
     clawpatch_vt->d3->fort_tag4refinement        = FCLAW3D_CLAWPATCH46_FORT_TAG4REFINEMENT;
-    clawpatch_vt->d3->fort_tag4coarsening        = FCLAW3D_CLAWPATCH46_FORT_TAG4COARSENING;
+    clawpatch_vt->d3->fort_tag4coarsening_3dx        = FCLAW3DX_CLAWPATCH46_FORT_TAG4COARSENING;
 
     /* output functions */
     clawpatch_vt->fort_header_ascii              = FCLAW3D_CLAWPATCH46_FORT_HEADER_ASCII;
@@ -1752,7 +1762,7 @@ void initialize_3d_claw46_fort_vt(fclaw_clawpatch_vtable_t* clawpatch_vt)
     clawpatch_vt->d3->fort_interpolate2fine      = FCLAW3D_CLAWPATCH46_FORT_INTERPOLATE2FINE;
 
     clawpatch_vt->d3->fort_tag4refinement        = FCLAW3D_CLAWPATCH46_FORT_TAG4REFINEMENT;
-    clawpatch_vt->d3->fort_tag4coarsening        = FCLAW3D_CLAWPATCH46_FORT_TAG4COARSENING;
+    clawpatch_vt->d3->fort_tag4coarsening_3dx        = FCLAW3DX_CLAWPATCH46_FORT_TAG4COARSENING;
 
     /* output functions */
     clawpatch_vt->fort_header_ascii              = FCLAW3D_CLAWPATCH46_FORT_HEADER_ASCII;

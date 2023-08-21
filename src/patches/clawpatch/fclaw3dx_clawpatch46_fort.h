@@ -92,6 +92,32 @@ void FCLAW3D_CLAWPATCH46_FORT_TAG4REFINEMENT(const int* mx,
 
 
 /** Fortran subroutine name */
+#define FCLAW3DX_CLAWPATCH46_FORT_TAG4COARSENING \
+           FCLAW_F77_FUNC(fclaw3dx_clawpatch46_fort_tag4coarsening, \
+                          FCLAW3DX_CLAWPATCH46_FORT_TAG4COARSENING)
+
+/** @copydoc fclaw3d_clawpatch46_fort_tag4coarsening() */
+void FCLAW3DX_CLAWPATCH46_FORT_TAG4COARSENING(const int* mx, 
+                                             const int* my, 
+                                             const int* mz,
+                                             const int* mbc, 
+                                             const int* meqn,
+                                             double xlower[], 
+                                             double ylower[], 
+                                             double zlower[],
+                                             const double* dx, 
+                                             const double* dy, 
+                                             const double* dz,
+                                             const int* blockno,
+                                             double q0[],
+                                             double q1[],
+                                             double q2[],
+                                             double q3[],
+                                             const double* tag_threshold,
+                                             const int* initflag,
+                                             int* tag_patch);
+
+/** Fortran subroutine name */
 #define FCLAW3D_CLAWPATCH46_FORT_TAG4COARSENING \
            FCLAW_F77_FUNC(fclaw3d_clawpatch46_fort_tag4coarsening, \
                           FCLAW3D_CLAWPATCH46_FORT_TAG4COARSENING)
@@ -113,9 +139,14 @@ void FCLAW3D_CLAWPATCH46_FORT_TAG4COARSENING(const int* mx,
                                              double q1[],
                                              double q2[],
                                              double q3[],
+                                             double q4[],
+                                             double q5[],
+                                             double q6[],
+                                             double q7[],
                                              const double* tag_threshold,
                                              const int* initflag,
                                              int* tag_patch);
+
 
 /** Fortran subroutine name */
 #define FCLAW3D_CLAWPATCH46_FORT_INTERPOLATE2FINE \

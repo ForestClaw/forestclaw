@@ -203,7 +203,8 @@ TEST_CASE("3dx fclaw_clawpatch_vtable_initialize")
 
     //regridding
     CHECK(clawpatch_vt->d3->fort_tag4refinement         == &FCLAW3D_CLAWPATCH46_FORT_TAG4REFINEMENT);
-    CHECK(clawpatch_vt->d3->fort_tag4coarsening         == &FCLAW3D_CLAWPATCH46_FORT_TAG4COARSENING);
+    CHECK(clawpatch_vt->d3->fort_tag4coarsening_3dx     == &FCLAW3DX_CLAWPATCH46_FORT_TAG4COARSENING);
+    CHECK(clawpatch_vt->d3->fort_tag4coarsening         == NULL);
     CHECK(clawpatch_vt->d3->fort_user_exceeds_threshold == NULL);
     CHECK(clawpatch_vt->d3->fort_interpolate2fine       == &FCLAW3DX_CLAWPATCH46_FORT_INTERPOLATE2FINE);
     CHECK(clawpatch_vt->d3->fort_average2coarse         == &FCLAW3DX_CLAWPATCH46_FORT_AVERAGE2COARSE);
@@ -901,7 +902,7 @@ TEST_CASE("3dx fclaw_clawpatch tag4coarsening")
 
             fclaw_clawpatch_vtable_t * clawpatch_vt = fclaw_clawpatch_vt(test_data.glob);
 
-            clawpatch_vt->d3->fort_tag4coarsening = [](const int *mx, const int *my, const int *mz, 
+            clawpatch_vt->d3->fort_tag4coarsening_3dx = [](const int *mx, const int *my, const int *mz, 
                                                        const int *mbc, const int *meqn, 
                                                        double xlower[], double ylower[], double zlower[], 
                                                        const double *dx, const double *dy, const double *dz, 

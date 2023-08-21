@@ -1,4 +1,4 @@
-subroutine fclaw3d_clawpatch46_fort_tag4coarsening(mx,my,mz, mbc,meqn, & 
+subroutine fclaw3dx_clawpatch46_fort_tag4coarsening(mx,my,mz, mbc,meqn, & 
            xlower,ylower,zlower,dx,dy, dz, blockno, q0, q1, q2, q3, &
            coarsen_threshold, initflag, tag_patch)
     implicit none
@@ -49,6 +49,84 @@ subroutine fclaw3d_clawpatch46_fort_tag4coarsening(mx,my,mz, mbc,meqn, &
            q3,qmin,qmax,dx,dy,dz,xlower(3), ylower(3),zlower, &
            coarsen_threshold,initflag, tag_patch)
 
+end subroutine fclaw3dx_clawpatch46_fort_tag4coarsening
+
+subroutine fclaw3d_clawpatch46_fort_tag4coarsening(mx,my,mz, mbc,meqn, & 
+           xlower,ylower,zlower,dx,dy, dz, blockno, &
+           q0, q1, q2, q3, q4, q5, q6, q7, &
+           coarsen_threshold, initflag, tag_patch)
+    implicit none
+
+    integer :: mx,my, mz, mbc, meqn, tag_patch, initflag
+    integer :: blockno
+    double precision :: xlower(0:7), ylower(0:7), zlower(0:7), dx, dy, dz
+    double precision :: coarsen_threshold
+    double precision :: q0(1-mbc:mx+mbc,1-mbc:my+mbc,1-mbc:mz+mbc,meqn)
+    double precision :: q1(1-mbc:mx+mbc,1-mbc:my+mbc,1-mbc:mz+mbc,meqn)
+    double precision :: q2(1-mbc:mx+mbc,1-mbc:my+mbc,1-mbc:mz+mbc,meqn)
+    double precision :: q3(1-mbc:mx+mbc,1-mbc:my+mbc,1-mbc:mz+mbc,meqn)
+    double precision :: q4(1-mbc:mx+mbc,1-mbc:my+mbc,1-mbc:mz+mbc,meqn)
+    double precision :: q5(1-mbc:mx+mbc,1-mbc:my+mbc,1-mbc:mz+mbc,meqn)
+    double precision :: q6(1-mbc:mx+mbc,1-mbc:my+mbc,1-mbc:mz+mbc,meqn)
+    double precision :: q7(1-mbc:mx+mbc,1-mbc:my+mbc,1-mbc:mz+mbc,meqn)
+
+
+    integer :: mq
+    double precision :: qmin(meqn), qmax(meqn)
+
+    !! # Don't coarsen when initializing the mesh
+    if (initflag .ne. 0) then
+        tag_patch = 0
+        return
+    endif
+
+    !! # Assume that we will coarsen a family unless we find a grid
+    !! # that doesn't pass the coarsening test.
+    tag_patch = 1
+    do mq = 1,meqn
+        qmin(mq) = q0(1,1,1,mq)
+        qmax(mq) = q0(1,1,1,mq)
+    end do
+
+    call fclaw3d_clawpatch46_test_refine3(blockno,mx,my,mz,mbc,meqn, & 
+           q0,qmin,qmax, dx,dy,dz,xlower(0), ylower(0),zlower(0),  &
+           coarsen_threshold,initflag, tag_patch)
+    if (tag_patch == 0) return
+
+    call fclaw3d_clawpatch46_test_refine3(blockno,mx,my,mz,mbc,meqn, & 
+           q1,qmin,qmax,dx,dy,dz,xlower(1), ylower(1), zlower(1), & 
+           coarsen_threshold,initflag, tag_patch)
+    if (tag_patch == 0) return
+
+    call fclaw3d_clawpatch46_test_refine3(blockno,mx,my,mz,mbc,meqn, & 
+           q2,qmin,qmax,dx,dy,dz,xlower(2), ylower(2),zlower(2),  &
+           coarsen_threshold,initflag, tag_patch)
+    if (tag_patch == 0) return
+
+    call fclaw3d_clawpatch46_test_refine3(blockno,mx,my,mz,mbc,meqn, &
+           q3,qmin,qmax,dx,dy,dz,xlower(3), ylower(3),zlower(3), &
+           coarsen_threshold,initflag, tag_patch)
+    if (tag_patch == 0) return
+
+    call fclaw3d_clawpatch46_test_refine3(blockno,mx,my,mz,mbc,meqn, &
+           q4,qmin,qmax,dx,dy,dz,xlower(4), ylower(4),zlower(4), &
+           coarsen_threshold,initflag, tag_patch)
+    if (tag_patch == 0) return
+
+    call fclaw3d_clawpatch46_test_refine3(blockno,mx,my,mz,mbc,meqn, &
+           q5,qmin,qmax,dx,dy,dz,xlower(5), ylower(5),zlower(5), &
+           coarsen_threshold,initflag, tag_patch)
+    if (tag_patch == 0) return
+
+    call fclaw3d_clawpatch46_test_refine3(blockno,mx,my,mz,mbc,meqn, &
+           q6,qmin,qmax,dx,dy,dz,xlower(6), ylower(6),zlower(6), &
+           coarsen_threshold,initflag, tag_patch)
+    if (tag_patch == 0) return
+
+    call fclaw3d_clawpatch46_test_refine3(blockno,mx,my,mz,mbc,meqn, &
+           q7,qmin,qmax,dx,dy,dz,xlower(7), ylower(7),zlower(7), &
+           coarsen_threshold,initflag, tag_patch)
+
 end subroutine fclaw3d_clawpatch46_fort_tag4coarsening
 
 subroutine fclaw3d_clawpatch46_test_refine3(blockno,mx,my,mz,mbc, & 
@@ -71,7 +149,7 @@ subroutine fclaw3d_clawpatch46_test_refine3(blockno,mx,my,mz,mbc, &
     logical(kind=4) :: is_ghost, clawpatch3_is_ghost
 
 
-    do k = 1,mz
+    do k = 1-mbc,mz+mbc
         do i = 1-mbc,mx+mbc
             do j = 1-mbc,my+mbc                
                 xc = xlower + (i-0.5)*dx

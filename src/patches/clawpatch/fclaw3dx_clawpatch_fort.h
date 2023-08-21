@@ -329,6 +329,40 @@ typedef void (*fclaw3d_clawpatch_fort_tag4refinement_t)(const int* mx,
  * @param[in]  init_flag true if in initialization stage
  * @param[out] tag_patch true if patches should be coarsened 
  */
+typedef void (*fclaw3dx_clawpatch_fort_tag4coarsening_t)(const int* mx, 
+                                                        const int* my, 
+                                                        const int* mz,
+                                                        const int* mbc, 
+                                                        const int* meqn,
+                                                        double xlower[], 
+                                                        double ylower[],
+                                                        double zlower[],
+                                                        const double* dx, 
+                                                        const double* dy, 
+                                                        const double* dz,
+                                                        const int* blockno,
+                                                        double q0[],
+                                                        double q1[],
+                                                        double q2[],
+                                                        double q3[],
+                                                        const double* tag_threshold,
+                                                        const int* init_flag,
+                                                        int* tag_patch);
+
+/**
+ * @brief Tags a quad of patches for coarsening.
+ * 
+ * @param[in]  mx, my, mz the number cells in the x, y, and z directions, excluding ghost
+ * @param[in]  mbc the number of ghost cells
+ * @param[in]  meqn the number of equations
+ * @param[in]  xlower, ylower, zlower the coordinate of the lower bottom left corner
+ * @param[in]  dx, dy, dz spacing of cells in the x, y, and z directions
+ * @param[in]  blockno the block number
+ * @param[in]  q1,q3,q3,q4,q5,q6,q7,q8 the solutions on the patches
+ * @param[in]  tag_threshold the threshold for tagging
+ * @param[in]  init_flag true if in initialization stage
+ * @param[out] tag_patch true if patches should be coarsened 
+ */
 typedef void (*fclaw3d_clawpatch_fort_tag4coarsening_t)(const int* mx, 
                                                         const int* my, 
                                                         const int* mz,
@@ -345,6 +379,10 @@ typedef void (*fclaw3d_clawpatch_fort_tag4coarsening_t)(const int* mx,
                                                         double q1[],
                                                         double q2[],
                                                         double q3[],
+                                                        double q4[],
+                                                        double q5[],
+                                                        double q6[],
+                                                        double q7[],
                                                         const double* tag_threshold,
                                                         const int* init_flag,
                                                         int* tag_patch);

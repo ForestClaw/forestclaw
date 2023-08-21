@@ -306,13 +306,15 @@ struct fclaw_clawpatch_vtable_3d
     /** Tags a patch for refinement. */
     fclaw3d_clawpatch_fort_tag4refinement_t        fort_tag4refinement;
     /** Tags a quad of patches for coarsening. */
+    fclaw3dx_clawpatch_fort_tag4coarsening_t       fort_tag4coarsening_3dx;
+    /** Tags 8 patches for coarsening. */
     fclaw3d_clawpatch_fort_tag4coarsening_t        fort_tag4coarsening;
     /** @deprecated Checks if solution exceeds a threshold */
     fclaw3d_clawpatch_fort_exceeds_threshold_t     fort_user_exceeds_threshold;
 
     /** Averages a fine patches to a coarse patch */
     fclaw3d_clawpatch_fort_average2coarse_t        fort_average2coarse;
-    /** Interpolates from a coarse patch to a fine patche */
+    /** Interpolates from a coarse patch to a fine patches */
     fclaw3d_clawpatch_fort_interpolate2fine_t      fort_interpolate2fine;
 
     /** @} */
