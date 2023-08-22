@@ -6,6 +6,7 @@ add_library(forestclaw_c OBJECT
   fclaw_base.c 
   fclaw_block.c
   fclaw_convenience.c
+  fclaw_corner_neighbors.c
   fclaw_diagnostics.c
   fclaw_domain.c
   fclaw_edge_neighbors.c
@@ -39,7 +40,6 @@ add_library(forestclaw_c OBJECT
   fclaw_vtable.c
 
   fclaw2d_convenience.c
-  fclaw2d_corner_neighbors.c
   fclaw2d_map.c
   fclaw2d_map_brick.c
   fclaw2d_map_query.c
@@ -118,6 +118,7 @@ install(FILES
   fclaw_advance.h 
   fclaw_base.h 
   fclaw_block.h
+  fclaw_corner_neighbors.h
   fclaw_diagnostics.h
   fclaw_domain.h
   fclaw_edge_neighbors.h
@@ -148,7 +149,6 @@ install(FILES
   fp_exception_glibc_extension.h 
 
   fclaw2d_convenience.h
-  fclaw2d_corner_neighbors.h
   fclaw2d_defs.h 
   fclaw2d_include_all.h 
   fclaw2d_map.h
