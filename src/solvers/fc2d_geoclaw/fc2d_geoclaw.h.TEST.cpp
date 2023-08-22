@@ -28,7 +28,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_clawpatch_options.h>
 #include <fc2d_geoclaw.h>
 #include <fc2d_geoclaw_options.h>
-#include <fclaw2d_forestclaw.h>
+#include <fclaw_forestclaw.h>
 #include <fclaw2d_convenience.h>
 #include <fclaw3d_convenience.h>
 #include <test.hpp>
@@ -44,7 +44,7 @@ TEST_CASE("fc2d_geoclaw_solver_initialize fails with 3d domain")
 	fclaw_clawpatch_options_store(glob, clawpatch_opts);
 	fc2d_geoclaw_options_store(glob, FCLAW_ALLOC_ZERO(fc2d_geoclaw_options_t,1));
 
-	fclaw2d_vtables_initialize(glob);
+	fclaw_vtables_initialize(glob);
 	CHECK_SC_ABORTED(fc2d_geoclaw_solver_initialize(glob));
 
 	fclaw_domain_destroy(domain);
@@ -62,7 +62,7 @@ TEST_CASE("fc2d_geoclaw_solver_initialize fails with 3d clawpatch options")
 	fclaw_clawpatch_options_store(glob, clawpatch_opts);
 	fc2d_geoclaw_options_store(glob, FCLAW_ALLOC_ZERO(fc2d_geoclaw_options_t,1));
 
-	fclaw2d_vtables_initialize(glob);
+	fclaw_vtables_initialize(glob);
 	CHECK_SC_ABORTED(fc2d_geoclaw_solver_initialize(glob));
 
 	fclaw_domain_destroy(domain);
@@ -89,10 +89,10 @@ TEST_CASE("fc2d_geoclaw_solver_initialize stores two seperate vtables in two sep
 	fclaw_options_store(glob2, FCLAW_ALLOC_ZERO(fclaw_options_t,1));
 	fc2d_geoclaw_options_store(glob2, FCLAW_ALLOC_ZERO(fc2d_geoclaw_options_t,1));
 
-	fclaw2d_vtables_initialize(glob1);
+	fclaw_vtables_initialize(glob1);
 	fc2d_geoclaw_solver_initialize(glob1);
 
-	fclaw2d_vtables_initialize(glob2);
+	fclaw_vtables_initialize(glob2);
 	fc2d_geoclaw_solver_initialize(glob2);
 
 	CHECK_NE(fc2d_geoclaw_vt(glob1), fc2d_geoclaw_vt(glob2));
@@ -115,7 +115,7 @@ TEST_CASE("fc2d_geoclaw_solver_initialize sets is_set flag")
 	fclaw_options_store(glob, FCLAW_ALLOC_ZERO(fclaw_options_t,1));
 	fc2d_geoclaw_options_store(glob, FCLAW_ALLOC_ZERO(fc2d_geoclaw_options_t,1));
 
-	fclaw2d_vtables_initialize(glob);
+	fclaw_vtables_initialize(glob);
 	fc2d_geoclaw_solver_initialize(glob);
 
 
@@ -165,11 +165,11 @@ TEST_CASE("fc2d_geoclaw_vtable_initialize fails if called twice on a glob")
 	fclaw_options_store(glob2, FCLAW_ALLOC_ZERO(fclaw_options_t,1));
 	fc2d_geoclaw_options_store(glob2, FCLAW_ALLOC_ZERO(fc2d_geoclaw_options_t,1));
 
-	fclaw2d_vtables_initialize(glob1);
+	fclaw_vtables_initialize(glob1);
 	fc2d_geoclaw_solver_initialize(glob1);
 	CHECK_SC_ABORTED(fc2d_geoclaw_solver_initialize(glob1));
 
-	fclaw2d_vtables_initialize(glob2);
+	fclaw_vtables_initialize(glob2);
 	fc2d_geoclaw_solver_initialize(glob2);
 	CHECK_SC_ABORTED(fc2d_geoclaw_solver_initialize(glob2));
 

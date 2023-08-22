@@ -38,7 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_filesystem.h>
 #include <fclaw_base.h>
 
-#include <fclaw2d_forestclaw.h>
+#include <fclaw_forestclaw.h>
 #include <fclaw_global.h>
 
 static
@@ -57,7 +57,7 @@ void filament_initialize(fclaw_global_t* glob)
     fclaw_domain_data_new(glob->domain);
 
     /* Initialize virtual table for ForestClaw */
-    fclaw2d_vtables_initialize(glob);
+    fclaw_vtables_initialize(glob);
 
     if (user->claw_version == 4)
     {
@@ -80,7 +80,7 @@ void filament_finalize(fclaw_global_t* glob)
 {
     fclaw_set_global_context(glob);
 
-    fclaw2d_problem_setup(glob);
+    fclaw_problem_setup(glob);
     fclaw_finalize(glob);
 
     fclaw_clear_global_context(glob);
@@ -100,7 +100,7 @@ void swirl_initialize(fclaw_global_t* glob)
     swirl_opt = swirl_get_options(glob);
 
     /* Initialize virtual table for ForestClaw */
-    fclaw2d_vtables_initialize(glob);
+    fclaw_vtables_initialize(glob);
 
     /* Initialize virtual tables for solvers */
     if (swirl_opt->claw_version == 4)
@@ -126,7 +126,7 @@ void swirl_finalize(fclaw_global_t* glob)
 {
     fclaw_set_global_context(glob);
 
-    fclaw2d_problem_setup(glob);
+    fclaw_problem_setup(glob);
     fclaw_finalize(glob);
 
     fclaw_clear_global_context(glob);

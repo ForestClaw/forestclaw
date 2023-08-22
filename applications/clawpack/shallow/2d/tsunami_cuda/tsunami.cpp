@@ -77,7 +77,7 @@ void run_program(fclaw_global_t* glob)
     user_options_t* user_opt = tsunami_get_options(glob);
 
     /* Initialize virtual table for ForestClaw */
-    fclaw2d_vtables_initialize(glob);    
+    fclaw_vtables_initialize(glob);    
 
     double ax = fclaw_opt->ax;
     double bx = fclaw_opt->bx;

@@ -25,7 +25,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <test.hpp>
 
-#include <fclaw2d_forestclaw.h>
+#include <fclaw_forestclaw.h>
 #include <fclaw2d_convenience.h>
 #include <fclaw_global.h>
 
@@ -71,7 +71,7 @@ TEST_CASE("FCLAW2D_CLAWPATCH_EXCEEDS_THRESHOLD calls user function")
     clawpatch_opts->refinement_criteria = FCLAW_REFINE_CRITERIA_USER;
     fclaw_clawpatch_options_store(glob, clawpatch_opts);
 
-    fclaw2d_vtables_initialize(glob);
+    fclaw_vtables_initialize(glob);
     fclaw_clawpatch_vtable_initialize(glob, 4);
 
     fclaw_clawpatch_vt(glob)->d2->fort_user_exceeds_threshold = 
@@ -144,7 +144,7 @@ TEST_CASE("FCLAW3DX_CLAWPATCH_EXCEEDS_THRESHOLD calls user function")
     fclaw_clawpatch_options_store(glob, opts);
 
 
-    fclaw2d_vtables_initialize(glob);
+    fclaw_vtables_initialize(glob);
     fclaw_clawpatch_vtable_initialize(glob, 4);
 
     fclaw_clawpatch_vt(glob)->d3->fort_user_exceeds_threshold = 

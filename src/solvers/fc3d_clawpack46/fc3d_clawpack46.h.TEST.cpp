@@ -26,7 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_global.h>
 #include <fc3d_clawpack46.h>
 #include <fc3d_clawpack46_options.h>
-#include <fclaw2d_forestclaw.h>
+#include <fclaw_forestclaw.h>
 #include <fclaw2d_convenience.h>
 #include <fclaw3d_convenience.h>
 #include <fclaw_clawpatch_options.h>
@@ -43,7 +43,7 @@ TEST_CASE("fc3d_clawpack46_solver_initialize fails with 2d clawpatch options")
 	fclaw_clawpatch_options_store(glob, clawpatch_opts);
 	fc3d_clawpack46_options_store(glob, FCLAW_ALLOC_ZERO(fc3d_clawpack46_options_t,1));
 
-	fclaw2d_vtables_initialize(glob);
+	fclaw_vtables_initialize(glob);
 	CHECK_SC_ABORTED(fc3d_clawpack46_solver_initialize(glob));
 
 	fclaw_domain_destroy(domain);
@@ -69,10 +69,10 @@ TEST_CASE("fc3d_clawpack46_solver_initialize stores two seperate vtables in two 
 	fclaw_clawpatch_options_store(glob2, opts2);
 	fc3d_clawpack46_options_store(glob2, FCLAW_ALLOC_ZERO(fc3d_clawpack46_options_t,1));
 
-	fclaw2d_vtables_initialize(glob1);
+	fclaw_vtables_initialize(glob1);
 	fc3d_clawpack46_solver_initialize(glob1);
 
-	fclaw2d_vtables_initialize(glob2);
+	fclaw_vtables_initialize(glob2);
 	fc3d_clawpack46_solver_initialize(glob2);
 
 	CHECK_NE(fc3d_clawpack46_vt(glob1), fc3d_clawpack46_vt(glob2));
@@ -96,7 +96,7 @@ TEST_CASE("fc3d_clawpack46_solver_initialize sets is_set flag")
 	fclaw_clawpatch_options_store(glob, opts);
 	fc3d_clawpack46_options_store(glob, FCLAW_ALLOC_ZERO(fc3d_clawpack46_options_t,1));
 
-	fclaw2d_vtables_initialize(glob);
+	fclaw_vtables_initialize(glob);
 	fc3d_clawpack46_solver_initialize(glob);
 
 
@@ -146,11 +146,11 @@ TEST_CASE("fc3d_clawpack46_vtable_initialize fails if called twice on a glob")
 	fclaw_clawpatch_options_store(glob2, opts2);
 	fc3d_clawpack46_options_store(glob2, FCLAW_ALLOC_ZERO(fc3d_clawpack46_options_t,1));
 
-	fclaw2d_vtables_initialize(glob1);
+	fclaw_vtables_initialize(glob1);
 	fc3d_clawpack46_solver_initialize(glob1);
 	CHECK_SC_ABORTED(fc3d_clawpack46_solver_initialize(glob1));
 
-	fclaw2d_vtables_initialize(glob2);
+	fclaw_vtables_initialize(glob2);
 	fc3d_clawpack46_solver_initialize(glob2);
 	CHECK_SC_ABORTED(fc3d_clawpack46_solver_initialize(glob2));
 

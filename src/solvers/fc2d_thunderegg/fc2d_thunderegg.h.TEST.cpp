@@ -28,7 +28,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_convenience.h>
 #include <fclaw3d_convenience.h>
 #include <fc2d_thunderegg.h>
-#include <fclaw2d_forestclaw.h>
+#include <fclaw_forestclaw.h>
 #include <test.hpp>
 
 TEST_CASE("fc2d_thunderegg_solver_initialize fails with 3d domain")
@@ -41,7 +41,7 @@ TEST_CASE("fc2d_thunderegg_solver_initialize fails with 3d domain")
 	fclaw_clawpatch_options_t* clawpatch_opts = fclaw_clawpatch_options_new(3);
 	fclaw_clawpatch_options_store(glob, clawpatch_opts);
 
-	fclaw2d_vtables_initialize(glob);
+	fclaw_vtables_initialize(glob);
 	CHECK_SC_ABORTED(fc2d_thunderegg_solver_initialize(glob));
 
 	fclaw_domain_destroy(domain);
@@ -58,7 +58,7 @@ TEST_CASE("fc2d_thunderegg_solver_initialize fails with 3d clawpatch options")
 	fclaw_clawpatch_options_t* clawpatch_opts = fclaw_clawpatch_options_new(3);
 	fclaw_clawpatch_options_store(glob, clawpatch_opts);
 
-	fclaw2d_vtables_initialize(glob);
+	fclaw_vtables_initialize(glob);
 	CHECK_SC_ABORTED(fc2d_thunderegg_solver_initialize(glob));
 
 	fclaw_domain_destroy(domain);
@@ -78,10 +78,10 @@ TEST_CASE("fc2d_thunderegg_solver_initialize stores two seperate vtables in two 
 	fclaw_clawpatch_options_store(glob1, clawpatch_opt);
 	fclaw_clawpatch_options_store(glob2, clawpatch_opt);
 
-	fclaw2d_vtables_initialize(glob1);
+	fclaw_vtables_initialize(glob1);
 	fc2d_thunderegg_solver_initialize(glob1);
 
-	fclaw2d_vtables_initialize(glob2);
+	fclaw_vtables_initialize(glob2);
 	fc2d_thunderegg_solver_initialize(glob2);
 
 	CHECK_NE(fc2d_thunderegg_vt(glob1), fc2d_thunderegg_vt(glob2));
@@ -101,7 +101,7 @@ TEST_CASE("fc2d_thunderegg_solver_initialize sets is_set flag")
 	fclaw_clawpatch_options_t* clawpatch_opt = fclaw_clawpatch_options_new(2);
 	fclaw_clawpatch_options_store(glob, clawpatch_opt);
 
-	fclaw2d_vtables_initialize(glob);
+	fclaw_vtables_initialize(glob);
 	fc2d_thunderegg_solver_initialize(glob);
 
 
@@ -126,11 +126,11 @@ TEST_CASE("fc2d_thunderegg_vtable_initialize fails if called twice on a glob")
 	fclaw_clawpatch_options_store(glob1, clawpatch_opt);
 	fclaw_clawpatch_options_store(glob2, clawpatch_opt);
 
-	fclaw2d_vtables_initialize(glob1);
+	fclaw_vtables_initialize(glob1);
 	fc2d_thunderegg_solver_initialize(glob1);
 	CHECK_SC_ABORTED(fc2d_thunderegg_solver_initialize(glob1));
 
-	fclaw2d_vtables_initialize(glob2);
+	fclaw_vtables_initialize(glob2);
 	fc2d_thunderegg_solver_initialize(glob2);
 	CHECK_SC_ABORTED(fc2d_thunderegg_solver_initialize(glob2));
 

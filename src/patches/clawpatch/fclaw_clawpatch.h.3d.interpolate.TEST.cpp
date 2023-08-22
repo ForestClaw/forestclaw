@@ -44,7 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fstream>
 #include <bitset>
 
-#include <fclaw2d_forestclaw.h>
+#include <fclaw_forestclaw.h>
 
 namespace {
 struct CubeDomain {
@@ -86,7 +86,7 @@ struct CubeDomain {
         //map = fclaw3d_map_new_nomap();
         //fclaw_global_store_map_3d(glob, map);
 
-        fclaw2d_vtables_initialize(glob);
+        fclaw_vtables_initialize(glob);
         fclaw_clawpatch_vtable_initialize(glob, 4);
 
         fclaw_domain_data_new(glob->domain);

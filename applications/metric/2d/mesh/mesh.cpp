@@ -25,7 +25,7 @@
 
 #include "mesh_user.h"
 
-#include <fclaw2d_forestclaw.h>
+#include <fclaw_forestclaw.h>
 
 static void *
 options_register_user (fclaw_app_t * app, void *package, sc_options_t * opt)

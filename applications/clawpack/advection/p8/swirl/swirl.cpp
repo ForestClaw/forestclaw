@@ -152,7 +152,7 @@ void run_program(fclaw_global_t* glob)
 
 #ifdef P8HACK
     /* Initialize virtual table for ForestClaw */
-    fclaw2d_vtables_initialize(glob);
+    fclaw_vtables_initialize(glob);
 
     if (user_opt->claw_version == 4)
     {

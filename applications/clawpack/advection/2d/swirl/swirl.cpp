@@ -54,7 +54,7 @@ void run_program(fclaw_global_t* glob)
     const user_options_t *user_opt = swirl_get_options(glob);
 
     /* Initialize virtual table for ForestClaw */
-    fclaw2d_vtables_initialize(glob);
+    fclaw_vtables_initialize(glob);
 
     /* Initialize virtual tables for solvers */
     if (user_opt->claw_version == 4)

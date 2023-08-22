@@ -78,7 +78,7 @@ void phasefield_run_program(fclaw_global_t* glob)
 
 
     /* Initialize virtual table for ForestClaw */
-    fclaw2d_vtables_initialize(glob);
+    fclaw_vtables_initialize(glob);
 
     /* Test thunderegg solver */
     fc2d_thunderegg_solver_initialize(glob);

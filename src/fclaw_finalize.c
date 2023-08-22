@@ -30,7 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_options.h>
 #include <fclaw2d_map.h>
 #include <fclaw_domain.h>
-#include <fclaw2d_forestclaw.h>
+#include <fclaw_forestclaw.h>
 
 /**
  *  This macro defines two utility functions for reading and writing CSV data of a specified type,

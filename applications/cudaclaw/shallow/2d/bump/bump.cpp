@@ -58,7 +58,7 @@ void run_program(fclaw_global_t* glob)
     user_options_t* user_opt = bump_get_options(glob);
 
     /* Initialize virtual table for ForestClaw */
-    fclaw2d_vtables_initialize(glob);
+    fclaw_vtables_initialize(glob);
 
     /* Initialize virtual tables for solvers */
     fc2d_cudaclaw_options_t *clawopt = fc2d_cudaclaw_get_options(glob);

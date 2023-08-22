@@ -23,7 +23,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <fclaw2d_forestclaw.h>
+#include <fclaw_forestclaw.h>
 
 #include <fclaw_global.h>
 #include <fclaw_options.h>
@@ -110,7 +110,7 @@ void fclaw_initialize(fclaw_global_t *glob)
     fclaw_timer_start (&glob->timers[FCLAW_TIMER_INIT]);
 
     /* User defined problem setup */
-    fclaw2d_problem_setup(glob);
+    fclaw_problem_setup(glob);
 
     /* set specific refinement strategy */
     fclaw_domain_set_refinement

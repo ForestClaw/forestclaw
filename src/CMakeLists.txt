@@ -17,6 +17,7 @@ add_library(forestclaw_c OBJECT
   fclaw_farraybox.cpp
   fclaw_filesystem.cpp
   fclaw_finalize.c
+  fclaw_forestclaw.c
   fclaw_gauges.c 
   fclaw_ghost_fill.c
   fclaw_global.c
@@ -39,7 +40,6 @@ add_library(forestclaw_c OBJECT
 
   fclaw2d_convenience.c
   fclaw2d_corner_neighbors.c
-  fclaw2d_forestclaw.c
   fclaw2d_map.c
   fclaw2d_map_brick.c
   fclaw2d_map_query.c
@@ -126,6 +126,7 @@ install(FILES
   fclaw_face_neighbors.h
   fclaw_farraybox.hpp 
   fclaw_filesystem.h 
+  fclaw_forestclaw.h
   fclaw_gauges.h 
   fclaw_ghost_fill.h
   fclaw_global.h 
@@ -149,7 +150,6 @@ install(FILES
   fclaw2d_convenience.h
   fclaw2d_corner_neighbors.h
   fclaw2d_defs.h 
-  fclaw2d_forestclaw.h
   fclaw2d_include_all.h 
   fclaw2d_map.h
   fclaw2d_map_brick.h

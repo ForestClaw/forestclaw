@@ -24,7 +24,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "sphere_user.h"
-#include <fclaw2d_forestclaw.h>
+#include <fclaw_forestclaw.h>
 
 #include <fc2d_clawpack46.h>
 

@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -23,34 +23,34 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FCLAW2D_FORESTCLAW_H
-#define FCLAW2D_FORESTCLAW_H
+#include <fclaw_forestclaw.h>
 
-#ifdef __cplusplus
-extern "C"
+#include <fclaw_global.h>
+#include <fclaw_patch.h>
+#include <fclaw_vtable.h>
+#include <fclaw_diagnostics.h>
+#include <fclaw_gauges.h>
+#include <fclaw2d_rays.h>
+
+#include <fclaw_elliptic_solver.h>
+
+void fclaw_vtables_initialize(fclaw_global_t *glob)
 {
-#if 0
-}                               /* need this because indent is dumb */
-#endif
-#endif
-
-struct fclaw_global;
-
-void fclaw2d_problem_setup(struct fclaw_global *glob);
-void fclaw2d_vtables_initialize(struct fclaw_global *glob);
-
-void fclaw_initialize (struct fclaw_global *glob);
-void fclaw_run (struct fclaw_global *glob);
-void fclaw_finalize(struct fclaw_global *glob);
-
-#ifdef __cplusplus
-#if 0
-{                               /* need this because indent is dumb */
-#endif
+    fclaw_vtable_initialize(glob);
+    fclaw_patch_vtable_initialize(glob);
+    fclaw_diagnostics_vtable_initialize(glob);
+    fclaw_elliptic_vtable_initialize(glob);
+    fclaw_gauges_vtable_initialize(glob);
+    fclaw2d_ray_vtable_initialize(glob);
 }
-#endif
 
-
-/* Note: either we make this a C .h file, or we remove the extern "C". */
-
-#endif
+void fclaw_problem_setup(fclaw_global_t *glob)
+{
+	fclaw_vtable_t *fc_vt = fclaw_vt(glob);
+	
+    /* User defined problem setup */
+    if (fc_vt->problem_setup != NULL)
+    {
+        fc_vt->problem_setup(glob);
+    }
+}

@@ -86,7 +86,7 @@ void run_program(fclaw_global_t* glob)
 
 
     /* Initialize virtual table for ForestClaw */
-    fclaw2d_vtables_initialize(glob);
+    fclaw_vtables_initialize(glob);
 
     fc2d_clawpack46_solver_initialize(glob);
 

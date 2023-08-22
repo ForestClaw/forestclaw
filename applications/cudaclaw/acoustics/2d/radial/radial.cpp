@@ -63,7 +63,7 @@ void run_program(fclaw_global_t* glob)
     user_opt = radial_get_options(glob);
 
     /* Initialize virtual table for ForestClaw */
-    fclaw2d_vtables_initialize(glob);
+    fclaw_vtables_initialize(glob);
 
     fc2d_cudaclaw_options_t *clawopt = fc2d_cudaclaw_get_options(glob);
 

@@ -26,7 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef MESH_USER_H
 #define MESH_USER_H
 
-#include <fclaw2d_forestclaw.h>
+#include <fclaw_forestclaw.h>
 #include </Users/calhoun/projects/ForestClaw/code/forestclaw/applications/advection/2d/all/clawpack_user.h>
 
 #ifdef __cplusplus

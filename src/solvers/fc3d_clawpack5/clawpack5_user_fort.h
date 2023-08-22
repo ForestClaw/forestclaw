@@ -26,7 +26,7 @@
 #ifndef CLAWPACK5_USER_FORT_H
 #define CLAWPACK5_USER_FORT_H
 
-#include <fclaw2d_forestclaw.h>
+#include <fclaw_forestclaw.h>
 #include <fclaw_package.h>
 
 #include "fc3d_clawpack5_options.h"

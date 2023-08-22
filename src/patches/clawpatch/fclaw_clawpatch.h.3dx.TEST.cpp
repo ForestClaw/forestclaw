@@ -40,7 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fstream>
 #include <bitset>
 
-#include <fclaw2d_forestclaw.h>
+#include <fclaw_forestclaw.h>
 
 #define CHECK_BOX_DIMENSIONS(abox, mbc, mx, my, mz, mfields)\
 {\
@@ -97,7 +97,7 @@ struct SinglePatchDomain {
         map = fclaw2d_map_new_nomap();
         fclaw_global_store_map_2d(glob, map);
 
-        fclaw2d_vtables_initialize(glob);
+        fclaw_vtables_initialize(glob);
         fclaw_clawpatch_vtable_initialize(glob, 4);
 
         fclaw_domain_data_new(glob->domain);
@@ -152,7 +152,7 @@ struct QuadDomain {
         map = fclaw2d_map_new_nomap();
         fclaw_global_store_map_2d(glob, map);
 
-        fclaw2d_vtables_initialize(glob);
+        fclaw_vtables_initialize(glob);
         fclaw_clawpatch_vtable_initialize(glob, 4);
 
         fclaw_domain_data_new(glob->domain);
@@ -185,7 +185,7 @@ TEST_CASE("3dx fclaw_clawpatch_vtable_initialize")
     fclaw_clawpatch_options_t* opts = fclaw_clawpatch_options_new(3);
     fclaw_clawpatch_options_store(glob, opts);
 
-    fclaw2d_vtables_initialize(glob);
+    fclaw_vtables_initialize(glob);
 
     fclaw_clawpatch_vtable_initialize(glob, 4);
 
@@ -288,7 +288,7 @@ TEST_CASE("3dx fclaw_clawpatch patch_build")
         fclaw2d_map_context_t* map = fclaw2d_map_new_nomap();
         fclaw_global_store_map_2d(glob, map);
 
-        fclaw2d_vtables_initialize(glob);
+        fclaw_vtables_initialize(glob);
         fclaw_clawpatch_vtable_initialize(glob, 4);
 
         fclaw_domain_data_new(glob->domain);
@@ -683,7 +683,7 @@ TEST_CASE("3dx fclaw_clawpatch_metric_scalar")
 TEST_CASE("3dx fclaw_clawpatch_metric_vector")
 {
     fclaw_global_t* glob = fclaw_global_new(); 
-    fclaw2d_vtables_initialize(glob);
+    fclaw_vtables_initialize(glob);
 
     SinglePatchDomain test_data;
     test_data.setup();

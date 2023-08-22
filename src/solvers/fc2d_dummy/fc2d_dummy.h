@@ -27,7 +27,7 @@
 #define FC2D_DUMMY_H
 
 #include <fclaw_package.h>
-#include <fclaw2d_forestclaw.h>
+#include <fclaw_forestclaw.h>
 
 #ifdef __cplusplus
 extern "C"

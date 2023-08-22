@@ -59,7 +59,7 @@ void slosh_run_program(fclaw_global_t* glob)
     fclaw_domain_data_new(glob->domain);
 
     /* Initialize virtual table for ForestClaw */
-    fclaw2d_vtables_initialize(glob);
+    fclaw_vtables_initialize(glob);
 
     fc2d_geoclaw_solver_initialize(glob);
 

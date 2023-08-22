@@ -25,7 +25,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw_patch.h>
 
-#include <fclaw2d_forestclaw.h>
+#include <fclaw_forestclaw.h>
 #include <fclaw_global.h>
 #include <fclaw_options.h>
 #include <fclaw_advance.h>
@@ -536,7 +536,7 @@ void user_run(fclaw_global_t * globs[],int nglobs)
         for(int i=0; i< nglobs; i++){
             if(!finished[i]){
                 fclaw_set_global_context(globs[i]);
-                fclaw2d_problem_setup(globs[i]);
+                fclaw_problem_setup(globs[i]);
 
                 tcurr[i] = outstyle_1(&contexts[i], n*dt[i], globs[i]);
                 finished[i] = tcurr[i] >= fclaw_opts[i]->tfinal;
