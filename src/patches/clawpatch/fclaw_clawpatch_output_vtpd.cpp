@@ -12,12 +12,7 @@ using namespace std;
 namespace
 {
 /**
- * @brief Write the dataset metadata information
- *
- * @param comm the communicator
- * @param file the file
- * @param domain the domain
- * @return int the offset in the file after the metadata information
+ * @brief Write a VTI file for a single patch.
  */
 void 
 WriteVTIFile(fclaw_domain_t * domain, fclaw_patch_t * patch,
@@ -42,17 +37,16 @@ WriteVTIFile(fclaw_domain_t * domain, fclaw_patch_t * patch,
 		&xlower, &ylower, &zlower, 
 		&dx, &dy, &dz);
 
-	int start = (mx+2*mbc)*mbc + mbc;
 	int stride_j = mx + 2 * mbc;
 	int stride_k = stride_j * (my + 2 * mbc);
 	int stride_m = stride_k * (mz + 2 * mbc);
 
-	int appended_data_stride = sizeof(uint32_t) + mx * my * mz * sizeof(double);
+	int appended_data_stride = sizeof(uint32_t) + mx * my * mz * sizeof(float);
 
 	file << "<?xml version=\"1.0\"?>" << endl;
 	file << "<VTKFile type=\"ImageData\" version=\"0.1\" byte_order=\"LittleEndian\" header_type=\"UInt32\">" << endl;
 	file << "\t<ImageData WholeExtent=\"0 " << mx << " 0 " << my << " 0 " << mz << "\" Origin=\"" << xlower << " " << ylower << " " << zlower << "\" Spacing=\"" << dx << " " << dy << " " << dz << "\" Direction=\"1 0 0 0 1 0 0 0 1\">" << endl;
-	file << "\t\t<Piece Extent=\"0 " << mx << " 0 " << mx << " 0 " << mz << "\">" << endl;
+	file << "\t\t<Piece Extent=\"0 " << mx << " 0 " << my << " 0 " << mz << "\">" << endl;
 	file << "\t\t\t<PointData>" << endl;
 	file << "\t\t\t</PointData>" << endl;
 	file << "\t\t\t<CellData>" << endl;
