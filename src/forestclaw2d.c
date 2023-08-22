@@ -890,6 +890,61 @@ fclaw2d_patch_corner_neighbors (fclaw_domain_t * domain,
                              domain->blocks[*rblockno].num_patches));
         /* *INDENT-ON* */
     }
+#ifdef P4_TO_P8
+    /* hack to get around p8est bug */
+    if(*neighbor_size == FCLAW_PATCH_BOUNDARY)
+    {
+        const int* corner_faces = p8est_corner_faces[cornerno];
+        int corner_touches_coarse_face = 0;
+        for(int f = 0; f < 3; f++)
+        {
+            if(mesh->quad_to_face[P4EST_FACES*patchno+corner_faces[f]] > 23)
+            {
+                corner_touches_coarse_face = 1;
+                break;
+            }
+        }
+        if(corner_touches_coarse_face)
+        {
+            const int* corner_edges = p8est_corner_edges[cornerno];
+            for(int i = 0; i < 3; i++)
+            {
+                int edge = corner_edges[i];
+                int edge_rproc[4];
+                int edge_rblockno;
+                int edge_rpatchno[4];
+                int edge_rfaceno;
+                fclaw_patch_relation_t  edge_neighbor_size;
+                fclaw_patch_edge_neighbors (domain,
+                                              blockno, patchno, edge,
+                                              edge_rproc, &edge_rblockno,
+                                              edge_rpatchno, &edge_rfaceno, &edge_neighbor_size);
+                if(edge_neighbor_size == FCLAW_PATCH_SAMESIZE)
+                {
+                    int edge_axis = edge/4;
+                    int upper_edge_axis = cornerno & (1<<edge_axis);
+                    int neighbor_face = edge_axis*2;
+                    if(upper_edge_axis)
+                    {
+                        neighbor_face++;
+                    }
+                    int n_qid = edge_rpatchno[0];
+                    int e =      mesh->quad_to_face[P4EST_FACES*n_qid+neighbor_face];
+                    int n_qid2 = mesh->quad_to_quad[P4EST_FACES*n_qid+neighbor_face];
+                    if(e > 0 && e <= 23)
+                    {
+                        *rproc = domain->mpirank;
+                        *rblockno = blockno;
+                        *rpatchno = n_qid2;
+                        *rcorner = cornerno ^ ((1<<3)-1);
+                        *neighbor_size = FCLAW_PATCH_SAMESIZE;
+                        break;
+                    }
+                }
+            }
+        }
+    }
+#endif
 
     return *neighbor_size != FCLAW_PATCH_BOUNDARY;
 }
