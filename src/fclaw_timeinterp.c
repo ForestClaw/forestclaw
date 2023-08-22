@@ -23,37 +23,35 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FCLAW2D_TIMEINTERP_H
-#define FCLAW2D_TIMEINTERP_H
+#include <fclaw_timeinterp.h>
+#include <fclaw_patch.h>
+#include <fclaw_global.h>
 
-#include <fclaw_base.h>    /* Defines FCLAW_F77_FUNC */
-
-#ifdef __cplusplus
-extern "C"
+static
+void cb_setup_time_interp(fclaw_domain_t *domain,
+                          fclaw_patch_t *this_patch,
+                          int blockno,
+                          int patchno,
+                          void *user)
 {
-#if 0
-}                               /* need this because indent is dumb */
-#endif
-#endif
-
-struct fclaw_global;
-
-void fclaw2d_timeinterp(struct fclaw_global *glob,
-                       int level, double alpha);
-
-#define FCLAW2D_TIMEINTERP_FORT FCLAW_F77_FUNC (fclaw2d_timeinterp_fort, \
-                                                FCLAW2D_TIMEINTERP_FORT)
-void FCLAW2D_TIMEINTERP_FORT(const int *mx, const int* my, const int* mbc,
-                             const int *meqn, const int* psize,
-                             double qcurr[], double qlast[],
-                             double qinterp[],const double* alpha,
-                             const int* ierror);
-
-#ifdef __cplusplus
-#if 0
-{
-#endif
+    fclaw_global_iterate_t *s = (fclaw_global_iterate_t*) user;
+    if (fclaw_patch_has_finegrid_neighbors(this_patch))
+    {
+        double alpha = *((double*) s->user);
+        fclaw_patch_setup_timeinterp(s->glob,this_patch,alpha);
+    }
 }
-#endif
 
-#endif
+/* ----------------------------------------------------------------------
+   Main routine in this file.  This file assumes that both coarse and
+   fine grids have valid interior data;  they only need to exchange (
+   via interpolating and averaging) ghost cell values.
+   -------------------------------------------------------------------- */
+
+void fclaw_timeinterp(fclaw_global_t *glob,
+                        int level,double alpha)
+{
+    /* Store time interpolated data into m_griddata_time_sync. */
+    fclaw_global_iterate_level(glob,level,cb_setup_time_interp,
+                                 (void *) &alpha);
+}

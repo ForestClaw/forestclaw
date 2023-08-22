@@ -33,6 +33,7 @@ add_library(forestclaw_c OBJECT
   fclaw_run.c
   fclaw_time_sync.c
   fclaw_timer.c
+  fclaw_timeinterp.c
   fclaw_vtable.c
 
   fclaw2d_convenience.c
@@ -44,7 +45,6 @@ add_library(forestclaw_c OBJECT
   fclaw2d_output_tikz.c
   fclaw2d_partition.c
   fclaw2d_rays.c
-  fclaw2d_timeinterp.c
   fclaw2d_update_single_step.c
 
   forestclaw.c
@@ -123,6 +123,7 @@ install(FILES
   fclaw_edge_neighbors.h
   fclaw_elliptic_solver.h 
   fclaw_exchange.h
+  fclaw_face_neighbors.h
   fclaw_farraybox.hpp 
   fclaw_filesystem.h 
   fclaw_gauges.h 
@@ -137,6 +138,7 @@ install(FILES
   fclaw_regrid.h
   fclaw_timer.h 
   fclaw_time_sync.h
+  fclaw_timeinterp.h
   fclaw_mpi.h 
   fclaw_math.h 
   fclaw_vtable.h
@@ -146,7 +148,6 @@ install(FILES
   fclaw2d_convenience.h
   fclaw2d_corner_neighbors.h
   fclaw2d_defs.h 
-  fclaw2d_face_neighbors.h
   fclaw2d_forestclaw.h
   fclaw2d_include_all.h 
   fclaw2d_map.h
@@ -155,7 +156,6 @@ install(FILES
   fclaw2d_map_query_defs.h
   fclaw2d_partition.h
   fclaw2d_rays.h
-  fclaw2d_timeinterp.h
   fclaw2d_to_3d.h
   fclaw2d_update_single_step.h
 

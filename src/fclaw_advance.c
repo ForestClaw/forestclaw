@@ -27,7 +27,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_advance.h>
 #include <fclaw_math.h>
 
-#include <fclaw2d_timeinterp.h>
+#include <fclaw_timeinterp.h>
 #include <fclaw_ghost_fill.h>
 #include <fclaw2d_update_single_step.h>
 #include <fclaw_options.h>
@@ -228,7 +228,7 @@ double advance_level(fclaw_global_t *glob,
 								   coarser_level,alpha);
 
 				fclaw_timer_start (&glob->timers[FCLAW_TIMER_EXTRA1]);
-				fclaw2d_timeinterp(glob,coarser_level,alpha);
+				fclaw_timeinterp(glob,coarser_level,alpha);
 				fclaw_timer_stop (&glob->timers[FCLAW_TIMER_EXTRA1]);
 			}
 		}
