@@ -13,6 +13,7 @@ add_library(forestclaw_c OBJECT
   fclaw_exchange.c
   fclaw_exchange_2d.c
   fclaw_exchange_3d.c
+  fclaw_face_neighbors.c
   fclaw_farraybox.cpp
   fclaw_filesystem.cpp
   fclaw_finalize.c
@@ -36,7 +37,6 @@ add_library(forestclaw_c OBJECT
 
   fclaw2d_convenience.c
   fclaw2d_corner_neighbors.c
-  fclaw2d_face_neighbors.c
   fclaw2d_forestclaw.c
   fclaw2d_map.c
   fclaw2d_map_brick.c

@@ -68,7 +68,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_ghost_fill.h>
 #include <fclaw2d_corner_neighbors.h>
 #include <fclaw_edge_neighbors.h>
-#include <fclaw2d_face_neighbors.h>
+#include <fclaw_face_neighbors.h>
 
 #include <fclaw_global.h>
 #include <fclaw_timer.h>

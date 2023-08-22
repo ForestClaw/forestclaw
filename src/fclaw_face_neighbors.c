@@ -27,7 +27,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * Average, coarsen and copy between grids at faces.
  **/
 
-#include <fclaw2d_face_neighbors.h>
+#include <fclaw_face_neighbors.h>
 
 #include <fclaw_global.h>
 #include <fclaw2d_defs.h>
