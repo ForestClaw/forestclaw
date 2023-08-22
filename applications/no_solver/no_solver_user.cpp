@@ -25,7 +25,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "no_solver_user.h"
 
-#include <fclaw2d_include_all.h>
+#include <fclaw_include_all.h>
 
 #include <fclaw_clawpatch.h>
 #include <fclaw2d_clawpatch_output_ascii.h>

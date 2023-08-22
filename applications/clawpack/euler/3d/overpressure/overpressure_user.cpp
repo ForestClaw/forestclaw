@@ -27,7 +27,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "../all/euler3d_user.h"
 
-#include <fclaw2d_include_all.h>
+#include <fclaw_include_all.h>
 
 #include <fclaw_clawpatch.h>
 #include <fclaw3dx_clawpatch_fort.h>

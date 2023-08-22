@@ -26,7 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef EULER3D_USER_H
 #define EULER3D_USER_H
 
-#include <fclaw2d_include_all.h>
+#include <fclaw_include_all.h>
 
 
 /* Headers for both Clawpack 4.6 and  Clawpack 5.0 */

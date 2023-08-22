@@ -131,6 +131,7 @@ install(FILES
   fclaw_gauges.h 
   fclaw_ghost_fill.h
   fclaw_global.h 
+  fclaw_include_all.h 
   fclaw_options.h 
   fclaw_output.h
   fclaw_package.h 
@@ -150,7 +151,6 @@ install(FILES
 
   fclaw2d_convenience.h
   fclaw2d_defs.h 
-  fclaw2d_include_all.h 
   fclaw2d_map.h
   fclaw2d_map_brick.h
   fclaw2d_map_query.h

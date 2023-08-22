@@ -25,7 +25,7 @@
 
 #include "allencahn_user.h"
     
-#include <fclaw2d_include_all.h>
+#include <fclaw_include_all.h>
 
 #include <fclaw_output.h>
 #include <fclaw_diagnostics.h>

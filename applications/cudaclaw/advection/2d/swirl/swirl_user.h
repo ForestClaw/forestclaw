@@ -26,7 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef SWIRL_USER_H
 #define SWIRL_USER_H
 
-#include <fclaw2d_include_all.h>
+#include <fclaw_include_all.h>
 
 #include <fc2d_cudaclaw.h>
 

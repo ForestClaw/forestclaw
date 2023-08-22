@@ -26,7 +26,7 @@
 #include "radial/radial_user.h"
 #include "slosh/slosh_user.h"
 
-#include <fclaw2d_include_all.h>
+#include <fclaw_include_all.h>
 
 #include <fclaw_clawpatch.h>
 #include <fclaw_clawpatch_options.h>

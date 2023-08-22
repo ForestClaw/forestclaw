@@ -30,7 +30,7 @@
 #include <fc2d_cudaclaw_options.h>
 #include <cudaclaw_user_fort.h>
 
-#include <fclaw2d_include_all.h>
+#include <fclaw_include_all.h>
 
 #include <fclaw_clawpatch.h>
 #include <fclaw_clawpatch_options.h>

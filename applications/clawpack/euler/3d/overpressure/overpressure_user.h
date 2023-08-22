@@ -26,7 +26,7 @@
 #ifndef OVERPRESSURE_USER_H
 #define OVERPRESSURE_USER_H
 
-#include <fclaw2d_include_all.h>
+#include <fclaw_include_all.h>
 
 #include <fclaw_clawpatch_options.h>
 #include <fclaw_clawpatch.h>

@@ -26,10 +26,10 @@
 #ifndef SHOCKBUBBLE_USER_H
 #define SHOCKBUBBLE_USER_H
 
-#include <fclaw2d_include_all.h>
+#include <fclaw_include_all.h>
 
 
-#include <fclaw2d_include_all.h>
+#include <fclaw_include_all.h>
 
 #include <fc2d_cudaclaw.h>
 #include <cudaclaw_user_fort.h>

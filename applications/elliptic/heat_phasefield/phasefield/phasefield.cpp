@@ -28,7 +28,7 @@
     
 #include <fclaw_filesystem.h>
 
-#include <fclaw2d_include_all.h>
+#include <fclaw_include_all.h>
 
 #include <fclaw_global.h>
 #include <fclaw_output.h>

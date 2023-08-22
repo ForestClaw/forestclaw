@@ -26,7 +26,7 @@
 #ifndef SHOCKBUBBLE_USER_HPP
 #define SHOCKBUBBLE_USER_HPP
 
-#include <fclaw2d_include_all.h>
+#include <fclaw_include_all.h>
 
 #ifdef __cplusplus
 extern "C"

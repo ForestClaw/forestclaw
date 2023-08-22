@@ -26,7 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef ALLENCAHN_OPTIONS_H
 #define ALLENCAHN_OPTIONS_H
 
-#include <fclaw2d_include_all.h>
+#include <fclaw_include_all.h>
 
 #ifdef __cplusplus
 extern "C"
