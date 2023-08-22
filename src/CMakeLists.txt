@@ -28,6 +28,7 @@ add_library(forestclaw_c OBJECT
   fclaw_patch.c
   fclaw_package.c 
   fclaw_physical_bc.c
+  fclaw_partition.c
   fclaw_pointer_map.c
   fclaw_regrid.c
   fclaw_run.c
@@ -43,7 +44,6 @@ add_library(forestclaw_c OBJECT
   fclaw2d_map_brick.c
   fclaw2d_map_query.c
   fclaw2d_output_tikz.c
-  fclaw2d_partition.c
   fclaw2d_rays.c
   fclaw2d_update_single_step.c
 
@@ -132,6 +132,7 @@ install(FILES
   fclaw_options.h 
   fclaw_output.h
   fclaw_package.h 
+  fclaw_partition.h
   fclaw_patch.h
   fclaw_physical_bc.h
   fclaw_pointer_map.h 
@@ -154,7 +155,6 @@ install(FILES
   fclaw2d_map_brick.h
   fclaw2d_map_query.h
   fclaw2d_map_query_defs.h
-  fclaw2d_partition.h
   fclaw2d_rays.h
   fclaw2d_to_3d.h
   fclaw2d_update_single_step.h

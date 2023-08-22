@@ -23,9 +23,9 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <fclaw2d_partition.h>
+#include <fclaw_partition.h>
 
-#include <fclaw2d_convenience.h>  /* p4est domain, patch handling routines */
+#include <fclaw_convenience.h>  /* p4est domain, patch handling routines */
 
 #include <fclaw_global.h>
 #include <fclaw_domain.h>
@@ -110,7 +110,7 @@ void  cb_partition_transfer(fclaw_domain_t * old_domain,
    Public interface
    -------------------------------------------------------------------------- */
 /* Question : Do all patches on this processor get packed? */
-void fclaw2d_partition_domain(fclaw_global_t* glob,
+void fclaw_parition_domain(fclaw_global_t* glob,
                               fclaw_timer_names_t running)
 {
     fclaw_domain_t** domain = &glob->domain;

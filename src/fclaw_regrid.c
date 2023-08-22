@@ -35,7 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw_global.h>
 #include <fclaw_ghost_fill.h>
-#include <fclaw2d_partition.h>
+#include <fclaw_partition.h>
 #include <fclaw_vtable.h>
 #include <fclaw_domain.h>
 #include <fclaw_patch.h>
@@ -286,7 +286,7 @@ void fclaw_regrid(fclaw_global_t *glob)
         new_domain = NULL;
 
         /* Repartition for load balancing.  Second arg (mode) for vtk output */
-        fclaw2d_partition_domain(glob,FCLAW_TIMER_REGRID);
+        fclaw_parition_domain(glob,FCLAW_TIMER_REGRID);
 
         /* Set up ghost patches. Communication happens for indirect ghost exchanges. */
 

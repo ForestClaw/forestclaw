@@ -38,8 +38,8 @@ extern "C"
 
 struct fclaw_domain;
 
-void fclaw2d_partition_domain(struct fclaw_global* glob, 
-                              fclaw_timer_names_t running);
+void fclaw_parition_domain(struct fclaw_global* glob, 
+                           fclaw_timer_names_t running);
 
 #ifdef __cplusplus
 #if 0

@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw_gauges.h>
 
-#include <fclaw2d_partition.h>
+#include <fclaw_partition.h>
 #include <fclaw_physical_bc.h>
 #include <fclaw_ghost_fill.h>
 #include <fclaw_diagnostics.h>
@@ -212,7 +212,7 @@ void fclaw_initialize(fclaw_global_t *glob)
                 new_domain = NULL;
 
                 /* Repartition domain to new processors.    */
-                fclaw2d_partition_domain(glob,FCLAW_TIMER_INIT);
+                fclaw_parition_domain(glob,FCLAW_TIMER_INIT);
 
                 /* Set up ghost patches.  This probably doesn't need to be done
                    each time we add a new level. */
