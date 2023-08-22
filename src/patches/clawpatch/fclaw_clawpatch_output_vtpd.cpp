@@ -76,7 +76,7 @@ WriteVTIFile(fclaw_domain_t * domain, fclaw_patch_t * patch,
 		}
 
 		int offset = appended_data_stride * index;
-		file << "\t\t\t\t<DataArray type=\"Float64\" Name=\"" << name << "\" NumberOfComponents=\"" << meqn << "\" format=\"appended\" RangeMin=\"" << min_val << "\" RangeMax=\"" << max_val << "\" offset=\"" << offset << "\">" << endl;
+		file << "\t\t\t\t<DataArray type=\"Float32\" Name=\"" << name << "\" NumberOfComponents=\"" << meqn << "\" format=\"appended\" RangeMin=\"" << min_val << "\" RangeMax=\"" << max_val << "\" offset=\"" << offset << "\">" << endl;
 		file << "\t\t\t\t</DataArray>" << endl;
 		index++;
 	}
@@ -86,7 +86,7 @@ WriteVTIFile(fclaw_domain_t * domain, fclaw_patch_t * patch,
 	file << "\t<AppendedData encoding=\"raw\">" << endl;
 	file << "\t\t_";
 
-	uint32_t size = mx * my * mz * meqn * sizeof(double);
+	uint32_t size = mx * my * mz * meqn * sizeof(float);
 
 	for(int i=0; i<1; i++)
 	{
@@ -100,8 +100,8 @@ WriteVTIFile(fclaw_domain_t * domain, fclaw_patch_t * patch,
 		for(int i = 0; i < my; i++)
 		for(int m = 0; m < meqn; m++)
 		{
-			double val = q[i+mbc + (j+mbc) * stride_j + (k+mbc) * stride_k + m * stride_m];
-			file.write(reinterpret_cast<const char *>(&val), sizeof(double));
+			float val = q[i+mbc + (j+mbc) * stride_j + (k+mbc) * stride_k + m * stride_m];
+			file.write(reinterpret_cast<const char *>(&val), sizeof(float));
 		}
 	}
 
