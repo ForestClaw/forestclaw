@@ -1239,14 +1239,12 @@ void clawpatch_average2coarse(fclaw_global_t *glob,
     int mbc = clawpatch_opt->mbc;
     int meqn = clawpatch_opt->meqn;
 
-    double *areacoarse = clawpatch_get_area(glob, coarse_patch);
-
-    double *qcoarse = fclaw_clawpatch_get_q(glob,coarse_patch);
 
     for(int igrid = 0; igrid < fclaw_domain_num_children(glob->domain); igrid++)
     {
         fclaw_patch_t *fine_patch = &fine_patches[igrid];
         double *qfine = fclaw_clawpatch_get_q(glob,fine_patch);
+        double *qcoarse = fclaw_clawpatch_get_q(glob,coarse_patch);
 
         const fclaw_options_t* fclaw_opt = fclaw_get_options(glob);
 
@@ -1255,6 +1253,8 @@ void clawpatch_average2coarse(fclaw_global_t *glob,
 
         if(clawpatch_opt->dim == 2)
         {
+            double *areacoarse = clawpatch_get_area(glob, coarse_patch);
+
             double *areafine =  NULL;
             if (fclaw_opt->manifold)
                 areafine = clawpatch_get_area(glob, fine_patch);
@@ -1267,8 +1267,9 @@ void clawpatch_average2coarse(fclaw_global_t *glob,
         }
         else
         {
+            double *volcoarse = clawpatch_get_volume(glob, coarse_patch);
+
             double *volfine = NULL;
-            double *volcoarse = areacoarse;
             if (fclaw_opt->manifold)
                 volfine = clawpatch_get_volume(glob, fine_patch);
 
@@ -1762,7 +1763,7 @@ void initialize_3d_claw46_fort_vt(fclaw_clawpatch_vtable_t* clawpatch_vt)
     clawpatch_vt->d3->fort_interpolate2fine      = FCLAW3D_CLAWPATCH46_FORT_INTERPOLATE2FINE;
 
     clawpatch_vt->d3->fort_tag4refinement        = FCLAW3D_CLAWPATCH46_FORT_TAG4REFINEMENT;
-    clawpatch_vt->d3->fort_tag4coarsening_3dx        = FCLAW3DX_CLAWPATCH46_FORT_TAG4COARSENING;
+    clawpatch_vt->d3->fort_tag4coarsening        = FCLAW3D_CLAWPATCH46_FORT_TAG4COARSENING;
 
     /* output functions */
     clawpatch_vt->fort_header_ascii              = FCLAW3D_CLAWPATCH46_FORT_HEADER_ASCII;
