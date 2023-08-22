@@ -61,7 +61,7 @@ typedef struct fclaw3d_file_context fclaw3d_file_context_t;
  * is written to the file.
  *
  * The opened file can be used to write to the file using the functions
- * \ref fclaw3d_file_write_block, \ref fclaw3d_file_write_field and functions
+ * \ref fclaw3d_file_write_block, \ref fclaw3d_file_write_array and functions
  * in other files operating on \ref fclaw3d_file_context_t.
  *
  * This function does not abort on MPI I/O errors but returns NULL.
@@ -169,7 +169,7 @@ fclaw3d_file_context_t *fclaw3d_file_write_block (fclaw3d_file_context_t *
  *                              non-contigous patch data. The patch data is
  *                              expected to be stored according to the Morton
  *                              order of the patches. For \b patch_size == 0
- *                              the function writes an empty field. The section
+ *                              the function writes an empty array. The section
  *                              header and the padding is still written.
  *                              In this case errcode is set to \ref
  *                              FCLAW3D_FILE_ERR_SUCCESS.
@@ -180,7 +180,7 @@ fclaw3d_file_context_t *fclaw3d_file_write_block (fclaw3d_file_context_t *
  *                              In case of error the file is tried to close
  *                              and \b fc is freed.
  */
-fclaw3d_file_context_t *fclaw3d_file_write_field (fclaw3d_file_context_t *
+fclaw3d_file_context_t *fclaw3d_file_write_array (fclaw3d_file_context_t *
                                                   fc, const char *user_string,
                                                   size_t patch_size,
                                                   sc_array_t *patch_data,
@@ -198,7 +198,7 @@ fclaw3d_file_context_t *fclaw3d_file_write_field (fclaw3d_file_context_t *
  * as errcode.
  *
  * After calling this function the user can continue reading the opened file
- * by calling \ref fclaw3d_file_read_block, \ref fclaw3d_file_read_field and
+ * by calling \ref fclaw3d_file_read_block, \ref fclaw3d_file_read_array and
  * functions in other files operating on \ref fclaw3d_file_context_t.
  *
  * This function does not abort on MPI I/O errors but returns NULL.
@@ -283,8 +283,8 @@ fclaw3d_file_context_t *fclaw3d_file_read_block (fclaw3d_file_context_t *
  * This is a collective function.
  * The function closes and deallocates the file context and returns NULL
  * if the bytes the user wants to read exceed the given file and/or
- * the element size of the field given by \b patch_data->elem_size does not
- * coincide with the element size according to the field metadata given in
+ * the element size of the array given by \b patch_data->elem_size does not
+ * coincide with the element size according to the array metadata given in
  * the file.
  *
  * The data is read in parallel using the partition of the domain (and the
@@ -328,7 +328,7 @@ fclaw3d_file_context_t *fclaw3d_file_read_block (fclaw3d_file_context_t *
  *                            In case of error the file is tried to close
  *                            and \b fc is freed.
  */
-fclaw3d_file_context_t *fclaw3d_file_read_field (fclaw3d_file_context_t *
+fclaw3d_file_context_t *fclaw3d_file_read_array (fclaw3d_file_context_t *
                                                  fc, char *user_string,
                                                  size_t patch_size,
                                                  sc_array_t *patch_data,

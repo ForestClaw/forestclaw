@@ -72,7 +72,7 @@ fclaw2d_file_write_block (fclaw2d_file_context_t *
 }
 
 fclaw2d_file_context_t *
-fclaw2d_file_write_field (fclaw2d_file_context_t *
+fclaw2d_file_write_array (fclaw2d_file_context_t *
                           fc, const char *user_string,
                           size_t patch_size,
                           sc_array_t * patch_data, int *errcode)
@@ -123,7 +123,7 @@ fclaw2d_file_read_block (fclaw2d_file_context_t *
 }
 
 fclaw2d_file_context_t *
-fclaw2d_file_read_field (fclaw2d_file_context_t *
+fclaw2d_file_read_array (fclaw2d_file_context_t *
                          fc, char *user_string,
                          size_t patch_size,
                          sc_array_t * patch_data, int *errcode)
