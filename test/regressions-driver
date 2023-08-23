@@ -152,6 +152,8 @@ if test $error -eq 0; then
 
     # test name to show to console and logs
     test_name="$relative_dir: $line"
+    # remove leading "./" from line
+    line=`echo $line | sed -e "s|^.*/||"`
     # full command to execute
     full_cmd="$FCLAW_BUILD_DIR/applications/$relative_dir/$line"
   
