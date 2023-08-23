@@ -500,8 +500,10 @@ void fc3d_clawpack46_solver_initialize(fclaw_global_t* glob)
 	fclaw_clawpatch_options_t* clawpatch_opt = fclaw_clawpatch_get_options(glob);
 	fc3d_clawpack46_options_t* clawopt = fc3d_clawpack46_get_options(glob);
 
-	FCLAW_ASSERT_MESSAGE(clawpatch_opt->dim == 3,
-			"Clawpatch dimension set to 2d. fc3d_clawpack46 is only for 3d.");
+	if(clawpatch_opt->dim != 3)
+	{
+		FCLAW_ABORT("Clawpatch dimension set to 2d. fc3d_clawpack46 is only for 3d.");
+	}
 
     clawopt->method[6] = clawpatch_opt->maux;
 

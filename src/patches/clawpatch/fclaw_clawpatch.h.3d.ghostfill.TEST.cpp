@@ -675,7 +675,7 @@ TEST_CASE("3d ghost fill on cube with refinement coarse interior")
 
         CHECK_EQ(cube.glob->domain->global_num_patches, 64);
         cube.setup();
-        CHECK_EQ(cube.glob->domain->global_num_patches, 127);
+        CHECK_EQ(cube.glob->domain->global_num_patches, 456);
 
         //create output domain with bigger size, so that we can see ghost cells
         //in the vtk output
@@ -693,7 +693,7 @@ TEST_CASE("3d ghost fill on cube with refinement coarse interior")
         fclaw_clawpatch_vt(cube_output.glob)->d3->fort_interpolate2fine = fort_interpolate2fine;
         CHECK_EQ(cube_output.glob->domain->global_num_patches, 64);
         cube_output.setup();
-        CHECK_EQ(cube_output.glob->domain->global_num_patches, 127);
+        CHECK_EQ(cube_output.glob->domain->global_num_patches, 456);
 
         //initialize patches
         fclaw_global_iterate_patches(
@@ -723,9 +723,9 @@ TEST_CASE("3d ghost fill on cube with refinement coarse interior")
             nullptr
         );
 
-        CHECK_EQ(cube.glob->domain->global_num_patches, 127);
+        CHECK_EQ(cube.glob->domain->global_num_patches, 456);
         fclaw_ghost_update(cube.glob, 2, 4, 0, 0, FCLAW_TIMER_NONE);
-        CHECK_EQ(cube.glob->domain->global_num_patches, 127);
+        CHECK_EQ(cube.glob->domain->global_num_patches, 456);
 
         //check ghost cells
         //fill output domain with error

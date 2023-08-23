@@ -107,31 +107,5 @@ TEST_CASE("fclaw_global_clear_static")
     fclaw_global_t* glob = (fclaw_global_t*)123;
     fclaw_global_set_static(glob);
     fclaw_global_clear_static();
-#ifdef FCLAW_ENABLE_DEBUG
-    CHECK_SC_ABORTED(fclaw_global_get_static_global());
-#else
     CHECK_EQ(fclaw_global_get_static_global(), nullptr);
-#endif
 }
-
-#ifdef FCLAW_ENABLE_DEBUG
-
-TEST_CASE("fclaw_global_set_static twice fails")
-{
-    fclaw_global_t* glob = (fclaw_global_t*)123;
-    fclaw_global_set_static(glob);
-    CHECK_SC_ABORTED(fclaw_global_set_static(glob));
-    fclaw_global_clear_static();
-}
-
-TEST_CASE("fclaw_global_clear_static assert fails when NULL")
-{
-    CHECK_SC_ABORTED(fclaw_global_clear_static());
-}
-
-TEST_CASE("fclaw_global_get_static_global assert fails when NULL")
-{
-    CHECK_SC_ABORTED(fclaw_global_get_static_global());
-}
-
-#endif

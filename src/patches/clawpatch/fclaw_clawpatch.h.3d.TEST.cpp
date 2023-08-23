@@ -884,6 +884,10 @@ namespace{
     fclaw_clawpatch_t* t4c_cp1;
     fclaw_clawpatch_t* t4c_cp2;
     fclaw_clawpatch_t* t4c_cp3;
+    fclaw_clawpatch_t* t4c_cp4;
+    fclaw_clawpatch_t* t4c_cp5;
+    fclaw_clawpatch_t* t4c_cp6;
+    fclaw_clawpatch_t* t4c_cp7;
     int t4c_tag_patch;
     int t4c_init_flag;
 }
@@ -905,15 +909,20 @@ TEST_CASE("3d fclaw_clawpatch tag4coarsening")
             t4c_cp1 = fclaw2d_clawpatch_get_clawpatch(&test_data.domain->blocks[0].patches[1]);
             t4c_cp2 = fclaw2d_clawpatch_get_clawpatch(&test_data.domain->blocks[0].patches[2]);
             t4c_cp3 = fclaw2d_clawpatch_get_clawpatch(&test_data.domain->blocks[0].patches[3]);
+            t4c_cp4 = fclaw2d_clawpatch_get_clawpatch(&test_data.domain->blocks[0].patches[4]);
+            t4c_cp5 = fclaw2d_clawpatch_get_clawpatch(&test_data.domain->blocks[0].patches[5]);
+            t4c_cp6 = fclaw2d_clawpatch_get_clawpatch(&test_data.domain->blocks[0].patches[6]);
+            t4c_cp7 = fclaw2d_clawpatch_get_clawpatch(&test_data.domain->blocks[0].patches[7]);
 
             fclaw_clawpatch_vtable_t * clawpatch_vt = fclaw_clawpatch_vt(test_data.glob);
 
-            clawpatch_vt->d3->fort_tag4coarsening_3dx = [](const int *mx, const int *my, const int *mz, 
+            clawpatch_vt->d3->fort_tag4coarsening = [](const int *mx, const int *my, const int *mz, 
                                                        const int *mbc, const int *meqn, 
                                                        double xlower[], double ylower[], double zlower[], 
                                                        const double *dx, const double *dy, const double *dz, 
                                                        const int *blockno, 
                                                        double q0[], double q1[], double q2[], double q3[], 
+                                                       double q4[], double q5[], double q6[], double q7[], 
                                                        const double *tag_threshold, const int *init_flag, int *tag_patch)
             {
                 CHECK(*mx == t4c_cp->d3->mx);
@@ -932,6 +941,10 @@ TEST_CASE("3d fclaw_clawpatch tag4coarsening")
                 CHECK(q1 == t4c_cp1->griddata.dataPtr());
                 CHECK(q2 == t4c_cp2->griddata.dataPtr());
                 CHECK(q3 == t4c_cp3->griddata.dataPtr());
+                CHECK(q4 == t4c_cp4->griddata.dataPtr());
+                CHECK(q5 == t4c_cp5->griddata.dataPtr());
+                CHECK(q6 == t4c_cp6->griddata.dataPtr());
+                CHECK(q7 == t4c_cp7->griddata.dataPtr());
                 CHECK(*tag_threshold == .90210);
                 CHECK(*init_flag == t4c_init_flag);
                 *tag_patch = t4c_tag_patch;

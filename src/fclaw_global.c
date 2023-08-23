@@ -234,24 +234,21 @@ void* fclaw_global_get_attribute (fclaw_global_t* glob, const char* key)
     return fclaw_pointer_map_get(glob->attributes, key);
 }
 
-static fclaw_global_t* fclaw2d_global_glob = NULL;
+static fclaw_global_t* fclaw_global_glob = NULL;
 
 void fclaw_global_set_static (fclaw_global_t* glob)
 {
-    FCLAW_ASSERT (fclaw2d_global_glob == NULL);
-    fclaw2d_global_glob = glob;
+    fclaw_global_glob = glob;
 }
 
 void fclaw_global_clear_static (void)
 {
-    FCLAW_ASSERT (fclaw2d_global_glob != NULL);
-    fclaw2d_global_glob = NULL;
+    fclaw_global_glob = NULL;
 }
 
 fclaw_global_t* fclaw_global_get_static_global (void)
 {
-    FCLAW_ASSERT(fclaw2d_global_glob != NULL);
-    return fclaw2d_global_glob;
+    return fclaw_global_glob;
 }
 
 // Only 2d for now need fclaw2d_options

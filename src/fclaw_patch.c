@@ -919,19 +919,19 @@ void patch_vt_destroy(void* vt)
 
 void fclaw_patch_vtable_initialize(fclaw_global_t* glob)
 {
-    FCLAW_ASSERT_MESSAGE(
-        glob->domain != NULL, 
-        "domain needs to be stored in glob before initializing vtables"
-    );
+    if(glob->domain == NULL)
+    {
+        FCLAW_ABORT("domain needs to be stored in glob before initializing vtables");
+    }
 
     fclaw_patch_vtable_t *patch_vt = patch_vt_new(glob->domain->dim);
 
     patch_vt->is_set = 1;
 
-    FCLAW_ASSERT_MESSAGE(
-        fclaw_pointer_map_get(glob->vtables,"fclaw_patch") == NULL, 
-        "Vtable has already been initialized"
-    );
+    if(fclaw_pointer_map_get(glob->vtables,"fclaw_patch") != NULL)
+    {
+        FCLAW_ABORT("Vtable has already been initialized");
+    }
     fclaw_pointer_map_insert(glob->vtables, "fclaw_patch", patch_vt, patch_vt_destroy);
 }
 
