@@ -8,6 +8,7 @@ libforestclaw_installed_headers = \
 	src/fclaw_advance.h \
 	src/fclaw_base.h \
 	src/fclaw_block.h \
+	src/fclaw_convenience.h \
 	src/fclaw_corner_neighbors.h \
 	src/fclaw_diagnostics.h \
 	src/fclaw_domain.h \

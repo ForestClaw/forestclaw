@@ -118,6 +118,7 @@ install(FILES
   fclaw_advance.h 
   fclaw_base.h 
   fclaw_block.h
+  fclaw_convenience.h
   fclaw_corner_neighbors.h
   fclaw_diagnostics.h
   fclaw_domain.h
