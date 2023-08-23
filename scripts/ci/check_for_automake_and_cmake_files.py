@@ -4,7 +4,9 @@
 
 # set of exceptions to this check with explanation in comments
 exceptions = {
-    "./applications/CMakeLists.txt" # cooresponding file is MakeFile.apps in root of source tree
+    "./applications/CMakeLists.txt", # cooresponding file is MakeFile.apps in root of source tree
+    "./applications/cmake/Modules/add_regressions.cmake",
+    "./applications/cmake/Modules/discover_regressions.cmake"
 }
 
 import os
