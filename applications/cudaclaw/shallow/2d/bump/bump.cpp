@@ -42,8 +42,8 @@ fclaw_domain_t* create_domain(sc_MPI_Comm mpicomm,
     cont = fclaw2d_map_new_nomap();
 
     domain = fclaw2d_domain_new_conn_map (mpicomm, fclaw_opt->minlevel, conn, cont);
-    fclaw2d_domain_list_levels(domain, FCLAW_VERBOSITY_ESSENTIAL);
-    fclaw2d_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);  
+    fclaw_domain_list_levels(domain, FCLAW_VERBOSITY_ESSENTIAL);
+    fclaw_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);  
     return domain;
 }
 
@@ -53,7 +53,7 @@ void run_program(fclaw_global_t* glob)
     /* ---------------------------------------------------------------
        Set domain data.
        --------------------------------------------------------------- */
-    fclaw2d_domain_data_new(glob->domain);
+    fclaw_domain_data_new(glob->domain);
 
     user_options_t* user_opt = bump_get_options(glob);
 
@@ -82,13 +82,13 @@ void run_program(fclaw_global_t* glob)
     PROFILE_CUDA_GROUP("Allocate GPU and GPU buffers",1);
     fc2d_cudaclaw_allocate_buffers(glob);
 
-    fclaw2d_initialize(glob);
-    fclaw2d_run(glob);
+    fclaw_initialize(glob);
+    fclaw_run(glob);
 
     PROFILE_CUDA_GROUP("De-allocate GPU and GPU buffers",1);
     fc2d_cudaclaw_deallocate_buffers(glob);
     
-    fclaw2d_finalize(glob);
+    fclaw_finalize(glob);
 }
 
 

@@ -37,7 +37,7 @@ void radial_problem_setup(fclaw_global_t* glob)
         fclose(f);
     }
     /* We want to make sure node 0 gets here before proceeding */
-    fclaw2d_domain_barrier (glob->domain);  /* redundant?  */
+    fclaw_domain_barrier (glob->domain);  /* redundant?  */
 
     setprob_cuda();
 
@@ -49,7 +49,7 @@ void radial_link_solvers(fclaw_global_t *glob)
 {
     //fclaw2d_patch_vtable_t*  patch_vt = fclaw2d_patch_vt(glob);  
 
-    fclaw2d_vtable_t *vt = fclaw2d_vt(glob);
+    fclaw_vtable_t *vt = fclaw_vt(glob);
     vt->problem_setup = &radial_problem_setup;  /* Version-independent */
 
     //const user_options_t* user = radial_get_options(glob);

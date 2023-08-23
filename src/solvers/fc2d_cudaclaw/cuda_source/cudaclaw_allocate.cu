@@ -78,7 +78,7 @@ void cudaclaw_allocate_fluxes(fclaw_global_t *glob,
     value = 0;
     CHECK(cudaMemset((void*)fluxes->speeds_dev, value, fluxes->num_bytes_speeds));
 
-    fclaw2d_patch_set_user_data(glob,patch,fluxes);
+    fclaw_patch_set_user_data(glob,patch,fluxes);
 }
 
 void cudaclaw_deallocate_fluxes(fclaw_global_t *glob,
@@ -86,7 +86,7 @@ void cudaclaw_deallocate_fluxes(fclaw_global_t *glob,
 {
     PROFILE_CUDA_GROUP("De-allocate patch device memory",4);       
     cudaclaw_fluxes_t *fluxes = (cudaclaw_fluxes_t*) 
-               fclaw2d_patch_get_user_data(glob,patch);
+               fclaw_patch_get_user_data(glob,patch);
 
     FCLAW_ASSERT(fluxes != NULL);
 

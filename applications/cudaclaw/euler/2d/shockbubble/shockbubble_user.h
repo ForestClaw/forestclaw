@@ -28,9 +28,6 @@
 
 #include <fclaw_include_all.h>
 
-
-#include <fclaw_include_all.h>
-
 #include <fc2d_cudaclaw.h>
 #include <cudaclaw_user_fort.h>
 

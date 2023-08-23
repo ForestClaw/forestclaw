@@ -38,7 +38,7 @@ void swirl_problem_setup(fclaw_global_t* glob)
     }
 
     /* Make sure node 0 has written 'setprob.data' before proceeding */
-    fclaw2d_domain_barrier (glob->domain);
+    fclaw_domain_barrier (glob->domain);
 
     setprob();
 }
@@ -46,8 +46,8 @@ void swirl_problem_setup(fclaw_global_t* glob)
 
 void swirl_link_solvers(fclaw_global_t *glob)
 {
-	fclaw2d_vtable_t *vt = fclaw2d_vt(glob);
-    fclaw2d_patch_vtable_t*  patch_vt = fclaw2d_patch_vt(glob);  
+	fclaw_vtable_t *vt = fclaw_vt(glob);
+    fclaw_patch_vtable_t*  patch_vt = fclaw_patch_vt(glob);  
 
 
 	vt->problem_setup = &swirl_problem_setup;  /* Version-independent */

@@ -246,7 +246,7 @@ void cudaclaw_setaux(fclaw_global_t *glob,
         return;
     }
 
-    if (fclaw2d_patch_is_ghost(this_patch))
+    if (fclaw_patch_is_ghost(this_patch))
     {
         /* This is going to be removed at some point */
         return;
@@ -301,7 +301,7 @@ double cudaclaw_update(fclaw_global_t *glob,
 #endif
 
     /* -------------------------------- Main update ----------------------------------- */
-    fclaw2d_timer_start_threadsafe (&glob->timers[FCLAW_TIMER_ADVANCE_STEP2]);  
+    fclaw_timer_start_threadsafe (&glob->timers[FCLAW_TIMER_ADVANCE_STEP2]);  
 
     cuclaw_opt = fc2d_cudaclaw_get_options(glob);
     maxcfl = 0.0;
@@ -354,7 +354,7 @@ double cudaclaw_update(fclaw_global_t *glob,
         FCLAW_FREE(buffer_data->user);                                      
     }
 
-    fclaw2d_timer_stop_threadsafe (&glob->timers[FCLAW_TIMER_ADVANCE_STEP2]);       
+    fclaw_timer_stop_threadsafe (&glob->timers[FCLAW_TIMER_ADVANCE_STEP2]);       
 
     /* -------------------------------- Source term ----------------------------------- */
     if (cuclaw_opt->src_term > 0)
@@ -417,10 +417,10 @@ void fc2d_cudaclaw_solver_initialize(fclaw_global_t* glob)
     }
 
     int claw_version = 4;
-    fclaw2d_clawpatch_vtable_initialize(glob, claw_version);
+    fclaw_clawpatch_vtable_initialize(glob, claw_version);
 
-    fclaw2d_vtable_t*                fclaw_vt = fclaw2d_vt(glob);
-    fclaw2d_patch_vtable_t*          patch_vt = fclaw2d_patch_vt(glob);  
+    fclaw_vtable_t*                fc_vt    = fclaw_vt(glob);
+    fclaw_patch_vtable_t*          patch_vt = fclaw_patch_vt(glob);  
 
     fc2d_cudaclaw_vtable_t*  cudaclaw_vt = cudaclaw_vt_new();
 
@@ -430,8 +430,8 @@ void fc2d_cudaclaw_solver_initialize(fclaw_global_t* glob)
 #endif    
 
     /* ForestClaw vtable items */
-    fclaw_vt->output_frame                   = cudaclaw_output;
-    fclaw_vt->problem_setup                  = cudaclaw_setprob;    
+    fc_vt->output_frame                      = cudaclaw_output;
+    fc_vt->problem_setup                     = cudaclaw_setprob;    
 
     /* These could be over-written by user specific settings */
     patch_vt->initialize                     = cudaclaw_qinit;

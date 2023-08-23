@@ -43,7 +43,7 @@ extern "C"
 
 
 struct fclaw_global;
-struct fclaw2d_patch;
+struct fclaw_patch;
 struct cudaclaw_fluxes;
 
 
@@ -76,10 +76,10 @@ typedef void (*cudaclaw_cuda_speeds_t)(int idir, int meqn, int mwaves, int maux,
 /* ------------------------------------- Function headers ------------------------------*/
 
 void cudaclaw_allocate_fluxes(struct fclaw_global *glob,
-                              struct fclaw2d_patch *patch);
+                              struct fclaw_patch *patch);
     
 void cudaclaw_deallocate_fluxes(struct fclaw_global *glob,
-                                struct fclaw2d_patch *patch);
+                                struct fclaw_patch *patch);
 
 
 double cudaclaw_step2_batch(struct fclaw_global* glob,
@@ -87,7 +87,7 @@ double cudaclaw_step2_batch(struct fclaw_global* glob,
                             int patch_buffer_len, double t, double dt);
 
 void cudaclaw_store_buffer(struct fclaw_global* glob,
-                           struct fclaw2d_patch *this_patch,
+                           struct fclaw_patch *this_patch,
                            int this_atch_idx,
                            int count, int iter, 
                            struct cudaclaw_fluxes* flux_array);

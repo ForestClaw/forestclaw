@@ -22,7 +22,7 @@ void cudaclaw_store_buffer(fclaw_global_t* glob,
 
 
     cudaclaw_fluxes_t *fluxes = (cudaclaw_fluxes_t*) 
-               fclaw2d_patch_get_user_data(glob,this_patch);
+               fclaw_patch_get_user_data(glob,this_patch);
 
     FCLAW_ASSERT(fluxes != NULL);
 
