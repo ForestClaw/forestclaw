@@ -28,6 +28,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_domain.h>
 #include <fclaw_options.h>
 #include <fclaw_patch.h>
+#include <fclaw_exchange.h>
 
 // 2d/3d functions hidden from users
 void fclaw2d_exchange_setup(struct fclaw_global* glob,
