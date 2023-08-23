@@ -973,7 +973,7 @@ namespace{
     fclaw_clawpatch_t* i2f_cp1;
     fclaw_clawpatch_t* i2f_cp2;
     fclaw_clawpatch_t* i2f_cp3;
-    std::bitset<4> i2f_igrids;
+    std::bitset<8> i2f_igrids;
     int i2f_manifold;
 }
 TEST_CASE("3d fclaw_clawpatch interpolate2fine")
