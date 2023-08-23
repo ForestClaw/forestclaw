@@ -78,7 +78,7 @@ function(add_regressions filename source_dir build_dir mpiexec mpiexec_np_flag m
         string(REGEX REPLACE "^.*/" "" executable "${executable}")
 
         if(executable STREQUAL "cd")
-            list(GET argv 1 directory)
+            list(GET argv 0 directory)
 
             cmake_path(APPEND working_directory "${directory}")
             cmake_path(SET working_directory NORMALIZE "${working_directory}")
