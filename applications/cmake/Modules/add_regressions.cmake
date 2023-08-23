@@ -14,7 +14,7 @@ function(add_regressions TARGET)
   set(ctest_include_file "${CMAKE_CURRENT_BINARY_DIR}/${TARGET}_include-${args_hash}.cmake")
   file(WRITE "${ctest_include_file}"
     "include(\"${PROJECT_SOURCE_DIR}/cmake/Modules/discover_regressions.cmake\")\n"
-    "add_regressions(\"${CMAKE_CURRENT_SOURCE_DIR}/${TARGET}\" \"${CMAKE_CURRENT_SOURCE_DIR}\" \"${CMAKE_CURRENT_BINARY_DIR}\")\n"
+    "add_regressions(\"${CMAKE_CURRENT_SOURCE_DIR}/${TARGET}\" \"${CMAKE_CURRENT_SOURCE_DIR}\" \"${CMAKE_CURRENT_BINARY_DIR}\" \"${MPIEXEC_EXECUTABLE}\" \"${MPIEXEC_NUMPROC_FLAG}\" \"${MPIEXEC_MAX_NUMPROCS}\")\n"
   )
 
   if(NOT CMAKE_VERSION VERSION_LESS 3.10)

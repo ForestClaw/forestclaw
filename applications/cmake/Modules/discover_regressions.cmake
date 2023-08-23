@@ -28,29 +28,12 @@ function(read_file_lines filepath out_list)
     set(${out_list} "${non_empty_lines}" PARENT_SCOPE)
 endfunction()
 
-function(add_regressions filename source_dir build_dir)
+function(add_regressions filename source_dir build_dir mpiexec mpiexec_np_flag mpiexec_max_np)
     read_file_lines(${filename} tests) 
 
     set(working_directory "${source_dir}")
     # Loop through each test
     foreach(test IN LISTS tests)
-        list(GET argv 0 executable)
-        if(executable STREQUAL "cd")
-            list(GET argv 1 directory)
-
-            cmake_path(APPEND working_directory "${directory}")
-            cmake_path(SET working_directory NORMALIZE "${working_directory}")
-
-            message(STATUS "${working_directory}")
-        else()
-            string(REGEX REPLACE "^.*applications/" "" relative_source_directory "${working_directory}")
-            set(test_name "${relative_source_directory}: ${test}")
-
-            string(REGEX REPLACE "^.*/" "" test "${test}")
-            string(REGEX REPLACE "[ \t].*" "" executable "${test}")
-            string(REGEX REPLACE "^${executable}" "" args "${test}")
-            cmake_path(APPEND build_dir "${executable}" OUTPUT_VARIABLE executable)
-
             # Initialize an empty list to hold the final split values
             set(argv "")
 
@@ -61,12 +44,12 @@ function(add_regressions filename source_dir build_dir)
             set(in_quotes FALSE)
 
             # Get length of the string
-            string(LENGTH ${args} args_length)
+            string(LENGTH ${test} test_length)
 
             # Loop through each character in the string
-            foreach(index RANGE 0 ${args_length})
+            foreach(index RANGE 0 ${test_length})
                 # Use string(SUBSTRING) to get a single character from the string
-                string(SUBSTRING ${args} ${index} 1 char)
+                string(SUBSTRING ${test} ${index} 1 char)
               if(char STREQUAL "\"" OR char STREQUAL "'")
                 # Toggle the in-quotes state
                 set(in_quotes NOT ${in_quotes})
@@ -89,7 +72,25 @@ function(add_regressions filename source_dir build_dir)
               list(APPEND argv "${current_token}")
             endif()
 
-            add_test(${test_name} ${TEST_RUNNER} ${executable} ${argv})
+
+        list(GET argv 0 executable)
+        list(REMOVE_AT argv 0)
+        string(REGEX REPLACE "^.*/" "" executable "${executable}")
+
+        if(executable STREQUAL "cd")
+            list(GET argv 1 directory)
+
+            cmake_path(APPEND working_directory "${directory}")
+            cmake_path(SET working_directory NORMALIZE "${working_directory}")
+
+            message(STATUS "${working_directory}")
+        else()
+            string(REGEX REPLACE "^.*applications/" "" relative_source_directory "${working_directory}")
+            set(test_name "${relative_source_directory}: ${test}")
+
+            cmake_path(APPEND build_dir "${executable}" OUTPUT_VARIABLE executable)
+
+              add_test(${test_name} ${mpiexec} ${mpiexec_np_flag} ${mpiexec_max_np} ${executable} ${argv})
 
             set_tests_properties(${test_name} PROPERTIES WORKING_DIRECTORY ${working_directory})
 
