@@ -142,7 +142,10 @@ void fclaw_elliptic_vtable_initialize(fclaw_global_t* glob)
     /* User should set the setup, rhs and solve routines */
     elliptic_vt->is_set = 1;
 
-	FCLAW_ASSERT(fclaw_pointer_map_get(glob->vtables,"fclaw2d_elliptic") == NULL);
+	if(fclaw_pointer_map_get(glob->vtables,"fclaw2d_elliptic") != NULL)
+    {
+        fclaw_abortf("fclaw_elliptic_vtable_initialize : elliptic vtable already initialized\n");
+    }
 	fclaw_pointer_map_insert(glob->vtables, "fclaw2d_elliptic", elliptic_vt, elliptic_vt_destroy);
 }
 

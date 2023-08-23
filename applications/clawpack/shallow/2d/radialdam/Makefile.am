@@ -2,7 +2,7 @@
 
 bin_PROGRAMS += applications/clawpack/shallow/2d/radialdam/radialdam
 
-TESTS += applications/clawpack/shallow/2d/radialdam/regressions.sh
+TESTS += applications/clawpack/shallow/2d/radialdam/regressions.txt
 
 applications_clawpack_shallow_2d_radialdam_radialdam_SOURCES = \
 	applications/clawpack/shallow/2d/radialdam/radialdam.cpp \

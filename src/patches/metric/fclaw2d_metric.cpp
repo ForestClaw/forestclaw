@@ -478,7 +478,10 @@ void fclaw2d_metric_vtable_initialize(fclaw_global_t* glob)
 
     metric_vt->is_set = 1;
 
-	FCLAW_ASSERT(fclaw_pointer_map_get(glob->vtables,METRIC_VTABLE_NAME) == NULL);
+	if(fclaw_pointer_map_get(glob->vtables,METRIC_VTABLE_NAME) != NULL)
+    {
+        fclaw_abortf("Metric vtable %s already set\n",METRIC_VTABLE_NAME);
+    }
 	fclaw_pointer_map_insert(glob->vtables,METRIC_VTABLE_NAME, metric_vt, metric_vt_destroy);
 }
 

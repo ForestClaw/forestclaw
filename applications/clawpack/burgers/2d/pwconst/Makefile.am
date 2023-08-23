@@ -1,6 +1,6 @@
 bin_PROGRAMS += applications/clawpack/burgers/2d/pwconst/pwconst
 
-TESTS += applications/clawpack/burgers/2d/pwconst/regressions.sh
+TESTS += applications/clawpack/burgers/2d/pwconst/regressions.txt
 
 applications_clawpack_burgers_2d_pwconst_pwconst_SOURCES = \
 	applications/clawpack/burgers/2d/pwconst/pwconst.cpp \

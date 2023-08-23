@@ -2,7 +2,7 @@
 
 bin_PROGRAMS += applications/clawpack/advection/p8/swirl/swirl
 
-#TESTS += applications/clawpack/advection/p8/swirl/regressions.sh
+#TESTS += applications/clawpack/advection/p8/swirl/regressions.txt
 
 applications_clawpack_advection_p8_swirl_swirl_SOURCES = \
         applications/clawpack/advection/p8/swirl/swirl.cpp \

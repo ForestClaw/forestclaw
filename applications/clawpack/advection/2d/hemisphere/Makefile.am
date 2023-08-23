@@ -43,4 +43,4 @@ applications_clawpack_advection_2d_hemisphere_hemisphere_LDADD = \
         $(FCLAW_CLAWPATCH_LDADD) \
         $(FCLAW_LDADD)
 
-TESTS += applications/clawpack/advection/2d/hemisphere/regressions.sh
+TESTS += applications/clawpack/advection/2d/hemisphere/regressions.txt

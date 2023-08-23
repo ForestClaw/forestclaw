@@ -2,7 +2,7 @@
 
 bin_PROGRAMS += applications/elliptic/poisson/poisson
 
-TESTS += applications/elliptic/poisson/regressions.sh
+TESTS += applications/elliptic/poisson/regressions.txt
 
 applications_elliptic_poisson_poisson_SOURCES = \
 	applications/elliptic/poisson/poisson.cpp \

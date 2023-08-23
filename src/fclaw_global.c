@@ -207,7 +207,10 @@ void fclaw_global_iterate_partitioned (fclaw_global_t * glob,
 void fclaw_global_options_store (fclaw_global_t* glob, const char* key, void* options)
 {
     
-    FCLAW_ASSERT(fclaw_pointer_map_get(glob->options,key) == NULL);
+    if(fclaw_pointer_map_get(glob->options,key) != NULL)
+    {
+        fclaw_abortf("Options %s already stored in glob\n", key);
+    }
     fclaw_pointer_map_insert(glob->options, key, options, NULL);
 }
 
@@ -215,7 +218,10 @@ void* fclaw_global_get_options (fclaw_global_t* glob, const char* key)
 {
     
     void* options = fclaw_pointer_map_get(glob->options, key);
-    FCLAW_ASSERT(options != NULL);
+    if(options == NULL)
+    {
+        fclaw_abortf("Options %s not found in glob\n", key);
+    }
     return options;   
 }
 

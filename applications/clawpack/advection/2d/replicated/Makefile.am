@@ -1,6 +1,6 @@
 bin_PROGRAMS += applications/clawpack/advection/2d/replicated/replicated
 
-TESTS += applications/clawpack/advection/2d/replicated/regressions.sh
+TESTS += applications/clawpack/advection/2d/replicated/regressions.txt
 
 applications_clawpack_advection_2d_replicated_replicated_SOURCES = \
 	applications/clawpack/advection/2d/replicated/replicated.cpp \

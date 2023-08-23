@@ -2,7 +2,7 @@
 
 bin_PROGRAMS += applications/clawpack/advection/2d/gaussian/gaussian
 
-TESTS += applications/clawpack/advection/2d/gaussian/regressions.sh
+TESTS += applications/clawpack/advection/2d/gaussian/regressions.txt
 
 applications_clawpack_advection_2d_gaussian_gaussian_SOURCES = \
 	applications/clawpack/advection/2d/gaussian/gaussian.cpp \

@@ -2,7 +2,7 @@
 
 bin_PROGRAMS += applications/elliptic/heat/heat
 
-TESTS += applications/elliptic/heat/regressions.sh
+TESTS += applications/elliptic/heat/regressions.txt
 
 applications_elliptic_heat_heat_SOURCES = \
 	applications/elliptic/heat/heat.cpp \

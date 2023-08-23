@@ -402,7 +402,10 @@ void fclaw_gauges_vtable_initialize(fclaw_global_t* glob)
 
     gauges_vt->is_set = 1;
 
-	FCLAW_ASSERT(fclaw_pointer_map_get(glob->vtables,"fclaw_gauges") == NULL);
+	if(fclaw_pointer_map_get(glob->vtables,"fclaw_gauges") != NULL)
+    {
+        fclaw_abortf("fclaw_gauges_vtable_initialize : gauges vtable already initialized\n");
+    }
 	fclaw_pointer_map_insert(glob->vtables, "fclaw_gauges", gauges_vt, fclaw_gauges_vt_destroy);
 }
 /* ---------------------------- Virtualized Functions --------------------------------- */

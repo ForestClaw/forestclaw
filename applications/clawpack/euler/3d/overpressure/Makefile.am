@@ -2,7 +2,7 @@
 
 bin_PROGRAMS += applications/clawpack/euler/3d/overpressure/overpressure
 
-TESTS += applications/clawpack/euler/3d/overpressure/regressions.sh
+TESTS += applications/clawpack/euler/3d/overpressure/regressions.txt
 
 applications_clawpack_euler_3d_overpressure_overpressure_SOURCES = \
 	applications/clawpack/euler/3d/overpressure/overpressure.cpp \
@@ -32,7 +32,7 @@ applications_clawpack_euler_3d_overpressure_overpressure_SOURCES = \
 EXTRA_DIST += \
 	applications/clawpack/euler/3d/overpressure/fclaw_options.ini \
 	applications/clawpack/euler/3d/overpressure/regression.ini \
-	applications/clawpack/euler/3d/overpressure/regressions.sh \
+	applications/clawpack/euler/3d/overpressure/regressions.txt \
 	applications/clawpack/euler/3d/overpressure/afterframe.m \
 	applications/clawpack/euler/3d/overpressure/mapc2p.m \
 	applications/clawpack/euler/3d/overpressure/read_vars.m \

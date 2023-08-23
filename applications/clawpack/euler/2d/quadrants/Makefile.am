@@ -2,7 +2,7 @@
 
 bin_PROGRAMS += applications/clawpack/euler/2d/quadrants/quadrants
 
-TESTS += applications/clawpack/euler/2d/quadrants/regressions.sh
+TESTS += applications/clawpack/euler/2d/quadrants/regressions.txt
 
 applications_clawpack_euler_2d_quadrants_quadrants_SOURCES = \
 	applications/clawpack/euler/2d/quadrants/quadrants.cpp \

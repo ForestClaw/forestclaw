@@ -52,7 +52,10 @@ fclaw_diagnostics_vtable_t* fclaw_diagnostics_vt(fclaw_global_t* glob)
 {
 	fclaw_diagnostics_vtable_t* diagnostics_vt = (fclaw_diagnostics_vtable_t*) 
 	   							fclaw_pointer_map_get(glob->vtables, "fclaw2d_diagnostics");
-	FCLAW_ASSERT(diagnostics_vt != NULL);
+	if(diagnostics_vt == NULL)
+    {
+        fclaw_abortf("fclaw_diagnostics_vt : diagnostics vtable not initialized\n");
+    }
 	FCLAW_ASSERT(diagnostics_vt->is_set != 0);
     return diagnostics_vt;
 }
@@ -84,7 +87,10 @@ void fclaw_diagnostics_vtable_initialize(fclaw_global_t* glob)
 
     diag_vt->is_set = 1;
 
-	FCLAW_ASSERT(fclaw_pointer_map_get(glob->vtables,"fclaw2d_diagnostics") == NULL);
+	if(fclaw_pointer_map_get(glob->vtables,"fclaw2d_diagnostics") != NULL)
+    {
+        fclaw_abortf("fclaw_diagnostics_vtable_initialize : diagnostics vtable already initialized\n");
+    }
 	fclaw_pointer_map_insert(glob->vtables, "fclaw2d_diagnostics", diag_vt, diagnostics_vt_destroy);
 }
 

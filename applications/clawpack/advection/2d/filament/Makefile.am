@@ -2,7 +2,7 @@
 
 bin_PROGRAMS += applications/clawpack/advection/2d/filament/filament
 
-TESTS += applications/clawpack/advection/2d/filament/regressions.sh
+TESTS += applications/clawpack/advection/2d/filament/regressions.txt
 
 applications_clawpack_advection_2d_filament_filament_SOURCES = \
 	applications/clawpack/advection/2d/filament/filament.cpp \

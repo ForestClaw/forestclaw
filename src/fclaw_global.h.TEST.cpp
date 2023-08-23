@@ -45,18 +45,10 @@ TEST_CASE("fclaw_global_options_store and fclaw_global_get_options test") {
     const char** retrieved_option2 = static_cast<const char**>(fclaw_global_get_options(glob, key2));
     CHECK_EQ(retrieved_option2, &option2);
 
-#ifdef FCLAW_ENABLE_DEBUG
     // TEST inserting twice
     CHECK_SC_ABORTED(fclaw_global_options_store(glob, key2, &option2));
-#endif
-    // Test with a non-existing key
     const char* key3 = "non-existing key";
-#ifdef FCLAW_ENABLE_DEBUG
     CHECK_SC_ABORTED(fclaw_global_get_options(glob, key3));
-#else
-    void* retrieved_option3 = fclaw_global_get_options(glob, key3);
-    CHECK_EQ(retrieved_option3, nullptr);
-#endif
 
     fclaw_global_destroy(glob);
 }

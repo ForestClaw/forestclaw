@@ -2,7 +2,7 @@
 
 bin_PROGRAMS += applications/elliptic/phasefield/phasefield
 
-TESTS += applications/elliptic/phasefield/regressions.sh
+TESTS += applications/elliptic/phasefield/regressions.txt
 
 applications_elliptic_phasefield_phasefield_SOURCES = \
 	applications/elliptic/phasefield/phasefield.cpp \

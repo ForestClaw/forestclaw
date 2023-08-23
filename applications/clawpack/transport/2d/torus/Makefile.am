@@ -1,6 +1,6 @@
 bin_PROGRAMS += applications/clawpack/transport/2d/torus/torus_transport
 
-TESTS += applications/clawpack/transport/2d/torus/regressions.sh
+TESTS += applications/clawpack/transport/2d/torus/regressions.txt
 
 applications_clawpack_transport_2d_torus_torus_transport_SOURCES = \
 	applications/clawpack/transport/2d/torus/torus.cpp \

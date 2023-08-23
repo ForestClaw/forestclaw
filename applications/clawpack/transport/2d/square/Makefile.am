@@ -2,7 +2,7 @@
 
 bin_PROGRAMS += applications/clawpack/transport/2d/square/square
 
-TESTS += applications/clawpack/transport/2d/square/regressions.sh
+TESTS += applications/clawpack/transport/2d/square/regressions.txt
 
 applications_clawpack_transport_2d_square_square_SOURCES = \
 	applications/clawpack/transport/2d/square/square.cpp \

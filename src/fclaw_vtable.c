@@ -69,6 +69,9 @@ void fclaw_vtable_initialize(fclaw_global_t *glob)
 
     vt->is_set = 1;
 
-	FCLAW_ASSERT(fclaw_pointer_map_get(glob->vtables,"fclaw") == NULL);
+	if(fclaw_pointer_map_get(glob->vtables,"fclaw") != NULL)
+    {
+        fclaw_abortf("fclaw_vtable_initialize : fclaw vtable already initialized\n");
+    }
 	fclaw_pointer_map_insert(glob->vtables, "fclaw", vt, vt_destroy);
 }
