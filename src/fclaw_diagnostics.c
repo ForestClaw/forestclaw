@@ -195,7 +195,7 @@ void fclaw_diagnostics_gather(fclaw_global_t *glob,
 void fclaw_diagnostics_reset(fclaw_global_t *glob)
 {
     fclaw_diagnostics_accumulator_t *acc = 
-            (fclaw_diagnostics_acumulator_t*) fclaw_global_get_attribute(glob, "acc");
+            (fclaw_diagnostics_accumulator_t*) fclaw_global_get_attribute(glob, "acc");
     const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
     fclaw_diagnostics_vtable_t *diag_vt = fclaw_diagnostics_vt(glob);
 
@@ -222,7 +222,7 @@ void fclaw_diagnostics_reset(fclaw_global_t *glob)
 void fclaw_diagnostics_finalize(fclaw_global_t *glob)
 {
     fclaw_diagnostics_accumulator_t *acc =
-            (fclaw_diagnostics_acumulator_t*) fclaw_global_get_attribute(glob, "acc");
+            (fclaw_diagnostics_accumulator_t*) fclaw_global_get_attribute(glob, "acc");
     const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
     fclaw_diagnostics_vtable_t *diag_vt = fclaw_diagnostics_vt(glob);
 
