@@ -29,8 +29,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * @brief functions for filesystem operations
  * 
  */
-#ifndef FCLAW_FILESYSTEM
-#define FCLAW_FILESYSTEM
+#ifndef FCLAW_FILESYSTEM_H
+#define FCLAW_FILESYSTEM_H
 
 #ifdef __cplusplus
 extern "C"

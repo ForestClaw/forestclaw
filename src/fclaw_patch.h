@@ -28,8 +28,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 
-#ifndef FCLAW2D_PATCH_H
-#define FCLAW2D_PATCH_H
+#ifndef FCLAW_PATCH_H
+#define FCLAW_PATCH_H
 
 #include <forestclaw.h>  /* Contains definition of patch-iterator callback */
 

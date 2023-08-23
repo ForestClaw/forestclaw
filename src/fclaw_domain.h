@@ -27,8 +27,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * Domain structures and routines
  */
 
-#ifndef FCLAW2D_DOMAIN_H
-#define FCLAW2D_DOMAIN_H
+#ifndef FCLAW_DOMAIN_H
+#define FCLAW_DOMAIN_H
 
 #include <forestclaw2d.h>  /* Needed for domain_exchange/domain_indirect info */
 
