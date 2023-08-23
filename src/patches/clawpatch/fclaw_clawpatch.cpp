@@ -1972,7 +1972,7 @@ void fclaw_clawpatch_vtable_initialize(fclaw_global_t* glob,
 
     if(fclaw_pointer_map_get(glob->vtables, "fclaw_clawpatch") != NULL)
     {
-        FCLAW_ABORT("fclaw_clawpatch_vtable_initialize : " \
+        fclaw_abortf("fclaw_clawpatch_vtable_initialize : " \
                     "fclaw_clawpatch already initialized\n");
     }
     fclaw_pointer_map_insert(glob->vtables, "fclaw_clawpatch", clawpatch_vt, clawpatch_vt_destroy);

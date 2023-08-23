@@ -921,7 +921,7 @@ void fclaw_patch_vtable_initialize(fclaw_global_t* glob)
 {
     if(glob->domain == NULL)
     {
-        FCLAW_ABORT("domain needs to be stored in glob before initializing vtables");
+        fclaw_abortf("domain needs to be stored in glob before initializing vtables");
     }
 
     fclaw_patch_vtable_t *patch_vt = patch_vt_new(glob->domain->dim);
@@ -930,7 +930,7 @@ void fclaw_patch_vtable_initialize(fclaw_global_t* glob)
 
     if(fclaw_pointer_map_get(glob->vtables,"fclaw_patch") != NULL)
     {
-        FCLAW_ABORT("Vtable has already been initialized");
+        fclaw_abortf("vtable has already been initialized");
     }
     fclaw_pointer_map_insert(glob->vtables, "fclaw_patch", patch_vt, patch_vt_destroy);
 }

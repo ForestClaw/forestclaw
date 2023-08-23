@@ -484,13 +484,13 @@ void fc2d_clawpack46_solver_initialize(fclaw_global_t* glob)
 {
 	if(glob->domain->dim != 2)
 	{
-		FCLAW_ABORT("Domain set to 3d. fc2d_clawpack46 is only for 2d");
+		fclaw_abortf("Domain set to 3d. fc2d_clawpack46 is only for 2d");
 	}
 
 	fclaw_clawpatch_options_t* clawpatch_opt = fclaw_clawpatch_get_options(glob);
 	if(clawpatch_opt->dim != 2)
 	{
-		FCLAW_ABORT("Clawpatch dimension set to 3d. fc2d_clawpack46 is only for 2d");
+		fclaw_abortf("Clawpatch dimension set to 3d. fc2d_clawpack46 is only for 2d");
 	}
 	
 	fc2d_clawpack46_options_t* clawopt = fc2d_clawpack46_get_options(glob);

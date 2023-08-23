@@ -922,39 +922,12 @@ fclaw_app_get_options (fclaw_app_t * a)
     return a->opt;
 }
 
-/*** which of the following do we need? ***/
-
-#if 0
-
 void
-fclaw2d_global_log (int log_priority, const char *message)
-{
-    /* TODO: establish an fclaw_package_id */
-    SC_GEN_LOG (sc_package_id, SC_LC_GLOBAL, log_priority, message);
-}
+fclaw_abortf(const char *fmt, ...){
+    va_list ap;
 
-void *
-fclaw2d_alloc (size_t size)
-{
-    return sc_malloc (p4est_package_id, size);
+    va_start (ap, fmt);
+    fclaw_logv (SC_LC_NORMAL, SC_LP_ERROR, fmt, ap);
+    va_end (ap);
+    sc_abort();
 }
-
-void *
-fclaw2d_calloc (size_t nmemb, size_t size)
-{
-    return sc_calloc (p4est_package_id, nmemb, size);
-}
-
-void *
-fclaw2d_realloc (void *ptr, size_t size)
-{
-    return sc_realloc (p4est_package_id, ptr, size);
-}
-
-void
-fclaw2d_free (void *ptr)
-{
-    sc_free (p4est_package_id, ptr);
-}
-
-#endif /* 0 */

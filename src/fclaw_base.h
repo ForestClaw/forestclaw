@@ -250,7 +250,6 @@ fclaw_app_options_vtable_t;
 #define FCLAW_EXECUTE_ASSERT_TRUE(expression) \
   do { (void) (expression); } while (0)
 #endif
-#define FCLAW_ABORT(error_message)  SC_ABORT (error_message)
 
 /** Query the package identity for use with libsc functions.
  * This is -1 until fclaw_init or fclaw_app_new has been called.
@@ -341,6 +340,12 @@ void fclaw_debugf (const char *fmt, ...)
 #endif
     ;
 /* *INDENT-ON* */
+
+/**
+ * Print a an error mesage and abort the program
+ * \param [in] fmt      A printf-style format string.
+ */
+void fclaw_abortf(const char* fmt,...);
 
 /** Register ForestClaw with libsc and print version and variable information.
  * It is not necessary to call this function, but it makes the log output more
