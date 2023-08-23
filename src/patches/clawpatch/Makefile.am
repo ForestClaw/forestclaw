@@ -45,7 +45,7 @@ libclawpatch_compiled_sources = \
 	src/patches/clawpatch/fclaw3dx_clawpatch_utils.f \
 	\
 	src/patches/clawpatch/fclaw3d_clawpatch_transform.c \
-	src/patches/clawpatch/fclaw3d_clawpatch_utils.f \
+	src/patches/clawpatch/fclaw3d_clawpatch_utils.f90 \
 	\
 	src/patches/clawpatch/fort_user/fclaw2d_clawpatch_tag_criteria.c \
 	src/patches/clawpatch/fort_user/fclaw2d_clawpatch_difference_exceeds_th.f90 \
