@@ -46,9 +46,4 @@ target_link_libraries(heat_phasefield PRIVATE
   FORESTCLAW::FC2D_THUNDEREGG ZLIB::ZLIB
 )
 
-add_test(NAME elliptic_heat_phasefield 
-         COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/regressions.sh
-         WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-
-set_tests_properties(elliptic_heat_phasefield
-         PROPERTIES ENVIRONMENT "${FCLAW_TEST_ENVIRONMENT}")
+add_regressions(regressions.txt)
