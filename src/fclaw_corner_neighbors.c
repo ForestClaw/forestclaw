@@ -425,6 +425,8 @@ void cb_corner_fill(fclaw_domain_t *domain,
                         &is_block_corner,
                         &transform_data.block_iface);
 
+        transform_data.icorner = icorner;
+        transform_data_finegrid.icorner = icorner;
         transform_data_finegrid.block_iface = -1;
 
         /* Sets block_corner_count to 0 */
@@ -550,7 +552,7 @@ void cb_corner_fill(fclaw_domain_t *domain,
                        local fine grid patch.  We do not need to average to the 
                        remote patch corners unless corners are used in the 
                        interpolation stencil. */
-                    int coarse_icorner = transform_data.icorner;
+                    int coarse_icorner = transform_data_finegrid.icorner;
 
                     fclaw_patch_interpolate_corner(s->glob,
                                                    coarse_patch,
