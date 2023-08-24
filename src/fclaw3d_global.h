@@ -116,6 +116,32 @@ void fclaw3d_global_store_domain (fclaw3d_global_t* glob,
 void fclaw3d_global_store_map (fclaw3d_global_t* glob,
                                fclaw3d_map_context_t * map);
 
+/**
+ * @brief Pack global structure into buffer
+ * 
+ * @param glob the global structure
+ * @param buffer the buffer to write to
+ * @return size_t number of bytes written
+ */
+size_t fclaw3d_global_pack(const fclaw3d_global_t * glob, char* buffer);
+
+/**
+ * @brief Get the number of bytes needed to pack the global structure
+ * 
+ * @param glob the structure
+ * @return size_t the number of bytes needed to store structure
+ */
+size_t fclaw3d_global_packsize(const fclaw3d_global_t * glob);
+
+/**
+ * @brief Unpack global structure from buffer
+ * 
+ * @param buffer the buffer to read from
+ * @param glob newly create global structure
+ * @return size_t number of bytes read
+ */
+size_t fclaw3d_global_unpack(char* buffer, fclaw3d_global_t** glob);
+
 void fclaw3d_global_iterate_level (fclaw3d_global_t * glob, int level,
                                    fclaw3d_patch_callback_t pcb, void *user);
 

@@ -39,6 +39,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define FCLAW2D_NUMSIBLINGS             FCLAW3D_NUMSIBLINGS
 #define FCLAW2D_NUMFACENEIGHBORS        FCLAW3D_NUMFACENEIGHBORS
 /* not redefining REFINEFACTOR, which should be dimension-independent */
+#define FCLAW2D_FILE_USER_STRING_BYTES  FCLAW3D_FILE_USER_STRING_BYTES
+#define FCLAW2D_FILE_MAX_BLOCK_SIZE     FCLAW3D_FILE_MAX_BLOCK_SIZE
+#define FCLAW2D_FILE_ERR_SUCCESS        FCLAW3D_FILE_ERR_SUCCESS
+#define FCLAW2D_FILE_ERR_FORMAT         FCLAW3D_FILE_ERR_FORMAT
+#define FCLAW2D_FILE_ERR_NOT_IMPLEMENTED FCLAW3D_FILE_ERR_NOT_IMPLEMENTED
 
 /* redefine typedefs */
 #define fclaw2d_patch_flags_t           fclaw3d_patch_flags_t
@@ -48,6 +53,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define fclaw2d_patch_data_t            fclaw3d_patch_data_t
 #define fclaw2d_block_t                 fclaw3d_block_t
 #define fclaw2d_domain_t                fclaw3d_domain_t
+#define fclaw2d_file_context            fclaw3d_file_context
+#define fclaw2d_file_context_t          fclaw3d_file_context_t
 #define fclaw2d_domain_data_t           fclaw3d_domain_data_t
 #define fclaw2d_domain_persist_t        fclaw3d_domain_persist_t
 #define fclaw2d_timer_names_t           fclaw3d_timer_names_t
@@ -132,6 +139,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define fclaw2d_domain_barrier          fclaw3d_domain_barrier
 #define fclaw2d_domain_dimension        fclaw3d_domain_dimension
 #define fclaw2d_check_initial_level     fclaw3d_check_initial_level
+#define fclaw2d_file_open_write         fclaw3d_file_open_write
+#define fclaw2d_file_write_block        fclaw3d_file_write_block
+#define fclaw2d_file_write_array        fclaw3d_file_write_array
+#define fclaw2d_file_open_read          fclaw3d_file_open_read
+#define fclaw2d_file_read_block         fclaw3d_file_read_block
+#define fclaw2d_file_read_array         fclaw3d_file_read_array
+#define fclaw2d_file_error_string       fclaw3d_file_error_string
+#define fclaw2d_file_close              fclaw3d_file_close
 #define fclaw2d_domain_new_unitsquare   fclaw3d_domain_new_unitcube
 #define fclaw2d_domain_new_brick        fclaw3d_domain_new_brick
 #define fclaw2d_domain_new_conn         fclaw3d_domain_new_conn
@@ -295,6 +310,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define fclaw2d_global_destroy          fclaw3d_global_destroy
 #define fclaw2d_global_store_domain     fclaw3d_global_store_domain
 #define fclaw2d_global_store_map        fclaw3d_global_store_map
+#define fclaw2d_global_unpack           fclaw3d_global_unpack
+#define fclaw2d_global_pack             fclaw3d_global_pack
+#define fclaw2d_global_packsize         fclaw3d_global_packsize
 #define fclaw2d_global_iterate_level    fclaw3d_global_iterate_level
 #define fclaw2d_global_iterate_patches  fclaw3d_global_iterate_patches
 #define fclaw2d_global_iterate_families fclaw3d_global_iterate_families
