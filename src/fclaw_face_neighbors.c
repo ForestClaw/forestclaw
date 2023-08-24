@@ -32,6 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_global.h>
 #include <fclaw2d_defs.h>
 #include <fclaw3d_defs.h>
+#include <fclaw2d_domain.h>
 
 #include <fclaw_block.h>
 #include <fclaw_patch.h>
@@ -465,7 +466,7 @@ void fclaw_face_neighbor_ghost(fclaw_global_t* glob,
 {
 	fclaw_domain_t *domain = glob->domain;
 
-	fclaw_domain_data_t *ddata = domain->domain_data;
+	fclaw_domain_data_t *ddata = fclaw_domain_get_data(domain);
 	const fclaw_options_t *gparms = fclaw_get_options(glob);
 	int refratio = gparms->refratio;
 

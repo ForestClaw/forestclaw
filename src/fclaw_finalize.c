@@ -182,11 +182,11 @@ void fclaw_finalize(fclaw_global_t* glob)
     }
     else
     {
-        fclaw3d_map_context_t* map = fclaw2d_map_get(glob);
-        if (map != NULL) {
-            //TODO
-            //fclaw3d_map_destroy(map);
-        }
+        //fclaw3d_map_context_t* map = fclaw2d_map_get(glob);
+        //if (map != NULL) {
+        //    //TODO
+        //    //fclaw3d_map_destroy(map);
+        //}
     }
     fclaw_domain_barrier (glob->domain);
 

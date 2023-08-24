@@ -124,8 +124,8 @@ void cb_fclaw_regrid_repopulate(fclaw_domain_t * old_domain,
     fclaw_global_iterate_t* g = (fclaw_global_iterate_t*) user;
     int domain_init = *((int*) g->user);
 
-    fclaw_domain_data_t *ddata_old = old_domain->domain_data;
-    fclaw_domain_data_t *ddata_new = new_domain->domain_data;
+    fclaw_domain_data_t *ddata_old = fclaw_domain_get_data(old_domain);
+    fclaw_domain_data_t *ddata_new = fclaw_domain_get_data(new_domain);
     fclaw_build_mode_t build_mode = FCLAW_BUILD_FOR_UPDATE;
 
     if (newsize == FCLAW_PATCH_SAMESIZE)

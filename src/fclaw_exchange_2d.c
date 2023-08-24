@@ -24,17 +24,22 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include <fclaw_global.h>
-#include <fclaw_domain.h>
 #include <fclaw_options.h>
 #include <fclaw_patch.h>
 
 #include <fclaw_exchange.h>
 
-#ifdef P4_TO_P8
+#ifndef P4_TO_P8
+
+#include <fclaw2d_domain.h>
+#include <fclaw2d_convenience.h>
+
+#else
 
 #include <fclaw3d_convenience.h>
-
+#include <fclaw3d_domain.h>
 #include <fclaw2d_to_3d.h>
+#include <fclaw3d_domain.h>
 
 #define d2 d3
 
@@ -46,7 +51,7 @@ static
 fclaw_domain_exchange_t*
     get_exchange_data(fclaw_global_t* glob)
 {
-    fclaw_domain_data_t *ddata = glob->domain->domain_data;
+    fclaw_domain_data_t *ddata = fclaw_domain_get_data(glob->domain);
     return ddata->d2->domain_exchange;
 }
 
@@ -55,7 +60,7 @@ static
 void set_exchange_data(fclaw_global_t* glob,
                        fclaw_domain_exchange_t *e)
 {
-    fclaw_domain_data_t *ddata = glob->domain->domain_data;
+    fclaw_domain_data_t *ddata = fclaw_domain_get_data(glob->domain);
     ddata->d2->domain_exchange = e;
 }
 
@@ -63,7 +68,7 @@ static
 fclaw2d_domain_indirect_t*
     get_indirect_data(fclaw_global_t* glob)
 {
-    fclaw_domain_data_t *ddata = glob->domain->domain_data;
+    fclaw_domain_data_t *ddata = fclaw_domain_get_data(glob->domain);
     return ddata->d2->domain_indirect;
 }
 
@@ -71,7 +76,7 @@ static
 void set_indirect_data(fclaw_global_t* glob,
                        fclaw2d_domain_indirect_t *ind)
 {
-    fclaw_domain_data_t *ddata = glob->domain->domain_data;
+    fclaw_domain_data_t *ddata = fclaw_domain_get_data(glob->domain);
     ddata->d2->domain_indirect = ind;
 }
 

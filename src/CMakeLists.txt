@@ -152,6 +152,7 @@ install(FILES
 
   fclaw2d_convenience.h
   fclaw2d_defs.h 
+  fclaw2d_domain.h
   fclaw2d_map.h
   fclaw2d_map_brick.h
   fclaw2d_map_query.h
@@ -161,6 +162,7 @@ install(FILES
   fclaw2d_update_single_step.h
 
   fclaw3d_convenience.h
+  fclaw3d_domain.h
   fclaw3d_defs.h
   fclaw3d_include_all.h 
   fclaw3d_map.h

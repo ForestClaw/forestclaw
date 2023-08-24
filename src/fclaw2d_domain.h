@@ -27,10 +27,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * Domain structures and routines
  */
 
-#ifndef FCLAW_DOMAIN_H
-#define FCLAW_DOMAIN_H
+#ifndef FCLAW2D_DOMAIN_H
+#define FCLAW2D_DOMAIN_H
 
 #include <forestclaw2d.h>  /* Needed for domain_exchange/domain_indirect info */
+#include <fclaw_domain.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -46,42 +47,15 @@ extern "C"
        Deleting patch and exchange data in domain_reset might go into a
        toplevel algorithmic function quite naturally outside of domain.
  */
-struct fclaw_global;
-typedef struct fclaw_domain_data
+struct fclaw2d_global;
+
+typedef struct fclaw_domain_data_d2
 {
     /* Debug counters and timers */
-    int count_set_patch;
-    int count_delete_patch;
+    fclaw_domain_exchange_t *domain_exchange;
+    fclaw2d_domain_indirect_t *domain_indirect;
 
-    struct fclaw_domain_data_d2* d2;
-    struct fclaw_domain_data_d3* d3;
-
-} fclaw_domain_data_t;
-
-
-void fclaw_domain_data_new(struct fclaw_domain *domain);
-
-void fclaw_domain_data_delete(struct fclaw_domain* domain);
-
-void fclaw_domain_setup(struct fclaw_global* glob,
-                          struct fclaw_domain* new_domain);
-
-void fclaw_domain_reset(struct fclaw_global* glob);
-
-fclaw_domain_data_t* fclaw_domain_get_data(struct fclaw_domain *domain);
-
-/* OpenMP iterator (not part of forestclaw2d.h */
-void fclaw_domain_iterate_level_mthread (struct fclaw_domain * domain, int level,
-                                           fclaw_patch_callback_t pcb, void *user);
-
-/* below are the functions needed for dimension independence */
-
-/** safeguard value for dimension-independent domain */
-#define FCLAW2D_DOMAIN_MAGIC 0x56780202
-
-void fclaw2d_domain_iterate_cb
-  (fclaw_domain_t * d2, fclaw_patch_t * patch,
-   int blockno, int patchno, void *user);
+} fclaw_domain_data_d2_t;
 
 #ifdef __cplusplus
 #if 0

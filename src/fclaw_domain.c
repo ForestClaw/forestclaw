@@ -25,6 +25,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw_global.h>
 #include <fclaw_domain.h>
+#include <fclaw2d_domain.h>
+#include <fclaw3d_domain.h>
 
 #include <fclaw2d_convenience.h>  /* Contains domain_destroy and others */
 #include <fclaw_patch.h>
@@ -43,28 +45,30 @@ void fclaw_domain_data_new(fclaw_domain_t *domain)
 {
     fclaw_domain_data_t* ddata = (fclaw_domain_data_t*) domain->user;
     ddata = FCLAW_ALLOC_ZERO (fclaw_domain_data_t, 1);
-    domain->domain_data = ddata;
+    domain->user = ddata;
     if(domain->dim == 2)
     {
-        ddata->d2 = FCLAW_ALLOC_ZERO (fclaw2d_domain_data_t, 1);
+        ddata->d2 = FCLAW_ALLOC_ZERO (fclaw_domain_data_d2_t, 1);
     }
     else 
     {
-        ddata->d3 = FCLAW_ALLOC_ZERO (fclaw3d_domain_data_t, 1);
+        ddata->d3 = FCLAW_ALLOC_ZERO (fclaw_domain_data_d3_t, 1);
     }
 }
 
 void fclaw_domain_data_delete(fclaw_domain_t* domain)
 {
+    fclaw_domain_data_t* ddata = (fclaw_domain_data_t*) domain->user;
     if(domain->dim == 2)
     {
-        FCLAW_FREE (domain->domain_data->d2);
+        FCLAW_FREE (ddata->d2);
     }
     else 
     {
-        FCLAW_FREE (domain->domain_data->d3);
+        FCLAW_FREE (ddata->d3);
     }
-    FCLAW_FREE (domain->domain_data);
+    FCLAW_FREE (ddata);
+    domain->user = NULL;
 }
 
 void fclaw_domain_setup(fclaw_global_t* glob,
@@ -106,7 +110,7 @@ void fclaw_domain_reset(fclaw_global_t* glob)
         block->user = NULL;
     }
 
-    fclaw_domain_data_t *ddata = (*domain)->domain_data;
+    fclaw_domain_data_t *ddata = fclaw_domain_get_data(*domain);
     if((*domain)->dim == 2)
     {
         if (ddata->d2->domain_exchange != NULL)
@@ -132,6 +136,12 @@ void fclaw_domain_reset(fclaw_global_t* glob)
 
     fclaw_domain_destroy(*domain);
     *domain = NULL;
+}
+
+fclaw_domain_data_t*
+fclaw_domain_get_data(fclaw_domain_t* domain)
+{
+    return (fclaw_domain_data_t*) domain->user;
 }
 
 void fclaw_domain_iterate_level_mthread (fclaw_domain_t * domain, int level,
