@@ -1570,6 +1570,51 @@ fclaw2d_domain_free_after_partition (fclaw_domain_t * domain,
     p4est_reset_data (wrap->p4est, 0, NULL, wrap->p4est->user_pointer);
 }
 
+fclaw2d_domain_exchange_t *
+fclaw2d_domain_allocate_before_exchange (fclaw_domain_t * domain,
+                                         size_t data_size)
+{
+    int i;
+    char *m;
+    fclaw2d_domain_exchange_t *e;
+
+    e = FCLAW_ALLOC (fclaw2d_domain_exchange_t, 1);
+    e->data_size = data_size;
+    e->num_exchange_patches = domain->num_exchange_patches;
+    e->num_ghost_patches = domain->num_ghost_patches;
+
+    e->patch_data = FCLAW_ALLOC (void *, domain->num_exchange_patches);
+    e->ghost_data = FCLAW_ALLOC (void *, domain->num_ghost_patches);
+    e->ghost_contiguous_memory = m = FCLAW_ALLOC (char,
+                                                  (size_t)
+                                                  domain->num_ghost_patches *
+                                                  data_size);
+    for (i = 0; i < domain->num_ghost_patches; ++i)
+    {
+        e->ghost_data[i] = m;
+        m += data_size;
+    }
+
+    e->async_state = NULL;
+    e->by_levels = 0;
+    e->inside_async = 0;
+
+    return e;
+}
+
+void
+fclaw2d_domain_ghost_exchange (fclaw_domain_t * domain,
+                               fclaw2d_domain_exchange_t * e,
+                               int exchange_minlevel, int exchange_maxlevel)
+{
+    FCLAW_ASSERT (e->async_state == NULL);
+    FCLAW_ASSERT (!e->inside_async);
+
+    fclaw2d_domain_ghost_exchange_begin
+        (domain, e, exchange_minlevel, exchange_maxlevel);
+    fclaw2d_domain_ghost_exchange_end (domain, e);
+}
+
 void
 fclaw2d_domain_ghost_exchange_begin (fclaw_domain_t * domain,
                                      fclaw2d_domain_exchange_t * e,
@@ -1632,6 +1677,16 @@ fclaw2d_domain_ghost_exchange_end (fclaw_domain_t * domain,
 
     e->async_state = NULL;
     e->inside_async = 0;
+}
+
+void
+fclaw2d_domain_free_after_exchange (fclaw_domain_t * domain,
+                                    fclaw2d_domain_exchange_t * e)
+{
+    FCLAW_FREE (e->ghost_contiguous_memory);
+    FCLAW_FREE (e->ghost_data);
+    FCLAW_FREE (e->patch_data);
+    FCLAW_FREE (e);
 }
 
 #ifndef P4_TO_P8

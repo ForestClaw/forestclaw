@@ -55,7 +55,7 @@ const fclaw3d_patch_flags_t fclaw3d_patch_block_face_flags[6] = {
 };
 
 int
-fclaw_patch_edge_neighbors (fclaw_domain_t * domain,
+fclaw3d_patch_edge_neighbors (fclaw_domain_t * domain,
                               int blockno, int patchno, int edgeno,
                               int rprocs_out[], int *rblockno_out,
                               int rpatchnos_out[],
