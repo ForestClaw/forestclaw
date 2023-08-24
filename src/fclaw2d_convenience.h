@@ -192,8 +192,7 @@ typedef int (*fclaw2d_integrate_ray_t) (fclaw_domain_t * domain,
 void fclaw2d_domain_integrate_rays (fclaw_domain_t * domain,
                                     fclaw2d_integrate_ray_t intersect,
                                     sc_array_t * rays,
-                                    sc_array_t * integrals,
-                                    void * user);
+                                    sc_array_t * integrals, void *user);
 
 /** Callback function to compute the interpolation data for a point and a patch.
  *

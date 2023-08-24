@@ -115,6 +115,31 @@ void fclaw_global_iterate_partitioned (fclaw_global_t * glob,
                                          struct fclaw_domain * new_domain,
                                          fclaw_transfer_callback_t tcb,
                                          void *user);
+/**
+ * @brief Pack global structure into buffer
+ * 
+ * @param glob the global structure
+ * @param buffer the buffer to write to
+ * @return size_t number of bytes written
+ */
+size_t fclaw_global_pack(const fclaw_global_t * glob, char* buffer);
+
+/**
+ * @brief Get the number of bytes needed to pack the global structure
+ * 
+ * @param glob the structure
+ * @return size_t the number of bytes needed to store structure
+ */
+size_t fclaw_global_packsize(const fclaw_global_t * glob);
+
+/**
+ * @brief Unpack global structure from buffer
+ * 
+ * @param buffer the buffer to read from
+ * @param glob newly create global structure
+ * @return size_t number of bytes read
+ */
+size_t fclaw_global_unpack(char* buffer, fclaw_global_t** glob);
 
 /**
  * @brief Store an options structure in the glob

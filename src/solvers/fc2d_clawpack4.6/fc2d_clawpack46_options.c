@@ -28,6 +28,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_clawpatch_options.h>
 #include <fclaw_global.h>
 #include <fclaw_options.h>
+#include <fclaw_pointer_map.h>
+#include <fclaw_packing.h>
 
 static void*
 clawpack46_register (fc2d_clawpack46_options_t* clawopt, sc_options_t * opt)
@@ -67,6 +69,8 @@ clawpack46_register (fc2d_clawpack46_options_t* clawopt, sc_options_t * opt)
 
 
     clawopt->is_registered = 1;
+    clawopt->is_unpacked = 0;
+
     return NULL;
 }
 
@@ -104,6 +108,114 @@ void clawpack46_destroy (fc2d_clawpack46_options_t * clawopt)
     fclaw_options_destroy_array (clawopt->mthbc);
     fclaw_options_destroy_array (clawopt->order);
     fclaw_options_destroy_array (clawopt->mthlim);
+
+    //free strings if unpacked
+    if (clawopt->is_unpacked)
+    {
+        FCLAW_FREE((void*) clawopt->order_string);
+        FCLAW_FREE((void*) clawopt->mthlim_string);
+        FCLAW_FREE((void*) clawopt->mthbc_string);
+    }
+
+    FCLAW_FREE (clawopt);
+}
+
+static void clawpack46_destroy_void(void* user)
+{
+    fc2d_clawpack46_options_t* clawopt = (fc2d_clawpack46_options_t*) user;
+    clawpack46_destroy(clawopt);
+}
+
+static size_t 
+options_packsize(void* user)
+{
+    fc2d_clawpack46_options_t* opts = (fc2d_clawpack46_options_t*) user;
+
+    size_t size = sizeof(fc2d_clawpack46_options_t);
+    size += fclaw_packsize_string(opts->order_string);
+    size += 2*sizeof(int);  /* order */
+    size += opts->mwaves*sizeof(int);  /* mthlim */
+    size += fclaw_packsize_string(opts->mthlim_string);
+    size += 4*sizeof(int);  /* mthbc */
+    size += fclaw_packsize_string(opts->mthbc_string);
+
+    return size;
+}
+
+static size_t 
+options_pack(void* user, char* buffer)
+{
+    char* buffer_start = buffer;
+
+    fc2d_clawpack46_options_t* opts = (fc2d_clawpack46_options_t*) user;
+
+    //pack entire struct
+    buffer += FCLAW_PACK(*opts, buffer);
+
+    //append arrays to buffer
+    buffer += fclaw_pack_string(opts->order_string,buffer);
+    buffer += fclaw_pack_int(opts->order[0],buffer);
+    buffer += fclaw_pack_int(opts->order[1],buffer);
+    for(size_t i = 0; i < opts->mwaves; i++)
+    {
+        buffer += fclaw_pack_int(opts->mthlim[i],buffer);
+    }
+    buffer += fclaw_pack_string(opts->mthlim_string,buffer);
+    for(size_t i = 0; i < 4; i++)
+    {
+        buffer += fclaw_pack_int(opts->mthbc[i],buffer);
+    }
+    buffer += fclaw_pack_string(opts->mthbc_string,buffer);
+
+    return buffer-buffer_start;
+}
+
+static size_t 
+options_unpack(char* buffer, void** user)
+{
+    char* buffer_start = buffer;
+
+    fc2d_clawpack46_options_t** opts_ptr = (fc2d_clawpack46_options_t**) user;
+    *opts_ptr = FCLAW_ALLOC(fc2d_clawpack46_options_t,1);
+    fc2d_clawpack46_options_t* opts = *opts_ptr;
+
+    buffer += FCLAW_UNPACK(buffer, opts);
+
+    //unpack arrays
+    buffer += fclaw_unpack_string(buffer,(char**) &opts->order_string);
+    opts->order = FCLAW_ALLOC(int,2);
+    buffer += fclaw_unpack_int(buffer,&opts->order[0]);
+    buffer += fclaw_unpack_int(buffer,&opts->order[1]);
+    opts->mthlim = FCLAW_ALLOC(int,opts->mwaves);
+    for(size_t i = 0; i < opts->mwaves; i++)
+    {
+        buffer += fclaw_unpack_int(buffer,&opts->mthlim[i]);
+    }
+    buffer += fclaw_unpack_string(buffer,(char**) &opts->mthlim_string);
+    opts->mthbc = FCLAW_ALLOC(int,4);
+    for(size_t i = 0; i < 4; i++)
+    {
+        buffer += fclaw_unpack_int(buffer,&opts->mthbc[i]);
+    }
+    buffer += fclaw_unpack_string(buffer,(char**) &opts->mthbc_string);
+
+    opts->is_unpacked = 1;
+   
+    return buffer-buffer_start;
+}
+
+static fclaw_packing_vtable_t packing_vt = 
+{
+	options_pack,
+	options_unpack,
+	options_packsize,
+	clawpack46_destroy_void
+};
+
+const fclaw_packing_vtable_t* 
+fc2d_clawpack46_options_get_packing_vtable()
+{
+    return &packing_vt;
 }
 
 /* ------------------------------------------------------
@@ -169,8 +281,6 @@ options_destroy (fclaw_app_t * app, void *package, void *registered)
     FCLAW_ASSERT (clawopt->is_registered);
 
     clawpack46_destroy (clawopt);
-
-    FCLAW_FREE (clawopt);
 }
 
 static const fclaw_app_options_vtable_t clawpack46_options_vtable = {
@@ -187,6 +297,8 @@ fc2d_clawpack46_options_t*  fc2d_clawpack46_options_register (fclaw_app_t * app,
                                                               const char *section,
                                                               const char *configfile)
 {
+    fclaw_app_register_options_packing_vtable("fc2d_clawpack46", &packing_vt);
+
     fc2d_clawpack46_options_t *clawopt;
 
     FCLAW_ASSERT (app != NULL);

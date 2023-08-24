@@ -163,6 +163,13 @@ void fclaw_clawpatch_options_store (struct fclaw_global *glob,
  */
 fclaw_clawpatch_options_t* fclaw_clawpatch_get_options(struct fclaw_global* glob);
 
+/**
+ * @brief Get the packing vtable for fclaw_clawpatch_options_t
+ * 
+ * @return const fclaw_packing_vtable_t* the vtable
+ */
+const fclaw_packing_vtable_t* fclaw_clawpatch_options_get_packing_vtable();
+
 
 #ifdef __cplusplus
 #if 0

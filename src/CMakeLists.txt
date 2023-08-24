@@ -27,6 +27,7 @@ add_library(forestclaw_c OBJECT
   fclaw_output.c
   fclaw_patch.c
   fclaw_package.c 
+  fclaw_packing.c 
   fclaw_physical_bc.c
   fclaw_partition.c
   fclaw_pointer_map.c
@@ -39,6 +40,7 @@ add_library(forestclaw_c OBJECT
 
   fclaw2d_convenience.c
   fclaw2d_exchange.c
+  fclaw2d_file.c
   fclaw2d_map.c
   fclaw2d_map_brick.c
   fclaw2d_map_query.c
@@ -52,6 +54,7 @@ add_library(forestclaw_c OBJECT
 
   fclaw3d_convenience.c
   fclaw3d_exchange.c
+  fclaw3d_file.c
   fclaw3d_map.c
 
   fp_exception_glibc_extension.c
@@ -137,6 +140,7 @@ install(FILES
   fclaw_output.h
   fclaw_package.h 
   fclaw_partition.h
+  fclaw_packing.h
   fclaw_patch.h
   fclaw_physical_bc.h
   fclaw_pointer_map.h 
@@ -153,6 +157,7 @@ install(FILES
   fclaw2d_convenience.h
   fclaw2d_defs.h 
   fclaw2d_domain.h
+  fclaw2d_file.h
   fclaw2d_map.h
   fclaw2d_map_brick.h
   fclaw2d_map_query.h
@@ -164,6 +169,7 @@ install(FILES
   fclaw3d_convenience.h
   fclaw3d_domain.h
   fclaw3d_defs.h
+  fclaw3d_file.h
   fclaw3d_include_all.h 
   fclaw3d_map.h
 
@@ -182,6 +188,7 @@ install(TARGETS forestclaw
 if(BUILD_TESTING)
   add_executable(forestclaw.TEST
       fclaw_gauges.h.TEST.cpp
+      fclaw_packing.h.TEST.cpp
       fclaw_pointer_map.h.TEST.cpp
       fclaw_elliptic_solver.h.TEST.cpp
       fclaw_diagnostics.h.TEST.cpp

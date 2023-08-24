@@ -26,6 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_global.h>
 #include <fclaw_options.h>
 #include <fc2d_clawpack46_options.h>
+#include <fclaw_packing.h>
 #include <test.hpp>
 
 TEST_CASE("fc2d_clawpack46_options can store options in two seperate globs")
@@ -78,4 +79,80 @@ TEST_CASE("fc2d_clawpack46_options_store fails if called twice on a glob")
 	fclaw_global_destroy(glob2);
 }
 
+TEST_CASE("fc2d_clawpack46_options packing/unpacking")
+{
+	fc2d_clawpack46_options_t* opts = FCLAW_ALLOC_ZERO(fc2d_clawpack46_options_t,1);
+	opts->mwaves = 5;
+	opts->order_string = "[2 2]";
+	int order[] = {2,2};
+	opts->order = order;
+	int mthlim[] = {5,4,3,2,1};
+	opts->mthlim = mthlim;
+	opts->mthlim_string = "[5 4 3 2 1]";
+	int mthbc[] = {0, 1, 1, 1};
+	opts->mthbc = mthbc;
+	opts->mthbc_string = "[0 1 1 1]";
+
+	int method[] = {0,4,3,2,5,6,99};
+	for(size_t i = 0; i < 7; ++i)
+		opts->method[i] = method[i];
+
+	opts->mcapa = 3;
+	opts->src_term = 2;
+	opts->use_fwaves = 1;
+
+	opts->ascii_out = 2;
+	opts->vtk_out = 3;
+
+	opts->is_registered = 1;
+
+	opts->is_unpacked = 0;
+
+	const fclaw_packing_vtable_t* vt = fc2d_clawpack46_options_get_packing_vtable();
+
+	size_t size = vt->size(opts);
+	char buffer[size];
+	size_t bytes_written = vt->pack(opts,buffer);
+	REQUIRE_EQ(bytes_written,size);
+
+	fc2d_clawpack46_options_t* output_opts = nullptr;
+	size_t bytes_read = vt->unpack(buffer,(void**)&output_opts);
+
+	REQUIRE_EQ(bytes_read,size);
+	REQUIRE_NE(output_opts,nullptr);
+
+	CHECK_EQ(output_opts->mwaves, opts->mwaves);
+
+	CHECK_NE(output_opts->order_string, opts->order_string);
+	CHECK_UNARY(!strcmp(output_opts->order_string, opts->order_string));
+
+	CHECK_EQ(output_opts->order[0], opts->order[0]);
+	CHECK_EQ(output_opts->order[1], opts->order[1]);
+
+	for(size_t i = 0; i < 5; ++i)
+		CHECK_EQ(output_opts->mthlim[i], opts->mthlim[i]);
+	
+	CHECK_NE(output_opts->mthlim_string, opts->mthlim_string);
+	CHECK_UNARY(!strcmp(output_opts->mthlim_string, opts->mthlim_string));
+
+	for(size_t i = 0; i < 4; ++i)
+		CHECK_EQ(output_opts->mthbc[i], opts->mthbc[i]);
+
+	CHECK_NE(output_opts->mthbc_string, opts->mthbc_string);
+	CHECK_UNARY(!strcmp(output_opts->mthbc_string, opts->mthbc_string));
+
+	for(size_t i = 0; i < 7; ++i)
+		CHECK_EQ(output_opts->method[i], opts->method[i]);
+
+	CHECK_EQ(output_opts->mcapa, opts->mcapa);
+	CHECK_EQ(output_opts->src_term, opts->src_term);
+	CHECK_EQ(output_opts->use_fwaves, opts->use_fwaves);
+	CHECK_EQ(output_opts->ascii_out, opts->ascii_out);
+	CHECK_EQ(output_opts->vtk_out, opts->vtk_out);
+	CHECK_EQ(output_opts->is_registered, opts->is_registered);
+	CHECK_UNARY(output_opts->is_unpacked);
+
+	vt->destroy(output_opts);
+	FCLAW_FREE(opts);
+}
 #endif
