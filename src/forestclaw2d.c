@@ -1689,8 +1689,6 @@ fclaw2d_domain_free_after_exchange (fclaw_domain_t * domain,
     FCLAW_FREE (e);
 }
 
-#ifndef P4_TO_P8
-
 struct fclaw2d_domain_indirect
 {
     int ready;
@@ -1698,6 +1696,10 @@ struct fclaw2d_domain_indirect
     fclaw2d_domain_exchange_t *e;
 };
 
+/* These static functions are unused in 3D as long as the 3D case is not
+ * implemented.
+ */
+#ifndef P4_TO_P8
 static void
 indirect_encode (p4est_ghost_t * ghost, int mpirank,
                  int *rproc, int *rpatchno)
@@ -1733,10 +1735,12 @@ indirect_match (int *pi,
     *rpatchno = pi + 3;
     *rfaceno = pi + 5;
 }
+#endif
 
 fclaw2d_domain_indirect_t *
 fclaw2d_domain_indirect_begin (fclaw_domain_t * domain)
 {
+#ifndef P4_TO_P8
     int num_exc;
     int neall, nb, ne, np;
     int face;
@@ -1804,8 +1808,19 @@ fclaw2d_domain_indirect_begin (fclaw_domain_t * domain)
     FCLAW_FREE (pbdata);
 
     return ind;
+#else
+    FCLAW_ASSERT (domain != NULL);
+
+    /* The 3D case is currently not implemented. */
+
+    return NULL;
+#endif
 }
 
+/* These static functions are unused in 3D as long as the 3D case is not
+ * implemented.
+ */
+#ifndef P4_TO_P8
 static uint64_t
 pli_make_key (int p, int rpatchno)
 {
@@ -1878,11 +1893,13 @@ indirect_decode (sc_hash_t * pli_hash, uint64_t * pli_keys,
 
     return good;
 }
+#endif
 
 void
 fclaw2d_domain_indirect_end (fclaw_domain_t * domain,
                              fclaw2d_domain_indirect_t * ind)
 {
+#ifndef P4_TO_P8
     int ndgp;
     int good, good2;
     int p, ng;
@@ -1987,6 +2004,15 @@ fclaw2d_domain_indirect_end (fclaw_domain_t * domain,
 
     /* now we allow queries on the ghost data */
     ind->ready = 1;
+#else
+    FCLAW_ASSERT (domain != NULL);
+
+    /* The 3D case is currently not implemented. That is why we assert on ind
+     * beging NULL as it is currently always returned by
+     * fclaw3d_domain_indirect_begin.
+     */
+    FCLAW_ASSERT (ind == NULL);
+#endif
 }
 
 fclaw_patch_relation_t
@@ -1996,6 +2022,7 @@ fclaw2d_domain_indirect_neighbors (fclaw_domain_t * domain,
                                    int *rblockno, int rpatchno[2],
                                    int *rfaceno)
 {
+#ifndef P4_TO_P8
     int *pi;
     int *grproc, *grblockno, *grpatchno, *grfaceno;
     fclaw_patch_relation_t prel;
@@ -2067,20 +2094,37 @@ fclaw2d_domain_indirect_neighbors (fclaw_domain_t * domain,
 
     /* and return */
     return prel;
+#else
+    /* Since the 3D case is currently not implemented it is not valid to call
+     * this function.
+     */
+    SC_ABORT_NOT_REACHED ();
+
+    /* This code has no meaning. It is never reached. */
+    return FCLAW_PATCH_BOUNDARY;
+#endif
 }
 
 void
 fclaw2d_domain_indirect_destroy (fclaw_domain_t * domain,
                                  fclaw2d_domain_indirect_t * ind)
 {
+#ifndef P4_TO_P8
     FCLAW_ASSERT (ind != NULL && ind->ready);
     FCLAW_ASSERT (domain == ind->domain);
 
     fclaw2d_domain_free_after_exchange (domain, ind->e);
     FCLAW_FREE (ind);
-}
+#else
+    FCLAW_ASSERT (domain != NULL);
 
+    /* The 3D case is currently not implemented. That is why we assert on ind
+     * beging NULL as it is currently always returned by
+     * fclaw3d_domain_indirect_begin.
+     */
+    FCLAW_ASSERT (ind == NULL);
 #endif
+}
 
 int
 fclaw2d_domain_is_meta (fclaw_domain_t * domain)
