@@ -29,6 +29,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw3d_defs.h>
 
 #include <fclaw_patch.h>
+#include <forestclaw2d.h>
+#include <forestclaw3d.h>
 
 
 void fclaw_block_get_block_boundary(fclaw_global_t * glob,

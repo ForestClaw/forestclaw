@@ -165,7 +165,6 @@ void get_corner_neighbor(fclaw_global_t *glob,
     int rproc_corner;
     int corner_patch_idx;
     fclaw_patch_relation_t neighbor_type;
-    const int refine_factor = fclaw_domain_refine_factor(domain);
 
     /* Note : Pillowsphere case does not return a block corner neighbor */
     int ispillowsphere = 0;
@@ -223,8 +222,8 @@ void get_corner_neighbor(fclaw_global_t *glob,
                remote face number.  The remote face number encodes the
                orientation, so we have 0 <= rfaceno < 8 */
             int rfaceno;
-            int rproc[refine_factor];
-            int rpatchno[refine_factor];
+            int rproc[4]; // overallocate for 3d
+            int rpatchno[4];
             int rblockno;  /* Should equal *corner_block_idx, above. */
             fclaw_patch_face_neighbors(domain,
                                          this_block_idx,
@@ -288,8 +287,8 @@ void get_corner_neighbor(fclaw_global_t *glob,
         {
             *block_corner_count = 2;
             has_corner_neighbor = 1;
-            int rpatchno[refine_factor];
-            int rproc[refine_factor];
+            int rpatchno[4]; // overallocate for 3d
+            int rproc[4];
             int rfaceno;
 
             /* Use only faces 0 or 1 to get block data. */
@@ -309,7 +308,7 @@ void get_corner_neighbor(fclaw_global_t *glob,
             {
                 /* igrid = 0 at corners 0,1 and (R-1) at corners 2,3,
                    where R = refinement factor */
-                igrid = (icorner/2)*(refine_factor - 1);
+                igrid = (icorner/2)*(2 - 1);
             }
             else
             {

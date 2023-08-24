@@ -29,7 +29,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_exchange.h>
 
 #include <fclaw2d_convenience.h>   /* p4est domain, patch handling routines */
-#include <forestclaw2d.h>          /* Needed for patch_relation_t data */
+#include <forestclaw3d.h>          /* Needed for patch_relation_t data */
 
 #include <fclaw_gauges.h>
 
@@ -369,15 +369,15 @@ void cb_set_neighbor_types(fclaw_domain_t *domain,
 		int redgeno;
 
 		fclaw_patch_relation_t neighbor_type;
-		fclaw_patch_edge_neighbors(domain,
-								   blockno,
-								   patchno,
-								   iedge,
-								   rproc,
-								   &rblockno,
-                                   rpatchno,
-								   &redgeno,
-								   &neighbor_type);
+		fclaw3d_patch_edge_neighbors(domain,
+								     blockno,
+								     patchno,
+								     iedge,
+								     rproc,
+								     &rblockno,
+                                     rpatchno,
+								     &redgeno,
+								     &neighbor_type);
 
 		fclaw_patch_set_edge_type(this_patch,iedge,neighbor_type);
 	}

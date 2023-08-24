@@ -41,10 +41,12 @@ extern "C"
 #endif
 
 struct fclaw3d_global;
+typedef struct fclaw3d_domain_exchange fclaw3d_domain_exchange_t;
+typedef struct fclaw3d_domain_indirect fclaw3d_domain_indirect_t;
 
 typedef struct fclaw_domain_data_d3
 {
-    fclaw_domain_exchange_t *domain_exchange;
+    fclaw3d_domain_exchange_t *domain_exchange;
     fclaw3d_domain_indirect_t *domain_indirect;
 
 } fclaw_domain_data_d3_t;

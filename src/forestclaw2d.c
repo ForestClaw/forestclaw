@@ -915,7 +915,7 @@ fclaw2d_patch_corner_neighbors (fclaw_domain_t * domain,
                 int edge_rpatchno[4];
                 int edge_rfaceno;
                 fclaw_patch_relation_t  edge_neighbor_size;
-                fclaw_patch_edge_neighbors (domain,
+                fclaw3d_patch_edge_neighbors (domain,
                                               blockno, patchno, edge,
                                               edge_rproc, &edge_rblockno,
                                               edge_rpatchno, &edge_rfaceno, &edge_neighbor_size);
@@ -1526,7 +1526,7 @@ fclaw2d_domain_free_after_partition (fclaw_domain_t * domain,
 
 void
 fclaw2d_domain_ghost_exchange_begin (fclaw_domain_t * domain,
-                                     fclaw_domain_exchange_t * e,
+                                     fclaw2d_domain_exchange_t * e,
                                      int exchange_minlevel,
                                      int exchange_maxlevel)
 {
@@ -1568,7 +1568,7 @@ fclaw2d_domain_ghost_exchange_begin (fclaw_domain_t * domain,
 
 void
 fclaw2d_domain_ghost_exchange_end (fclaw_domain_t * domain,
-                                   fclaw_domain_exchange_t * e)
+                                   fclaw2d_domain_exchange_t * e)
 {
     p4est_ghost_exchange_t *exc = (p4est_ghost_exchange_t *) e->async_state;
 
@@ -1594,7 +1594,7 @@ struct fclaw2d_domain_indirect
 {
     int ready;
     fclaw_domain_t *domain;
-    fclaw_domain_exchange_t *e;
+    fclaw2d_domain_exchange_t *e;
 };
 
 static void
@@ -1654,7 +1654,7 @@ fclaw2d_domain_indirect_begin (fclaw_domain_t * domain)
     /* allocate internal state for this operation */
     ind = FCLAW_ALLOC_ZERO (fclaw2d_domain_indirect_t, 1);
     ind->domain = domain;
-    ind->e = fclaw_domain_allocate_before_exchange (domain, data_size);
+    ind->e = fclaw2d_domain_allocate_before_exchange (domain, data_size);
 
     /* loop through exchange patches and fill their neighbor information */
     pbdata = pi = FCLAW_ALLOC (int, num_exc * P4EST_FACES * 6);
@@ -1975,7 +1975,7 @@ fclaw2d_domain_indirect_destroy (fclaw_domain_t * domain,
     FCLAW_ASSERT (ind != NULL && ind->ready);
     FCLAW_ASSERT (domain == ind->domain);
 
-    fclaw_domain_free_after_exchange (domain, ind->e);
+    fclaw2d_domain_free_after_exchange (domain, ind->e);
     FCLAW_FREE (ind);
 }
 

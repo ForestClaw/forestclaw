@@ -87,6 +87,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define fclaw2d_patch_destroy_user_data_t fclaw3d_patch_destroy_user_data_t
 #define fclaw2d_patch_metric_patch_t    fclaw3d_patch_metric_patch_t
 #define fclaw2d_domain_indirect_t       fclaw3d_domain_indirect_t
+#define fclaw2d_domain_exchange_t           fclaw3d_domain_exchange_t
 
 /* redefine enums */
 #define FCLAW2D_PATCH_CHILDID           FCLAW3D_PATCH_CHILDID

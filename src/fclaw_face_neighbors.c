@@ -167,7 +167,7 @@ void get_face_neighbors(fclaw_global_t *glob,
 			/* Patch has two neighbors */
 			**ref_flag_ptr = 1; /* patches are at one level finer */
 			*fine_grid_pos_ptr = NULL;
-			num_neighbors = fclaw_domain_refine_factor(domain);
+			num_neighbors = fclaw_domain_num_children(domain)/2;
 		}
 		else
 		{

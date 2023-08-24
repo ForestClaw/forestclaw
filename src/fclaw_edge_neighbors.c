@@ -33,6 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_physical_bc.h>
 #include <fclaw_patch.h>
 
+#include <forestclaw3d.h>
 
 
 /* This is used to determine neighbor patch relative level (finer, coarser or samesize)
@@ -183,15 +184,15 @@ void get_edge_neighbors(fclaw_global_t *glob,
     int edge_patch_idx[2];
     fclaw_patch_relation_t neighbor_type;
     int has_edge_neighbor =
-        fclaw_patch_edge_neighbors(domain,
-                                   this_block_idx,
-                                   this_patch_idx,
-                                   icorner,
-                                   rproc_edge,
-                                   edge_block_idx,
-                                   edge_patch_idx,
-                                   rcornerno,
-                                   &neighbor_type);
+        fclaw3d_patch_edge_neighbors(domain,
+                                     this_block_idx,
+                                     this_patch_idx,
+                                     icorner,
+                                     rproc_edge,
+                                     edge_block_idx,
+                                     edge_patch_idx,
+                                     rcornerno,
+                                     &neighbor_type);
 
     fclaw_timer_stop (&glob->timers[FCLAW_TIMER_NEIGHBOR_SEARCH]);    
 

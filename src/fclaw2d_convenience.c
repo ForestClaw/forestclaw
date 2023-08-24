@@ -628,9 +628,9 @@ fclaw2d_domain_adapt (fclaw_domain_t * domain)
                 for (int edge = 0; max_tlevel <= level &&
                      edge < P8EST_EDGES; ++edge)
                 {
-                    fclaw_patch_edge_neighbors (domain, nb, np, edge,
-                                                nprocs, &nblockno,
-                                                npatchno, &nfc, &nrel);
+                    fclaw3d_patch_edge_neighbors (domain, nb, np, edge,
+                                                  nprocs, &nblockno,
+                                                  npatchno, &nfc, &nrel);
 
                     /* we refine ourself if the neighbor wants to be finer */
                     if (nrel == FCLAW_PATCH_SAMESIZE)

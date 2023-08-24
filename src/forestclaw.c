@@ -24,6 +24,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include <forestclaw.h>
+#include <forestclaw2d.h>
+#include <forestclaw3d.h>
 #include <p4est.h>
 #include <p8est.h>
 
@@ -190,7 +192,7 @@ fclaw_domain_num_orientations (const fclaw_domain_t * domain)
 
 void
 fclaw_domain_edge_faces (const fclaw_domain_t * domain,
-                         int iedge, int faces[P4EST_DIM])
+                         int iedge, int faces[2])
 {
     FCLAW_ASSERT (0 <= iedge && iedge < fclaw_domain_num_edges(domain));
     faces[0] = p8est_edge_faces[iedge][0];
@@ -247,8 +249,7 @@ fclaw_patch_childid (const fclaw_patch_t * patch)
     } 
     else 
     {
-        childid = patch->flags & FCLAW3D_PATCH_CHILDID;
-        FCLAW_ASSERT (0 <= childid && childid < P8EST_CHILDREN);
+        return fclaw3d_patch_childid(patch);
     }
 
     return childid;
@@ -570,109 +571,6 @@ void fclaw_domain_free_after_partition(fclaw_domain_t *domain, void ***patch_dat
     {
         SC_ABORT_NOT_REACHED();
     }
-}
-
-////////////////////////////////////////
-// exchange
-///////////////////////////////////////
-
-//definition of dimension specific functions
-void fclaw2d_domain_ghost_exchange_begin (fclaw_domain_t * domain,
-                                          fclaw_domain_exchange_t * e,
-                                          int exchange_minlevel,
-                                          int exchange_maxlevel);
-
-void fclaw2d_domain_ghost_exchange_end (fclaw_domain_t * domain,
-                                        fclaw_domain_exchange_t * e);
-
-void fclaw3d_domain_ghost_exchange_begin (fclaw_domain_t * domain,
-                                          fclaw_domain_exchange_t * e,
-                                          int exchange_minlevel,
-                                          int exchange_maxlevel);
-
-void fclaw3d_domain_ghost_exchange_end (fclaw_domain_t * domain,
-                                        fclaw_domain_exchange_t * e);
-
-fclaw_domain_exchange_t*
-fclaw_domain_allocate_before_exchange(fclaw_domain_t *domain, size_t data_size)
-{
-    int i;
-    char *m;
-    fclaw_domain_exchange_t *e;
-
-    e = FCLAW_ALLOC (fclaw_domain_exchange_t, 1);
-    e->data_size = data_size;
-    e->num_exchange_patches = domain->num_exchange_patches;
-    e->num_ghost_patches = domain->num_ghost_patches;
-
-    e->patch_data = FCLAW_ALLOC (void *, domain->num_exchange_patches);
-    e->ghost_data = FCLAW_ALLOC (void *, domain->num_ghost_patches);
-    e->ghost_contiguous_memory = m = FCLAW_ALLOC (char,
-                                                  (size_t)
-                                                  domain->num_ghost_patches *
-                                                  data_size);
-    for (i = 0; i < domain->num_ghost_patches; ++i)
-    {
-        e->ghost_data[i] = m;
-        m += data_size;
-    }
-
-    e->async_state = NULL;
-    e->by_levels = 0;
-    e->inside_async = 0;
-
-    return e;
-}
-
-void fclaw_domain_ghost_exchange(fclaw_domain_t *domain, fclaw_domain_exchange_t *e, int exchange_minlevel, int exchange_maxlevel)
-{
-
-    FCLAW_ASSERT (e->async_state == NULL);
-    FCLAW_ASSERT (!e->inside_async);
-
-    fclaw_domain_ghost_exchange_begin
-        (domain, e, exchange_minlevel, exchange_maxlevel);
-    fclaw_domain_ghost_exchange_end (domain, e);
-}
-
-void fclaw_domain_ghost_exchange_begin(fclaw_domain_t *domain, fclaw_domain_exchange_t *e, int exchange_minlevel, int exchange_maxlevel)
-{
-    if(domain->dim == 2)
-    {
-        fclaw2d_domain_ghost_exchange_begin(domain,e,exchange_minlevel,exchange_maxlevel);
-    }
-    else if (domain->dim == 3)
-    {
-        fclaw3d_domain_ghost_exchange_begin(domain,e,exchange_minlevel,exchange_maxlevel);
-    }
-    else
-    {
-        SC_ABORT_NOT_REACHED();
-    }
-}
-
-void fclaw_domain_ghost_exchange_end(fclaw_domain_t *domain, fclaw_domain_exchange_t *e)
-{
-    if(domain->dim == 2)
-    {
-        fclaw2d_domain_ghost_exchange_end(domain,e);
-    }
-    else if (domain->dim == 3)
-    {
-        fclaw3d_domain_ghost_exchange_end(domain,e);
-    }
-    else
-    {
-        SC_ABORT_NOT_REACHED();
-    }
-}
-
-void fclaw_domain_free_after_exchange(fclaw_domain_t *domain, fclaw_domain_exchange_t *e)
-{
-    FCLAW_FREE (e->ghost_contiguous_memory);
-    FCLAW_FREE (e->ghost_data);
-    FCLAW_FREE (e->patch_data);
-    FCLAW_FREE (e);
 }
 
 ////////////////////////////////////////
