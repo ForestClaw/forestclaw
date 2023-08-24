@@ -52,6 +52,52 @@ const fclaw2d_patch_flags_t fclaw2d_patch_block_face_flags[4] = {
 #define FCLAW2D_DOMAIN_TAG_SERIALIZE 4527
 #endif
 
+void
+fclaw2d_domain_corner_faces (const fclaw_domain_t * domain,
+                             int icorner, int faces[P4EST_DIM])
+{
+    FCLAW_ASSERT (0 <= icorner && icorner < P4EST_CHILDREN);
+    faces[0] = p4est_corner_faces[icorner][0];
+    faces[1] = p4est_corner_faces[icorner][1];
+#ifdef P4_TO_P8
+    faces[2] = p8est_corner_faces[icorner][2];
+#endif
+}
+
+int
+fclaw2d_patch_corner_dimension (const fclaw_patch_t * patch, int cornerno)
+{
+    const int childid = fclaw2d_patch_childid (patch);
+
+    FCLAW_ASSERT (0 <= cornerno && cornerno < P4EST_CHILDREN);
+
+    return (patch->level == 0 ||
+            cornerno == childid ||
+            cornerno == P4EST_CHILDREN - 1 - childid) ? 0 : 1;
+}
+
+int
+fclaw2d_patch_childid (const fclaw_patch_t * patch)
+{
+    const int childid = patch->flags & FCLAW2D_PATCH_CHILDID;
+
+    FCLAW_ASSERT (0 <= childid && childid < P4EST_CHILDREN);
+
+    return childid;
+}
+
+int
+fclaw2d_patch_is_first_sibling (const fclaw_patch_t * patch)
+{
+    return patch->flags & FCLAW2D_PATCH_FIRST_SIBLING ? 1 : 0;
+}
+
+int
+fclaw2d_patch_is_ghost (const fclaw_patch_t * patch)
+{
+    return patch->flags & FCLAW2D_PATCH_IS_GHOST ? 1 : 0;
+}
+
 static fclaw_patch_t *
 fclaw2d_domain_get_patch (fclaw_domain_t * domain, int blockno, int patchno)
 {
