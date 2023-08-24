@@ -2,7 +2,7 @@
 
 bin_PROGRAMS += applications/geoclaw/bowl_slosh/bowl_slosh
 
-TESTS += applications/geoclaw/bowl_slosh/regressions.txt
+TESTS += applications/geoclaw/bowl_slosh/regressions.sh
 
 applications_geoclaw_bowl_slosh_bowl_slosh_SOURCES = \
 	applications/geoclaw/bowl_slosh/slosh_user.cpp \

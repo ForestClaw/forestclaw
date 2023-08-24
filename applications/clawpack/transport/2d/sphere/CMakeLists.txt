@@ -36,8 +36,6 @@ add_executable(sphere_transport
   $<TARGET_OBJECTS:sphere_transport_f>
 )
 
-set_target_properties(sphere_transport PROPERTIES OUTPUT_NAME sphere)
-
 target_include_directories(sphere_transport PRIVATE 
   ${CMAKE_CURRENT_SOURCE_DIR} 
   ${all}
@@ -48,4 +46,8 @@ target_link_libraries(sphere_transport PRIVATE
  FORESTCLAW::CLAWPACK5
 )
 
-add_regressions(regressions.txt)
+add_test(NAME clawpack_transport_2d_sphere 
+         COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/regressions.sh
+         WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+set_tests_properties(clawpack_transport_2d_sphere
+         PROPERTIES ENVIRONMENT "${FCLAW_TEST_ENVIRONMENT}")

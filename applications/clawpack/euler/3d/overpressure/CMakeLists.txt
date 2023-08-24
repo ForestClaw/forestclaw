@@ -40,4 +40,5 @@ target_link_libraries(overpressure PRIVATE
  FORESTCLAW::CLAWPACK3_46
 )
 
-add_regressions(regressions.txt)
+add_test(NAME clawpack_euler_3d_overpressure COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/regressions.sh WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+set_tests_properties(clawpack_euler_3d_overpressure  PROPERTIES ENVIRONMENT "${FCLAW_TEST_ENVIRONMENT}")

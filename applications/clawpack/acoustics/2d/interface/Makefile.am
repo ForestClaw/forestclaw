@@ -3,7 +3,7 @@
 
 bin_PROGRAMS += applications/clawpack/acoustics/2d/interface/interface
 
-TESTS += applications/clawpack/acoustics/2d/interface/regressions.txt
+TESTS += applications/clawpack/acoustics/2d/interface/regressions.sh
 
 applications_clawpack_acoustics_2d_interface_interface_SOURCES = \
 	applications/clawpack/acoustics/2d/interface/interface.cpp \

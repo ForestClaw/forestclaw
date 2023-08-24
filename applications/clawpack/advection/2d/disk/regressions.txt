@@ -1,4 +1,0 @@
-./disk -F regression.ini --user:claw-version=4 --user:example=0   --regression-check=regression_values_0.csv 
-./disk -F regression.ini --user:claw-version=5 --user:example=0   --regression-check=regression_values_1.csv 
-./disk -F regression.ini --user:claw-version=4 --user:example=1   --regression-check=regression_values_2.csv 
-./disk -F regression.ini --user:claw-version=5 --user:example=1   --regression-check=regression_values_3.csv 

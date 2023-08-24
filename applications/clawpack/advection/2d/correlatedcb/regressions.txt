@@ -1,4 +1,0 @@
-./correlatedcb -F regression.ini --user:claw-version=4 --user:mapping=0  --regression-check=regression_values_0.csv 
-./correlatedcb -F regression.ini --user:claw-version=4 --user:mapping=1  --regression-check=regression_values_1.csv 
-./correlatedcb -F regression.ini --user:claw-version=5 --user:mapping=0  --regression-check=regression_values_2.csv 
-./correlatedcb -F regression.ini --user:claw-version=5 --user:mapping=1  --regression-check=regression_values_3.csv 

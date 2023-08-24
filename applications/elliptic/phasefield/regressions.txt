@@ -1,1 +1,0 @@
-./phasefield -F regression.ini  --regression-check=regression_values_0.csv 

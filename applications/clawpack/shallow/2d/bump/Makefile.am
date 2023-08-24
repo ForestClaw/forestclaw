@@ -2,7 +2,7 @@
 
 bin_PROGRAMS += applications/clawpack/shallow/2d/bump/bump
 
-TESTS += applications/clawpack/shallow/2d/bump/regressions.txt
+TESTS += applications/clawpack/shallow/2d/bump/regressions.sh
 
 applications_clawpack_shallow_2d_bump_bump_SOURCES = \
 	applications/clawpack/shallow/2d/bump/bump.cpp \

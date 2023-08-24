@@ -2,7 +2,7 @@
 
 bin_PROGRAMS += applications/clawpack/advection/2d/swirl_rays/swirl
 
-#TESTS += applications/clawpack/advection/2d/swirl_rays/regressions.txt
+TESTS += applications/clawpack/advection/2d/swirl_rays/regressions.sh
 
 applications_clawpack_advection_2d_swirl_rays_swirl_SOURCES = \
 	applications/clawpack/advection/2d/swirl_rays/swirl_user.cpp \

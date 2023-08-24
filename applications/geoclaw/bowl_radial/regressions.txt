@@ -1,2 +1,0 @@
-cd regression
-../bowl_radial -F regression.ini  --regression-check=regression_values_0.csv 

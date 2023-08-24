@@ -1,6 +1,0 @@
-./radial -F regression.ini     --user:claw-version=4 --user:example=0  --regression-check=regression_values_0.csv 
-./radial -F regression_map.ini --user:claw-version=4 --user:example=1  --regression-check=regression_values_1.csv 
-./radial -F regression_map.ini --user:claw-version=4 --user:example=2  --regression-check=regression_values_2.csv 
-./radial -F regression.ini     --user:claw-version=5 --user:example=0  --regression-check=regression_values_3.csv 
-./radial -F regression_map.ini --user:claw-version=5 --user:example=1  --regression-check=regression_values_4.csv 
-./radial -F regression_map.ini --user:claw-version=5 --user:example=2  --regression-check=regression_values_5.csv 

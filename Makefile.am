@@ -52,9 +52,7 @@ AM_TESTS_ENVIRONMENT = \
                       @FCLAW_VALGRIND@ @FCLAW_VALGRIND_FLAGS@" \
 	FCLAW_MPI_TEST_FLAGS="" \
 	FCLAW_APPLICATIONS_SRC_DIR="@abs_top_srcdir@/applications" \
-	FCLAW_APPLICATIONS_BUILD_DIR="@abs_top_builddir@/applications" \
-	FCLAW_SRC_DIR="@abs_top_srcdir@" \
-	FCLAW_BUILD_DIR="@abs_top_builddir@" 
+	FCLAW_APPLICATIONS_BUILD_DIR="@abs_top_builddir@/applications"
 
 # recurse only into subpackages
 SUBDIRS = @FCLAW_SC_SUBDIR@ @FCLAW_P4EST_SUBDIR@

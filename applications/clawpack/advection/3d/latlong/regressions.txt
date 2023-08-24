@@ -1,1 +1,0 @@
-./latlong -F regression.ini --user:claw-version=4  --regression-check=regression_values_0.csv 

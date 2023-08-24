@@ -2,7 +2,7 @@
 
 bin_PROGRAMS += applications/clawpack/advection/2d/slotted_disk/slotted_disk
 
-TESTS += applications/clawpack/advection/2d/slotted_disk/regressions.txt
+TESTS += applications/clawpack/advection/2d/slotted_disk/regressions.sh
 
 applications_clawpack_advection_2d_slotted_disk_slotted_disk_SOURCES = \
 	applications/clawpack/advection/2d/slotted_disk/slotted_disk.cpp \

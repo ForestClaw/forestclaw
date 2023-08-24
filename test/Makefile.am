@@ -4,15 +4,13 @@ check_LTLIBRARIES = test/libtestutils.la
 
 #TEST_EXTENTIONS += .MPI1 .TEST
 
-TEST_EXTENSIONS   = .TEST .MPI1 .txt
+TEST_EXTENSIONS   = .sh .TEST .MPI1
 SH_LOG_COMPILER   = $(SHELL)
 AM_SH_LOG_FLAGS   = 
 MPI1_LOG_DRIVER   = @top_srcdir@/test/doc-test-driver
 AM_MPI1_LOG_FLAGS =
 TEST_LOG_DRIVER   = @top_srcdir@/test/doc-test-driver
 AM_TEST_LOG_FLAGS =
-TXT_LOG_DRIVER    = @top_srcdir@/test/regressions-driver
-AM_TXT_LOG_FLAGS =
 LOG_COMPILER = $(SHELL)
 AM_LOG_FLAGS = 
 

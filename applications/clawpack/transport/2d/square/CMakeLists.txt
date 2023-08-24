@@ -48,5 +48,10 @@ target_link_libraries(square PRIVATE
  FORESTCLAW::CLAWPACK5
 )
 
-add_regressions(regressions.txt)
+add_test(NAME clawpack_transport_2d_square 
+         COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/regressions.sh
+         WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+set_tests_properties(clawpack_transport_2d_square
+         PROPERTIES ENVIRONMENT "${FCLAW_TEST_ENVIRONMENT}")
+
 

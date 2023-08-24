@@ -1,6 +1,0 @@
-./radialdam -F regression.ini     --user:claw-version=4 --user:example=0 --trapfpe=F  --regression-check=regression_values_0.csv 
-./radialdam -F regression.ini     --user:claw-version=5 --user:example=0 --trapfpe=F  --regression-check=regression_values_1.csv 
-./radialdam -F regression_map.ini --user:claw-version=4 --user:example=1 --trapfpe=F  --regression-check=regression_values_2.csv 
-./radialdam -F regression_map.ini --user:claw-version=5 --user:example=1 --trapfpe=F  --regression-check=regression_values_3.csv 
-./radialdam -F regression_map.ini --user:claw-version=4 --user:example=2 --trapfpe=F  --regression-check=regression_values_4.csv 
-./radialdam -F regression_map.ini --user:claw-version=5 --user:example=2 --trapfpe=F  --regression-check=regression_values_5.csv 

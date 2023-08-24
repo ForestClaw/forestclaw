@@ -1,1 +1,0 @@
-./heat_phasefield -F regression.ini   --heat:regression-check=heat_regression_values_0.csv --phasefield:regression-check=phasefield_regression_values_0.csv

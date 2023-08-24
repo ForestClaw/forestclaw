@@ -1,6 +1,6 @@
 bin_PROGRAMS += applications/clawpack/advection/3d/latlong/latlong
 
-TESTS += applications/clawpack/advection/3d/latlong/regressions.txt
+TESTS += applications/clawpack/advection/3d/latlong/regressions.sh
 
 applications_clawpack_advection_3d_latlong_latlong_SOURCES = \
 	applications/clawpack/advection/3d/latlong/latlong.cpp \

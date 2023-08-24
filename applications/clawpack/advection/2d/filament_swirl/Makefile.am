@@ -3,7 +3,7 @@
 bin_PROGRAMS += applications/clawpack/advection/2d/filament_swirl/filament_swirl
 bin_PROGRAMS += applications/clawpack/advection/2d/filament_swirl/filament_swirl_split
 
-TESTS += applications/clawpack/advection/2d/filament_swirl/regressions.txt
+TESTS += applications/clawpack/advection/2d/filament_swirl/regressions.sh
 
 applications_clawpack_advection_2d_filament_swirl_filament_swirl_COMMON_SOURCES = \
 	applications/clawpack/advection/2d/filament_swirl/user_run.c \

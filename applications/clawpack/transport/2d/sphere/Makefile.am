@@ -2,7 +2,7 @@
 
 bin_PROGRAMS += applications/clawpack/transport/2d/sphere/sphere_transport
 
-TESTS += applications/clawpack/transport/2d/sphere/regressions.txt
+TESTS += applications/clawpack/transport/2d/sphere/regressions.sh
 
 applications_clawpack_transport_2d_sphere_sphere_transport_SOURCES = \
 	applications/clawpack/transport/2d/sphere/sphere.cpp \

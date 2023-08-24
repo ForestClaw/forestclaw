@@ -1,2 +1,0 @@
-./sphere -F regression.ini --user:example=1  --regression-check=regression_values_0.csv 
-#./sphere -F regression.ini --user:example=2  --regression-check=regression_values_1.csv 

@@ -1,6 +1,6 @@
 bin_PROGRAMS += applications/clawpack/advection/3d/sphere/sphere
 
-TESTS += applications/clawpack/advection/3d/sphere/regressions.txt
+TESTS += applications/clawpack/advection/3d/sphere/regressions.sh
 
 applications_clawpack_advection_3d_sphere_sphere_SOURCES = \
 	applications/clawpack/advection/3d/sphere/sphere.cpp \

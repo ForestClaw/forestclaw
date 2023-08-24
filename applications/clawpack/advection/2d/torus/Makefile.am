@@ -1,6 +1,6 @@
 bin_PROGRAMS += applications/clawpack/advection/2d/torus/torus
 
-TESTS += applications/clawpack/advection/2d/torus/regressions.txt
+TESTS += applications/clawpack/advection/2d/torus/regressions.sh
 
 applications_clawpack_advection_2d_torus_torus_SOURCES = \
 	applications/clawpack/advection/2d/torus/torus.cpp \

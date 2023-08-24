@@ -34,4 +34,5 @@ target_link_libraries(disk PRIVATE
  FORESTCLAW::CLAWPACK5
 )
 
-add_regressions(regressions.txt)
+add_test(NAME clawpack_advection_2d_disk COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/regressions.sh WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+set_tests_properties(clawpack_advection_2d_disk PROPERTIES ENVIRONMENT "${FCLAW_TEST_ENVIRONMENT}")

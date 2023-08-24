@@ -33,8 +33,6 @@ add_executable(torus_transport
   $<TARGET_OBJECTS:torus_transport_f>
 )
 
-set_target_properties(torus_transport PROPERTIES OUTPUT_NAME torus)
-
 target_include_directories(torus_transport PRIVATE 
   ${CMAKE_CURRENT_SOURCE_DIR} 
   ${all}
@@ -45,6 +43,6 @@ target_link_libraries(torus_transport PRIVATE
   FORESTCLAW::CLAWPACK5
 )
 
-add_regressions(regressions.txt)
-
+add_test(NAME clawpack_transport_2d_torus COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/regressions.sh WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+set_tests_properties(clawpack_transport_2d_torus PROPERTIES ENVIRONMENT "${FCLAW_TEST_ENVIRONMENT}")
 

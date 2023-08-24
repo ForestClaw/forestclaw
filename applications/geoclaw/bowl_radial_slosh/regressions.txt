@@ -1,1 +1,0 @@
-./bowl_radial_slosh -F regression.ini  --radial:regression-check=radial_regression_values_0.csv --slosh:regression-check=slosh_regression_values_0.csv

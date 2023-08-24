@@ -2,7 +2,7 @@
 
 bin_PROGRAMS += applications/clawpack/advection/2d/correlatedcb/correlatedcb
 
-TESTS += applications/clawpack/advection/2d/correlatedcb/regressions.txt
+TESTS += applications/clawpack/advection/2d/correlatedcb/regressions.sh
 
 applications_clawpack_advection_2d_correlatedcb_correlatedcb_SOURCES = \
 	applications/clawpack/advection/2d/correlatedcb/correlatedcb.cpp \

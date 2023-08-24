@@ -45,4 +45,4 @@ applications_clawpack_advection_2d_disk_disk_LDADD = \
         $(FCLAW_CLAWPATCH_LDADD) \
         $(FCLAW_LDADD)
 
-TESTS += applications/clawpack/advection/2d/disk/regressions.txt
+TESTS += applications/clawpack/advection/2d/disk/regressions.sh

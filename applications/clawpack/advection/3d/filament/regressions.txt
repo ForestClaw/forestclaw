@@ -1,5 +1,0 @@
-./filament -F regression.ini     --user:example=0  --regression-check=regression_values_0.csv 
-# ./filament -F regression_map.ini --user:example=1  --regression-check=regression_values_1.csv 
-# ./filament -F regression_map.ini --user:example=2  --regression-check=regression_values_2.csv 
-# ./filament -F regression_map.ini --user:example=3  --regression-check=regression_values_3.csv 
-
