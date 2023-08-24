@@ -12,8 +12,6 @@ add_library(forestclaw_c OBJECT
   fclaw_edge_neighbors.c
   fclaw_elliptic_solver.c
   fclaw_exchange.c
-  fclaw_exchange_2d.c
-  fclaw_exchange_3d.c
   fclaw_face_neighbors.c
   fclaw_farraybox.cpp
   fclaw_filesystem.cpp
@@ -40,6 +38,7 @@ add_library(forestclaw_c OBJECT
   fclaw_vtable.c
 
   fclaw2d_convenience.c
+  fclaw2d_exchange.c
   fclaw2d_map.c
   fclaw2d_map_brick.c
   fclaw2d_map_query.c
@@ -52,6 +51,7 @@ add_library(forestclaw_c OBJECT
   forestclaw3d.c
 
   fclaw3d_convenience.c
+  fclaw3d_exchange.c
   fclaw3d_map.c
 
   fp_exception_glibc_extension.c

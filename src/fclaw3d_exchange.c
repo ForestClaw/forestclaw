@@ -24,4 +24,4 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #define P4_TO_P8
-#include "fclaw_exchange_2d.c"
+#include "fclaw2d_exchange.c"

@@ -78,8 +78,6 @@ libforestclaw_compiled_sources = \
 	src/fclaw_edge_neighbors.c \
 	src/fclaw_elliptic_solver.c \
 	src/fclaw_exchange.c \
-	src/fclaw_exchange_2d.c \
-	src/fclaw_exchange_3d.c \
 	src/fclaw_face_neighbors.c \
 	src/fclaw_farraybox.cpp \
 	src/fclaw_filesystem.cpp \
@@ -106,6 +104,7 @@ libforestclaw_compiled_sources = \
 	src/fclaw_vtable.c \
 	\
 	src/fclaw2d_convenience.c \
+	src/fclaw2d_exchange.c \
 	src/fclaw2d_map.c \
 	src/fclaw2d_map_brick.c \
 	src/fclaw2d_map_query.c \
@@ -114,6 +113,7 @@ libforestclaw_compiled_sources = \
 	src/fclaw2d_update_single_step.c \
 	\
 	src/forestclaw.c \
+	src/fclaw3d_exchange.c \
 	src/forestclaw2d.c \
 	src/forestclaw3d.c \
 	\
