@@ -63,7 +63,7 @@ void create_domain (fclaw_global_t * glob,
                                   rotate,
                                   user->alpha,
                                   user->beta);
-    fclaw_global_store_map_2d (glob, cont);
+    fclaw2d_map_store (glob, cont);
 }
 
 static

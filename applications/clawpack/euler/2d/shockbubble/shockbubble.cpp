@@ -61,7 +61,7 @@ void create_domain_map (fclaw_global_t *glob,
     /* Construct and store map */
     brick = fclaw2d_map_new_brick (domain, mi, mj, a, b);
     cont = fclaw2d_map_new_nomap_brick (brick);
-    fclaw_global_store_map_2d (glob, cont);
+    fclaw2d_map_store (glob, cont);
 }
 
 static

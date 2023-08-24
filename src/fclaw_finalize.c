@@ -175,14 +175,14 @@ void fclaw_finalize(fclaw_global_t* glob)
     fclaw_diagnostics_finalize(glob);
     if(glob->domain->dim == 2)
     {
-        fclaw2d_map_context_t* map = fclaw_global_get_map_2d(glob);
+        fclaw2d_map_context_t* map = fclaw2d_map_get(glob);
         if (map != NULL) {
             fclaw2d_map_destroy(map);
         }
     }
     else
     {
-        fclaw3d_map_context_t* map = fclaw_global_get_map_3d(glob);
+        fclaw3d_map_context_t* map = fclaw2d_map_get(glob);
         if (map != NULL) {
             //TODO
             //fclaw3d_map_destroy(map);

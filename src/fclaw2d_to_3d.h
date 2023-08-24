@@ -226,6 +226,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define fclaw2d_domain_indirect_destroy     fclaw3d_domain_indirect_destroy
 #define fclaw2d_domain_indirect_end         fclaw3d_domain_indirect_end
 #define fclaw2d_domain_indirect_begin       fclaw3d_domain_indirect_begin
+#define fclaw2d_map_store                   fclaw3d_map_store
+#define fclaw2d_map_get                     fclaw3d_map_get
 
 #define fclaw2d_exchange_setup          fclaw3d_exchange_setup
 #define fclaw2d_exchange_delete         fclaw3d_exchange_delete

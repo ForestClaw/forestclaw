@@ -82,7 +82,7 @@ void fclaw_initialize(fclaw_global_t *glob)
 	/* This mapping context is needed by fortran mapping functions */
     if((*domain)->dim == 2)
     {
-	    fclaw2d_map_context_t *cont = fclaw_global_get_map_2d(glob);
+	    fclaw2d_map_context_t *cont = fclaw2d_map_get(glob);
         //TODO set this this somewhere else
 	    FCLAW_MAP_SET_CONTEXT(&cont);
     }

@@ -106,34 +106,9 @@ fclaw_global_store_domain (fclaw_global_t* glob, fclaw_domain_t* domain)
     fclaw2d_map_context_t* map = (fclaw2d_map_context_t*)
            fclaw_domain_attribute_access (glob->domain, "fclaw_map_context", NULL);
 
-    fclaw_global_store_map_2d(glob, map);
+    fclaw2d_map_store(glob, map);
 }
 
-void
-fclaw_global_store_map_2d (fclaw_global_t* glob,
-                          fclaw2d_map_context_t * map)
-{
-    fclaw_global_attribute_store(glob, "map_2d", map, NULL);
-}
-
-fclaw2d_map_context_t*
-fclaw_global_get_map_2d(fclaw_global_t* glob)
-{
-    return (fclaw2d_map_context_t*) fclaw_global_get_attribute(glob,"map_2d");
-}
-
-void
-fclaw_global_store_map_3d (fclaw_global_t* glob,
-                          fclaw3d_map_context_t * map)
-{
-    fclaw_global_attribute_store(glob, "map_3d", map, NULL);
-}
-
-fclaw3d_map_context_t*
-fclaw_global_get_map_3d(fclaw_global_t* glob)
-{
-    return (fclaw3d_map_context_t*) fclaw_global_get_attribute(glob,"map_3d");
-}
 
 void
 fclaw_global_destroy (fclaw_global_t * glob)

@@ -41,6 +41,7 @@ extern "C"
 /* Fix syntax highlighting */
 #endif
 
+typedef struct fclaw_global fclaw_global_t;
 struct fclaw3d_map_context;
 typedef struct fclaw3d_map_context fclaw3d_map_context_t;
 
@@ -66,6 +67,23 @@ struct fclaw3d_map_context
 void fclaw3d_map_destroy (fclaw3d_map_context_t * cont);
 
 fclaw3d_map_context_t* fclaw3d_map_new_nomap (void);
+
+/**
+ * Store the map in the glob
+ *
+ * @param glob the global context
+ * @param map the map to store
+ */
+void fclaw3d_map_store (fclaw_global_t* glob,
+                        struct fclaw3d_map_context * map);
+
+/**
+ * Get map from the glob
+ *
+ * @param the global context
+ * @return the map
+ */
+fclaw3d_map_context_t* fclaw3d_map_get(fclaw_global_t* glob);       
 
 #ifdef __cplusplus
 }

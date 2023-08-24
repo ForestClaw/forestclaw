@@ -38,19 +38,36 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_map.h>
 #include <fclaw2d_map_query.h>  /* Needed for pillowsphere query */
 
+#define MAP_KEY "map_2d"
 #elif PATCH_DIM == 3 && REFINE_DIM == 2
 
 #include <fclaw_global.h>
 #include <fclaw3dx_map.h>
 //#include <fclaw3d_map_query.h>  /* Needed for pillowsphere query */
 //#include <_fclaw2d_to_fclaw3d.h>
+#define MAP_KEY "map_2d"
 
 #else /* this is full 3D */
 #include <fclaw3d_map.h>
 #include <fclaw2d_to_3d.h>
+
+#define MAP_KEY "map_3d"
 #endif
 
 #ifndef P4_TO_P8
+
+void
+fclaw2d_map_store (fclaw_global_t* glob,
+                          fclaw2d_map_context_t * map)
+{
+    fclaw_global_attribute_store(glob, MAP_KEY, map, NULL);
+}
+
+fclaw2d_map_context_t*
+fclaw2d_map_get(fclaw_global_t* glob)
+{
+    return (fclaw2d_map_context_t*) fclaw_global_get_attribute(glob,MAP_KEY);
+}
 
 /* This function can be called from Fortran inside of ClawPatch. */
 void
@@ -493,7 +510,7 @@ fclaw2d_options_postprocess_map_data(fclaw2d_map_data_t * map_data)
 
 int fclaw2d_map_pillowsphere(fclaw_global_t* glob)
 {
-    fclaw2d_map_context_t *cont = fclaw_global_get_map_2d(glob);
+    fclaw2d_map_context_t *cont = fclaw2d_map_get(glob);
     return FCLAW2D_MAP_IS_PILLOWSPHERE(&cont) != 0;    
 }
 

@@ -38,6 +38,7 @@ extern "C"
 /* Fix syntax highlighting */
 #endif
 
+typedef struct fclaw_global fclaw_global_t;
 struct p4est_connectivity;
 struct fclaw_global;
 
@@ -131,6 +132,24 @@ struct fclaw2d_map_context
     fclaw2d_map_context_t *brick;
     void *user_data;
 };
+
+/**
+ * Store the map in the glob
+ *
+ * @param glob the global context
+ * @param map the map to store
+ */
+void fclaw2d_map_store (fclaw_global_t* glob,
+                        struct fclaw2d_map_context * map);
+
+/**
+ * Get map from the glob
+ *
+ * @param the global context
+ * @return the map
+ */
+fclaw2d_map_context_t* fclaw2d_map_get(fclaw_global_t* glob);
+
 
 
 void set_scale(fclaw2d_map_context_t* cont, const double scale[]);

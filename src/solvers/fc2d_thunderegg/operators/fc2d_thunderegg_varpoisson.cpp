@@ -349,7 +349,7 @@ void fc2d_thunderegg_varpoisson_solve(fclaw_global_t *glob)
     p4est_wrap_t *wrap = (p4est_wrap_t *)domain->pp;
 
     // create map function
-    fclaw2d_map_context_t* cont = fclaw_global_get_map_2d(glob);
+    fclaw2d_map_context_t* cont = fclaw2d_map_get(glob);
     P4estDomainGenerator::BlockMapFunc bmf = [&](int block_no, double unit_x,      
                                         double unit_y, double &x, double &y) 
     {

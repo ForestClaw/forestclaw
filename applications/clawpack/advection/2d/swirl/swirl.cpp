@@ -40,7 +40,7 @@ void create_domain_map (fclaw_global_t *glob, fclaw_options_t* gparms)
 
     /* Map unit square to disk using mapc2m_disk.f */
     gparms->manifold = 0;
-    fclaw_global_store_map_2d (glob, fclaw2d_map_new_nomap ());
+    fclaw2d_map_store (glob, fclaw2d_map_new_nomap ());
 }
 
 static
