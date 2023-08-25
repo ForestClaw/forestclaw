@@ -39,8 +39,6 @@ extern "C"
 #endif
 
 typedef struct fclaw_global fclaw_global_t;
-typedef struct fclaw2d_map_context fclaw2d_map_context_t;
-typedef struct fclaw3d_map_context fclaw3d_map_context_t;
 
 struct fclaw_global
 {

@@ -48,6 +48,9 @@ extern "C"
 /* ---------------------------------------------------------------------- */
 ///@{
 
+typedef struct fclaw_patch_d3 fclaw_patch_d3_t;
+typedef struct fclaw_block_d3 fclaw_block_d3_t;
+
 /**
  * @brief Enum for encoding patch information
  */

@@ -32,6 +32,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_defs.h>
 #include <fclaw3d_defs.h>
 
+#include <forestclaw2d.h>
+#include <forestclaw3d.h>
+
 /* ------------------------------- static access functions ---------------------------- */
 static
 fclaw_patch_data_t* get_patch_data(fclaw_patch_t* patch)
@@ -1220,7 +1223,14 @@ int fclaw_patch_on_coarsefine_interface(fclaw_patch_t *patch)
 int
 fclaw_patch_on_parallel_boundary (const fclaw_patch_t * patch)
 {
-    return patch->flags & FCLAW2D_PATCH_ON_PARALLEL_BOUNDARY ? 1 : 0;
+    if(patch->dim == 2)
+    {
+        return patch->flags & FCLAW2D_PATCH_ON_PARALLEL_BOUNDARY ? 1 : 0;
+    }
+    else 
+    {
+        return patch->flags & FCLAW3D_PATCH_ON_PARALLEL_BOUNDARY ? 1 : 0;
+    }
 }
 
 int* fclaw_patch_block_corner_count(fclaw_global_t* glob,

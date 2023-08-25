@@ -47,22 +47,21 @@ extern "C"
 /* ---------------------------------------------------------------------- */
 ///@{
 
+typedef struct fclaw_domain_persist fclaw_domain_persist_t;
 /** Typedef for fclaw_domain */
 typedef struct fclaw_domain fclaw_domain_t;
 /** Typedef for fclaw_block */
 typedef struct fclaw_block fclaw_block_t;
 /** Typedef for fclaw_patch */
 typedef struct fclaw_patch fclaw_patch_t;
-typedef struct fclaw_patch_bounds_2d fclaw_patch_bounds_2d_t;
-typedef struct fclaw_patch_bounds_3d fclaw_patch_bounds_3d_t;
 
-struct fclaw_patch_bounds_2d
+struct fclaw_patch_d2
 {
     double xlower, xupper;
     double ylower, yupper;
 };
 
-struct fclaw_patch_bounds_3d
+struct fclaw_patch_d3
 {
     double xlower, xupper;
     double ylower, yupper;
@@ -76,8 +75,8 @@ struct fclaw_patch_bounds_3d
 struct fclaw_patch
 {
     int dim;
-    fclaw_patch_bounds_2d_t* d2;
-    fclaw_patch_bounds_3d_t* d3;
+    struct fclaw_patch_d2* d2;
+    struct fclaw_patch_d3* d3;
     int level;                  /**< 0 is root, increases if refined */
     int target_level;           /**< level desired after adaptation */
     int flags;                  /**< flags that encode tree information */
@@ -92,7 +91,7 @@ struct fclaw_patch
     void *user;                 /**< User Pointer */
 };
 
-typedef struct fclaw_block_d2
+struct fclaw_block_d2
 {
     /** @{ @brief lower left coordinate */
     double xlower, xupper;
@@ -103,9 +102,9 @@ typedef struct fclaw_block_d2
     double vertices[4 * 3];     /**< for each block corner, the xyz coordinates
                                      of the p4est_connectivity structure */
     int is_boundary[4];         /**< physical boundary flag */
-} fclaw_block_d2_t;
+};
 
-typedef struct fclaw_block_d3
+struct fclaw_block_d3
 {
     /** @{ @brief left/right coordinate */
     double xlower, xupper;
@@ -119,7 +118,7 @@ typedef struct fclaw_block_d3
     double vertices[8 * 3];     /**< for each block corner, the xyz coordinates
                                      of the p8est_connectivity structure */
     int is_boundary[6];         /**< physical boundary flag */
-} fclaw_block_d3_t;
+};
 
 /**
  * @brief Data Structure for a block
@@ -127,8 +126,8 @@ typedef struct fclaw_block_d3
 typedef struct fclaw_block
 {
     int dim;
-    fclaw_block_d2_t* d2;
-    fclaw_block_d3_t* d3;
+    struct fclaw_block_d2* d2;
+    struct fclaw_block_d3* d3;
     int num_patches;            /**< local patches in this block */
     int num_patches_before;     /**< in all previous blocks */
     int num_exchange_patches;   /**< exchange patches in this block */
@@ -167,7 +166,7 @@ fclaw_domain_persist_t;
  * Variables that are synchronized and shared between processors
  * are denoted *global*.
  */
-typedef struct fclaw_domain
+struct fclaw_domain
 {
     int dim;
 
@@ -216,7 +215,7 @@ typedef struct fclaw_domain
     sc_keyvalue_t *attributes;  /**< Reserved to store domain attributes */
 
     void *user; /**< user data pointer */
-} fclaw_domain_t;
+};
 
 ///@}
 /* ---------------------------------------------------------------------- */

@@ -29,6 +29,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_convenience.h>
 #include <forestclaw2d.h>
+#include <forestclaw2d.h>
 #include <p4est_bits.h>
 #include <p4est_search.h>
 #include <p4est_vtk.h>
@@ -38,19 +39,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw3d_convenience.h>
 #include <forestclaw3d.h>
+#include <forestclaw3d.h>
 #include <p8est_bits.h>
 #include <p8est_search.h>
 #include <p8est_vtk.h>
 #include <p8est_wrap.h>
 
-#include <fclaw2d_to_3d.h>
-
 // for dimension dependent values
 // needs to be defined AFTER all other headers
 #define d2 d3
-
-#define fclaw_patch_bounds_2d_t fclaw_patch_bounds_3d_t
-#define fclaw_block_d2_t fclaw_block_d3_t
 
 #endif
 
@@ -235,7 +232,7 @@ fclaw2d_domain_new (p4est_wrap_t * wrap, sc_keyvalue_t * attributes)
         for (j = 0; j < block->num_patches; ++j)
         {
             patch = block->patches + j;
-            patch->d2 = FCLAW_ALLOC_ZERO(fclaw_patch_bounds_2d_t,1);
+            patch->d2 = FCLAW_ALLOC_ZERO(fclaw_patch_d2_t,1);
             quad = p4est_quadrant_array_index (&tree->quadrants, (size_t) j);
             patch->target_level = patch->level = level = (int) quad->level;
             patch->flags = p4est_quadrant_child_id (quad);
@@ -307,7 +304,7 @@ fclaw2d_domain_new (p4est_wrap_t * wrap, sc_keyvalue_t * attributes)
     for (i = 0; i < domain->num_ghost_patches; ++i)
     {
         patch = domain->ghost_patches + i;
-        patch->d2 = FCLAW_ALLOC_ZERO(fclaw_patch_bounds_2d_t,1);
+        patch->d2 = FCLAW_ALLOC_ZERO(fclaw_patch_d2_t,1);
         quad = p4est_quadrant_array_index (&ghost->ghosts, (size_t) i);
         patch->target_level = patch->level = level = (int) quad->level;
         patch->flags =
@@ -1267,7 +1264,7 @@ integrate_ray_fn (p4est_t * p4est, p4est_topidx_t which_tree,
     fclaw_patch_t fclaw2d_patch;
     memset (&fclaw2d_patch, 0, sizeof (fclaw_patch_t));
 
-    fclaw_patch_bounds_2d_t fclaw2d_patch_bounds;
+    fclaw_patch_d2_t fclaw2d_patch_bounds;
     fclaw2d_patch.d2 = &fclaw2d_patch_bounds;
 
     int patchno;
@@ -1499,7 +1496,7 @@ interpolate_partition_fn (p4est_t * p4est, p4est_topidx_t which_tree,
     fclaw_patch_t fclaw2d_patch;
     memset(&fclaw2d_patch, 0, sizeof(fclaw_patch_t));
 
-    fclaw_patch_bounds_2d_t fclaw2d_patch_bounds;
+    fclaw_patch_d2_t fclaw2d_patch_bounds;
     fclaw2d_patch.d2 = &fclaw2d_patch_bounds;
 
     int patchno;
@@ -1569,7 +1566,7 @@ interpolate_local_fn (p4est_t * p4est, p4est_topidx_t which_tree,
     fclaw_patch_t fclaw2d_patch;
     memset(&fclaw2d_patch, 0, sizeof(fclaw_patch_t));
 
-    fclaw_patch_bounds_2d_t fclaw2d_patch_bounds;
+    fclaw_patch_d2_t fclaw2d_patch_bounds;
     fclaw2d_patch.d2 = &fclaw2d_patch_bounds;
 
     int patchno;

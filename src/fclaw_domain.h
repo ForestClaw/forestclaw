@@ -30,7 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW_DOMAIN_H
 #define FCLAW_DOMAIN_H
 
-#include <forestclaw2d.h>  /* Needed for domain_exchange/domain_indirect info */
+#include <forestclaw.h>  /* Needed for domain_exchange/domain_indirect info */
 
 #ifdef __cplusplus
 extern "C"

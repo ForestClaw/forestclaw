@@ -26,8 +26,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW2D_TO_3D_H
 #define FCLAW2D_TO_3D_H
 
+#ifdef FORESTCLAW2D_H
+#error "The include files forestclaw2d.h and fclaw2d_to_3d.h cannot be combined"
+#endif
+
 #include <p4est_to_p8est.h>
 
+/* redefine macros */
 #define FCLAW2D_SPACEDIM                FCLAW3D_SPACEDIM
 #define FCLAW2D_NUMFACES                FCLAW3D_NUMFACES
 #define FCLAW2D_NUMCORNERS              FCLAW3D_NUMCORNERS
@@ -97,7 +102,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define fclaw2d_patch_destroy_user_data_t fclaw3d_patch_destroy_user_data_t
 #define fclaw2d_patch_metric_patch_t    fclaw3d_patch_metric_patch_t
 #define fclaw2d_domain_indirect_t       fclaw3d_domain_indirect_t
-#define fclaw2d_domain_exchange_t           fclaw3d_domain_exchange_t
+#define fclaw2d_domain_exchange_t       fclaw3d_domain_exchange_t
+#define fclaw_patch_d2_t                fclaw_patch_d3_t
+#define fclaw_block_d2_t                fclaw_block_d3_t
 
 /* redefine enums */
 #define FCLAW2D_PATCH_CHILDID           FCLAW3D_PATCH_CHILDID

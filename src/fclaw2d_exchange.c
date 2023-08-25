@@ -31,17 +31,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifndef P4_TO_P8
 
-#include <fclaw2d_domain.h>
-#include <fclaw2d_convenience.h>
 #include <forestclaw2d.h>
+#include <fclaw2d_convenience.h>
+#include <fclaw2d_domain.h>
 
 #else
 
+#include <forestclaw3d.h>
 #include <fclaw3d_convenience.h>
 #include <fclaw3d_domain.h>
-#include <fclaw2d_to_3d.h>
-#include <fclaw3d_domain.h>
-#include <forestclaw3d.h>
 
 
 #define d2 d3
