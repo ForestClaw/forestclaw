@@ -57,11 +57,7 @@ static void
 fclaw2d_patch_set_boundary_xylower (fclaw_patch_t * patch,
                                     p4est_quadrant_t * quad)
 {
-#ifndef P4_TO_P8
-    patch->dim = 2;
-#else
-    patch->dim = 3;
-#endif
+    patch->dim = P4EST_DIM;
 
     p4est_qcoord_t qh;
 
@@ -539,6 +535,7 @@ fclaw2d_domain_adapt (fclaw_domain_t * domain)
     if (domain->p.smooth_refine)
     {
         int ng, nb, np;
+        int face, corner;
         int nprocs[P4EST_HALF], nblockno, npatchno[P4EST_HALF], nfc;
         int level, max_tlevel;
         int exists;
@@ -572,7 +569,7 @@ fclaw2d_domain_adapt (fclaw_domain_t * domain)
                 max_tlevel = patch->target_level;
 
                 /* loop through face neighbors of this patch */
-                for (int face = 0; max_tlevel <= level &&
+                for (face = 0; max_tlevel <= level &&
                      face < wrap->p4est_faces; ++face)
                 {
                     nrel = fclaw_patch_face_neighbors (domain, nb, np, face,
@@ -688,7 +685,7 @@ fclaw2d_domain_adapt (fclaw_domain_t * domain)
 #endif
 
                 /* loop through corner neighbors of this patch */
-                for (int corner = 0; max_tlevel <= level &&
+                for (corner = 0; max_tlevel <= level &&
                      corner < wrap->p4est_children; ++corner)
                 {
                     exists = fclaw_patch_corner_neighbors (domain, nb, np,
@@ -1262,7 +1259,6 @@ integrate_ray_fn (p4est_t * p4est, p4est_topidx_t which_tree,
 
 
     fclaw_patch_t fclaw2d_patch;
-    memset (&fclaw2d_patch, 0, sizeof (fclaw_patch_t));
 
     fclaw_patch_d2_t fclaw2d_patch_bounds;
     fclaw2d_patch.d2 = &fclaw2d_patch_bounds;
