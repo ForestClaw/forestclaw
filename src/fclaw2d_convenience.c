@@ -24,23 +24,31 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include <sc_notify.h>
+
 #ifndef P4_TO_P8
+
 #include <fclaw2d_convenience.h>
+#include <forestclaw2d.h>
 #include <p4est_bits.h>
 #include <p4est_search.h>
 #include <p4est_vtk.h>
 #include <p4est_wrap.h>
+
 #else
+
 #include <fclaw3d_convenience.h>
+#include <forestclaw3d.h>
 #include <p8est_bits.h>
 #include <p8est_search.h>
 #include <p8est_vtk.h>
 #include <p8est_wrap.h>
 
 #include <fclaw2d_to_3d.h>
+
 // for dimension dependent values
 // needs to be defined AFTER all other headers
 #define d2 d3
+
 #define fclaw_patch_bounds_2d_t fclaw_patch_bounds_3d_t
 #define fclaw_block_d2_t fclaw_block_d3_t
 
@@ -1240,7 +1248,7 @@ fclaw2d_ray_integral_t;
 typedef struct fclaw2d_integrate_ray_data
 {
     fclaw_domain_t *domain;
-    fclaw2d_integrate_ray_t integrate_ray;
+    fclaw_integrate_ray_t integrate_ray;
     void *user;
 }
 fclaw2d_integrate_ray_data_t;
@@ -1311,7 +1319,7 @@ integrate_ray_fn (p4est_t * p4est, p4est_topidx_t which_tree,
 
 void
 fclaw2d_domain_integrate_rays (fclaw_domain_t * domain,
-                               fclaw2d_integrate_ray_t intersect,
+                               fclaw_integrate_ray_t intersect,
                                sc_array_t * rays, sc_array_t * integrals,
                                void * user)
 {
@@ -1402,7 +1410,7 @@ overlap_point_t;
 typedef struct overlap_producer_comm
 {
     fclaw_domain_t *domain;
-    fclaw2d_interpolate_point_t interpolate;
+    fclaw_interpolate_point_t interpolate;
     void *user;
     p4est_t *pro4est;
     sc_MPI_Comm glocomm;
@@ -1418,7 +1426,7 @@ overlap_producer_comm_t;
 typedef struct overlap_consumer_comm
 {
     fclaw_domain_t *domain;
-    fclaw2d_interpolate_point_t interpolate;
+    fclaw_interpolate_point_t interpolate;
     void *user;
     sc_array_t *query_points;
     sc_array_t *query_indices;
@@ -1988,7 +1996,7 @@ consumer_producer_update_local (overlap_global_comm_t * g)
 void
 fclaw2d_overlap_exchange (fclaw_domain_t * domain,
                           sc_array_t * query_points,
-                          fclaw2d_interpolate_point_t interpolate, void *user)
+                          fclaw_interpolate_point_t interpolate, void *user)
 {
     p4est_t p4est;
     p4est_connectivity_t conn;

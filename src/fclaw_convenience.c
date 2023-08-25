@@ -23,62 +23,9 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include "fclaw_convenience.h"
 #include "fclaw2d_convenience.h"
 #include "fclaw3d_convenience.h"
-
-void fclaw2d_domain_destroy (fclaw_domain_t * domain);
-
-fclaw_domain_t *fclaw2d_domain_adapt (fclaw_domain_t * domain);
-
-fclaw_domain_t *fclaw2d_domain_partition (fclaw_domain_t * domain,
-                                            int weight_exponent);
-
-void fclaw2d_domain_partition_unchanged (fclaw_domain_t * domain,
-                                         int *unchanged_first,
-                                         int *unchanged_length,
-                                         int *unchanged_old_first);
-
-void fclaw2d_domain_complete (fclaw_domain_t * domain);
-
-void fclaw2d_domain_write_vtk (fclaw_domain_t * domain,
-                               const char *basename);
-
-void fclaw2d_domain_list_levels (fclaw_domain_t * domain, int log_priority);
-
-void fclaw2d_domain_list_neighbors (fclaw_domain_t * domain,
-                                    int log_priority);
-
-void fclaw2d_domain_list_adapted (fclaw_domain_t * old_domain,
-                                  fclaw_domain_t * new_domain,
-                                  int log_priority);
-
-
-void fclaw3d_domain_destroy (fclaw_domain_t * domain);
-
-fclaw_domain_t *fclaw3d_domain_adapt (fclaw_domain_t * domain);
-
-fclaw_domain_t *fclaw3d_domain_partition (fclaw_domain_t * domain,
-                                            int weight_exponent);
-
-void fclaw3d_domain_partition_unchanged (fclaw_domain_t * domain,
-                                         int *unchanged_first,
-                                         int *unchanged_length,
-                                         int *unchanged_old_first);
-
-void fclaw3d_domain_complete (fclaw_domain_t * domain);
-
-void fclaw3d_domain_write_vtk (fclaw_domain_t * domain,
-                               const char *basename);
-
-void fclaw3d_domain_list_levels (fclaw_domain_t * domain, int log_priority);
-
-void fclaw3d_domain_list_neighbors (fclaw_domain_t * domain,
-                                    int log_priority);
-
-void fclaw3d_domain_list_adapted (fclaw_domain_t * old_domain,
-                                  fclaw_domain_t * new_domain,
-                                  int log_priority);
-
 
 void fclaw_domain_destroy (fclaw_domain_t * domain)
 {
