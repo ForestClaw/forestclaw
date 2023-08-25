@@ -31,7 +31,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_global.h>
 #include <fclaw_domain.h>
 #include <fclaw_patch.h>
-#include <fclaw2d_convenience.h>
+#include <fclaw_convenience.h>
+#include <fclaw2d_map.h>
 #include <fclaw3d_metric.hpp>
 #include <fclaw3d_metric.h>
 #include <fclaw_options.h>
@@ -91,7 +92,7 @@ struct SinglePatchDomain {
         opts->rhs_fields = 1;
         fclaw_clawpatch_options_store(glob, opts);
 
-        domain = fclaw2d_domain_new_unitsquare(sc_MPI_COMM_WORLD, 0);
+        domain = fclaw_domain_new_unitsquare(sc_MPI_COMM_WORLD, 0);
         fclaw_global_store_domain(glob, domain);
 
         map = fclaw2d_map_new_nomap();
@@ -146,7 +147,7 @@ struct QuadDomain {
         opts->rhs_fields = 1;
         fclaw_clawpatch_options_store(glob, opts);
 
-        domain = fclaw2d_domain_new_unitsquare(sc_MPI_COMM_WORLD, 1);
+        domain = fclaw_domain_new_unitsquare(sc_MPI_COMM_WORLD, 1);
         fclaw_global_store_domain(glob, domain);
 
         map = fclaw2d_map_new_nomap();
@@ -178,7 +179,7 @@ struct QuadDomain {
 }
 TEST_CASE("3dx fclaw_clawpatch_vtable_initialize")
 {
-	fclaw_domain_t* domain = fclaw2d_domain_new_unitsquare(sc_MPI_COMM_WORLD, 1);
+	fclaw_domain_t* domain = fclaw_domain_new_unitsquare(sc_MPI_COMM_WORLD, 1);
     fclaw_global_t* glob = fclaw_global_new();
 	fclaw_global_store_domain(glob, domain);
 
@@ -282,7 +283,7 @@ TEST_CASE("3dx fclaw_clawpatch patch_build")
         opts->rhs_fields = rhs_fields;
         fclaw_clawpatch_options_store(glob, opts);
 
-	    fclaw_domain_t* domain = fclaw2d_domain_new_unitsquare(sc_MPI_COMM_WORLD, 0);
+	    fclaw_domain_t* domain = fclaw_domain_new_unitsquare(sc_MPI_COMM_WORLD, 0);
 	    fclaw_global_store_domain(glob, domain);
 
         fclaw2d_map_context_t* map = fclaw2d_map_new_nomap();

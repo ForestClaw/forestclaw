@@ -28,7 +28,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_options.h>
 #include <fclaw_exchange.h>
 
-#include <fclaw2d_convenience.h>   /* p4est domain, patch handling routines */
+#include <fclaw_convenience.h>   /* p4est domain, patch handling routines */
 #include <forestclaw3d.h>          /* Needed for patch_relation_t data */
 
 #include <fclaw_gauges.h>

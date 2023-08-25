@@ -35,7 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_domain.h>
 #include <fclaw_patch.h>
 #include <fclaw3d_map.h>
-#include <fclaw3d_convenience.h>
+#include <fclaw_convenience.h>
 #include <fclaw3d_metric.hpp>
 #include <fclaw3d_metric.h>
 #include <fclaw_options.h>
@@ -81,7 +81,7 @@ struct CubeDomain {
         opts->rhs_fields = 1;
         fclaw_clawpatch_options_store(glob, opts);
 
-        domain = fclaw3d_domain_new_unitcube(sc_MPI_COMM_WORLD, minlevel);
+        domain = fclaw_domain_new_unitcube(sc_MPI_COMM_WORLD, minlevel);
         fclaw_global_store_domain(glob, domain);
 
         //map = fclaw3d_map_new_nomap();

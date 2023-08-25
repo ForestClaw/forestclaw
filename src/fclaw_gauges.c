@@ -30,7 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw_options.h>
 #include <fclaw_global.h>
-#include <fclaw2d_convenience.h>  /* Needed to get search function for gauges */
+#include <fclaw_convenience.h>  /* Needed to get search function for gauges */
 #include <fclaw_diagnostics.h>
 
 /* Some mapping functions */
@@ -297,9 +297,9 @@ void fclaw_locate_gauges(fclaw_global_t *glob)
 
     sc_array_t *results = sc_array_new_size(sizeof(int), num);
 
-    fclaw2d_domain_search_points(glob->domain, 
-                                 gauge_info->block_offsets,
-                                 gauge_info->coordinates, results);
+    fclaw_domain_search_points(glob->domain, 
+                               gauge_info->block_offsets,
+                               gauge_info->coordinates, results);
 
     for (i = 0; i < gauge_acc->num_gauges; ++i)
     {
