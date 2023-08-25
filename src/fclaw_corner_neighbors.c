@@ -361,7 +361,6 @@ void cb_corner_fill(fclaw_domain_t *domain,
                     int this_patch_idx,
                     void *user)
 {
-    const int num_faces = fclaw_domain_num_faces(domain);
     const int num_corners = fclaw_domain_num_corners(domain);
 
     fclaw_global_iterate_t* s = (fclaw_global_iterate_t*) user; 
