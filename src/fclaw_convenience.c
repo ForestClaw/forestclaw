@@ -27,6 +27,72 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "fclaw2d_convenience.h"
 #include "fclaw3d_convenience.h"
 
+fclaw_domain_t *fclaw_domain_new_unitsquare (sc_MPI_Comm mpicomm,
+                                             int initial_level)
+{
+    return fclaw2d_domain_new_unitsquare(mpicomm,initial_level);
+}
+
+fclaw_domain_t *fclaw_domain_new_torus_2d (sc_MPI_Comm mpicomm,
+                                            int initial_level)
+{
+    return fclaw2d_domain_new_torus(mpicomm,initial_level);
+}
+
+fclaw_domain_t *fclaw_domain_new_twosphere_2d (sc_MPI_Comm mpicomm,
+                                               int initial_level)
+{
+    return fclaw2d_domain_new_twosphere(mpicomm,initial_level);
+}
+
+fclaw_domain_t *fclaw_domain_new_cubedsphere_2d (sc_MPI_Comm mpicomm,
+                                                 int initial_level)
+{
+    return fclaw2d_domain_new_cubedsphere(mpicomm,initial_level);
+}
+
+fclaw_domain_t *fclaw_domain_new_disk_2d (sc_MPI_Comm mpicomm,
+                                          int periodic_in_x,
+                                          int periodic_in_y,
+                                          int initial_level)
+{
+    return fclaw2d_domain_new_disk(mpicomm,periodic_in_x,periodic_in_y,
+                                   initial_level);
+}
+
+fclaw_domain_t *fclaw_domain_new_brick_2d (sc_MPI_Comm mpicomm,
+                                           int blocks_in_x, int blocks_in_y,
+                                           int periodic_in_x,
+                                           int periodic_in_y,
+                                           int initial_level)
+{
+    return fclaw2d_domain_new_brick(mpicomm,blocks_in_x,blocks_in_y,
+                                    periodic_in_x,periodic_in_y,
+                                    initial_level);
+}
+
+fclaw_domain_t *fclaw_domain_new_unitcube (sc_MPI_Comm mpicomm,
+                                           int initial_level)
+{
+    return fclaw3d_domain_new_unitcube(mpicomm,initial_level);
+}
+
+fclaw_domain_t *fclaw_domain_new_brick_3d (sc_MPI_Comm mpicomm,
+                                           int blocks_in_x, int blocks_in_y,
+                                           int blocks_in_z,
+                                           int periodic_in_x,
+                                           int periodic_in_y,
+                                           int periodic_in_z,
+                                           int initial_level)
+{
+    return fclaw3d_domain_new_brick(mpicomm,blocks_in_x,blocks_in_y,
+                                    blocks_in_z,
+                                    periodic_in_x,periodic_in_y,
+                                    periodic_in_z,
+                                    initial_level);
+}
+
+
 void fclaw_domain_destroy (fclaw_domain_t * domain)
 {
     if(domain->dim == 2)
@@ -175,6 +241,64 @@ void fclaw_domain_list_adapted (fclaw_domain_t * old_domain,
     else if(old_domain->dim == 3)
     {
         fclaw3d_domain_list_adapted(old_domain,new_domain,log_priority);
+    }
+    else
+    {
+        SC_ABORT_NOT_REACHED ();
+    }
+}
+
+void fclaw_domain_search_points (fclaw_domain_t * domain,
+                                 sc_array_t * block_offsets,
+                                 sc_array_t * coordinates,
+                                 sc_array_t * results)
+{
+    if(domain->dim == 2)
+    {
+        fclaw2d_domain_search_points(domain,block_offsets,coordinates,results);
+    }
+    else if(domain->dim == 3)
+    {
+        fclaw3d_domain_search_points(domain,block_offsets,coordinates,results);
+    }
+    else
+    {
+        SC_ABORT_NOT_REACHED ();
+    }
+}
+
+void fclaw_domain_integrate_rays (fclaw_domain_t * domain,
+                                  fclaw_integrate_ray_t intersect,
+                                  sc_array_t * rays,
+                                  sc_array_t * integrals,
+                                  void * user)
+{
+    if(domain->dim == 2)
+    {
+        fclaw2d_domain_integrate_rays(domain,intersect,rays,integrals,user);
+    }
+    else if(domain->dim == 3)
+    {
+        fclaw3d_domain_integrate_rays(domain,intersect,rays,integrals,user);
+    }
+    else
+    {
+        SC_ABORT_NOT_REACHED ();
+    }
+}
+
+void fclaw_overlap_exchange (fclaw_domain_t * domain,
+                             sc_array_t * query_points,
+                             fclaw_interpolate_point_t interpolate,
+                             void *user)
+{
+    if(domain->dim == 2)
+    {
+        fclaw2d_overlap_exchange(domain,query_points,interpolate,user);
+    }
+    else if(domain->dim == 3)
+    {
+        fclaw3d_overlap_exchange(domain,query_points,interpolate,user);
     }
     else
     {
