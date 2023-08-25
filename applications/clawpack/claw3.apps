@@ -8,20 +8,20 @@
 # -----------------------------------------------
 
 # Swirl : Scalar advection
-include applications/clawpack/advection/3d/swirl/Makefile.am
+include applications/clawpack/advection/3dx/swirl/Makefile.am
 include applications/clawpack/advection/p8/swirl/Makefile.am
 
 # Filament : sphere in rotating flow field
-include applications/clawpack/advection/3d/filament/Makefile.am
+include applications/clawpack/advection/3dx/filament/Makefile.am
 
 # Disk : rotating flow field
-include applications/clawpack/advection/3d/disk/Makefile.am
+include applications/clawpack/advection/3dx/disk/Makefile.am
 
 # Sphere : rotating ring (rigid body rotation)
-include applications/clawpack/advection/3d/sphere/Makefile.am
+include applications/clawpack/advection/3dx/sphere/Makefile.am
 
 # Latlong : beach ball
-include applications/clawpack/advection/3d/latlong/Makefile.am
+include applications/clawpack/advection/3dx/latlong/Makefile.am
 
 
 # -----------------------------------------------
