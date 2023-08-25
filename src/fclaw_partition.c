@@ -70,10 +70,22 @@ void  cb_partition_transfer(fclaw_domain_t * old_domain,
 
     if (old_patch != NULL)
     {
-        FCLAW_ASSERT(old_patch->d2->xlower == new_patch->d2->xlower);
-        FCLAW_ASSERT(old_patch->d2->ylower == new_patch->d2->ylower);
-        FCLAW_ASSERT(old_patch->d2->xupper == new_patch->d2->xupper);
-        FCLAW_ASSERT(old_patch->d2->yupper == new_patch->d2->yupper);
+        if (old_patch->dim == 2)
+        {
+            FCLAW_ASSERT(old_patch->d2->xlower == new_patch->d2->xlower);
+            FCLAW_ASSERT(old_patch->d2->ylower == new_patch->d2->ylower);
+            FCLAW_ASSERT(old_patch->d2->xupper == new_patch->d2->xupper);
+            FCLAW_ASSERT(old_patch->d2->yupper == new_patch->d2->yupper);
+        }
+        else
+        {
+            FCLAW_ASSERT(old_patch->d3->xlower == new_patch->d3->xlower);
+            FCLAW_ASSERT(old_patch->d3->ylower == new_patch->d3->ylower);
+            FCLAW_ASSERT(old_patch->d3->zlower == new_patch->d3->zlower);
+            FCLAW_ASSERT(old_patch->d3->xupper == new_patch->d3->xupper);
+            FCLAW_ASSERT(old_patch->d3->yupper == new_patch->d3->yupper);
+            FCLAW_ASSERT(old_patch->d3->zupper == new_patch->d3->zupper);
+        }
 
         new_patch->user = old_patch->user;
         old_patch->user = NULL;
