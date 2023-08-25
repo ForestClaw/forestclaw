@@ -345,7 +345,8 @@ void fclaw_debugf (const char *fmt, ...)
  * Print a an error mesage and abort the program
  * \param [in] fmt      A printf-style format string.
  */
-void fclaw_abortf(const char* fmt,...);
+void fclaw_abortf(const char* fmt,...)
+    __attribute__ ((noreturn));
 
 /** Register ForestClaw with libsc and print version and variable information.
  * It is not necessary to call this function, but it makes the log output more
