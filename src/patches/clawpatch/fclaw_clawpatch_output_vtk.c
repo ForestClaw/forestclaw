@@ -762,7 +762,7 @@ fclaw3d_output_vtk_coordinate_cb (fclaw_global_t * glob,
 {
     int mx,my,mz,mbc;
     double dx,dy,dz,xlower,ylower,zlower;
-    fclaw3d_clawpatch_grid_data(glob,patch,&mx,&my,&mz, &mbc,
+    fclaw_clawpatch_grid_data_3d(glob,patch,&mx,&my,&mz, &mbc,
                                 &xlower,&ylower,&zlower, &dx,&dy, &dz);
 
     const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
@@ -850,7 +850,7 @@ fclaw3d_output_vtk_value_cb (fclaw_global_t * glob,
 
     int mx,my,mz,mbc;
     double xlower,ylower,zlower,dx,dy,dz;
-    fclaw3d_clawpatch_grid_data(glob,patch,&mx,&my,&mz, &mbc,
+    fclaw_clawpatch_grid_data_3d(glob,patch,&mx,&my,&mz, &mbc,
                                &xlower,&ylower,&zlower, &dx,&dy, &dz);
 
     const int xlane = mx + 2 * mbc;

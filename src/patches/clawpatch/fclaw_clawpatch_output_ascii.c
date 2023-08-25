@@ -82,7 +82,7 @@ void cb_clawpatch_output_ascii (fclaw_domain_t * domain,
         double xlower,ylower,zlower,dx,dy,dz;
         FCLAW_ASSERT(clawpatch_vt->d3->fort_output_ascii);
 
-        fclaw3d_clawpatch_grid_data(glob,patch,&mx,&my,&mz,&mbc,
+        fclaw_clawpatch_grid_data_3d(glob,patch,&mx,&my,&mz,&mbc,
                                      &xlower,&ylower,&zlower,
                                      &dx,&dy,&dz);
         clawpatch_vt->d3->fort_output_ascii(fname,&mx,&my,&mz,&meqn,&mbc,

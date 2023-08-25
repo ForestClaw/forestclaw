@@ -62,7 +62,7 @@ void fclaw_clawpatch_diagnostics_cons_default(fclaw_global_t *glob,
         FCLAW_ASSERT(clawpatch_vt->d3->fort_conservation_check != NULL);
         int mz;
         double zlower, dz;
-        fclaw3d_clawpatch_grid_data(glob,patch,&mx,&my,&mz, &mbc,
+        fclaw_clawpatch_grid_data_3d(glob,patch,&mx,&my,&mz, &mbc,
                                     &xlower,&ylower,&zlower, &dx,&dy, &dz);    
         clawpatch_vt->d3->fort_conservation_check(&mx, &my, &mz, &mbc, &meqn, 
                                                   &dx,&dy,&dz,
@@ -115,7 +115,7 @@ void fclaw_clawpatch_diagnostics_error_default(fclaw_global_t *glob,
 
         int mx, my, mz, mbc;
         double xlower,ylower,zlower,dx,dy,dz;
-        fclaw3d_clawpatch_grid_data(glob,patch,&mx,&my,&mz, 
+        fclaw_clawpatch_grid_data_3d(glob,patch,&mx,&my,&mz, 
                                     &mbc,&xlower,&ylower,&zlower, 
                                     &dx,&dy,&dz);
         clawpatch_vt->d3->fort_compute_patch_error(&blockno, &mx,&my,&mz,

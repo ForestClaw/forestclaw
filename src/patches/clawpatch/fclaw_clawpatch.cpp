@@ -1088,7 +1088,7 @@ int clawpatch_tag4refinement(fclaw_global_t *glob,
         {
             int mx,my,mz,mbc;
             double xlower,ylower,zlower,dx,dy,dz;
-            fclaw3d_clawpatch_grid_data(glob,patch,&mx,&my,&mz, &mbc,
+            fclaw_clawpatch_grid_data_3d(glob,patch,&mx,&my,&mz, &mbc,
                                         &xlower,&ylower,&zlower, &dx,&dy,&dz);
 
             clawpatch_vt->d3->fort_tag4refinement(&mx,&my,&mz, &mbc,&meqn,
@@ -1127,7 +1127,7 @@ int clawpatch_tag4coarsening(fclaw_global_t *glob,
         else 
         {
             /* For extruded meshes, zlower is the same for all patches. */
-            fclaw3d_clawpatch_grid_data(glob,&fine_patches[igrid],&mx,&my,&mz,&mbc,
+            fclaw_clawpatch_grid_data_3d(glob,&fine_patches[igrid],&mx,&my,&mz,&mbc,
                                         &xlower[igrid],&ylower[igrid],&zlower[igrid],&dx,&dy,&dz);
         }
     }
@@ -2058,7 +2058,7 @@ void fclaw3dx_clawpatch_grid_data(fclaw_global_t* glob,
 }
 
 /* The metric terms only know about fclaw3d routines;  not 3dx routines */
-void fclaw3d_clawpatch_grid_data(fclaw_global_t* glob,
+void fclaw_clawpatch_grid_data_3d(fclaw_global_t* glob,
                                  fclaw_patch_t* patch,
                                  int* mx, int* my, int* mz, int* mbc,
                                  double* xlower, double* ylower,

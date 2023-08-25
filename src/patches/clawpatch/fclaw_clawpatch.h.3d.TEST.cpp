@@ -458,7 +458,7 @@ TEST_CASE("3d fclaw_clawpatch_grid_data")
         fclaw_clawpatch_t* cp = fclaw2d_clawpatch_get_clawpatch(&test_data.domain->blocks[0].patches[0]);
         int mx_out,my_out,mz_out,mbc_out;
         double xlower,ylower,zlower,dx,dy,dz;
-        fclaw3d_clawpatch_grid_data(test_data.glob, &test_data.domain->blocks[0].patches[0],
+        fclaw_clawpatch_grid_data_3d(test_data.glob, &test_data.domain->blocks[0].patches[0],
                                      &mx_out, &my_out, &mz_out, &mbc_out, &xlower, &ylower, &zlower, &dx, &dy, &dz);
 
         CHECK(mx_out == test_data.opts->d3->mx);

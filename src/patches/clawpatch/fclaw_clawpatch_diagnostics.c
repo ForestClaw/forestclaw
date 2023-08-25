@@ -105,7 +105,7 @@ void cb_compute_diagnostics(fclaw_domain_t *domain,
     }
     else 
     {
-        fclaw3d_clawpatch_grid_data(s->glob,patch,&mx,&my,&mz, 
+        fclaw_clawpatch_grid_data_3d(s->glob,patch,&mx,&my,&mz, 
                                     &mbc,&xlower,&ylower,&zlower, &dx,&dy,&dz);
 
         // double *volume = fclaw3dx_clawpatch_get_area(s->glob,patch);

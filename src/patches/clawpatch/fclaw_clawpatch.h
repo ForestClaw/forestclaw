@@ -457,18 +457,18 @@ void fclaw_clawpatch_grid_data_2d(struct fclaw_global* glob,
  * @param[out] xlower, ylower, zlower the lower bottom left coordinate of the patch
  * @param[out] dx, dy, dz the spacings in the x, y, and z directions
  */
-void fclaw3d_clawpatch_grid_data(struct fclaw_global* glob,
-                                 struct fclaw_patch* patch,
-                                 int* mx, 
-                                 int* my, 
-                                 int* mz, 
-                                 int* mbc,
-                                 double* xlower, 
-                                 double* ylower,
-                                 double* zlower, 
-                                 double* dx, 
-                                 double* dy, 
-                                 double* dz);
+void fclaw_clawpatch_grid_data_3d(struct fclaw_global* glob,
+                                  struct fclaw_patch* patch,
+                                  int* mx, 
+                                  int* my, 
+                                  int* mz, 
+                                  int* mbc,
+                                  double* xlower, 
+                                  double* ylower,
+                                  double* zlower, 
+                                  double* dx, 
+                                  double* dy, 
+                                  double* dz);
 
 /**
  * @brief Get the scalar metrics of a patch

@@ -69,7 +69,7 @@ void clawpack46_qinit(fclaw_global_t *glob,
 {
 	int mx,my,mz,mbc;
 	double dx,dy,dz, xlower,ylower, zlower;
-	fclaw3d_clawpatch_grid_data(glob,patch,&mx,&my,&mz,&mbc,
+	fclaw_clawpatch_grid_data_3d(glob,patch,&mx,&my,&mz,&mbc,
 								&xlower,&ylower,&zlower, 
 								&dx,&dy,&dz);
 
@@ -111,7 +111,7 @@ void clawpack46_bc3(fclaw_global_t *glob,
 
 	int mx,my,mz, mbc;
 	double dx,dy,dz, xlower,ylower, zlower;
-	fclaw3d_clawpatch_grid_data(glob,patch, &mx,&my,&mz,&mbc,
+	fclaw_clawpatch_grid_data_3d(glob,patch, &mx,&my,&mz,&mbc,
 								&xlower,&ylower,&zlower, &dx,&dy,&dz);
 
 	double *aux;
@@ -177,7 +177,7 @@ void clawpack46_b4step3(fclaw_global_t *glob,
 
 	int mx,my,mz,mbc;
 	double xlower,ylower,zlower,dx,dy,dz;
-	fclaw3d_clawpatch_grid_data(glob,patch, &mx,&my,&mz, &mbc,
+	fclaw_clawpatch_grid_data_3d(glob,patch, &mx,&my,&mz, &mbc,
 								&xlower,&ylower,&zlower,&dx,&dy,&dz);
 
 	int meqn;
@@ -211,7 +211,7 @@ void clawpack46_src3(fclaw_global_t *glob,
 
 	int mx,my,mz, mbc;
 	double xlower,ylower,zlower,dx,dy,dz;
-	fclaw3d_clawpatch_grid_data(glob,patch, &mx,&my,&mz, &mbc,
+	fclaw_clawpatch_grid_data_3d(glob,patch, &mx,&my,&mz, &mbc,
 								&xlower,&ylower,&zlower, &dx,&dy, &dz);
 
 	double *q;
@@ -252,7 +252,7 @@ void clawpack46_setaux(fclaw_global_t *glob,
 
 	int mx,my,mz,mbc;
 	double xlower,ylower,zlower, dx,dy, dz;
-	fclaw3d_clawpatch_grid_data(glob,patch, &mx,&my,&mz,&mbc,
+	fclaw_clawpatch_grid_data_3d(glob,patch, &mx,&my,&mz,&mbc,
 								&xlower,&ylower,&zlower, &dx,&dy, &dz);
 	int maux;
 	double *aux;
@@ -297,7 +297,7 @@ double clawpack46_step3(fclaw_global_t *glob,
 
 	int mx, my, mz, mbc;
 	double xlower, ylower, zlower, dx,dy, dz;
-	fclaw3d_clawpatch_grid_data(glob,patch,&mx,&my,&mz,&mbc,
+	fclaw_clawpatch_grid_data_3d(glob,patch,&mx,&my,&mz,&mbc,
 								&xlower,&ylower,&zlower, &dx,&dy,&dz);
 
 	int meqn;
@@ -587,7 +587,7 @@ void fc3d_clawpack46_set_capacity(fclaw_global_t *glob,
 
 	int mx,my,mz, mbc;
 	double dx,dy,dz, xlower,ylower,zlower;
-	fclaw3d_clawpatch_grid_data(glob,patch, &mx,&my,&mz,&mbc,
+	fclaw_clawpatch_grid_data_3d(glob,patch, &mx,&my,&mz,&mbc,
 								&xlower,&ylower,&zlower,&dx,&dy,&dz);
 
 	double *volume = fclaw3d_clawpatch_get_volume(glob,patch);

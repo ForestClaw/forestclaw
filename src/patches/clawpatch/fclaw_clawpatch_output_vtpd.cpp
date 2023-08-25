@@ -32,7 +32,7 @@ WriteVTIFile(fclaw_domain_t * domain, fclaw_patch_t * patch,
 	int meqn = fclaw_clawpatch_get_options(glob)->meqn;
 	int mx, my, mz, mbc;
 	double xlower, ylower, zlower, dx, dy, dz;
-	fclaw3d_clawpatch_grid_data(glob, patch, 
+	fclaw_clawpatch_grid_data_3d(glob, patch, 
 		&mx, &my, &mz, &mbc, 
 		&xlower, &ylower, &zlower, 
 		&dx, &dy, &dz);
