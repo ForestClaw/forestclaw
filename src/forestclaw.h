@@ -654,7 +654,7 @@ int fclaw_patch_corner_neighbors (fclaw_domain_t * domain,
  *                              On output, corner number seen from
  *                              the corner neighbor patch.
  */
-void fclaw_patch_corner_swap (int *cornerno, int *rcornerno);
+void fclaw_patch_corner_swap (int dim, int *cornerno, int *rcornerno);
 
 /** Transform a patch coordinate into a neighbor patch's coordinate system.
  * This function assumes that the two patches are of the SAME size and that the
@@ -672,11 +672,11 @@ void fclaw_patch_corner_swap (int *cornerno, int *rcornerno);
  * \param [in,out] i        Integer coordinate along x-axis in \a based .. \a mx.
  * \param [in,out] j        Integer coordinate along y-axis in \a based .. \a my.
  */
-void fclaw_patch_transform_corner (fclaw_patch_t * ipatch,
-                                   fclaw_patch_t * opatch,
-                                   int icorner, int is_block_boundary,
-                                   int mx, int my,
-                                   int based, int *i, int *j);
+void fclaw_patch_transform_corner_2d (fclaw_patch_t * ipatch,
+                                      fclaw_patch_t * opatch,
+                                      int icorner, int is_block_boundary,
+                                      int mx, int my,
+                                      int based, int *i, int *j);
 
 /** Transform a patch coordinate into a neighbor patch's coordinate system.
  * This function assumes that the neighbor patch is smaller (HALF size) and that
@@ -700,11 +700,11 @@ void fclaw_patch_transform_corner (fclaw_patch_t * ipatch,
  *                          On output, they are relative to the fine patch and
  *                          stored in order of the children of the coarse patch.
  */
-void fclaw_patch_transform_corner2 (fclaw_patch_t * ipatch,
-                                    fclaw_patch_t * opatch,
-                                    int icorner, int is_block_boundary,
-                                    int mx, int my, int based,
-                                    int i[], int j[]);
+void fclaw_patch_transform_corner2_2d (fclaw_patch_t * ipatch,
+                                       fclaw_patch_t * opatch,
+                                       int icorner, int is_block_boundary,
+                                       int mx, int my, int based,
+                                       int i[], int j[]);
 
 /** Transform a patch coordinate into a neighbor patch's coordinate system.
  * This function assumes that the two patches are of the SAME size and that the

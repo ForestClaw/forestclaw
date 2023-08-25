@@ -212,6 +212,275 @@ fclaw_patch_is_ghost (const fclaw_patch_t * patch)
     }
 }
 
+int 
+fclaw_patch_boundary_type(fclaw_domain_t *domain, int blockno, int patchno, int boundaries[6])
+{
+    if(domain->dim == 2)
+    {
+        return fclaw2d_patch_boundary_type(domain,blockno,patchno,boundaries);
+    }
+    else if (domain->dim == 3)
+    {
+        return fclaw3d_patch_boundary_type(domain,blockno,patchno,boundaries);
+    }
+    else
+    {
+        SC_ABORT_NOT_REACHED();
+    }
+}
+
+int 
+fclaw_patch_normal_match(fclaw_domain_t *domain, int blockno, int patchno, int faceno)
+{
+    if(domain->dim == 2)
+    {
+        return fclaw2d_patch_normal_match(domain,blockno,patchno,faceno);
+    }
+    else if (domain->dim == 3)
+    {
+        return fclaw3d_patch_normal_match(domain,blockno,patchno,faceno);
+    }
+    else
+    {
+        SC_ABORT_NOT_REACHED();
+    }
+}
+
+fclaw_patch_relation_t 
+fclaw_patch_face_neighbors(fclaw_domain_t *domain, int blockno, int patchno, int faceno, int rproc[2], int *rblockno, int rpatchno[2], int *rfaceno)
+{
+    if(domain->dim == 2)
+    {
+        return fclaw2d_patch_face_neighbors(domain,blockno,patchno,faceno,rproc,rblockno,rpatchno,rfaceno);
+    }
+    else if (domain->dim == 3)
+    {
+        return fclaw3d_patch_face_neighbors(domain,blockno,patchno,faceno,rproc,rblockno,rpatchno,rfaceno);
+    }
+    else
+    {
+        SC_ABORT_NOT_REACHED();
+    }
+}
+
+void 
+fclaw_patch_face_swap (int dim, int *faceno, int *rfaceno)
+{
+    if(dim == 2)
+    {
+        fclaw2d_patch_face_swap(faceno,rfaceno);
+    }
+    else if (dim == 3)
+    {
+        fclaw3d_patch_face_swap(faceno,rfaceno);
+    }
+    else
+    {
+        fclaw_abortf("fclaw_patch_face_swap : dim = %d not supported\n",dim);
+    }
+}
+
+void 
+fclaw_patch_face_transformation (int dim, int faceno, int rfaceno,
+                                 int ftransform[])
+{
+    if(dim == 2)
+    {
+        fclaw2d_patch_face_transformation(faceno,rfaceno,ftransform);
+    }
+    else if(dim == 3)
+    {
+        fclaw3d_patch_face_transformation(faceno,rfaceno,ftransform);
+    }
+    else
+    {
+        fclaw_abortf("fclaw_patch_face_transformation : dim = %d not supported\n",dim);
+    }
+}
+
+void 
+fclaw_patch_face_transformation_block (int dim, int ftransform[],
+                                       int sameblock)
+{
+    if(dim == 2)
+    {
+        fclaw2d_patch_face_transformation_block(ftransform, sameblock);
+    }
+    else if(dim == 3)
+    {
+        fclaw3d_patch_face_transformation_block(ftransform, sameblock);
+    }
+    else
+    {
+        fclaw_abortf("fclaw_patch_face_transformation_block : dim = %d not supported\n",dim);
+    }
+}
+
+void 
+fclaw_patch_face_transformation_intra (int dim, int ftransform[])
+{
+    if(dim == 2)
+    {
+        fclaw2d_patch_face_transformation_intra(ftransform);
+    }
+    else if(dim == 3)
+    {
+        fclaw3d_patch_face_transformation_intra(ftransform);
+    }
+    else
+    {
+        fclaw_abortf("fclaw_patch_face_transformation_intra : dim = %d not supported\n",dim);
+    }
+}
+
+int 
+fclaw_patch_face_transformation_valid (int dim, const int ftransform[])
+{
+    if(dim == 2)
+    {
+        return fclaw2d_patch_face_transformation_valid(ftransform);
+    }
+    else if(dim == 3)
+    {
+        return fclaw3d_patch_face_transformation_valid(ftransform);
+    }
+    else
+    {
+        fclaw_abortf("fclaw_patch_face_transformation_valid : dim = %d not supported\n",dim);
+    }
+}
+
+void 
+fclaw_patch_transform_face_2d (fclaw_patch_t * ipatch,
+                               fclaw_patch_t * opatch,
+                               const int ftransform[],
+                               int mx, int my, int based, int *i, int *j)
+{
+    fclaw2d_patch_transform_face(ipatch,opatch,ftransform,mx,my,based,i,j);
+}
+
+void 
+fclaw_patch_transform_face2_2d (fclaw_patch_t * ipatch,
+                                fclaw_patch_t * opatch,
+                                const int ftransform[],
+                                int mx, int my, int based, int i[],
+                                int j[])
+{
+    fclaw2d_patch_transform_face2(ipatch,opatch,ftransform,mx,my,based,i,j);
+}
+
+void 
+fclaw_patch_transform_face_3d (fclaw_patch_t * ipatch,
+                               fclaw_patch_t * opatch,
+                               const int ftransform[],
+                               int mx, int my, int mz, int based,
+                               int *i, int *j, int *k)
+{
+    fclaw3d_patch_transform_face(ipatch,opatch,ftransform,mx,my,mz,based,i,j,k);
+}
+
+void 
+fclaw_patch_transform_face2_3d (fclaw_patch_t * ipatch,
+                                fclaw_patch_t * opatch,
+                                const int ftransform[],
+                                int mx, int my, int mz, int based,
+                                int i[], int j[], int k[])
+{
+    fclaw3d_patch_transform_face2(ipatch,opatch,ftransform,mx,my,mz,based,i,j,k);
+}
+
+
+int 
+fclaw_patch_corner_neighbors(fclaw_domain_t *domain, int blockno, int patchno, int cornerno, int *rproc, int *rblockno, int *rpatchno, int *rcorner, fclaw_patch_relation_t *neighbor_size)
+{
+    if(domain->dim == 2)
+    {
+        return fclaw2d_patch_corner_neighbors(domain,blockno,patchno,cornerno,rproc,rblockno,rpatchno,rcorner,neighbor_size);
+    }
+    else if (domain->dim == 3)
+    {
+        return fclaw3d_patch_corner_neighbors(domain,blockno,patchno,cornerno,rproc,rblockno,rpatchno,rcorner,neighbor_size);
+    }
+    else
+    {
+        SC_ABORT_NOT_REACHED();
+    }
+}
+
+void fclaw_patch_corner_swap (int dim, int *cornerno, int *rcornerno)
+{
+    if(dim == 2)
+    {
+        fclaw2d_patch_corner_swap(cornerno,rcornerno);
+    }
+    else if(dim == 3)
+    {
+        fclaw3d_patch_corner_swap(cornerno,rcornerno);
+    }
+    else
+    {
+        fclaw_abortf("fclaw_patch_corner_swap : dim = %d not supported\n",dim);
+    }
+}
+
+void fclaw_patch_transform_corner_2d (fclaw_patch_t * ipatch,
+                                      fclaw_patch_t * opatch,
+                                      int icorner, int is_block_boundary,
+                                      int mx, int my,
+                                      int based, int *i, int *j)
+{
+    fclaw2d_patch_transform_corner(ipatch,opatch,icorner,is_block_boundary,
+                                   mx,my,based,i,j);
+}
+
+void fclaw_patch_transform_corner2_2d (fclaw_patch_t * ipatch,
+                                       fclaw_patch_t * opatch,
+                                       int icorner, int is_block_boundary,
+                                       int mx, int my, int based,
+                                       int i[], int j[])
+{
+    fclaw2d_patch_transform_corner2(ipatch,opatch,icorner,is_block_boundary,
+                                    mx,my,based,i,j);
+}
+
+/** Transform a patch coordinate into a neighbor patch's coordinate system.
+ * This function assumes that the two patches are of the SAME size and that the
+ * patches lie in coordinate systems with the same orientation.
+ * It is LEGAL to call this function for both local and ghost patches.
+ * \param [in] ipatch       The patch that the input coordinates are relative to.
+ * \param [in] opatch       The patch that the output coordinates are relative to.
+ * \param [in] icorner      Corner number of this patch to transform across.
+ *                          This function assumes ocorner == icorner ^ 7, so
+ *                          ocorner is the opposite corner of icorner.
+ * \param [in] is_block_boundary      Set to true for a block corner.
+ * \param [in] mx           Number of cells along x direction of patch.
+ * \param [in] my           Number of cells along y direction of patch.
+ * \param [in] mz           Number of cells along z direction of patch.
+ * \param [in] based        Indices are 0-based for corners and 1-based for cells.
+ * \param [in,out] i        Integer coordinate along x-axis in \a based .. \a mx.
+ * \param [in,out] j        Integer coordinate along y-axis in \a based .. \a my.
+ * \param [in,out] k        Integer coordinate along z-axis in \a based .. \a mz.
+ */
+void fclaw_patch_transform_corner_3d (fclaw_patch_t * ipatch,
+                                      fclaw_patch_t * opatch,
+                                      int icorner, int is_block_boundary,
+                                      int mx, int my, int mz,
+                                      int based, int *i, int *j, int *k)
+{
+    fclaw3d_patch_transform_corner(ipatch,opatch,icorner,is_block_boundary,
+                                   mx,my,mz,based,i,j,k);
+}
+
+void fclaw_patch_transform_corner2_3d (fclaw_patch_t * ipatch,
+                                       fclaw_patch_t * opatch,
+                                       int icorner, int is_block_boundary,
+                                       int mx, int my, int mz, int based,
+                                       int i[], int j[], int k[])
+{
+    fclaw3d_patch_transform_corner2(ipatch,opatch,icorner,is_block_boundary,
+                                    mx,my,mz,based,i,j,k);
+}
+
 void
 fclaw_domain_iterate_level (fclaw_domain_t * domain, int level,
                               fclaw_patch_callback_t pcb, void *user)
@@ -506,82 +775,3 @@ void fclaw_domain_free_after_partition(fclaw_domain_t *domain, void ***patch_dat
     }
 }
 
-void fclaw_patch_face_swap(int dim, int *faceno, int *rfaceno)
-{
-    if(dim == 2)
-    {
-        fclaw2d_patch_face_swap(faceno,rfaceno);
-    }
-    else if (dim == 3)
-    {
-        fclaw3d_patch_face_swap(faceno,rfaceno);
-    }
-    else
-    {
-        SC_ABORT_NOT_REACHED();
-    }
-}
-
-int fclaw_patch_boundary_type(fclaw_domain_t *domain, int blockno, int patchno, int boundaries[4])
-{
-    if(domain->dim == 2)
-    {
-        return fclaw2d_patch_boundary_type(domain,blockno,patchno,boundaries);
-    }
-    else if (domain->dim == 3)
-    {
-        return fclaw3d_patch_boundary_type(domain,blockno,patchno,boundaries);
-    }
-    else
-    {
-        SC_ABORT_NOT_REACHED();
-    }
-}
-
-int fclaw_patch_normal_match(fclaw_domain_t *domain, int blockno, int patchno, int faceno)
-{
-    if(domain->dim == 2)
-    {
-        return fclaw2d_patch_normal_match(domain,blockno,patchno,faceno);
-    }
-    else if (domain->dim == 3)
-    {
-        return fclaw3d_patch_normal_match(domain,blockno,patchno,faceno);
-    }
-    else
-    {
-        SC_ABORT_NOT_REACHED();
-    }
-}
-
-fclaw_patch_relation_t fclaw_patch_face_neighbors(fclaw_domain_t *domain, int blockno, int patchno, int faceno, int rproc[2], int *rblockno, int rpatchno[2], int *rfaceno)
-{
-    if(domain->dim == 2)
-    {
-        return fclaw2d_patch_face_neighbors(domain,blockno,patchno,faceno,rproc,rblockno,rpatchno,rfaceno);
-    }
-    else if (domain->dim == 3)
-    {
-        return fclaw3d_patch_face_neighbors(domain,blockno,patchno,faceno,rproc,rblockno,rpatchno,rfaceno);
-    }
-    else
-    {
-        SC_ABORT_NOT_REACHED();
-    }
-}
-
-int fclaw_patch_corner_neighbors(fclaw_domain_t *domain, int blockno, int patchno, int cornerno, int *rproc, int *rblockno, int *rpatchno, int *rcorner, fclaw_patch_relation_t *neighbor_size)
-{
-    if(domain->dim == 2)
-    {
-        return fclaw2d_patch_corner_neighbors(domain,blockno,patchno,cornerno,rproc,rblockno,rpatchno,rcorner,neighbor_size);
-    }
-    else if (domain->dim == 3)
-    {
-        return fclaw3d_patch_corner_neighbors(domain,blockno,patchno,cornerno,rproc,rblockno,rpatchno,rcorner,neighbor_size);
-    }
-    else
-    {
-        SC_ABORT_NOT_REACHED();
-    }
-}
