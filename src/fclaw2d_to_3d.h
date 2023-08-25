@@ -155,11 +155,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define fclaw2d_map_new_nomap           fclaw3d_map_new_nomap
 
 /* translations for the global data structure */
-#define fclaw2d_iterate_patch_cb        fclaw3d_iterate_patch_cb
-#define fclaw2d_iterate_family_cb       fclaw3d_iterate_family_cb
 #define fclaw2d_domain_integrate_rays   fclaw3d_domain_integrate_rays
 #define fclaw2d_overlap_exchange        fclaw3d_overlap_exchange
-#define fclaw2d_global_store_map        fclaw3d_global_store_map
 
 /* translations not found in p4est */
 #ifndef p4est_wrap_new_unitsquare
