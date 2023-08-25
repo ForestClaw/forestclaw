@@ -594,11 +594,11 @@ void fclaw_clawpatch_metric_scalar_3d(struct fclaw_global* glob,
  * @param[out] surfnormals the surface normal for each cell center of the patch
  *             An array of dimension(-mbc:mx+mbc+1,-mbc:my+mbc+1,3)
  */
-void fclaw3d_clawpatch_metric_basis(struct fclaw_global* glob,
-                                      struct fclaw_patch* patch,
-                                      double **xrot, 
-                                      double **yrot,
-                                      double **zrot);
+void fclaw_clawpatch_metric_basis_3d(struct fclaw_global* glob,
+                                     struct fclaw_patch* patch,
+                                     double **xrot, 
+                                     double **yrot,
+                                     double **zrot);
 
 /**
  * @brief Get the mesh metrics of a patch
@@ -609,16 +609,16 @@ void fclaw3d_clawpatch_metric_basis(struct fclaw_global* glob,
  * @param[out] xd, yd, zd the coordinates of the nodes
  * @param[out] area the area of each cell
  */
-void fclaw3d_clawpatch_mesh_data(struct fclaw_global* glob,
-                                 struct fclaw_patch* patch,
-                                 double **xp, 
-                                 double **yp, 
-                                 double **zp,
-                                 double **xd, 
-                                 double **yd, 
-                                 double **zd,
-                                 double **volume,
-                                 double **faceareas);
+void fclaw_clawpatch_mesh_data_3d(struct fclaw_global* glob,
+                                  struct fclaw_patch* patch,
+                                  double **xp, 
+                                  double **yp, 
+                                  double **zp,
+                                  double **xd, 
+                                  double **yd, 
+                                  double **zd,
+                                  double **volume,
+                                  double **faceareas);
 
 
 /**

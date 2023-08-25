@@ -2290,7 +2290,7 @@ void fclaw2d_clawpatch_metric_basis(struct fclaw_global* glob,
 
 
 
-void fclaw3d_clawpatch_mesh_data(fclaw_global_t* glob,
+void fclaw_clawpatch_mesh_data_3d(fclaw_global_t* glob,
                                  fclaw_patch_t* patch,
                                  double **xp, double **yp, double **zp,
                                  double **xd, double **yd, double **zd,

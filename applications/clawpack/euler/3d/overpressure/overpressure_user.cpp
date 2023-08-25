@@ -100,7 +100,7 @@ void overpressure_patch_setup(fclaw_global_t *glob,
 
     double *xd,*yd,*zd,*volume,*faceareas;
     double *xp,*yp,*zp;
-    fclaw3d_clawpatch_mesh_data(glob,patch,&xp,&yp,&zp,
+    fclaw_clawpatch_mesh_data_3d(glob,patch,&xp,&yp,&zp,
                                 &xd,&yd,&zd,&volume,&faceareas);
 
     double *xrot, *yrot, *zrot;
