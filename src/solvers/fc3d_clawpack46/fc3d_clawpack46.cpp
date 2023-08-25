@@ -590,7 +590,7 @@ void fc3d_clawpack46_set_capacity(fclaw_global_t *glob,
 	fclaw_clawpatch_grid_data_3d(glob,patch, &mx,&my,&mz,&mbc,
 								&xlower,&ylower,&zlower,&dx,&dy,&dz);
 
-	double *volume = fclaw3d_clawpatch_get_volume(glob,patch);
+	double *volume = fclaw_clawpatch_get_volume_3d(glob,patch);
 
 	int maux;
 	double *aux;

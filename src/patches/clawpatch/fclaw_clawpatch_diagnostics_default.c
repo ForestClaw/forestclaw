@@ -38,7 +38,7 @@ void fclaw_clawpatch_diagnostics_cons_default(fclaw_global_t *glob,
                                               void *user)
 {
     error_info_t* error_data = (error_info_t*) user;
-    double* area = fclaw2d_clawpatch_get_area(glob,patch);  /* Might be null */
+    double* area = fclaw_clawpatch_get_area_2d(glob,patch);  /* Might be null */
 
     int meqn;
     double *q; 
@@ -82,7 +82,7 @@ void fclaw_clawpatch_diagnostics_error_default(fclaw_global_t *glob,
 
     fclaw_clawpatch_vtable_t *clawpatch_vt = fclaw_clawpatch_vt(glob);
 
-    double *area = fclaw2d_clawpatch_get_area(glob,patch);  /* Might be null */
+    double *area = fclaw_clawpatch_get_area_2d(glob,patch);  /* Might be null */
     double *q;
     int meqn;
     fclaw_clawpatch_soln_data(glob,patch,&q,&meqn);

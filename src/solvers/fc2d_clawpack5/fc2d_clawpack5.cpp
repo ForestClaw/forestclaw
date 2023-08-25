@@ -554,7 +554,7 @@ void fc2d_clawpack5_set_capacity(fclaw_global_t *glob,
     fclaw_clawpatch_grid_data_2d(glob,this_patch, &mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
-    area = fclaw2d_clawpatch_get_area(glob,this_patch);
+    area = fclaw_clawpatch_get_area_2d(glob,this_patch);
 
     fclaw_clawpatch_aux_data(glob,this_patch,&aux,&maux);
     FCLAW_ASSERT(maux >= mcapa && mcapa > 0);

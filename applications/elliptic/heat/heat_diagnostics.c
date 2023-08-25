@@ -101,7 +101,7 @@ void heat_compute(fclaw_domain_t *domain,
     fclaw_clawpatch_grid_data_2d(s->glob,patch,&mx,&my,&mbc,&xlower,&ylower,&dx,&dy);
 
     fclaw_clawpatch_vtable_t *clawpatch_vt = fclaw_clawpatch_vt(s->glob);
-    double *area = fclaw2d_clawpatch_get_area(s->glob,patch);  
+    double *area = fclaw_clawpatch_get_area_2d(s->glob,patch);  
     FCLAW_ASSERT(clawpatch_vt->d2->fort_compute_patch_area != NULL);
     error_data->area += clawpatch_vt->d2->fort_compute_patch_area(&mx,&my,&mbc,&dx,&dy,area);
 

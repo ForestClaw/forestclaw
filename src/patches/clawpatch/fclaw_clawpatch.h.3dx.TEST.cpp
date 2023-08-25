@@ -428,7 +428,7 @@ TEST_CASE("3dx fclaw_clawpatch_get_volume")
 
     //CHECK
     fclaw3d_metric_patch_t* mp = fclaw3dx_clawpatch_get_metric_patch(&test_data.domain->blocks[0].patches[0]);
-    CHECK(fclaw3d_clawpatch_get_volume(test_data.glob, 
+    CHECK(fclaw_clawpatch_get_volume_3d(test_data.glob, 
                 &test_data.domain->blocks[0].patches[0]) == mp->volume.dataPtr());
 }
 #endif

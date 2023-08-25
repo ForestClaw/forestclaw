@@ -2218,13 +2218,13 @@ double* fclaw_clawpatch_get_q_timesync(fclaw_global_t* glob,
     return q_time_sync(patch, time_interp);
 }
 
-double* fclaw2d_clawpatch_get_area(fclaw_global_t* glob,
+double* fclaw_clawpatch_get_area_2d(fclaw_global_t* glob,
                                  fclaw_patch_t* patch)
 {
     return clawpatch_get_area(glob, patch);
 }
 
-double* fclaw3d_clawpatch_get_volume(fclaw_global_t* glob,
+double* fclaw_clawpatch_get_volume_3d(fclaw_global_t* glob,
                                      fclaw_patch_t* patch)
 {
     return clawpatch_get_volume(glob, patch);

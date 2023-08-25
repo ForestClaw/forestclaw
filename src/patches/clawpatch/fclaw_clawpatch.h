@@ -627,8 +627,8 @@ void fclaw_clawpatch_mesh_data_3d(struct fclaw_global* glob,
  * @param this_patch the patch to get the are for
  * @return double* the area array
  */
-double* fclaw2d_clawpatch_get_area(struct fclaw_global* glob,
-                                   struct fclaw_patch* patch);
+double* fclaw_clawpatch_get_area_2d(struct fclaw_global* glob,
+                                     struct fclaw_patch* patch);
 
 /**
  * @brief Get the area for each cell of the patch
@@ -636,8 +636,8 @@ double* fclaw2d_clawpatch_get_area(struct fclaw_global* glob,
  * @param this_patch the patch to get the are for
  * @return double* the area array
  */
-double* fclaw3d_clawpatch_get_volume(struct fclaw_global* glob,
-                                     struct fclaw_patch* this_patch);
+double* fclaw_clawpatch_get_volume_3d(struct fclaw_global* glob,
+                                      struct fclaw_patch* this_patch);
 
 
 /**

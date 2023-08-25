@@ -170,7 +170,7 @@ void heat_compute_error(fclaw_global_t *glob,
         fclaw_clawpatch_grid_data_2d(glob,patch,&mx,&my,&mbc,&xlower,
                                     &ylower,&dx,&dy);
 
-        double *area = fclaw2d_clawpatch_get_area(glob,patch);  /* Might be null */
+        double *area = fclaw_clawpatch_get_area_2d(glob,patch);  /* Might be null */
 
         /* Solution is stored in the RHS */
         double *q;

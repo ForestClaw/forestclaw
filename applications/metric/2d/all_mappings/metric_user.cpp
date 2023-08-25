@@ -85,7 +85,7 @@ void metric_patch_initialize(fclaw_domain_t *domain,
                                    &surfnormals, &edgelengths,
                                    &curvature);
 
-    area =  fclaw2d_clawpatch_get_area(domain, this_patch);
+    area =  fclaw_clawpatch_get_area_2d(domain, this_patch);
 
 #if 0
     error = fclaw2d_clawpatch_get_error(domain, this_patch);

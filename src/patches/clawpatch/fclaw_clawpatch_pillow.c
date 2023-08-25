@@ -105,8 +105,8 @@ void pillow_average_block_corner(fclaw_global_t *glob,
                                     &qcoarse,&meqn);
     double* qfine = fclaw_clawpatch_get_q(glob,fine_patch);
 
-    double *areacoarse = fclaw2d_clawpatch_get_area(glob,coarse_patch);
-    double *areafine = fclaw2d_clawpatch_get_area(glob,fine_patch);
+    double *areacoarse = fclaw_clawpatch_get_area_2d(glob,coarse_patch);
+    double *areafine = fclaw_clawpatch_get_area_2d(glob,fine_patch);
 
     fclaw_clawpatch_pillow_vtable_t* pillow_vt = fclaw_clawpatch_pillow_vt(glob);
 
