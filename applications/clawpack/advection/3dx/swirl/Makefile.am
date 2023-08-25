@@ -4,7 +4,7 @@ bin_PROGRAMS += applications/clawpack/advection/3dx/swirl/swirl
 
 TESTS += applications/clawpack/advection/3dx/swirl/regressions.sh
 
-applications_clawpack_advection_3d_swirl_swirl_SOURCES = \
+applications_clawpack_advection_3dx_swirl_swirl_SOURCES = \
 	applications/clawpack/advection/3dx/swirl/swirl.cpp \
 	applications/clawpack/advection/3dx/swirl/swirl_user.cpp \
 	applications/clawpack/advection/3dx/swirl/swirl_user.h \
@@ -36,13 +36,13 @@ EXTRA_DIST += \
 ## Include headers and libraries needed to build this application
 ##  -- Only really need AM_CPPFLAGS and LDADD (since these include all the other 
 ##     variables).  But others are included here for completeness
-applications_clawpack_advection_3d_swirl_swirl_CPPFLAGS = \
+applications_clawpack_advection_3dx_swirl_swirl_CPPFLAGS = \
         $(AM_CPPFLAGS) \
         $(FCLAW_CLAWPACK3_46_CPPFLAGS) \
         $(FCLAW_CLAWPATCH_CPPFLAGS)
 
 
-applications_clawpack_advection_3d_swirl_swirl_LDADD = \
+applications_clawpack_advection_3dx_swirl_swirl_LDADD = \
         $(LDADD) \
         $(FCLAW_CLAWPACK3_46_LDADD) \
         $(FCLAW_CLAWPATCH_LDADD) \

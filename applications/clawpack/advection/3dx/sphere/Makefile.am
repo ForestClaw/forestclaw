@@ -2,7 +2,7 @@ bin_PROGRAMS += applications/clawpack/advection/3dx/sphere/sphere
 
 TESTS += applications/clawpack/advection/3dx/sphere/regressions.sh
 
-applications_clawpack_advection_3d_sphere_sphere_SOURCES = \
+applications_clawpack_advection_3dx_sphere_sphere_SOURCES = \
 	applications/clawpack/advection/3dx/sphere/sphere.cpp \
 	applications/clawpack/advection/3dx/sphere/sphere_user.cpp \
 	applications/clawpack/advection/3dx/sphere/sphere_user.h \
@@ -29,12 +29,12 @@ EXTRA_DIST += \
 	applications/clawpack/advection/3dx/sphere/setplot3.m \
 	applications/clawpack/advection/3dx/sphere/mapc2p.m
 
-applications_clawpack_advection_3d_sphere_sphere_CPPFLAGS = \
+applications_clawpack_advection_3dx_sphere_sphere_CPPFLAGS = \
         $(AM_CPPFLAGS) \
         $(FCLAW_CLAWPACK46_CPPFLAGS) \
         $(FCLAW_CLAWPATCH_CPPFLAGS)
 
-applications_clawpack_advection_3d_sphere_sphere_LDADD = \
+applications_clawpack_advection_3dx_sphere_sphere_LDADD = \
         $(LDADD) \
         $(FCLAW_CLAWPACK46_LDADD) \
         $(FCLAW_CLAWPATCH_LDADD) \
