@@ -551,15 +551,15 @@ void fclaw2d_clawpatch_metric_data(struct fclaw_global* glob,
  *             (i,j,2) contains the the left edge length for cell (i,j).
  * @param[out] curvature the curvature for each cell in the patch
  */
-void fclaw2d_clawpatch_metric_data2(struct fclaw_global* glob,
-                                    struct fclaw_patch* patch,
-                                    double **xnormals, 
-                                    double **ynormals,
-                                    double **xtangents, 
-                                    double **ytangents,
-                                    double **surfnormals, 
-                                    double ** edgelengths,
-                                    double **curvature);
+void fclaw_clawpatch_metric_data2_2d(struct fclaw_global* glob,
+                                     struct fclaw_patch* patch,
+                                     double **xnormals, 
+                                     double **ynormals,
+                                     double **xtangents, 
+                                     double **ytangents,
+                                     double **surfnormals, 
+                                     double ** edgelengths,
+                                     double **curvature);
 
 /**
  * @brief Get the scalar metrics of a patch

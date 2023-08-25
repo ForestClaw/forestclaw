@@ -82,7 +82,7 @@ void radialdam_patch_setup(fclaw_global_t *glob,
 
     double *xnormals,*ynormals,*xtangents,*ytangents;
     double *surfnormals,*edgelengths,*curvature;
-    fclaw2d_clawpatch_metric_data2(glob,patch,
+    fclaw_clawpatch_metric_data2_2d(glob,patch,
                                    &xnormals,&ynormals,
                                    &xtangents,&ytangents,
                                    &surfnormals,&edgelengths,

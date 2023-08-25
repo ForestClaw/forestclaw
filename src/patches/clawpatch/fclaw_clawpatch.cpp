@@ -2261,7 +2261,7 @@ void fclaw2d_clawpatch_metric_data(fclaw_global_t* glob,
     fclaw2d_metric_patch_mesh_data(glob,patch,xp,yp,zp,xd,yd,zd,area);
 }
 
-void fclaw2d_clawpatch_metric_data2(fclaw_global_t* glob,
+void fclaw_clawpatch_metric_data2_2d(fclaw_global_t* glob,
                                     fclaw_patch_t* patch,
                                     double **xnormals, double **ynormals,
                                     double **xtangents, double **ytangents,

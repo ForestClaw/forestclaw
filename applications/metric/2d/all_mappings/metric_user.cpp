@@ -79,7 +79,7 @@ void metric_patch_initialize(fclaw_domain_t *domain,
 
     fclaw2d_clawpatch_soln_data(domain,this_patch,&q,&meqn);
 
-    fclaw2d_clawpatch_metric_data2(domain, this_patch,
+    fclaw_clawpatch_metric_data2_2d(domain, this_patch,
                                    &xnormals, &ynormals,
                                    &xtangents, &ytangents,
                                    &surfnormals, &edgelengths,
