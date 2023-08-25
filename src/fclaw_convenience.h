@@ -161,8 +161,8 @@ void fclaw_domain_list_adapted (fclaw_domain_t * old_domain,
                                   fclaw_domain_t * new_domain,
                                   int log_priority);
 
-/** Search triples of (block number, x, y coordinates) in the mesh.
- * The x, y coordinates must be in [0, 1]^2.
+/** Search tuples of (block number, x, y, (z for 3D) coordinates) in the mesh.
+ * The coordinates must be in [0, 1]^2 (or [0, 1]^3 for 3D domains)
  * The input data must be equal on every process: This is a collective call.
  *
  * A point is found at most once even if it is on a patch boundary.
@@ -176,9 +176,12 @@ void fclaw_domain_list_adapted (fclaw_domain_t * old_domain,
  *                              have indices [block_offsets[t], block_offsets[t + 1])
  *                              in the \b coordinates and results arrays.
  * \param [in] coordinates      An array of elem_size == 2 * sizeof (double) with
- *                              entries (x, y) in [0, 1]^2.  Of these entries,
+ *                              entries (x, y) in [0, 1]^2, or an array of
+ *                              elem_size == 3 * sizeof (double) with entries
+ *                              (x, y, z) in [0, 1]^3 for 3D domains.
+ *                              Of these entries,
  *                              there are \b block_offsets[num_blocks] many.
- *                              We do not enforce the x and y ranges
+ *                              We do not enforce the coordinate ranges
  *                              and simply do not find any point outside its block.
  * \param [in,out] results      On input, an array of type int and an element
  *                              count of \b block_offsets[num_blocks].
