@@ -27,5 +27,5 @@ macro(register_unit_tests test_executable)
   # relative path to executable
   string(REPLACE "${CMAKE_SOURCE_DIR}/" "" RELATIVE_PATH "${CMAKE_CURRENT_SOURCE_DIR}")
 
-  doctest_discover_tests(${test_executable} TEST_PREFIX "${RELATIVE_PATH}/${test_executable} --test-case\"" TEST_SUFFIX "\"" PROPERTIES LABELS "unit_test")
+  doctest_discover_tests(${test_executable} TEST_PREFIX "${RELATIVE_PATH}/${test_executable} --test-case=\"" TEST_SUFFIX "\"" PROPERTIES LABELS "unit_test")
 endmacro()
