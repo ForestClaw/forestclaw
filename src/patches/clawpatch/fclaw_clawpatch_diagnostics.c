@@ -100,7 +100,7 @@ void cb_compute_diagnostics(fclaw_domain_t *domain,
     {
         double *area = fclaw2d_clawpatch_get_area(s->glob,patch);  
         FCLAW_ASSERT(clawpatch_vt->d2->fort_compute_patch_area != NULL);
-        fclaw2d_clawpatch_grid_data(s->glob,patch,&mx,&my,&mbc,&xlower,&ylower,&dx,&dy);
+        fclaw_clawpatch_grid_data_2d(s->glob,patch,&mx,&my,&mbc,&xlower,&ylower,&dx,&dy);
         error_data->area += clawpatch_vt->d2->fort_compute_patch_area(&mx,&my,&mbc,&dx,&dy,area);
     }
     else 

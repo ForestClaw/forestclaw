@@ -338,7 +338,7 @@ void fclaw2d_clawpatch_time_sync_setup(fclaw_global_t* glob,
 
     int mx,my,mbc;
     double dx,dy,xlower,ylower;
-	fclaw2d_clawpatch_grid_data(glob,this_patch,&mx,&my,&mbc,
+	fclaw_clawpatch_grid_data_2d(glob,this_patch,&mx,&my,&mbc,
 	                            &xlower,&ylower,&dx,&dy);
 
 	fclaw2d_clawpatch_metric_scalar(glob,this_patch,
@@ -386,7 +386,7 @@ void fclaw2d_clawpatch_time_sync_f2c(fclaw_global_t* glob,
 
 	int mx,my,mbc;
 	double dx,dy,xlower,ylower;
-	fclaw2d_clawpatch_grid_data(glob,coarse_patch,&mx,&my,&mbc,
+	fclaw_clawpatch_grid_data_2d(glob,coarse_patch,&mx,&my,&mbc,
 	                            &xlower,&ylower,&dx,&dy);
 
 	fclaw2d_clawpatch_registers_t* crcoarse = 
@@ -450,7 +450,7 @@ void fclaw2d_clawpatch_time_sync_samesize (struct fclaw_global* glob,
 
 	int mx,my,mbc;
 	double dx,dy,xlower,ylower;
-	fclaw2d_clawpatch_grid_data(glob,this_patch,&mx,&my,&mbc,
+	fclaw_clawpatch_grid_data_2d(glob,this_patch,&mx,&my,&mbc,
 	                            &xlower,&ylower,&dx,&dy);
 
 	fclaw2d_clawpatch_registers_t* crthis = 

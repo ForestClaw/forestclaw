@@ -66,7 +66,7 @@ void torus_patch_setup(fclaw_global_t *glob,
     double *aux,*edgelengths,*area, *curvature;
     double *xnormals,*ynormals,*xtangents,*ytangents,*surfnormals;
 
-    fclaw2d_clawpatch_grid_data(glob,this_patch,&mx,&my,&mbc,
+    fclaw_clawpatch_grid_data_2d(glob,this_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
     fclaw2d_clawpatch_metric_scalar(glob, this_patch,&area,&edgelengths,

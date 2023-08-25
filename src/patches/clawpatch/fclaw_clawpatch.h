@@ -437,15 +437,15 @@ void fclaw_clawpatch_save_current_step(struct fclaw_global* glob,
  * @param[out] xlower, ylower the lower left coordinate of the patch
  * @param[out] dx, dy the spacings in the x and y directions
  */
-void fclaw2d_clawpatch_grid_data(struct fclaw_global* glob,
-                                 struct fclaw_patch* patch,
-                                 int* mx, 
-                                 int* my, 
-                                 int* mbc,
-                                 double* xlower, 
-                                 double* ylower,
-                                 double* dx, 
-                                 double* dy);
+void fclaw_clawpatch_grid_data_2d(struct fclaw_global* glob,
+                                  struct fclaw_patch* patch,
+                                  int* mx, 
+                                  int* my, 
+                                  int* mbc,
+                                  double* xlower, 
+                                  double* ylower,
+                                  double* dx, 
+                                  double* dy);
 
 /**
  * @brief Get the grid data for a specific patch

@@ -242,7 +242,7 @@ void geoclaw_gauge_update_default(fclaw_global_t*
 
     int m;
 
-    fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mbc,
+    fclaw_clawpatch_grid_data_2d(glob,patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
     fclaw_gauge_get_data(glob,g,&num, &xc, &yc, &t1, &t2);

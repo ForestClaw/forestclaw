@@ -70,7 +70,7 @@ void clawpack46_qinit(fclaw_global_t *glob,
 
 	int mx,my,mbc;
 	double dx,dy,xlower,ylower;
-	fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mbc,
+	fclaw_clawpatch_grid_data_2d(glob,patch,&mx,&my,&mbc,
 								&xlower,&ylower,&dx,&dy);
 	int meqn;
 	double *q;
@@ -106,7 +106,7 @@ void clawpack46_bc2(fclaw_global_t *glob,
 
 	int mx,my,mbc;
 	double xlower,ylower,dx,dy;
-	fclaw2d_clawpatch_grid_data(glob,patch, &mx,&my,&mbc,
+	fclaw_clawpatch_grid_data_2d(glob,patch, &mx,&my,&mbc,
 								&xlower,&ylower,&dx,&dy);
 
 	int maux;
@@ -160,7 +160,7 @@ void clawpack46_b4step2(fclaw_global_t *glob,
 
 	int mx,my,mbc;
 	double xlower,ylower,dx,dy;
-	fclaw2d_clawpatch_grid_data(glob,patch, &mx,&my,&mbc,
+	fclaw_clawpatch_grid_data_2d(glob,patch, &mx,&my,&mbc,
 								&xlower,&ylower,&dx,&dy);
 
 	int meqn;
@@ -198,7 +198,7 @@ void clawpack46_src2(fclaw_global_t *glob,
 
 	int mx,my,mbc;
 	double xlower,ylower,dx,dy;
-	fclaw2d_clawpatch_grid_data(glob,patch, &mx,&my,&mbc,
+	fclaw_clawpatch_grid_data_2d(glob,patch, &mx,&my,&mbc,
 								&xlower,&ylower,&dx,&dy);
 
 	int meqn;
@@ -239,7 +239,7 @@ void clawpack46_setaux(fclaw_global_t *glob,
 
 	int mx,my,mbc;
 	double xlower,ylower,dx,dy;
-	fclaw2d_clawpatch_grid_data(glob,patch, &mx,&my,&mbc,
+	fclaw_clawpatch_grid_data_2d(glob,patch, &mx,&my,&mbc,
 								&xlower,&ylower,&dx,&dy);
 
 	int maux;
@@ -296,7 +296,7 @@ double clawpack46_step2(fclaw_global_t *glob,
 
 	int mx, my, mbc;
 	double xlower, ylower, dx,dy;
-	fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mbc,
+	fclaw_clawpatch_grid_data_2d(glob,patch,&mx,&my,&mbc,
 								&xlower,&ylower,&dx,&dy);
 
 	int meqn;
@@ -570,7 +570,7 @@ void fc2d_clawpack46_set_capacity(fclaw_global_t *glob,
 {
 	int mx,my,mbc;
 	double dx,dy,xlower,ylower;
-	fclaw2d_clawpatch_grid_data(glob,patch, &mx,&my,&mbc,
+	fclaw_clawpatch_grid_data_2d(glob,patch, &mx,&my,&mbc,
 								&xlower,&ylower,&dx,&dy);
 
 	double *area = fclaw2d_clawpatch_get_area(glob,patch);

@@ -68,7 +68,7 @@ void sphere_patch_setup_manifold(fclaw_global_t *glob,
 {
     int mx,my,mbc;
     double xlower,ylower,dx,dy;
-    fclaw2d_clawpatch_grid_data(glob,this_patch,&mx,&my,&mbc,
+    fclaw_clawpatch_grid_data_2d(glob,this_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
     double *xp, *yp, *zp, *xd, *yd, *zd, *area;
@@ -105,7 +105,7 @@ void sphere_b4step2(fclaw_global_t *glob,
 {
     int mx,my,mbc;
     double xlower,ylower,dx,dy;
-    fclaw2d_clawpatch_grid_data(glob,this_patch,&mx,&my,&mbc,
+    fclaw_clawpatch_grid_data_2d(glob,this_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
     double *xnormals,*ynormals,*xtangents,*ytangents,*surfnormals;
@@ -133,7 +133,7 @@ int sphere_tag4refinement(fclaw_global_t *glob,
 {
     int mx,my,mbc;
     double xlower,ylower,dx,dy;
-    fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mbc,
+    fclaw_clawpatch_grid_data_2d(glob,patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
     double *q;
@@ -172,7 +172,7 @@ int sphere_tag4coarsening(fclaw_global_t *glob,
     int mx,my,mbc;
     double xlower,ylower,dx,dy;
     fclaw_patch_t *patch0 = &fine_patches[0];
-    fclaw2d_clawpatch_grid_data(glob,patch0,&mx,&my,&mbc,
+    fclaw_clawpatch_grid_data_2d(glob,patch0,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
     double *q[4];
@@ -221,7 +221,7 @@ void cb_sphere_output_ascii (fclaw_domain_t * domain,
     
     int mx,my,mbc;
     double xlower,ylower,dx,dy;
-    fclaw2d_clawpatch_grid_data(glob,this_patch,&mx,&my,&mbc,
+    fclaw_clawpatch_grid_data_2d(glob,this_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
     int meqn;

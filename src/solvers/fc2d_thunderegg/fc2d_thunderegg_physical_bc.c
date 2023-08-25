@@ -56,7 +56,7 @@ void cb_fc2d_thunderegg_physical_bc(fclaw_domain_t *domain,
 
     int mx, my, mbc;
     double xlower, ylower, dx, dy;
-    fclaw2d_clawpatch_grid_data(s->glob,patch,&mx,&my,&mbc,
+    fclaw_clawpatch_grid_data_2d(s->glob,patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
     const fc2d_thunderegg_options_t* mg_opt = fc2d_thunderegg_get_options(s->glob);

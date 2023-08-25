@@ -1077,7 +1077,7 @@ int clawpatch_tag4refinement(fclaw_global_t *glob,
 
             int mx,my,mbc;
             double xlower,ylower,dx,dy;
-            fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mbc,
+            fclaw_clawpatch_grid_data_2d(glob,patch,&mx,&my,&mbc,
                                         &xlower,&ylower,&dx,&dy);
             clawpatch_vt->d2->fort_tag4refinement(&mx,&my,&mbc,&meqn,&xlower,&ylower,
                                                   &dx,&dy, &blockno, q,
@@ -1121,7 +1121,7 @@ int clawpatch_tag4coarsening(fclaw_global_t *glob,
         fclaw_clawpatch_soln_data(glob,&fine_patches[igrid],&q[igrid],&meqn);
         if(clawpatch_vt->dim == 2)
         {
-            fclaw2d_clawpatch_grid_data(glob,&fine_patches[igrid],&mx,&my,&mbc,
+            fclaw_clawpatch_grid_data_2d(glob,&fine_patches[igrid],&mx,&my,&mbc,
                                         &xlower[igrid],&ylower[igrid],&dx,&dy);
         }
         else 
@@ -2021,7 +2021,7 @@ fclaw3d_clawpatch_get_metric_patch(fclaw_patch_t* patch)
     return get_metric_patch_3d(patch);
 }
 
-void fclaw2d_clawpatch_grid_data(fclaw_global_t* glob,
+void fclaw_clawpatch_grid_data_2d(fclaw_global_t* glob,
                                  fclaw_patch_t* patch,
                                  int* mx, int* my, int* mbc,
                                  double* xlower, double* ylower,

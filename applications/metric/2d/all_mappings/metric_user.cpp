@@ -74,7 +74,7 @@ void metric_patch_initialize(fclaw_domain_t *domain,
     double *surfnormals, *edgelengths;
     double *q, *area, *curvature;
 
-    fclaw2d_clawpatch_grid_data(domain,this_patch,&mx,&my,&mbc,
+    fclaw_clawpatch_grid_data_2d(domain,this_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
     fclaw2d_clawpatch_soln_data(domain,this_patch,&q,&meqn);

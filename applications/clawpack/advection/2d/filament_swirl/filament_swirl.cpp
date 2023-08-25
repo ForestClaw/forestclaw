@@ -194,7 +194,7 @@ void add_cell_centers (fclaw_domain_t * domain, fclaw_patch_t * patch,
     FCLAW_ASSERT (c->query_points != NULL);
 
     /* create one query point for every cell in the patch */
-    fclaw2d_clawpatch_grid_data (c->glob, patch, &mx, &my, &mbc,
+    fclaw_clawpatch_grid_data_2d (c->glob, patch, &mx, &my, &mbc,
                                  &xlower, &ylower, &dx, &dy);
     for (i = 0; i < mx; i++)
     {

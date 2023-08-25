@@ -41,7 +41,7 @@ void transport_patch_setup_manifold(fclaw_global_t *glob,
 
     int mx,my,mbc;
     double xlower,ylower,dx,dy;
-    fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mbc,
+    fclaw_clawpatch_grid_data_2d(glob,patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
     double *xd, *yd, *zd,*xp,*yp, *zp, *area;
@@ -70,7 +70,7 @@ void transport_b4step2_manifold(fclaw_global_t *glob,
 {
     int mx, my, mbc;
     double xlower,ylower, dx,dy;
-    fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mbc,
+    fclaw_clawpatch_grid_data_2d(glob,patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
     double *xp,*yp,*zp,*xd,*yd,*zd;

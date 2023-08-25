@@ -33,7 +33,7 @@ void cudaclaw_allocate_fluxes(fclaw_global_t *glob,
     int maux = claw_opt->maux;
 
     /* Set values needed in batch node */
-    fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mbc,
+    fclaw_clawpatch_grid_data_2d(glob,patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
     fluxes->dx = dx;

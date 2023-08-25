@@ -281,7 +281,7 @@ swirl_intersect_ray (fclaw_domain_t *domain, fclaw_patch_t *patch,
         FCLAW_ASSERT(glob != NULL);
 
         /* Obtain cell indices of the hits. */
-        fclaw2d_clawpatch_grid_data(glob, patch, &mx, &my, &mbc,
+        fclaw_clawpatch_grid_data_2d(glob, patch, &mx, &my, &mbc,
                                     &xlower, &ylower, &dx, &dy);
         fclaw_clawpatch_soln_data(glob, patch, &sol, &meqn);
         sol_rows = mx + 2 * mbc;
