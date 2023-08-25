@@ -51,6 +51,8 @@ fclaw_global_t* fclaw_global_new (void)
     glob->mpisize = 0;
     glob->mpirank = -1;
 
+    glob->domain = NULL;
+
     glob->pkg_container = fclaw_package_container_new ();
     glob->vtables = fclaw_pointer_map_new ();
     glob->options = fclaw_pointer_map_new ();
