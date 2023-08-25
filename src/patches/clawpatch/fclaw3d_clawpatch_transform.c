@@ -26,7 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_patch.h>
 #include <fclaw_global.h>
 
-#include <forestclaw3d.h>
+#include <forestclaw.h>
 
 #include <fclaw_clawpatch_options.h>
 #include <fclaw3d_clawpatch_transform.h>
@@ -47,13 +47,13 @@ void fclaw3d_clawpatch_transform_init_data(fclaw_global_t* glob,
 void fclaw3d_clawpatch_face_transformation (int faceno, int rfaceno, int ftransform[])
 {
     /* Defined in forestclaw2d.c */
-    fclaw3d_patch_face_transformation (faceno, rfaceno, ftransform);
+    fclaw_patch_face_transformation (3, faceno, rfaceno, ftransform);
 }
 
 void fclaw3d_clawpatch_face_transformation_intra (int ftransform[])
 {
     /* Defined in forestclaw2d.c */
-    fclaw3d_patch_face_transformation_intra (ftransform);
+    fclaw_patch_face_transformation_intra (3, ftransform);
 }
 
 
@@ -76,11 +76,11 @@ FCLAW3D_CLAWPATCH_TRANSFORM_FACE (const int *i1, const int *j1,
     *i2 = *i1;
     *j2 = *j1;
     *k2 = *k1;
-    fclaw3d_patch_transform_face (tdata->this_patch,
-                                  tdata->neighbor_patch,
-                                  tdata->transform,
-                                  mx, my, mz, 
-                                  tdata->based, i2, j2, k2);
+    fclaw_patch_transform_face_3d (tdata->this_patch,
+                                   tdata->neighbor_patch,
+                                   tdata->transform,
+                                   mx, my, mz, 
+                                   tdata->based, i2, j2, k2);
                             
 }
 
@@ -102,11 +102,11 @@ FCLAW3D_CLAWPATCH_TRANSFORM_FACE_HALF (const int *i1, const int *j1, const int* 
     i2[0] = *i1;
     j2[0] = *j1;
     k2[0] = *k1;
-    fclaw3d_patch_transform_face2 (tdata->this_patch,
-                                   tdata->neighbor_patch,
-                                   tdata->transform, 
-                                   mx, my, mz,
-                                   tdata->based, i2, j2, k2);
+    fclaw_patch_transform_face2_3d (tdata->this_patch,
+                                    tdata->neighbor_patch,
+                                    tdata->transform, 
+                                    mx, my, mz,
+                                    tdata->based, i2, j2, k2);
 }
 
 
@@ -219,10 +219,10 @@ FCLAW3D_CLAWPATCH_TRANSFORM_CORNER (const int *i1, const int *j1, const int *k1,
 #if 0
         FCLAW_ASSERT (tdata->block_iface < 4);
 #endif
-        fclaw3d_patch_transform_face (tdata->this_patch,
-                                      tdata->neighbor_patch, tdata->transform,
-                                      mx, my, mz,
-                                      tdata->based, i2, j2, k2);
+        fclaw_patch_transform_face_3d (tdata->this_patch,
+                                       tdata->neighbor_patch, tdata->transform,
+                                       mx, my, mz,
+                                       tdata->based, i2, j2, k2);
     }
     else
     {
@@ -230,11 +230,11 @@ FCLAW3D_CLAWPATCH_TRANSFORM_CORNER (const int *i1, const int *j1, const int *k1,
          * corners, we assume both patches lie in coordinate systems with the
          * same orientation. */
         FCLAW_ASSERT (tdata->block_iface == -1);
-        fclaw3d_patch_transform_corner (tdata->this_patch,
-                                        tdata->neighbor_patch,
-                                        tdata->icorner, tdata->is_block_corner,
-                                        mx, my, mz,
-                                        tdata->based, i2, j2, k2);
+        fclaw_patch_transform_corner_3d (tdata->this_patch,
+                                         tdata->neighbor_patch,
+                                         tdata->icorner, tdata->is_block_corner,
+                                         mx, my, mz,
+                                         tdata->based, i2, j2, k2);
     }
 }
 
@@ -257,11 +257,11 @@ FCLAW3D_CLAWPATCH_TRANSFORM_CORNER_HALF (const int *i1, const int *j1, const int
     if (tdata->block_iface >= 0)
     {
         /* block-face but not a block-corner. */
-        fclaw3d_patch_transform_face2 (tdata->this_patch,
-                                       tdata->neighbor_patch,
-                                       tdata->transform, 
-                                       mx, my, mz,
-                                       tdata->based, i2, j2, k2);
+        fclaw_patch_transform_face2_3d (tdata->this_patch,
+                                        tdata->neighbor_patch,
+                                        tdata->transform, 
+                                        mx, my, mz,
+                                        tdata->based, i2, j2, k2);
     }
     else
     {
@@ -269,11 +269,11 @@ FCLAW3D_CLAWPATCH_TRANSFORM_CORNER_HALF (const int *i1, const int *j1, const int
          * corners, we assume both patches lie in coordinate systems with the
          * same orientation. */
         FCLAW_ASSERT (tdata->block_iface == -1);
-        fclaw3d_patch_transform_corner2 (tdata->this_patch,
-                                         tdata->neighbor_patch,
-                                         tdata->icorner, tdata->is_block_corner,
-                                         mx, my, mz,
-                                         tdata->based, i2, j2, k2);
+        fclaw_patch_transform_corner2_3d (tdata->this_patch,
+                                          tdata->neighbor_patch,
+                                          tdata->icorner, tdata->is_block_corner,
+                                          mx, my, mz,
+                                          tdata->based, i2, j2, k2);
     }
 }
 
@@ -294,9 +294,9 @@ FCLAW3D_CLAWPATCH_TRANSFORM_EDGE_HALF (const int *i1, const int *j1, const int* 
     j2[0] = *j1;
     k2[0] = *k1;
     //intra block transform for now
-    fclaw3d_patch_transform_face2 (tdata->this_patch,
-                                   tdata->neighbor_patch,
-                                   tdata->transform, 
-                                   mx, my, mz,
-                                   tdata->based, i2, j2, k2);
+    fclaw_patch_transform_face2_3d (tdata->this_patch,
+                                    tdata->neighbor_patch,
+                                    tdata->transform, 
+                                    mx, my, mz,
+                                    tdata->based, i2, j2, k2);
 }

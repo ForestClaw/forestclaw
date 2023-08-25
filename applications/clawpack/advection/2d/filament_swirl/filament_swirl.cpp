@@ -328,7 +328,7 @@ int overlap_interpolate (fclaw_domain_t * domain, fclaw_patch_t * patch,
     }
 
     /* check, if we are on the consumer or the producer side (boolean) */
-    consumer_side = fclaw2d_domain_is_meta (domain);
+    consumer_side = fclaw_domain_is_meta (domain);
 
     /* set tolerances */
     if (consumer_side)

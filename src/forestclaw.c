@@ -774,4 +774,36 @@ void fclaw_domain_free_after_partition(fclaw_domain_t *domain, void ***patch_dat
         SC_ABORT_NOT_REACHED();
     }
 }
+int fclaw_domain_is_meta (fclaw_domain_t * domain)
+{
+    if(domain->dim == 2)
+    {
+        return fclaw2d_domain_is_meta(domain);
+    }
+    else if (domain->dim == 3)
+    {
+        return fclaw3d_domain_is_meta(domain);
+    }
+    else
+    {
+        SC_ABORT_NOT_REACHED();
+    }
+}
+
+void fclaw_domain_init_meta (fclaw_domain_t *domain, int mpirank)
+{
+    if(domain->dim == 2)
+    {
+        fclaw2d_domain_init_meta(domain,mpirank);
+    }
+    else if (domain->dim == 3)
+    {
+        fclaw3d_domain_init_meta(domain,mpirank);
+    }
+    else
+    {
+        SC_ABORT_NOT_REACHED();
+    }
+}
+
 
