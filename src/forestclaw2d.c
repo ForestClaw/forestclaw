@@ -2146,6 +2146,7 @@ fclaw2d_domain_init_meta (fclaw_domain_t * domain, int mpirank)
 
     /* initialize to -1 and set pointers to NULL */
     memset (domain, -1, sizeof (fclaw_domain_t));
+    domain->dim = P4EST_DIM;
     domain->mpicomm = sc_MPI_COMM_NULL;
     domain->blocks = NULL;
     domain->exchange_patches = NULL;
