@@ -91,7 +91,7 @@ clawpatch_register(fclaw_clawpatch_options_t *clawpatch_options,
                          "Save aux variables when re-taking a time step [F]");
 
     /* Set verbosity level for reporting timing */
-    sc_keyvalue_t *kv = clawpatch_options->kv_refinement_criteria = kv_refinement_criterea_new();
+    sc_keyvalue_t *kv = clawpatch_options->kv_refinement_criteria;
     sc_options_add_keyvalue (opt, 0, "refinement-criteria", 
                              &clawpatch_options->refinement_criteria, "minmax",
                              kv, "Refinement criteria [minmax]");
@@ -116,14 +116,6 @@ clawpatch_postprocess(fclaw_clawpatch_options_t *clawpatch_opt)
 static fclaw_exit_type_t
 clawpatch_check(fclaw_clawpatch_options_t *clawpatch_opt)
 {
-#if 0
-    if (clawpatch_opt->mx != clawpatch_opt->my)
-    {
-        fclaw_global_essentialf("Clawpatch error : mx != my\n");
-        return FCLAW_EXIT_ERROR;    
-    }
-#endif
-
     if (2*clawpatch_opt->mbc > (clawpatch_opt->dim == 2 ? clawpatch_opt->d2->mx : clawpatch_opt->d3->mx))
     {
         fclaw_global_essentialf("Clawpatch error : 2*mbc > mx or 2*mbc > my\n");
@@ -170,6 +162,8 @@ fclaw_clawpatch_options_new (int dim)
         exit(1);
     }
 
+    clawpatch_options->kv_refinement_criteria = kv_refinement_criterea_new();
+
     return clawpatch_options;
 }
 
@@ -191,9 +185,6 @@ fclaw_clawpatch_options_destroy (fclaw_clawpatch_options_t *clawpatch_opt)
     }
 
     FCLAW_FREE(clawpatch_opt);
-    FCLAW_ASSERT (clawpatch_opt->kv_refinement_criteria != NULL);
-    sc_keyvalue_destroy (clawpatch_opt->kv_refinement_criteria);
-    FCLAW_FREE(clawpatch_opt);
 }
 
 static void
@@ -205,34 +196,65 @@ clawpatch_destroy_void(void *clawpatch_opt)
 static size_t 
 options_packsize(void* user)
 {
-    return sizeof(fclaw_clawpatch_options_t);
+    fclaw_clawpatch_options_t* opts = (fclaw_clawpatch_options_t*) user;
+    size_t size = sizeof(fclaw_clawpatch_options_t);
+    if(opts->dim == 2)
+    {
+        size += sizeof(struct fclaw_clawpatch_options_2d);
+    }
+    else
+    {
+        size += sizeof(struct fclaw_clawpatch_options_3d);
+    }
+    return size;
 }
 
 static size_t 
 options_pack(void* user, char* buffer)
 {
+    char* buffer_start = buffer;
     fclaw_clawpatch_options_t* opts = (fclaw_clawpatch_options_t*) user;
 
     //pack entire struct
-    return FCLAW_PACK(*opts,buffer);
+    buffer += FCLAW_PACK(*opts,buffer);
+
+    if(opts->dim == 2)
+    {
+        buffer += FCLAW_PACK(*opts->d2,buffer);
+    }
+    else
+    {
+        buffer += FCLAW_PACK(*opts->d3,buffer);
+    }
+
+    return buffer - buffer_start;
 }
 
 static size_t 
 options_unpack(char* buffer, void** user)
 {
+    char* buffer_start = buffer;
     fclaw_clawpatch_options_t** opts_ptr = (fclaw_clawpatch_options_t**) user;
 
     *opts_ptr = FCLAW_ALLOC(fclaw_clawpatch_options_t,1);
 
-    FCLAW_UNPACK(buffer,*opts_ptr);
+    buffer += FCLAW_UNPACK(buffer,*opts_ptr);
+    if((*opts_ptr)->dim == 2)
+    {
+        (*opts_ptr)->d2 = FCLAW_ALLOC(struct fclaw_clawpatch_options_2d,1);
+        (*opts_ptr)->d3 = NULL;
+        buffer += FCLAW_UNPACK(buffer,(*opts_ptr)->d2);
+    }
+    else
+    {
+        (*opts_ptr)->d2 = NULL;
+        (*opts_ptr)->d3 = FCLAW_ALLOC(struct fclaw_clawpatch_options_3d,1);
+        buffer += FCLAW_UNPACK(buffer,(*opts_ptr)->d3);
+    }
 
-    fclaw_clawpatch_options_t* opts = *opts_ptr;
+    (*opts_ptr)->kv_refinement_criteria = kv_refinement_criterea_new();
 
-    *opts = *(fclaw_clawpatch_options_t*) buffer;
-
-    opts->kv_refinement_criteria = kv_refinement_criterea_new();
-
-    return sizeof(fclaw_clawpatch_options_t);
+    return buffer - buffer_start;
 }
 
 static fclaw_packing_vtable_t packing_vt = 

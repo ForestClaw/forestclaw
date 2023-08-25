@@ -139,6 +139,7 @@ TEST_CASE("2d fclaw_clawpatch_options packing/unpacking")
 	REQUIRE_EQ(bytes_read,size);
 	REQUIRE_NE(output_opts,nullptr);
 
+	CHECK_EQ(output_opts->dim,2);
 	CHECK_EQ(output_opts->d2->mx,opts->d2->mx);
 	CHECK_EQ(output_opts->d2->my,opts->d2->my);
 	CHECK_EQ(output_opts->maux,opts->maux);
@@ -158,7 +159,7 @@ TEST_CASE("2d fclaw_clawpatch_options packing/unpacking")
 
 TEST_CASE("3d fclaw_clawpatch_options packing/unpacking")
 {
-	fclaw_clawpatch_options_t* opts = FCLAW_ALLOC_ZERO(fclaw_clawpatch_options_t,1);
+	fclaw_clawpatch_options_t* opts = fclaw_clawpatch_options_new(3);
 	opts->d3->mx = 5;
 	opts->d3->my = 6;
 	opts->d3->mz = 3;
@@ -185,6 +186,7 @@ TEST_CASE("3d fclaw_clawpatch_options packing/unpacking")
 	REQUIRE_EQ(bytes_read,size);
 	REQUIRE_NE(output_opts,nullptr);
 
+	CHECK_EQ(output_opts->dim,3);
 	CHECK_EQ(output_opts->d3->mx,opts->d3->mx);
 	CHECK_EQ(output_opts->d3->my,opts->d3->my);
 	CHECK_EQ(output_opts->d3->mz,opts->d3->mz);
