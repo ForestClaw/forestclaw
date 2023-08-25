@@ -160,6 +160,7 @@ void get_edge_neighbors(fclaw_global_t *glob,
                         fclaw_patch_transform_data_t* ftransform_finegrid)
 {
     fclaw_domain_t *domain = glob->domain;
+    const int num_face_neighbors = fclaw_domain_num_children(domain)/2;
 
     for(int i=0; i<2; i++)
     {
@@ -228,8 +229,8 @@ void get_edge_neighbors(fclaw_global_t *glob,
                remote face number.  The remote face number encodes the
                orientation, so we have 0 <= rfaceno < 8 */
             int rfaceno;
-            int rproc[4];
-            int rpatchno[4];
+            int rproc[num_face_neighbors];
+            int rpatchno[num_face_neighbors];
             int rblockno;  /* Should equal *corner_block_idx, above. */
             fclaw_patch_face_neighbors(domain,
                                        this_block_idx,
@@ -377,6 +378,7 @@ void cb_edge_fill(fclaw_domain_t *domain,
                   int this_patch_idx,
                   void *user)
 {
+    const int num_faces = fclaw_domain_num_faces(domain);
     const int num_edges = fclaw_domain_num_edges(domain);
 
     fclaw_global_iterate_t* s = (fclaw_global_iterate_t*) user; 
@@ -392,8 +394,8 @@ void cb_edge_fill(fclaw_domain_t *domain,
     int average_from_neighbor = filltype->exchange_type == FCLAW_AVERAGE;
     int interpolate_to_neighbor = filltype->exchange_type == FCLAW_INTERPOLATE;
 
-    int intersects_bdry[6];
-    int intersects_block[6];
+    int intersects_bdry[num_faces];
+    int intersects_block[num_faces];
 
     fclaw_physical_get_bc(s->glob,this_block_idx,this_patch_idx,
                             intersects_bdry);

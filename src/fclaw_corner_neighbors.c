@@ -287,7 +287,7 @@ void get_corner_neighbor(fclaw_global_t *glob,
         {
             *block_corner_count = 2;
             has_corner_neighbor = 1;
-            int rpatchno[4];
+            int rpatchno[4]; // overallocate for 3d
             int rproc[4];
             int rfaceno;
 
@@ -308,8 +308,7 @@ void get_corner_neighbor(fclaw_global_t *glob,
             {
                 /* igrid = 0 at corners 0,1 and (R-1) at corners 2,3,
                    where R = refinement factor */
-                int refratio = 2;
-                igrid = (icorner/2)*(refratio - 1);
+                igrid = (icorner/2)*(2 - 1);
             }
             else
             {
@@ -361,6 +360,7 @@ void cb_corner_fill(fclaw_domain_t *domain,
                     int this_patch_idx,
                     void *user)
 {
+    const int num_faces = fclaw_domain_num_faces(domain);
     const int num_corners = fclaw_domain_num_corners(domain);
 
     fclaw_global_iterate_t* s = (fclaw_global_iterate_t*) user; 
@@ -376,8 +376,8 @@ void cb_corner_fill(fclaw_domain_t *domain,
     int average_from_neighbor = filltype->exchange_type == FCLAW_AVERAGE;
     int interpolate_to_neighbor = filltype->exchange_type == FCLAW_INTERPOLATE;
 
-    int intersects_bdry[6]; //overallocate for 3d
-    int intersects_block[6];
+    int intersects_bdry[num_faces];
+    int intersects_block[num_faces];
     int is_block_corner;
     int is_interior_corner;
     int block_corner_count;
