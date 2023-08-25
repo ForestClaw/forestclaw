@@ -341,7 +341,7 @@ void fclaw2d_clawpatch_time_sync_setup(fclaw_global_t* glob,
 	fclaw_clawpatch_grid_data_2d(glob,this_patch,&mx,&my,&mbc,
 	                            &xlower,&ylower,&dx,&dy);
 
-	fclaw2d_clawpatch_metric_scalar(glob,this_patch,
+	fclaw_clawpatch_metric_scalar_2d(glob,this_patch,
 									&area, &edgelengths,&curvature);
 
     if (fclaw_opt->manifold)

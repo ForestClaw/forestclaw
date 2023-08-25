@@ -84,7 +84,7 @@ void annulus_patch_setup(fclaw_global_t *glob,
                                   &xd,&yd,&zd,&area);
 
     double *edgelengths,*curvature;
-    fclaw2d_clawpatch_metric_scalar(glob, patch,&area,&edgelengths,
+    fclaw_clawpatch_metric_scalar_2d(glob, patch,&area,&edgelengths,
                                     &curvature);
 
     int maux;

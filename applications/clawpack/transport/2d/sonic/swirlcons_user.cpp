@@ -181,7 +181,7 @@ void swirlcons_patch_setup_manifold(fclaw_global_t *glob,
                                   &xd,&yd,&zd,&area);
 
     double *edgelengths, *curvature;
-    fclaw2d_clawpatch_metric_scalar(glob, patch, &area,&edgelengths,
+    fclaw_clawpatch_metric_scalar_2d(glob, patch, &area,&edgelengths,
                                     &curvature);
 
     double *xnormals,*ynormals,*xtangents,*ytangents,*surfnormals;

@@ -2230,7 +2230,7 @@ double* fclaw3d_clawpatch_get_volume(fclaw_global_t* glob,
     return clawpatch_get_volume(glob, patch);
 }
 
-void fclaw2d_clawpatch_metric_scalar(fclaw_global_t* glob,
+void fclaw_clawpatch_metric_scalar_2d(fclaw_global_t* glob,
                                      fclaw_patch_t* patch,
                                      double **area, double** edgelengths,
                                      double **curvature)
