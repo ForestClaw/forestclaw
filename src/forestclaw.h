@@ -554,6 +554,70 @@ void fclaw_patch_transform_face2_2d (fclaw_patch_t * ipatch,
                                      int mx, int my, int based, int i[],
                                      int j[]);
 
+/** Transform a patch coordinate into a neighbor patch's coordinate system.
+ * This function assumes that the two patches are of the SAME size.
+ * If the neighbor patch is in the same block we must set (ftransform[8] & 4).
+ * Else we have an input patch in one block and on output patch across a face.
+ * It is LEGAL to call this function for both local and ghost patches.
+ * \param [in] ipatch       The patch that the input coordinates are relative to.
+ * \param [in] opatch       The patch that the output coordinates are relative to.
+ * \param [in] ftransform   It must have room for NINE (9) integers and be
+ *                          computed by \a fclaw3d_patch_face_transformation.
+ *                          If \a ipatch and \a opatch are in the same block,
+ *                          we require \a ftransform[8] |= 4.
+ * \param [in] mx           Number of cells along x direction of patch.
+ * \param [in] my           Number of cells along y direction of patch.
+ * \param [in] mz           Number of cells along z direction of patch.
+ *                          The number of cells must match according to the face
+ *                          transformation.
+ * \param [in] based        Indices are 0-based for corners and 1-based for cells.
+ * \param [in,out] i        Integer coordinate along x-axis in \a based .. \a mx.
+ * \param [in,out] j        Integer coordinate along y-axis in \a based .. \a my.
+ * \param [in,out] k        Integer coordinate along z-axis in \a based .. \a mz.
+ */
+void fclaw_patch_transform_face_3d (fclaw_patch_t * ipatch,
+                                    fclaw_patch_t * opatch,
+                                    const int ftransform[],
+                                    int mx, int my, int mz, int based,
+                                    int *i, int *j, int *k);
+
+/** Transform a patch coordinate into a neighbor patch's coordinate system.
+ * This function assumes that the neighbor patch is smaller (HALF size).
+ * If the neighbor patch is in the same block we must set (ftransform[8] & 4).
+ * Else we have an input patch in one block and on output patch across a face.
+ * It is LEGAL to call this function for both local and ghost patches.
+ * \param [in] ipatch       The patch that the input coordinates are relative to.
+ * \param [in] opatch       The patch that the output coordinates are relative to.
+ * \param [in] ftransform   It must have room for NINE (9) integers and be
+ *                          computed by \a fclaw3d_patch_face_transformation.
+ *                          If \a ipatch and \a opatch are in the same block,
+ *                          we require \a ftransform[8] |= 4.
+ * \param [in] mx           Number of cells along x direction of patch.
+ * \param [in] my           Number of cells along y direction of patch.
+ * \param [in] mz           Number of cells along z direction of patch.
+ *                          The number of cells must match according to the face
+ *                          transformation.
+ * \param [in] based        Indices are 0-based for corners and 1-based for cells.
+ * \param [in,out] i        EIGHT (8) integer coordinates along x-axis in
+ *                          \a based .. \a mx.  On input, only the first is used.
+ *                          On output, they are relative to the fine patch and
+ *                          stored in order of the children of the coarse patch.
+ * \param [in,out] j        EIGHT (8) integer coordinates along y-axis in
+ *                          \a based .. \a my.  On input, only the first is used.
+ *                          On output, they are relative to the fine patch and
+ *                          stored in order of the children of the coarse patch.
+ * \param [in,out] k        EIGHT (8) integer coordinates along z-axis in
+ *                          \a based .. \a mz.  On input, only the first is used.
+ *                          On output, they are relative to the fine patch and
+ *                          stored in order of the children of the coarse patch.
+ */
+void fclaw_patch_transform_face2_3d (fclaw_patch_t * ipatch,
+                                     fclaw_patch_t * opatch,
+                                     const int ftransform[],
+                                     int mx, int my, int mz, int based,
+                                     int i[], int j[], int k[]);
+
+
 /** Determine neighbor patch(es) and orientation across a given corner.
  * The current version only supports one neighbor, i.e., no true multi-block.
  * A query across a corner in the middle of a longer face returns the boundary.
@@ -642,6 +706,62 @@ void fclaw_patch_transform_corner2 (fclaw_patch_t * ipatch,
                                     int mx, int my, int based,
                                     int i[], int j[]);
 
+/** Transform a patch coordinate into a neighbor patch's coordinate system.
+ * This function assumes that the two patches are of the SAME size and that the
+ * patches lie in coordinate systems with the same orientation.
+ * It is LEGAL to call this function for both local and ghost patches.
+ * \param [in] ipatch       The patch that the input coordinates are relative to.
+ * \param [in] opatch       The patch that the output coordinates are relative to.
+ * \param [in] icorner      Corner number of this patch to transform across.
+ *                          This function assumes ocorner == icorner ^ 7, so
+ *                          ocorner is the opposite corner of icorner.
+ * \param [in] is_block_boundary      Set to true for a block corner.
+ * \param [in] mx           Number of cells along x direction of patch.
+ * \param [in] my           Number of cells along y direction of patch.
+ * \param [in] mz           Number of cells along z direction of patch.
+ * \param [in] based        Indices are 0-based for corners and 1-based for cells.
+ * \param [in,out] i        Integer coordinate along x-axis in \a based .. \a mx.
+ * \param [in,out] j        Integer coordinate along y-axis in \a based .. \a my.
+ * \param [in,out] k        Integer coordinate along z-axis in \a based .. \a mz.
+ */
+void fclaw_patch_transform_corner_3d (fclaw_patch_t * ipatch,
+                                      fclaw_patch_t * opatch,
+                                      int icorner, int is_block_boundary,
+                                      int mx, int my, int mz,
+                                      int based, int *i, int *j, int *k);
+
+/** Transform a patch coordinate into a neighbor patch's coordinate system.
+ * This function assumes that the neighbor patch is smaller (HALF size) and that
+ * the patches lie in coordinate systems with the same orientation.
+ * It is LEGAL to call this function for both local and ghost patches.
+ * \param [in] ipatch       The patch that the input coordinates are relative to.
+ * \param [in] opatch       The patch that the output coordinates are relative to.
+ * \param [in] icorner      Corner number of this patch to transform across.
+ *                          This function assumes ocorner == icorner ^ 7, so
+ *                          ocorner is the opposite corner of icorner.
+ * \param [in] is_block_boundary      Set to true for a block corner.
+ * \param [in] mx           Number of cells along x direction of patch.
+ * \param [in] my           Number of cells along y direction of patch.
+ * \param [in] mz           Number of cells along z direction of patch.
+ * \param [in] based        Indices are 0-based for corners and 1-based for cells.
+ * \param [in,out] i        EIGHT (8) integer coordinates along x-axis in
+ *                          \a based .. \a mx.  On input, only the first is used.
+ *                          On output, they are relative to the fine patch and
+ *                          stored in order of the children of the coarse patch.
+ * \param [in,out] j        EIGHT (8) integer coordinates along y-axis in
+ *                          \a based .. \a my.  On input, only the first is used.
+ *                          On output, they are relative to the fine patch and
+ *                          stored in order of the children of the coarse patch.
+ * \param [in,out] k        EIGHT (8) integer coordinates along y-axis in
+ *                          \a based .. \a mz.  On input, only the first is used.
+ *                          On output, they are relative to the fine patch and
+ *                          stored in order of the children of the coarse patch.
+ */
+void fclaw_patch_transform_corner2_3d (fclaw_patch_t * ipatch,
+                                       fclaw_patch_t * opatch,
+                                       int icorner, int is_block_boundary,
+                                       int mx, int my, int mz, int based,
+                                       int i[], int j[], int k[]);
 ///@}
 /* ---------------------------------------------------------------------- */
 ///                         @name Adaptivity
