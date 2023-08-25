@@ -2273,7 +2273,7 @@ void fclaw_clawpatch_metric_data2_2d(fclaw_global_t* glob,
                                     edgelengths,curvature);
 }
 
-void fclaw3d_clawpatch_metric_scalar(fclaw_global_t* glob,
+void fclaw_clawpatch_metric_scalar_3d(fclaw_global_t* glob,
                                      fclaw_patch_t* patch,
                                      double **volume, double** faceareas)
 {
