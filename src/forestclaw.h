@@ -388,7 +388,7 @@ void fclaw_domain_iterate_families (fclaw_domain_t * domain,
  * \return		True if at least one patch face is on a boundary.
  */
 int fclaw_patch_boundary_type (fclaw_domain_t * domain,
-                                 int blockno, int patchno, int boundaries[4]);
+                                 int blockno, int patchno, int boundaries[6]);
 
 /** Determine whether the normal to a face neighbor align.
  * \param [in] domain	Valid domain structure.

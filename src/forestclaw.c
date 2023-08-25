@@ -69,6 +69,149 @@ fclaw_domain_attribute_remove (fclaw_domain_t * domain, const char *name)
     FCLAW_ASSERT (et == SC_KEYVALUE_ENTRY_POINTER);
 }
 
+int
+fclaw_domain_dimension (const fclaw_domain_t * domain)
+{
+    return domain->dim;
+}
+
+int
+fclaw_domain_refine_factor (const fclaw_domain_t * domain)
+{
+    return (domain->dim == 2) ? P4EST_CHILDREN/2 : P8EST_CHILDREN/2;
+}
+
+int
+fclaw_domain_num_children (const fclaw_domain_t * domain)
+{
+    return (domain->dim == 2) ? P4EST_CHILDREN : P8EST_CHILDREN;
+}
+
+int
+fclaw_domain_num_faces (const fclaw_domain_t * domain)
+{
+    return (domain->dim == 2) ? P4EST_FACES : P8EST_FACES;
+}
+
+int
+fclaw_domain_num_edges (const fclaw_domain_t * domain)
+{
+    return (domain->dim == 2) ? 0 : P8EST_EDGES;
+}
+
+int
+fclaw_domain_num_corners (const fclaw_domain_t * domain)
+{
+    return (domain->dim == 2) ? P4EST_CHILDREN : P8EST_CHILDREN;
+}
+
+int
+fclaw_domain_num_face_corners (const fclaw_domain_t * domain)
+{
+    return (domain->dim == 2) ? P4EST_HALF : P8EST_HALF;
+}
+
+int
+fclaw_domain_num_orientations (const fclaw_domain_t * domain)
+{
+    return (domain->dim == 2) ? (P4EST_FACES * P4EST_HALF) : (P8EST_FACES * P8EST_HALF);
+}
+
+void
+fclaw_domain_edge_faces (const fclaw_domain_t * domain,
+                         int iedge, int faces[2])
+{
+    FCLAW_ASSERT (0 <= iedge && iedge < fclaw_domain_num_edges(domain));
+    faces[0] = p8est_edge_faces[iedge][0];
+    faces[1] = p8est_edge_faces[iedge][1];
+}
+
+void
+fclaw_domain_corner_faces (const fclaw_domain_t * domain,
+                             int icorner, int faces[3])
+{
+    if(domain->dim == 2)
+    {
+        return fclaw2d_domain_corner_faces(domain, icorner, faces);
+    }
+    else if(domain->dim == 3)
+    {
+        return fclaw3d_domain_corner_faces(domain, icorner, faces);
+    }
+    else 
+    {
+        SC_ABORT_NOT_REACHED();
+    }
+}
+
+int
+fclaw_patch_corner_dimension (const fclaw_patch_t * patch, int cornerno)
+{
+    if(patch->dim == 2)
+    {
+        return fclaw2d_patch_corner_dimension(patch, cornerno);
+    }
+    else if(patch->dim == 3)
+    {
+        return fclaw3d_patch_corner_dimension(patch, cornerno);
+    }
+    else 
+    {
+        SC_ABORT_NOT_REACHED();
+    }
+}
+
+int
+fclaw_patch_childid (const fclaw_patch_t * patch)
+{
+    if(patch->dim == 2)
+    {
+        return fclaw2d_patch_childid(patch);
+    } 
+    else if(patch->dim == 3)
+    {
+        return fclaw3d_patch_childid(patch);
+    }
+    else 
+    {
+        SC_ABORT_NOT_REACHED();
+    }
+}
+
+int
+fclaw_patch_is_first_sibling (const fclaw_patch_t * patch)
+{
+    if(patch->dim == 2)
+    {
+        return fclaw2d_patch_is_first_sibling(patch);
+    }
+    else if(patch->dim == 3)
+    {
+        return fclaw3d_patch_is_first_sibling(patch);
+    }
+    else
+    {
+        SC_ABORT_NOT_REACHED();
+    }
+}
+
+int
+fclaw_patch_is_ghost (const fclaw_patch_t * patch)
+{
+    if(patch->dim == 2)
+    {
+        return fclaw2d_patch_is_ghost(patch);
+    }
+    else if(patch->dim == 3)
+    {
+        return fclaw3d_patch_is_ghost(patch);
+    }
+    else
+    {
+        SC_ABORT_NOT_REACHED();
+    }
+}
+
 void
 fclaw_domain_iterate_level (fclaw_domain_t * domain, int level,
                               fclaw_patch_callback_t pcb, void *user)
@@ -142,144 +285,9 @@ fclaw_domain_iterate_families (fclaw_domain_t * domain,
     }
 }
 
-int
-fclaw_domain_dimension (const fclaw_domain_t * domain)
-{
-    return domain->dim;
-}
 
-int
-fclaw_domain_refine_factor (const fclaw_domain_t * domain)
-{
-    return (domain->dim == 2) ? P4EST_CHILDREN/2 : P8EST_CHILDREN/2;
-}
 
-int
-fclaw_domain_num_children (const fclaw_domain_t * domain)
-{
-    return (domain->dim == 2) ? P4EST_CHILDREN : P8EST_CHILDREN;
-}
 
-int
-fclaw_domain_num_faces (const fclaw_domain_t * domain)
-{
-    return (domain->dim == 2) ? P4EST_FACES : P8EST_FACES;
-}
-
-int
-fclaw_domain_num_edges (const fclaw_domain_t * domain)
-{
-    return (domain->dim == 2) ? 0 : P8EST_EDGES;
-}
-
-int
-fclaw_domain_num_corners (const fclaw_domain_t * domain)
-{
-    return (domain->dim == 2) ? P4EST_CHILDREN : P8EST_CHILDREN;
-}
-
-int
-fclaw_domain_num_face_corners (const fclaw_domain_t * domain)
-{
-    return (domain->dim == 2) ? P4EST_HALF : P8EST_HALF;
-}
-
-int
-fclaw_domain_num_orientations (const fclaw_domain_t * domain)
-{
-    return (domain->dim == 2) ? (P4EST_FACES * P4EST_HALF) : (P8EST_FACES * P8EST_HALF);
-}
-
-void
-fclaw_domain_edge_faces (const fclaw_domain_t * domain,
-                         int iedge, int faces[2])
-{
-    FCLAW_ASSERT (0 <= iedge && iedge < fclaw_domain_num_edges(domain));
-    faces[0] = p8est_edge_faces[iedge][0];
-    faces[1] = p8est_edge_faces[iedge][1];
-}
-
-void
-fclaw_domain_corner_faces (const fclaw_domain_t * domain,
-                             int icorner, int faces[P4EST_DIM])
-{
-    FCLAW_ASSERT (0 <= icorner && icorner < fclaw_domain_num_children(domain));
-    if(domain->dim == 2)
-    {
-        faces[0] = p4est_corner_faces[icorner][0];
-        faces[1] = p4est_corner_faces[icorner][1];
-    }
-    else
-    {
-        faces[0] = p8est_corner_faces[icorner][0];
-        faces[1] = p8est_corner_faces[icorner][1];
-        faces[2] = p8est_corner_faces[icorner][2];
-    }
-}
-
-int
-fclaw_patch_corner_dimension (const fclaw_patch_t * patch, int cornerno)
-{
-    const int childid = fclaw_patch_childid (patch);
-
-    if(patch->dim == 2)
-    {
-        FCLAW_ASSERT (0 <= cornerno && cornerno < P4EST_CHILDREN);
-        return (patch->level == 0 ||
-                cornerno == childid ||
-                cornerno == P4EST_CHILDREN - 1 - childid) ? 0 : 1;
-    }
-    else
-    {
-        FCLAW_ASSERT (0 <= cornerno && cornerno < P8EST_CHILDREN);
-        return (patch->level == 0 ||
-                cornerno == childid ||
-                cornerno == P8EST_CHILDREN - 1 - childid) ? 0 : 1;
-    }
-}
-
-int
-fclaw_patch_childid (const fclaw_patch_t * patch)
-{
-    int childid;
-    if(patch->dim == 2)
-    {
-        childid = patch->flags & FCLAW2D_PATCH_CHILDID;
-        FCLAW_ASSERT (0 <= childid && childid < P4EST_CHILDREN);
-    } 
-    else 
-    {
-        return fclaw3d_patch_childid(patch);
-    }
-
-    return childid;
-}
-
-int
-fclaw_patch_is_first_sibling (const fclaw_patch_t * patch)
-{
-    if(patch->dim == 2)
-    {
-        return patch->flags & FCLAW2D_PATCH_FIRST_SIBLING ? 1 : 0;
-    }
-    else
-    {
-        return patch->flags & FCLAW3D_PATCH_FIRST_SIBLING ? 1 : 0;
-    }
-}
-
-int
-fclaw_patch_is_ghost (const fclaw_patch_t * patch)
-{
-    if(patch->dim == 2)
-    {
-        return patch->flags & FCLAW2D_PATCH_IS_GHOST ? 1 : 0;
-    }
-    else
-    {
-        return patch->flags & FCLAW3D_PATCH_IS_GHOST ? 1 : 0;
-    }
-}
 
 #define FCLAW2D_DOMAIN_TAG_SERIALIZE 4526
 #define FCLAW3D_DOMAIN_TAG_SERIALIZE 4527
@@ -362,44 +370,6 @@ fclaw_domain_serialization_leave (fclaw_domain_t * domain)
     }
 }
 
-////////////////////////////////////////
-// adaptivity
-///////////////////////////////////////
-
-//definition of dimension specific functions
-
-void fclaw2d_domain_set_refinement (fclaw_domain_t * domain,
-                                    int smooth_refine, int smooth_level,
-                                    int coarsen_delay);
-
-void fclaw2d_patch_mark_refine (fclaw_domain_t * domain,
-                                int blockno, int patchno);
-
-void fclaw2d_patch_mark_coarsen (fclaw_domain_t * domain,
-                                 int blockno, int patchno);
-
-void fclaw2d_domain_iterate_adapted (fclaw_domain_t * old_domain,
-                                     fclaw_domain_t * new_domain,
-                                     fclaw_match_callback_t mcb,
-                                     void *user);
-
-void fclaw3d_domain_set_refinement (fclaw_domain_t * domain,
-                                    int smooth_refine, int smooth_level,
-                                    int coarsen_delay);
-
-void fclaw3d_patch_mark_refine (fclaw_domain_t * domain,
-                                int blockno, int patchno);
-
-void fclaw3d_patch_mark_coarsen (fclaw_domain_t * domain,
-                                 int blockno, int patchno);
-
-void fclaw3d_domain_iterate_adapted (fclaw_domain_t * old_domain,
-                                     fclaw_domain_t * new_domain,
-                                     fclaw_match_callback_t mcb,
-                                     void *user);
-
-// dimension independent functions
-
 void
 fclaw_domain_set_refinement (fclaw_domain_t * domain,
                              int smooth_refine, int smooth_level,
@@ -472,43 +442,6 @@ fclaw_domain_iterate_adapted(fclaw_domain_t *old_domain, fclaw_domain_t *new_dom
     }
 }
 
-////////////////////////////////////////
-// partition
-///////////////////////////////////////
-
-//definition of dimension specific functions
-void fclaw2d_domain_allocate_before_partition (fclaw_domain_t * domain,
-                                               size_t data_size,
-                                               void ***patch_data);
-
-void fclaw2d_domain_retrieve_after_partition (fclaw_domain_t * domain,
-                                              void ***patch_data);
-
-void fclaw2d_domain_iterate_partitioned (fclaw_domain_t * old_domain,
-                                         fclaw_domain_t * new_domain,
-                                         fclaw_transfer_callback_t tcb,
-                                         void *user);
-
-void fclaw2d_domain_free_after_partition (fclaw_domain_t * domain,
-                                          void ***patch_data);
-
-
-void fclaw3d_domain_allocate_before_partition (fclaw_domain_t * domain,
-                                               size_t data_size,
-                                               void ***patch_data);
-
-void fclaw3d_domain_retrieve_after_partition (fclaw_domain_t * domain,
-                                              void ***patch_data);
-
-void fclaw3d_domain_iterate_partitioned (fclaw_domain_t * old_domain,
-                                         fclaw_domain_t * new_domain,
-                                         fclaw_transfer_callback_t tcb,
-                                         void *user);
-
-void fclaw3d_domain_free_after_partition (fclaw_domain_t * domain,
-                                          void ***patch_data);
-
-
 void fclaw_domain_allocate_before_partition(fclaw_domain_t *domain, size_t data_size, void ***patch_data)
 {
     if(domain->dim == 2)
@@ -573,15 +506,6 @@ void fclaw_domain_free_after_partition(fclaw_domain_t *domain, void ***patch_dat
     }
 }
 
-////////////////////////////////////////
-// neighbors
-///////////////////////////////////////
-
-//definition of dimension specific functions
-
-void fclaw2d_patch_face_swap (int *faceno, int *rfaceno);
-void fclaw3d_patch_face_swap (int *faceno, int *rfaceno);
-
 void fclaw_patch_face_swap(int dim, int *faceno, int *rfaceno)
 {
     if(dim == 2)
@@ -597,49 +521,6 @@ void fclaw_patch_face_swap(int dim, int *faceno, int *rfaceno)
         SC_ABORT_NOT_REACHED();
     }
 }
-
-int fclaw2d_patch_boundary_type (fclaw_domain_t * domain,
-                                 int blockno, int patchno, int boundaries[4]);
-
-int fclaw2d_patch_normal_match (fclaw_domain_t * domain,
-                                int blockno, int patchno, int faceno);
-
-fclaw_patch_relation_t fclaw2d_patch_face_neighbors (fclaw_domain_t *
-                                                       domain, int blockno,
-                                                       int patchno,
-                                                       int faceno,
-                                                       int rproc[2],
-                                                       int *rblockno,
-                                                       int rpatchno[2],
-                                                       int *rfaceno);
-
-int fclaw2d_patch_corner_neighbors (fclaw_domain_t * domain,
-                                    int blockno, int patchno, int cornerno,
-                                    int *rproc, int *rblockno, int *rpatchno,
-                                    int *rcorner,
-                                    fclaw_patch_relation_t * neighbor_size);
-int fclaw3d_patch_boundary_type (fclaw_domain_t * domain,
-                                 int blockno, int patchno, int boundaries[6]);
-
-int fclaw3d_patch_normal_match (fclaw_domain_t * domain,
-                                int blockno, int patchno, int faceno);
-
-
-fclaw_patch_relation_t fclaw3d_patch_face_neighbors (fclaw_domain_t *
-                                                       domain, int blockno,
-                                                       int patchno,
-                                                       int faceno,
-                                                       int rproc[4],
-                                                       int *rblockno,
-                                                       int rpatchno[4],
-                                                       int *rfaceno);
-
-int fclaw3d_patch_corner_neighbors (fclaw_domain_t * domain,
-                                    int blockno, int patchno, int cornerno,
-                                    int *rproc, int *rblockno, int *rpatchno,
-                                    int *rcorner,
-                                    fclaw_patch_relation_t * neighbor_size);
-
 
 int fclaw_patch_boundary_type(fclaw_domain_t *domain, int blockno, int patchno, int boundaries[4])
 {

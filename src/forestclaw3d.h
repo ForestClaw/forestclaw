@@ -145,10 +145,11 @@ int fclaw3d_domain_num_face_corners (const fclaw_domain_t * domain);
  */
 int fclaw3d_domain_num_orientations (const fclaw_domain_t * domain);
 
+#endif 
+
 /** Find the numbers of faces adjacent to a cube corner: 2 in 2D, 3 in 3D. */
 void fclaw3d_domain_corner_faces (const fclaw_domain_t * domain,
                                   int icorner, int faces[3]);
-#endif
 ///@}
 /* ---------------------------------------------------------------------- */
 ///                      @name Patch Functions
