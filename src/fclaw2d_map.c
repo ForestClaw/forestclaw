@@ -49,7 +49,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #else /* this is full 3D */
 #include <fclaw3d_map.h>
-#include <fclaw2d_to_3d.h>
 
 #define MAP_KEY "map_3d"
 #endif
