@@ -41,14 +41,6 @@ extern "C"
 #endif
 #endif
 
-/* CB: chicken and egg -- should global include domain or vice versa?
-       Believe removing any dependence on global from domain will work.
-       Setting a global timer in domain_setup may likely be refactored.
-       Deleting patch and exchange data in domain_reset might go into a
-       toplevel algorithmic function quite naturally outside of domain.
- */
-struct fclaw2d_global;
-
 typedef struct fclaw_domain_data_d2
 {
     /* Debug counters and timers */

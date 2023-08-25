@@ -30,6 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW3D_DOMAIN_H
 #define FCLAW3D_DOMAIN_H
 
+#include <forestclaw3d.h>
 #include <fclaw_domain.h>
 
 #ifdef __cplusplus
@@ -39,10 +40,6 @@ extern "C"
 }                               /* need this because indent is dumb */
 #endif
 #endif
-
-struct fclaw3d_global;
-typedef struct fclaw3d_domain_exchange fclaw3d_domain_exchange_t;
-typedef struct fclaw3d_domain_indirect fclaw3d_domain_indirect_t;
 
 typedef struct fclaw_domain_data_d3
 {
