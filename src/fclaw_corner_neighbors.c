@@ -376,8 +376,8 @@ void cb_corner_fill(fclaw_domain_t *domain,
     int average_from_neighbor = filltype->exchange_type == FCLAW_AVERAGE;
     int interpolate_to_neighbor = filltype->exchange_type == FCLAW_INTERPOLATE;
 
-    int intersects_bdry[3]; //overallocate for 3d
-    int intersects_block[3];
+    int intersects_bdry[6]; //overallocate for 3d
+    int intersects_block[6];
     int is_block_corner;
     int is_interior_corner;
     int block_corner_count;
