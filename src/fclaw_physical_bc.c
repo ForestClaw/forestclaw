@@ -82,7 +82,7 @@ void fclaw_physical_get_bc(fclaw_global_t *glob,
                            int *intersects_bdry)
 {
     const int num_faces = fclaw_domain_num_faces(glob->domain);
-    int bdry[num_faces]; //overallocate for 3d
+    int bdry[6]; //overallocate for 3d
     fclaw_patch_boundary_type(glob->domain,this_block_idx,this_patch_idx,bdry);
     int i;
     for(i = 0; i < num_faces; i++)

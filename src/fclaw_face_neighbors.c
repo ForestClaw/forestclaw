@@ -84,9 +84,9 @@ void get_face_neighbors(fclaw_global_t *glob,
 	fclaw_domain_t *domain = glob->domain;
 	const int num_faces = fclaw_domain_num_faces(domain);
 
-	int rproc[num_faces];
+	int rproc[4]; // overallocate for 3d
 	int rblockno;
-	int rpatchno[num_faces];
+	int rpatchno[4];
 	int rfaceno;
 	int num_neighbors;
 	int ir;
@@ -226,8 +226,8 @@ void cb_face_fill(fclaw_domain_t *domain,
 	const fclaw_options_t *gparms = fclaw_get_options(s->glob);
 	const int refratio = gparms->refratio;
 
-	int intersects_phys_bdry[num_faces];
-	int intersects_block[num_faces];
+	int intersects_phys_bdry[6]; //overallocate for 3d
+	int intersects_block[6];
 
 	fclaw_physical_get_bc(s->glob,this_block_idx,this_patch_idx,
 							intersects_phys_bdry);
@@ -288,7 +288,7 @@ void cb_face_fill(fclaw_domain_t *domain,
 			int iface_neighbor;
 			int *iface_neighbor_ptr = &iface_neighbor;
 
-			fclaw_patch_t* neighbor_patches[num_faces];
+			fclaw_patch_t* neighbor_patches[4]; //overallocate for 3d
 
 			/* Reset this in case it got set in a remote copy */
 			transform_data.this_patch = this_patch;
@@ -470,8 +470,8 @@ void fclaw_face_neighbor_ghost(fclaw_global_t* glob,
 	const fclaw_options_t *gparms = fclaw_get_options(glob);
 	int refratio = gparms->refratio;
 
-	int rproc[2];
-	int rpatchno[2];
+	int rproc[4]; //overallocate for 3d
+	int rpatchno[4];
 	int rblockno;
 	int rfaceno;
 	int i, iface, igrid;
