@@ -2127,7 +2127,7 @@ double *fclaw_clawpatch_get_q(fclaw_global_t* glob,
 }
 
 fclaw2d_clawpatch_registers_t* 
-fclaw2d_clawpatch_get_registers(fclaw_global_t* glob,
+fclaw_clawpatch_get_registers_2d(fclaw_global_t* glob,
                                 fclaw_patch_t* patch)
 {
     fclaw_clawpatch_t *cp = get_clawpatch(patch);

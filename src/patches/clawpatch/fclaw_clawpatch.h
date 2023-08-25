@@ -819,8 +819,8 @@ double* fclaw_clawpatch_get_q_timesync(struct fclaw_global* glob,
  * @return the registers
  */
 struct fclaw2d_clawpatch_registers* 
-fclaw2d_clawpatch_get_registers(struct fclaw_global* glob,
-                                struct fclaw_patch* patch);
+fclaw_clawpatch_get_registers_2d(struct fclaw_global* glob,
+                                 struct fclaw_patch* patch);
 
 #ifdef __cplusplus
 }

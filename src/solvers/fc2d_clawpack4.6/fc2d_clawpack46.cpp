@@ -309,7 +309,7 @@ double clawpack46_step2(fclaw_global_t *glob,
 	double cflgrid = 0.0;
 
 	fclaw2d_clawpatch_registers_t* cr = 
-		  fclaw2d_clawpatch_get_registers(glob,patch);
+		  fclaw_clawpatch_get_registers_2d(glob,patch);
 
 	int* block_corner_count = fclaw_patch_block_corner_count(glob,patch);
 

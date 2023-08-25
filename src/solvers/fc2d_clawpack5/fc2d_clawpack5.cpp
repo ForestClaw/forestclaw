@@ -279,7 +279,7 @@ double clawpack5_step2(fclaw_global_t *glob,
     double cflgrid = 0.0;
 
     fclaw2d_clawpatch_registers_t* cr = 
-          fclaw2d_clawpatch_get_registers(glob,this_patch);
+          fclaw_clawpatch_get_registers_2d(glob,this_patch);
 
     /* Evaluate fluxes needed in correction terms */
     const fclaw_options_t* fclaw_opt = fclaw_get_options(glob);
