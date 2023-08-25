@@ -99,7 +99,7 @@ void annulus_patch_setup(fclaw_global_t *glob,
     if (user->example <= 3)
     {
         double *xnormals,*ynormals,*xtangents,*ytangents,*surfnormals;
-        fclaw2d_clawpatch_metric_vector(glob,patch,
+        fclaw_clawpatch_metric_vector_2d(glob,patch,
                                         &xnormals, &ynormals,
                                         &xtangents, &ytangents,
                                         &surfnormals);
@@ -127,7 +127,7 @@ void annulus_b4step2(fclaw_global_t *glob,
                                 &xlower,&ylower,&dx,&dy);
 
     double *xnormals,*ynormals,*xtangents,*ytangents,*surfnormals;
-    fclaw2d_clawpatch_metric_vector(glob,this_patch,
+    fclaw_clawpatch_metric_vector_2d(glob,this_patch,
                                     &xnormals, &ynormals,
                                     &xtangents, &ytangents,
                                     &surfnormals);

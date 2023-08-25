@@ -80,7 +80,7 @@ void sphere_patch_setup_manifold(fclaw_global_t *glob,
                                     &curvature);
 
     double *xnormals,*ynormals,*xtangents,*ytangents,*surfnormals;
-    fclaw2d_clawpatch_metric_vector(glob,this_patch,
+    fclaw_clawpatch_metric_vector_2d(glob,this_patch,
                                     &xnormals, &ynormals,
                                     &xtangents, &ytangents,
                                     &surfnormals);
@@ -109,7 +109,7 @@ void sphere_b4step2(fclaw_global_t *glob,
                                 &xlower,&ylower,&dx,&dy);
 
     double *xnormals,*ynormals,*xtangents,*ytangents,*surfnormals;
-    fclaw2d_clawpatch_metric_vector(glob,this_patch,
+    fclaw_clawpatch_metric_vector_2d(glob,this_patch,
                                     &xnormals, &ynormals,
                                     &xtangents, &ytangents,
                                     &surfnormals);

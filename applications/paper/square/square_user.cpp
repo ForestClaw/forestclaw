@@ -101,7 +101,7 @@ void square_patch_setup_manifold(fclaw_global_t *glob,
 
     /* Assume that velocities don't depend on t */
     double *xnormals,*ynormals,*xtangents,*ytangents,*surfnormals;
-    fclaw2d_clawpatch_metric_vector(glob,patch, &xnormals, &ynormals, 
+    fclaw_clawpatch_metric_vector_2d(glob,patch, &xnormals, &ynormals, 
                                     &xtangents, &ytangents, &surfnormals);
 
     double t = 0; /* Not used */

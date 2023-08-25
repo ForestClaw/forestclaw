@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //For Clawpatch
 #define fclaw2d_clawpatch_get_metric_patch   fclaw3d_clawpatch_get_metric_patch
 #define fclaw_clawpatch_metric_scalar_2d      fclaw3d_clawpatch_metric_scalar
-#define fclaw2d_clawpatch_metric_vector      fclaw3d_clawpatch_metric_basis
+#define fclaw_clawpatch_metric_vector_2d      fclaw3d_clawpatch_metric_basis
 #define fclaw2d_clawpatch_metric_data        fclaw3d_clawpatch_metric_data
 #define fclaw2d_clawpatch_get_area           fclaw3d_clawpatch_get_volume
 #define clawpatch_get_area                   clawpatch_get_volume

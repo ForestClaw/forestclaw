@@ -39,7 +39,7 @@ void transport_b4step2_manifold(fclaw_global_t *glob,
                                 &xlower,&ylower,&dx,&dy);
 
     double *xnormals,*ynormals,*xtangents,*ytangents,*surfnormals;
-    fclaw2d_clawpatch_metric_vector(glob,patch,
+    fclaw_clawpatch_metric_vector_2d(glob,patch,
                                     &xnormals, &ynormals,
                                     &xtangents, &ytangents,
                                     &surfnormals);

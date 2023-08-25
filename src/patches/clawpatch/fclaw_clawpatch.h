@@ -504,13 +504,13 @@ void fclaw_clawpatch_metric_scalar_2d(struct fclaw_global* glob,
  * @param[out] surfnormals the surface normal for each cell center of the patch
  *             An array of dimension(-mbc:mx+mbc+1,-mbc:my+mbc+1,3)
  */
-void fclaw2d_clawpatch_metric_vector(struct fclaw_global* glob,
-                                     struct fclaw_patch* patch,
-                                     double **xnormals, 
-                                     double **ynormals,
-                                     double **xtangents, 
-                                     double **ytangents,
-                                     double **surfnormals);
+void fclaw_clawpatch_metric_vector_2d(struct fclaw_global* glob,
+                                      struct fclaw_patch* patch,
+                                      double **xnormals, 
+                                      double **ynormals,
+                                      double **xtangents, 
+                                      double **ytangents,
+                                      double **surfnormals);
 
 /**
  * @brief Get the mesh metrics of a patch

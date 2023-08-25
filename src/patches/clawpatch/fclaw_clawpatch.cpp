@@ -2239,7 +2239,7 @@ void fclaw_clawpatch_metric_scalar_2d(fclaw_global_t* glob,
                                 curvature);
 }
 
-void fclaw2d_clawpatch_metric_vector(struct fclaw_global* glob,
+void fclaw_clawpatch_metric_vector_2d(struct fclaw_global* glob,
                                      struct fclaw_patch* patch,
                                      double **xnormals, double **ynormals,
                                      double **xtangents, double **ytangents,

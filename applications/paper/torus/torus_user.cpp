@@ -91,7 +91,7 @@ void torus_patch_setup(fclaw_global_t *glob,
 
 
     double *xnormals,*ynormals,*xtangents,*ytangents,*surfnormals;
-    fclaw2d_clawpatch_metric_vector(glob,patch,
+    fclaw_clawpatch_metric_vector_2d(glob,patch,
                                     &xnormals, &ynormals,
                                     &xtangents, &ytangents,
                                     &surfnormals);
