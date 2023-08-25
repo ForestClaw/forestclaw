@@ -29,7 +29,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw_timeinterp.h>
 #include <fclaw_ghost_fill.h>
-#include <fclaw2d_update_single_step.h>
+#include <fclaw_update_single_step.h>
 #include <fclaw_options.h>
 #include <fclaw_global.h>
 #include <fclaw_vtable.h>
@@ -179,7 +179,7 @@ double update_level_solution(fclaw_global_t *glob,
 							 double t, double dt)
 {
 	/* There might not be any grids at this level */
-	double cfl = fclaw2d_update_single_step(glob,level,t,dt);
+	double cfl = fclaw_update_single_step(glob,level,t,dt);
 
 	return cfl;
 }

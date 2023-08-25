@@ -23,7 +23,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <fclaw2d_update_single_step.h>
+#include <fclaw_update_single_step.h>
 
 #include <fclaw_global.h>
 #include <fclaw_domain.h>
@@ -52,7 +52,7 @@ void cb_single_step(fclaw_domain_t *domain,
 
     double maxcfl;
     
-    fclaw2d_single_step_data_t *ss_data = (fclaw2d_single_step_data_t *) g->user;
+    fclaw_single_step_data_t *ss_data = (fclaw_single_step_data_t *) g->user;
     double dt = ss_data->dt;
     double t = ss_data->t;
     
@@ -70,13 +70,13 @@ void cb_single_step(fclaw_domain_t *domain,
 }
 
 
-double fclaw2d_update_single_step(fclaw_global_t *glob,
+double fclaw_update_single_step(fclaw_global_t *glob,
                                   int level,
                                   double t, double dt)
 {
 
     /* Iterate over every patch at this level */
-    fclaw2d_single_step_data_t ss_data;
+    fclaw_single_step_data_t ss_data;
     ss_data.t = t;
     ss_data.dt = dt;
     ss_data.maxcfl = 0;

@@ -44,7 +44,7 @@ struct fclaw_global;
 /**
  * @brief Buffer data for cudaclaw
  */
-typedef struct fclaw2d_single_step_buffer_data
+typedef struct fclaw_single_step_buffer_data
 {
     /** Number of patches in buffer */
     int total_count;
@@ -52,13 +52,13 @@ typedef struct fclaw2d_single_step_buffer_data
     int iter;
     /**  Buffer pointer */
     void* user;    
-} fclaw2d_single_step_buffer_data_t;
+} fclaw_single_step_buffer_data_t;
 
 
 /**
  * @brief Struct for single step iteration over patches
  */
-typedef struct fclaw2d_single_step_data
+typedef struct fclaw_single_step_data
 {
     /** The time */
     double t;
@@ -67,8 +67,8 @@ typedef struct fclaw2d_single_step_data
     /** The maxcfl */
     double maxcfl;
     /** The buffer data */
-    fclaw2d_single_step_buffer_data_t buffer_data;
-} fclaw2d_single_step_data_t;
+    fclaw_single_step_buffer_data_t buffer_data;
+} fclaw_single_step_data_t;
 
 /**
  * @brief Advance the level using a single explicit time step.
@@ -90,9 +90,9 @@ typedef struct fclaw2d_single_step_data
  * @param dt the time step
  * @return double the maxcfl
  */
-double fclaw2d_update_single_step(struct fclaw_global *glob,
-                                  int level,
-                                  double t, double dt);
+double fclaw_update_single_step(struct fclaw_global *glob,
+                                int level,
+                                double t, double dt);
 
 
 #ifdef __cplusplus

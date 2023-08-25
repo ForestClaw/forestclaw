@@ -46,7 +46,7 @@ add_library(forestclaw_c OBJECT
   fclaw2d_map_query.c
   fclaw2d_output_tikz.c
   fclaw2d_rays.c
-  fclaw2d_update_single_step.c
+  fclaw_update_single_step.c
 
   forestclaw.c
   forestclaw2d.c
@@ -164,7 +164,7 @@ install(FILES
   fclaw2d_map_query_defs.h
   fclaw2d_rays.h
   fclaw2d_to_3d.h
-  fclaw2d_update_single_step.h
+  fclaw_update_single_step.h
 
   fclaw3d_convenience.h
   fclaw3d_domain.h
