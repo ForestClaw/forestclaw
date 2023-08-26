@@ -307,8 +307,8 @@ double cudaclaw_update(fclaw_global_t *glob,
     maxcfl = 0.0;
 
 
-    fclaw2d_single_step_buffer_data_t *buffer_data = 
-              (fclaw2d_single_step_buffer_data_t*) user;
+    fclaw_single_step_buffer_data_t *buffer_data = 
+              (fclaw_single_step_buffer_data_t*) user;
 
     patch_buffer_len = cuclaw_opt->buffer_len;
     iter = buffer_data->iter;
