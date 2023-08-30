@@ -521,8 +521,8 @@ main (int argc, char **argv)
         geo->blocks = filament_domain->blocks;
 
         /* obtain interpolation data of the points from the producer side */
-        fclaw2d_overlap_exchange (filament_glob->domain, c->query_points,
-                                  overlap_interpolate, geo);
+        fclaw_overlap_exchange (filament_glob->domain, c->query_points,
+                                overlap_interpolate, geo);
 
         /* output the interpolation data for all query points */
         output_query_points (c);
