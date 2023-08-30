@@ -1569,15 +1569,15 @@ fclaw2d_domain_free_after_partition (fclaw_domain_t * domain,
     p4est_reset_data (wrap->p4est, 0, NULL, wrap->p4est->user_pointer);
 }
 
-fclaw2d_domain_exchange_t *
+fclaw_domain_exchange_t *
 fclaw2d_domain_allocate_before_exchange (fclaw_domain_t * domain,
                                          size_t data_size)
 {
     int i;
     char *m;
-    fclaw2d_domain_exchange_t *e;
+    fclaw_domain_exchange_t *e;
 
-    e = FCLAW_ALLOC (fclaw2d_domain_exchange_t, 1);
+    e = FCLAW_ALLOC (fclaw_domain_exchange_t, 1);
     e->data_size = data_size;
     e->num_exchange_patches = domain->num_exchange_patches;
     e->num_ghost_patches = domain->num_ghost_patches;
@@ -1603,7 +1603,7 @@ fclaw2d_domain_allocate_before_exchange (fclaw_domain_t * domain,
 
 void
 fclaw2d_domain_ghost_exchange (fclaw_domain_t * domain,
-                               fclaw2d_domain_exchange_t * e,
+                               fclaw_domain_exchange_t * e,
                                int exchange_minlevel, int exchange_maxlevel)
 {
     FCLAW_ASSERT (e->async_state == NULL);
@@ -1616,7 +1616,7 @@ fclaw2d_domain_ghost_exchange (fclaw_domain_t * domain,
 
 void
 fclaw2d_domain_ghost_exchange_begin (fclaw_domain_t * domain,
-                                     fclaw2d_domain_exchange_t * e,
+                                     fclaw_domain_exchange_t * e,
                                      int exchange_minlevel,
                                      int exchange_maxlevel)
 {
@@ -1658,7 +1658,7 @@ fclaw2d_domain_ghost_exchange_begin (fclaw_domain_t * domain,
 
 void
 fclaw2d_domain_ghost_exchange_end (fclaw_domain_t * domain,
-                                   fclaw2d_domain_exchange_t * e)
+                                   fclaw_domain_exchange_t * e)
 {
     p4est_ghost_exchange_t *exc = (p4est_ghost_exchange_t *) e->async_state;
 
@@ -1680,7 +1680,7 @@ fclaw2d_domain_ghost_exchange_end (fclaw_domain_t * domain,
 
 void
 fclaw2d_domain_free_after_exchange (fclaw_domain_t * domain,
-                                    fclaw2d_domain_exchange_t * e)
+                                    fclaw_domain_exchange_t * e)
 {
     FCLAW_FREE (e->ghost_contiguous_memory);
     FCLAW_FREE (e->ghost_data);
@@ -1692,7 +1692,7 @@ struct fclaw2d_domain_indirect
 {
     int ready;
     fclaw_domain_t *domain;
-    fclaw2d_domain_exchange_t *e;
+    fclaw_domain_exchange_t *e;
 };
 
 /* These static functions are unused in 3D as long as the 3D case is not

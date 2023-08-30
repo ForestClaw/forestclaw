@@ -774,6 +774,97 @@ void fclaw_domain_free_after_partition(fclaw_domain_t *domain, void ***patch_dat
         SC_ABORT_NOT_REACHED();
     }
 }
+
+fclaw_domain_exchange_t* 
+fclaw_domain_allocate_before_exchange (fclaw_domain_t * domain,
+                                       size_t data_size)
+{
+    if(domain->dim == 2)
+    {
+        return fclaw2d_domain_allocate_before_exchange(domain,data_size);
+    }
+    else if (domain->dim == 3)
+    {
+        return fclaw3d_domain_allocate_before_exchange(domain,data_size);
+    }
+    else
+    {
+        SC_ABORT_NOT_REACHED();
+    }
+}
+
+void fclaw_domain_ghost_exchange (fclaw_domain_t * domain,
+                                  fclaw_domain_exchange_t * e,
+                                  int exchange_minlevel,
+                                  int exchange_maxlevel)
+{
+    if(domain->dim == 2)
+    {
+        fclaw2d_domain_ghost_exchange(domain,e,exchange_minlevel,exchange_maxlevel);
+    }
+    else if (domain->dim == 3)
+    {
+        fclaw3d_domain_ghost_exchange(domain,e,exchange_minlevel,exchange_maxlevel);
+    }
+    else
+    {
+        SC_ABORT_NOT_REACHED();
+    }
+}
+
+void fclaw_domain_ghost_exchange_begin (fclaw_domain_t * domain,
+                                        fclaw_domain_exchange_t * e,
+                                        int exchange_minlevel,
+                                        int exchange_maxlevel)
+{
+    if(domain->dim == 2)
+    {
+        fclaw2d_domain_ghost_exchange_begin(domain,e,exchange_minlevel,exchange_maxlevel);
+    }
+    else if (domain->dim == 3)
+    {
+        fclaw3d_domain_ghost_exchange_begin(domain,e,exchange_minlevel,exchange_maxlevel);
+    }
+    else
+    {
+        SC_ABORT_NOT_REACHED();
+    }
+}
+
+void fclaw_domain_ghost_exchange_end (fclaw_domain_t * domain,
+                                      fclaw_domain_exchange_t * e)
+{
+    if(domain->dim == 2)
+    {
+        fclaw2d_domain_ghost_exchange_end(domain,e);
+    }
+    else if (domain->dim == 3)
+    {
+        fclaw3d_domain_ghost_exchange_end(domain,e);
+    }
+    else
+    {
+        SC_ABORT_NOT_REACHED();
+    }
+}
+
+void fclaw_domain_free_after_exchange (fclaw_domain_t * domain,
+                                       fclaw_domain_exchange_t * e)
+{
+    if(domain->dim == 2)
+    {
+        fclaw2d_domain_free_after_exchange(domain,e);
+    }
+    else if (domain->dim == 3)
+    {
+        fclaw3d_domain_free_after_exchange(domain,e);
+    }
+    else
+    {
+        SC_ABORT_NOT_REACHED();
+    }
+}
+
 int fclaw_domain_is_meta (fclaw_domain_t * domain)
 {
     if(domain->dim == 2)

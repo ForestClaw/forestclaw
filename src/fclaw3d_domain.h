@@ -43,7 +43,7 @@ extern "C"
 
 typedef struct fclaw_domain_data_d3
 {
-    fclaw3d_domain_exchange_t *domain_exchange;
+    fclaw_domain_exchange_t *domain_exchange;
     fclaw3d_domain_indirect_t *domain_indirect;
 
 } fclaw_domain_data_d3_t;

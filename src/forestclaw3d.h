@@ -663,43 +663,6 @@ void fclaw3d_domain_free_after_partition (fclaw_domain_t * domain,
 /* ---------------------------------------------------------------------- */
 ///@{
 
-/** Data structure for storing allocated data for parallel exchange. */
-typedef struct fclaw3d_domain_exchange
-{
-    size_t data_size; /**< The number of bytes per patch to exchange */
-
-    /* These two members are for consistency checking */
-    int num_exchange_patches; /**< Number of patches to send */
-    int num_ghost_patches; /**< Number of patches to receive */
-    /**
-       One pointer per processor-local exchange patch in order, for a total
-       count of domain->num_exchange_patches.  This applies precisely to local
-       patches that touch the parallel boundary from the inside, i.e., if
-       (flags & FCLAW3D_PATCH_ON_PARALLEL_BOUNDARY).
-     */
-    void **patch_data;
-    /**
-       Array of domain->num_ghost_patches many void pointers, each pointing to
-       exactly data_size bytes of memory that can be read from by forestclaw
-       after each fclaw3d_domain_parallel_exchange.
-     */
-    void **ghost_data;
-    /**
-       Memory where the ghost patch data actually lives.
-       The above array ghost_data points into this memory.
-       It will not be necessary to dereference this memory explicitly.
-     */
-    char *ghost_contiguous_memory;
-
-    /** Temporary storage required for asynchronous ghost exchange.
-     * It is allocated and freed by the begin/end calls below.
-     */
-    void *async_state;
-    int inside_async;           /**< Between asynchronous begin and end? */
-    int by_levels;              /**< Did we use levels on the inside? */
-}
-fclaw3d_domain_exchange_t;
-
 /** Allocate buffer to hold the data from off-processor patches.
  * Free this by fclaw3d_domain_free_after_exchange before regridding.
  * \param [in] domain           The domain is not modified.
@@ -708,7 +671,7 @@ fclaw3d_domain_exchange_t;
  *                              The pointers in patch_data[i] need to be set
  *                              after this call by forestclaw.
  */
-fclaw3d_domain_exchange_t
+fclaw_domain_exchange_t
     * fclaw3d_domain_allocate_before_exchange (fclaw_domain_t * domain,
                                                size_t data_size);
 
@@ -725,7 +688,7 @@ fclaw3d_domain_exchange_t
  * \param [in] exchange_maxlevel The maximum quadrant level that is exchanged.
  */
 void fclaw3d_domain_ghost_exchange (fclaw_domain_t * domain,
-                                    fclaw3d_domain_exchange_t * e,
+                                    fclaw_domain_exchange_t * e,
                                     int exchange_minlevel,
                                     int exchange_maxlevel);
 
@@ -741,7 +704,7 @@ void fclaw3d_domain_ghost_exchange (fclaw_domain_t * domain,
  *                              overwritten after this function returns.
  */
 void fclaw3d_domain_ghost_exchange_begin (fclaw_domain_t * domain,
-                                          fclaw3d_domain_exchange_t * e,
+                                          fclaw_domain_exchange_t * e,
                                           int exchange_minlevel,
                                           int exchange_maxlevel);
 
@@ -752,7 +715,7 @@ void fclaw3d_domain_ghost_exchange_begin (fclaw_domain_t * domain,
  * \param [in,out] e            Its ghost_data member must have survived.
  */
 void fclaw3d_domain_ghost_exchange_end (fclaw_domain_t * domain,
-                                        fclaw3d_domain_exchange_t * e);
+                                        fclaw_domain_exchange_t * e);
 
 /** Free buffers used in exchanging off-processor data during time stepping.
  * This should be done just before regridding.
@@ -760,7 +723,7 @@ void fclaw3d_domain_ghost_exchange_end (fclaw_domain_t * domain,
  * \param [in] e                Allocated buffers.
  */
 void fclaw3d_domain_free_after_exchange (fclaw_domain_t * domain,
-                                         fclaw3d_domain_exchange_t * e);
+                                         fclaw_domain_exchange_t * e);
 
 ///@}
 /* ---------------------------------------------------------------------- */
