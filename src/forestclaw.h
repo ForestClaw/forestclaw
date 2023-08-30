@@ -55,12 +55,18 @@ typedef struct fclaw_block fclaw_block_t;
 /** Typedef for fclaw_patch */
 typedef struct fclaw_patch fclaw_patch_t;
 
+/**
+ * @brief 2D specific patch information
+ */
 struct fclaw_patch_d2
 {
     double xlower, xupper;
     double ylower, yupper;
 };
 
+/**
+ * @brief 3D specific patch information
+ */
 struct fclaw_patch_d3
 {
     double xlower, xupper;
@@ -74,9 +80,9 @@ struct fclaw_patch_d3
  */
 struct fclaw_patch
 {
-    int dim;
-    struct fclaw_patch_d2* d2;
-    struct fclaw_patch_d3* d3;
+    int dim;                    /**< dimension */
+    struct fclaw_patch_d2* d2;  /**< 2D specific information */
+    struct fclaw_patch_d3* d3;  /**< 3D specific informaiton */
     int level;                  /**< 0 is root, increases if refined */
     int target_level;           /**< level desired after adaptation */
     int flags;                  /**< flags that encode tree information */
@@ -91,6 +97,9 @@ struct fclaw_patch
     void *user;                 /**< User Pointer */
 };
 
+/**
+ * @brief 2D specific block information
+ */
 struct fclaw_block_d2
 {
     /** @{ @brief lower left coordinate */
@@ -104,6 +113,9 @@ struct fclaw_block_d2
     int is_boundary[4];         /**< physical boundary flag */
 };
 
+/**
+ * @brief 3D specfic block information
+ */
 struct fclaw_block_d3
 {
     /** @{ @brief left/right coordinate */
@@ -125,9 +137,9 @@ struct fclaw_block_d3
  */
 typedef struct fclaw_block
 {
-    int dim;
-    struct fclaw_block_d2* d2;
-    struct fclaw_block_d3* d3;
+    int dim;                    /**< dimension */
+    struct fclaw_block_d2* d2;  /**< 2D specific information */
+    struct fclaw_block_d3* d3;  /**< 3D specific informaiton */
     int num_patches;            /**< local patches in this block */
     int num_patches_before;     /**< in all previous blocks */
     int num_exchange_patches;   /**< exchange patches in this block */
@@ -143,7 +155,7 @@ typedef struct fclaw_block
     fclaw_patch_t *patches;           /**< The patches for this block */
     fclaw_patch_t **patchbylevel;     /**< Pointer to the first patch in each level **/
     fclaw_patch_t **exchange_patches; /**< Pointer for each exchange patch */
-    void *user;                         /**< User pointer */
+    void *user;                       /**< User pointer */
 } fclaw_block_t;
 
 /** This structure identify parameters that are copied from a domain
@@ -168,7 +180,7 @@ fclaw_domain_persist_t;
  */
 struct fclaw_domain
 {
-    int dim;
+    int dim;                    /**< dimension */
 
     sc_MPI_Comm mpicomm;        /**< MPI communicator */
     int mpisize;                /**< MPI size */
@@ -230,7 +242,7 @@ struct fclaw_domain
  * \param [in] attribute        Arbitrary data stored under \a name.
  */
 void fclaw_domain_attribute_add (fclaw_domain_t * domain,
-                                   const char *name, void *attribute);
+                                 const char *name, void *attribute);
 
 /** Access a named attribute of the domain.
  * \param [in] domain   The domain may or may not have the queried attribute.
@@ -240,7 +252,7 @@ void fclaw_domain_attribute_add (fclaw_domain_t * domain,
  *                      or \a default_attr if the attribute does not exist.
  */
 void *fclaw_domain_attribute_access (fclaw_domain_t * domain,
-                                       const char *name, void *default_attr);
+                                     const char *name, void *default_attr);
 
 /** Remove a named attribute from the domain.
  * It is NOT necessary to call this function before domain destruction.
@@ -248,7 +260,7 @@ void *fclaw_domain_attribute_access (fclaw_domain_t * domain,
  * \param [in] name     An attribute of this name must exist.
  */
 void fclaw_domain_attribute_remove (fclaw_domain_t * domain,
-                                      const char *name);
+                                    const char *name);
 ///@}
 /* ---------------------------------------------------------------------- */
 ///                  @name Topological Properties
@@ -285,7 +297,7 @@ int fclaw_domain_num_orientations (const fclaw_domain_t * domain);
 void fclaw_domain_edge_faces(const fclaw_domain_t *domain, int iedge, int faces[2]);
 /** Find the numbers of faces adjacent to a cube corner: 2 in 2D, 3 in 3D. */
 void fclaw_domain_corner_faces (const fclaw_domain_t * domain,
-                                  int icorner, int faces[3]);
+                                int icorner, int faces[3]);
 
 ///@}
 /* ---------------------------------------------------------------------- */
@@ -296,7 +308,7 @@ void fclaw_domain_corner_faces (const fclaw_domain_t * domain,
 /** Return the dimension of a corner.
  * This function is LEGAL to call for both local and ghost patches.
  * \param [in] patch    A patch with properly set member variables.
- * \param [in] cornerno A corner number in 0..3.
+ * \param [in] cornerno A corner number in 0..3 for 2D or 0..7 for 3D.
  * \return              0 if the corner is always at a fourfold intersection,
  *                      1 if the corner would end up in the middle of a face
  *                      when there is a coarser neighbor.
@@ -307,7 +319,7 @@ int fclaw_patch_corner_dimension (const fclaw_patch_t * patch,
 /** Return the number of a patch with respect to its parent in the tree.
  * This function is LEGAL to call for both local and ghost patches.
  * \param [in] patch    A patch with properly set member variables.
- * \return              The child id is a number in 0..3.
+ * \return              The child id is a number in 0..3 for 2D or 0..7 for 3D.
  */
 int fclaw_patch_childid (const fclaw_patch_t * patch);
 
@@ -349,7 +361,7 @@ typedef void (*fclaw_patch_callback_t)
  * \param [in,out] user	Data is passed to the pcb callback.
  */
 void fclaw_domain_iterate_level (fclaw_domain_t * domain, int level,
-                                   fclaw_patch_callback_t pcb, void *user);
+                                 fclaw_patch_callback_t pcb, void *user);
 
 /** Iterate over all local patches of all levels.
  * \param [in] domain	General domain structure.
@@ -357,8 +369,8 @@ void fclaw_domain_iterate_level (fclaw_domain_t * domain, int level,
  * \param [in,out] user	Data is passed to the pcb callback.
  */
 void fclaw_domain_iterate_patches (fclaw_domain_t * domain,
-                                     fclaw_patch_callback_t pcb,
-                                     void *user);
+                                   fclaw_patch_callback_t pcb,
+                                   void *user);
 
 /** Iterate over all families of local sibling patches.
  * \param [in] domain	General domain structure.
@@ -369,8 +381,8 @@ void fclaw_domain_iterate_patches (fclaw_domain_t * domain,
  * \param [in,out] user	Data is passed to the pcb callback.
  */
 void fclaw_domain_iterate_families (fclaw_domain_t * domain,
-                                      fclaw_patch_callback_t pcb,
-                                      void *user);
+                                    fclaw_patch_callback_t pcb,
+                                    void *user);
 
 ///@}
 /* ---------------------------------------------------------------------- */
@@ -383,12 +395,13 @@ void fclaw_domain_iterate_families (fclaw_domain_t * domain,
  * \param [in] domain	Valid domain structure.
  * \param [in] blockno	Number of the block within the domain.
  * \param [in] patchno	Number of the patch within the block.
- * \param [in,out] boundaries	Domain boundary boolean flags.
- *			The order is left, right, bottom, top.
+ * \param [in,out] boundaries	Domain boundary boolean flags 
+            (length 4 for 2D, 6 for 3D).
+ *			The order is left, right, front, back, bottom, top.
  * \return		True if at least one patch face is on a boundary.
  */
 int fclaw_patch_boundary_type (fclaw_domain_t * domain,
-                                 int blockno, int patchno, int boundaries[6]);
+                               int blockno, int patchno, int boundaries[]);
 
 /** Determine whether the normal to a face neighbor align.
  * \param [in] domain	Valid domain structure.
@@ -398,7 +411,7 @@ int fclaw_patch_boundary_type (fclaw_domain_t * domain,
  * \return		True if normals match, false for mismatch.
  */
 int fclaw_patch_normal_match (fclaw_domain_t * domain,
-                                int blockno, int patchno, int faceno);
+                              int blockno, int patchno, int faceno);
 
 typedef enum fclaw_face_neighbor
 {
@@ -419,11 +432,12 @@ fclaw_patch_relation_t;
  * \param [in] blockno  Number of the block within the domain.
  * \param [in] patchno  Number of the patch within the block.
  * \param [in] faceno   Number of the patch face: left, right, bottom, top.
- * \param [out] rproc   Processor number of neighbor patches.  Exception:
- *                      If the neighbor is a bigger patch, rproc[1] contains
- *                      the number of the small patch as one of two half faces.
+ * \param [out] rproc   Processor number of neighbor patches (length 2 in 2D, 4 in 3D).  
+ *                      Exception:
+ *                      If the neighbors are half-size patches, rproc contains
+ *                      the numbers of the small patches.
  * \param [out] rblockno        Neighbor block number.
- * \param [out] rpatchno        Neighbor patch numbers for up to 2 neighbors.
+ * \param [out] rpatchno        Neighbor patch numbers (length 2 in 2D, 4 in 3D)
  *                              The patch number is relative to its block.
  *                              If the neighbor is off-processor, this is not
  *                              a patch number but in [0, num_ghost_patches[.
@@ -431,15 +445,16 @@ fclaw_patch_relation_t;
  * \return              The relative patch size of the face neighbor.
  */
 fclaw_patch_relation_t fclaw_patch_face_neighbors (fclaw_domain_t *
-                                                       domain, int blockno,
-                                                       int patchno,
-                                                       int faceno,
-                                                       int rproc[2],
-                                                       int *rblockno,
-                                                       int rpatchno[2],
-                                                       int *rfaceno);
+                                                   domain, int blockno,
+                                                   int patchno,
+                                                   int faceno,
+                                                   int rproc[],
+                                                   int *rblockno,
+                                                   int rpatchno[],
+                                                   int *rfaceno);
 
 /** Change perspective across a face neighbor situation.
+ * \param [in]     dim      Dimension [2, 3].
  * \param [in,out] faceno   On input, valid face number for a patch.
  *                          On output, valid face number seen from
  *                          faceno's neighbor patch.
@@ -451,11 +466,19 @@ fclaw_patch_relation_t fclaw_patch_face_neighbors (fclaw_domain_t *
 void fclaw_patch_face_swap (int dim, int *faceno, int *rfaceno);
 
 /** Fill an array with the axis combination of a face neighbor transform.
+ * \param [in]  dim         Dimension [2, 3].
  * \param [in]  faceno      The number of the originating face.
- * \param [in]  rfaceno     Encoded as rfaceno = r * 4 + nf, where nf = 0..3 is
+ * \param [in]  rfaceno     In 2D: 
+ *                          Encoded as rfaceno = r * 4 + nf, where nf = 0..3 is
+ *                          the neigbbor's connecting face number and r = 0..1
+ *                          is the relative orientation to the neighbor's face.
+ *
+ *                          In 3D:
+ *                          Encoded as rfaceno = r * 6 + nf, where nf = 0..3 is
  *                          the neigbbor's connecting face number and r = 0..1
  *                          is the relative orientation to the neighbor's face.
  * \param [out] ftransform  This array holds 9 integers.
+ *                          In 2D:
  *              [0,2]       The coordinate axis sequence of the origin face,
  *                          the first referring to the tangential and the second
  *                          to the normal.  A permutation of (0, 1).
@@ -469,12 +492,27 @@ void fclaw_patch_face_swap (int dim, int *faceno, int *rfaceno);
  *                          [8] & 4: Both patches are in the same block,
  *                                   the \a ftransform contents are ignored.
  *              [1,4,7]     0 (unused for compatibility with 3D).
+ *
+ *                          In 3D:
+ *              [0..2]      The coordinate axis sequence of the origin face,
+ *                          the first two referring to the tangentials and the
+ *                          third to the normal.  A permutation of (0, 1, 2).
+ *              [3..5]      The coordinate axis sequence of the target face.
+ *              [6..8]      Edge reversal flags for tangential axes (boolean);
+ *                          face code in [0, 3] for the normal coordinate q:
+ *                          0: q' = -q
+ *                          1: q' = q + 1
+ *                          2: q' = q - 1
+ *                          3: q' = 2 - q
+ *                          [8] & 4: Both patches are in the same block,
+ *                                   the \a ftransform contents are ignored.
  */
 void fclaw_patch_face_transformation (int dim, int faceno, int rfaceno,
                                       int ftransform[]);
 
 /** Modify an existing face transformation depending on intra-block usage.
  * This function can be called any number of times on the same transform array.
+ * \param [in] dim              Dimension [2, 3].
  * \param [in,out] ftransform   Array of values necessarily created by \ref
  *                              fclaw_patch_face_transformation.
  * \param [in] sameblock        Transformation supposed to work in same block?
@@ -486,11 +524,13 @@ void fclaw_patch_face_transformation_block (int dim, int ftransform[],
  * that operates on two patches in the same block (the trivial case).
  * Use when there is no prior call to \ref fclaw_patch_face_transformation.
  * Don't postprocess the result any further -- it's only useful intra-block.
+ * \param [in] dim              Dimension [2, 3].
  * \param [out] ftransform      Gets initialized to a same-block transform.
  */
 void fclaw_patch_face_transformation_intra (int dim, int ftransform[]);
 
 /** Return whether a face transformation is valid.
+ * \param [in] dim              Dimension [2, 3].
  * \param [in] ftransform       Array of values as created by \ref
  *                              fclaw_patch_face_transformation,
  *                              possibly modified by \ref
@@ -499,7 +539,7 @@ void fclaw_patch_face_transformation_intra (int dim, int ftransform[]);
  */
 int fclaw_patch_face_transformation_valid (int dim, const int ftransform[]);
 
-/** Transform a patch coordinate into a neighbor patch's coordinate system.
+/** Transform a 2D patch coordinate into a neighbor patch's coordinate system.
  * This function assumes that the two patches are of the SAME size.
  * If the neighbor patch is in the same block we must set (ftransform[8] & 4).
  * Else we have an input patch in one block and on output patch across a face.
@@ -523,7 +563,7 @@ void fclaw_patch_transform_face_2d (fclaw_patch_t * ipatch,
                                     const int ftransform[],
                                     int mx, int my, int based, int *i, int *j);
 
-/** Transform a patch coordinate into a neighbor patch's coordinate system.
+/** Transform a 2D patch coordinate into a neighbor patch's coordinate system.
  * This function assumes that the neighbor patch is smaller (HALF size).
  * If the neighbor patch is in the same block we must set (ftransform[8] & 4).
  * Else we have an input patch in one block and on output patch across a face.
@@ -554,7 +594,7 @@ void fclaw_patch_transform_face2_2d (fclaw_patch_t * ipatch,
                                      int mx, int my, int based, int i[],
                                      int j[]);
 
-/** Transform a patch coordinate into a neighbor patch's coordinate system.
+/** Transform a 3D patch coordinate into a neighbor patch's coordinate system.
  * This function assumes that the two patches are of the SAME size.
  * If the neighbor patch is in the same block we must set (ftransform[8] & 4).
  * Else we have an input patch in one block and on output patch across a face.
@@ -581,7 +621,7 @@ void fclaw_patch_transform_face_3d (fclaw_patch_t * ipatch,
                                     int mx, int my, int mz, int based,
                                     int *i, int *j, int *k);
 
-/** Transform a patch coordinate into a neighbor patch's coordinate system.
+/** Transform a 3D patch coordinate into a neighbor patch's coordinate system.
  * This function assumes that the neighbor patch is smaller (HALF size).
  * If the neighbor patch is in the same block we must set (ftransform[8] & 4).
  * Else we have an input patch in one block and on output patch across a face.
@@ -628,7 +668,9 @@ void fclaw_patch_transform_face2_3d (fclaw_patch_t * ipatch,
  * \param [in] domain   Valid domain structure.
  * \param [in] blockno  Number of the block within the domain.
  * \param [in] patchno  Number of the patch within the block.
- * \param [in] cornerno	Number of the patch corner: 0=bl, 1=br, 2=tl, 3=tr.
+ * \param [in] cornerno	Number of the patch corner:
+ *                          In 2D: 0=bl, 1=br, 2=tl, 3=tr.
+ *                          In 3D: 0=bfl, ..., 7=tbr.
  * \param [out] rproc   Processor number of neighbor patch.
  * \param [out] rblockno        Neighbor block number.
  * \param [out] rpatchno        Neighbor patch number relative to the block.
@@ -646,6 +688,7 @@ int fclaw_patch_corner_neighbors (fclaw_domain_t * domain,
                                   fclaw_patch_relation_t * neighbor_size);
 
 /** Change perspective across a corner neighbor situation.
+ * \param [in]     dim          Dimension [2, 3].
  * \param [in,out] cornerno     On input, valid corner number for a patch.
  *                              On output, corner number seen from
  *                              the corner neighbor patch.
@@ -656,7 +699,7 @@ int fclaw_patch_corner_neighbors (fclaw_domain_t * domain,
  */
 void fclaw_patch_corner_swap (int dim, int *cornerno, int *rcornerno);
 
-/** Transform a patch coordinate into a neighbor patch's coordinate system.
+/** Transform a 2D patch coordinate into a neighbor patch's coordinate system.
  * This function assumes that the two patches are of the SAME size and that the
  * patches lie in coordinate systems with the same orientation.
  * It is LEGAL to call this function for both local and ghost patches.
@@ -678,7 +721,7 @@ void fclaw_patch_transform_corner_2d (fclaw_patch_t * ipatch,
                                       int mx, int my,
                                       int based, int *i, int *j);
 
-/** Transform a patch coordinate into a neighbor patch's coordinate system.
+/** Transform a 2D patch coordinate into a neighbor patch's coordinate system.
  * This function assumes that the neighbor patch is smaller (HALF size) and that
  * the patches lie in coordinate systems with the same orientation.
  * It is LEGAL to call this function for both local and ghost patches.
@@ -706,7 +749,7 @@ void fclaw_patch_transform_corner2_2d (fclaw_patch_t * ipatch,
                                        int mx, int my, int based,
                                        int i[], int j[]);
 
-/** Transform a patch coordinate into a neighbor patch's coordinate system.
+/** Transform a 3D patch coordinate into a neighbor patch's coordinate system.
  * This function assumes that the two patches are of the SAME size and that the
  * patches lie in coordinate systems with the same orientation.
  * It is LEGAL to call this function for both local and ghost patches.
@@ -730,7 +773,7 @@ void fclaw_patch_transform_corner_3d (fclaw_patch_t * ipatch,
                                       int mx, int my, int mz,
                                       int based, int *i, int *j, int *k);
 
-/** Transform a patch coordinate into a neighbor patch's coordinate system.
+/** Transform a 3D patch coordinate into a neighbor patch's coordinate system.
  * This function assumes that the neighbor patch is smaller (HALF size) and that
  * the patches lie in coordinate systems with the same orientation.
  * It is LEGAL to call this function for both local and ghost patches.
@@ -784,8 +827,8 @@ void fclaw_patch_transform_corner2_3d (fclaw_patch_t * ipatch,
  *                              against each patch's individual counter.
  */
 void fclaw_domain_set_refinement (fclaw_domain_t * domain,
-                                    int smooth_refine, int smooth_level,
-                                    int coarsen_delay);
+                                  int smooth_refine, int smooth_level,
+                                  int coarsen_delay);
 
 /** Mark a patch for refinement.
  * This must ONLY be called for local patches.
@@ -793,7 +836,7 @@ void fclaw_domain_set_refinement (fclaw_domain_t * domain,
  * \ref fclaw_domain_iterate_adapted.
  */
 void fclaw_patch_mark_refine (fclaw_domain_t * domain,
-                                int blockno, int patchno);
+                              int blockno, int patchno);
 
 /** Mark a patch for coarsening.
  * This must ONLY be called for local patches.
@@ -803,7 +846,7 @@ void fclaw_patch_mark_refine (fclaw_domain_t * domain,
  * \ref fclaw_domain_iterate_adapted.
  */
 void fclaw_patch_mark_coarsen (fclaw_domain_t * domain,
-                                 int blockno, int patchno);
+                               int blockno, int patchno);
 
 /** Callback prototype used in fclaw_domain_iterate_adapted.
  * The newsize value informs on refine/coarsen/noop status.
@@ -852,8 +895,8 @@ void fclaw_domain_iterate_adapted (fclaw_domain_t * old_domain,
  *                              *patch_data must be NULL before the call.
  */
 void fclaw_domain_allocate_before_partition (fclaw_domain_t * domain,
-                                               size_t data_size,
-                                               void ***patch_data);
+                                             size_t data_size,
+                                             void ***patch_data);
 
 /** Reallocate data buffer to reflect patch data after partition.
  * \param [in,out] domain       The memory lives inside this domain.
@@ -864,7 +907,7 @@ void fclaw_domain_allocate_before_partition (fclaw_domain_t * domain,
  *                              memory that can be read from by forestclaw.
  */
 void fclaw_domain_retrieve_after_partition (fclaw_domain_t * domain,
-                                              void ***patch_data);
+                                            void ***patch_data);
 
 /** Callback to iterate through the partitions.
  * We traverse every patch in the new partition.  If that patch was already
@@ -885,12 +928,12 @@ void fclaw_domain_retrieve_after_partition (fclaw_domain_t * domain,
  *                              fclaw_domain_iterate_partitioned.
  */
 typedef void (*fclaw_transfer_callback_t) (fclaw_domain_t * old_domain,
-                                             fclaw_patch_t * old_patch,
-                                             fclaw_domain_t * new_domain,
-                                             fclaw_patch_t * new_patch,
-                                             int blockno,
-                                             int old_patchno, int new_patchno,
-                                             void *user);
+                                           fclaw_patch_t * old_patch,
+                                           fclaw_domain_t * new_domain,
+                                           fclaw_patch_t * new_patch,
+                                           int blockno,
+                                           int old_patchno, int new_patchno,
+                                           void *user);
 
 /** Iterate over the previous and partitioned domain simultaneously.
  * We iterate over local patches only.
@@ -900,9 +943,9 @@ typedef void (*fclaw_transfer_callback_t) (fclaw_domain_t * old_domain,
  * \param [in,out] user         This pointer is passed to the callback.
  */
 void fclaw_domain_iterate_partitioned (fclaw_domain_t * old_domain,
-                                         fclaw_domain_t * new_domain,
-                                         fclaw_transfer_callback_t tcb,
-                                         void *user);
+                                       fclaw_domain_t * new_domain,
+                                       fclaw_transfer_callback_t tcb,
+                                       void *user);
 
 /** Free buffers that were used in transfering data during partition.
  * \param [in,out] domain       The memory lives inside this domain.
@@ -910,7 +953,7 @@ void fclaw_domain_iterate_partitioned (fclaw_domain_t * old_domain,
  *                              *patch_data will be NULL after the call.
  */
 void fclaw_domain_free_after_partition (fclaw_domain_t * domain,
-                                          void ***patch_data);
+                                        void ***patch_data);
 
 ///@}
 /* ---------------------------------------------------------------------- */
