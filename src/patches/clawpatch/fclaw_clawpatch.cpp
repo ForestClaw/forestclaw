@@ -1983,6 +1983,12 @@ void fclaw_clawpatch_vtable_initialize(fclaw_global_t* glob,
 /* These functions are not virtualized and are not defined by the 
    patch interface */
 
+int fclaw_clawpatch_dim(fclaw_patch_t* patch)
+{
+    fclaw_clawpatch_t *cp = get_clawpatch(patch);
+    return cp->dim;
+}
+
 fclaw_clawpatch_vtable_t* fclaw_clawpatch_vt(fclaw_global_t* glob)
 {
 

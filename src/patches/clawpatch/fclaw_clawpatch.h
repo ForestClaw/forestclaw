@@ -428,6 +428,14 @@ void fclaw_clawpatch_save_current_step(struct fclaw_global* glob,
 /* ------------------------------- Misc access functions ------------------------------ */
 
 /**
+ * @brief Get the dimension of the clawpatch
+ * 
+ * @param patch the clawpatch
+ * @return int the dimension
+ */
+int fclaw_clawpatch_dim(struct fclaw_patch * patch);
+
+/**
  * @brief Get the grid data for a specific patch
  * 
  * @param[in]  glob glob the global context
