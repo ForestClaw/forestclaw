@@ -35,24 +35,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_patch.h>
 #include <fclaw_global.h>
 
-#if REFINE_DIM == 2 && PATCH_DIM == 2
-
 #include <fclaw2d_clawpatch_transform.h>
 
 #include <fclaw_clawpatch_options.h>
-
-#elif REFINE_DIM == 2 && PATCH_DIM == 3
-
-#include <fclaw3dx_clawpatch_transform.h>
-
-#include <fclaw_clawpatch_options.h>
-
-#include <fclaw3dx_clawpatch_transform.h>
-
-#include <_fclaw2d_to_fclaw3dx.h>
-
-#endif
-
 
 void fclaw2d_clawpatch_transform_init_data(fclaw_global_t* glob, 
                                            fclaw_patch_t* this_patch,
@@ -88,13 +73,17 @@ FCLAW2D_CLAWPATCH_TRANSFORM_FACE (const int *i1, const int *j1,
     const fclaw_clawpatch_options_t *clawpatch_opt = 
         (fclaw_clawpatch_options_t*) tdata->user;
 
-#if PATCH_DIM == 2
-    int mx = clawpatch_opt->d2->mx;
-    int my = clawpatch_opt->d2->my;
-#else
-    int mx = clawpatch_opt->d3->mx;
-    int my = clawpatch_opt->d3->my;
-#endif
+    int mx,my;
+    if(clawpatch_opt->dim == 2)
+    {
+        mx = clawpatch_opt->d2->mx;
+        my = clawpatch_opt->d2->my;
+    }
+    else
+    {
+        mx = clawpatch_opt->d3->mx;
+        my = clawpatch_opt->d3->my;
+    }
 
     *i2 = *i1;
     *j2 = *j1;
@@ -116,13 +105,17 @@ FCLAW2D_CLAWPATCH_TRANSFORM_FACE_HALF (const int *i1, const int *j1,
     const fclaw_clawpatch_options_t *clawpatch_opt = 
         (fclaw_clawpatch_options_t*) tdata->user;
 
-#if PATCH_DIM == 2
-    int mx = clawpatch_opt->d2->mx;
-    int my = clawpatch_opt->d2->my;
-#else
-    int mx = clawpatch_opt->d3->mx;
-    int my = clawpatch_opt->d3->my;
-#endif
+    int mx,my;
+    if(clawpatch_opt->dim == 2)
+    {
+        mx = clawpatch_opt->d2->mx;
+        my = clawpatch_opt->d2->my;
+    }
+    else
+    {
+        mx = clawpatch_opt->d3->mx;
+        my = clawpatch_opt->d3->my;
+    }
 
     i2[0] = *i1;
     j2[0] = *j1;
@@ -143,13 +136,17 @@ FCLAW2D_CLAWPATCH_TRANSFORM_CORNER (const int *i1, const int *j1,
     const fclaw_clawpatch_options_t *clawpatch_opt = 
         (fclaw_clawpatch_options_t*) tdata->user;
 
-#if PATCH_DIM == 2
-    int mx = clawpatch_opt->d2->mx;
-    int my = clawpatch_opt->d2->my;
-#else
-    int mx = clawpatch_opt->d3->mx;
-    int my = clawpatch_opt->d3->my;
-#endif
+    int mx,my;
+    if(clawpatch_opt->dim == 2)
+    {
+        mx = clawpatch_opt->d2->mx;
+        my = clawpatch_opt->d2->my;
+    }
+    else
+    {
+        mx = clawpatch_opt->d3->mx;
+        my = clawpatch_opt->d3->my;
+    }
 
     *i2 = *i1;
     *j2 = *j1;
@@ -187,13 +184,17 @@ FCLAW2D_CLAWPATCH_TRANSFORM_CORNER_HALF (const int *i1, const int *j1,
     const fclaw_clawpatch_options_t *clawpatch_opt = 
         (fclaw_clawpatch_options_t*) tdata->user;
 
-#if PATCH_DIM == 2
-    int mx = clawpatch_opt->d2->mx;
-    int my = clawpatch_opt->d2->my;
-#else
-    int mx = clawpatch_opt->d3->mx;
-    int my = clawpatch_opt->d3->my;
-#endif
+    int mx,my;
+    if(clawpatch_opt->dim == 2)
+    {
+        mx = clawpatch_opt->d2->mx;
+        my = clawpatch_opt->d2->my;
+    }
+    else
+    {
+        mx = clawpatch_opt->d3->mx;
+        my = clawpatch_opt->d3->my;
+    }
 
     i2[0] = *i1;
     j2[0] = *j1;

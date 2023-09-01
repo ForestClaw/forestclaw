@@ -44,7 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_metric.hpp>
 
 #include <fclaw3dx_clawpatch_fort.h>
-#include <fclaw3dx_clawpatch_transform.h>
+#include <fclaw2d_clawpatch_transform.h>
 
 #include <fclaw3d_clawpatch_transform.h>
 

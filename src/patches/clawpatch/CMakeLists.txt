@@ -87,8 +87,6 @@ add_library(clawpatch
 
   fclaw3d_clawpatch_transform.c
 
-  fclaw3dx_clawpatch_transform.c
-
   fort_user/fclaw2d_clawpatch_tag_criteria.c
   fort3_user/fclaw3d_clawpatch_tag_criteria.c
   ${metric}/fclaw2d_metric.cpp
@@ -127,7 +125,6 @@ install(FILES
 	fclaw2d_clawpatch46_fort.h
 	fclaw2d_clawpatch5_fort.h
 
-	fclaw3dx_clawpatch_transform.h
 	fclaw3dx_clawpatch_fort.h
 	fclaw3dx_clawpatch46_fort.h
 

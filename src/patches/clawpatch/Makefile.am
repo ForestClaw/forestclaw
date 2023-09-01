@@ -18,7 +18,6 @@ libclawpatch_installed_headers = \
 	src/patches/clawpatch/fclaw2d_clawpatch46_fort.h \
 	src/patches/clawpatch/fclaw2d_clawpatch5_fort.h \
 	\
-	src/patches/clawpatch/fclaw3dx_clawpatch_transform.h \
 	src/patches/clawpatch/fclaw3dx_clawpatch_fort.h \
 	src/patches/clawpatch/fclaw3dx_clawpatch46_fort.h \
 	\
@@ -43,7 +42,6 @@ libclawpatch_compiled_sources = \
 	src/patches/clawpatch/fclaw2d_clawpatch_transform.c \
 	src/patches/clawpatch/fclaw2d_clawpatch_utils.f \
 	\
-	src/patches/clawpatch/fclaw3dx_clawpatch_transform.c \
 	src/patches/clawpatch/fclaw3dx_clawpatch_utils.f \
 	\
 	src/patches/clawpatch/fclaw3d_clawpatch_transform.c \

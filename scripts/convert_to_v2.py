@@ -252,7 +252,6 @@ fclaw_1to2 = {
     #===== ./src/fclaw2d_output.h =====
     "<fclaw2d_output.h>"              : "<fclaw_output.h>",
     "fclaw2d_output_frame"            : "fclaw_output_frame",
-    "fclaw2d_output_frame_tikz"       : "fclaw_output_frame_tikz",
 
     #===== ./src/fclaw2d_partition.h =====
     "<fclaw2d_partition.h>"    : "<fclaw_partition.h>",
@@ -672,14 +671,18 @@ fclaw_1to2 = {
     "fclaw3dx_user_average2coarse"               : "fclaw3d_user_average2coarse",
 
     #===== ./src/patches/clawpatch/fclaw3dx_clawpatch_transform.h =====
-    #"<fclaw3dx_clawpatch_transform.h>"             : "<fclaw2d_clawpatch_transform.h>",
-    #"fclaw3dx_clawpatch_transform_init_data"       : "fclaw2d_clawpatch_transform_init_data",
-    #"fclaw3dx_clawpatch_face_transformation"       : "fclaw2d_clawpatch_face_transformation",
-    #"fclaw3dx_clawpatch_face_transformation_intra" : "fclaw2d_clawpatch_face_transformation_intra",
-    #"FCLAW3DX_CLAWPATCH_TRANSFORM_FACE"            : "FCLAW2D_CLAWPATCH_TRANSFORM_FACE",
-    #"FCLAW3DX_CLAWPATCH_TRANSFORM_FACE_HALF"       : "FCLAW2D_CLAWPATCH_TRANSFORM_FACE_HALF",
-    #"FCLAW3DX_CLAWPATCH_TRANSFORM_CORNER"          : "FCLAW2D_CLAWPATCH_TRANSFORM_CORNER",
-    #"FCLAW3DX_CLAWPATCH_TRANSFORM_CORNER_HALF"     : "FCLAW2D_CLAWPATCH_TRANSFORM_CORNER_HALF"
+    "<fclaw3dx_clawpatch_transform.h>"             : "<fclaw2d_clawpatch_transform.h>",
+    "fclaw3dx_clawpatch_transform_init_data"       : "fclaw2d_clawpatch_transform_init_data",
+    "fclaw3dx_clawpatch_face_transformation"       : "fclaw2d_clawpatch_face_transformation",
+    "fclaw3dx_clawpatch_face_transformation_intra" : "fclaw2d_clawpatch_face_transformation_intra",
+    "FCLAW3DX_CLAWPATCH_TRANSFORM_FACE"            : "FCLAW2D_CLAWPATCH_TRANSFORM_FACE",
+    "FCLAW3DX_CLAWPATCH_TRANSFORM_FACE_HALF"       : "FCLAW2D_CLAWPATCH_TRANSFORM_FACE_HALF",
+    "FCLAW3DX_CLAWPATCH_TRANSFORM_CORNER"          : "FCLAW2D_CLAWPATCH_TRANSFORM_CORNER",
+    "FCLAW3DX_CLAWPATCH_TRANSFORM_CORNER_HALF"     : "FCLAW2D_CLAWPATCH_TRANSFORM_CORNER_HALF",
+    "fclaw3dx_clawpatch_transform_face"            : "fclaw2d_clawpatch_transform_face",
+    "fclaw3dx_clawpatch_transform_face_half"       : "fclaw2d_clawpatch_transform_face_half",
+    "fclaw3dx_clawpatch_transform_corner"          : "fclaw2d_clawpatch_transform_corner",
+    "fclaw3dx_clawpatch_transform_corner_half"     : "fclaw2d_clawpatch_transform_corner_half"
 
 }
 
@@ -708,7 +711,7 @@ def replace_identifiers_and_includes(filepath, code, identifier_map):
 
 def process_directory(root_dir, identifier_map):
     # Use glob to find all C++ files recursively.
-    for filepath in [f for f in glob.glob(f"{root_dir}/**/*", recursive=True) if f.lower().endswith(('.c', '.h', '.cpp', '.hpp'))]:
+    for filepath in [f for f in glob.glob(f"{root_dir}/**/*", recursive=True) if f.lower().endswith(('.c', '.h', '.cpp', '.hpp', '.f', '.f90'))]:
         print(f"Processing {filepath}...")
         
         # Read the existing code from the file
