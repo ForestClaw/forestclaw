@@ -1641,8 +1641,11 @@ typedef struct fclaw_patch_vtable_d3
 /** vtable for patch level routines */
 struct fclaw_patch_vtable
 {
+    /** The dimension of the patches */
     int dim;
+    /** 2D specific functions */
     fclaw_patch_vtable_d2_t* d2;
+    /** 3D specific functions */
     fclaw_patch_vtable_d3_t* d3;
 
     /** @{ @name Creating/Deleting/Building */

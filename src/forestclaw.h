@@ -434,8 +434,8 @@ fclaw_patch_relation_t;
  * \param [in] faceno   Number of the patch face: left, right, bottom, top.
  * \param [out] rproc   Processor number of neighbor patches (length 2 in 2D, 4 in 3D).  
  *                      Exception:
- *                      If the neighbors are half-size patches, rproc contains
- *                      the numbers of the small patches.
+ *                      If the neighbor is a bigger patch, rproc[1] contains
+ *                      the number of the small patch as one of the smaller faces.
  * \param [out] rblockno        Neighbor block number.
  * \param [out] rpatchno        Neighbor patch numbers (length 2 in 2D, 4 in 3D)
  *                              The patch number is relative to its block.
@@ -1141,7 +1141,7 @@ void fclaw_domain_indirect_end (fclaw_domain_t * domain,
  * \param [in] faceno           Number of the ghost patch's face to look across.
  * \param [out] rproc           Processor number of neighbor patches.  Exception 1:
  *                              If the neighbor is a bigger patch, rproc[1] contains
- *                              the number of the small patch as one of two half faces,
+ *                              the number of the small patch as one the smaller faces,
  *                              but only if the neighbor fits the above criteria.
  *                              Exception 2: For non-indirect patches, set it to -1.
  * \param [out] rblockno        The number of the neighbor block.
