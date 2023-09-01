@@ -29,22 +29,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw_exchange.h>
 
-#ifndef P4_TO_P8
-
-#include <forestclaw2d.h>
-#include <fclaw2d_convenience.h>
-#include <fclaw2d_domain.h>
-
-#else
-
-#include <forestclaw3d.h>
-#include <fclaw3d_convenience.h>
-#include <fclaw3d_domain.h>
-
-
-#define d2 d3
-
-#endif
+#include <forestclaw.h>
+#include <fclaw_domain.h>
+#include <fclaw_convenience.h>
 
 /* Also needed in fclaw2d_domain_reset */
 /* edit: right now this is not the case, switching to static */
@@ -53,7 +40,7 @@ fclaw_domain_exchange_t*
     get_exchange_data(fclaw_global_t* glob)
 {
     fclaw_domain_data_t *ddata = fclaw_domain_get_data(glob->domain);
-    return ddata->d2->domain_exchange;
+    return ddata->domain_exchange;
 }
 
 /* Should these be access functions in domain?  */
@@ -62,23 +49,23 @@ void set_exchange_data(fclaw_global_t* glob,
                        fclaw_domain_exchange_t *e)
 {
     fclaw_domain_data_t *ddata = fclaw_domain_get_data(glob->domain);
-    ddata->d2->domain_exchange = e;
+    ddata->domain_exchange = e;
 }
 
 static
-fclaw2d_domain_indirect_t*
+fclaw_domain_indirect_t*
     get_indirect_data(fclaw_global_t* glob)
 {
     fclaw_domain_data_t *ddata = fclaw_domain_get_data(glob->domain);
-    return ddata->d2->domain_indirect;
+    return ddata->domain_indirect;
 }
 
 static
 void set_indirect_data(fclaw_global_t* glob,
-                       fclaw2d_domain_indirect_t *ind)
+                       fclaw_domain_indirect_t *ind)
 {
     fclaw_domain_data_t *ddata = fclaw_domain_get_data(glob->domain);
-    ddata->d2->domain_indirect = ind;
+    ddata->domain_indirect = ind;
 }
 
 static
@@ -204,8 +191,7 @@ void fclaw2d_exchange_setup(fclaw_global_t* glob,
         int np;
         for (np = 0; np < domain->blocks[nb].num_patches; ++np)
         {
-            if (domain->blocks[nb].patches[np].flags &
-                FCLAW2D_PATCH_ON_PARALLEL_BOUNDARY)
+            if (fclaw_patch_on_parallel_boundary(&domain->blocks[nb].patches[np]))
             {                
                 fclaw_patch_local_ghost_alloc(glob, &e->patch_data[zz++]);
             }
@@ -226,8 +212,8 @@ void fclaw2d_exchange_setup(fclaw_global_t* glob,
     }
 
     fclaw_timer_start (&glob->timers[FCLAW_TIMER_GHOSTPATCH_COMM]);
-    fclaw2d_domain_indirect_t *ind =
-        fclaw2d_domain_indirect_begin(domain);
+    fclaw_domain_indirect_t *ind =
+        fclaw_domain_indirect_begin(domain);
 
     fclaw_timer_stop (&glob->timers[FCLAW_TIMER_GHOSTPATCH_COMM]);
 
@@ -255,7 +241,7 @@ void fclaw2d_exchange_setup(fclaw_global_t* glob,
     }
 
     fclaw_timer_start (&glob->timers[FCLAW_TIMER_GHOSTPATCH_COMM]);
-    fclaw2d_domain_indirect_end(domain,ind);
+    fclaw_domain_indirect_end(domain,ind);
     fclaw_timer_stop (&glob->timers[FCLAW_TIMER_GHOSTPATCH_COMM]);
 
     if (running != FCLAW_TIMER_NONE)
@@ -284,8 +270,7 @@ void fclaw2d_exchange_delete(fclaw_global_t* glob)
             int np;
             for (np = 0; np < (*domain)->blocks[nb].num_patches; ++np)
             {
-                if ((*domain)->blocks[nb].patches[np].flags &
-                    FCLAW2D_PATCH_ON_PARALLEL_BOUNDARY)
+                if (fclaw_patch_on_parallel_boundary(&(*domain)->blocks[nb].patches[np]))
                 {
                     fclaw_patch_local_ghost_free(glob,&e_old->patch_data[zz++]);
                 }
@@ -299,8 +284,8 @@ void fclaw2d_exchange_delete(fclaw_global_t* glob)
 
     /* Destroy indirect data needed to communicate between ghost patches
        from different procs */
-    fclaw2d_domain_indirect_t* ind_old = get_indirect_data(glob);
-    fclaw2d_domain_indirect_destroy(*domain,ind_old);
+    fclaw_domain_indirect_t* ind_old = get_indirect_data(glob);
+    fclaw_domain_indirect_destroy(*domain,ind_old);
     fclaw_timer_stop (&glob->timers[FCLAW_TIMER_GHOSTPATCH_BUILD]);
 }
 
@@ -330,8 +315,7 @@ void fclaw2d_exchange_ghost_patches_begin(fclaw_global_t* glob,
         int np;
         for (np = 0; np < domain->blocks[nb].num_patches; ++np)
         {
-            if (domain->blocks[nb].patches[np].flags &
-                FCLAW2D_PATCH_ON_PARALLEL_BOUNDARY)
+            if (fclaw_patch_on_parallel_boundary(&domain->blocks[nb].patches[np]))
             {
                 fclaw_patch_t *this_patch = &domain->blocks[nb].patches[np];
                 int level = this_patch->level;

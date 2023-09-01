@@ -25,8 +25,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw_global.h>
 #include <fclaw_domain.h>
-#include <fclaw2d_domain.h>
-#include <fclaw3d_domain.h>
 
 #include <fclaw2d_convenience.h>  /* Contains domain_destroy and others */
 #include <fclaw_patch.h>
@@ -46,27 +44,11 @@ void fclaw_domain_data_new(fclaw_domain_t *domain)
     fclaw_domain_data_t* ddata = (fclaw_domain_data_t*) domain->user;
     ddata = FCLAW_ALLOC_ZERO (fclaw_domain_data_t, 1);
     domain->user = ddata;
-    if(domain->dim == 2)
-    {
-        ddata->d2 = FCLAW_ALLOC_ZERO (fclaw_domain_data_d2_t, 1);
-    }
-    else 
-    {
-        ddata->d3 = FCLAW_ALLOC_ZERO (fclaw_domain_data_d3_t, 1);
-    }
 }
 
 void fclaw_domain_data_delete(fclaw_domain_t* domain)
 {
     fclaw_domain_data_t* ddata = (fclaw_domain_data_t*) domain->user;
-    if(domain->dim == 2)
-    {
-        FCLAW_FREE (ddata->d2);
-    }
-    else 
-    {
-        FCLAW_FREE (ddata->d3);
-    }
     FCLAW_FREE (ddata);
     domain->user = NULL;
 }
@@ -111,23 +93,10 @@ void fclaw_domain_reset(fclaw_global_t* glob)
     }
 
     fclaw_domain_data_t *ddata = fclaw_domain_get_data(*domain);
-    if((*domain)->dim == 2)
+    if (ddata->domain_exchange != NULL)
     {
-        if (ddata->d2->domain_exchange != NULL)
-        {
-            /* TO DO: translate fclaw2d_exchange files */
-            fclaw_exchange_delete(glob);
-        }
-
-    }
-    else 
-    {
-        if (ddata->d3->domain_exchange != NULL)
-        {
-            /* TO DO: translate fclaw2d_exchange files */
-            fclaw_exchange_delete(glob);
-        }
-
+        /* TO DO: translate fclaw2d_exchange files */
+        fclaw_exchange_delete(glob);
     }
 
     FCLAW_ASSERT(ddata->count_set_patch == ddata->count_delete_patch);

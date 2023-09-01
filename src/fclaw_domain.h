@@ -53,8 +53,8 @@ typedef struct fclaw_domain_data
     int count_set_patch;
     int count_delete_patch;
 
-    struct fclaw_domain_data_d2* d2;
-    struct fclaw_domain_data_d3* d3;
+    fclaw_domain_exchange_t *domain_exchange;
+    fclaw_domain_indirect_t *domain_indirect;
 
 } fclaw_domain_data_t;
 

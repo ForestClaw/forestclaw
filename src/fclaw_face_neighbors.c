@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_global.h>
 #include <fclaw2d_defs.h>
 #include <fclaw3d_defs.h>
-#include <fclaw2d_domain.h>
+#include <fclaw_domain.h>
 
 #include <fclaw_block.h>
 #include <fclaw_patch.h>
@@ -522,12 +522,12 @@ void fclaw_face_neighbor_ghost(fclaw_global_t* glob,
 			   exchange face data before being thrown over proc fence.
 			*/
 			fclaw_patch_relation_t neighbor_type =
-				fclaw2d_domain_indirect_neighbors(domain,
-												  ddata->d2->domain_indirect,
-												  this_ghost_idx,
-												  iface,rproc,
-												  &rblockno, rpatchno,
-												  &rfaceno);
+				fclaw_domain_indirect_neighbors(domain,
+												ddata->domain_indirect,
+												this_ghost_idx,
+												iface,rproc,
+												&rblockno, rpatchno,
+												&rfaceno);
 
 			if (neighbor_type != FCLAW_PATCH_BOUNDARY)
 			{

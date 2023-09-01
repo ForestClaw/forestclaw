@@ -43,7 +43,6 @@ libforestclaw_installed_headers = \
 	\
 	src/fclaw2d_convenience.h \
 	src/fclaw2d_defs.h \
-	src/fclaw2d_domain.h \
 	src/fclaw2d_file.h \
 	src/fclaw2d_map.h \
 	src/fclaw2d_map_brick.h \
@@ -54,7 +53,6 @@ libforestclaw_installed_headers = \
 	src/fclaw_update_single_step.h \
 	\
 	src/fclaw3d_convenience.h \
-	src/fclaw3d_domain.h \
 	src/fclaw3d_defs.h \
 	src/fclaw3d_file.h \
 	src/fclaw3d_include_all.h \
