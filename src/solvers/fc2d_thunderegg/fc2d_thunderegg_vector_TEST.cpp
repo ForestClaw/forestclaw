@@ -34,9 +34,10 @@
 #include <fclaw_global.h>
 #include <fclaw_domain.h>
 #include <fclaw_patch.h>
-#include <fclaw2d_convenience.h>
+#include <fclaw_convenience.h>
 #include <fclaw2d_metric.hpp>
 #include <fclaw2d_metric.h>
+#include <fclaw2d_map.h>
 #include <fclaw_options.h>
 #include <test.hpp>
 #include <test/test.hpp>
@@ -75,7 +76,7 @@ struct QuadDomain {
         opts->rhs_fields = 1;
         fclaw_clawpatch_options_store(glob, opts);
 
-        domain = fclaw2d_domain_new_unitsquare(sc_MPI_COMM_WORLD, 1);
+        domain = fclaw_domain_new_unitsquare(sc_MPI_COMM_WORLD, 1);
         fclaw_global_store_domain(glob, domain);
 
         map = fclaw2d_map_new_nomap();
@@ -138,7 +139,7 @@ struct QuadDomainBrick {
         opts->rhs_fields = 1;
         fclaw_clawpatch_options_store(glob, opts);
 
-        domain = fclaw2d_domain_new_brick(sc_MPI_COMM_WORLD, fopts.mi, fopts.mj, 0,0,0);
+        domain = fclaw_domain_new_brick_2d(sc_MPI_COMM_WORLD, fopts.mi, fopts.mj, 0,0,0);
         fclaw_global_store_domain(glob, domain);
 
         map = fclaw2d_map_new_nomap();

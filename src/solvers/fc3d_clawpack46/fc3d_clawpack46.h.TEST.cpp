@@ -27,14 +27,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fc3d_clawpack46.h>
 #include <fc3d_clawpack46_options.h>
 #include <fclaw_forestclaw.h>
-#include <fclaw2d_convenience.h>
+#include <fclaw_convenience.h>
 #include <fclaw3d_convenience.h>
 #include <fclaw_clawpatch_options.h>
 #include <test.hpp>
 
 TEST_CASE("fc3d_clawpack46_solver_initialize fails with 2d clawpatch options")
 {
-	fclaw_domain_t* domain = fclaw2d_domain_new_unitsquare(sc_MPI_COMM_WORLD, 0);
+	fclaw_domain_t* domain = fclaw_domain_new_unitsquare(sc_MPI_COMM_WORLD, 0);
 	fclaw_global_t* glob = fclaw_global_new();
 	fclaw_global_store_domain(glob, domain);
 
@@ -55,7 +55,7 @@ TEST_CASE("fc3d_clawpack46_solver_initialize stores two seperate vtables in two 
 	fclaw_global_t* glob1 = fclaw_global_new();
 	fclaw_global_t* glob2 = fclaw_global_new();
 
-	fclaw_domain_t* domain = fclaw2d_domain_new_unitsquare(sc_MPI_COMM_WORLD, 0);
+	fclaw_domain_t* domain = fclaw_domain_new_unitsquare(sc_MPI_COMM_WORLD, 0);
 	fclaw_global_store_domain(glob1, domain);
 	fclaw_global_store_domain(glob2, domain);
 
@@ -86,7 +86,7 @@ TEST_CASE("fc3d_clawpack46_solver_initialize stores two seperate vtables in two 
 
 TEST_CASE("fc3d_clawpack46_solver_initialize sets is_set flag")
 {
-	fclaw_domain_t* domain = fclaw2d_domain_new_unitsquare(sc_MPI_COMM_WORLD, 0);
+	fclaw_domain_t* domain = fclaw_domain_new_unitsquare(sc_MPI_COMM_WORLD, 0);
 	fclaw_global_t* glob = fclaw_global_new();
 	fclaw_global_store_domain(glob, domain);
 
@@ -114,7 +114,7 @@ TEST_CASE("fc3d_clawpack46_vt fails if not intialized")
 	fclaw_global_t* glob1 = fclaw_global_new();
 	fclaw_global_t* glob2 = fclaw_global_new();
 
-	fclaw_domain_t* domain = fclaw2d_domain_new_unitsquare(sc_MPI_COMM_WORLD, 0);
+	fclaw_domain_t* domain = fclaw_domain_new_unitsquare(sc_MPI_COMM_WORLD, 0);
 	fclaw_global_store_domain(glob1, domain);
 	fclaw_global_store_domain(glob2, domain);
 
@@ -132,7 +132,7 @@ TEST_CASE("fc3d_clawpack46_vtable_initialize fails if called twice on a glob")
 	fclaw_global_t* glob1 = fclaw_global_new();
 	fclaw_global_t* glob2 = fclaw_global_new();
 
-	fclaw_domain_t* domain = fclaw2d_domain_new_unitsquare(sc_MPI_COMM_WORLD, 0);
+	fclaw_domain_t* domain = fclaw_domain_new_unitsquare(sc_MPI_COMM_WORLD, 0);
 	fclaw_global_store_domain(glob1, domain);
 	fclaw_global_store_domain(glob2, domain);
 

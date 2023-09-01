@@ -9,7 +9,7 @@ extern "C"
 #include <stdlib.h>   /* defines size_t */
 
 
-struct fclaw2d_patch;
+struct fclaw_patch_t;
 struct fclaw_global;
 
 /* This can breaks cuda if memory is not aligne dproperly; use -malign-double flag
