@@ -751,9 +751,9 @@ int FCLAW3D_CLAWPATCH_TAG_CRITERIA(const int *blockno,
                                    const int *is_ghost);
 
 /** Fortran subroutine name */
-#define FCLAW3DX_CLAWPATCH_EXCEEDS_THRESHOLD \
-                  FCLAW_F77_FUNC(fclaw3dx_clawpatch_exceeds_threshold, \
-                                  FCLAW3DX_CLAWPATCH_EXCEEDS_THRESHOLD)
+#define FCLAW3D_CLAWPATCH_EXCEEDS_THRESHOLD \
+                  FCLAW_F77_FUNC(fclaw3d_clawpatch_exceeds_threshold, \
+                                  FCLAW3D_CLAWPATCH_EXCEEDS_THRESHOLD)
 
 /**
  * @brief Check if the refinment threshold is exceeded
