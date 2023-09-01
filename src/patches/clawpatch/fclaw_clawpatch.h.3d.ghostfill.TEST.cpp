@@ -223,7 +223,7 @@ TEST_CASE("3d clawpatch ghost filling on uniform cube")
             {
                 fclaw_global_iterate_t* g = (fclaw_global_iterate_t*)user;
                 fclaw_clawpatch_options_t* opts = fclaw_clawpatch_get_options(g->glob);
-                fclaw_clawpatch_t* clawpatch = fclaw2d_clawpatch_get_clawpatch(patch);
+                fclaw_clawpatch_t* clawpatch = fclaw_clawpatch_get_clawpatch(patch);
                 // clear q
                 double* q = fclaw_clawpatch_get_q(g->glob, patch);
                 int size = fclaw_clawpatch_size(g->glob);
@@ -264,12 +264,12 @@ TEST_CASE("3d clawpatch ghost filling on uniform cube")
                 iterate_t* iterate = (iterate_t*)g->user;
                 //clawpatch to store error in
                 fclaw_patch_t* error_patch = &iterate->error_glob->domain->blocks[blockno].patches[patchno];  
-                fclaw_clawpatch_t* error_clawpatch = fclaw2d_clawpatch_get_clawpatch(error_patch);
+                fclaw_clawpatch_t* error_clawpatch = fclaw_clawpatch_get_clawpatch(error_patch);
                 int mbc = error_clawpatch->mbc;
 
 
                 fclaw_clawpatch_options_t* opts = fclaw_clawpatch_get_options(g->glob);
-                fclaw_clawpatch_t* clawpatch = fclaw2d_clawpatch_get_clawpatch(patch);
+                fclaw_clawpatch_t* clawpatch = fclaw_clawpatch_get_clawpatch(patch);
 
                 // get q
                 double* q = fclaw_clawpatch_get_q(g->glob, patch);
@@ -463,7 +463,7 @@ TEST_CASE("3d ghost fill on cube with refinement")
             {
                 fclaw_global_iterate_t* g = (fclaw_global_iterate_t*)user;
                 fclaw_clawpatch_options_t* opts = fclaw_clawpatch_get_options(g->glob);
-                fclaw_clawpatch_t* clawpatch = fclaw2d_clawpatch_get_clawpatch(patch);
+                fclaw_clawpatch_t* clawpatch = fclaw_clawpatch_get_clawpatch(patch);
                 // clear q
                 double* q = fclaw_clawpatch_get_q(g->glob, patch);
                 int size = fclaw_clawpatch_size(g->glob);
@@ -506,12 +506,12 @@ TEST_CASE("3d ghost fill on cube with refinement")
                 iterate_t* iterate = (iterate_t*)g->user;
                 //clawpatch to store error in
                 fclaw_patch_t* error_patch = &iterate->error_glob->domain->blocks[blockno].patches[patchno];  
-                fclaw_clawpatch_t* error_clawpatch = fclaw2d_clawpatch_get_clawpatch(error_patch);
+                fclaw_clawpatch_t* error_clawpatch = fclaw_clawpatch_get_clawpatch(error_patch);
                 int mbc = error_clawpatch->mbc;
 
 
                 fclaw_clawpatch_options_t* opts = fclaw_clawpatch_get_options(g->glob);
-                fclaw_clawpatch_t* clawpatch = fclaw2d_clawpatch_get_clawpatch(patch);
+                fclaw_clawpatch_t* clawpatch = fclaw_clawpatch_get_clawpatch(patch);
 
                 // get q
                 double* q = fclaw_clawpatch_get_q(g->glob, patch);
@@ -703,7 +703,7 @@ TEST_CASE("3d ghost fill on cube with refinement coarse interior")
             {
                 fclaw_global_iterate_t* g = (fclaw_global_iterate_t*)user;
                 fclaw_clawpatch_options_t* opts = fclaw_clawpatch_get_options(g->glob);
-                fclaw_clawpatch_t* clawpatch = fclaw2d_clawpatch_get_clawpatch(patch);
+                fclaw_clawpatch_t* clawpatch = fclaw_clawpatch_get_clawpatch(patch);
                 // clear q
                 double* q = fclaw_clawpatch_get_q(g->glob, patch);
                 int size = fclaw_clawpatch_size(g->glob);
@@ -746,12 +746,12 @@ TEST_CASE("3d ghost fill on cube with refinement coarse interior")
                 iterate_t* iterate = (iterate_t*)g->user;
                 //clawpatch to store error in
                 fclaw_patch_t* error_patch = &iterate->error_glob->domain->blocks[blockno].patches[patchno];  
-                fclaw_clawpatch_t* error_clawpatch = fclaw2d_clawpatch_get_clawpatch(error_patch);
+                fclaw_clawpatch_t* error_clawpatch = fclaw_clawpatch_get_clawpatch(error_patch);
                 int mbc = error_clawpatch->mbc;
 
 
                 fclaw_clawpatch_options_t* opts = fclaw_clawpatch_get_options(g->glob);
-                fclaw_clawpatch_t* clawpatch = fclaw2d_clawpatch_get_clawpatch(patch);
+                fclaw_clawpatch_t* clawpatch = fclaw_clawpatch_get_clawpatch(patch);
 
                 // get q
                 double* q = fclaw_clawpatch_get_q(g->glob, patch);

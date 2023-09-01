@@ -130,7 +130,7 @@ struct fclaw_clawpatch_t
  * @return fclaw_clawpatch_t* the clawpatch structure
  */
 fclaw_clawpatch_t* 
-fclaw2d_clawpatch_get_clawpatch(struct fclaw_patch* this_patch);
+fclaw_clawpatch_get_clawpatch(struct fclaw_patch* this_patch);
 
 /**
  * @brief Get the metrix structure for a patch
@@ -139,7 +139,7 @@ fclaw2d_clawpatch_get_clawpatch(struct fclaw_patch* this_patch);
  * @return fclaw2d_metric_patch_t* the metric structure
  */
 fclaw2d_metric_patch_t* 
-fclaw2d_clawpatch_get_metric_patch(struct fclaw_patch* this_patch);
+fclaw_clawpatch_get_metric_patch_2d(struct fclaw_patch* this_patch);
 
 /**
  * @brief Get the metrix structure for a patch
@@ -148,7 +148,7 @@ fclaw2d_clawpatch_get_metric_patch(struct fclaw_patch* this_patch);
  * @return fclaw2d_metric_patch_t* the metric structure
  */
 struct fclaw3d_metric_patch_t* 
-fclaw3dx_clawpatch_get_metric_patch(struct fclaw_patch* this_patch);
+fclaw_clawpatch_get_metric_patch_3d(struct fclaw_patch* this_patch);
 
 
 #endif /* !FCLAW2D_CLAWPATCH_HPP */

@@ -2002,14 +2002,14 @@ void fclaw_clawpatch_save_current_step(fclaw_global_t* glob,
 
 
 fclaw_clawpatch_t* 
-fclaw2d_clawpatch_get_clawpatch(fclaw_patch_t* patch)
+fclaw_clawpatch_get_clawpatch(fclaw_patch_t* patch)
 {
     return get_clawpatch(patch);
 }
 
 
 fclaw2d_metric_patch_t* 
-fclaw2d_clawpatch_get_metric_patch(fclaw_patch_t* patch)
+fclaw_clawpatch_get_metric_patch_2d(fclaw_patch_t* patch)
 {
     return get_metric_patch_2d(patch);
 }
