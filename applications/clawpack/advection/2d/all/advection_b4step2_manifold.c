@@ -40,7 +40,7 @@ void advection_b4step2_manifold(fclaw_global_t *glob,
 
     double *xp,*yp,*zp,*xd,*yd,*zd;
     double *area;
-    fclaw2d_clawpatch_metric_data(glob,patch,&xp,&yp,&zp,&xd,&yd,&zd,&area);
+    fclaw_clawpatch_metric_data_2d(glob,patch,&xp,&yp,&zp,&xd,&yd,&zd,&area);
 
     int maux;
     double *aux;

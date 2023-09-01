@@ -77,7 +77,7 @@ void radialdam_patch_setup(fclaw_global_t *glob,
 
     double *xd,*yd,*zd;
     double *xp,*yp,*zp, *area;
-    fclaw2d_clawpatch_metric_data(glob,patch,&xp,&yp,&zp,
+    fclaw_clawpatch_metric_data_2d(glob,patch,&xp,&yp,&zp,
                                   &xd,&yd,&zd,&area);
 
     double *xnormals,*ynormals,*xtangents,*ytangents;

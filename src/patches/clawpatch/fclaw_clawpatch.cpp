@@ -2236,7 +2236,7 @@ void fclaw_clawpatch_metric_vector_2d(struct fclaw_global* glob,
 
 
 
-void fclaw2d_clawpatch_metric_data(fclaw_global_t* glob,
+void fclaw_clawpatch_metric_data_2d(fclaw_global_t* glob,
                                    fclaw_patch_t* patch,
                                    double **xp, double **yp, double **zp,
                                    double **xd, double **yd, double **zd,

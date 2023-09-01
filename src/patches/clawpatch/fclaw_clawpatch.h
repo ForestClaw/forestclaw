@@ -529,15 +529,15 @@ void fclaw_clawpatch_metric_vector_2d(struct fclaw_global* glob,
  * @param[out] xd, yd, zd the coordinates of the nodes
  * @param[out] area the area of each cell
  */
-void fclaw2d_clawpatch_metric_data(struct fclaw_global* glob,
-                                   struct fclaw_patch* patch,
-                                   double **xp, 
-                                   double **yp, 
-                                   double **zp,
-                                   double **xd, 
-                                   double **yd, 
-                                   double **zd,
-                                   double **area);
+void fclaw_clawpatch_metric_data_2d(struct fclaw_global* glob,
+                                    struct fclaw_patch* patch,
+                                    double **xp, 
+                                    double **yp, 
+                                    double **zp,
+                                    double **xd, 
+                                    double **yd, 
+                                    double **zd,
+                                    double **area);
 /**
  * @brief Get the mesh metrics of a patch
  * 

@@ -38,7 +38,7 @@ void advection_patch_setup_manifold(fclaw_global_t *glob,
 
     double *xd,*yd,*zd,*area;
     double *xp,*yp,*zp;
-    fclaw2d_clawpatch_metric_data(glob,patch,&xp,&yp,&zp,
+    fclaw_clawpatch_metric_data_2d(glob,patch,&xp,&yp,&zp,
                                   &xd,&yd,&zd,&area);
 
     int maux;

@@ -45,7 +45,7 @@ void transport_b4step2_manifold(fclaw_global_t *glob,
                                     &surfnormals);
 
     double *xp, *yp, *zp, *xd, *yd, *zd, *area;
-    fclaw2d_clawpatch_metric_data(glob,patch,&xp,&yp,&zp,
+    fclaw_clawpatch_metric_data_2d(glob,patch,&xp,&yp,&zp,
                                   &xd,&yd,&zd,&area);
 
     double *aux;

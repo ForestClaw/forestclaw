@@ -65,7 +65,7 @@ void radial_patch_setup(fclaw_global_t *glob,
 
     double *xp,*yp,*zp;
     double *xd,*yd,*zd,*area;
-    fclaw2d_clawpatch_metric_data(glob,patch,&xp,&yp,&zp,
+    fclaw_clawpatch_metric_data_2d(glob,patch,&xp,&yp,&zp,
                                   &xd,&yd,&zd,&area);
 
     double *xnormals,*ynormals,*xtangents,*ytangents;
