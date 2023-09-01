@@ -252,7 +252,7 @@ void fclaw_exchange_setup(fclaw_global_t* glob,
 
 void fclaw_exchange_delete(fclaw_global_t* glob)
 {
-    fclaw_domain_t** domain = &glob->domain;
+    fclaw_domain_t* domain = glob->domain;
     fclaw_timer_start (&glob->timers[FCLAW_TIMER_GHOSTPATCH_BUILD]);
 
     /* Free old parallel ghost patch data structure, must exist by construction. */
@@ -265,12 +265,12 @@ void fclaw_exchange_delete(fclaw_global_t* glob)
         /* Delete local patches which are passed to other procs */
         int zz = 0;
         int nb;
-        for (nb = 0; nb < (*domain)->num_blocks; ++nb)
+        for (nb = 0; nb < domain->num_blocks; ++nb)
         {
             int np;
-            for (np = 0; np < (*domain)->blocks[nb].num_patches; ++np)
+            for (np = 0; np < domain->blocks[nb].num_patches; ++np)
             {
-                if (fclaw_patch_on_parallel_boundary(&(*domain)->blocks[nb].patches[np]))
+                if (fclaw_patch_on_parallel_boundary(&domain->blocks[nb].patches[np]))
                 {
                     fclaw_patch_local_ghost_free(glob,&e_old->patch_data[zz++]);
                 }
@@ -280,12 +280,12 @@ void fclaw_exchange_delete(fclaw_global_t* glob)
 
     /* Delete ghost patches from remote neighboring patches */
     delete_remote_ghost_patches(glob);
-    fclaw_domain_free_after_exchange (*domain, e_old);
+    fclaw_domain_free_after_exchange (domain, e_old);
 
     /* Destroy indirect data needed to communicate between ghost patches
        from different procs */
     fclaw_domain_indirect_t* ind_old = get_indirect_data(glob);
-    fclaw_domain_indirect_destroy(*domain,ind_old);
+    fclaw_domain_indirect_destroy(domain,ind_old);
     fclaw_timer_stop (&glob->timers[FCLAW_TIMER_GHOSTPATCH_BUILD]);
 }
 
