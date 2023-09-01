@@ -142,6 +142,17 @@ fclaw_1to2 = {
     "fclaw2d_diagnostics_reset"             : "fclaw_diagnostics_reset",
     "fclaw2d_diagnostics_finalize"          : "fclaw_diagnostics_finalize",
 
+    #===== ./src/fclaw2d_domain.h =====
+    "<fclaw2d_domain.h>"                   : "<fclaw_domain.h>",
+    "fclaw2d_domain_data"                  : "fclaw_domain_data",
+    "fclaw2d_domain_data_t"                : "fclaw_domain_data_t",
+    "fclaw2d_domain_data_new"              : "fclaw_domain_data_new",
+    "fclaw2d_domain_data_delete"           : "fclaw_domain_data_delete",
+    "fclaw2d_domain_setup"                 : "fclaw_domain_setup",
+    "fclaw2d_domain_reset"                 : "fclaw_domain_reset",
+    "fclaw2d_domain_get_data"              : "fclaw_domain_get_data",
+    "fclaw2d_domain_iterate_level_mthread" : "fclaw_domain_iterate_level_mthread",
+
     #===== ./src/fclaw2d_elliptic_solver.h =====
     "<fclaw2d_elliptic_solver.h>"        : "<fclaw_elliptic_solver.h>",
     "fclaw2d_elliptic_setup_t"           : "fclaw_elliptic_setup_t",
@@ -574,8 +585,33 @@ fclaw_1to2 = {
     "fclaw3dx_clawpatch_use_pillowsphere"         : "fclaw_clawpatch_use_pillowsphere",
     "fclaw3dx_clawpatch_pillow_vtable_initialize" : "fclaw_clawpatch_pillow_vtable_initialize",
     "fclaw3dx_clawpatch_pillow_vtable"            : "fclaw_clawpatch_pillow_vtable",
-    "fclaw3dx_clawpatch_pillow_vt"                : "fclaw_clawpatch_pillow_vt"
+    "fclaw3dx_clawpatch_pillow_vt"                : "fclaw_clawpatch_pillow_vt",
 
+    #===== ./src/patches/clawpatch/fclaw3dx_clawpatch_fort.h =====
+    "FCLAW3DX_CLAWPATCH_GET_REFINEMENT_CRITERIA" : "FCLAW3D_CLAWPATCH_GET_REFINEMENT_CRITERIA",
+    "FCLAW3DX_CLAWPATCH_TAG_CRITERIA"            : "FCLAW3D_CLAWPATCH_TAG_CRITERIA",
+    "FCLAW3DX_CLAWPATCH_EXCEEDS_THRESHOLD"       : "FCLAW3D_CLAWPATCH_EXCEEDS_THRESHOLD",
+    "FCLAW3DX_CLAWPATCH_VALUE_EXCEEDS_TH"        : "FCLAW3D_CLAWPATCH_VALUE_EXCEEDS_TH",
+    "FCLAW3DX_CLAWPATCH_DIFFERENCE_EXCEEDS_TH"   : "FCLAW3D_CLAWPATCH_DIFFERENCE_EXCEEDS_TH",
+    "FCLAW3DX_CLAWPATCH_MINMAX_EXCEEDS_TH"       : "FCLAW3D_CLAWPATCH_MINMAX_EXCEEDS_TH",
+    "FCLAW3DX_CLAWPATCH_GRADIENT_EXCEEDS_TH"     : "FCLAW3D_CLAWPATCH_GRADIENT_EXCEEDS_TH",
+    "FCLAW3DX_USER_EXCEEDS_TH"                   : "FCLAW3D_USER_EXCEEDS_TH",
+    "FCLAW3DX_USER_TAG4REFINEMENT"               : "FCLAW3D_USER_TAG4REFINEMENT",
+    "FCLAW3DX_USER_TAG4COARSENING"               : "FCLAW3D_USER_TAG4COARSENING",
+    "FCLAW3DX_USER_INTERPOLATE2FINE"             : "FCLAW3D_USER_INTERPOLATE2FINE",
+    "FCLAW3DX_USER_AVERAGE2COARSE"               : "FCLAW3D_USER_AVERAGE2COARSE",
+    "fclaw3dx_clawpatch_get_refinement_criteria" : "fclaw3d_clawpatch_get_refinement_criteria",
+    "fclaw3dx_clawpatch_tag_criteria"            : "fclaw3d_clawpatch_tag_criteria",
+    "fclaw3dx_clawpatch_exceeds_threshold"       : "fclaw3d_clawpatch_exceeds_threshold",
+    "fclaw3dx_clawpatch_value_exceeds_th"        : "fclaw3d_clawpatch_value_exceeds_th",
+    "fclaw3dx_clawpatch_difference_exceeds_th"   : "fclaw3d_clawpatch_difference_exceeds_th",
+    "fclaw3dx_clawpatch_minmax_exceeds_th"       : "fclaw3d_clawpatch_minmax_exceeds_th",
+    "fclaw3dx_clawpatch_gradient_exceeds_th"     : "fclaw3d_clawpatch_gradient_exceeds_th",
+    "fclaw3dx_user_exceeds_th"                   : "fclaw3d_user_exceeds_th",
+    "fclaw3dx_user_tag4refinement"               : "fclaw3d_user_tag4refinement",
+    "fclaw3dx_user_tag4coarsening"               : "fclaw3d_user_tag4coarsening",
+    "fclaw3dx_user_interpolate2fine"             : "fclaw3d_user_interpolate2fine",
+    "fclaw3dx_user_average2coarse"               : "fclaw3d_user_average2coarse"
 }
 
 import os
