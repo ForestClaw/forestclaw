@@ -36,6 +36,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cstring>
 #else
 #include <unistd.h>
+#include <string.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <errno.h>
+#include <limits.h>
 #endif
 
 char* fclaw_cwd()
@@ -55,8 +60,8 @@ char* fclaw_cwd()
 
 void fclaw_cd(const char* dir)
 {
+    fclaw_mkdir(dir);
 #ifdef __cpp_lib_filesystem
-    // create "dir" including parents if it doesn't exist
     std::filesystem::path output_dir(dir);
 	std::filesystem::path output_path;
     if(output_dir.is_absolute())
@@ -69,11 +74,69 @@ void fclaw_cd(const char* dir)
         output_path /= output_dir;
     }
 
-	std::filesystem::create_directories(output_path);
-
 	std::filesystem::current_path(output_path);
 #else
     int error = chdir(dir);
     FCLAW_ASSERT(error == 0);
 #endif
+}
+
+void fclaw_mkdir(const char* path)
+{
+#ifdef __cpp_lib_filesystem
+    // create "dir" including parents if it doesn't exist
+    std::filesystem::path output_dir(path);
+    std::filesystem::path output_path;
+    if(output_dir.is_absolute())
+    {
+        output_path = output_dir;
+    }
+    else
+    {
+        output_path = std::filesystem::current_path();
+        output_path /= output_dir;
+    }
+
+    std::filesystem::create_directories(output_path);
+#else
+    // posix equivalent of std::filesystem::create_directories
+    mode_t mode = S_IRWXU | S_IRWXG | S_IRWXO; 
+    // Make a copy of the path to modify it.
+    char* path_copy = FCLAW_ALLOC(char,PATH_MAX+1);
+    strcpy(path_copy, path);
+
+    // Start with the root directory.
+    char *ptr = path_copy;
+    if (*ptr == '/') {
+        ptr++;
+    }
+
+    // Traverse the path one segment at a time.
+    while ((ptr = strchr(ptr, '/')) != NULL) {
+        *ptr = '\0';
+
+        // Try to create the directory.
+        if (mkdir(path_copy, mode) == -1) {
+            // If mkdir failed and the directory doesn't exist, it's an error.
+            if (errno != EEXIST) {
+                fclaw_abortf("fclaw_mkdir: %s", strerror(errno));
+            }
+        }
+
+        // Restore the path separator and move to the next segment.
+        *ptr = '/';
+        ptr++;
+    }
+
+    // Create the final directory.
+    if (mkdir(path, mode) == -1) {
+        if (errno != EEXIST) {
+            fclaw_abortf("fclaw_mkdir: %s", strerror(errno));
+        }
+    }
+
+    FCLAW_FREE(path_copy);
+    return 0;
+#endif
+
 }

@@ -6,6 +6,7 @@
 #include <vector>
 #include <fclaw_global.h>
 #include <fclaw_options.h>
+#include <fclaw_filesystem.h>
 #include <fclaw_clawpatch_options.h>
 #include <fclaw_clawpatch.h>
 using namespace std;
@@ -124,6 +125,7 @@ void fclaw_clawpatch_output_vtpd_to_file (fclaw_global_t * glob, const char* bas
 	int rank = glob->mpirank;
 	if (rank == 0) {
 		WriteVTPDFile(basename, glob);
+		fclaw_mkdir(basename);
 		filesystem::create_directory(basename);
 	}
 	sc_MPI_Barrier(glob->mpicomm);
