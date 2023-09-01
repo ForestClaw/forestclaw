@@ -2036,12 +2036,12 @@ void fclaw_clawpatch_grid_data_2d(fclaw_global_t* glob,
     *dy = cp->d2->dy;
 }
 
-void fclaw3dx_clawpatch_grid_data(fclaw_global_t* glob,
-                                 fclaw_patch_t* patch,
-                                 int* mx, int* my, int* mz, int* mbc,
-                                 double* xlower, double* ylower,
-                                 double* zlower, 
-                                 double* dx, double* dy, double* dz)
+void fclaw_clawpatch_grid_data_3d(fclaw_global_t* glob,
+                                  fclaw_patch_t* patch,
+                                  int* mx, int* my, int* mz, int* mbc,
+                                  double* xlower, double* ylower,
+                                  double* zlower, 
+                                  double* dx, double* dy, double* dz)
 {
     fclaw_clawpatch_t *cp = get_clawpatch(patch);
     *mx = cp->d3->mx;
@@ -2055,21 +2055,6 @@ void fclaw3dx_clawpatch_grid_data(fclaw_global_t* glob,
     *dy = cp->d3->dy;
     *dz = cp->d3->dz;
 }
-
-/* The metric terms only know about fclaw3d routines;  not 3dx routines */
-void fclaw_clawpatch_grid_data_3d(fclaw_global_t* glob,
-                                 fclaw_patch_t* patch,
-                                 int* mx, int* my, int* mz, int* mbc,
-                                 double* xlower, double* ylower,
-                                 double* zlower, 
-                                 double* dx, double* dy, double* dz)
-
-{
-    fclaw3dx_clawpatch_grid_data(glob,patch,mx,my,mz,mbc,
-                                 xlower,ylower,zlower,
-                                 dx,dy,dz);
-}
-
 
 void fclaw_clawpatch_aux_data(fclaw_global_t *glob,
                                 fclaw_patch_t *patch,
