@@ -1,34 +1,11 @@
 /* # check to see if value exceeds threshold */
 
-#ifndef REFINE_DIM
-#define REFINE_DIM 2
-#endif
-
-#ifndef PATCH_DIM
-#define PATCH_DIM 2
-#endif
-
-
 #include<fclaw_global.h>
-
-#if REFINE_DIM == 2 && PATCH_DIM == 2
 
 #include "../fclaw_clawpatch.h"
 
 #include "../fclaw_clawpatch_options.h"
 #include "../fclaw2d_clawpatch_fort.h"
-
-#elif REFINE_DIM == 2 && PATCH_DIM == 3
-
-#include "../fclaw3dx_clawpatch.h"
-
-#include "../fclaw_clawpatch_options.h"
-#include "../fclaw2d_clawpatch_fort.h"
-#include "../fclaw3d_clawpatch_fort.h"
-
-#include <_fclaw2d_to_fclaw3dx.h>
-
-#endif
 
 
 /* ------------------------------------------------------------------------------------ */
