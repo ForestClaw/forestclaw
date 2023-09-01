@@ -222,7 +222,7 @@ void fclaw3d_clawpatch_pillow_vtable_initialize(struct fclaw_global* glob,
 /**
  * @brief vtable for handling block corners for pillow sphere
  */
-struct fclaw2d_clawpatch_pillow_vtable
+struct fclaw_clawpatch_pillow_vtable_d2
 {
     /* Block corners */
     /** Handles the boundary condition at block corners */
@@ -235,7 +235,7 @@ struct fclaw2d_clawpatch_pillow_vtable
 /**
  * @brief vtable for handling block corners for pillow sphere
  */
-struct fclaw3d_clawpatch_pillow_vtable
+struct fclaw_clawpatch_pillow_vtable_d3
 {
     /* Block corners */
     /** Handles the boundary condition at block corners */
@@ -249,8 +249,8 @@ struct fclaw3d_clawpatch_pillow_vtable
 struct fclaw_clawpatch_pillow_vtable
 {
     int dim;
-    struct fclaw2d_clawpatch_pillow_vtable* d2;
-    struct fclaw3d_clawpatch_pillow_vtable* d3;
+    struct fclaw_clawpatch_pillow_vtable_d2* d2;
+    struct fclaw_clawpatch_pillow_vtable_d3* d3;
 
     /** True if vtable is set */
     int is_set;

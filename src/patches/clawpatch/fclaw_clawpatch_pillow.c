@@ -205,11 +205,11 @@ fclaw_clawpatch_pillow_vtable_t* pillow_vt_new(int dim)
     pillow_vt->dim = dim;
     if(dim == 2)
     {
-        pillow_vt->d2 = FCLAW_ALLOC_ZERO(struct fclaw2d_clawpatch_pillow_vtable,1);
+        pillow_vt->d2 = FCLAW_ALLOC_ZERO(struct fclaw_clawpatch_pillow_vtable_d2,1);
     }
     else 
     {
-        pillow_vt->d3 = FCLAW_ALLOC_ZERO(struct fclaw3d_clawpatch_pillow_vtable,1);
+        pillow_vt->d3 = FCLAW_ALLOC_ZERO(struct fclaw_clawpatch_pillow_vtable_d3,1);
     }
     return pillow_vt;
 }
