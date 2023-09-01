@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_clawpatch.h>
 #include <fclaw_clawpatch_options.h>
 #include <fclaw2d_clawpatch_fort.h>
-#include <fclaw3dx_clawpatch_fort.h>
+#include <fclaw3d_clawpatch_fort.h>
 
 namespace{
     struct exceeds_test_parameters

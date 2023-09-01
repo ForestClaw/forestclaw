@@ -35,7 +35,7 @@
 
 #include "../fclaw_clawpatch_options.h"
 // #include "../fclaw2d_clawpatch_fort.h"
-#include "../fclaw3dx_clawpatch_fort.h"
+#include "../fclaw3d_clawpatch_fort.h"
 
 
 

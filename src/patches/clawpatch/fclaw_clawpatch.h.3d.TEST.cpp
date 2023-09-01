@@ -26,7 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_clawpatch.hpp>
 #include <fclaw_clawpatch.h>
 #include <fclaw_clawpatch_options.h>
-#include <fclaw3dx_clawpatch46_fort.h>
+#include <fclaw3d_clawpatch46_fort.h>
 #include <fclaw_clawpatch_output_ascii.h>
 #include <fclaw_global.h>
 #include <fclaw_domain.h>

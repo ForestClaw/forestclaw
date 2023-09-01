@@ -125,8 +125,8 @@ install(FILES
 	fclaw2d_clawpatch46_fort.h
 	fclaw2d_clawpatch5_fort.h
 
-	fclaw3dx_clawpatch_fort.h
-	fclaw3dx_clawpatch46_fort.h
+	fclaw3d_clawpatch_fort.h
+	fclaw3d_clawpatch46_fort.h
 
 	${metric}/fclaw2d_metric.h
 	${metric}/fclaw2d_metric.hpp

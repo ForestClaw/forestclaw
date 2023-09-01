@@ -18,8 +18,8 @@ libclawpatch_installed_headers = \
 	src/patches/clawpatch/fclaw2d_clawpatch46_fort.h \
 	src/patches/clawpatch/fclaw2d_clawpatch5_fort.h \
 	\
-	src/patches/clawpatch/fclaw3dx_clawpatch_fort.h \
-	src/patches/clawpatch/fclaw3dx_clawpatch46_fort.h \
+	src/patches/clawpatch/fclaw3d_clawpatch_fort.h \
+	src/patches/clawpatch/fclaw3d_clawpatch46_fort.h \
 	\
 	src/patches/metric/fclaw2d_metric.h \
 	src/patches/metric/fclaw2d_metric.hpp \

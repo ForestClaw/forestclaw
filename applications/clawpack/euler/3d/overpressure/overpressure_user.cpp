@@ -30,7 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_include_all.h>
 
 #include <fclaw_clawpatch.h>
-#include <fclaw3dx_clawpatch_fort.h>
+#include <fclaw3d_clawpatch_fort.h>
 
 #include <fc3d_clawpack46.h>
 #include <fc3d_clawpack46_options.h>

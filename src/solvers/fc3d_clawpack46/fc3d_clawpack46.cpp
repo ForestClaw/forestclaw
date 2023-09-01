@@ -36,7 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_clawpatch_output_ascii.h> 
 #include <fclaw_clawpatch_output_vtk.h>
 #include <fclaw_clawpatch_output_vtpd.h>
-#include <fclaw3dx_clawpatch_fort.h>
+#include <fclaw3d_clawpatch_fort.h>
 
 #include <fclaw3d_metric.h>
 #include <fclaw3d_metric.hpp>

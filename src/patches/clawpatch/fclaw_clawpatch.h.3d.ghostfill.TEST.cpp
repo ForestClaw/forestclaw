@@ -28,7 +28,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_ghost_fill.h>
 #include <fclaw_clawpatch_options.h>
 #include <fclaw_clawpatch_output_vtpd.h>
-#include <fclaw3dx_clawpatch46_fort.h>
+#include <fclaw3d_clawpatch46_fort.h>
 #include <fclaw_clawpatch_output_ascii.h>
 #include <fclaw_global.h>
 #include <fclaw_regrid.h>

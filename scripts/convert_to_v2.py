@@ -682,7 +682,13 @@ fclaw_1to2 = {
     "fclaw3dx_clawpatch_transform_face"            : "fclaw2d_clawpatch_transform_face",
     "fclaw3dx_clawpatch_transform_face_half"       : "fclaw2d_clawpatch_transform_face_half",
     "fclaw3dx_clawpatch_transform_corner"          : "fclaw2d_clawpatch_transform_corner",
-    "fclaw3dx_clawpatch_transform_corner_half"     : "fclaw2d_clawpatch_transform_corner_half"
+    "fclaw3dx_clawpatch_transform_corner_half"     : "fclaw2d_clawpatch_transform_corner_half",
+
+    #===== ./src/patches/clawpatch/fclaw3dx_clawpatch_fort.h =====
+    "<fclaw3dx_clawpatch_fort.h>"                  : "<fclaw3d_clawpatch_fort.h>",
+
+    #===== ./src/patches/clawpatch/fclaw3dx_clawpatch46_fort.h =====
+    "<fclaw3dx_clawpatch46_fort.h>"                : "<fclaw3d_clawpatch46_fort.h>"
 
 }
 
