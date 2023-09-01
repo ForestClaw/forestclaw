@@ -35,7 +35,7 @@ libclawpatch_compiled_sources = \
 	src/patches/clawpatch/fclaw_clawpatch_options.c \
 	src/patches/clawpatch/fclaw_clawpatch_output_ascii.c \
 	src/patches/clawpatch/fclaw_clawpatch_output_vtk.c \
-	src/patches/clawpatch/fclaw_clawpatch_output_vtpd.cpp \
+	src/patches/clawpatch/fclaw_clawpatch_output_vtpd.c \
 	src/patches/clawpatch/fclaw_clawpatch_pillow.c \
 	\
 	src/patches/clawpatch/fclaw2d_clawpatch_conservation.c \
