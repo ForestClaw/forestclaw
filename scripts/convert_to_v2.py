@@ -1,7 +1,7 @@
 fclaw_1to2 = {
 
     #===== ./src/forestclaw2d.h =====
-    "forestclaw2d.h"   : "forestclaw.h",
+    "<forestclaw2d.h>" : "<forestclaw.h>",
     "fclaw2d_domain_t" : "fclaw_domain_t",
     "fclaw2d_block_t"  : "fclaw_block_t",
     "fclaw2d_patch_t"  : "fclaw_patch_t",
@@ -88,6 +88,7 @@ fclaw_1to2 = {
     "fclaw2d_domain_serialization_leave"      : "fclaw_domain_serialization_leave",
 
     #===== ./src/forestclaw2d_convenience.h =====
+    "<fclaw2d_convenience.h>"       : "<fclaw_convenience.h>",
     "fclaw2d_domain_new_unitsquare" : "fclaw_domain_new_unitsquare",
     "fclaw2d_domain_new_torus"      : "fclaw_domain_new_torus_2d",
     "fclaw2d_domain_new_twosphere"  : "fclaw_domain_new_twosphere_2d",
@@ -112,18 +113,18 @@ fclaw_1to2 = {
     "fclaw2d_overlap_exchange"           : "fclaw_overlap_exchange",
 
     #===== ./src/fclaw2d_advance.h =====
-    "fclaw2d_advance.h"          : "fclaw_advance.h",
+    "<fclaw2d_advance.h>"        : "<fclaw_advance.h>",
     "fclaw2d_advance_all_levels" : "fclaw_advance_all_levels",
 
     #===== ./src/fclaw2d_block.h =====
-    "fclaw2d_block.h"                  : "fclaw_block.h",
+    "<fclaw2d_block.h>"                : "<fclaw_block.h>",
     "fclaw2d_block_get_block_boundary" : "fclaw_block_get_block_boundary",
 
     #===== ./src/fclaw2d_corner_neighbors.h =====
     "fclaw2d_corner_neighbors.h" : "fclaw_corner_neighbors.h",
 
     #===== ./src/fclaw2d_diagnostics.h =====
-    "fclaw2d_diagnostics.h"                 : "fclaw_diagnostics.h",
+    "<fclaw2d_diagnostics.h>"               : "<fclaw_diagnostics.h>",
     "fclaw2d_diagnostics_vtable"            : "fclaw_diagnostics_vtable",
     "fclaw2d_diagnostics_vtable_t"          : "fclaw_diagnostics_vtable_t",
     "fclaw2d_diagnostics_accumulator"       : "fclaw_diagnostics_accumulator",
@@ -142,7 +143,7 @@ fclaw_1to2 = {
     "fclaw2d_diagnostics_finalize"          : "fclaw_diagnostics_finalize",
 
     #===== ./src/fclaw2d_elliptic_solver.h =====
-    "fclaw2d_elliptic_solver.h"          : "fclaw_elliptic_solver.h",
+    "<fclaw2d_elliptic_solver.h>"        : "<fclaw_elliptic_solver.h>",
     "fclaw2d_elliptic_setup_t"           : "fclaw_elliptic_setup_t",
     "fclaw2d_elliptic_rhs_t"             : "fclaw_elliptic_rhs_t",
     "fclaw2d_elliptic_solve_t"           : "fclaw_elliptic_solve_t",
@@ -154,22 +155,22 @@ fclaw_1to2 = {
     "fclaw2d_elliptic_vt"                : "fclaw_elliptic_vt",
 
     #===== ./src/fclaw2d_exchange.h =====
-    "fclaw2d_exchange.h"                   : "fclaw_exchange.h",
+    "<fclaw2d_exchange.h>"                 : "<fclaw_exchange.h>",
     "fclaw2d_exchange_setup"               : "fclaw_exchange_setup",
     "fclaw2d_exchange_delete"              : "fclaw_exchange_delete",
     "fclaw2d_exchange_ghost_patches_begin" : "fclaw_exchange_ghost_patches_begin",
     "fclaw2d_exchange_ghost_patches_end"   : "fclaw_exchange_ghost_patches_end",
 
     #===== ./src/fclaw2d_face_neighbors.h =====
-    "fclaw2d_face_neighbors.h"    : "fclaw_face_neighbors.h",
+    "<fclaw2d_face_neighbors.h>"  : "<fclaw_face_neighbors.h>",
     "fclaw2d_face_neighbor_ghost" : "fclaw_face_neighbor_ghost",
 
     #===== ./src/fclaw2d_farraybox.hpp =====
-    "fclaw2d_farraybox.hpp"        : "fclaw_farraybox.hpp",
+    "<fclaw2d_farraybox.hpp>"      : "<fclaw_farraybox.hpp>",
     "fclaw2d_farraybox_set_to_nan" : "fclaw_farraybox_set_to_nan",
 
     #===== ./src/fclaw2d_forestclaw.h =====
-    "fclaw2d_forestclaw.h"       : "fclaw_forestclaw.h",
+    "<fclaw2d_forestclaw.h>"     : "<fclaw_forestclaw.h>",
     "fclaw2d_problem_setup"      : "fclaw_problem_setup",
     "fclaw2d_vtables_initialize" : "fclaw_vtables_initialize",
     "fclaw2d_initialize"         : "fclaw_initialize",
@@ -177,7 +178,7 @@ fclaw_1to2 = {
     "fclaw2d_finalize"           : "fclaw_finalize",
     
     #===== ./src/fclaw2d_ghost_fill.h =====
-    "fclaw2d_ghost_fill.h"               : "fclaw_ghost_fill.h",
+    "<fclaw2d_ghost_fill.h>"             : "<fclaw_ghost_fill.h>",
     "fclaw2d_ghost_fill_parallel_mode"   : "fclaw_ghost_fill_parallel_mode",
     "FCLAW2D_BOUNDARY_INTERIOR_ONLY"     : "FCLAW_BOUNDARY_INTERIOR_ONLY",
     "FCLAW2D_BOUNDARY_GHOST_ONLY"        : "FCLAW_BOUNDARY_GHOST_ONLY",
@@ -203,7 +204,7 @@ fclaw_1to2 = {
     "fclaw2d_face_neighbor_ghost"        : "fclaw_face_neighbor_ghost",
 
     #===== ./src/fclaw2d_global.h =====
-    "fclaw2d_global.h"                     : "fclaw_global.h",
+    "<fclaw2d_global.h>"                   : "<fclaw_global.h>",
     "fclaw2d_iterate_patch_cb"             : "fclaw_iterate_patch_cb",
     "fclaw2d_iterate_family_cb"            : "fclaw_iterate_family_cb",
     "fclaw2d_global_t"                     : "fclaw_global_t",
@@ -230,25 +231,24 @@ fclaw_1to2 = {
     "fclaw2d_clear_global_context"         : "fclaw_clear_global_context",
 
     #===== ./src/fclaw2d_include_all.h =====
-    "fclaw2d_include_all.h" : "fclaw_include_all.h",
+    "<fclaw2d_include_all.h>" : "<fclaw_include_all.h>",
 
     #===== ./src/fclaw2d_options.h =====
-    "fclaw2d_options.h"     : "fclaw_options.h",
+    "<fclaw2d_options.h>"   : "<fclaw_options.h>",
     "fclaw2d_options_store" : "fclaw_options_store",
     "fclaw2d_get_options"   : "fclaw_get_options",
 
     #===== ./src/fclaw2d_output.h =====
-    "fclaw2d_output.h"                : "fclaw_output.h",
+    "<fclaw2d_output.h>"              : "<fclaw_output.h>",
     "fclaw2d_output_frame"            : "fclaw_output_frame",
     "fclaw2d_output_frame_tikz"       : "fclaw_output_frame_tikz",
 
     #===== ./src/fclaw2d_partition.h =====
-
-    "fclaw2d_partition.h"      : "fclaw_partition.h",
+    "<fclaw2d_partition.h>"    : "<fclaw_partition.h>",
     "fclaw2d_partition_domain" : "fclaw_partition_domain",
 
     #===== ./src/fclaw2d_patch.h =====
-    "fclaw2d_patch.h"                       : "fclaw_patch.h",
+    "<fclaw2d_patch.h>"                     : "<fclaw_patch.h>",
 
     "fclaw2d_patch_vtable_t"                : "fclaw_patch_vtable_t",
     "fclaw2d_patch_data_t"                  : "fclaw_patch_data_t",
@@ -373,8 +373,9 @@ fclaw_1to2 = {
     "fclaw2d_patch_on_coarsefine_interface"   : "fclaw_patch_on_coarsefine_interface",
     "fclaw2d_patch_block_corner_count"        : "fclaw_patch_block_corner_count",
     "fclaw2d_patch_set_block_corner_count"    : "fclaw_patch_set_block_corner_count",
+
     #===== ./src/fclaw2d_physical_bc.h =====
-    "fclaw2d_physical_bc.h"       : "fclaw_physical_bc.h",
+    "<fclaw2d_physical_bc.h>"      : "<fclaw_physical_bc.h>",
 
     "fclaw2d_physical_time_info"   : "fclaw_physical_time_info",
     "fclaw2d_physical_time_info_t" : "fclaw_physical_time_info_t",
@@ -384,7 +385,7 @@ fclaw_1to2 = {
     "fclaw2d_physical_bc_default"  : "fclaw_physical_bc_default",
 
     #===== ./src/fclaw2d_regrid.h =====
-    "fclaw2d_regrid.h"                       : "fclaw_regrid.h",
+    "<fclaw2d_regrid.h>"                     : "<fclaw_regrid.h>",
     "cb_fclaw2d_regrid_tag4refinement"       : "cb_fclaw_regrid_tag4refinement",
     "cb_fclaw2d_regrid_repopulate"           : "cb_fclaw_regrid_repopulate",
     "fclaw2d_regrid_set_neighbor_types"      : "fclaw_regrid_set_neighbor_types",
@@ -393,7 +394,7 @@ fclaw_1to2 = {
     "fclaw2d_regrid_set_neighbor_types"      : "fclaw_regrid_set_neighbor_types",
 
     #===== ./src/fclaw2d_time_sync.h =====
-    "fclaw2d_time_sync.h"                    : "fclaw_time_sync.h",
+    "<fclaw2d_time_sync.h>"                  : "<fclaw_time_sync.h>",
     "fclaw2d_time_sync_type"                 : "fclaw_time_sync_type",
     "FCLAW2D_TIME_SYNC_RESET_F2C"            : "FCLAW_TIME_SYNC_RESET_F2C",
     "FCLAW2D_TIME_SYNC_RESET_SAMESIZE"       : "FCLAW_TIME_SYNC_RESET_SAMESIZE",
@@ -402,11 +403,11 @@ fclaw_1to2 = {
     "fclaw2d_time_sync"                      : "fclaw_time_sync",
 
     #===== ./src/fclaw2d_timeinterp.h =====
-    "fclaw2d_timeinterp.h"                   : "fclaw_timeinterp.h",
+    "<fclaw2d_timeinterp.h>"                 : "<fclaw_timeinterp.h>",
     "fclaw2d_timeinterp"                     : "fclaw_timeinterp",
 
     #===== ./src/fclaw2d_update_single_step.h =====
-                               
+    "<fclaw2d_update_single_step.h>"         : "<fclaw_update_single_step.h>",
     "fclaw2d_single_step_buffer_data"        : "fclaw_single_step_buffer_data",
     "fclaw2d_single_step_buffer_data_t"      : "fclaw_single_step_buffer_data_t",
     "fclaw2d_single_step_data"               : "fclaw_single_step_data",
@@ -414,7 +415,7 @@ fclaw_1to2 = {
     "fclaw2d_update_single_step"             : "fclaw_update_single_step",
 
     #===== ./src/fclaw2d_vtable.h =====
-    "fclaw2d_vtable.h"                       : "fclaw_vtable.h",
+    "<fclaw2d_vtable.h>"                     : "<fclaw_vtable.h>",
     "fclaw2d_problem_setup_t"                : "fclaw_problem_setup_t",
     "fclaw2d_output_frame_t"                 : "fclaw_output_frame_t",
     "fclaw2d_after_regrid_t"                 : "fclaw_after_regrid_t",
@@ -423,10 +424,9 @@ fclaw_1to2 = {
     "fclaw2d_vt"                             : "fclaw_vt",
     "fclaw2d_vtable_initialize"              : "fclaw_vtable_initialize",
     "fclaw2d_after_regrid"                   : "fclaw_after_regrid",
-
                                             
     #===== ./src/patches/clawpatch/fclaw2d_clawpatch.h =====
-    "fclaw2d_clawpatch.h"                    : "fclaw_clawpatch.h",
+    "<fclaw2d_clawpatch.h>"                  : "<fclaw_clawpatch.h>",
     "fclaw2d_clawpatch_vtable_t"             : "fclaw_clawpatch_vtable_t",
     "fclaw2d_clawpatch_vtable_initialize"    : "fclaw_clawpatch_vtable_initialize",
     "fclaw2d_clawpatch_vt"                   : "fclaw_clawpatch_vt",
@@ -456,13 +456,13 @@ fclaw_1to2 = {
     "fclaw2d_clawpatch_get_registers"        : "fclaw_clawpatch_get_registers_2d",
 
     #===== ./src/patches/clawpatch/fclaw2d_clawpatch.hpp =====
-    "fclaw2d_clawpatch.hpp"                  : "fclaw_clawpatch.hpp",
+    "<fclaw2d_clawpatch.hpp>"                : "<fclaw_clawpatch.hpp>",
     "fclaw2d_clawpatch_t"                    : "fclaw_clawpatch_t",
     "fclaw2d_clawpatch_get_clawpatch"        : "fclaw_clawpatch_get_clawpatch",
     "fclaw2d_clawpatch_get_metric_patch"     : "fclaw_clawpatch_get_metric_patch",
 
     #===== ./src/patches/clawpatch/fclaw2d_clawpatch_diagnostics.h =====
-    "fclaw2d_clawpatch_diagnostics.h"                 : "fclaw_clawpatch_diagnostics.h",
+    "<fclaw2d_clawpatch_diagnostics.h>"               : "<fclaw_clawpatch_diagnostics.h>",
     "fclaw2d_clawpatch_diagnostics_initialize"        : "fclaw_clawpatch_diagnostics_initialize",
     "fclaw2d_clawpatch_diagnostics_compute"           : "fclaw_clawpatch_diagnostics_compute",
     "fclaw2d_clawpatch_diagnostics_gather"            : "fclaw_clawpatch_diagnostics_gather",
@@ -473,7 +473,7 @@ fclaw_1to2 = {
     "fclaw2d_clawpatch_diagnostics_error_default"     : "fclaw_clawpatch_diagnostics_error_default",
 
     #===== ./src/patches/clawpatch/fclaw2d_clawpatch_options.h =====
-    "fclaw2d_clawpatch_options.h"             : "fclaw_clawpatch_options.h",
+    "<fclaw2d_clawpatch_options.h>"           : "<fclaw_clawpatch_options.h>",
     "fclaw2d_clawpatch_options_t"             : "fclaw_clawpatch_options_t",
     "fclaw2d_clawpatch_options"               : "fclaw_clawpatch_options",
     "fclaw2d_clawpatch_options_register"      : "fclaw_clawpatch_options_register",
@@ -481,18 +481,18 @@ fclaw_1to2 = {
     "fclaw2d_clawpatch_get_options"           : "fclaw_clawpatch_get_options",
 
     #===== ./src/patches/clawpatch/fclaw2d_clawpatch_output_ascii.h =====
-    "fclaw2d_clawpatch_output_ascii.h"        : "fclaw_clawpatch_output_ascii.h",
+    "<fclaw2d_clawpatch_output_ascii.h>"      : "<fclaw_clawpatch_output_ascii.h>",
     "fclaw2d_clawpatch_output_ascii"          : "fclaw_clawpatch_output_ascii",
     "fclaw2d_clawpatch_time_header_ascii"     : "fclaw_clawpatch_time_header_ascii",
 
     #===== ./src/patches/clawpatch/fclaw2d_clawpatch_output_vtk.h =====
-    "fclaw2d_clawpatch_output_vtk.h"          : "fclaw_clawpatch_output_vtk.h",
+    "<fclaw2d_clawpatch_output_vtk.h>"        : "<fclaw_clawpatch_output_vtk.h>",
     "fclaw2d_vtk_patch_data_t"                : "fclaw_vtk_patch_data_t",
     "fclaw2d_vtk_write_file"                  : "fclaw_vtk_write_file",
     "fclaw2d_clawpatch_output_vtk"            : "fclaw_clawpatch_output_vtk",
 
     #===== ./src/patches/clawpatch/fclaw2d_clawpatch_pillow.h =====
-    "fclaw2d_clawpatch_pillow.h"                 : "fclaw_clawpatch_pillow.h",
+    "<fclaw2d_clawpatch_pillow.h>"               : "<fclaw_clawpatch_pillow.h>",
                                
     "fclaw2d_clawpatch_pillow_vtable_t"          : "fclaw_clawpatch_pillow_vtable_t",
     "fclaw2d_clawpatch_use_pillowsphere"         : "fclaw_clawpatch_use_pillowsphere",
@@ -501,7 +501,7 @@ fclaw_1to2 = {
     "fclaw2d_clawpatch_pillow_vt"                : "fclaw_clawpatch_pillow_vt",
 
     #===== ./src/patches/clawpatch/fclaw3dx_clawpatch.h =====
-    "fclaw3dx_clawpatch.h"                      : "fclaw_clawpatch.h",
+    "<fclaw3dx_clawpatch.h>"                    : "<fclaw_clawpatch.h>",
     "fclaw3dx_clawpatch_vtable_t"               : "fclaw_clawpatch_vtable_t",
     "fclaw3dx_clawpatch_vtable_initialize"      : "fclaw_clawpatch_vtable_initialize",
     "fclaw3dx_clawpatch_vt"                     : "fclaw_clawpatch_vt",
@@ -530,13 +530,13 @@ fclaw_1to2 = {
     "fclaw3dx_clawpatch_get_q_timesync"         : "fclaw_clawpatch_get_q_timesync",
 
     #===== ./src/patches/clawpatch/fclaw3dx_clawpatch.hpp =====
-    "fclaw3dx_clawpatch.hpp"                    : "fclaw_clawpatch.hpp",
+    "<fclaw3dx_clawpatch.hpp>"                  : "<fclaw_clawpatch.hpp>",
     "fclaw3dx_clawpatch_t"                      : "fclaw_clawpatch_t",
     "fclaw3dx_clawpatch_get_clawpatch"          : "fclaw_clawpatch_get_clawpatch",
     "fclaw3dx_clawpatch_get_metric_patch"       : "fclaw_clawpatch_get_metric_patch",
 
     #===== ./src/patches/clawpatch/fclaw3dx_clawpatch_diagnostics.h =====
-    "fclaw3dx_clawpatch_diagnostics.h"                 : "fclaw_clawpatch_diagnostics.h",
+    "<fclaw3dx_clawpatch_diagnostics.h>"               : "<fclaw_clawpatch_diagnostics.h>",
     "fclaw3dx_clawpatch_error_info_t"                  : "error_info_t",
     "fclaw3dx_clawpatch_diagnostics_initialize"        : "fclaw_clawpatch_diagnostics_initialize",
     "fclaw3dx_clawpatch_diagnostics_compute"           : "fclaw_clawpatch_diagnostics_compute",
@@ -548,7 +548,7 @@ fclaw_1to2 = {
     "fclaw3dx_clawpatch_diagnostics_error_default"     : "fclaw_clawpatch_diagnostics_error_default",
 
     #===== ./src/patches/clawpatch/fclaw3dx_clawpatch_options.h =====
-    "fclaw3dx_clawpatch_options.h"             : "fclaw_clawpatch_options.h",                           
+    "<fclaw3dx_clawpatch_options.h>"             : "<fclaw_clawpatch_options.h>",                           
     "fclaw3dx_clawpatch_options_t"             : "fclaw_clawpatch_options_t",
     "fclaw3dx_clawpatch_options"               : "fclaw_clawpatch_options",
     "fclaw3dx_clawpatch_options_t"             : "fclaw_clawpatch_options_t",
@@ -557,19 +557,19 @@ fclaw_1to2 = {
     "fclaw3dx_clawpatch_get_options"           : "fclaw_clawpatch_get_options",
 
     #===== ./src/patches/clawpatch/fclaw3dx_clawpatch_output_ascii.h =====
-    "fclaw3dx_clawpatch_output_ascii.h"        : "fclaw_clawpatch_output_ascii.h",
+    "<fclaw3dx_clawpatch_output_ascii.h>"      : "<fclaw_clawpatch_output_ascii.h>",
     "fclaw3dx_clawpatch_output_ascii_cb"       : "fclaw_clawpatch_output_ascii_cb",
     "fclaw3dx_clawpatch_output_ascii"          : "fclaw_clawpatch_output_ascii",
     "fclaw3dx_clawpatch_time_header_ascii"     : "fclaw_clawpatch_time_header_ascii",
 
     #===== ./src/patches/clawpatch/fclaw3dx_clawpatch_output_vtk.h =====
-    "fclaw3dx_clawpatch_output_vtk.h"          : "fclaw_clawpatch_output_vtk.h",
+    "<fclaw3dx_clawpatch_output_vtk.h>"        : "<fclaw_clawpatch_output_vtk.h>",
     "fclaw3dx_vtk_patch_data_t"                : "fclaw_vtk_patch_data_t",
     "fclaw3dx_vtk_write_file"                  : "fclaw3d_vtk_write_file",
     "fclaw3dx_clawpatch_output_vtk"            : "fclaw_clawpatch_output_vtk",
 
     #===== ./src/patches/clawpatch/fclaw3dx_clawpatch_pillow.h =====
-    "fclaw3dx_clawpatch_pillow.h"                 : "fclaw_clawpatch_pillow.h",
+    "<fclaw3dx_clawpatch_pillow.h>"               : "<fclaw_clawpatch_pillow.h>",
     "fclaw3dx_clawpatch_pillow_vtable_t"          : "fclaw_clawpatch_pillow_vtable_t",
     "fclaw3dx_clawpatch_use_pillowsphere"         : "fclaw_clawpatch_use_pillowsphere",
     "fclaw3dx_clawpatch_pillow_vtable_initialize" : "fclaw_clawpatch_pillow_vtable_initialize",
@@ -577,3 +577,48 @@ fclaw_1to2 = {
     "fclaw3dx_clawpatch_pillow_vt"                : "fclaw_clawpatch_pillow_vt"
 
 }
+
+import os
+import glob
+from pygments import highlight
+from pygments.lexers import CppLexer
+from pygments.formatters import NullFormatter
+from pygments.token import Token
+
+def replace_identifiers_and_includes(code, identifier_map):
+    lexer = CppLexer()
+    tokens = lexer.get_tokens(code)
+    new_code = ''
+    
+    for ttype, value in tokens:
+        if ttype in Token.Comment.PreprocFile:
+            new_code += identifier_map.get(value, value)
+        elif ttype in Token.Name:
+            new_code += identifier_map.get(value, value)
+        else:
+            new_code += value
+            
+    return new_code
+
+def process_directory(root_dir, identifier_map):
+    # Use glob to find all C++ files recursively.
+    for filepath in glob.glob(f"{root_dir}/**/*.[cChH]*", recursive=True):
+        print(f"Processing {filepath}...")
+        
+        # Read the existing code from the file
+        with open(filepath, 'r') as f:
+            old_code = f.read()
+        
+        # Replace the identifiers
+        new_code = replace_identifiers_and_includes(old_code, identifier_map)
+        
+        # Write the new code back to the file
+        with open(filepath, 'w') as f:
+            f.write(new_code)
+
+
+# Root directory where your C++ files are stored
+root_dir = './'
+
+# Process all C++ files in the directory and subdirectories
+process_directory(root_dir, fclaw_1to2)
