@@ -26,7 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <test.hpp>
 
 #include <fclaw_forestclaw.h>
-#include <fclaw2d_convenience.h>
+#include <fclaw_convenience.h>
 #include <fclaw_global.h>
 
 #include <fclaw_clawpatch.h>
@@ -63,7 +63,7 @@ TEST_CASE("FCLAW2D_CLAWPATCH_EXCEEDS_THRESHOLD calls user function")
     global_exceeds_test_parameters = exceeds_test_parameters();
     exceeds_test_parameters& params = global_exceeds_test_parameters;
 
-    fclaw_domain_t* domain = fclaw2d_domain_new_unitsquare(sc_MPI_COMM_WORLD, 1);
+    fclaw_domain_t* domain = fclaw_domain_new_unitsquare(sc_MPI_COMM_WORLD, 1);
 	fclaw_global_t* glob = fclaw_global_new();
     fclaw_global_store_domain(glob, domain);
 
@@ -135,7 +135,7 @@ TEST_CASE("FCLAW3DX_CLAWPATCH_EXCEEDS_THRESHOLD calls user function")
     global_exceeds_test_parameters = exceeds_test_parameters();
     exceeds_test_parameters& params = global_exceeds_test_parameters;
 
-    fclaw_domain_t* domain = fclaw2d_domain_new_unitsquare(sc_MPI_COMM_WORLD, 1);
+    fclaw_domain_t* domain = fclaw_domain_new_unitsquare(sc_MPI_COMM_WORLD, 1);
 	fclaw_global_t* glob = fclaw_global_new();
     fclaw_global_store_domain(glob, domain);
 
