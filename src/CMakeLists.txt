@@ -39,7 +39,6 @@ add_library(forestclaw_c OBJECT
   fclaw_vtable.c
 
   fclaw2d_convenience.c
-  fclaw2d_exchange.c
   fclaw2d_file.c
   fclaw2d_map.c
   fclaw2d_map_brick.c
@@ -53,7 +52,6 @@ add_library(forestclaw_c OBJECT
   forestclaw3d.c
 
   fclaw3d_convenience.c
-  fclaw3d_exchange.c
   fclaw3d_file.c
   fclaw3d_map.c
 

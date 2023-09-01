@@ -106,7 +106,6 @@ libforestclaw_compiled_sources = \
 	src/fclaw_vtable.c \
 	\
 	src/fclaw2d_convenience.c \
-	src/fclaw2d_exchange.c \
 	src/fclaw2d_file.c \
 	src/fclaw2d_map.c \
 	src/fclaw2d_map_brick.c \
@@ -120,7 +119,6 @@ libforestclaw_compiled_sources = \
 	src/forestclaw3d.c \
 	\
 	src/fclaw3d_convenience.c \
-	src/fclaw3d_exchange.c \
 	src/fclaw3d_file.c \
 	src/fclaw3d_map.c \
 	\
