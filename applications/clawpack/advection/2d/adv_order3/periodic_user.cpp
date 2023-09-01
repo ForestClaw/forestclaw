@@ -51,7 +51,7 @@ void periodic_problem_setup(fclaw_global_t* glob)
         fprintf(f, "%20.16f    %s",user->vbar,"\% vbar\n");
         fclose(f);
     }
-    fclaw2d_domain_barrier (glob->domain);
+    fclaw_domain_barrier (glob->domain);
     PERIODIC_SETPROB();
 }
 
@@ -83,16 +83,16 @@ void cb_periodic_output_ascii (fclaw_domain_t * domain,
 
 
     /* Get info not readily available to user */
-    fclaw2d_patch_get_info(glob->domain,this_patch,
+    fclaw_patch_get_info(glob->domain,this_patch,
                            this_block_idx,this_patch_idx,
                            &patch_num,&level);
     
     fclaw_clawpatch_grid_data_2d(glob,this_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
-    fclaw2d_clawpatch_soln_data(glob,this_patch,&q,&meqn);
-    error = fclaw2d_clawpatch_get_error(glob,this_patch);
-    soln = fclaw2d_clawpatch_get_exactsoln(glob,this_patch);
+    fclaw_clawpatch_soln_data(glob,this_patch,&q,&meqn);
+    error = fclaw_clawpatch_get_error(glob,this_patch);
+    soln = fclaw_clawpatch_get_exactsoln(glob,this_patch);
 
     char fname[BUFSIZ];
     snprintf (fname, BUFSIZ, "%s.q%04d", fclaw_opt->prefix, iframe);
@@ -115,7 +115,7 @@ void cb_periodic_output_ascii (fclaw_domain_t * domain,
 
 void periodic_link_solvers(fclaw_global_t *glob)
 {
-    fclaw2d_vtable_t *vt = fclaw2d_vt(glob);
+    fclaw_vtable_t *vt = fclaw_vt(glob);
 
 
     vt->problem_setup = &periodic_problem_setup;  /* Version-independent */

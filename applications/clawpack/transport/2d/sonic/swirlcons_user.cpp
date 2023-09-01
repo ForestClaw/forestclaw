@@ -45,8 +45,8 @@ void cb_swirl_output_ascii (fclaw_domain_t * domain,
 
 void swirlcons_link_solvers(fclaw_global_t *glob)
 {
-    fclaw2d_vtable_t                     *vt = fclaw2d_vt(glob);
-    fclaw2d_patch_vtable_t         *patch_vt = fclaw2d_patch_vt(glob);
+    fclaw_vtable_t                     *vt = fclaw_vt(glob);
+    fclaw_patch_vtable_t         *patch_vt = fclaw_patch_vt(glob);
     fclaw_clawpatch_vtable_t *clawpatch_vt = fclaw_clawpatch_vt(glob);
     fc2d_clawpack46_vtable_t  *clawpack46_vt = fc2d_clawpack46_vt(glob);
 
@@ -151,7 +151,7 @@ void swirlcons_problem_setup(fclaw_global_t* glob)
     MPI_Barrier(MPI_COMM_WORLD);
 #endif
  
-    fclaw2d_domain_barrier (glob->domain);  /* redundant?  */
+    fclaw_domain_barrier (glob->domain);  /* redundant?  */
     SWIRLCONS_SETPROB();
 
 #if 0
@@ -177,7 +177,7 @@ void swirlcons_patch_setup_manifold(fclaw_global_t *glob,
 
 
     double *xp, *yp, *zp, *xd, *yd, *zd, *area;
-    fclaw2d_clawpatch_metric_data(glob,patch,&xp,&yp,&zp,
+    fclaw_clawpatch_metric_data_2d(glob,patch,&xp,&yp,&zp,
                                   &xd,&yd,&zd,&area);
 
     double *edgelengths, *curvature;
@@ -192,7 +192,7 @@ void swirlcons_patch_setup_manifold(fclaw_global_t *glob,
 
     double *aux;
     int maux;
-    fclaw2d_clawpatch_aux_data(glob,patch,&aux,&maux);
+    fclaw_clawpatch_aux_data(glob,patch,&aux,&maux);
 
     switch(user->mapping)
     {
@@ -231,7 +231,7 @@ void cb_swirl_output_ascii (fclaw_domain_t * domain,
 
     /* Get info not readily available to user */
     int local_patch_num, global_num, level;
-    fclaw2d_patch_get_info(glob->domain,patch,
+    fclaw_patch_get_info(glob->domain,patch,
                            blockno,patchno,
                            &global_num, 
                            &local_patch_num,&level);
@@ -243,11 +243,11 @@ void cb_swirl_output_ascii (fclaw_domain_t * domain,
 
     double *q;
     int meqn;
-    fclaw2d_clawpatch_soln_data(glob,patch,&q,&meqn);
+    fclaw_clawpatch_soln_data(glob,patch,&q,&meqn);
 
 
-    double* error = fclaw2d_clawpatch_get_error(glob,patch);
-    double* soln = fclaw2d_clawpatch_get_exactsoln(glob,patch);
+    double* error = fclaw_clawpatch_get_error(glob,patch);
+    double* soln = fclaw_clawpatch_get_exactsoln(glob,patch);
 
     const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
     char fname[BUFSIZ];

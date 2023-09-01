@@ -36,11 +36,11 @@ void create_domain_map (fclaw_global_t *glob,
 {
     fclaw_domain_t         *domain = NULL;
 
-    domain = fclaw2d_domain_new_unitsquare (mpicomm, fclaw_opt->minlevel);
-    fclaw2d_domain_list_levels (domain, FCLAW_VERBOSITY_ESSENTIAL);
-    fclaw2d_domain_list_neighbors (domain, FCLAW_VERBOSITY_DEBUG);
+    domain = fclaw_domain_new_unitsquare (mpicomm, fclaw_opt->minlevel);
+    fclaw_domain_list_levels (domain, FCLAW_VERBOSITY_ESSENTIAL);
+    fclaw_domain_list_neighbors (domain, FCLAW_VERBOSITY_DEBUG);
     fclaw_global_store_domain (glob, domain);
-    fclaw2d_global_store_map (glob, fclaw2d_map_new_nomap ());
+    fclaw2d_map_store (glob, fclaw2d_map_new_nomap ());
 }
 
 static
@@ -51,22 +51,22 @@ void run_program(fclaw_global_t* glob)
        --------------------------------------------------------------- */
     const user_options_t *user = no_solver_get_options(glob);
 
-    fclaw2d_domain_data_new(glob->domain);
+    fclaw_domain_data_new(glob->domain);
 
     /* Initialize virtual table for ForestClaw */
-    fclaw2d_vtable_initialize(glob);
-    fclaw2d_diagnostics_vtable_initialize();
+    fclaw_vtable_initialize(glob);
+    fclaw_diagnostics_vtable_initialize();
 
-    fclaw2d_clawpatch_vtable_initialize(user->clawpatch_version);
+    fclaw_clawpatch_vtable_initialize(user->clawpatch_version);
 
     no_solver_link_solvers(glob);
 
     /* ---------------------------------------------------------------
        Run
        --------------------------------------------------------------- */
-    fclaw2d_initialize(glob);
-    fclaw2d_run(glob);
-    fclaw2d_finalize(glob);
+    fclaw_initialize(glob);
+    fclaw_run(glob);
+    fclaw_finalize(glob);
 }
 
 int

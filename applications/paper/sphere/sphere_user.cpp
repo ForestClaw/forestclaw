@@ -57,7 +57,7 @@ void sphere_problem_setup(fclaw_global_t* glob)
         fprintf(f,  "%-24d   %s",user->curvature_correction,"\% Curvature correction\n");
         fclose(f);
     }
-    fclaw2d_domain_barrier (glob->domain);
+    fclaw_domain_barrier (glob->domain);
     SPHERE_SETPROB();
 }
 
@@ -72,7 +72,7 @@ void sphere_patch_setup_manifold(fclaw_global_t *glob,
                                 &xlower,&ylower,&dx,&dy);
 
     double *xp, *yp, *zp, *xd, *yd, *zd, *area;
-    fclaw2d_clawpatch_metric_data(glob,this_patch,&xp,&yp,&zp,
+    fclaw_clawpatch_metric_data_2d(glob,this_patch,&xp,&yp,&zp,
                                   &xd,&yd,&zd,&area);
 
     double *edgelengths,*curvature;
@@ -87,7 +87,7 @@ void sphere_patch_setup_manifold(fclaw_global_t *glob,
 
     int maux;
     double *aux;
-    fclaw2d_clawpatch_aux_data(glob,this_patch,&aux,&maux);
+    fclaw_clawpatch_aux_data(glob,this_patch,&aux,&maux);
 
     SPHERE_SETAUX(&blockno, &mx,&my,&mbc, &xlower,&ylower,
                   &dx,&dy, area, edgelengths,xp,yp,zp,
@@ -116,7 +116,7 @@ void sphere_b4step2(fclaw_global_t *glob,
 
     double *aux;
     int maux;
-    fclaw2d_clawpatch_aux_data(glob,this_patch,&aux,&maux);
+    fclaw_clawpatch_aux_data(glob,this_patch,&aux,&maux);
 
     SPHERE_SET_VELOCITIES(&blockno, &mx, &my, &mbc,
                           &dx, &dy, &xlower, &ylower,
@@ -138,7 +138,7 @@ int sphere_tag4refinement(fclaw_global_t *glob,
 
     double *q;
     int meqn;
-    fclaw2d_clawpatch_soln_data(glob,patch,&q,&meqn);
+    fclaw_clawpatch_soln_data(glob,patch,&q,&meqn);
 
     const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
     double refine_threshold = fclaw_opt->refine_threshold;
@@ -179,7 +179,7 @@ int sphere_tag4coarsening(fclaw_global_t *glob,
     int meqn;
     for (int igrid = 0; igrid < 4; igrid++)
     {
-        fclaw2d_clawpatch_soln_data(glob,&fine_patches[igrid],&q[igrid],&meqn);
+        fclaw_clawpatch_soln_data(glob,&fine_patches[igrid],&q[igrid],&meqn);
     }
 
     const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
@@ -215,7 +215,7 @@ void cb_sphere_output_ascii (fclaw_domain_t * domain,
 
     /* Get info not readily available to user */
     int local_num, global_num, level;
-    fclaw2d_patch_get_info(glob->domain,this_patch,
+    fclaw_patch_get_info(glob->domain,this_patch,
                            this_block_idx,this_patch_idx,
                            &global_num, &local_num,&level);
     
@@ -226,13 +226,13 @@ void cb_sphere_output_ascii (fclaw_domain_t * domain,
 
     int meqn;
     double *q;
-    fclaw2d_clawpatch_soln_data(glob,this_patch,&q,&meqn);
-    double* error = fclaw2d_clawpatch_get_error(glob,this_patch);
-    double* soln = fclaw2d_clawpatch_get_exactsoln(glob,this_patch);
+    fclaw_clawpatch_soln_data(glob,this_patch,&q,&meqn);
+    double* error = fclaw_clawpatch_get_error(glob,this_patch);
+    double* soln = fclaw_clawpatch_get_exactsoln(glob,this_patch);
 
     double *aux;
     int maux;
-    fclaw2d_clawpatch_aux_data(glob,this_patch,&aux,&maux);
+    fclaw_clawpatch_aux_data(glob,this_patch,&aux,&maux);
 
 
     const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
@@ -256,10 +256,10 @@ void cb_sphere_output_ascii (fclaw_domain_t * domain,
 void sphere_link_solvers(fclaw_global_t *glob)
 {
     /* ForestClaw core functions */
-    fclaw2d_vtable_t *vt = fclaw2d_vt(glob);
+    fclaw_vtable_t *vt = fclaw_vt(glob);
     vt->problem_setup = &sphere_problem_setup;  /* Version-independent */
 
-    fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt(glob);
+    fclaw_patch_vtable_t *patch_vt = fclaw_patch_vt(glob);
     patch_vt->setup   = &sphere_patch_setup_manifold;
     patch_vt->tag4refinement = sphere_tag4refinement;
     patch_vt->tag4coarsening = sphere_tag4coarsening;

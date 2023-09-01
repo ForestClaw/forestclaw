@@ -48,8 +48,8 @@ fclaw_domain_t* create_domain(sc_MPI_Comm mpicomm,
     cont = fclaw2d_map_new_nomap();
 
     domain = fclaw2d_domain_new_conn_map (mpicomm, fclaw_opt->minlevel, conn, cont);
-    fclaw2d_domain_list_levels(domain, FCLAW_VERBOSITY_ESSENTIAL);
-    fclaw2d_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);
+    fclaw_domain_list_levels(domain, FCLAW_VERBOSITY_ESSENTIAL);
+    fclaw_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);
 
     return domain;
 }
@@ -59,7 +59,7 @@ void run_program(fclaw_global_t* glob)
 {
     fclaw_domain_t    **domain = &glob->domain;
 
-    fclaw2d_domain_data_new(*domain);
+    fclaw_domain_data_new(*domain);
 
     fclaw_vtables_initialize(glob);
 
@@ -70,10 +70,10 @@ void run_program(fclaw_global_t* glob)
        --------------------------------------------------------------- */
     fc2d_geoclaw_module_setup(glob);
 
-    fclaw2d_initialize(glob);
+    fclaw_initialize(glob);
     fc2d_geoclaw_run(glob);
     
-    fclaw2d_finalize(glob);
+    fclaw_finalize(glob);
 }
 
 int

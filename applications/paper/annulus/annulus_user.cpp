@@ -80,7 +80,7 @@ void annulus_patch_setup(fclaw_global_t *glob,
                                 &xlower,&ylower,&dx,&dy);
 
     double *xp, *yp, *zp, *xd, *yd, *zd, *area;
-    fclaw2d_clawpatch_metric_data(glob,patch,&xp,&yp,&zp,
+    fclaw_clawpatch_metric_data_2d(glob,patch,&xp,&yp,&zp,
                                   &xd,&yd,&zd,&area);
 
     double *edgelengths,*curvature;
@@ -89,7 +89,7 @@ void annulus_patch_setup(fclaw_global_t *glob,
 
     int maux;
     double *aux;
-    fclaw2d_clawpatch_aux_data(glob,patch,&aux,&maux);
+    fclaw_clawpatch_aux_data(glob,patch,&aux,&maux);
     ANNULUS_SETAUX(&blockno, &mx,&my,&mbc, &xlower,&ylower,
                   &dx,&dy, area, edgelengths,xp,yp,zp,
                   aux, &maux);
@@ -134,7 +134,7 @@ void annulus_b4step2(fclaw_global_t *glob,
 
     double *aux;
     int maux;
-    fclaw2d_clawpatch_aux_data(glob,this_patch,&aux,&maux);
+    fclaw_clawpatch_aux_data(glob,this_patch,&aux,&maux);
 
     ANNULUS_SET_VELOCITIES(&blockno, &mx, &my, &mbc,
                            &dx, &dy, &xlower, &ylower,
@@ -145,11 +145,11 @@ void annulus_b4step2(fclaw_global_t *glob,
 void annulus_link_solvers(fclaw_global_t *glob)
 {
     /* ForestClaw virtual functions */
-    fclaw2d_vtable_t  *vt = fclaw2d_vt(glob);
+    fclaw_vtable_t  *vt = fclaw_vt(glob);
     vt->problem_setup = &annulus_problem_setup;
 
     /* Patch virtual functions */
-    fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt(glob);
+    fclaw_patch_vtable_t *patch_vt = fclaw_patch_vt(glob);
     patch_vt->setup = &annulus_patch_setup;
 
     /* Clawpatch virtual table */

@@ -123,8 +123,8 @@ void metric_diagnostics(fclaw_domain_t *domain, const double t)
 {
     /* Compute a global sum */
     double sum = 0;
-    fclaw2d_domain_iterate_patches(domain,cb_total_area,(void *) &sum);
-    sum = fclaw2d_domain_global_sum (domain, sum);
+    fclaw_domain_iterate_patches(domain,cb_total_area,(void *) &sum);
+    sum = fclaw_domain_global_sum (domain, sum);
 
     fclaw2d_map_context_t* cont = fclaw2d_domain_get_map_context(domain);
     double exact_area = metric_surface_area(cont);
@@ -141,12 +141,12 @@ void metric_diagnostics(fclaw_domain_t *domain, const double t)
            uniformly refined */
 
         double minvalue = 100;
-        fclaw2d_domain_iterate_patches(domain,cb_min_cell_area,(void *) &minvalue);
-        minvalue = fclaw2d_domain_global_minimum (domain, minvalue);
+        fclaw_domain_iterate_patches(domain,cb_min_cell_area,(void *) &minvalue);
+        minvalue = fclaw_domain_global_minimum (domain, minvalue);
 
         double maxvalue = 0;
-        fclaw2d_domain_iterate_patches(domain,cb_max_cell_area,(void *) &maxvalue);
-        maxvalue = fclaw2d_domain_global_maximum (domain, maxvalue);
+        fclaw_domain_iterate_patches(domain,cb_max_cell_area,(void *) &maxvalue);
+        maxvalue = fclaw_domain_global_maximum (domain, maxvalue);
 
         fclaw_global_productionf("%30s %24.8e\n","Minimum value (kappa)",minvalue);
         fclaw_global_productionf("%30s %24.8e\n","Maximum value (kappa)",maxvalue);

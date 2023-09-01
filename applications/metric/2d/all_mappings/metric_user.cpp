@@ -26,32 +26,32 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "metric_user.h"
 #include <fclaw_farraybox.hpp>
 
-static fclaw2d_vtable_t fclaw2d_vt;
+static fclaw_vtable_t fclaw_vt;
 
 /* Want to write this so clawpack isn't needed */
 static fc2d_clawpack46_vtable_t classic_claw46;
 
 void metric_link_patch(fclaw_domain_t *domain)
 {
-    fclaw2d_init_vtable(&fclaw2d_vt);
+    fclaw2d_init_vtable(&fclaw_vt);
     const user_options_t* user = metric_user_get_options(domain);
 
-    fclaw2d_vt.problem_setup = &metric_problem_setup;
+    fclaw_vt.problem_setup = &metric_problem_setup;
 
     if (user->claw_version == 4)
     {
-        fc2d_clawpack46_set_vtable_defaults(&fclaw2d_vt,&classic_claw46);
+        fc2d_clawpack46_set_vtable_defaults(&fclaw_vt,&classic_claw46);
 
-        fclaw2d_vt.patch_initialize = &metric_patch_initialize;
-        fclaw2d_vt.metric_compute_area = &fclaw2d_metric_compute_area_exact;
+        fclaw_vt.patch_initialize = &metric_patch_initialize;
+        fclaw_vt.metric_compute_area = &fclaw2d_metric_compute_area_exact;
 
-        fclaw2d_vt.run_user_diagnostics = &metric_diagnostics;
-        fclaw2d_vt.fort_compute_patch_error  = &compute_error;
+        fclaw_vt.run_user_diagnostics = &metric_diagnostics;
+        fclaw_vt.fort_compute_patch_error  = &compute_error;
 
         fc2d_clawpack46_set_vtable(classic_claw46);
     }
 
-    fclaw2d_set_vtable(domain,&fclaw2d_vt);
+    fclaw2d_set_vtable(domain,&fclaw_vt);
 
 }
 
@@ -77,7 +77,7 @@ void metric_patch_initialize(fclaw_domain_t *domain,
     fclaw_clawpatch_grid_data_2d(domain,this_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
-    fclaw2d_clawpatch_soln_data(domain,this_patch,&q,&meqn);
+    fclaw_clawpatch_soln_data(domain,this_patch,&q,&meqn);
 
     fclaw_clawpatch_metric_data2_2d(domain, this_patch,
                                    &xnormals, &ynormals,

@@ -45,7 +45,7 @@ void cb_gem3d_output_mesh (fclaw_domain_t * domain,
     int level;
 
     /* Get info not readily available to user */
-    fclaw2d_patch_get_info(glob->domain,this_patch,
+    fclaw_patch_get_info(glob->domain,this_patch,
                            this_block_idx,this_patch_idx,
                            &patch_num,&level);
 
@@ -67,7 +67,7 @@ void cb_gem3d_output_mesh (fclaw_domain_t * domain,
         int rpatchno[2];
         int rfaceno;
         fclaw_patch_relation_t neighbor_type =
-                      fclaw2d_patch_face_neighbors(domain,
+                      fclaw_patch_face_neighbors(domain,
                                                    this_block_idx,
                                                    this_patch_idx,
                                                    iface,
@@ -76,22 +76,22 @@ void cb_gem3d_output_mesh (fclaw_domain_t * domain,
                                                    rpatchno,
                                                    &rfaceno);
         int ir[2];
-        if (neighbor_type == FCLAW2D_PATCH_BOUNDARY)
+        if (neighbor_type == FCLAW_PATCH_BOUNDARY)
         {
             ir[0] = -1;
             ir[1] = -1;  
         }
-        else if (neighbor_type == FCLAW2D_PATCH_SAMESIZE)
+        else if (neighbor_type == FCLAW_PATCH_SAMESIZE)
         {
             ir[0] = rpatchno[0]; 
             ir[1] = rpatchno[0];
         }
-        else if (neighbor_type == FCLAW2D_PATCH_DOUBLESIZE)
+        else if (neighbor_type == FCLAW_PATCH_DOUBLESIZE)
         {
             ir[0] = rpatchno[0];
             ir[1] = rpatchno[0];
         }
-        else if (neighbor_type == FCLAW2D_PATCH_HALFSIZE)
+        else if (neighbor_type == FCLAW_PATCH_HALFSIZE)
         {
             ir[0] = rpatchno[0];
             ir[1] = rpatchno[1];
@@ -136,7 +136,7 @@ void gem3d_output_mesh(fclaw_global_t* glob,int iframe)
 
     fclaw_domain_t *domain = glob->domain;
 
-    fclaw2d_domain_serialization_enter (domain);
+    fclaw_domain_serialization_enter (domain);
 
     if (domain->mpirank == 0)
     {
@@ -151,7 +151,7 @@ void gem3d_output_mesh(fclaw_global_t* glob,int iframe)
     fclaw_global_iterate_patches (glob, cb_gem3d_output_mesh, f);
     fclose(f);
 
-    fclaw2d_domain_serialization_leave (domain);
+    fclaw_domain_serialization_leave (domain);
     /* END OF NON-SCALABLE CODE */
 
 

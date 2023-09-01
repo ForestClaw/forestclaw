@@ -60,10 +60,10 @@ main (int argc, char **argv)
      --------------------------------------------------------------- */
   /* For sphere */
   // domain = fclaw2d_domain_new_twosphere (mpicomm,gparms->minlevel);
-  domain = fclaw2d_domain_new_unitsquare (mpicomm, gparms->minlevel);
+  domain = fclaw_domain_new_unitsquare (mpicomm, gparms->minlevel);
 
-  fclaw2d_domain_list_levels(domain, lp);
-  fclaw2d_domain_list_neighbors(domain, lp);
+  fclaw_domain_list_levels(domain, lp);
+  fclaw_domain_list_neighbors(domain, lp);
 
   /* ---------------------------------------------------------------
      Set domain data.

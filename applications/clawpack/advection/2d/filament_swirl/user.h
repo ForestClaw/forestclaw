@@ -34,7 +34,7 @@ extern "C"
 #endif
 #endif
 
-typedef struct fclaw_global fclaw2d_global_t;
+typedef struct fclaw_global fclaw_global_t;
 void user_run(fclaw_global_t *globs[],int nglobs);
 
 #ifdef __cplusplus

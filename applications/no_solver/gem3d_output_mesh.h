@@ -35,11 +35,11 @@ extern "C"
 #endif
 
 struct fclaw_global;
-struct fclaw2d_patch;
+struct fclaw_patch_t;
 struct fclaw_domain;
 
 void cb_gem3d_output_mesh (struct fclaw_domain * domain,
-                           struct fclaw2d_patch * this_patch,
+                           struct fclaw_patch_t * this_patch,
                            int this_block_idx, int this_patch_idx,
                            void *user);
 

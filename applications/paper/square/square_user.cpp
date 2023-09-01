@@ -56,7 +56,7 @@ void square_problem_setup(fclaw_global_t* glob)
         fprintf(f,  "%-24.6f   %s",user->velocity[1],"\% v\n");
         fclose(f);
     }
-    fclaw2d_domain_barrier (glob->domain);
+    fclaw_domain_barrier (glob->domain);
     SQUARE_SETPROB();
 
 
@@ -73,7 +73,7 @@ void square_patch_setup_manifold(fclaw_global_t *glob,
                                 &xlower,&ylower,&dx,&dy);
 
     double *xp, *yp, *zp, *xd, *yd, *zd, *area;
-    fclaw2d_clawpatch_metric_data(glob,patch,&xp,&yp,&zp,
+    fclaw_clawpatch_metric_data_2d(glob,patch,&xp,&yp,&zp,
                                   &xd,&yd,&zd,&area);
 
     double *edgelengths,*curvature;
@@ -82,7 +82,7 @@ void square_patch_setup_manifold(fclaw_global_t *glob,
 
     double *aux;
     int maux;
-    fclaw2d_clawpatch_aux_data(glob,patch,&aux,&maux);    
+    fclaw_clawpatch_aux_data(glob,patch,&aux,&maux);    
 
     const user_options_t* user = square_get_options(glob);
     if (user->claw_version == 4) 
@@ -136,7 +136,7 @@ void cb_square_output_ascii (fclaw_domain_t * domain,
 
     /* Get info not readily available to user */
     int level, patch_num, global_num;
-    fclaw2d_patch_get_info(glob->domain,patch,
+    fclaw_patch_get_info(glob->domain,patch,
                            blockno,patchno,
                            &global_num, &patch_num,&level);
     
@@ -147,9 +147,9 @@ void cb_square_output_ascii (fclaw_domain_t * domain,
 
     double *q;
     int meqn;
-    fclaw2d_clawpatch_soln_data(glob,patch,&q,&meqn);
-    double* error = fclaw2d_clawpatch_get_error(glob,patch);
-    double* soln = fclaw2d_clawpatch_get_exactsoln(glob,patch);
+    fclaw_clawpatch_soln_data(glob,patch,&q,&meqn);
+    double* error = fclaw_clawpatch_get_error(glob,patch);
+    double* soln = fclaw_clawpatch_get_exactsoln(glob,patch);
 
     char fname[BUFSIZ];
     snprintf (fname, BUFSIZ, "%s.q%04d", fclaw_opt->prefix, iframe);
@@ -176,10 +176,10 @@ void cb_square_output_ascii (fclaw_domain_t * domain,
 void square_link_solvers(fclaw_global_t *glob)
 {
     /* ForestClaw core functions */
-    fclaw2d_vtable_t *vt = fclaw2d_vt(glob);
+    fclaw_vtable_t *vt = fclaw_vt(glob);
     vt->problem_setup = &square_problem_setup;  /* Version-independent */
 
-    fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt(glob);
+    fclaw_patch_vtable_t *patch_vt = fclaw_patch_vt(glob);
     patch_vt->setup = &square_patch_setup_manifold;
 
     fclaw_clawpatch_vtable_t *clawpatch_vt = fclaw_clawpatch_vt(glob);

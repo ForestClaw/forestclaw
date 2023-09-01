@@ -28,8 +28,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_include_all.h>
 
 #include <fclaw_clawpatch.h>
-#include <fclaw2d_clawpatch_output_ascii.h>
-#include <fclaw2d_physical_bc.h>
+#include <fclaw_clawpatch_output_ascii.h>
+#include <fclaw_physical_bc.h>
 
 #include "gem3d_output_mesh.h"
 
@@ -38,12 +38,12 @@ void no_solver_output(fclaw_global_t* glob,int iframe);
 
 void no_solver_link_solvers(fclaw_global_t* global)
 {
-    fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt(glob);
-    fclaw2d_vtable_t* vt = fclaw2d_vt(glob);
+    fclaw_patch_vtable_t *patch_vt = fclaw_patch_vt(glob);
+    fclaw_vtable_t* vt = fclaw_vt(glob);
 
     patch_vt->single_step_update   = &no_solver_update;
     patch_vt->initialize           = &no_solver_patch_initialize;
-    patch_vt->physical_bc          = &fclaw2d_physical_bc_default;  /* do nothing */
+    patch_vt->physical_bc          = &fclaw_physical_bc_default;  /* do nothing */
     vt->output_frame               = &no_solver_output;
 
 }
@@ -60,7 +60,7 @@ void no_solver_patch_initialize(fclaw_global_t *glob,
     fclaw_clawpatch_grid_data_2d(glob,this_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
-    fclaw2d_clawpatch_soln_data(glob,this_patch,&q,&meqn);
+    fclaw_clawpatch_soln_data(glob,this_patch,&q,&meqn);
 
     int blockno = this_block_idx;
     INITIALIZE(&mx,&my,&meqn,&mbc,&blockno,&xlower,&ylower,&dx,&dy,q);
@@ -81,7 +81,7 @@ static
 void no_solver_output(fclaw_global_t* glob,int iframe)
 {
     /* Create usual output */
-    fclaw2d_clawpatch_output_ascii(glob,iframe);
+    fclaw_clawpatch_output_ascii(glob,iframe);
 
     /* Write out mesh (for GEM3d) */
     gem3d_output_mesh(glob,iframe);

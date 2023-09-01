@@ -57,7 +57,7 @@ typedef struct user_options
 } user_options_t;
 
 struct fclaw_global;
-struct fclaw2d_patch;
+struct fclaw_patch_t;
 
 #if 0
 /* So syntax highlighting works */

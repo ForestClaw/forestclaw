@@ -50,7 +50,7 @@ void torus_problem_setup(fclaw_global_t *glob)
         fprintf(f,  "%-24.6f   %s",user->beta,"\% beta\n");
         fclose(f);
     }
-    fclaw2d_domain_barrier (glob->domain);
+    fclaw_domain_barrier (glob->domain);
     TORUS_SETPROB();
 }
 
@@ -77,7 +77,7 @@ void torus_patch_setup(fclaw_global_t *glob,
                                     &xtangents, &ytangents,
                                     &surfnormals);
 
-    fclaw2d_clawpatch_aux_data(glob,this_patch,&aux,&maux);
+    fclaw_clawpatch_aux_data(glob,this_patch,&aux,&maux);
 
     /* Handles both non-conservative (ex 1-2) and conservative (ex 3-4) forms */
     FCLAW_ASSERT(maux == 7);
@@ -90,8 +90,8 @@ void torus_patch_setup(fclaw_global_t *glob,
 
 void torus_link_solvers(fclaw_global_t *glob)
 {
-    fclaw2d_vtable_t *vt = fclaw2d_vt(glob);
-    fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt(glob);
+    fclaw_vtable_t *vt = fclaw_vt(glob);
+    fclaw_patch_vtable_t *patch_vt = fclaw_patch_vt(glob);
     fclaw_clawpatch_vtable_t *clawpatch_vt = fclaw_clawpatch_vt(glob);
 
     vt->problem_setup = &torus_problem_setup;  /* Version-independent */

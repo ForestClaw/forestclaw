@@ -43,23 +43,23 @@ void create_domain_map (fclaw_global_t *glob,
     {
     case 0:
         /* Use [ax,bx]x[ay,by] */
-        domain = fclaw2d_domain_new_unitsquare (glob->mpicomm, fclaw_opt->minlevel);
+        domain = fclaw_domain_new_unitsquare (glob->mpicomm, fclaw_opt->minlevel);
         cont = fclaw2d_map_new_nomap ();
         break;
     case 1:
         /* Five patch square : maps to [-1,1]x[-1,1] */
-        domain = fclaw2d_domain_new_disk (glob->mpicomm, 0, 0, fclaw_opt->minlevel);
+        domain = fclaw_domain_new_disk_2d (glob->mpicomm, 0, 0, fclaw_opt->minlevel);
         cont = fclaw2d_map_new_fivepatch (fclaw_opt->scale,
                                           fclaw_opt->shift, user->alpha);
         break;
     case 2:
         /* Pillow disk (single block) */
-        domain = fclaw2d_domain_new_unitsquare (glob->mpicomm, fclaw_opt->minlevel);
+        domain = fclaw_domain_new_unitsquare (glob->mpicomm, fclaw_opt->minlevel);
         cont = fclaw2d_map_new_pillowdisk (fclaw_opt->scale, fclaw_opt->shift,rotate);
         break;
     case 3:
         /* Pillow disk mapping of the five patch square */
-        domain = fclaw2d_domain_new_disk (glob->mpicomm, 0, 0, fclaw_opt->minlevel);
+        domain = fclaw_domain_new_disk_2d (glob->mpicomm, 0, 0, fclaw_opt->minlevel);
         cont = fclaw2d_map_new_pillowdisk5 (fclaw_opt->scale, fclaw_opt->shift,
                                             rotate,user->alpha);
         break;

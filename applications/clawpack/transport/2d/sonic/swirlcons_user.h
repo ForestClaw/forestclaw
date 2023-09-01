@@ -56,7 +56,7 @@ typedef struct user_options
 } user_options_t;
 
 struct fclaw_global;
-struct fclaw2d_patch;
+struct fclaw_patch_t;
 
 #define SWIRLCONS_SETPROB FCLAW_F77_FUNC(swirlcons_setprob, SWIRLCONS_SETPROB)
 void SWIRLCONS_SETPROB();
@@ -93,7 +93,7 @@ fclaw2d_map_context_t* fclaw2d_map_new_bilinear(fclaw2d_map_context_t *brick,
                                                 const double center[]);
 
 void swirlcons_patch_setup_manifold(struct fclaw_global *glob,
-                                    struct fclaw2d_patch *this_patch,
+                                    struct fclaw_patch_t *this_patch,
                                     int this_block_idx,
                                     int this_patch_idx);
 

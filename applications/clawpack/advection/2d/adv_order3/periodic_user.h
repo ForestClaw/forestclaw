@@ -98,7 +98,7 @@ void PERIODIC_FORT_INTERPOLATE_FACE(const int* mx, const int* my,
                                                const int* idir, const int* iside,
                                                const int* num_neighbors,
                                                const int* refratio, const int* igrid,
-                                               struct fclaw2d_patch_transform_data** 
+                                               struct fclaw_patch_transform_data** 
                                                transform_cptr);
 
 #define PERIODIC_FORT_INTERPOLATE_CORNER \
@@ -108,7 +108,7 @@ void PERIODIC_FORT_INTERPOLATE_CORNER(const int* mx, const int* my,
                                                  const int* mbc,const int* meqn, 
                                                  const int* a_refratio, double this_q[],
                                                  double neighbor_q[], const int* a_corner,
-                                                 struct fclaw2d_patch_transform_data** 
+                                                 struct fclaw_patch_transform_data** 
                                                  transform_cptr);
 
 

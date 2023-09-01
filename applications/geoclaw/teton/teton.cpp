@@ -54,8 +54,8 @@ fclaw_domain_t* create_domain(sc_MPI_Comm mpicomm, fclaw_options_t* fclaw_opt)
     cont = fclaw2d_map_new_nomap_brick(brick);
 
     domain = fclaw2d_domain_new_conn_map (mpicomm, fclaw_opt->minlevel, conn, cont);
-    fclaw2d_domain_list_levels(domain, FCLAW_VERBOSITY_ESSENTIAL);
-    fclaw2d_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);
+    fclaw_domain_list_levels(domain, FCLAW_VERBOSITY_ESSENTIAL);
+    fclaw_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);
 
     return domain;
 }
@@ -69,7 +69,7 @@ void run_program(fclaw_global_t* glob)
     /* ---------------------------------------------------------------
        Set domain data.
        --------------------------------------------------------------- */
-    fclaw2d_domain_data_new(glob->domain);
+    fclaw_domain_data_new(glob->domain);
 
     /* Initialize virtual table for ForestClaw */
     fclaw_vtables_initialize(glob);
@@ -84,10 +84,10 @@ void run_program(fclaw_global_t* glob)
     /* ---------------------------------------------------------------
        Initialize, run and finalize
        --------------------------------------------------------------- */
-    fclaw2d_initialize(glob);
-    fclaw2d_run(glob);
+    fclaw_initialize(glob);
+    fclaw_run(glob);
 
-    fclaw2d_finalize(glob);
+    fclaw_finalize(glob);
 }
 
 int

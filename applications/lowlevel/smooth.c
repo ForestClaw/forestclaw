@@ -24,7 +24,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include <fclaw_base.h>
-#include <fclaw2d_convenience.h>
+#include <fclaw_convenience.h>
 
 #define TBUFSIZ (2 * BUFSIZ)
 
@@ -310,7 +310,7 @@ main (int argc, char **argv)
     init_values (s);
 
     /* create a new domain */
-    s->domain = fclaw2d_domain_new_unitsquare (s->mpicomm, s->minlevel);
+    s->domain = fclaw_domain_new_unitsquare (s->mpicomm, s->minlevel);
     fclaw_domain_set_refinement (s->domain, s->smooth_refine,
                                  s->smooth_level, s->coarsen_delay);
 

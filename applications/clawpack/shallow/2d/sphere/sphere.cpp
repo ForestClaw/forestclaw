@@ -183,21 +183,21 @@ void run_program(fclaw_app_t* app)
 
     domain = fclaw2d_domain_new_conn_map (mpicomm, gparms->minlevel, conn, cont);
 
-    fclaw2d_domain_list_levels(domain, FCLAW_VERBOSITY_ESSENTIAL);
-    fclaw2d_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);
+    fclaw_domain_list_levels(domain, FCLAW_VERBOSITY_ESSENTIAL);
+    fclaw_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);
 
     /* ---------------------------------------------------------------
        Set domain data.
        --------------------------------------------------------------- */
     fclaw2d_domain_set_app (domain,app);
 
-    fclaw2d_domain_data_new(domain);
+    fclaw_domain_data_new(domain);
 
     sphere_link_solvers(domain);
 
-    fclaw2d_initialize(&domain);
-    fclaw2d_run(&domain);
-    fclaw2d_finalize(&domain);
+    fclaw_initialize(&domain);
+    fclaw_run(&domain);
+    fclaw_finalize(&domain);
 }
 
 int

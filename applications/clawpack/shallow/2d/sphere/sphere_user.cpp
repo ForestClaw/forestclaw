@@ -31,7 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 static fc2d_clawpack46_vtable_t classic_claw;
 
-static fclaw2d_vtable_t vt;
+static fclaw_vtable_t vt;
 
 void sphere_link_solvers(fclaw_domain_t *domain)
 {

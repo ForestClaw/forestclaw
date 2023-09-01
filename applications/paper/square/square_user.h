@@ -63,7 +63,7 @@ typedef struct user_options
 } user_options_t;
 
 struct fclaw_global;
-struct fclaw2d_patch;
+struct fclaw_patch_t;
 
 #define SQUARE_SETPROB FCLAW_F77_FUNC(square_setprob, SQUARE_SETPROB)
 void SQUARE_SETPROB();

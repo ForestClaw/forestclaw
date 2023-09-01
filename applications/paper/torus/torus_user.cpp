@@ -59,7 +59,7 @@ void torus_problem_setup(fclaw_global_t *glob)
         fprintf(f,  "%-24.8f   %s",user->phi[1],"\% phi_range[1]\n");    
         fclose(f);
     }
-    fclaw2d_domain_barrier (glob->domain);
+    fclaw_domain_barrier (glob->domain);
     TORUS_SETPROB();        
 }
 
@@ -75,7 +75,7 @@ void torus_patch_setup(fclaw_global_t *glob,
                                 &xlower,&ylower,&dx,&dy);
 
     double *xp, *yp, *zp, *xd, *yd, *zd, *area;
-    fclaw2d_clawpatch_metric_data(glob,patch,&xp,&yp,&zp,
+    fclaw_clawpatch_metric_data_2d(glob,patch,&xp,&yp,&zp,
                                   &xd,&yd,&zd,&area);
 
     double *edgelengths,*curvature;
@@ -84,7 +84,7 @@ void torus_patch_setup(fclaw_global_t *glob,
 
     int maux;
     double *aux;
-    fclaw2d_clawpatch_aux_data(glob,patch,&aux,&maux);
+    fclaw_clawpatch_aux_data(glob,patch,&aux,&maux);
     TORUS_SETAUX(&blockno, &mx,&my,&mbc, &xlower,&ylower,
                   &dx,&dy, area, edgelengths,xp,yp,zp,
                   aux, &maux);
@@ -121,7 +121,7 @@ void cb_torus_output_ascii (fclaw_domain_t * domain,
 
     /* Get info not readily available to user */
     int level,patch_num, global_num;
-    fclaw2d_patch_get_info(glob->domain,this_patch,
+    fclaw_patch_get_info(glob->domain,this_patch,
                            blockno,patchno,
                            &global_num, &patch_num,&level);
     
@@ -132,9 +132,9 @@ void cb_torus_output_ascii (fclaw_domain_t * domain,
 
     int meqn;
     double* q;
-    fclaw2d_clawpatch_soln_data(glob,this_patch,&q,&meqn);
-    double* error = fclaw2d_clawpatch_get_error(glob,this_patch);
-    double* soln = fclaw2d_clawpatch_get_exactsoln(glob,this_patch);
+    fclaw_clawpatch_soln_data(glob,this_patch,&q,&meqn);
+    double* error = fclaw_clawpatch_get_error(glob,this_patch);
+    double* soln = fclaw_clawpatch_get_exactsoln(glob,this_patch);
 
     const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
     char fname[BUFSIZ];
@@ -167,10 +167,10 @@ void cb_torus_output_ascii (fclaw_domain_t * domain,
 void torus_link_solvers(fclaw_global_t *glob)
 {
 
-    fclaw2d_vtable_t *vt = fclaw2d_vt(glob);
+    fclaw_vtable_t *vt = fclaw_vt(glob);
     vt->problem_setup = &torus_problem_setup;  /* Version-independent */
 
-    fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt(glob);
+    fclaw_patch_vtable_t *patch_vt = fclaw_patch_vt(glob);
     patch_vt->setup   = &torus_patch_setup;
 
     fc2d_clawpack46_vtable_t *claw46_vt = fc2d_clawpack46_vt(glob);

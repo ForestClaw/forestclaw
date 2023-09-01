@@ -171,7 +171,7 @@ torthem_destroy (torthem_t * torthem)
     fclaw_options_destroy (&torthem->fclaw_opt);
 
 #if 1
-    fclaw2d_finalize (torthem->global);
+    fclaw_finalize (torthem->global);
     fclaw_global_destroy (torthem->global);
 #endif
 }

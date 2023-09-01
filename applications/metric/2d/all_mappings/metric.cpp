@@ -176,14 +176,14 @@ void run_program(fclaw_app_t* app)
 
   /* ---------------------------------------------------------- */
 
-  fclaw2d_domain_list_levels(domain, FCLAW_VERBOSITY_INFO);
-  fclaw2d_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);
+  fclaw_domain_list_levels(domain, FCLAW_VERBOSITY_INFO);
+  fclaw_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);
 
 
   /* ---------------------------------------------------------------
      Set domain data.
      --------------------------------------------------------------- */
-  fclaw2d_domain_data_new(domain);
+  fclaw_domain_data_new(domain);
   fclaw2d_domain_set_app(domain,app);
 
   /* Link other routines that need to be included. */
@@ -193,9 +193,9 @@ void run_program(fclaw_app_t* app)
      Initialize and run the simulation
      -------------------------------------------------- */
 
-  fclaw2d_initialize(&domain);
-  fclaw2d_run(&domain);
-  fclaw2d_finalize(&domain);
+  fclaw_initialize(&domain);
+  fclaw_run(&domain);
+  fclaw_finalize(&domain);
 }
 
 int
