@@ -717,7 +717,7 @@ def replace_identifiers_and_includes(filepath, code, identifier_map):
 
 def process_directory(root_dir, identifier_map):
     # Use glob to find all C++ files recursively.
-    for filepath in [f for f in glob.glob(f"{root_dir}/**/*", recursive=True) if f.lower().endswith(('.c', '.h', '.cpp', '.hpp', '.f', '.f90'))]:
+    for filepath in [f for f in glob.glob(f"{root_dir}/**/*", recursive=True) if f.lower().endswith(('.c', '.h', '.cpp', '.hpp', '.f', '.f90', '.cu'))]:
         print(f"Processing {filepath}...")
         
         # Read the existing code from the file
