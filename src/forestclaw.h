@@ -1099,7 +1099,75 @@ void fclaw_domain_ghost_exchange_end (fclaw_domain_t * domain,
 void fclaw_domain_free_after_exchange (fclaw_domain_t * domain,
                                        fclaw_domain_exchange_t * e);
 
+///@}
+/* ---------------------------------------------------------------------- */
+///                 @name Indirect Parallel Neighbors
+/* ---------------------------------------------------------------------- */
+///@{
 
+/* Data structure for storing indirect parallel neighbor information */
+typedef struct fclaw_domain_indirect fclaw_domain_indirect_t;
+
+/** Begin sending messages to determine neighbors of ghost patches.
+ * This call must not be interleaved with any ghost_exchange calls.
+ * \param [in] domain           This domain must remain valid until
+ *                              \ref fclaw_domain_indirect_destroy.
+ * \return                      A private data structure that will hold
+ *                              the context for indirect ghost neighbors.
+ */
+fclaw_domain_indirect_t
+    * fclaw_domain_indirect_begin (fclaw_domain_t * domain);
+
+/** End sending messages to determine neighbors of ghost patches.
+ * This call must not be interleaved with any ghost_exchange calls.
+ * When this function returns, the necessary information is complete
+ * and \ref fclaw_domain_indirect_neighbors may be called any number of times.
+ * \param [in] domain           Must be the same domain used in the begin call.
+ * \param [in,out] ind          Must be returned by an earlier call to
+ *                              \ref fclaw_domain_indirect_begin
+ *                              and will be completed with parallel information.
+ */
+void fclaw_domain_indirect_end (fclaw_domain_t * domain,
+                                fclaw_domain_indirect_t * ind);
+
+/** Call this analogously to \ref fclaw_domain_face_neighbors.
+ * We only return an indirect ghost neighbor patch:  This is defined as a ghost
+ * patch that is neighbor to the calling ghost patch and belongs to a processor
+ * that is neither the owner of that ghost patch nor our own processor.
+ * \param [in] domain           Must be the same domain used in begin and end.
+ * \param [in] ind              Must have been initialized by \ref
+ *                              fclaw_domain_indirect_end.
+ * \param [in] ghostno          Number of the ghost patch whose neighbors we seek.
+ * \param [in] faceno           Number of the ghost patch's face to look across.
+ * \param [out] rproc           Processor number of neighbor patches.  Exception 1:
+ *                              If the neighbor is a bigger patch, rproc[1] contains
+ *                              the number of the small patch as one of two half faces,
+ *                              but only if the neighbor fits the above criteria.
+ *                              Exception 2: For non-indirect patches, set it to -1.
+ * \param [out] rblockno        The number of the neighbor block.
+ * \param [out] rpatchno        Only for indirect ghost patches, we store
+ *                              the number relative to our ghost patch array.
+ *                              For all other patches, this is -1.
+ * \param [out] faceno          The face number and orientation of the neighbor(s).
+ * \return                      Only for indirect ghost patches, the size of the
+ *                              neighbor(s).  For all others, we set this to
+ *                              \ref fclaw_PATCH_BOUNDARY.
+ */
+fclaw_patch_relation_t
+fclaw_domain_indirect_neighbors (fclaw_domain_t * domain,
+                                 fclaw_domain_indirect_t * ind,
+                                 int ghostno, int faceno, int rproc[],
+                                 int *rblockno, int rpatchno[],
+                                 int *rfaceno);
+
+/** Destroy all context data for indirect ghost neighbor patches.
+ * \param [in] domain           Must be the same domain used in begin and end.
+ * \param [in,out] ind          Memory will be freed.
+ */
+void fclaw_domain_indirect_destroy (fclaw_domain_t * domain,
+                                    fclaw_domain_indirect_t * ind);
+
+///@}
 /* ---------------------------------------------------------------------- */
 ///                      @name Meta Domains
 /* ---------------------------------------------------------------------- */
