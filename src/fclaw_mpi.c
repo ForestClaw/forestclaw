@@ -25,7 +25,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw_mpi.h>
 #include <fclaw_global.h>
-#include <forestclaw2d.h>
+#include <forestclaw.h>
 
 /* Functions with C prototypes to use forestclaw from C code */
 

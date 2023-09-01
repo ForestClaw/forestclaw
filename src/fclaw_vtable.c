@@ -28,7 +28,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_output.h>
 #include <fclaw_global.h>
 
-#include <forestclaw2d.h>
+#include <forestclaw.h>
 
 static
 fclaw_vtable_t* vt_new()
