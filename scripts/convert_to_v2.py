@@ -545,7 +545,7 @@ fclaw_1to2 = {
     "<fclaw2d_clawpatch_options.h>"           : "<fclaw_clawpatch_options.h>",
     "fclaw2d_clawpatch_options_t"             : "fclaw_clawpatch_options_t",
     "fclaw2d_clawpatch_options"               : "fclaw_clawpatch_options",
-    "fclaw2d_clawpatch_options_register"      : "fclaw_clawpatch_options_register",
+    "fclaw2d_clawpatch_options_register"      : "fclaw_clawpatch_options_register_2d",
     "fclaw2d_clawpatch_options_store"         : "fclaw_clawpatch_options_store",
     "fclaw2d_clawpatch_get_options"           : "fclaw_clawpatch_get_options",
 
