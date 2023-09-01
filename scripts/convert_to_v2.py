@@ -699,15 +699,21 @@ def replace_identifiers_and_includes(filepath, code, identifier_map):
     tokens = lexer.get_tokens(code)
     new_code = ''
     
+    changes = False
+
     for ttype, value in tokens:
         if ttype in Token.Comment.PreprocFile:
-            new_code += identifier_map.get(value, value)
+            new_value = identifier_map.get(value, value)
+            changes = changes or (new_value != value)
+            new_code += new_value
         elif ttype in Token.Name:
-            new_code += identifier_map.get(value, value)
+            new_value = identifier_map.get(value, value)
+            changes = changes or (new_value != value)
+            new_code += new_value
         else:
             new_code += value
             
-    return new_code
+    return new_code, changes
 
 def process_directory(root_dir, identifier_map):
     # Use glob to find all C++ files recursively.
@@ -719,11 +725,13 @@ def process_directory(root_dir, identifier_map):
             old_code = f.read()
         
         # Replace the identifiers
-        new_code = replace_identifiers_and_includes(filepath, old_code, identifier_map)
+        new_code, changes = replace_identifiers_and_includes(filepath, old_code, identifier_map)
 
-        # Write the new code back to the file
-        with open(filepath, 'w') as f:
-            f.write(new_code)
+        if changes:
+            print(f"Upadated   {filepath}...")
+            # Write the new code back to the file
+            with open(filepath, 'w') as f:
+                f.write(new_code)
 
 
 # Root directory where your C++ files are stored
