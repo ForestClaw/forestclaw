@@ -113,10 +113,6 @@ typedef void  (*pillow_fort_interpolate_block_corner_t)(int* mx, int* my, int* m
                                                         int* icoarse_corner,
                                                         int* blockno);
 
-/** typedef */
-typedef struct fclaw3dx_clawpatch_pillow_vtable fclaw3dx_clawpatch_pillow_vtable_t;
-
-
 /* ----------------------------- Fortran typedefs ------------------------------------- */
 
 /**
