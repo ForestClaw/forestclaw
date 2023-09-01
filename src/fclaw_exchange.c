@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_domain.h>
 #include <fclaw_convenience.h>
 
-/* Also needed in fclaw2d_domain_reset */
+/* Also needed in fclaw_domain_reset */
 /* edit: right now this is not the case, switching to static */
 static
 fclaw_domain_exchange_t*
@@ -160,7 +160,7 @@ unpack_remote_ghost_patches(fclaw_global_t* glob,
    Public interface
    -------------------------------------------------------------------------- */
 /* This is called whenever a new domain is created (initialize, regrid) */
-void fclaw2d_exchange_setup(fclaw_global_t* glob,
+void fclaw_exchange_setup(fclaw_global_t* glob,
                             fclaw_timer_names_t running)
 {
     fclaw_domain_t* domain = glob->domain;
@@ -171,7 +171,7 @@ void fclaw2d_exchange_setup(fclaw_global_t* glob,
     size_t data_size = psize;  /* Includes sizeof(datatype), i.e. sizeof(double) */
     fclaw_domain_exchange_t *e;
 
-    /* we just created a grid by fclaw2d_initialize or fclaw2d_regrid
+    /* we just created a grid by fclaw_initialize or fclaw_regrid
        and we now need to allocate data to store and retrieve local
        boundary patches and remote ghost patches */
     e = fclaw_domain_allocate_before_exchange (domain, data_size);
@@ -250,7 +250,7 @@ void fclaw2d_exchange_setup(fclaw_global_t* glob,
     }
 }
 
-void fclaw2d_exchange_delete(fclaw_global_t* glob)
+void fclaw_exchange_delete(fclaw_global_t* glob)
 {
     fclaw_domain_t** domain = &glob->domain;
     fclaw_timer_start (&glob->timers[FCLAW_TIMER_GHOSTPATCH_BUILD]);
@@ -295,7 +295,7 @@ void fclaw2d_exchange_delete(fclaw_global_t* glob)
    -------------------------------------------------------------- */
 
 /* This is called whenever all time levels are time synchronized. */
-void fclaw2d_exchange_ghost_patches_begin(fclaw_global_t* glob,
+void fclaw_exchange_ghost_patches_begin(fclaw_global_t* glob,
                                           int minlevel,
                                           int maxlevel,
                                           int time_interp,
@@ -359,7 +359,7 @@ void fclaw2d_exchange_ghost_patches_begin(fclaw_global_t* glob,
 }
 
 /* This is called whenever all time levels are time synchronized. */
-void fclaw2d_exchange_ghost_patches_end(fclaw_global_t* glob,
+void fclaw_exchange_ghost_patches_end(fclaw_global_t* glob,
                                         int minlevel,
                                         int maxlevel,
                                         int time_interp,
