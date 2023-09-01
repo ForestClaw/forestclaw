@@ -12,7 +12,7 @@ extern "C"
 {
 #endif
 
-struct fclaw2d_patch;
+struct fclaw_patch_t;
 struct fclaw_global;
 
 typedef struct cudaclaw5_fluxes
@@ -36,10 +36,10 @@ typedef struct cudaclaw5_fluxes
 } cudaclaw5_fluxes_t;
 
 void cudaclaw5_allocate_fluxes(struct fclaw_global *glob,
-                               struct fclaw2d_patch *patch);
+                               struct fclaw_patch_t *patch);
 
 void cudaclaw5_deallocate_fluxes(struct fclaw_global *glob,
-                                 struct fclaw2d_patch *patch);
+                                 struct fclaw_patch_t *patch);
 
 
 #ifdef __cplusplus
