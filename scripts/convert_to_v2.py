@@ -528,7 +528,7 @@ fclaw_1to2 = {
     "<fclaw2d_clawpatch.hpp>"                : "<fclaw_clawpatch.hpp>",
     "fclaw2d_clawpatch_t"                    : "fclaw_clawpatch_t",
     "fclaw2d_clawpatch_get_clawpatch"        : "fclaw_clawpatch_get_clawpatch",
-    "fclaw2d_clawpatch_get_metric_patch"     : "fclaw_clawpatch_get_metric_patch",
+    "fclaw2d_clawpatch_get_metric_patch"     : "fclaw_clawpatch_get_metric_patch_2d",
 
     #===== ./src/patches/clawpatch/fclaw2d_clawpatch_diagnostics.h =====
     "<fclaw2d_clawpatch_diagnostics.h>"               : "<fclaw_clawpatch_diagnostics.h>",
@@ -557,7 +557,7 @@ fclaw_1to2 = {
     #===== ./src/patches/clawpatch/fclaw2d_clawpatch_output_vtk.h =====
     "<fclaw2d_clawpatch_output_vtk.h>"        : "<fclaw_clawpatch_output_vtk.h>",
     "fclaw2d_vtk_patch_data_t"                : "fclaw_vtk_patch_data_t",
-    "fclaw2d_vtk_write_file"                  : "fclaw_vtk_write_file",
+    "fclaw2d_vtk_write_file"                  : "fclaw_vtk_write_file_2d",
     "fclaw2d_clawpatch_output_vtk"            : "fclaw_clawpatch_output_vtk",
 
     #===== ./src/patches/clawpatch/fclaw2d_clawpatch_pillow.h =====
@@ -602,7 +602,7 @@ fclaw_1to2 = {
     "<fclaw3dx_clawpatch.hpp>"                  : "<fclaw_clawpatch.hpp>",
     "fclaw3dx_clawpatch_t"                      : "fclaw_clawpatch_t",
     "fclaw3dx_clawpatch_get_clawpatch"          : "fclaw_clawpatch_get_clawpatch",
-    "fclaw3dx_clawpatch_get_metric_patch"       : "fclaw_clawpatch_get_metric_patch",
+    "fclaw3dx_clawpatch_get_metric_patch"       : "fclaw_clawpatch_get_metric_patch_3d",
 
     #===== ./src/patches/clawpatch/fclaw3dx_clawpatch_diagnostics.h =====
     "<fclaw3dx_clawpatch_diagnostics.h>"               : "<fclaw_clawpatch_diagnostics.h>",
@@ -634,7 +634,7 @@ fclaw_1to2 = {
     #===== ./src/patches/clawpatch/fclaw3dx_clawpatch_output_vtk.h =====
     "<fclaw3dx_clawpatch_output_vtk.h>"        : "<fclaw_clawpatch_output_vtk.h>",
     "fclaw3dx_vtk_patch_data_t"                : "fclaw_vtk_patch_data_t",
-    "fclaw3dx_vtk_write_file"                  : "fclaw3d_vtk_write_file",
+    "fclaw3dx_vtk_write_file"                  : "fclaw_vtk_write_file_3d",
     "fclaw3dx_clawpatch_output_vtk"            : "fclaw_clawpatch_output_vtk",
 
     #===== ./src/patches/clawpatch/fclaw3dx_clawpatch_pillow.h =====
@@ -669,18 +669,30 @@ fclaw_1to2 = {
     "fclaw3dx_user_tag4refinement"               : "fclaw3d_user_tag4refinement",
     "fclaw3dx_user_tag4coarsening"               : "fclaw3d_user_tag4coarsening",
     "fclaw3dx_user_interpolate2fine"             : "fclaw3d_user_interpolate2fine",
-    "fclaw3dx_user_average2coarse"               : "fclaw3d_user_average2coarse"
+    "fclaw3dx_user_average2coarse"               : "fclaw3d_user_average2coarse",
+
+    #===== ./src/patches/clawpatch/fclaw3dx_clawpatch_transform.h =====
+    #"<fclaw3dx_clawpatch_transform.h>"             : "<fclaw2d_clawpatch_transform.h>",
+    #"fclaw3dx_clawpatch_transform_init_data"       : "fclaw2d_clawpatch_transform_init_data",
+    #"fclaw3dx_clawpatch_face_transformation"       : "fclaw2d_clawpatch_face_transformation",
+    #"fclaw3dx_clawpatch_face_transformation_intra" : "fclaw2d_clawpatch_face_transformation_intra",
+    #"FCLAW3DX_CLAWPATCH_TRANSFORM_FACE"            : "FCLAW2D_CLAWPATCH_TRANSFORM_FACE",
+    #"FCLAW3DX_CLAWPATCH_TRANSFORM_FACE_HALF"       : "FCLAW2D_CLAWPATCH_TRANSFORM_FACE_HALF",
+    #"FCLAW3DX_CLAWPATCH_TRANSFORM_CORNER"          : "FCLAW2D_CLAWPATCH_TRANSFORM_CORNER",
+    #"FCLAW3DX_CLAWPATCH_TRANSFORM_CORNER_HALF"     : "FCLAW2D_CLAWPATCH_TRANSFORM_CORNER_HALF"
+
 }
 
 import os
 import glob
+import pygments
 from pygments import highlight
 from pygments.lexers import CppLexer
 from pygments.formatters import NullFormatter
 from pygments.token import Token
 
-def replace_identifiers_and_includes(code, identifier_map):
-    lexer = CppLexer()
+def replace_identifiers_and_includes(filepath, code, identifier_map):
+    lexer = pygments.lexers.get_lexer_for_filename(filepath, stripnl=False, ensurenl=False)
     tokens = lexer.get_tokens(code)
     new_code = ''
     
@@ -696,7 +708,7 @@ def replace_identifiers_and_includes(code, identifier_map):
 
 def process_directory(root_dir, identifier_map):
     # Use glob to find all C++ files recursively.
-    for filepath in glob.glob(f"{root_dir}/**/*.[cChH]*", recursive=True):
+    for filepath in [f for f in glob.glob(f"{root_dir}/**/*", recursive=True) if f.lower().endswith(('.c', '.h', '.cpp', '.hpp'))]:
         print(f"Processing {filepath}...")
         
         # Read the existing code from the file
@@ -704,8 +716,8 @@ def process_directory(root_dir, identifier_map):
             old_code = f.read()
         
         # Replace the identifiers
-        new_code = replace_identifiers_and_includes(old_code, identifier_map)
-        
+        new_code = replace_identifiers_and_includes(filepath, old_code, identifier_map)
+
         # Write the new code back to the file
         with open(filepath, 'w') as f:
             f.write(new_code)
