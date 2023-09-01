@@ -54,6 +54,13 @@ char* fclaw_cwd();
  */
 void fclaw_cd(const char* dir);
 
+/**
+ * @brief create a directory, including parents
+ * 
+ * @param dir the directory to create. Can be absolute or relative.
+ */
+void fclaw_mkdir(const char* dir);
+
 #ifdef __cplusplus
 #if 0
 {

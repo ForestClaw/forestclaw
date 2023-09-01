@@ -79,7 +79,7 @@ add_library(clawpatch
   fclaw_clawpatch_options.c
   fclaw_clawpatch_output_ascii.c
   fclaw_clawpatch_output_vtk.c
-  fclaw_clawpatch_output_vtpd.cpp
+  fclaw_clawpatch_output_vtpd.c
   fclaw_clawpatch_pillow.c
 
   fclaw2d_clawpatch_transform.c
