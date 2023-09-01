@@ -30,6 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_clawpatch_pillow.h>
 
 #include <fclaw_clawpatch.h>
+#include <fclaw_clawpatch_options.h>
 #include <fclaw2d_clawpatch46_fort.h>
 #include <fclaw2d_clawpatch5_fort.h>
 #include <fclaw3dx_clawpatch46_fort.h>
@@ -229,14 +230,13 @@ void pillow_vt_destroy(void* vt)
     FCLAW_FREE (pillow_vt);
 }
 
-static
-void fclaw_clawpatch_pillow_vtable_initialize(int dim, 
-                                              fclaw_global_t* glob,
+void fclaw_clawpatch_pillow_vtable_initialize(fclaw_global_t* glob,
                                               int claw_version)
 {
-    fclaw_clawpatch_pillow_vtable_t *pillow_vt = pillow_vt_new(dim);
+    fclaw_clawpatch_options_t* clawpatch_opt = fclaw_clawpatch_get_options(glob);
+    fclaw_clawpatch_pillow_vtable_t *pillow_vt = pillow_vt_new(clawpatch_opt->dim);
 
-    if(dim == 2)
+    if(clawpatch_opt->dim == 2)
     {
         if (claw_version == 4)
         {
@@ -267,19 +267,6 @@ void fclaw_clawpatch_pillow_vtable_initialize(int dim,
     fclaw_pointer_map_insert(glob->vtables, "fclaw_clawpatch_pillow_vtable", pillow_vt, pillow_vt_destroy);
 
 }
-
-void fclaw2d_clawpatch_pillow_vtable_initialize(fclaw_global_t* glob,
-                                                int claw_version)
-{
-    fclaw_clawpatch_pillow_vtable_initialize(2,glob,claw_version);
-}
-
-void fclaw3d_clawpatch_pillow_vtable_initialize(fclaw_global_t* glob,
-                                                int claw_version)
-{
-    fclaw_clawpatch_pillow_vtable_initialize(3,glob,claw_version);
-}
-
 
 /* ------------------------------- Public access functions ---------------------------- */
 

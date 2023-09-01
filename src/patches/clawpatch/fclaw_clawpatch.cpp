@@ -1959,14 +1959,7 @@ void fclaw_clawpatch_vtable_initialize(fclaw_global_t* glob,
     fclaw_clawpatch_diagnostics_vtable_initialize(glob);
 
     /* Set the virtual table, even if it isn't used */
-    if(clawpatch_vt->dim == 2)
-    {
-        fclaw2d_clawpatch_pillow_vtable_initialize(glob, claw_version);
-    }
-    else
-    {
-        fclaw3d_clawpatch_pillow_vtable_initialize(glob, claw_version);
-    }
+    fclaw_clawpatch_pillow_vtable_initialize(glob, claw_version);
 
     clawpatch_vt->is_set = 1;
 

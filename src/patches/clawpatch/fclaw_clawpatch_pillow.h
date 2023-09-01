@@ -202,22 +202,13 @@ void fclaw_clawpatch_use_pillowsphere(struct fclaw_global* glob);
 /* --------------------------------- Virtual table ------------------------------------ */
 
 /**
- * @brief Initialize the pillow vtable for 2d clawpatch
+ * @brief Initialize the pillow vtable for clawpatch
  * 
  * @param glob the global context
  * @param claw_version the clawaptck verstion 4 for v4.6, 5 for v5
  */
-void fclaw2d_clawpatch_pillow_vtable_initialize(struct fclaw_global* glob, 
-                                                int claw_version);
-/**
- * @brief Initialize the pillow vtable for 3d clawpatch
- * 
- * @param glob the global context
- * @param claw_version the clawaptck verstion 4 for v4.6, 5 for v5
- */
-void fclaw3d_clawpatch_pillow_vtable_initialize(struct fclaw_global* glob, 
-                                                int claw_version);
-
+void fclaw_clawpatch_pillow_vtable_initialize(struct fclaw_global* glob, 
+                                              int claw_version);
 
 /**
  * @brief vtable for handling block corners for pillow sphere
