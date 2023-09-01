@@ -59,7 +59,7 @@ void
 FCLAW2D_MAP_BRICK_GET_DIM(fclaw2d_map_context_t **cont,
                           int *mi, int* mj)
 {
-    fclaw_block_ll_t *bv = (fclaw_block_ll_t *) (*cont)->brick->user_data;
+    fclaw2d_block_ll_t *bv = (fclaw2d_block_ll_t *) (*cont)->brick->user_data;
     *mi = bv->mi;
     *mj = bv->mj;
 }
@@ -71,7 +71,7 @@ fclaw2d_map_c2m_brick(fclaw2d_map_context_t * cont, int blockno,
                      double *xp, double *yp, double *zp)
 {
     /* Map the brick coordinates to global [0,1] coordinates. */
-    fclaw_block_ll_t *bv = (fclaw_block_ll_t *) cont->user_data;
+    fclaw2d_block_ll_t *bv = (fclaw2d_block_ll_t *) cont->user_data;
     *xp = (double) (bv->xv[blockno] + xc)/bv->mi;
     *yp = (double) (bv->yv[blockno] + yc)/bv->mj;
     *zp = 0;
@@ -79,7 +79,7 @@ fclaw2d_map_c2m_brick(fclaw2d_map_context_t * cont, int blockno,
 
 void fclaw2d_map_destroy_brick(fclaw2d_map_context_t *cont)
 {
-    fclaw_block_ll_t *bv = (fclaw_block_ll_t *) cont->user_data;
+    fclaw2d_block_ll_t *bv = (fclaw2d_block_ll_t *) cont->user_data;
     FCLAW_FREE(bv->xv);
     FCLAW_FREE(bv->yv);
 
@@ -92,7 +92,7 @@ fclaw2d_map_context_t* fclaw2d_map_new_brick_conn
   (p4est_connectivity_t *conn, int mi, int mj)
 {
     fclaw2d_map_context_t *cont;
-    fclaw_block_ll_t *bv;
+    fclaw2d_block_ll_t *bv;
     int i,nb,vnum;
 
     cont = FCLAW_ALLOC_ZERO (fclaw2d_map_context_t, 1);
@@ -101,7 +101,7 @@ fclaw2d_map_context_t* fclaw2d_map_new_brick_conn
     cont->destroy = fclaw2d_map_destroy_brick;
 
     nb = (int) conn->num_trees;
-    bv = FCLAW_ALLOC_ZERO(fclaw_block_ll_t,1);
+    bv = FCLAW_ALLOC_ZERO(fclaw2d_block_ll_t,1);
 
     /* We don't store this in user_double[], since that only has limited
        storage (16 doubles) */
@@ -138,7 +138,7 @@ fclaw2d_map_new_brick (fclaw_domain_t *domain,
                        int mi, int mj, int periodic_i, int periodic_j)
 {
     fclaw2d_map_context_t *cont;
-    fclaw_block_ll_t *bv;
+    fclaw2d_block_ll_t *bv;
     int i,nb;
 
     cont = FCLAW_ALLOC_ZERO (fclaw2d_map_context_t, 1);
@@ -147,7 +147,7 @@ fclaw2d_map_new_brick (fclaw_domain_t *domain,
     cont->destroy = fclaw2d_map_destroy_brick;
 
     nb = domain->num_blocks;
-    bv = FCLAW_ALLOC_ZERO(fclaw_block_ll_t,1);
+    bv = FCLAW_ALLOC_ZERO(fclaw2d_block_ll_t,1);
 
     /* We don't store this in user_double[], since that only has limited
        storage (16 doubles) */

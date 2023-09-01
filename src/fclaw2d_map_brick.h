@@ -57,14 +57,14 @@ void WRITE_BRICK_DATA(int* n,
                       double xv[],
                       double yv[]);
 
-typedef struct fclaw_block_ll
+typedef struct fclaw2d_block_ll
 {
     int nb;
     int mi, mj;
     double *xv;
     double *yv;
 }
-fclaw_block_ll_t;
+fclaw2d_block_ll_t;
 
 struct fclaw2d_map_context*
 fclaw2d_map_new_brick (fclaw_domain_t *domain,
