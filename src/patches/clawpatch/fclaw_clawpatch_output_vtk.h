@@ -77,12 +77,12 @@ typedef void (*fclaw_vtk_patch_data_t) (struct fclaw_global * glob,
  *                  Collective with identical value on all ranks.
  */
 int
-fclaw2d_vtk_write_file (struct fclaw_global * glob, const char *basename,
-                        int mx, int my,
-                        int meqn,
-                        double vtkspace, int vtkwrite,
-                        fclaw_vtk_patch_data_t coordinate_cb,
-                        fclaw_vtk_patch_data_t value_cb);
+fclaw_vtk_write_file_2d (struct fclaw_global * glob, const char *basename,
+                         int mx, int my,
+                         int meqn,
+                         double vtkspace, int vtkwrite,
+                         fclaw_vtk_patch_data_t coordinate_cb,
+                         fclaw_vtk_patch_data_t value_cb);
 
 /** 
  * Write a file in VTK format for the whole domain in parallel.
@@ -101,12 +101,12 @@ fclaw2d_vtk_write_file (struct fclaw_global * glob, const char *basename,
  *                  Collective with identical value on all ranks.
  */
 int
-fclaw3d_vtk_write_file (struct fclaw_global * glob, const char *basename,
-                        int mx, int my, int mz,
-                        int meqn,
-                        double vtkspace, int vtkwrite,
-                        fclaw_vtk_patch_data_t coordinate_cb,
-                        fclaw_vtk_patch_data_t value_cb);
+fclaw_vtk_write_file_3d (struct fclaw_global * glob, const char *basename,
+                         int mx, int my, int mz,
+                         int meqn,
+                         double vtkspace, int vtkwrite,
+                         fclaw_vtk_patch_data_t coordinate_cb,
+                         fclaw_vtk_patch_data_t value_cb);
 
 /**
  * @brief Output vtu file

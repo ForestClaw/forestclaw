@@ -690,7 +690,7 @@ fclaw_vtk_write_file (int dim, fclaw_global_t * glob, const char *basename,
 }
 
 int
-fclaw2d_vtk_write_file (fclaw_global_t * glob, const char *basename,
+fclaw_vtk_write_file_2d (fclaw_global_t * glob, const char *basename,
                         int mx, int my,
                         int meqn,
                         double vtkspace, int vtkwrite,
@@ -702,7 +702,7 @@ fclaw2d_vtk_write_file (fclaw_global_t * glob, const char *basename,
 }
 
 int
-fclaw3d_vtk_write_file (fclaw_global_t * glob, const char *basename,
+fclaw_vtk_write_file_3d (fclaw_global_t * glob, const char *basename,
                         int mx, int my, int mz,
                         int meqn,
                         double vtkspace, int vtkwrite,
@@ -914,7 +914,7 @@ void fclaw_clawpatch_output_vtk_to_file (fclaw_global_t * glob, const char* file
 
     if(clawpatch_opt->dim == 2)
     {
-        fclaw2d_vtk_write_file (glob, filename,
+        fclaw_vtk_write_file_2d (glob, filename,
                                 clawpatch_opt->d2->mx, 
                                 clawpatch_opt->d2->my,
                                 clawpatch_opt->meqn,
@@ -925,7 +925,7 @@ void fclaw_clawpatch_output_vtk_to_file (fclaw_global_t * glob, const char* file
     }
     else 
     {
-        fclaw3d_vtk_write_file (glob, filename,
+        fclaw_vtk_write_file_3d (glob, filename,
                                 clawpatch_opt->d3->mx, 
                                 clawpatch_opt->d3->my, 
                                 clawpatch_opt->d3->mz,
