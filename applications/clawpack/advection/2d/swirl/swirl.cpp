@@ -24,6 +24,7 @@
 */
 
 #include "swirl_user.h"
+#include <fclaw2d_file.h>
 
 #include "../all/advection_user.h"
 
@@ -46,6 +47,9 @@ void create_domain_map (fclaw2d_global_t *glob, fclaw_options_t* gparms)
 static
 void run_program(fclaw2d_global_t* glob)
 {
+    int errcode, retval;
+    fclaw2d_file_context_t *fc;
+
     /* ---------------------------------------------------------------
        Set domain data.
        --------------------------------------------------------------- */
@@ -73,6 +77,16 @@ void run_program(fclaw2d_global_t* glob)
        --------------------------------------------------------------- */
     fclaw2d_initialize(glob);
     fclaw2d_run(glob);
+
+    /* Example usage of forestclaw file functions. This is just for
+     * demonstration purposes. For an actual restart functionality in ForestClaw
+     * the workflow must be extended by providing buffers with the required
+     * data and the functions may be called at a more suitable place.
+     */
+    fc = fclaw2d_file_open_write ("swirl_io_test.p4d", "ForestClaw data file",
+                                  glob->domain, &errcode);
+
+    retval = fclaw2d_file_close (fc, &errcode);
 
     fclaw2d_finalize(glob);
 }
