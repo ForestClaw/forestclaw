@@ -207,7 +207,7 @@ fclaw_patch_edge_neighbors (fclaw_domain_t * domain,
 }
 
 void
-fclaw2d_patch_edge_swap (int *edgeno, int *redgeno)
+fclaw_patch_edge_swap (int *edgeno, int *redgeno)
 {
     int swap;
 
