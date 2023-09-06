@@ -27,6 +27,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_options.h>
 #include <fclaw2d_clawpatch_options.h>
 #include <fclaw3dx_clawpatch_options.h>
+#include <fclaw_packing.h>
 #include <test.hpp>
 
 TEST_CASE("fclaw2d_clawpatch_options can store options in two seperate globs")
@@ -138,4 +139,93 @@ TEST_CASE("fclaw3dx_clawpatch_get_options fails is fclaw2d_clawpatch_options is 
 	fclaw2d_global_destroy(glob);
 }
 
+TEST_CASE("fclaw2d_clawpatch_options packing/unpacking")
+{
+	fclaw2d_clawpatch_options_t* opts = FCLAW_ALLOC_ZERO(fclaw2d_clawpatch_options_t,1);
+	opts->mx = 5;
+	opts->my = 6;
+	opts->maux = 4;
+	opts->mbc = 3;
+	opts->meqn = 32;
+	opts->rhs_fields = 39;
+	opts->refinement_criteria = 1;
+	opts->interp_stencil_width = 3;
+	opts->ghost_patch_pack_aux = 7;
+	opts->save_aux = 1;
+	opts->is_registered = 1;
+
+	const fclaw_packing_vtable_t* vt = fclaw2d_clawpatch_options_get_packing_vtable();
+
+	size_t size = vt->size(opts);
+	char buffer[size];
+	size_t bytes_written = vt->pack(opts,buffer);
+	REQUIRE_EQ(bytes_written,size);
+
+	fclaw2d_clawpatch_options_t* output_opts = nullptr;
+	size_t bytes_read = vt->unpack(buffer,(void**)&output_opts);
+
+	REQUIRE_EQ(bytes_read,size);
+	REQUIRE_NE(output_opts,nullptr);
+
+	CHECK_EQ(output_opts->mx,opts->mx);
+	CHECK_EQ(output_opts->my,opts->my);
+	CHECK_EQ(output_opts->maux,opts->maux);
+	CHECK_EQ(output_opts->mbc,opts->mbc);
+	CHECK_EQ(output_opts->meqn,opts->meqn);
+	CHECK_EQ(output_opts->rhs_fields,opts->rhs_fields);
+	CHECK_EQ(output_opts->refinement_criteria,opts->refinement_criteria);
+	CHECK_EQ(output_opts->interp_stencil_width,opts->interp_stencil_width);
+	CHECK_EQ(output_opts->ghost_patch_pack_aux,opts->ghost_patch_pack_aux);
+	CHECK_EQ(output_opts->save_aux,opts->save_aux);
+	CHECK_EQ(output_opts->is_registered,opts->is_registered);
+
+	vt->destroy(output_opts);
+	FCLAW_FREE(opts);
+}
+
+TEST_CASE("fclaw3dx_clawpatch_options packing/unpacking")
+{
+	fclaw3dx_clawpatch_options_t* opts = FCLAW_ALLOC_ZERO(fclaw3dx_clawpatch_options_t,1);
+	opts->mx = 5;
+	opts->my = 6;
+	opts->mz = 3;
+	opts->maux = 4;
+	opts->mbc = 3;
+	opts->meqn = 32;
+	opts->rhs_fields = 39;
+	opts->refinement_criteria = 1;
+	opts->interp_stencil_width = 3;
+	opts->ghost_patch_pack_aux = 7;
+	opts->save_aux = 1;
+	opts->is_registered = 1;
+
+	const fclaw_packing_vtable_t* vt = fclaw3dx_clawpatch_options_get_packing_vtable();
+
+	size_t size = vt->size(opts);
+	char buffer[size];
+	size_t bytes_written = vt->pack(opts,buffer);
+	REQUIRE_EQ(bytes_written,size);
+
+	fclaw3dx_clawpatch_options_t* output_opts = nullptr;
+	size_t bytes_read = vt->unpack(buffer,(void**)&output_opts);
+
+	REQUIRE_EQ(bytes_read,size);
+	REQUIRE_NE(output_opts,nullptr);
+
+	CHECK_EQ(output_opts->mx,opts->mx);
+	CHECK_EQ(output_opts->my,opts->my);
+	CHECK_EQ(output_opts->mz,opts->mz);
+	CHECK_EQ(output_opts->maux,opts->maux);
+	CHECK_EQ(output_opts->mbc,opts->mbc);
+	CHECK_EQ(output_opts->meqn,opts->meqn);
+	CHECK_EQ(output_opts->rhs_fields,opts->rhs_fields);
+	CHECK_EQ(output_opts->refinement_criteria,opts->refinement_criteria);
+	CHECK_EQ(output_opts->interp_stencil_width,opts->interp_stencil_width);
+	CHECK_EQ(output_opts->ghost_patch_pack_aux,opts->ghost_patch_pack_aux);
+	CHECK_EQ(output_opts->save_aux,opts->save_aux);
+	CHECK_EQ(output_opts->is_registered,opts->is_registered);
+
+	vt->destroy(output_opts);
+	FCLAW_FREE(opts);
+}
 #endif

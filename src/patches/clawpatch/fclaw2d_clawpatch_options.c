@@ -23,6 +23,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include "fclaw_base.h"
 #ifndef REFINE_DIM
 #define REFINE_DIM 2
 #endif
@@ -46,6 +47,21 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #endif
 #include <fclaw2d_global.h>
+#include <fclaw_pointer_map.h>
+#include <fclaw_packing.h>
+
+static sc_keyvalue_t *
+kv_refinement_criterea_new()
+{
+    sc_keyvalue_t *kv = sc_keyvalue_new ();
+    sc_keyvalue_set_int (kv, "value",        FCLAW_REFINE_CRITERIA_VALUE);
+    sc_keyvalue_set_int (kv, "difference",   FCLAW_REFINE_CRITERIA_DIFFERENCE);
+    sc_keyvalue_set_int (kv, "minmax",       FCLAW_REFINE_CRITERIA_MINMAX);
+    sc_keyvalue_set_int (kv, "gradient",     FCLAW_REFINE_CRITERIA_GRADIENT);
+    sc_keyvalue_set_int (kv, "user",         FCLAW_REFINE_CRITERIA_USER);
+
+    return kv;
+}
 
 static void *
 clawpatch_register(fclaw2d_clawpatch_options_t *clawpatch_options,
@@ -88,12 +104,7 @@ clawpatch_register(fclaw2d_clawpatch_options_t *clawpatch_options,
                          "Save aux variables when re-taking a time step [F]");
 
     /* Set verbosity level for reporting timing */
-    sc_keyvalue_t *kv = clawpatch_options->kv_refinement_criteria = sc_keyvalue_new ();
-    sc_keyvalue_set_int (kv, "value",        FCLAW_REFINE_CRITERIA_VALUE);
-    sc_keyvalue_set_int (kv, "difference",   FCLAW_REFINE_CRITERIA_DIFFERENCE);
-    sc_keyvalue_set_int (kv, "minmax",       FCLAW_REFINE_CRITERIA_MINMAX);
-    sc_keyvalue_set_int (kv, "gradient",     FCLAW_REFINE_CRITERIA_GRADIENT);
-    sc_keyvalue_set_int (kv, "user",         FCLAW_REFINE_CRITERIA_USER);
+    sc_keyvalue_t *kv = clawpatch_options->kv_refinement_criteria = kv_refinement_criterea_new();
     sc_options_add_keyvalue (opt, 0, "refinement-criteria", 
                              &clawpatch_options->refinement_criteria, "minmax",
                              kv, "Refinement criteria [minmax]");
@@ -156,6 +167,60 @@ clawpatch_destroy (fclaw2d_clawpatch_options_t *clawpatch_opt)
 {
     FCLAW_ASSERT (clawpatch_opt->kv_refinement_criteria != NULL);
     sc_keyvalue_destroy (clawpatch_opt->kv_refinement_criteria);
+    FCLAW_FREE(clawpatch_opt);
+}
+
+static void
+clawpatch_destroy_void(void *clawpatch_opt)
+{
+    clawpatch_destroy ((fclaw2d_clawpatch_options_t *) clawpatch_opt);
+}
+
+static size_t 
+options_packsize(void* user)
+{
+    return sizeof(fclaw2d_clawpatch_options_t);
+}
+
+static size_t 
+options_pack(void* user, char* buffer)
+{
+    fclaw2d_clawpatch_options_t* opts = (fclaw2d_clawpatch_options_t*) user;
+
+    //pack entire struct
+    return FCLAW_PACK(*opts,buffer);
+}
+
+static size_t 
+options_unpack(char* buffer, void** user)
+{
+    fclaw2d_clawpatch_options_t** opts_ptr = (fclaw2d_clawpatch_options_t**) user;
+
+    *opts_ptr = FCLAW_ALLOC(fclaw2d_clawpatch_options_t,1);
+
+    FCLAW_UNPACK(buffer,*opts_ptr);
+
+    fclaw2d_clawpatch_options_t* opts = *opts_ptr;
+
+    *opts = *(fclaw2d_clawpatch_options_t*) buffer;
+
+    opts->kv_refinement_criteria = kv_refinement_criterea_new();
+
+    return sizeof(fclaw2d_clawpatch_options_t);
+}
+
+static fclaw_packing_vtable_t packing_vt = 
+{
+	options_pack,
+	options_unpack,
+	options_packsize,
+	clawpatch_destroy_void
+};
+
+const fclaw_packing_vtable_t* 
+fclaw2d_clawpatch_options_get_packing_vtable()
+{
+    return &packing_vt;
 }
 
 /* ------------------------------------------------------------------------
@@ -171,6 +236,8 @@ options_register(fclaw_app_t * a, void *optpkg, sc_options_t * opt)
 
     fclaw2d_clawpatch_options_t *clawpatch_opt = 
                                  (fclaw2d_clawpatch_options_t *) optpkg;
+
+    fclaw_app_register_options_packing_vtable(CLAWPATCH_OPTION_NAME, &packing_vt);
 
     return clawpatch_register(clawpatch_opt,opt);
 }
@@ -219,7 +286,6 @@ options_destroy (fclaw_app_t * a, void *package, void *registered)
 
     /* Destroy option arrays created in post-process */
     clawpatch_destroy (clawpatch_opt);
-    FCLAW_FREE(clawpatch_opt);
 }
 
 

@@ -23,6 +23,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include <fclaw_pointer_map.h>
 #include <fclaw_base.h>
 #include <fclaw_mpi.h>
 #include <iniparser.h>
@@ -30,6 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 static const char *fclaw_configdir = ".forestclaw";
 static const char *fclaw_env_configdir = "FCLAW_INI_DIR";
 static int fclaw_package_id = -1;
+static fclaw_pointer_map_t* packing_vtables = NULL;
 
 int
 fclaw_app_exit_type_to_status (fclaw_exit_type_t vexit)
@@ -349,6 +351,8 @@ fclaw_app_destroy (fclaw_app_t * a)
     sc_array_destroy (a->opt_pkg);
 
     FCLAW_FREE (a);
+
+    if(packing_vtables!=NULL) fclaw_pointer_map_destroy(packing_vtables);
 
     sc_finalize ();
 
@@ -920,6 +924,23 @@ fclaw_app_get_options (fclaw_app_t * a)
     FCLAW_ASSERT (a != NULL);
 
     return a->opt;
+}
+
+
+void fclaw_app_register_options_packing_vtable(const char*name,fclaw_packing_vtable_t* vtable){
+    if(packing_vtables == NULL)
+    {
+        packing_vtables = fclaw_pointer_map_new();
+    }
+    fclaw_pointer_map_insert(packing_vtables, name, vtable, NULL);
+}
+
+fclaw_packing_vtable_t* fclaw_app_get_options_packing_vtable(const char*name){
+    if(packing_vtables == NULL)
+    {
+        packing_vtables = fclaw_pointer_map_new();
+    }
+    return (fclaw_packing_vtable_t*) fclaw_pointer_map_get(packing_vtables,name);
 }
 
 /*** which of the following do we need? ***/
