@@ -960,10 +960,10 @@ fclaw2d_patch_corner_neighbors (fclaw_domain_t * domain,
                 int edge_rpatchno[4];
                 int edge_rfaceno;
                 fclaw_patch_relation_t  edge_neighbor_size;
-                fclaw3d_patch_edge_neighbors (domain,
-                                              blockno, patchno, edge,
-                                              edge_rproc, &edge_rblockno,
-                                              edge_rpatchno, &edge_rfaceno, &edge_neighbor_size);
+                fclaw_patch_edge_neighbors (domain,
+                                            blockno, patchno, edge,
+                                            edge_rproc, &edge_rblockno,
+                                            edge_rpatchno, &edge_rfaceno, &edge_neighbor_size);
                 if(edge_neighbor_size == FCLAW_PATCH_SAMESIZE)
                 {
                     int edge_axis = edge/4;

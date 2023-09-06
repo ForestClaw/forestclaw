@@ -399,34 +399,6 @@ void fclaw3d_patch_transform_face2 (fclaw_patch_t * ipatch,
                                     int mx, int my, int mz, int based,
                                     int i[], int j[], int k[]);
 
-/** Determine neighbor patch(es) and orientation across a given edge.
- * The current version only supports one neighbor, i.e., no true multi-block.
- * A query across an edge in the middle of a longer face returns the boundary.
- * We only return edge neighbors that are not already face neighbors.
- * Inter-tree edges are only returned if the number of meeting edges is
- * exactly four.  Five or more are currently not supported.
- * This must ONLY be called for local patches.
- * \param [in] domain   Valid domain structure.
- * \param [in] blockno  Number of the block within the domain.
- * \param [in] patchno  Number of the patch within the block.
- * \param [in] edgeno	Number of the patch edge: 4 parallel to x axis,
-                        then 4 parallel to y axis, then 4 parallel to z.
- * \param [out] rproc   Processor number of neighbor patch.
- * \param [out] rblockno        Neighbor block number.
- * \param [out] rpatchno        Neighbor patch number relative to the block.
- *                              If the neighbor is off-processor, this is not
- *                              a patch number but in [0, num_ghosts_patches[.
- * \param [out] redge           Number of the edge from the other neighbor.
- * \param [out] neighbor_size   The relative patch size of the neighbor.
- * \return                      True if at least one edge neighbor exists
- *                              that is not already a face neighbor.
- */
-int fclaw3d_patch_edge_neighbors (fclaw_domain_t * domain,
-                                  int blockno, int patchno, int edgeno,
-                                  int *rproc, int *rblockno, int *rpatchno,
-                                  int *redge,
-                                  fclaw_patch_relation_t * neighbor_size);
-
 /** Change perspective across an edge neighbor situation.
  * \param [in,out] edgeno       On input, valid edge number for a patch.
  *                              On output, edge number seen from

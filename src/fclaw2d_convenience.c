@@ -29,7 +29,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_convenience.h>
 #include <forestclaw2d.h>
-#include <forestclaw2d.h>
 #include <p4est_bits.h>
 #include <p4est_search.h>
 #include <p4est_vtk.h>
@@ -38,7 +37,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #else
 
 #include <fclaw3d_convenience.h>
-#include <forestclaw3d.h>
 #include <forestclaw3d.h>
 #include <p8est_bits.h>
 #include <p8est_search.h>
@@ -630,9 +628,9 @@ fclaw2d_domain_adapt (fclaw_domain_t * domain)
                 for (int edge = 0; max_tlevel <= level &&
                      edge < P8EST_EDGES; ++edge)
                 {
-                    fclaw3d_patch_edge_neighbors (domain, nb, np, edge,
-                                                  nprocs, &nblockno,
-                                                  npatchno, &nfc, &nrel);
+                    fclaw_patch_edge_neighbors (domain, nb, np, edge,
+                                                nprocs, &nblockno,
+                                                npatchno, &nfc, &nrel);
 
                     /* we refine ourself if the neighbor wants to be finer */
                     if (nrel == FCLAW_PATCH_SAMESIZE)
