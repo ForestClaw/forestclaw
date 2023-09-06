@@ -1068,32 +1068,39 @@ fclaw2d_patch_transform_corner (fclaw_patch_t * ipatch,
         if ((icorner & 1) == 0)
         {
             /* This corner is on the left face of the patch */
+            /* verify the blocks are corner-neighbors with the next assertions */
+            FCLAW_ASSERT (fabs (opatch->d2->xupper - 1.) < SC_1000_EPS);
             xshift = +1.;
         }
         else
         {
             /* This corner is on the right face of the patch */
+            FCLAW_ASSERT (fabs (opatch->d2->xlower) < SC_1000_EPS);
             xshift = -1.;
         }
         if ((icorner & 2) == 0)
         {
             /* This corner is on the front face of the patch */
+            FCLAW_ASSERT (fabs (opatch->d2->yupper - 1.) < SC_1000_EPS);
             yshift = +1.;
         }
         else
         {
             /* This corner is on the back face of the patch */
+            FCLAW_ASSERT (fabs (opatch->d2->ylower) < SC_1000_EPS);
             yshift = -1.;
         }
 #ifdef P4_TO_P8
         if ((icorner & 4) == 0)
         {
             /* This corner is on the bottom face of the patch */
+            FCLAW_ASSERT (fabs (opatch->d3->zupper - 1.) < SC_1000_EPS);
             zshift = +1.;
         }
         else
         {
             /* This corner is on the top face of the patch */
+            FCLAW_ASSERT (fabs (opatch->d3->zlower) < SC_1000_EPS);
             zshift = -1.;
         }
 #endif
@@ -1175,32 +1182,39 @@ fclaw2d_patch_transform_corner2 (fclaw_patch_t * ipatch,
         if ((icorner & 1) == 0)
         {
             /* This corner is on the left face of the patch */
+            /* verify the blocks are corner-neighbors with the next assertions */
+            FCLAW_ASSERT (fabs (opatch->d2->xupper - 1.) < SC_1000_EPS);
             xshift = +1.;
         }
         else
         {
             /* This corner is on the right face of the patch */
+            FCLAW_ASSERT (fabs (opatch->d2->xlower) < SC_1000_EPS);
             xshift = -1.;
         }
         if ((icorner & 2) == 0)
         {
             /* This corner is on the front face of the patch */
+            FCLAW_ASSERT (fabs (opatch->d2->yupper - 1.) < SC_1000_EPS);
             yshift = +1.;
         }
         else
         {
             /* This corner is on the back face of the patch */
+            FCLAW_ASSERT (fabs (opatch->d2->ylower) < SC_1000_EPS);
             yshift = -1.;
         }
 #ifdef P4_TO_P8
         if ((icorner & 4) == 0)
         {
             /* This corner is on the bottom face of the patch */
+            FCLAW_ASSERT (fabs (opatch->d3->zupper - 1.) < SC_1000_EPS);
             zshift = +1.;
         }
         else
         {
             /* This corner is on the top face of the patch */
+            FCLAW_ASSERT (fabs (opatch->d3->zlower) < SC_1000_EPS);
             zshift = -1.;
         }
 #endif
