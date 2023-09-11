@@ -85,7 +85,7 @@ typedef struct fclaw2d_file_context fclaw2d_file_context_t;
  */
 fclaw2d_file_context_t *fclaw2d_file_open_write (const char *filename,
                                                  const char *user_string,
-                                                 fclaw_domain_t *domain,
+                                                 fclaw2d_domain_t *domain,
                                                  int *errcode);
 
 /** Write a serial data block to an opened parallel file.
@@ -223,7 +223,7 @@ fclaw2d_file_context_t *fclaw2d_file_write_array (fclaw2d_file_context_t *
 fclaw2d_file_context_t *fclaw2d_file_open_read (sc_MPI_Comm mpicomm,
                                                 const char *filename,
                                                 char *user_string,
-                                                fclaw_domain_t **domain,
+                                                fclaw2d_domain_t **domain,
                                                 int *errcode);
 
 /** Read a serial data block from an opened file.

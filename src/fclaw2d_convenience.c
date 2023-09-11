@@ -24,39 +24,26 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include <sc_notify.h>
-
 #ifndef P4_TO_P8
-
 #include <fclaw2d_convenience.h>
-#include <forestclaw2d.h>
 #include <p4est_bits.h>
 #include <p4est_search.h>
 #include <p4est_vtk.h>
 #include <p4est_wrap.h>
-
 #else
-
 #include <fclaw3d_convenience.h>
-#include <forestclaw3d.h>
 #include <p8est_bits.h>
 #include <p8est_search.h>
 #include <p8est_vtk.h>
 #include <p8est_wrap.h>
-
-// for dimension dependent values
-// needs to be defined AFTER all other headers
-#define d2 d3
-
 #endif
 
 const double fclaw2d_smallest_h = 1. / (double) P4EST_ROOT_LEN;
 
 static void
-fclaw2d_patch_set_boundary_xylower (fclaw_patch_t * patch,
+fclaw2d_patch_set_boundary_xylower (fclaw2d_patch_t * patch,
                                     p4est_quadrant_t * quad)
 {
-    patch->dim = P4EST_DIM;
-
     p4est_qcoord_t qh;
 
     qh = P4EST_QUADRANT_LEN (quad->level);
@@ -88,19 +75,19 @@ fclaw2d_patch_set_boundary_xylower (fclaw_patch_t * patch,
 #endif
     /* This suffices to test for block corners by using bitwise and */
 
-    patch->d2->xlower = quad->x * fclaw2d_smallest_h;
-    patch->d2->xupper = (quad->x + qh) * fclaw2d_smallest_h;
-    patch->d2->ylower = quad->y * fclaw2d_smallest_h;
-    patch->d2->yupper = (quad->y + qh) * fclaw2d_smallest_h;
+    patch->xlower = quad->x * fclaw2d_smallest_h;
+    patch->xupper = (quad->x + qh) * fclaw2d_smallest_h;
+    patch->ylower = quad->y * fclaw2d_smallest_h;
+    patch->yupper = (quad->y + qh) * fclaw2d_smallest_h;
 #ifdef P4_TO_P8
-    patch->d3->zlower = quad->z * fclaw2d_smallest_h;
-    patch->d3->zupper = (quad->z + qh) * fclaw2d_smallest_h;
+    patch->zlower = quad->z * fclaw2d_smallest_h;
+    patch->zupper = (quad->z + qh) * fclaw2d_smallest_h;
 #endif
 }
 
 /** Domain constructor takes ownership of wrap.
  */
-static fclaw_domain_t *
+static fclaw2d_domain_t *
 fclaw2d_domain_new (p4est_wrap_t * wrap, sc_keyvalue_t * attributes)
 {
     int mpiret;
@@ -121,17 +108,16 @@ fclaw2d_domain_new (p4est_wrap_t * wrap, sc_keyvalue_t * attributes)
 #endif
     p4est_tree_t *tree;
     p4est_quadrant_t *quad, *mirror;
-    fclaw_domain_t *domain;
-    fclaw_block_t *block;
-    fclaw_patch_t *patch;
-    fclaw_patch_t *currentbylevel[P4EST_MAXLEVEL + 1];
+    fclaw2d_domain_t *domain;
+    fclaw2d_block_t *block;
+    fclaw2d_patch_t *patch;
+    fclaw2d_patch_t *currentbylevel[P4EST_MAXLEVEL + 1];
 
 #ifdef FCLAW_ENABLE_DEBUG
     memset (currentbylevel, 0,
-            sizeof (fclaw_patch_t *) * (P4EST_MAXLEVEL + 1));
+            sizeof (fclaw2d_patch_t *) * (P4EST_MAXLEVEL + 1));
 #endif
-    domain = FCLAW_ALLOC_ZERO (fclaw_domain_t, 1);
-    domain->dim = P4EST_DIM;
+    domain = FCLAW_ALLOC_ZERO (fclaw2d_domain_t, 1);
     domain->mpicomm = wrap->p4est->mpicomm;
     domain->mpisize = wrap->p4est->mpisize;
     domain->mpirank = wrap->p4est->mpirank;
@@ -142,7 +128,7 @@ fclaw2d_domain_new (p4est_wrap_t * wrap, sc_keyvalue_t * attributes)
     domain->num_exchange_patches = (int) ghost->mirrors.elem_count;
     if (domain->num_exchange_patches > 0)
     {
-        domain->exchange_patches = FCLAW_ALLOC (fclaw_patch_t *,
+        domain->exchange_patches = FCLAW_ALLOC (fclaw2d_patch_t *,
                                                 domain->num_exchange_patches);
         mirror = p4est_quadrant_array_index (&ghost->mirrors, nm);
         mirror_quadrant_num = (int) mirror->p.piggy3.local_num;
@@ -159,7 +145,7 @@ fclaw2d_domain_new (p4est_wrap_t * wrap, sc_keyvalue_t * attributes)
     FCLAW_ASSERT (domain->num_ghost_patches ==
                   (int) mesh->ghost_num_quadrants);
     domain->num_blocks = nb = (int) conn->num_trees;
-    domain->blocks = FCLAW_ALLOC_ZERO (fclaw_block_t, domain->num_blocks);
+    domain->blocks = FCLAW_ALLOC_ZERO (fclaw2d_block_t, domain->num_blocks);
     domain->possible_maxlevel = P4EST_QMAXLEVEL;
     local_num_patches = 0;
     local_minlevel = domain->possible_maxlevel;
@@ -182,14 +168,13 @@ fclaw2d_domain_new (p4est_wrap_t * wrap, sc_keyvalue_t * attributes)
             p4est_tree_array_index (wrap->p4est->trees, (p4est_topidx_t) i);
         tree_minlevel = domain->possible_maxlevel;
         tree_maxlevel = -1;
-        block->d2 = FCLAW_ALLOC_ZERO (fclaw_block_d2_t, 1);
-        block->d2->xlower = 0.;
-        block->d2->xupper = 1.;
-        block->d2->ylower = 0.;
-        block->d2->yupper = 1.;
+        block->xlower = 0.;
+        block->xupper = 1.;
+        block->ylower = 0.;
+        block->yupper = 1.;
 #ifdef P4_TO_P8
-        block->d3->zlower = 0.;
-        block->d3->zupper = 1.;
+        block->zlower = 0.;
+        block->zupper = 1.;
 #endif
         if (conn->vertices != NULL && conn->tree_to_vertex != NULL)
         {
@@ -197,13 +182,13 @@ fclaw2d_domain_new (p4est_wrap_t * wrap, sc_keyvalue_t * attributes)
             {
                 vnum = conn->tree_to_vertex[P4EST_CHILDREN * i + j];
                 FCLAW_ASSERT (0 <= vnum && vnum < conn->num_vertices);
-                memcpy (block->d2->vertices + 3 * j, conn->vertices + 3 * vnum,
+                memcpy (block->vertices + 3 * j, conn->vertices + 3 * vnum,
                         3 * sizeof (double));
             }
         }
         else
         {
-            memset (block->d2->vertices, 0, P4EST_CHILDREN * 3 * sizeof (double));
+            memset (block->vertices, 0, P4EST_CHILDREN * 3 * sizeof (double));
         }
         for (face = 0; face < P4EST_FACES; ++face)
         {
@@ -212,21 +197,20 @@ fclaw2d_domain_new (p4est_wrap_t * wrap, sc_keyvalue_t * attributes)
                 && conn->tree_to_face[P4EST_FACES * i + face] ==
                 (int8_t) face)
             {
-                block->d2->is_boundary[face] = 1;
+                block->is_boundary[face] = 1;
             }
         }
         block->num_patches = (int) tree->quadrants.elem_count;
         block->patches =
-            FCLAW_ALLOC_ZERO (fclaw_patch_t, block->num_patches);
+            FCLAW_ALLOC_ZERO (fclaw2d_patch_t, block->num_patches);
         block->patchbylevel =
-            FCLAW_ALLOC_ZERO (fclaw_patch_t *,
+            FCLAW_ALLOC_ZERO (fclaw2d_patch_t *,
                               domain->possible_maxlevel + 1);
 
         block_nm_pre = nm;
         for (j = 0; j < block->num_patches; ++j)
         {
             patch = block->patches + j;
-            patch->d2 = FCLAW_ALLOC_ZERO(fclaw_patch_d2_t,1);
             quad = p4est_quadrant_array_index (&tree->quadrants, (size_t) j);
             patch->target_level = patch->level = level = (int) quad->level;
             patch->flags = p4est_quadrant_child_id (quad);
@@ -294,11 +278,10 @@ fclaw2d_domain_new (p4est_wrap_t * wrap, sc_keyvalue_t * attributes)
 
     /* allocate ghost patches */
     domain->ghost_patches =
-        FCLAW_ALLOC_ZERO (fclaw_patch_t, domain->num_ghost_patches);
+        FCLAW_ALLOC_ZERO (fclaw2d_patch_t, domain->num_ghost_patches);
     for (i = 0; i < domain->num_ghost_patches; ++i)
     {
         patch = domain->ghost_patches + i;
-        patch->d2 = FCLAW_ALLOC_ZERO(fclaw_patch_d2_t,1);
         quad = p4est_quadrant_array_index (&ghost->ghosts, (size_t) i);
         patch->target_level = patch->level = level = (int) quad->level;
         patch->flags =
@@ -339,7 +322,7 @@ fclaw2d_check_initial_level (sc_MPI_Comm mpicomm, int initial_level)
                      "Initial level %d too fine for p4est", initial_level);
 }
 
-fclaw_domain_t *
+fclaw2d_domain_t *
 fclaw2d_domain_new_unitsquare (sc_MPI_Comm mpicomm, int initial_level)
 {
     fclaw2d_check_initial_level (mpicomm, initial_level);
@@ -350,7 +333,7 @@ fclaw2d_domain_new_unitsquare (sc_MPI_Comm mpicomm, int initial_level)
 
 #ifndef P4_TO_P8
 
-fclaw_domain_t *
+fclaw2d_domain_t *
 fclaw2d_domain_new_torus (sc_MPI_Comm mpicomm, int initial_level)
 {
     fclaw2d_check_initial_level (mpicomm, initial_level);
@@ -359,7 +342,7 @@ fclaw2d_domain_new_torus (sc_MPI_Comm mpicomm, int initial_level)
                             NULL);
 }
 
-fclaw_domain_t *
+fclaw2d_domain_t *
 fclaw2d_domain_new_twosphere (sc_MPI_Comm mpicomm, int initial_level)
 {
     fclaw2d_check_initial_level (mpicomm, initial_level);
@@ -368,7 +351,7 @@ fclaw2d_domain_new_twosphere (sc_MPI_Comm mpicomm, int initial_level)
                             NULL);
 }
 
-fclaw_domain_t *
+fclaw2d_domain_t *
 fclaw2d_domain_new_cubedsphere (sc_MPI_Comm mpicomm, int initial_level)
 {
     fclaw2d_check_initial_level (mpicomm, initial_level);
@@ -376,7 +359,7 @@ fclaw2d_domain_new_cubedsphere (sc_MPI_Comm mpicomm, int initial_level)
                                NULL);
 }
 
-fclaw_domain_t *
+fclaw2d_domain_t *
 fclaw2d_domain_new_disk (sc_MPI_Comm mpicomm,
                          int periodic_in_x, int periodic_in_y,
                          int initial_level)
@@ -389,7 +372,7 @@ fclaw2d_domain_new_disk (sc_MPI_Comm mpicomm,
 
 #endif /* P4_TO_P8 */
 
-fclaw_domain_t *
+fclaw2d_domain_t *
 fclaw2d_domain_new_brick (sc_MPI_Comm mpicomm,
                           int blocks_in_x, int blocks_in_y,
 #ifdef P4_TO_P8
@@ -416,12 +399,12 @@ fclaw2d_domain_new_brick (sc_MPI_Comm mpicomm,
     return fclaw2d_domain_new (wrap, NULL);
 }
 
-fclaw_domain_t *
+fclaw2d_domain_t *
 fclaw2d_domain_new_conn (sc_MPI_Comm mpicomm, int initial_level,
                          p4est_connectivity_t * conn)
 {
     p4est_wrap_t *wrap;
-    fclaw_domain_t *domain;
+    fclaw2d_domain_t *domain;
 
     fclaw2d_check_initial_level (mpicomm, initial_level);
     wrap = p4est_wrap_new_conn (mpicomm, conn, initial_level);
@@ -434,15 +417,15 @@ fclaw2d_domain_new_conn (sc_MPI_Comm mpicomm, int initial_level,
 
 /* function to be removed once no longer called by applications */
 
-fclaw_domain_t *
+fclaw2d_domain_t *
 fclaw2d_domain_new_conn_map (sc_MPI_Comm mpicomm, int initial_level,
                              p4est_connectivity_t * conn,
                              fclaw2d_map_context_t * cont)
 {
-    fclaw_domain_t *domain =
+    fclaw2d_domain_t *domain =
       fclaw2d_domain_new_conn (mpicomm, initial_level, conn);
 
-    fclaw_domain_attribute_add (domain, "fclaw_map_context", cont);
+    fclaw2d_domain_attribute_add (domain, "fclaw_map_context", cont);
 
     return domain;
 }
@@ -450,10 +433,10 @@ fclaw2d_domain_new_conn_map (sc_MPI_Comm mpicomm, int initial_level,
 #endif
 
 void
-fclaw2d_domain_destroy (fclaw_domain_t * domain)
+fclaw2d_domain_destroy (fclaw2d_domain_t * domain)
 {
     int i;
-    fclaw_block_t *block;
+    fclaw2d_block_t *block;
 
     FCLAW_ASSERT (!domain->just_adapted);
     FCLAW_ASSERT (!domain->just_partitioned);
@@ -461,20 +444,11 @@ fclaw2d_domain_destroy (fclaw_domain_t * domain)
     for (i = 0; i < domain->num_blocks; ++i)
     {
         block = domain->blocks + i;
-        for (int p = 0; p < block->num_patches; ++p)
-        {
-            FCLAW_FREE (block->patches[p].d2);
-        }
-        FCLAW_FREE (block->d2);
         FCLAW_FREE (block->patches);
         FCLAW_FREE (block->patchbylevel);
     }
     FCLAW_FREE (domain->blocks);
 
-    for (i = 0; i < domain->num_ghost_patches; ++i)
-    {
-        FCLAW_FREE (domain->ghost_patches[i].d2);
-    }
     FCLAW_FREE (domain->ghost_patches);
     FCLAW_FREE (domain->ghost_target_levels);
     FCLAW_FREE (domain->mirror_target_levels);
@@ -490,18 +464,18 @@ fclaw2d_domain_destroy (fclaw_domain_t * domain)
 }
 
 static void
-fclaw2d_domain_copy_parameters (fclaw_domain_t * domain_dest,
-                                fclaw_domain_t * domain_src)
+fclaw2d_domain_copy_parameters (fclaw2d_domain_t * domain_dest,
+                                fclaw2d_domain_t * domain_src)
 {
     memcpy (&domain_dest->p, &domain_src->p,
-            sizeof (fclaw_domain_persist_t));
+            sizeof (fclaw2d_domain_persist_t));
 }
 
-static fclaw_patch_t *
-fclaw2d_domain_get_neighbor_patch (fclaw_domain_t * domain,
+static fclaw2d_patch_t *
+fclaw2d_domain_get_neighbor_patch (fclaw2d_domain_t * domain,
                                    int nproc, int nblockno, int npatchno)
 {
-    fclaw_block_t *block;
+    fclaw2d_block_t *block;
 
     /* the block number should always be right */
     FCLAW_ASSERT (0 <= nblockno && nblockno < domain->num_blocks);
@@ -520,8 +494,8 @@ fclaw2d_domain_get_neighbor_patch (fclaw_domain_t * domain,
     return block->patches + npatchno;
 }
 
-fclaw_domain_t *
-fclaw2d_domain_adapt (fclaw_domain_t * domain)
+fclaw2d_domain_t *
+fclaw2d_domain_adapt (fclaw2d_domain_t * domain)
 {
     p4est_wrap_t *wrap = (p4est_wrap_t *) domain->pp;
 
@@ -538,9 +512,9 @@ fclaw2d_domain_adapt (fclaw_domain_t * domain)
         int level, max_tlevel;
         int exists;
         int k;
-        fclaw_patch_relation_t nrel;
-        fclaw_block_t *block;
-        fclaw_patch_t *gpatch, *patch, *npatch;
+        fclaw2d_patch_relation_t nrel;
+        fclaw2d_block_t *block;
+        fclaw2d_patch_t *gpatch, *patch, *npatch;
 
         /* exchange target refinement level with parallel neighbors */
         p4est_ghost_exchange_custom (wrap->p4est, p4est_wrap_get_ghost (wrap),
@@ -570,12 +544,12 @@ fclaw2d_domain_adapt (fclaw_domain_t * domain)
                 for (face = 0; max_tlevel <= level &&
                      face < wrap->p4est_faces; ++face)
                 {
-                    nrel = fclaw_patch_face_neighbors (domain, nb, np, face,
-                                                       nprocs, &nblockno,
-                                                       npatchno, &nfc);
+                    nrel = fclaw2d_patch_face_neighbors (domain, nb, np, face,
+                                                         nprocs, &nblockno,
+                                                         npatchno, &nfc);
 
                     /* we refine ourself if the neighbor wants to be finer */
-                    if (nrel == FCLAW_PATCH_SAMESIZE)
+                    if (nrel == FCLAW2D_PATCH_SAMESIZE)
                     {
                         npatch = fclaw2d_domain_get_neighbor_patch (domain,
                                                                     nprocs[0],
@@ -589,7 +563,7 @@ fclaw2d_domain_adapt (fclaw_domain_t * domain)
                             max_tlevel =
                                 SC_MAX (max_tlevel, npatch->target_level);
                     }
-                    else if (nrel == FCLAW_PATCH_DOUBLESIZE)
+                    else if (nrel == FCLAW2D_PATCH_DOUBLESIZE)
                     {
                         npatch = fclaw2d_domain_get_neighbor_patch (domain,
                                                                     nprocs[0],
@@ -601,7 +575,7 @@ fclaw2d_domain_adapt (fclaw_domain_t * domain)
                             max_tlevel =
                                 SC_MAX (max_tlevel, npatch->target_level);
                     }
-                    else if (nrel == FCLAW_PATCH_HALFSIZE)
+                    else if (nrel == FCLAW2D_PATCH_HALFSIZE)
                     {
                         for (k = 0; k < P4EST_HALF; ++k)
                         {
@@ -619,81 +593,27 @@ fclaw2d_domain_adapt (fclaw_domain_t * domain)
                     }
                     else
                     {
-                        FCLAW_ASSERT (nrel == FCLAW_PATCH_BOUNDARY);
+                        FCLAW_ASSERT (nrel == FCLAW2D_PATCH_BOUNDARY);
                     }
                 }
 
 #ifdef P4_TO_P8
                 /* loop through edge neighbors of this patch */
-                for (int edge = 0; max_tlevel <= level &&
-                     edge < P8EST_EDGES; ++edge)
-                {
-                    fclaw_patch_edge_neighbors (domain, nb, np, edge,
-                                                nprocs, &nblockno,
-                                                npatchno, &nfc, &nrel);
-
-                    /* we refine ourself if the neighbor wants to be finer */
-                    if (nrel == FCLAW_PATCH_SAMESIZE)
-                    {
-                        npatch = fclaw2d_domain_get_neighbor_patch (domain,
-                                                                    nprocs[0],
-                                                                    nblockno,
-                                                                    npatchno
-                                                                    [0]);
-                        P4EST_ASSERT (npatch->level == level);
-                        if (npatch->level >= domain->p.smooth_level)
-                            /* Match target level only if we are in a level that
-                               should be refined */
-                            max_tlevel =
-                                SC_MAX (max_tlevel, npatch->target_level);
-                    }
-                    else if (nrel == FCLAW_PATCH_DOUBLESIZE)
-                    {
-                        npatch = fclaw2d_domain_get_neighbor_patch (domain,
-                                                                    nprocs[0],
-                                                                    nblockno,
-                                                                    npatchno
-                                                                    [0]);
-                        P4EST_ASSERT (npatch->level == level - 1);
-                        if (npatch->level >= domain->p.smooth_level)
-                            max_tlevel =
-                                SC_MAX (max_tlevel, npatch->target_level);
-                    }
-                    else if (nrel == FCLAW_PATCH_HALFSIZE)
-                    {
-                        for (k = 0; k < 2; ++k)
-                        {
-                            npatch =
-                                fclaw2d_domain_get_neighbor_patch (domain,
-                                                                   nprocs[k],
-                                                                   nblockno,
-                                                                   npatchno
-                                                                   [k]);
-                            P4EST_ASSERT (npatch->level == level + 1);
-                            if (npatch->level >= domain->p.smooth_level)
-                                max_tlevel =
-                                    SC_MAX (max_tlevel, npatch->target_level);
-                        }
-                    }
-                    else
-                    {
-                        FCLAW_ASSERT (nrel == FCLAW_PATCH_BOUNDARY);
-                    }
-                }
+                /* to be implemented */
 #endif
 
                 /* loop through corner neighbors of this patch */
                 for (corner = 0; max_tlevel <= level &&
                      corner < wrap->p4est_children; ++corner)
                 {
-                    exists = fclaw_patch_corner_neighbors (domain, nb, np,
-                                                           corner, nprocs,
-                                                           &nblockno,
-                                                           npatchno,
-                                                           &nfc, &nrel);
+                    exists = fclaw2d_patch_corner_neighbors (domain, nb, np,
+                                                             corner, nprocs,
+                                                             &nblockno,
+                                                             npatchno,
+                                                             &nfc, &nrel);
                     if (exists)
                     {
-                        FCLAW_ASSERT (nrel != FCLAW_PATCH_BOUNDARY);
+                        FCLAW_ASSERT (nrel != FCLAW2D_PATCH_BOUNDARY);
                         npatch =
                             fclaw2d_domain_get_neighbor_patch (domain,
                                                                nprocs[0],
@@ -728,7 +648,7 @@ fclaw2d_domain_adapt (fclaw_domain_t * domain)
     /* do the adaptation */
     if (p4est_wrap_adapt (wrap))
     {
-        fclaw_domain_t *newd;
+        fclaw2d_domain_t *newd;
 
         domain->pp_owned = 0;
         newd = fclaw2d_domain_new (wrap, domain->attributes);
@@ -741,8 +661,8 @@ fclaw2d_domain_adapt (fclaw_domain_t * domain)
     {
         /* clean up the target levels since we don't adapt */
         int nb, np;
-        fclaw_block_t *block;
-        fclaw_patch_t *patch;
+        fclaw2d_block_t *block;
+        fclaw2d_patch_t *patch;
 
         for (nb = 0; nb < domain->num_blocks; ++nb)
         {
@@ -758,8 +678,8 @@ fclaw2d_domain_adapt (fclaw_domain_t * domain)
     }
 }
 
-fclaw_domain_t *
-fclaw2d_domain_partition (fclaw_domain_t * domain, int weight_exponent)
+fclaw2d_domain_t *
+fclaw2d_domain_partition (fclaw2d_domain_t * domain, int weight_exponent)
 {
     p4est_wrap_t *wrap = (p4est_wrap_t *) domain->pp;
     p4est_locidx_t uf, ul, uof;
@@ -771,7 +691,7 @@ fclaw2d_domain_partition (fclaw_domain_t * domain, int weight_exponent)
     domain->just_adapted = 0;
     if (p4est_wrap_partition (wrap, weight_exponent, &uf, &ul, &uof))
     {
-        fclaw_domain_t *newd;
+        fclaw2d_domain_t *newd;
 
         domain->pp_owned = 0;
         newd = fclaw2d_domain_new (wrap, domain->attributes);
@@ -790,7 +710,7 @@ fclaw2d_domain_partition (fclaw_domain_t * domain, int weight_exponent)
 }
 
 void
-fclaw2d_domain_partition_unchanged (fclaw_domain_t * domain,
+fclaw2d_domain_partition_unchanged (fclaw2d_domain_t * domain,
                                     int *unchanged_first,
                                     int *unchanged_length,
                                     int *unchanged_old_first)
@@ -814,7 +734,7 @@ fclaw2d_domain_partition_unchanged (fclaw_domain_t * domain,
 }
 
 void
-fclaw2d_domain_complete (fclaw_domain_t * domain)
+fclaw2d_domain_complete (fclaw2d_domain_t * domain)
 {
     p4est_wrap_t *wrap = (p4est_wrap_t *) domain->pp;
 
@@ -831,7 +751,7 @@ fclaw2d_domain_complete (fclaw_domain_t * domain)
 }
 
 void
-fclaw2d_domain_write_vtk (fclaw_domain_t * domain, const char *basename)
+fclaw2d_domain_write_vtk (fclaw2d_domain_t * domain, const char *basename)
 {
     p4est_wrap_t *wrap = (p4est_wrap_t *) domain->pp;
 
@@ -842,8 +762,8 @@ fclaw2d_domain_write_vtk (fclaw_domain_t * domain, const char *basename)
 }
 
 static void
-fclaw2d_domain_list_level_callback (fclaw_domain_t * domain,
-                                    fclaw_patch_t * patch, int block_no,
+fclaw2d_domain_list_level_callback (fclaw2d_domain_t * domain,
+                                    fclaw2d_patch_t * patch, int block_no,
                                     int patch_no, void *user)
 {
     FCLAW_ASSERT (0 <= block_no && block_no < domain->num_blocks);
@@ -855,7 +775,7 @@ fclaw2d_domain_list_level_callback (fclaw_domain_t * domain,
 }
 
 void
-fclaw2d_domain_list_levels (fclaw_domain_t * domain, int lp)
+fclaw2d_domain_list_levels (fclaw2d_domain_t * domain, int lp)
 {
     int level;
     int count, count_all;
@@ -869,7 +789,7 @@ fclaw2d_domain_list_levels (fclaw_domain_t * domain, int lp)
          ++level)
     {
         count = 0;
-        fclaw_domain_iterate_level (domain, level,
+        fclaw2d_domain_iterate_level (domain, level,
                                       fclaw2d_domain_list_level_callback,
                                       &count);
         P4EST_LOGF (lp, "Patches on level %2d: %9d\n", level, count);
@@ -886,13 +806,13 @@ typedef struct fclaw2d_domain_list_neighbors
 fclaw2d_domain_list_neighbors_t;
 
 static void
-fclaw2d_domain_list_neighbors_callback (fclaw_domain_t * domain,
-                                        fclaw_patch_t * patch, int block_no,
+fclaw2d_domain_list_neighbors_callback (fclaw2d_domain_t * domain,
+                                        fclaw2d_patch_t * patch, int block_no,
                                         int patch_no, void *user)
 {
     fclaw2d_domain_list_neighbors_t *ln =
         (fclaw2d_domain_list_neighbors_t *) user;
-    fclaw_patch_relation_t fnt;
+    fclaw2d_patch_relation_t fnt;
     int faceno, cornerno, rcorner;
     int rproc[P4EST_FACES], rblockno, rpatchno[P4EST_FACES], rfaceno;
 
@@ -903,9 +823,9 @@ fclaw2d_domain_list_neighbors_callback (fclaw_domain_t * domain,
 
     for (faceno = 0; faceno < P4EST_FACES; ++faceno)
     {
-        fnt = fclaw_patch_face_neighbors (domain, block_no, patch_no,
-                                          faceno, rproc, &rblockno,
-                                          rpatchno, &rfaceno);
+        fnt = fclaw2d_patch_face_neighbors (domain, block_no, patch_no,
+                                            faceno, rproc, &rblockno,
+                                            rpatchno, &rfaceno);
         P4EST_LOGF (ln->lp, "Block %d patch %d face %d neighbor %d\n",
                     block_no, patch_no, faceno, (int) fnt);
     }
@@ -914,9 +834,9 @@ fclaw2d_domain_list_neighbors_callback (fclaw_domain_t * domain,
 #endif
     for (cornerno = 0; cornerno < P4EST_CHILDREN; ++cornerno)
     {
-        (void) fclaw_patch_corner_neighbors (domain, block_no, patch_no,
-                                             cornerno, rproc, &rblockno,
-                                             rpatchno, &rcorner, &fnt);
+        (void) fclaw2d_patch_corner_neighbors (domain, block_no, patch_no,
+                                               cornerno, rproc, &rblockno,
+                                               rpatchno, &rcorner, &fnt);
         P4EST_LOGF (ln->lp, "Block %d patch %d corner %d %d neighbor %d\n",
                     block_no, patch_no, cornerno, rcorner, (int) fnt);
     }
@@ -925,24 +845,24 @@ fclaw2d_domain_list_neighbors_callback (fclaw_domain_t * domain,
 }
 
 void
-fclaw2d_domain_list_neighbors (fclaw_domain_t * domain, int lp)
+fclaw2d_domain_list_neighbors (fclaw2d_domain_t * domain, int lp)
 {
     fclaw2d_domain_list_neighbors_t ln;
 
     ln.lp = lp;
     ln.count = 0;
-    fclaw_domain_iterate_patches (domain,
+    fclaw2d_domain_iterate_patches (domain,
                                     fclaw2d_domain_list_neighbors_callback,
                                     &ln);
     FCLAW_ASSERT (ln.count == domain->local_num_patches);
 }
 
 static void
-fclaw2d_domain_list_adapted_callback (fclaw_domain_t * old_domain,
-                                      fclaw_patch_t * old_patch,
-                                      fclaw_domain_t * new_domain,
-                                      fclaw_patch_t * new_patch,
-                                      fclaw_patch_relation_t newsize,
+fclaw2d_domain_list_adapted_callback (fclaw2d_domain_t * old_domain,
+                                      fclaw2d_patch_t * old_patch,
+                                      fclaw2d_domain_t * new_domain,
+                                      fclaw2d_patch_t * new_patch,
+                                      fclaw2d_patch_relation_t newsize,
                                       int blockno,
                                       int old_patchno, int new_patchno,
                                       void *user)
@@ -962,7 +882,7 @@ fclaw2d_domain_list_adapted_callback (fclaw_domain_t * old_domain,
     FCLAW_ASSERT (new_patch ==
                   new_domain->blocks[blockno].patches + new_patchno);
 
-    if (newsize == FCLAW_PATCH_HALFSIZE)
+    if (newsize == FCLAW2D_PATCH_HALFSIZE)
     {
         /* refinement */
         FCLAW_ASSERT (new_patchno + P4EST_CHILDREN <=
@@ -970,12 +890,12 @@ fclaw2d_domain_list_adapted_callback (fclaw_domain_t * old_domain,
         for (k = 0; k < P4EST_CHILDREN; ++k)
         {
             FCLAW_ASSERT (new_patch[k].level == old_patch->level + 1);
-            FCLAW_ASSERT (fclaw_patch_childid (&new_patch[k]) == k);
+            FCLAW_ASSERT (fclaw2d_patch_childid (&new_patch[k]) == k);
         }
         P4EST_LOGF (lp, "Block %d refinement %d to %d\n",
                     blockno, old_patchno, new_patchno);
     }
-    else if (newsize == FCLAW_PATCH_DOUBLESIZE)
+    else if (newsize == FCLAW2D_PATCH_DOUBLESIZE)
     {
         /* coarsening */
         FCLAW_ASSERT (old_patchno + P4EST_CHILDREN <=
@@ -983,7 +903,7 @@ fclaw2d_domain_list_adapted_callback (fclaw_domain_t * old_domain,
         for (k = 0; k < P4EST_CHILDREN; ++k)
         {
             FCLAW_ASSERT (old_patch[k].level == new_patch->level + 1);
-            FCLAW_ASSERT (fclaw_patch_childid (&old_patch[k]) == k);
+            FCLAW_ASSERT (fclaw2d_patch_childid (&old_patch[k]) == k);
         }
         P4EST_LOGF (lp, "Block %d coarsening %d to %d\n",
                     blockno, old_patchno, new_patchno);
@@ -991,27 +911,27 @@ fclaw2d_domain_list_adapted_callback (fclaw_domain_t * old_domain,
     else
     {
         /* noop */
-        FCLAW_ASSERT (newsize == FCLAW_PATCH_SAMESIZE);
+        FCLAW_ASSERT (newsize == FCLAW2D_PATCH_SAMESIZE);
         FCLAW_ASSERT (old_patch->level == new_patch->level);
-        FCLAW_ASSERT (fclaw_patch_childid (old_patch) ==
-                      fclaw_patch_childid (new_patch));
+        FCLAW_ASSERT (fclaw2d_patch_childid (old_patch) ==
+                      fclaw2d_patch_childid (new_patch));
         P4EST_LOGF (lp, "Block %d noop patch %d and %d\n",
                     blockno, old_patchno, new_patchno);
     }
 }
 
 void
-fclaw2d_domain_list_adapted (fclaw_domain_t * old_domain,
-                             fclaw_domain_t * new_domain, int log_priority)
+fclaw2d_domain_list_adapted (fclaw2d_domain_t * old_domain,
+                             fclaw2d_domain_t * new_domain, int log_priority)
 {
-    fclaw_domain_iterate_adapted (old_domain, new_domain,
+    fclaw2d_domain_iterate_adapted (old_domain, new_domain,
                                     fclaw2d_domain_list_adapted_callback,
                                     (void *) &log_priority);
 }
 
 typedef struct fclaw2d_search_data
 {
-    fclaw_domain_t *domain;
+    fclaw2d_domain_t *domain;
     sc_array_t *coordinates;
     sc_array_t *results;
 }
@@ -1030,9 +950,9 @@ search_point_fn (p4est_t * p4est, p4est_topidx_t which_tree,
     double z;
 #endif
     double *xyentry;
-    fclaw_block_t *block;
+    fclaw2d_block_t *block;
 #ifdef FCLAW_ENABLE_DEBUG
-    fclaw_patch_t *patch;
+    fclaw2d_patch_t *patch;
 #endif
     fclaw2d_search_data_t *sd = (fclaw2d_search_data_t *) p4est->user_pointer;
     p4est_qcoord_t qh;
@@ -1097,10 +1017,10 @@ search_point_fn (p4est_t * p4est, p4est_topidx_t which_tree,
 #endif
 
     /* do the check a second time with the patch data */
-    FCLAW_ASSERT (x >= patch->d2->xlower && x <= patch->d2->xupper);
-    FCLAW_ASSERT (y >= patch->d2->ylower && y <= patch->d2->yupper);
+    FCLAW_ASSERT (x >= patch->xlower && x <= patch->xupper);
+    FCLAW_ASSERT (y >= patch->ylower && y <= patch->yupper);
 #ifdef P4_TO_P8
-    FCLAW_ASSERT (z >= patch->d3->zlower && z <= patch->d3->zupper);
+    FCLAW_ASSERT (z >= patch->zlower && z <= patch->zupper);
 #endif
 
     /* remember the smallest local quadrant number as result */
@@ -1121,7 +1041,7 @@ search_point_fn (p4est_t * p4est, p4est_topidx_t which_tree,
 }
 
 void
-fclaw2d_domain_search_points (fclaw_domain_t * domain,
+fclaw2d_domain_search_points (fclaw2d_domain_t * domain,
                               sc_array_t * block_offsets,
                               sc_array_t * coordinates, sc_array_t * results)
 {
@@ -1239,8 +1159,8 @@ fclaw2d_ray_integral_t;
 
 typedef struct fclaw2d_integrate_ray_data
 {
-    fclaw_domain_t *domain;
-    fclaw_integrate_ray_t integrate_ray;
+    fclaw2d_domain_t *domain;
+    fclaw2d_integrate_ray_t integrate_ray;
     void *user;
 }
 fclaw2d_integrate_ray_data_t;
@@ -1252,15 +1172,9 @@ integrate_ray_fn (p4est_t * p4est, p4est_topidx_t which_tree,
 {
     double integral;
     int intersects;
-    fclaw_domain_t *domain;
-    fclaw_patch_t *patch;
-
-
-    fclaw_patch_t fclaw2d_patch;
-
-    fclaw_patch_d2_t fclaw2d_patch_bounds;
-    fclaw2d_patch.d2 = &fclaw2d_patch_bounds;
-
+    fclaw2d_domain_t *domain;
+    fclaw2d_patch_t *patch;
+    fclaw2d_patch_t fclaw2d_patch;
     int patchno;
 
     /* assert that the user_pointer contains a valid integrate_ray_data_t */
@@ -1280,7 +1194,7 @@ integrate_ray_fn (p4est_t * p4est, p4est_topidx_t which_tree,
     domain = ird->domain;
     if (local_num >= 0)
     {
-        fclaw_block_t *block = domain->blocks + which_tree;
+        fclaw2d_block_t *block = domain->blocks + which_tree;
         patchno = local_num - block->num_patches_before;
         patch = block->patches + patchno;
     }
@@ -1309,8 +1223,8 @@ integrate_ray_fn (p4est_t * p4est, p4est_topidx_t which_tree,
 }
 
 void
-fclaw2d_domain_integrate_rays (fclaw_domain_t * domain,
-                               fclaw_integrate_ray_t intersect,
+fclaw2d_domain_integrate_rays (fclaw2d_domain_t * domain,
+                               fclaw2d_integrate_ray_t intersect,
                                sc_array_t * rays, sc_array_t * integrals,
                                void * user)
 {
@@ -1400,8 +1314,8 @@ overlap_point_t;
 
 typedef struct overlap_producer_comm
 {
-    fclaw_domain_t *domain;
-    fclaw_interpolate_point_t interpolate;
+    fclaw2d_domain_t *domain;
+    fclaw2d_interpolate_point_t interpolate;
     void *user;
     p4est_t *pro4est;
     sc_MPI_Comm glocomm;
@@ -1416,8 +1330,8 @@ overlap_producer_comm_t;
 
 typedef struct overlap_consumer_comm
 {
-    fclaw_domain_t *domain;
-    fclaw_interpolate_point_t interpolate;
+    fclaw2d_domain_t *domain;
+    fclaw2d_interpolate_point_t interpolate;
     void *user;
     sc_array_t *query_points;
     sc_array_t *query_indices;
@@ -1484,15 +1398,9 @@ interpolate_partition_fn (p4est_t * p4est, p4est_topidx_t which_tree,
                           p4est_quadrant_t * quadrant, int pfirst, int plast,
                           void *point)
 {
-    fclaw_domain_t *domain;
-    fclaw_patch_t *patch;
-
-    fclaw_patch_t fclaw2d_patch;
-    memset(&fclaw2d_patch, 0, sizeof(fclaw_patch_t));
-
-    fclaw_patch_d2_t fclaw2d_patch_bounds;
-    fclaw2d_patch.d2 = &fclaw2d_patch_bounds;
-
+    fclaw2d_domain_t *domain;
+    fclaw2d_patch_t *patch;
+    fclaw2d_patch_t fclaw2d_patch;
     int patchno;
     int intersects;
 
@@ -1512,7 +1420,7 @@ interpolate_partition_fn (p4est_t * p4est, p4est_topidx_t which_tree,
     FCLAW_ASSERT (c->interpolate != NULL);
 
     /* create artifical domain, that only contains mpi and tree structure data */
-    domain = FCLAW_ALLOC (fclaw_domain_t, 1);
+    domain = FCLAW_ALLOC (fclaw2d_domain_t, 1);
     /* Todo: works only for congruent communicators. Do we really need all this
      * information? */
     fclaw2d_domain_init_meta (domain, (pfirst == plast) ? pfirst : -1);
@@ -1554,15 +1462,9 @@ interpolate_local_fn (p4est_t * p4est, p4est_topidx_t which_tree,
                       p4est_quadrant_t * quadrant, p4est_locidx_t local_num,
                       void *point)
 {
-    fclaw_domain_t *domain;
-    fclaw_patch_t *patch;
-
-    fclaw_patch_t fclaw2d_patch;
-    memset(&fclaw2d_patch, 0, sizeof(fclaw_patch_t));
-
-    fclaw_patch_d2_t fclaw2d_patch_bounds;
-    fclaw2d_patch.d2 = &fclaw2d_patch_bounds;
-
+    fclaw2d_domain_t *domain;
+    fclaw2d_patch_t *patch;
+    fclaw2d_patch_t fclaw2d_patch;
     int patchno;
 
     /* assert that the user_pointer contains a valid interpolation_data_t */
@@ -1575,7 +1477,7 @@ interpolate_local_fn (p4est_t * p4est, p4est_topidx_t which_tree,
     domain = p->domain;
     if (local_num >= 0)
     {
-        fclaw_block_t *block = domain->blocks + which_tree;
+        fclaw2d_block_t *block = domain->blocks + which_tree;
         patchno = local_num - block->num_patches_before;
         patch = block->patches + patchno;
     }
@@ -1985,9 +1887,9 @@ consumer_producer_update_local (overlap_global_comm_t * g)
 }
 
 void
-fclaw2d_overlap_exchange (fclaw_domain_t * domain,
+fclaw2d_overlap_exchange (fclaw2d_domain_t * domain,
                           sc_array_t * query_points,
-                          fclaw_interpolate_point_t interpolate, void *user)
+                          fclaw2d_interpolate_point_t interpolate, void *user)
 {
     p4est_t p4est;
     p4est_connectivity_t conn;

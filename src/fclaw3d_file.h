@@ -24,7 +24,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 /** \file fclaw3d_file.h
- * Routines for parallel IO for \ref fclaw_domain_t and generic data.
+ * Routines for parallel IO for \ref fclaw3d_domain_t and generic data.
  *
  * Principle: All files are associated with a single domain, i.e. one can
  * write only one domain to one file.
@@ -85,7 +85,7 @@ typedef struct fclaw3d_file_context fclaw3d_file_context_t;
  */
 fclaw3d_file_context_t *fclaw3d_file_open_write (const char *filename,
                                                  const char *user_string,
-                                                 fclaw_domain_t *domain,
+                                                 fclaw3d_domain_t *domain,
                                                  int *errcode);
 
 /** Write a serial data block to an opened parallel file.
@@ -223,7 +223,7 @@ fclaw3d_file_context_t *fclaw3d_file_write_array (fclaw3d_file_context_t *
 fclaw3d_file_context_t *fclaw3d_file_open_read (sc_MPI_Comm mpicomm,
                                                 const char *filename,
                                                 char *user_string,
-                                                fclaw_domain_t **domain,
+                                                fclaw3d_domain_t **domain,
                                                 int *errcode);
 
 /** Read a serial data block from an opened file.

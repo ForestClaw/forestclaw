@@ -36,26 +36,27 @@ const fclaw3d_patch_flags_t fclaw3d_patch_block_face_flags[6] = {
 };
 
 int
-fclaw_patch_edge_neighbors (fclaw_domain_t * domain,
-                              int blockno, int patchno, int edgeno,
-                              int rprocs_out[], int *rblockno_out,
-                              int rpatchnos_out[],
-                              int *redge_out,
-                              fclaw_patch_relation_t * neighbor_size_out)
+fclaw3d_domain_num_edges (const fclaw3d_domain_t * domain)
 {
-    if(domain->dim != 3)
-    {
-        fclaw_global_essentialf("fclaw_patch_edge_neighbors is only used for 3d\n");
-        exit(1);
-    }
+    return P8EST_EDGES;
+}
 
+int
+fclaw3d_patch_edge_neighbors (fclaw2d_domain_t * domain,
+                              int blockno, int patchno, int edgeno,
+                              int *rproc, int *rblockno, int *rpatchno,
+                              int *redge,
+                              fclaw2d_patch_relation_t * neighbor_size)
+{
     p4est_wrap_t *wrap = (p4est_wrap_t *) domain->pp;
     p4est_t *p4est = wrap->p4est;
     p4est_ghost_t *ghost = wrap->match_aux ? wrap->ghost_aux : wrap->ghost;
     p4est_mesh_t *mesh = wrap->match_aux ? wrap->mesh_aux : wrap->mesh;
+    p4est_locidx_t local_num, qid;
+    p4est_locidx_t edgeid, cstart, cend;
     const p4est_quadrant_t *q;
     p4est_tree_t *rtree;
-    fclaw_block_t *block;
+    fclaw2d_block_t *block;
 
     FCLAW_ASSERT (domain->num_ghost_patches ==
                   (int) mesh->ghost_num_quadrants);
@@ -70,99 +71,62 @@ fclaw_patch_edge_neighbors (fclaw_domain_t * domain,
     FCLAW_ASSERT (0 <= patchno && patchno < block->num_patches);
     FCLAW_ASSERT (0 <= edgeno && edgeno < P8EST_EDGES);
 
-    p4est_locidx_t local_num = block->num_patches_before + patchno;
-    p4est_locidx_t quad_to_edge = mesh->quad_to_edge[P8EST_EDGES * local_num + edgeno];
+    local_num = block->num_patches_before + patchno;
+    qid = mesh->quad_to_edge[P8EST_EDGES * local_num + edgeno];
 
     /* We are not yet ready for general multiblock connectivities where more
      * than four blocks meet at an edge */
-    int num_neighbors = 0;
-    p4est_locidx_t quad_ids[2];
-    fclaw_patch_relation_t neighbor_size;
-    int redge;
-    if (quad_to_edge >= 0)
+    if (qid >= 0)
     {
-        /* has neighbor. process and get neighbors */
-        if (quad_to_edge >= mesh->local_num_quadrants + mesh->ghost_num_quadrants)
+        FCLAW_ASSERT (0 <= qid);
+        if (qid >= mesh->local_num_quadrants + mesh->ghost_num_quadrants)
         {
-            /* This is an inter-tree (face or edge) edge neighbor 
-               or half/double sized neighbor */
-            p4est_locidx_t edge_offset_i =
-                quad_to_edge - (mesh->local_num_quadrants + mesh->ghost_num_quadrants);
-            FCLAW_ASSERT (edge_offset_i < mesh->local_num_edges);
-
-            p4est_locidx_t cstart, cend;
-            cstart = fclaw2d_array_index_locidx (mesh->edge_offset, edge_offset_i);
-            cend = fclaw2d_array_index_locidx (mesh->edge_offset, edge_offset_i + 1);
-
-            /* get value in edge_edge array */
-            int e = *(int8_t *) sc_array_index_int (mesh->edge_edge,
-                                                    (int) cstart);
-            if ((e >= 0 && cstart + 1 < cend) || cstart + 2 < cend)
+            /* This is an inter-tree (face or edge) edge neighbor */
+            edgeid =
+                qid - (mesh->local_num_quadrants + mesh->ghost_num_quadrants);
+            FCLAW_ASSERT (edgeid < mesh->local_num_edges);
+            cstart =
+                fclaw2d_array_index_locidx (mesh->edge_offset, edgeid);
+            cend =
+                fclaw2d_array_index_locidx (mesh->edge_offset, edgeid + 1);
+            if (cstart + 1 < cend)
             {
                 /* At least a five-edge, which is currently not supported */
+                qid = -1;
             }
             else
             {
-                /* at least have one neighbor, get the first neighbor */
-                quad_ids[0] = fclaw2d_array_index_locidx (mesh->edge_quad, cstart);
-                /* decode */
-                if(e < 0)
-                {
-                    /* half sized neighbor */
-                    num_neighbors = 2;
-                    neighbor_size = FCLAW_PATCH_HALFSIZE;
-                    redge = (e + 24)%12;
-                    /* get the second neighbor */
-                    quad_ids[1] = fclaw2d_array_index_locidx (mesh->edge_quad, cstart+1);
-                }
-                else if (e > 23)
-                {
-                    /* double sized neighbor */
-                    num_neighbors = 1;
-                    neighbor_size = FCLAW_PATCH_DOUBLESIZE;
-                    redge = (e - 24)%12;
-                }
-                else 
-                {
-                    /* same sized neighbor inter-tree */
-                    num_neighbors = 1;
-                    neighbor_size = FCLAW_PATCH_SAMESIZE;
-                    redge = e%12;
-                }
-                FCLAW_ASSERT (0 <= redge && redge < P8EST_EDGES);
+                FCLAW_ASSERT (cstart + 1 == cend);
+                qid = fclaw2d_array_index_locidx (mesh->edge_quad, cstart);
+                *redge = (int)
+                    *(int8_t *) sc_array_index_int (mesh->edge_edge,
+                                                    (int) cstart);
+                FCLAW_ASSERT (0 <= *redge && *redge < P8EST_EDGES);
             }
         }
         else
         {
-            /* for same size intra-tree edges we take the edge is opposite */
-            num_neighbors = 1;
-            neighbor_size = FCLAW_PATCH_SAMESIZE;
-            quad_ids[0] = quad_to_edge;
-            redge = edgeno ^ 3;
+            /* for intra-tree edges we take the edge is opposite */
+            *redge = edgeno ^ 3;
         }
     }
-    else
+
+    if (qid < 0)
     {
         /* The value -1 is expected for an edge on the physical boundary */
         /* Currently we also return this for five- and more-edges */
-        neighbor_size = FCLAW_PATCH_BOUNDARY;
-        redge = -1;
+        *neighbor_size = FCLAW2D_PATCH_BOUNDARY;
+        *redge = -1;
     }
-
-    /* get rproc and rpatchno for each neighbor */
-    int rprocs[2];
-    int rblockno;
-    int rpatchnos[2];
-    for(int i=0; i < num_neighbors; i++)
+    else
     {
-        p4est_locidx_t qid = quad_ids[i];
         if (qid < mesh->local_num_quadrants)
         {
             /* local quadrant may be in a different tree */
-            rprocs[i] = domain->mpirank;
-            rblockno = (int) mesh->quad_to_tree[qid];
+            *rproc = domain->mpirank;
+            *rblockno = (int) mesh->quad_to_tree[qid];
             rtree = p4est_tree_array_index (p4est->trees,
-                                            (p4est_topidx_t) rblockno);
+                                            (p4est_topidx_t) * rblockno);
             FCLAW_ASSERT (rtree->quadrants_offset <= qid);
             qid -= rtree->quadrants_offset;     /* relative to tree */
             q = p4est_quadrant_array_index (&rtree->quadrants, qid);
@@ -171,43 +135,44 @@ fclaw_patch_edge_neighbors (fclaw_domain_t * domain,
         {
             qid -= mesh->local_num_quadrants;   /* relative to ghosts */
             FCLAW_ASSERT (qid < mesh->ghost_num_quadrants);
-            rprocs[i] = mesh->ghost_to_proc[qid];
-            FCLAW_ASSERT (rprocs[i] != domain->mpirank);
+            *rproc = mesh->ghost_to_proc[qid];
+            FCLAW_ASSERT (*rproc != domain->mpirank);
             q = p4est_quadrant_array_index (&ghost->ghosts, qid);
-            rblockno = (int) q->p.piggy3.which_tree;
+            *rblockno = (int) q->p.piggy3.which_tree;
         }
-        rpatchnos[i] = (int) qid;
+        *rpatchno = (int) qid;
+        switch (q->level - block->patches[patchno].level)
+        {
+        case -1:
+            *neighbor_size = FCLAW2D_PATCH_DOUBLESIZE;
+            break;
+        case 0:
+            *neighbor_size = FCLAW2D_PATCH_SAMESIZE;
+            break;
+        case 1:
+            *neighbor_size = FCLAW2D_PATCH_HALFSIZE;
+            break;
+        default:
+            SC_ABORT_NOT_REACHED ();
+        }
 
         /* *INDENT-OFF* */
-        FCLAW_ASSERT (rprocs[i] == domain->mpirank
-                      || (rpatchnos[0] >= 0
-                          && rpatchnos[0] < mesh->ghost_num_quadrants));
-        FCLAW_ASSERT (rprocs[i] != domain->mpirank
-                      || (rblockno >= 0 && rblockno < domain->num_blocks
-                          && rpatchnos[0] >= 0
-                          && rpatchnos[0] <
-                             domain->blocks[rblockno].num_patches));
+        FCLAW_ASSERT (*rproc == domain->mpirank
+                      || (*rpatchno >= 0
+                          && *rpatchno < mesh->ghost_num_quadrants));
+        FCLAW_ASSERT (*rproc != domain->mpirank
+                      || (*rblockno >= 0 && *rblockno < domain->num_blocks
+                          && *rpatchno >= 0
+                          && *rpatchno <
+                             domain->blocks[*rblockno].num_patches));
         /* *INDENT-ON* */
     }
 
-    /* set output variables
-       compiler may warn about uninitialized variables, 
-       and Valgrind will warn about uninitialized access.
-       makes debugging easier */
-    *rblockno_out = rblockno;
-    *redge_out = redge;
-    *neighbor_size_out = neighbor_size;
-    for(int i=0; i < num_neighbors; i++)
-    {
-        rprocs_out[i] = rprocs[i];
-        rpatchnos_out[i] = rpatchnos[i];
-    }
-
-    return neighbor_size != FCLAW_PATCH_BOUNDARY;
+    return *neighbor_size != FCLAW2D_PATCH_BOUNDARY;
 }
 
 void
-fclaw_patch_edge_swap (int *edgeno, int *redgeno)
+fclaw2d_patch_edge_swap (int *edgeno, int *redgeno)
 {
     int swap;
 
@@ -217,22 +182,20 @@ fclaw_patch_edge_swap (int *edgeno, int *redgeno)
 }
 
 void
-fclaw3d_patch_transform_edge (fclaw_patch_t * ipatch,
-                              fclaw_patch_t * opatch,
+fclaw3d_patch_transform_edge (fclaw2d_patch_t * ipatch,
+                              fclaw2d_patch_t * opatch,
                               int iedge, int is_block_boundary,
                               int mx, int my, int mz,
                               int based, int *i, int *j, int *k)
 {
-    FCLAW_ASSERT (ipatch->dim == 3);
-    FCLAW_ASSERT (opatch->dim == 3);
     FCLAW_ASSERT (ipatch->level == opatch->level);
     FCLAW_ASSERT (0 <= ipatch->level && ipatch->level < P4EST_MAXLEVEL);
-    FCLAW_ASSERT (ipatch->d3->xlower >= 0. && ipatch->d3->xlower < 1.);
-    FCLAW_ASSERT (opatch->d3->xlower >= 0. && opatch->d3->xlower < 1.);
-    FCLAW_ASSERT (ipatch->d3->ylower >= 0. && ipatch->d3->ylower < 1.);
-    FCLAW_ASSERT (opatch->d3->ylower >= 0. && opatch->d3->ylower < 1.);
-    FCLAW_ASSERT (ipatch->d3->zlower >= 0. && ipatch->d3->zlower < 1.);
-    FCLAW_ASSERT (opatch->d3->zlower >= 0. && opatch->d3->zlower < 1.);
+    FCLAW_ASSERT (ipatch->xlower >= 0. && ipatch->xlower < 1.);
+    FCLAW_ASSERT (opatch->xlower >= 0. && opatch->xlower < 1.);
+    FCLAW_ASSERT (ipatch->ylower >= 0. && ipatch->ylower < 1.);
+    FCLAW_ASSERT (opatch->ylower >= 0. && opatch->ylower < 1.);
+    FCLAW_ASSERT (ipatch->zlower >= 0. && ipatch->zlower < 1.);
+    FCLAW_ASSERT (opatch->zlower >= 0. && opatch->zlower < 1.);
 
     FCLAW_ASSERT (mx >= 1 && my >= 1 && mz >= 1);
     FCLAW_ASSERT (based == 0 || based == 1);
@@ -288,48 +251,46 @@ fclaw3d_patch_transform_edge (fclaw_patch_t * ipatch,
         /* verify the blocks are edge-neighbors */
         FCLAW_ASSERT ((xyzshift[0] == 0.) ||
                       (xyzshift[0] == 1.
-                       && fabs (opatch->d3->xupper - 1.) < SC_1000_EPS)
+                       && fabs (opatch->xupper - 1.) < SC_1000_EPS)
                       || (xyzshift[0] == -1.
-                          && fabs (opatch->d3->xlower) < SC_1000_EPS));
+                          && fabs (opatch->xlower) < SC_1000_EPS));
         FCLAW_ASSERT ((xyzshift[1] == 0.)
                       || (xyzshift[1] == 1.
-                          && fabs (opatch->d3->yupper - 1.) < SC_1000_EPS)
+                          && fabs (opatch->yupper - 1.) < SC_1000_EPS)
                       || (xyzshift[1] == -1.
-                          && fabs (opatch->d3->ylower) < SC_1000_EPS));
+                          && fabs (opatch->ylower) < SC_1000_EPS));
         FCLAW_ASSERT ((xyzshift[2] == 0.)
                       || (xyzshift[2] == 1.
-                          && fabs (opatch->d3->zupper - 1.) < SC_1000_EPS)
+                          && fabs (opatch->zupper - 1.) < SC_1000_EPS)
                       || (xyzshift[2] == -1.
-                          && fabs (opatch->d3->zlower) < SC_1000_EPS));
+                          && fabs (opatch->zlower) < SC_1000_EPS));
     }
 
     /* The two patches are in the same block, or in a different block
      * that has a coordinate system with the same orientation */
     *i +=
-        (int) ((ipatch->d3->xlower - opatch->d3->xlower + xyzshift[0]) * Rmxmymz[0]);
+        (int) ((ipatch->xlower - opatch->xlower + xyzshift[0]) * Rmxmymz[0]);
     *j +=
-        (int) ((ipatch->d3->ylower - opatch->d3->ylower + xyzshift[1]) * Rmxmymz[1]);
+        (int) ((ipatch->ylower - opatch->ylower + xyzshift[1]) * Rmxmymz[1]);
     *k +=
-        (int) ((ipatch->d3->zlower - opatch->d3->zlower + xyzshift[2]) * Rmxmymz[2]);
+        (int) ((ipatch->zlower - opatch->zlower + xyzshift[2]) * Rmxmymz[2]);
 }
 
 void
-fclaw3d_patch_transform_edge2 (fclaw_patch_t * ipatch,
-                               fclaw_patch_t * opatch,
+fclaw3d_patch_transform_edge2 (fclaw3d_patch_t * ipatch,
+                               fclaw3d_patch_t * opatch,
                                int iedge, int is_block_boundary,
                                int mx, int my, int mz, int based,
                                int i[], int j[], int k[])
 {
-    FCLAW_ASSERT (ipatch->dim == 3);
-    FCLAW_ASSERT (opatch->dim == 3);
     FCLAW_ASSERT (ipatch->level + 1 == opatch->level);
     FCLAW_ASSERT (0 <= ipatch->level && opatch->level < P4EST_MAXLEVEL);
-    FCLAW_ASSERT (ipatch->d3->xlower >= 0. && ipatch->d3->xlower < 1.);
-    FCLAW_ASSERT (opatch->d3->xlower >= 0. && opatch->d3->xlower < 1.);
-    FCLAW_ASSERT (ipatch->d3->ylower >= 0. && ipatch->d3->ylower < 1.);
-    FCLAW_ASSERT (opatch->d3->ylower >= 0. && opatch->d3->ylower < 1.);
-    FCLAW_ASSERT (ipatch->d3->zlower >= 0. && ipatch->d3->zlower < 1.);
-    FCLAW_ASSERT (opatch->d3->zlower >= 0. && opatch->d3->zlower < 1.);
+    FCLAW_ASSERT (ipatch->xlower >= 0. && ipatch->xlower < 1.);
+    FCLAW_ASSERT (opatch->xlower >= 0. && opatch->xlower < 1.);
+    FCLAW_ASSERT (ipatch->ylower >= 0. && ipatch->ylower < 1.);
+    FCLAW_ASSERT (opatch->ylower >= 0. && opatch->ylower < 1.);
+    FCLAW_ASSERT (ipatch->zlower >= 0. && ipatch->zlower < 1.);
+    FCLAW_ASSERT (opatch->zlower >= 0. && opatch->zlower < 1.);
 
     FCLAW_ASSERT (mx >= 1 && my >= 1 && mz >= 1);
     FCLAW_ASSERT (based == 0 || based == 1);
@@ -387,31 +348,31 @@ fclaw3d_patch_transform_edge2 (fclaw_patch_t * ipatch,
         /* verify the blocks are edge-neighbors */
         FCLAW_ASSERT ((xyzshift[0] == 0.) ||
                       (xyzshift[0] == 1.
-                       && fabs (opatch->d3->xupper - 1.) < SC_1000_EPS)
+                       && fabs (opatch->xupper - 1.) < SC_1000_EPS)
                       || (xyzshift[0] == -1.
-                          && fabs (opatch->d3->xlower) < SC_1000_EPS));
+                          && fabs (opatch->xlower) < SC_1000_EPS));
         FCLAW_ASSERT ((xyzshift[1] == 0.)
                       || (xyzshift[1] == 1.
-                          && fabs (opatch->d3->yupper - 1.) < SC_1000_EPS)
+                          && fabs (opatch->yupper - 1.) < SC_1000_EPS)
                       || (xyzshift[1] == -1.
-                          && fabs (opatch->d3->ylower) < SC_1000_EPS));
+                          && fabs (opatch->ylower) < SC_1000_EPS));
         FCLAW_ASSERT ((xyzshift[2] == 0.)
                       || (xyzshift[2] == 1.
-                          && fabs (opatch->d3->zupper - 1.) < SC_1000_EPS)
+                          && fabs (opatch->zupper - 1.) < SC_1000_EPS)
                       || (xyzshift[2] == -1.
-                          && fabs (opatch->d3->zlower) < SC_1000_EPS));
+                          && fabs (opatch->zlower) < SC_1000_EPS));
     }
 
     /* The two patches are in the same block, or in a different block
      * that has a coordinate system with the same orientation */
     di = based +
-        (int) ((ipatch->d3->xlower - opatch->d3->xlower + xyzshift[0]) * Rmxmymz[0] +
+        (int) ((ipatch->xlower - opatch->xlower + xyzshift[0]) * Rmxmymz[0] +
                2. * (*i - based));
     dj = based +
-        (int) ((ipatch->d3->ylower - opatch->d3->ylower + xyzshift[1]) * Rmxmymz[1] +
+        (int) ((ipatch->ylower - opatch->ylower + xyzshift[1]) * Rmxmymz[1] +
                2. * (*j - based));
     dk = based +
-        (int) ((ipatch->d3->zlower - opatch->d3->zlower + xyzshift[2]) * Rmxmymz[2] +
+        (int) ((ipatch->zlower - opatch->zlower + xyzshift[2]) * Rmxmymz[2] +
                2. * (*k - based));
 
     /* Without any rotation, the order of child cells is canonical */

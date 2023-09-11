@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 typedef struct fclaw2d_file_context
 {
-    fclaw_domain_t *domain;
+    fclaw2d_domain_t *domain;
     p4est_file_context_t *fc;
 }
 fclaw2d_file_context_t;
@@ -41,7 +41,7 @@ fclaw2d_file_context_t;
 fclaw2d_file_context_t *
 fclaw2d_file_open_write (const char *filename,
                          const char *user_string,
-                         fclaw_domain_t * domain, int *errcode)
+                         fclaw2d_domain_t * domain, int *errcode)
 {
     FCLAW_ASSERT (filename != NULL);
     FCLAW_ASSERT (user_string != NULL);
@@ -92,7 +92,7 @@ fclaw2d_file_context_t *
 fclaw2d_file_open_read (sc_MPI_Comm mpicomm,
                         const char *filename,
                         char *user_string,
-                        fclaw_domain_t ** domain, int *errcode)
+                        fclaw2d_domain_t ** domain, int *errcode)
 {
     FCLAW_ASSERT (filename != NULL);
     FCLAW_ASSERT (user_string != NULL);
