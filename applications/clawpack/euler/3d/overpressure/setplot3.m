@@ -47,23 +47,28 @@ ContourValues = [];   % draw contour lines from 'afterframe.m'
 xSliceCoords = [];
 ySliceCoords = [];
 zSliceCoords = [];
+InterpMethod = 'nearest';
 parms = read_vars();
 switch parms.mapping
     case 0
-        % Mapping in [-1,1]x[-1,1]x[0,2]
-        xSliceCoords = [0];
-        ySliceCoords = [0];
-        zSliceCoords = [0];
+        % Mapping in [-1,1]x[-1,1]x[-1,1]
+        xe = linspace(-1,1,9);
+        xc = xe(1:end-1) + 1/16;
+        xSliceCoords = xc;
+        ySliceCoords = xc;        
+        zSliceCoords = xc;   % [0.2 0.4 0.6 0.8];
     case 1
         % Mapped coordinates should specify slices in normalized [0,1]
         % coordinates.
+        xe = linspace(0,1,9);
+        xc = xe(1:end-1) + 1/16;
         xSliceCoords = [0.5];
         ySliceCoords = [0.5];        
         zSliceCoords = [0.5];   % [0.2 0.4 0.6 0.8];
     case 2
         xSliceCoords = [0.5];
         ySliceCoords = [0.5];
-        zSliceCoords = [0.5];   % [0.2 0.4 0.6 0.8];
+        zSliceCoords = [0];   % [0.2 0.4 0.6 0.8];
     case {3,4}
         zSliceCoords = [0, 0.25 0.5 0.75, 1.0]; 
     otherwise
@@ -85,3 +90,6 @@ IsosurfColors    = 'w';      % Colors for each surface.
 
 PlotBlockColors = 0;
 PlotParallelPartitions = 0;
+
+ScatterStyle = {'.','.','.','.'};
+UserMap1d = 1;
