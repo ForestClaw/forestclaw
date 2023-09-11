@@ -42,7 +42,7 @@ void fclaw_block_get_block_boundary(fclaw_global_t * glob,
         for (int iside = 0; iside < FCLAW2D_NUMFACES; iside++)
         {
             int iface_flags = fclaw2d_patch_block_face_flags[iside];
-            int is_block_face = (patch->flags & iface_flags) != 0;
+            int is_block_face = (patch->d2->flags & iface_flags) != 0;
 
             /* True for physical and block boundaries across a face */
             intersects_block[iside] = is_block_face;
@@ -53,7 +53,7 @@ void fclaw_block_get_block_boundary(fclaw_global_t * glob,
         for (int iside = 0; iside < FCLAW3D_NUMFACES; iside++)
         {
             int iface_flags = fclaw3d_patch_block_face_flags[iside];
-            int is_block_face = (patch->flags & iface_flags) != 0;
+            int is_block_face = (patch->d3->flags & iface_flags) != 0;
 
             /* True for physical and block boundaries across a face */
             intersects_block[iside] = is_block_face;
