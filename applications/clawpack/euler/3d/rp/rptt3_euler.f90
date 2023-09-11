@@ -76,6 +76,11 @@ SUBROUTINE clawpack46_rptt3(ixyz,icoor,imp,impt,maxm,meqn,mwaves, &
 
     double precision pres
 
+    logical debug, debug_check_rptt
+
+    debug = debug_check_rptt(ixyz,icoor,imp,impt,icom,jcom,kcom)
+ 
+
     IF (maxmrp < maxm+mbc)THEN
        WRITE(6,*) 'need to increase maxmrp in rpn3_neutral_qwave.f90'
        WRITE(6,*) 'maxmrp: ',maxmrp,' maxm: ',maxm,' mbc: ',mbc
@@ -176,30 +181,30 @@ SUBROUTINE clawpack46_rptt3(ixyz,icoor,imp,impt,maxm,meqn,mwaves, &
         DO i = 2-mbc, mx+mbc
             alpha(4) = g1a2(i) * (euv(i)*bsasdq(1,i) + u(i)*bsasdq(mu,i) &
                     + v(i)*bsasdq(mv,i) + w(i)*bsasdq(mw,i) - bsasdq(5,i))
-            alpha(2) = bsasdq(mu,i) - u(i)*bsasdq(1,i)
-            alpha(3) = bsasdq(mw,i) - w(i)*bsasdq(1,i)
+            alpha(2) = bsasdq(mw,i) - w(i)*bsasdq(1,i)
+            alpha(3) = bsasdq(mu,i) - u(i)*bsasdq(1,i)
             alpha(5) = (bsasdq(mv,i) &
                     + (a(i)-v(i))*bsasdq(1,i) - a(i)*alpha(4))/(2.d0*a(i))
             alpha(1) = bsasdq(1,i) - alpha(4) - alpha(5)
           
             waveb(1,1)  = alpha(1)
-            waveb(mu,1) = alpha(1)*u(i)
             waveb(mv,1) = alpha(1)*(v(i)-a(i))
             waveb(mw,1) = alpha(1)*w(i)
+            waveb(mu,1) = alpha(1)*u(i)
             waveb(5,1)  = alpha(1)*(enth(i) - v(i)*a(i))
             sb(1) = v(i) - a(i)
           
             waveb(1,2)  = alpha(4)
-            waveb(mu,2) = alpha(2) + u(i)*alpha(4)
             waveb(mv,2) =            v(i)*alpha(4)
-            waveb(mw,2) = alpha(3) + w(i)*alpha(4)
-            waveb(5,2)  = alpha(4)*0.5d0*u2v2w2(i) + alpha(2)*u(i) + alpha(3)*w(i)
+            waveb(mw,2) = alpha(2) + w(i)*alpha(4)
+            waveb(mu,2) = alpha(3) + u(i)*alpha(4)
+            waveb(5,2)  = alpha(4)*0.5d0*u2v2w2(i) + alpha(2)*w(i) + alpha(3)*u(i)
             sb(2) = v(i)
           
             waveb(1,3)  = alpha(5)
-            waveb(mu,3) = alpha(5)*u(i)
             waveb(mv,3) = alpha(5)*(v(i) + a(i))
             waveb(mw,3) = alpha(5)*w(i)
+            waveb(mu,3) = alpha(5)*u(i)
             waveb(5,3)  = alpha(5)*(enth(i) + v(i)*a(i))
             sb(3) = v(i) + a(i)
 
@@ -209,10 +214,21 @@ SUBROUTINE clawpack46_rptt3(ixyz,icoor,imp,impt,maxm,meqn,mwaves, &
                 cmbsasdq(:,i) = cmbsasdq(:,i) + MIN(sb(mws), 0.d0)*waveb(:,mws)
                 cpbsasdq(:,i) = cpbsasdq(:,i) + MAX(sb(mws), 0.d0)*waveb(:,mws)
             END DO
+            block
+                integer m
+                if (debug) then
+                    write(6,108) 'Minus (nomap rptt) : ', ixyz,icoor,i 
+                    write(6,107) (sb(m),m=1,3)
+                    write(6,107) a(i), g1a2(i), euv(i)
+                    write(6,109) (cmbsasdq(m,i),m=1,meqn)
+                    write(6,*) ' '
+                endif 
+            end block
+
        END DO
 
     ! Solve Riemann problem in the third coordinate direction
-    ELSEIF(icoor == 3)THEN
+    ELSEIF (icoor == 3) THEN
         DO i = 2-mbc, mx+mbc
             alpha(4) = g1a2(i) * (euv(i)*bsasdq(1,i) + u(i)*bsasdq(mu,i) &
                         + v(i)*bsasdq(mv,i) + w(i)*bsasdq(mw,i) - bsasdq(5,i))
@@ -223,23 +239,23 @@ SUBROUTINE clawpack46_rptt3(ixyz,icoor,imp,impt,maxm,meqn,mwaves, &
             alpha(1) = bsasdq(1,i) - alpha(4) - alpha(5)
           
             waveb(1,1)  = alpha(1)
+            waveb(mw,1) = alpha(1)*(w(i) - a(i))
             waveb(mu,1) = alpha(1)*u(i)
             waveb(mv,1) = alpha(1)*v(i)
-            waveb(mw,1) = alpha(1)*(w(i) - a(i))
             waveb(5,1)  = alpha(1)*(enth(i) - w(i)*a(i))
             sb(1) = w(i) - a(i)
           
             waveb(1,2)  = alpha(4)
+            waveb(mw,2) = alpha(4)*w(i)
             waveb(mu,2) = alpha(2) + alpha(4)*u(i)
             waveb(mv,2) = alpha(3) + alpha(4)*v(i)
-            waveb(mw,2) = alpha(4)*w(i)
             waveb(5,2)  = alpha(4)*0.5d0*u2v2w2(i) + alpha(2)*u(i) + alpha(3)*v(i)
             sb(2) = w(i)
           
             waveb(1,3)  = alpha(5)
+            waveb(mw,3) = alpha(5)*(w(i) + a(i))
             waveb(mu,3) = alpha(5)*u(i)
             waveb(mv,3) = alpha(5)*v(i)
-            waveb(mw,3) = alpha(5)*(w(i) + a(i))
             waveb(5,3)  = alpha(5)*(enth(i) + w(i)*a(i))
             sb(3) = w(i) + a(i)
           
@@ -249,7 +265,23 @@ SUBROUTINE clawpack46_rptt3(ixyz,icoor,imp,impt,maxm,meqn,mwaves, &
                 cmbsasdq(:,i) = cmbsasdq(:,i) + MIN(sb(mws), 0.d0)*waveb(:,mws)
                 cpbsasdq(:,i) = cpbsasdq(:,i) + MAX(sb(mws), 0.d0)*waveb(:,mws)
             END DO
+
+            block
+                integer m
+                if (debug) then
+                    write(6,108) 'Minus (nomap rptt) : ', ixyz,icoor,i 
+                    write(6,107) (sb(m),m=1,3)
+                    write(6,107) a(i), g1a2(i), euv(i)
+                    write(6,109) (cmbsasdq(m,i),m=1,meqn)
+                    write(6,*) ' '
+                endif 
+            end block
+
         END DO
     END IF
+
+107  format(3E24.16)
+108  format(A,'ixyz=',I2,'; icoor=',I2,'; i=',I2)              
+109  format(5E24.16)
 
 END SUBROUTINE clawpack46_rptt3

@@ -71,16 +71,21 @@ SUBROUTINE clawpack46_rpt3(ixyz,icoor,imp,maxm,meqn,mwaves,maux,mbc,&
 
     double precision pres
 
+    logical debug, debug_check_rpt
+
+    debug = debug_check_rpt(ixyz,icoor,imp,icom,jcom,kcom)
+
+
     IF (maxmrp < maxm+mbc)THEN
-       WRITE(6,*) 'need to increase maxmrp in rpt3_euler.f90'
-       WRITE(6,*) 'maxmrp: ',maxmrp,' maxm: ',maxm,' mbc: ',mbc
-       WRITE(6,*) 'maxm+mbc=',maxm+mbc
-       STOP
+        WRITE(6,*) 'need to increase maxmrp in rpt3_euler.f90'
+        WRITE(6,*) 'maxmrp: ',maxmrp,' maxm: ',maxm,' mbc: ',mbc
+        WRITE(6,*) 'maxm+mbc=',maxm+mbc
+        STOP
     ENDIF
 
     IF (mwaves /= 3) THEN
-       WRITE(6,*) '*** Should have mwaves=3 for this Riemann solver'
-       STOP
+        WRITE(6,*) '*** Should have mwaves=3 for this Riemann solver'
+        STOP
     ENDIF
     
     ! Set mu to point to  the component of the system that corresponds to 
@@ -96,18 +101,19 @@ SUBROUTINE clawpack46_rpt3(ixyz,icoor,imp,maxm,meqn,mwaves,maux,mbc,&
     ! ixyz=3:        z                  x                  y      
 
     IF(ixyz == 1)THEN
-       mu = 2
-       mv = 3
-       mw = 4
+        mu = 2
+        mv = 3
+        mw = 4
     ELSE IF(ixyz == 2)THEN
-       mu = 3
-       mv = 4
-       mw = 2
+        mu = 3
+        mv = 4
+        mw = 2
     ELSE
-       mu = 4
-       mv = 2
-       mw = 3
+        mu = 4
+        mv = 2
+        mw = 3
     ENDIF
+
 
     ! Note that notation for u,v, and w reflects assumption that the
     !   Riemann problems are in the x-direction with u in the normal
@@ -121,16 +127,16 @@ SUBROUTINE clawpack46_rpt3(ixyz,icoor,imp,maxm,meqn,mwaves,maux,mbc,&
 
     ! Loop over grid cell interfaces
     DO i = 2-mbc, mx+mbc
-       IF (qr(1,i-1) <= 0.d0 .OR. ql(1,i) <= 0.d0) THEN
-          WRITE(*,*) i, mu, mv, mw
-          WRITE(*,'(5e12.4)') (qr(j,i-1),j=1,5)
-          WRITE(*,'(5e12.4)') (ql(j,i),j=1,5)
-          IF (ixyz == 1) WRITE(6,*) '*** rho <= 0 in x-sweep at ',i
-          IF (ixyz == 2) WRITE(6,*) '*** rho <= 0 in y-sweep at ',i
-          IF (ixyz == 3) WRITE(6,*) '*** rho <= 0 in z-sweep at ',i
-          WRITE(6,*) 'stopped with rho <= 0...'
-          STOP
-       ENDIF
+        IF (qr(1,i-1) <= 0.d0 .OR. ql(1,i) <= 0.d0) THEN
+            WRITE(*,*) i, mu, mv, mw
+            WRITE(*,'(5e12.4)') (qr(j,i-1),j=1,5)
+            WRITE(*,'(5e12.4)') (ql(j,i),j=1,5)
+            IF (ixyz == 1) WRITE(6,*) '*** rho <= 0 in x-sweep at ',i
+            IF (ixyz == 2) WRITE(6,*) '*** rho <= 0 in y-sweep at ',i
+            IF (ixyz == 3) WRITE(6,*) '*** rho <= 0 in z-sweep at ',i
+            WRITE(6,*) 'stopped with rho <= 0...'
+            STOP
+        ENDIF
 !!       # Do we really need Roe averaged values here?        
 !!       rhsqrtl = SQRT(qr(1,i-1))
 !!       rhsqrtr = SQRT(ql(1,i))
@@ -155,101 +161,126 @@ SUBROUTINE clawpack46_rpt3(ixyz,icoor,imp,maxm,meqn,mwaves,maux,mbc,&
         enth(i) = (ql(5,i)+pres) / ql(1,i)
         asqrd = gamma1*(enth(i) - 0.5d0*u2v2w2(i))
 
-       IF (i>=0 .AND. i<=mx .AND. asqrd <= 0.d0) THEN
-          IF (ixyz == 1) WRITE(6,*) '*** a**2 <= 0 in x-sweep at ',i
-          IF (ixyz == 2) WRITE(6,*) '*** a**2 <= 0 in y-sweep at ',i
-          IF (ixyz == 3) WRITE(6,*) '*** a**2 <= 0 in z-sweep at ',i
-          WRITE(6,*) 'stopped with a**2 < 0...'
-          STOP
-       ENDIF
-       a(i) = SQRT(asqrd)
-       g1a2(i) = gamma1 / asqrd
-       euv(i) = enth(i) - u2v2w2(i)
+        IF (i>=0 .AND. i<=mx .AND. asqrd <= 0.d0) THEN
+            IF (ixyz == 1) WRITE(6,*) '*** a**2 <= 0 in x-sweep at ',i
+            IF (ixyz == 2) WRITE(6,*) '*** a**2 <= 0 in y-sweep at ',i
+            IF (ixyz == 3) WRITE(6,*) '*** a**2 <= 0 in z-sweep at ',i
+            WRITE(6,*) 'stopped with a**2 < 0...'
+            STOP
+        ENDIF
+        a(i) = SQRT(asqrd)
+        g1a2(i) = gamma1 / asqrd
+        euv(i) = enth(i) - u2v2w2(i)
     END DO
 
     ! Solve Riemann problem in the second coordinate direction
     IF(icoor == 2)THEN
-       DO i = 2-mbc, mx+mbc
-          alpha(4) = g1a2(i) &
-               * (euv(i)*asdq(1,i) + u(i)*asdq(mu,i) + v(i)*asdq(mv,i) &
-               + w(i)*asdq(mw,i) - asdq(5,i))
-          alpha(2) = asdq(mu,i) - u(i)*asdq(1,i)
-          alpha(3) = asdq(mw,i) - w(i)*asdq(1,i)
-          alpha(5) = (asdq(mv,i) &
-               + (a(i)-v(i))*asdq(1,i) - a(i)*alpha(4))/(2.d0*a(i))
-          alpha(1) = asdq(1,i) - alpha(4) - alpha(5)
+        DO i = 2-mbc, mx+mbc
+            alpha(4) = g1a2(i) &
+                * (euv(i)*asdq(1,i) + u(i)*asdq(mu,i) + v(i)*asdq(mv,i) &
+                   + w(i)*asdq(mw,i) - asdq(5,i))
+
+            !! If ixyz is "direction 1", then the indices for alpha are
+            !! "direction 2" and "direction 3"
+            !! Example : ixyz = 1, icoor=2 : Directions are (mu="v", mv="w", mw="u")
+            alpha(2) = asdq(mw,i) - w(i)*asdq(1,i)
+            alpha(3) = asdq(mu,i) - u(i)*asdq(1,i)
+            alpha(5) = (asdq(mv,i) + (a(i)-v(i))*asdq(1,i) - a(i)*alpha(4))/(2.d0*a(i))
+            alpha(1) = asdq(1,i) - alpha(4) - alpha(5)
         
-          waveb(1,1)  = alpha(1)
-          waveb(mu,1) = alpha(1)*u(i)
-          waveb(mv,1) = alpha(1)*(v(i)-a(i))
-          waveb(mw,1) = alpha(1)*w(i)
-          waveb(5,1)  = alpha(1)*(enth(i) - v(i)*a(i))
-          sb(1) = v(i) - a(i)
+            waveb(1,1)  = alpha(1)
+            waveb(mv,1) = alpha(1)*(v(i)-a(i))
+            waveb(mw,1) = alpha(1)*w(i)
+            waveb(mu,1) = alpha(1)*u(i)
+            waveb(5,1)  = alpha(1)*(enth(i) - v(i)*a(i))
+            sb(1) = v(i) - a(i)
           
-          waveb(1,2)  = alpha(4)
-          waveb(mu,2) = alpha(2) + u(i)*alpha(4)
-          waveb(mv,2) =            v(i)*alpha(4)
-          waveb(mw,2) = alpha(3) + w(i)*alpha(4)
-          waveb(5,2)  = alpha(4)*0.5d0*u2v2w2(i) + alpha(2)*u(i) + alpha(3)*w(i)
-          sb(2) = v(i)
+            waveb(1,2)  = alpha(4)
+            waveb(mv,2) =            v(i)*alpha(4)
+            waveb(mw,2) = alpha(2) + w(i)*alpha(4)
+            waveb(mu,2) = alpha(3) + u(i)*alpha(4)
+            waveb(5,2)  = alpha(4)*0.5d0*u2v2w2(i) + alpha(2)*w(i) + alpha(3)*u(i)
+            sb(2) = v(i)
           
-          waveb(1,3)  = alpha(5)
-          waveb(mu,3) = alpha(5)*u(i)
-          waveb(mv,3) = alpha(5)*(v(i) + a(i))
-          waveb(mw,3) = alpha(5)*w(i)
-          waveb(5,3)  = alpha(5)*(enth(i) + v(i)*a(i))
-          sb(3) = v(i) + a(i)
-          
-          bmasdq(:,i) = 0.d0
-          bpasdq(:,i) = 0.d0
-          DO mws = 1,mwaves
-             bmasdq(:,i) = bmasdq(:,i) + MIN(sb(mws), 0.d0)*waveb(:,mws)
-             bpasdq(:,i) = bpasdq(:,i) + MAX(sb(mws), 0.d0)*waveb(:,mws)
-          END DO
-       END DO
+            waveb(1,3)  = alpha(5)
+            waveb(mv,3) = alpha(5)*(v(i) + a(i))
+            waveb(mw,3) = alpha(5)*w(i)
+            waveb(mu,3) = alpha(5)*u(i)
+            waveb(5,3)  = alpha(5)*(enth(i) + v(i)*a(i))
+            sb(3) = v(i) + a(i)
+
+            bmasdq(:,i) = 0.d0
+            bpasdq(:,i) = 0.d0
+            DO mws = 1,mwaves
+               bmasdq(:,i) = bmasdq(:,i) + MIN(sb(mws), 0.d0)*waveb(:,mws)
+               bpasdq(:,i) = bpasdq(:,i) + MAX(sb(mws), 0.d0)*waveb(:,mws)
+            END DO
+
+            block
+                integer m
+                if (debug) then
+                    write(6,108) 'Minus (nomap rpt) : ', ixyz,icoor,imp,i 
+                    write(6,109) (sb(m),m=1,3)
+                    write(6,109) (bmasdq(m,i),m=1,meqn)
+                endif 
+            end block
+
+        END DO
 
     ! Solve Riemann problem in the third coordinate direction
     ELSEIF(icoor == 3)THEN
-       DO i = 2-mbc, mx+mbc
+        DO i = 2-mbc, mx+mbc
         
-          alpha(4) = g1a2(i) &
-               * (euv(i)*asdq(1,i) + u(i)*asdq(mu,i) + v(i)*asdq(mv,i) &
-               + w(i)*asdq(mw,i) - asdq(5,i))
-          alpha(2) = asdq(mu,i) - u(i)*asdq(1,i)
-          alpha(3) = asdq(mv,i) - v(i)*asdq(1,i)
-          alpha(5) = (asdq(mw,i) &
-               + (a(i)-w(i))*asdq(1,i) - a(i)*alpha(4))/(2.d0*a(i))
-          alpha(1) = asdq(1,i) - alpha(4) - alpha(5)
+            alpha(4) = g1a2(i) &
+                * (euv(i)*asdq(1,i) + u(i)*asdq(mu,i) + v(i)*asdq(mv,i) &
+                + w(i)*asdq(mw,i) - asdq(5,i))
+            alpha(2) = asdq(mu,i) - u(i)*asdq(1,i)
+            alpha(3) = asdq(mv,i) - v(i)*asdq(1,i)
+            alpha(5) = (asdq(mw,i) + (a(i)-w(i))*asdq(1,i) - a(i)*alpha(4))/(2.d0*a(i))
+            alpha(1) = asdq(1,i) - alpha(4) - alpha(5)
           
-          waveb(1,1)  = alpha(1)
-          waveb(mu,1) = alpha(1)*u(i)
-          waveb(mv,1) = alpha(1)*v(i)
-          waveb(mw,1) = alpha(1)*(w(i) - a(i))
-          waveb(5,1)  = alpha(1)*(enth(i) - w(i)*a(i))
-          sb(1) = w(i) - a(i)
+            waveb(1,1)  = alpha(1)
+            waveb(mw,1) = alpha(1)*(w(i) - a(i))
+            waveb(mu,1) = alpha(1)*u(i)
+            waveb(mv,1) = alpha(1)*v(i)
+            waveb(5,1)  = alpha(1)*(enth(i) - w(i)*a(i))
+            sb(1) = w(i) - a(i)
           
-          waveb(1,2)  = alpha(4)
-          waveb(mu,2) = alpha(2) + alpha(4)*u(i)
-          waveb(mv,2) = alpha(3) + alpha(4)*v(i)
-          waveb(mw,2) = alpha(4)*w(i)
-          waveb(5,2)  = alpha(4)*0.5d0*u2v2w2(i) + alpha(2)*u(i) + alpha(3)*v(i)
-          sb(2) = w(i)
+            waveb(1,2)  = alpha(4)
+            waveb(mw,2) = alpha(4)*w(i)
+            waveb(mu,2) = alpha(2) + alpha(4)*u(i)
+            waveb(mv,2) = alpha(3) + alpha(4)*v(i)
+            waveb(5,2)  = alpha(4)*0.5d0*u2v2w2(i) + alpha(2)*u(i) + alpha(3)*v(i)
+            sb(2) = w(i)
           
-          waveb(1,3)  = alpha(5)
-          waveb(mu,3) = alpha(5)*u(i)
-          waveb(mv,3) = alpha(5)*v(i)
-          waveb(mw,3) = alpha(5)*(w(i) + a(i))
-          waveb(5,3)  = alpha(5)*(enth(i) + w(i)*a(i))
-          sb(3) = w(i) + a(i)
+            waveb(1,3)  = alpha(5)
+            waveb(mw,3) = alpha(5)*(w(i) + a(i))
+            waveb(mu,3) = alpha(5)*u(i)
+            waveb(mv,3) = alpha(5)*v(i)
+            waveb(5,3)  = alpha(5)*(enth(i) + w(i)*a(i))
+            sb(3) = w(i) + a(i)
           
-          bmasdq(:,i) = 0.d0
-          bpasdq(:,i) = 0.d0
-          DO mws = 1,mwaves
-             bmasdq(:,i) = bmasdq(:,i) + MIN(sb(mws), 0.d0)*waveb(:,mws)
-             bpasdq(:,i) = bpasdq(:,i) + MAX(sb(mws), 0.d0)*waveb(:,mws)
-          END DO
+            bmasdq(:,i) = 0.d0
+            bpasdq(:,i) = 0.d0
+            DO mws = 1,mwaves
+                bmasdq(:,i) = bmasdq(:,i) + MIN(sb(mws), 0.d0)*waveb(:,mws)
+                bpasdq(:,i) = bpasdq(:,i) + MAX(sb(mws), 0.d0)*waveb(:,mws)
+            END DO
+
+            block
+                integer m
+                if (debug) then
+                    write(6,108) 'Minus (nomap rpt) : ', ixyz,icoor,imp, i 
+                    write(6,109) (sb(m),m=1,3)
+                    write(6,109) (bmasdq(m,i),m=1,meqn)
+                endif 
+            end block
 
        END DO
     END IF
+
+108     format(A,'ixyz=',I2,'; icoor=',I2,'; ilr = ',I2,'; i=',I2)
+109     format(5E24.16)
+
 
 END SUBROUTINE clawpack46_rpt3
