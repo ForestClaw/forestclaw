@@ -33,39 +33,59 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_domain.h>
 #include <fclaw_convenience.h>
 
-/* Also needed in fclaw_domain_reset */
-/* edit: right now this is not the case, switching to static */
-static
-fclaw_domain_exchange_t*
-    get_exchange_data(fclaw_global_t* glob)
+static 
+void** get_patch_data(fclaw_domain_t *domain)
 {
-    fclaw_domain_data_t *ddata = fclaw_domain_get_data(glob->domain);
-    return ddata->domain_exchange;
+    if(domain->dim == 2)
+    {
+        FCLAW_ASSERT(domain->d2->exchange != NULL);
+        return domain->d2->exchange->patch_data;
+    }
+    else if (domain->dim == 3)
+    {
+        FCLAW_ASSERT(domain->d3->exchange != NULL);
+        return domain->d3->exchange->patch_data;
+    }
+    else 
+    {
+        SC_ABORT_NOT_REACHED();
+    }
 }
 
-/* Should these be access functions in domain?  */
-static
-void set_exchange_data(fclaw_global_t* glob,
-                       fclaw_domain_exchange_t *e)
+static 
+void** get_ghost_data(fclaw_domain_t *domain)
 {
-    fclaw_domain_data_t *ddata = fclaw_domain_get_data(glob->domain);
-    ddata->domain_exchange = e;
+    if(domain->dim == 2)
+    {
+        FCLAW_ASSERT(domain->d2->exchange != NULL);
+        return domain->d2->exchange->ghost_data;
+    }
+    else if (domain->dim == 3)
+    {
+        FCLAW_ASSERT(domain->d3->exchange != NULL);
+        return domain->d3->exchange->ghost_data;
+    }
+    else 
+    {
+        SC_ABORT_NOT_REACHED();
+    }
 }
 
 static
-fclaw_domain_indirect_t*
-    get_indirect_data(fclaw_global_t* glob)
+int exchange_allocated(fclaw_domain_t* domain)
 {
-    fclaw_domain_data_t *ddata = fclaw_domain_get_data(glob->domain);
-    return ddata->domain_indirect;
-}
-
-static
-void set_indirect_data(fclaw_global_t* glob,
-                       fclaw_domain_indirect_t *ind)
-{
-    fclaw_domain_data_t *ddata = fclaw_domain_get_data(glob->domain);
-    ddata->domain_indirect = ind;
+    if(domain->dim == 2)
+    {
+        return domain->d2->exchange != NULL;
+    }
+    else if (domain->dim == 3)
+    {
+        return domain->d3->exchange != NULL;
+    }
+    else 
+    {
+        SC_ABORT_NOT_REACHED();
+    }
 }
 
 static
@@ -123,12 +143,12 @@ void delete_remote_ghost_patches(fclaw_global_t* glob)
 
 static void
 unpack_remote_ghost_patches(fclaw_global_t* glob,
-                            fclaw_domain_exchange_t *e,
                             int minlevel,
                             int maxlevel,
                             int time_interp)
 {
     fclaw_domain_t *domain = glob->domain;
+    void** ghost_data = get_ghost_data(domain);
 
     int i;
     for(i = 0; i < domain->num_ghost_patches; i++)
@@ -143,7 +163,7 @@ unpack_remote_ghost_patches(fclaw_global_t* glob,
             int patchno = i;
 
             /* access data stored on remote procs. */
-            void *q = e->ghost_data[patchno];
+            void *q = ghost_data[patchno];
 
             int unpack_to_timeinterp_patch=0;
             if (time_interp && level == minlevel-1)
@@ -169,15 +189,11 @@ void fclaw_exchange_setup(fclaw_global_t* glob,
 
     size_t psize = fclaw_patch_ghost_packsize(glob);
     size_t data_size = psize;  /* Includes sizeof(datatype), i.e. sizeof(double) */
-    fclaw_domain_exchange_t *e;
 
     /* we just created a grid by fclaw_initialize or fclaw_regrid
        and we now need to allocate data to store and retrieve local
        boundary patches and remote ghost patches */
-    e = fclaw_domain_allocate_before_exchange (domain, data_size);
-
-    /* Store e so we can retrieve it later */
-    set_exchange_data(glob,e);
+    fclaw_domain_allocate_before_exchange (domain, data_size);
 
     /* Store locations of on-proc boundary patches that will be communicated
        to neighboring remote procs.  The pointer stored in e->patch_data[]
@@ -186,6 +202,7 @@ void fclaw_exchange_setup(fclaw_global_t* glob,
        on manifolds).*/
     int zz = 0;
     int nb;
+    void ** patch_data = get_patch_data(domain);
     for (nb = 0; nb < domain->num_blocks; ++nb)
     {
         int np;
@@ -193,7 +210,7 @@ void fclaw_exchange_setup(fclaw_global_t* glob,
         {
             if (fclaw_patch_on_parallel_boundary(&domain->blocks[nb].patches[np]))
             {                
-                fclaw_patch_local_ghost_alloc(glob, &e->patch_data[zz++]);
+                fclaw_patch_local_ghost_alloc(glob, &patch_data[zz++]);
             }
         }
     }
@@ -212,8 +229,7 @@ void fclaw_exchange_setup(fclaw_global_t* glob,
     }
 
     fclaw_timer_start (&glob->timers[FCLAW_TIMER_GHOSTPATCH_COMM]);
-    fclaw_domain_indirect_t *ind =
-        fclaw_domain_indirect_begin(domain);
+    fclaw_domain_indirect_begin(domain);
 
     fclaw_timer_stop (&glob->timers[FCLAW_TIMER_GHOSTPATCH_COMM]);
 
@@ -223,7 +239,6 @@ void fclaw_exchange_setup(fclaw_global_t* glob,
     }
 
     /* Do some some work that we hope to hide by communication above.  */
-    set_indirect_data(glob,ind);
 
     /* Build ghost patches from neighboring remote processors.  These will be
        filled later with q data and the area, if we are on a manifold */
@@ -241,7 +256,7 @@ void fclaw_exchange_setup(fclaw_global_t* glob,
     }
 
     fclaw_timer_start (&glob->timers[FCLAW_TIMER_GHOSTPATCH_COMM]);
-    fclaw_domain_indirect_end(domain,ind);
+    fclaw_domain_indirect_end(domain);
     fclaw_timer_stop (&glob->timers[FCLAW_TIMER_GHOSTPATCH_COMM]);
 
     if (running != FCLAW_TIMER_NONE)
@@ -255,13 +270,11 @@ void fclaw_exchange_delete(fclaw_global_t* glob)
     fclaw_domain_t* domain = glob->domain;
     fclaw_timer_start (&glob->timers[FCLAW_TIMER_GHOSTPATCH_BUILD]);
 
-    /* Free old parallel ghost patch data structure, must exist by construction. */
-    fclaw_domain_exchange_t *e_old = get_exchange_data(glob);
-
     /* Free contiguous memory, if allocated.  If no memory was allocated
        (because we are not storing the area), nothing de-allocated. */
-    if (e_old != NULL)
+    if (exchange_allocated(domain))
     {
+        void** patch_data = get_patch_data(domain);
         /* Delete local patches which are passed to other procs */
         int zz = 0;
         int nb;
@@ -272,7 +285,7 @@ void fclaw_exchange_delete(fclaw_global_t* glob)
             {
                 if (fclaw_patch_on_parallel_boundary(&domain->blocks[nb].patches[np]))
                 {
-                    fclaw_patch_local_ghost_free(glob,&e_old->patch_data[zz++]);
+                    fclaw_patch_local_ghost_free(glob,&patch_data[zz++]);
                 }
             }
         }
@@ -280,12 +293,11 @@ void fclaw_exchange_delete(fclaw_global_t* glob)
 
     /* Delete ghost patches from remote neighboring patches */
     delete_remote_ghost_patches(glob);
-    fclaw_domain_free_after_exchange (domain, e_old);
+    fclaw_domain_free_after_exchange (domain);
 
     /* Destroy indirect data needed to communicate between ghost patches
        from different procs */
-    fclaw_domain_indirect_t* ind_old = get_indirect_data(glob);
-    fclaw_domain_indirect_destroy(domain,ind_old);
+    fclaw_domain_indirect_destroy(domain);
     fclaw_timer_stop (&glob->timers[FCLAW_TIMER_GHOSTPATCH_BUILD]);
 }
 
@@ -304,7 +316,7 @@ void fclaw_exchange_ghost_patches_begin(fclaw_global_t* glob,
     fclaw_domain_t* domain = glob->domain;
     fclaw_timer_start (&glob->timers[FCLAW_TIMER_GHOSTPATCH_BUILD]);
 
-    fclaw_domain_exchange_t *e = get_exchange_data(glob);
+    void** patch_data = get_patch_data(domain);
 
     /* Pack local data into on-proc patches at the parallel boundary that
        will be shipped of to other processors. */
@@ -325,8 +337,8 @@ void fclaw_exchange_ghost_patches_begin(fclaw_global_t* glob,
 
                 /* Pack q and area into one contingous block */
                 fclaw_patch_local_ghost_pack(glob,this_patch,
-                                               e->patch_data[zz++],
-                                               pack_time_interp);
+                                             &patch_data[zz++],
+                                             pack_time_interp);
             }
         }
     }
@@ -344,11 +356,11 @@ void fclaw_exchange_ghost_patches_begin(fclaw_global_t* glob,
         int time_interp_level = minlevel-1;
 
         fclaw_domain_ghost_exchange_begin
-            (domain, e,time_interp_level, maxlevel);
+            (domain, time_interp_level, maxlevel);
     }
     else
     {
-        fclaw_domain_ghost_exchange_begin(domain, e, minlevel, maxlevel);
+        fclaw_domain_ghost_exchange_begin(domain, minlevel, maxlevel);
 
     }
     fclaw_timer_stop (&glob->timers[FCLAW_TIMER_GHOSTPATCH_COMM]);
@@ -372,16 +384,14 @@ void fclaw_exchange_ghost_patches_end(fclaw_global_t* glob,
     }
     fclaw_timer_start (&glob->timers[FCLAW_TIMER_GHOSTPATCH_COMM]);
 
-    fclaw_domain_exchange_t *e = get_exchange_data(glob);
-
     /* Exchange only over levels currently in use */
     if (time_interp)
     {
-        fclaw_domain_ghost_exchange_end (domain, e);
+        fclaw_domain_ghost_exchange_end (domain);
     }
     else
     {
-        fclaw_domain_ghost_exchange_end (domain, e);
+        fclaw_domain_ghost_exchange_end (domain);
     }
 
     fclaw_timer_stop (&glob->timers[FCLAW_TIMER_GHOSTPATCH_COMM]);
@@ -394,7 +404,7 @@ void fclaw_exchange_ghost_patches_end(fclaw_global_t* glob,
     fclaw_timer_start (&glob->timers[FCLAW_TIMER_GHOSTPATCH_BUILD]);
     /* Unpack data from remote patches to corresponding ghost patches
        stored locally */
-    unpack_remote_ghost_patches(glob,e,minlevel,maxlevel,time_interp);
+    unpack_remote_ghost_patches(glob,minlevel,maxlevel,time_interp);
 
     /* Count calls to this function */
     ++glob->count_ghost_exchange;

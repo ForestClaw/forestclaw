@@ -60,9 +60,9 @@ fclaw_domain_t* create_domain(sc_MPI_Comm mpicomm,
                                   user->alpha,
                                   user->beta);
 
-    domain = fclaw2d_domain_new_conn_map (mpicomm, 
+    domain = fclaw_domain_wrap_2d(fclaw2d_domain_new_conn_map (mpicomm, 
                                           fclaw_opt->minlevel, 
-                                          conn, cont);
+                                          conn, cont));
 
     fclaw_domain_list_levels(domain, FCLAW_VERBOSITY_ESSENTIAL);
     fclaw_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);

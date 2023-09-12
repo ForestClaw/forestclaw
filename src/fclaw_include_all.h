@@ -37,6 +37,7 @@
 #include <fclaw_domain.h>
 #include <fclaw_diagnostics.h>
 #include <fclaw2d_convenience.h>
+#include <fclaw_convenience.h>
 #include <fclaw_global.h>
 #include <fclaw_vtable.h>
 

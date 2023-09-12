@@ -27,6 +27,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define ADVECTION_USER_P8_H
 
 #include <fclaw3d_include_all.h>
+#include <fclaw_include_all.h>
 
 #ifdef P8HACK
 

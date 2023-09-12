@@ -26,7 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW2D_RAYS_H
 #define FCLAW2D_RAYS_H
 
-#include "fclaw2d_convenience.h"  /* Needed for def. of fclaw2d_integrate_t */
+#include "fclaw_convenience.h"  /* Needed for def. of fclaw2d_integrate_t */
 
 #ifdef __cplusplus
 extern "C"
@@ -99,7 +99,7 @@ struct fclaw2d_ray_vtable
     fclaw2d_ray_allocate_and_define_t   allocate_and_define;
     fclaw2d_ray_deallocate_t            deallocate;
 
-    fclaw2d_integrate_ray_t             integrate;   /* Function that does the integration */
+    fclaw_integrate_ray_t             integrate;   /* Function that does the integration */
 #if 0
     fclaw2d_ray_create_files_t  create_ray_files;
     fclaw2d_ray_update_t        update_ray;

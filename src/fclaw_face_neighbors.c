@@ -523,7 +523,6 @@ void fclaw_face_neighbor_ghost(fclaw_global_t* glob,
 			*/
 			fclaw_patch_relation_t neighbor_type =
 				fclaw_domain_indirect_neighbors(domain,
-												ddata->domain_indirect,
 												this_ghost_idx,
 												iface,rproc,
 												&rblockno, rpatchno,

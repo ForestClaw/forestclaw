@@ -105,7 +105,7 @@ fclaw_domain_t* create_domain(sc_MPI_Comm mpicomm,
                                          user->center);
         break;
     case 4:
-        domain = fclaw3d_domain_new_unitcube(mpicomm, fclaw_opt->minlevel);
+        domain = fclaw_domain_new_unitcube(mpicomm, fclaw_opt->minlevel);
         break;
 
     default:
@@ -119,7 +119,7 @@ fclaw_domain_t* create_domain(sc_MPI_Comm mpicomm,
         {
             swirl_map_extrude(cont,user->maxelev);        
         }
-        domain = fclaw2d_domain_new_conn_map (mpicomm, fclaw_opt->minlevel, conn, cont);
+        domain = fclaw_domain_wrap_2d(fclaw2d_domain_new_conn_map (mpicomm, fclaw_opt->minlevel, conn, cont));
     }
     fclaw_domain_list_levels(domain, FCLAW_VERBOSITY_ESSENTIAL);
     fclaw_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);  
