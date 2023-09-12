@@ -26,7 +26,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FORESTCLAW_H
 #define FORESTCLAW_H
 
-#include <fclaw_base.h>
+#include <forestclaw2d.h>
+#include <forestclaw3d.h>
 #include <sc_keyvalue.h>
 
 #ifdef __cplusplus
@@ -181,6 +182,8 @@ fclaw_domain_persist_t;
 struct fclaw_domain
 {
     int dim;                    /**< dimension */
+    fclaw2d_domain_t* d2;
+    fclaw3d_domain_t* d3;
 
     sc_MPI_Comm mpicomm;        /**< MPI communicator */
     int mpisize;                /**< MPI size */
