@@ -182,7 +182,7 @@ void ray_integrate(fclaw_global_t *glob, void *acc)
     const fclaw2d_ray_vtable_t* ray_vt = fclaw2d_ray_vt(glob);
 
     /* This does a compute and a gather. */
-    fclaw2d_domain_integrate_rays(glob->domain, ray_vt->integrate, 
+    fclaw2d_domain_integrate_rays(glob->domain->d2, ray_vt->integrate, 
                                   sc_rays, integrals, glob);
 
     /* Copy integral value back to fclaw2d_ray_t */

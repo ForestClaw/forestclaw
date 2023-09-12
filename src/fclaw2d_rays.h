@@ -99,7 +99,7 @@ struct fclaw2d_ray_vtable
     fclaw2d_ray_allocate_and_define_t   allocate_and_define;
     fclaw2d_ray_deallocate_t            deallocate;
 
-    fclaw_integrate_ray_t             integrate;   /* Function that does the integration */
+    fclaw2d_integrate_ray_t             integrate;   /* Function that does the integration */
 #if 0
     fclaw2d_ray_create_files_t  create_ray_files;
     fclaw2d_ray_update_t        update_ray;
