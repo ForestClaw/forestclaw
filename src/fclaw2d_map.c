@@ -23,34 +23,20 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef REFINE_DIM
-#define REFINE_DIM 2
-#endif
-
-#ifndef PATCH_DIM
-#define PATCH_DIM 2
-#endif
-
-
-#if PATCH_DIM == 2
+#ifndef P4_TO_P8
 
 #include <fclaw_global.h>
 #include <fclaw2d_map.h>
 #include <fclaw2d_map_query.h>  /* Needed for pillowsphere query */
 
 #define MAP_KEY "map_2d"
-#elif PATCH_DIM == 3 && REFINE_DIM == 2
 
-#include <fclaw_global.h>
-#include <fclaw3dx_map.h>
-//#include <fclaw3d_map_query.h>  /* Needed for pillowsphere query */
-//#include <_fclaw2d_to_fclaw3d.h>
-#define MAP_KEY "map_2d"
+#else
 
-#else /* this is full 3D */
 #include <fclaw3d_map.h>
 
 #define MAP_KEY "map_3d"
+
 #endif
 
 #ifndef P4_TO_P8

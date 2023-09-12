@@ -56,25 +56,6 @@ typedef struct fclaw_block fclaw_block_t;
 /** Typedef for fclaw_patch */
 typedef struct fclaw_patch fclaw_patch_t;
 
-/**
- * @brief 2D specific patch information
- */
-struct fclaw_patch_d2
-{
-    double xlower, xupper;
-    double ylower, yupper;
-};
-
-/**
- * @brief 3D specific patch information
- */
-struct fclaw_patch_d3
-{
-    double xlower, xupper;
-    double ylower, yupper;
-    double zlower, zupper;
-};
-
 /** 
  * @brief The metadata structure for a forest leaf, which is a forestclaw patch.
  * The patch may be either a process-local patch or a ghost patch.
@@ -82,8 +63,8 @@ struct fclaw_patch_d3
 struct fclaw_patch
 {
     int dim;                    /**< dimension */
-    struct fclaw_patch_d2* d2;  /**< 2D specific information */
-    struct fclaw_patch_d3* d3;  /**< 3D specific informaiton */
+    fclaw2d_patch_t* d2;        /**< 2D specific information */
+    fclaw3d_patch_t* d3;        /**< 3D specific informaiton */
     int level;                  /**< 0 is root, increases if refined */
     int target_level;           /**< level desired after adaptation */
     int flags;                  /**< flags that encode tree information */

@@ -34,6 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_patch.h>
 
 #include <forestclaw.h>
+#include <fclaw_convenience.h>
 
 
 /* This is used to determine neighbor patch relative level (finer, coarser or samesize)
