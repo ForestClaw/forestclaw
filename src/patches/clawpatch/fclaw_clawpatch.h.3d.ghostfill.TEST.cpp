@@ -90,8 +90,7 @@ struct CubeDomain {
         fclaw_vtables_initialize(glob);
         fclaw_clawpatch_vtable_initialize(glob, 4);
 
-        fclaw_domain_data_new(glob->domain);
-    }
+            }
     void setup(){
         fclaw_initialize(glob);
     }

@@ -49,31 +49,15 @@ extern "C"
        toplevel algorithmic function quite naturally outside of domain.
  */
 struct fclaw_global;
-typedef struct fclaw_domain_data
-{
-    /* Debug counters and timers */
-    int count_set_patch;
-    int count_delete_patch;
-
-    void* domain_exchange;
-    void *domain_indirect;
-
-} fclaw_domain_data_t;
 
 fclaw_domain_t* fclaw_domain_wrap_2d(fclaw2d_domain_t *domain2d);
 
 fclaw_domain_t* fclaw_domain_wrap_3d(fclaw3d_domain_t *domain3d);
 
-void fclaw_domain_data_new(struct fclaw_domain *domain);
-
-void fclaw_domain_data_delete(struct fclaw_domain* domain);
-
 void fclaw_domain_setup(struct fclaw_global* glob,
                           struct fclaw_domain* new_domain);
 
 void fclaw_domain_reset(struct fclaw_global* glob);
-
-fclaw_domain_data_t* fclaw_domain_get_data(struct fclaw_domain *domain);
 
 /* OpenMP iterator (not part of forestclaw2d.h */
 void fclaw_domain_iterate_level_mthread (struct fclaw_domain * domain, int level,

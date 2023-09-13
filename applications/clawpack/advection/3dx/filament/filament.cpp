@@ -128,8 +128,6 @@ void run_program(fclaw_global_t* glob)
     /* ---------------------------------------------------------------
        Set domain data.
        --------------------------------------------------------------- */
-    fclaw_domain_data_new(glob->domain);
-
     /* Initialize virtual table for ForestClaw */
     fclaw_vtables_initialize(glob);
 

@@ -191,8 +191,7 @@ void run_program(fclaw_app_t* app)
        --------------------------------------------------------------- */
     fclaw2d_domain_set_app (domain,app);
 
-    fclaw_domain_data_new(domain);
-
+    
     sphere_link_solvers(domain);
 
     fclaw_initialize(&domain);

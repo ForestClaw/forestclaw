@@ -183,8 +183,7 @@ void run_program(fclaw_app_t* app)
   /* ---------------------------------------------------------------
      Set domain data.
      --------------------------------------------------------------- */
-  fclaw_domain_data_new(domain);
-  fclaw2d_domain_set_app(domain,app);
+    fclaw2d_domain_set_app(domain,app);
 
   /* Link other routines that need to be included. */
   metric_link_patch(domain);

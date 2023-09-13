@@ -85,8 +85,7 @@ struct QuadDomain {
         fclaw_vtables_initialize(glob);
         fclaw_clawpatch_vtable_initialize(glob, 4);
 
-        fclaw_domain_data_new(glob->domain);
-
+        
     }
     void setup(){
         fclaw_build_mode_t build_mode = FCLAW_BUILD_FOR_UPDATE;
@@ -148,8 +147,7 @@ struct QuadDomainBrick {
         fclaw_vtables_initialize(glob);
         fclaw_clawpatch_vtable_initialize(glob, 4);
     
-        fclaw_domain_data_new(glob->domain);
-    }
+            }
     void setup(){
         fclaw_build_mode_t build_mode = FCLAW_BUILD_FOR_UPDATE;
         fclaw_patch_build(glob, &domain->blocks[0].patches[0], 0, 0, &build_mode);

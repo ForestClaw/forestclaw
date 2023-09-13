@@ -179,6 +179,8 @@ struct fclaw_domain
     int dim;                    /**< dimension */
     fclaw_domain_d2_t* d2;
     fclaw_domain_d3_t* d3;
+    int count_set_patch;
+    int count_delete_patch;
 
     sc_MPI_Comm mpicomm;        /**< MPI communicator */
     int mpisize;                /**< MPI size */

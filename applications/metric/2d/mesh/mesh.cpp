@@ -106,8 +106,7 @@ void run_program(fclaw_global_t* glob)
     /* ---------------------------------------------------------------
        Set domain data.
        --------------------------------------------------------------- */
-    fclaw_domain_data_new(glob->domain);
-
+    
     user = (user_options_t*) mesh_user_get_options(glob);
 
     if (user->claw_version == 4)

@@ -51,8 +51,7 @@ void run_program(fclaw_global_t* glob)
        --------------------------------------------------------------- */
     const user_options_t *user = no_solver_get_options(glob);
 
-    fclaw_domain_data_new(glob->domain);
-
+    
     /* Initialize virtual table for ForestClaw */
     fclaw_vtable_initialize(glob);
     fclaw_diagnostics_vtable_initialize();

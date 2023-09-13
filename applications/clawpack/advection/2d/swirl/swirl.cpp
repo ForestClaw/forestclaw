@@ -49,8 +49,6 @@ void run_program(fclaw_global_t* glob)
     /* ---------------------------------------------------------------
        Set domain data.
        --------------------------------------------------------------- */
-    fclaw_domain_data_new(glob->domain);
-
     const user_options_t *user_opt = swirl_get_options(glob);
 
     /* Initialize virtual table for ForestClaw */

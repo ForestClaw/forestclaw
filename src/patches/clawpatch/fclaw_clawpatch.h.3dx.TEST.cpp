@@ -101,8 +101,7 @@ struct SinglePatchDomain {
         fclaw_vtables_initialize(glob);
         fclaw_clawpatch_vtable_initialize(glob, 4);
 
-        fclaw_domain_data_new(glob->domain);
-    }
+            }
     void setup(){
         fclaw_build_mode_t build_mode = FCLAW_BUILD_FOR_UPDATE;
         fclaw_patch_build(glob, &domain->blocks[0].patches[0], 0, 0, &build_mode);
@@ -156,8 +155,7 @@ struct QuadDomain {
         fclaw_vtables_initialize(glob);
         fclaw_clawpatch_vtable_initialize(glob, 4);
 
-        fclaw_domain_data_new(glob->domain);
-    }
+            }
     void setup(){
         fclaw_build_mode_t build_mode = FCLAW_BUILD_FOR_UPDATE;
         fclaw_patch_build(glob, &domain->blocks[0].patches[0], 0, 0, &build_mode);
@@ -292,8 +290,7 @@ TEST_CASE("3dx fclaw_clawpatch patch_build")
         fclaw_vtables_initialize(glob);
         fclaw_clawpatch_vtable_initialize(glob, 4);
 
-        fclaw_domain_data_new(glob->domain);
-        CHECK(domain->blocks[0].patches[0].user == nullptr);
+                CHECK(domain->blocks[0].patches[0].user == nullptr);
         fclaw_patch_build(glob, &domain->blocks[0].patches[0], 0, 0, &build_mode);
         CHECK(domain->blocks[0].patches[0].user != nullptr);
 

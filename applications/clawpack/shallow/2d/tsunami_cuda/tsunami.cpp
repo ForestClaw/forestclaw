@@ -70,8 +70,7 @@ void run_program(fclaw_global_t* glob)
     /* ---------------------------------------------------------------
        Set domain data.
        --------------------------------------------------------------- */
-    fclaw_domain_data_new(glob->domain);
-
+    
     /* Set domain dimensions so that we have square grid cells */
     fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
     user_options_t* user_opt = tsunami_get_options(glob);
