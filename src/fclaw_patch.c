@@ -1222,11 +1222,11 @@ fclaw_patch_on_parallel_boundary (const fclaw_patch_t * patch)
 {
     if(patch->dim == 2)
     {
-        return patch->d2->flags & FCLAW2D_PATCH_ON_PARALLEL_BOUNDARY ? 1 : 0;
+        return patch->patch_2d->flags & FCLAW2D_PATCH_ON_PARALLEL_BOUNDARY ? 1 : 0;
     }
     else 
     {
-        return patch->d3->flags & FCLAW3D_PATCH_ON_PARALLEL_BOUNDARY ? 1 : 0;
+        return patch->patch_3d->flags & FCLAW3D_PATCH_ON_PARALLEL_BOUNDARY ? 1 : 0;
     }
 }
 

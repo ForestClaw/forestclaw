@@ -376,9 +376,9 @@ TEST_CASE("3d ghost fill on cube with refinement")
                int patchno,
                int initflag)
         {
-            if(patch->d3->xlower == doctest::Approx(0.5)&&
-               patch->d3->ylower == doctest::Approx(0.5)&&
-               patch->d3->zlower == doctest::Approx(0.5))
+            if(patch->xlower == doctest::Approx(0.5)&&
+               patch->ylower == doctest::Approx(0.5)&&
+               patch->zlower == doctest::Approx(0.5))
             {
                 return 1;
             }
@@ -613,12 +613,12 @@ TEST_CASE("3d ghost fill on cube with refinement coarse interior")
                int patchno,
                int initflag)
         {
-            if(patch->d3->xlower == 0 ||
-                patch->d3->ylower == 0 ||
-                patch->d3->zlower == 0 ||
-                patch->d3->xupper == 1 ||
-                patch->d3->yupper == 1 ||
-                patch->d3->zupper == 1)
+            if(patch->xlower == 0 ||
+                patch->ylower == 0 ||
+                patch->zlower == 0 ||
+                patch->xupper == 1 ||
+                patch->yupper == 1 ||
+                patch->zupper == 1)
             {
                 return 1;
             }

@@ -178,11 +178,11 @@ fclaw_patch_corner_dimension (const fclaw_patch_t * patch, int cornerno)
 {
     if(patch->dim == 2)
     {
-        return fclaw2d_patch_corner_dimension(patch->d2, cornerno);
+        return fclaw2d_patch_corner_dimension(patch->patch_2d, cornerno);
     }
     else if(patch->dim == 3)
     {
-        return fclaw3d_patch_corner_dimension(patch->d3, cornerno);
+        return fclaw3d_patch_corner_dimension(patch->patch_3d, cornerno);
     }
     else 
     {
@@ -195,11 +195,11 @@ fclaw_patch_childid (const fclaw_patch_t * patch)
 {
     if(patch->dim == 2)
     {
-        return fclaw2d_patch_childid(patch->d2);
+        return fclaw2d_patch_childid(patch->patch_2d);
     } 
     else if(patch->dim == 3)
     {
-        return fclaw3d_patch_childid(patch->d3);
+        return fclaw3d_patch_childid(patch->patch_3d);
     }
     else 
     {
@@ -212,11 +212,11 @@ fclaw_patch_is_first_sibling (const fclaw_patch_t * patch)
 {
     if(patch->dim == 2)
     {
-        return fclaw2d_patch_is_first_sibling(patch->d2);
+        return fclaw2d_patch_is_first_sibling(patch->patch_2d);
     }
     else if(patch->dim == 3)
     {
-        return fclaw3d_patch_is_first_sibling(patch->d3);
+        return fclaw3d_patch_is_first_sibling(patch->patch_3d);
     }
     else
     {
@@ -229,11 +229,11 @@ fclaw_patch_is_ghost (const fclaw_patch_t * patch)
 {
     if(patch->dim == 2)
     {
-        return fclaw2d_patch_is_ghost(patch->d2);
+        return fclaw2d_patch_is_ghost(patch->patch_2d);
     }
     else if(patch->dim == 3)
     {
-        return fclaw3d_patch_is_ghost(patch->d3);
+        return fclaw3d_patch_is_ghost(patch->patch_3d);
     }
     else
     {
@@ -385,7 +385,7 @@ fclaw_patch_transform_face_2d (fclaw_patch_t * ipatch,
                                const int ftransform[],
                                int mx, int my, int based, int *i, int *j)
 {
-    fclaw2d_patch_transform_face(ipatch->d2,opatch->d2,ftransform,mx,my,based,i,j);
+    fclaw2d_patch_transform_face(ipatch->patch_2d,opatch->patch_2d,ftransform,mx,my,based,i,j);
 }
 
 void 
@@ -395,7 +395,7 @@ fclaw_patch_transform_face2_2d (fclaw_patch_t * ipatch,
                                 int mx, int my, int based, int i[],
                                 int j[])
 {
-    fclaw2d_patch_transform_face2(ipatch->d2,opatch->d2,ftransform,mx,my,based,i,j);
+    fclaw2d_patch_transform_face2(ipatch->patch_2d,opatch->patch_2d,ftransform,mx,my,based,i,j);
 }
 
 void 
@@ -405,7 +405,7 @@ fclaw_patch_transform_face_3d (fclaw_patch_t * ipatch,
                                int mx, int my, int mz, int based,
                                int *i, int *j, int *k)
 {
-    fclaw3d_patch_transform_face(ipatch->d3,opatch->d3,ftransform,mx,my,mz,based,i,j,k);
+    fclaw3d_patch_transform_face(ipatch->patch_3d,opatch->patch_3d,ftransform,mx,my,mz,based,i,j,k);
 }
 
 void 
@@ -415,7 +415,7 @@ fclaw_patch_transform_face2_3d (fclaw_patch_t * ipatch,
                                 int mx, int my, int mz, int based,
                                 int i[], int j[], int k[])
 {
-    fclaw3d_patch_transform_face2(ipatch->d3,opatch->d3,ftransform,mx,my,mz,based,i,j,k);
+    fclaw3d_patch_transform_face2(ipatch->patch_3d,opatch->patch_3d,ftransform,mx,my,mz,based,i,j,k);
 }
 
 
@@ -464,7 +464,7 @@ void fclaw_patch_transform_corner_2d (fclaw_patch_t * ipatch,
                                       int mx, int my,
                                       int based, int *i, int *j)
 {
-    fclaw2d_patch_transform_corner(ipatch->d2,opatch->d2,icorner,is_block_boundary,
+    fclaw2d_patch_transform_corner(ipatch->patch_2d,opatch->patch_2d,icorner,is_block_boundary,
                                    mx,my,based,i,j);
 }
 
@@ -474,7 +474,7 @@ void fclaw_patch_transform_corner2_2d (fclaw_patch_t * ipatch,
                                        int mx, int my, int based,
                                        int i[], int j[])
 {
-    fclaw2d_patch_transform_corner2(ipatch->d2,opatch->d2,icorner,is_block_boundary,
+    fclaw2d_patch_transform_corner2(ipatch->patch_2d,opatch->patch_2d,icorner,is_block_boundary,
                                     mx,my,based,i,j);
 }
 
@@ -502,7 +502,7 @@ void fclaw_patch_transform_corner_3d (fclaw_patch_t * ipatch,
                                       int mx, int my, int mz,
                                       int based, int *i, int *j, int *k)
 {
-    fclaw3d_patch_transform_corner(ipatch->d3,opatch->d3,icorner,is_block_boundary,
+    fclaw3d_patch_transform_corner(ipatch->patch_3d,opatch->patch_3d,icorner,is_block_boundary,
                                    mx,my,mz,based,i,j,k);
 }
 
@@ -512,7 +512,7 @@ void fclaw_patch_transform_corner2_3d (fclaw_patch_t * ipatch,
                                        int mx, int my, int mz, int based,
                                        int i[], int j[], int k[])
 {
-    fclaw3d_patch_transform_corner2(ipatch->d3,opatch->d3,icorner,is_block_boundary,
+    fclaw3d_patch_transform_corner2(ipatch->patch_3d,opatch->patch_3d,icorner,is_block_boundary,
                                     mx,my,mz,based,i,j,k);
 }
 
@@ -737,8 +737,8 @@ mcb_wrap2d(fclaw2d_domain_t * old_domain,
     fclaw_patch_t* old_patch = wrap_user->old_domain->blocks[blockno].patches + old_patchno;
     fclaw_patch_t* new_patch = wrap_user->new_domain->blocks[blockno].patches + new_patchno;
 
-    FCLAW_ASSERT(old_patch->d2 == old_patch_2d);
-    FCLAW_ASSERT(new_patch->d2 == new_patch_2d);
+    FCLAW_ASSERT(old_patch->patch_2d == old_patch_2d);
+    FCLAW_ASSERT(new_patch->patch_2d == new_patch_2d);
 
     wrap_user->mcb(wrap_user->old_domain, old_patch,
                    wrap_user->new_domain, new_patch,
@@ -763,8 +763,8 @@ mcb_wrap3d(fclaw3d_domain_t * old_domain,
     fclaw_patch_t* old_patch = wrap_user->old_domain->blocks[blockno].patches + old_patchno;
     fclaw_patch_t* new_patch = wrap_user->new_domain->blocks[blockno].patches + new_patchno;
 
-    FCLAW_ASSERT(old_patch->d3 == old_patch_3d);
-    FCLAW_ASSERT(new_patch->d3 == new_patch_3d);
+    FCLAW_ASSERT(old_patch->patch_3d == old_patch_3d);
+    FCLAW_ASSERT(new_patch->patch_3d == new_patch_3d);
 
     wrap_user->mcb(wrap_user->old_domain, old_patch,
                    wrap_user->new_domain, new_patch,
@@ -857,8 +857,8 @@ tcb_wrap2d(fclaw2d_domain_t * old_domain,
     fclaw_patch_t* old_patch = wrap_user->old_domain->blocks[blockno].patches + old_patchno;
     fclaw_patch_t* new_patch = wrap_user->new_domain->blocks[blockno].patches + new_patchno;
 
-    FCLAW_ASSERT(old_patch->d2 == old_patch_2d);
-    FCLAW_ASSERT(new_patch->d2 == new_patch_2d);
+    FCLAW_ASSERT(old_patch->patch_2d == old_patch_2d);
+    FCLAW_ASSERT(new_patch->patch_2d == new_patch_2d);
 
     wrap_user->tcb(wrap_user->old_domain, old_patch,
                    wrap_user->new_domain, new_patch,
@@ -881,8 +881,8 @@ tcb_wrap3d(fclaw3d_domain_t * old_domain,
     fclaw_patch_t* old_patch = wrap_user->old_domain->blocks[blockno].patches + old_patchno;
     fclaw_patch_t* new_patch = wrap_user->new_domain->blocks[blockno].patches + new_patchno;
 
-    FCLAW_ASSERT(old_patch->d3 == old_patch_3d);
-    FCLAW_ASSERT(new_patch->d3 == new_patch_3d);
+    FCLAW_ASSERT(old_patch->patch_3d == old_patch_3d);
+    FCLAW_ASSERT(new_patch->patch_3d == new_patch_3d);
 
     wrap_user->tcb(wrap_user->old_domain, old_patch,
                    wrap_user->new_domain, new_patch,

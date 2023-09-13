@@ -58,8 +58,8 @@ void convert_brick(fclaw_global_t *glob,
 
     int is_brick = FCLAW2D_MAP_IS_BRICK(&cont);
 
-    double xl = this_patch->d2->xlower;
-    double yl = this_patch->d2->ylower;
+    double xl = this_patch->xlower;
+    double yl = this_patch->ylower;
 
     double xlow,ylow;
 

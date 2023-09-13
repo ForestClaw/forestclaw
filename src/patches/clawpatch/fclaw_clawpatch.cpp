@@ -268,20 +268,19 @@ void clawpatch_define(fclaw_global_t* glob,
     {
         if(cp->dim == 2)
         {
-            cp->d2->xlower = patch->d2->xlower;
-            cp->d2->ylower = patch->d2->ylower;
-            cp->d2->xupper = patch->d2->xupper;
-            cp->d2->yupper = patch->d2->yupper;
+            cp->d2->xlower = patch->xlower;
+            cp->d2->ylower = patch->ylower;
+            cp->d2->xupper = patch->xupper;
+            cp->d2->yupper = patch->yupper;
         }
         else 
         {
-            cp->d3->xlower = patch->d2->xlower;
-            cp->d3->ylower = patch->d2->ylower;
-            cp->d3->xupper = patch->d2->xupper;
-            cp->d3->yupper = patch->d2->yupper;
-            //if REFINE_DIM == 2
-            cp->d3->zlower = 0;
-            cp->d3->zupper = 1;
+            cp->d3->xlower = patch->xlower;
+            cp->d3->ylower = patch->ylower;
+            cp->d3->zlower = patch->zlower;
+            cp->d3->xupper = patch->xupper;
+            cp->d3->yupper = patch->yupper;
+            cp->d3->zupper = patch->zupper;
         }
 
     }
@@ -295,17 +294,17 @@ void clawpatch_define(fclaw_global_t* glob,
         double xl,yl,xu,yu;
         if(patch->dim == 2)
         {
-            xl = patch->d2->xlower;
-            yl = patch->d2->ylower;
-            xu = patch->d2->xupper;
-            yu = patch->d2->yupper;
+            xl = patch->xlower;
+            yl = patch->ylower;
+            xu = patch->xupper;
+            yu = patch->yupper;
         }
         else 
         {
-            xl = patch->d3->xlower;
-            yl = patch->d3->ylower;
-            xu = patch->d3->xupper;
-            yu = patch->d3->yupper;
+            xl = patch->xlower;
+            yl = patch->ylower;
+            xu = patch->xupper;
+            yu = patch->yupper;
         }
 
         double xlower, ylower, xupper, yupper;
@@ -345,8 +344,8 @@ void clawpatch_define(fclaw_global_t* glob,
             double zupper = 1;
             if(patch->dim == 3)
             {
-                zlower = patch->d3->zlower;
-                zupper = patch->d3->zupper;
+                zlower = patch->zlower;
+                zupper = patch->zupper;
             }
             cp->d3->zlower = az + (bz - az)*zlower;
             cp->d3->zupper = az + (bz - az)*zupper;

@@ -176,10 +176,10 @@ intersect_patch (fclaw_patch_t *patch, swirl_ray_t *swirl_ray,
     FCLAW_ASSERT (dt != NULL);
 
     /* store the patch corners in an indexable format */
-    corners[0][0] = patch->d2->xlower;
-    corners[0][1] = patch->d2->ylower;
-    corners[1][0] = patch->d2->xupper;
-    corners[1][1] = patch->d2->yupper;
+    corners[0][0] = patch->xlower;
+    corners[0][1] = patch->ylower;
+    corners[1][0] = patch->xupper;
+    corners[1][1] = patch->yupper;
 
     /* compute the coordinates of intersections with most orthogonal edges */
     ni = i ^ 1;

@@ -63,8 +63,8 @@ typedef struct fclaw_patch fclaw_patch_t;
 struct fclaw_patch
 {
     int dim;                    /**< dimension */
-    fclaw2d_patch_t* d2;        /**< 2D specific information */
-    fclaw3d_patch_t* d3;        /**< 3D specific informaiton */
+    fclaw2d_patch_t* patch_2d;        /**< 2D specific information */
+    fclaw3d_patch_t* patch_3d;        /**< 3D specific informaiton */
     /** @{ @brief left/right coordinate */
     double xlower, xupper;
     /** @} */
