@@ -284,7 +284,7 @@ void fc2d_thunderegg_fivepoint_solve(fclaw_global_t *glob)
 
     // get p4est structure
     fclaw_domain_t *domain = glob->domain;
-    p4est_wrap_t *wrap = (p4est_wrap_t *)domain->pp;
+    p4est_wrap_t *wrap = (p4est_wrap_t *)domain->d2->domain->pp;
 
     // create map function
     fclaw2d_map_context_t* cont = fclaw2d_map_get(glob);

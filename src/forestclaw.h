@@ -203,12 +203,6 @@ struct fclaw_domain
     int global_minlevel;       /**< global min level */
     int global_maxlevel;       /**< global max level */
 
-    int just_adapted;           /**< true after non-trivial adaptation */
-    int just_partitioned;       /**< true after non-trivial partition */
-    int partition_unchanged_first;      /**< local index of first unchanged patch */
-    int partition_unchanged_length;     /**< number of unchanged quadrants */
-    int partition_unchanged_old_first;  /**< local index wrt. previous partition */
-
     int num_blocks;             /**< Total number of blocks. */
     fclaw_block_t *blocks;    /**< allocated storage */
     int num_exchange_patches;   /**< number my patches relevant to other procs.
@@ -219,11 +213,6 @@ struct fclaw_domain
     int num_ghost_patches;      /**< number of off-proc patches relevant to this proc */
     fclaw_patch_t *ghost_patches;     /**< array of off-proc patches */
 
-    void **mirror_target_levels;  /**< Points to target level of each mirror. */
-    int *ghost_target_levels;   /**< Contains target level for each ghost. */
-
-    void *pp;                   /**< opaque backend data */
-    int pp_owned;               /**< True if the pp member is owned by this domain */
     sc_keyvalue_t *attributes;  /**< Reserved to store domain attributes */
 
     void *user; /**< user data pointer */
