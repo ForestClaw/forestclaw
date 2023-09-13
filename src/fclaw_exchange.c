@@ -113,7 +113,8 @@ void build_remote_ghost_patches(fclaw_global_t* glob)
     {
         ghost_patch = &domain->ghost_patches[i];
 
-        blockno = ghost_patch->u.blockno;
+        blockno = ghost_patch->d2->u.blockno;
+        //TODO 3D?
 
         /* not clear how useful this patchno is.  In any case, it isn't
            used in defining the ClawPatch, so probably doesn't
@@ -158,7 +159,8 @@ unpack_remote_ghost_patches(fclaw_global_t* glob,
 
         if (level >= minlevel-1)
         {
-            int blockno = ghost_patch->u.blockno;
+            int blockno = ghost_patch->d2->u.blockno;
+            //TODO 3D?
 
             int patchno = i;
 

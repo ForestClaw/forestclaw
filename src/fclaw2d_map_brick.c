@@ -163,8 +163,8 @@ fclaw2d_map_new_brick (fclaw_domain_t *domain,
         fclaw_block_t *block = &domain->blocks[i];
 
         /* (x,y) reference coordinates of lower-left block corner */
-        bv->xv[i] = block->d2->vertices[0];
-        bv->yv[i] = block->d2->vertices[1];
+        bv->xv[i] = block->vertices[0];
+        bv->yv[i] = block->vertices[1];
     }
     cont->user_data = (void*) bv;
 

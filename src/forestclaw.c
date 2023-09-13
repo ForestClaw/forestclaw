@@ -520,23 +520,7 @@ void
 fclaw_domain_iterate_level (fclaw_domain_t * domain, int level,
                               fclaw_patch_callback_t pcb, void *user)
 {
-    int i, j;
-    fclaw_block_t *block;
-    fclaw_patch_t *patch;
-
-    FCLAW_ASSERT (0 <= level && level <= domain->possible_maxlevel);
-    for (i = 0; i < domain->num_blocks; ++i)
-    {
-        block = domain->blocks + i;
-        for (patch = block->patchbylevel[level];
-             patch != NULL; patch = patch->u.next)
-        {
-            j = (int) (patch - block->patches);
-            FCLAW_ASSERT (0 <= j && j < block->num_patches);
-            FCLAW_ASSERT (patch->level == level);
-            pcb (domain, patch, i, j, user);
-        }
-    }
+    fclaw_abortf("NOT IMPLIMENTED");
 }
 
 void

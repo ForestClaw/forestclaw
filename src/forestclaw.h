@@ -65,53 +65,18 @@ struct fclaw_patch
     int dim;                    /**< dimension */
     fclaw2d_patch_t* d2;        /**< 2D specific information */
     fclaw3d_patch_t* d3;        /**< 3D specific informaiton */
-    int level;                  /**< 0 is root, increases if refined */
-    int target_level;           /**< level desired after adaptation */
-    int flags;                  /**< flags that encode tree information */
-    /** Union, If this is a local patch, it points to the next patch, otherwise it gives
-     * the bock number of this patch */
-    union
-    {
-        fclaw_patch_t *next;  /**< local: next patch same level same block */
-        int blockno;            /**< off-proc: this patch's block number */
-    }
-    u;
-    void *user;                 /**< User Pointer */
-};
-
-/**
- * @brief 2D specific block information
- */
-struct fclaw_block_d2
-{
-    /** @{ @brief lower left coordinate */
-    double xlower, xupper;
-    /** @} */
-    /** @{ @brief upper right coordinate */
-    double ylower, yupper;
-    /** @} */
-    double vertices[4 * 3];     /**< for each block corner, the xyz coordinates
-                                     of the p4est_connectivity structure */
-    int is_boundary[4];         /**< physical boundary flag */
-};
-
-/**
- * @brief 3D specfic block information
- */
-struct fclaw_block_d3
-{
     /** @{ @brief left/right coordinate */
     double xlower, xupper;
     /** @} */
     /** @{ @brief front/back coordinate */
     double ylower, yupper;
     /** @} */
-    /** @{ @brief bottom/top coordinate */
+    /** @{ @brief bottom/top coordinate. For 2D refinement, these are always set to 0,1 respectively? TODO */
     double zlower, zupper;
     /** @} */
-    double vertices[8 * 3];     /**< for each block corner, the xyz coordinates
-                                     of the p8est_connectivity structure */
-    int is_boundary[6];         /**< physical boundary flag */
+    int level;                  /**< 0 is root, increases if refined */
+
+    void *user;                 /**< User Pointer */
 };
 
 /**
@@ -120,11 +85,21 @@ struct fclaw_block_d3
 typedef struct fclaw_block
 {
     int dim;                    /**< dimension */
-    struct fclaw_block_d2* d2;  /**< 2D specific information */
-    struct fclaw_block_d3* d3;  /**< 3D specific informaiton */
     int num_patches;            /**< local patches in this block */
     int num_patches_before;     /**< in all previous blocks */
     int num_exchange_patches;   /**< exchange patches in this block */
+    /** @{ @brief left/right coordinate */
+    double xlower, xupper;
+    /** @} */
+    /** @{ @brief front/back coordinate */
+    double ylower, yupper;
+    /** @} */
+    /** @{ @brief bottom/top coordinate. For 2D refinement these are always set to 0,1 respectively */
+    double zlower, zupper;
+    /** @} */
+    double vertices[8 * 3];     /**< for each block corner, the xyz coordinates
+                                     of the p8est_connectivity structure */
+    int is_boundary[6];         /**< physical boundary flag */
     /** @{ 
      * @brief min/max level
      * local over this block.  If this proc doesn't
@@ -135,8 +110,6 @@ typedef struct fclaw_block
     int maxlevel;
     /** @} */
     fclaw_patch_t *patches;           /**< The patches for this block */
-    fclaw_patch_t **patchbylevel;     /**< Pointer to the first patch in each level **/
-    fclaw_patch_t **exchange_patches; /**< Pointer for each exchange patch */
     void *user;                       /**< User pointer */
 } fclaw_block_t;
 
