@@ -62,9 +62,6 @@ struct fclaw_global
     int mpisize;              /**< Size of communicator. */
     int mpirank;              /**< Rank of this process in \b mpicomm. */
 
-    /** Solver packages for internal use. */
-    struct fclaw_package_container *pkg_container;
-
     struct fclaw_pointer_map *vtables;    /**< Vtables */
     struct fclaw_pointer_map *options;    /**< options */
     struct fclaw_pointer_map *attributes;    /**< attributes, things that are not vtables, or options */

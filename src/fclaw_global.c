@@ -53,7 +53,6 @@ fclaw_global_t* fclaw_global_new (void)
 
     glob->domain = NULL;
 
-    glob->pkg_container = fclaw_package_container_new ();
     glob->vtables = fclaw_pointer_map_new ();
     glob->options = fclaw_pointer_map_new ();
     glob->attributes = fclaw_pointer_map_new ();
@@ -208,7 +207,6 @@ fclaw_global_destroy (fclaw_global_t * glob)
 {
     FCLAW_ASSERT (glob != NULL);
 
-    fclaw_package_container_destroy ((fclaw_package_container_t *)glob->pkg_container);
     fclaw_pointer_map_destroy (glob->vtables);
     fclaw_pointer_map_destroy (glob->options);
     fclaw_pointer_map_destroy (glob->attributes);

@@ -116,20 +116,12 @@ fclaw_package_container_add (fclaw_package_container_t * pkg_container,
 int fclaw_package_container_add_pkg(fclaw_global_t* glob,
                                     void* opt)
 {
-    fclaw_package_container_t *pkg_container = 
-          (fclaw_package_container_t *) glob->pkg_container;
-    return fclaw_package_container_add (pkg_container, opt);
+    return 0;
 }
 
 
 void* fclaw_package_get_options(fclaw_global_t *glob, 
                                 int id)
 {
-    fclaw_package_t *pkg;
-    fclaw_package_container_t* pkg_container = glob->pkg_container;
-
-    FCLAW_ASSERT (pkg_container != NULL);
-    FCLAW_ASSERT (0 <= id && id < pkg_container->count);
-    pkg = pkg_container->pkgs[id];
-    return pkg->options;
+    return 0;
 }
