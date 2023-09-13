@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2023 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -33,7 +33,6 @@ main (int argc, char **argv)
 {
   int			lp;
   MPI_Comm		mpicomm;
-  sc_options_t          *options;
   fclaw2d_domain_t	*domain;
   fclaw_options_t         samr_options, *gparms = &samr_options;
 

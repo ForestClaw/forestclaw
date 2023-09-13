@@ -60,7 +60,8 @@ void fclaw2d_clawpatch_transform_init_data(fclaw2d_global_t* glob,
     /* Cell centered data */
     transform->based = 1;
 
-    /* Nothing to do for transform->user */
+    /* Store clawpatch_options in transform->user */
+    transform->user = (void*) fclaw2d_clawpatch_get_options(glob);
 }
 
 void fclaw2d_clawpatch_face_transformation (int faceno, int rfaceno, int ftransform[])
@@ -83,7 +84,7 @@ FCLAW2D_CLAWPATCH_TRANSFORM_FACE (const int *i1, const int *j1,
 {
     fclaw2d_patch_transform_data_t *tdata = *ptdata;
     const fclaw2d_clawpatch_options_t *clawpatch_opt = 
-             fclaw2d_clawpatch_get_options(tdata->glob);
+        (fclaw2d_clawpatch_options_t*) tdata->user;
 
     *i2 = *i1;
     *j2 = *j1;
@@ -104,7 +105,7 @@ FCLAW2D_CLAWPATCH_TRANSFORM_FACE_HALF (const int *i1, const int *j1,
 {
     fclaw2d_patch_transform_data_t *tdata = *ptdata;
     const fclaw2d_clawpatch_options_t *clawpatch_opt = 
-                fclaw2d_clawpatch_get_options(tdata->glob);
+        (fclaw2d_clawpatch_options_t*) tdata->user;
 
     i2[0] = *i1;
     j2[0] = *j1;
@@ -117,7 +118,6 @@ FCLAW2D_CLAWPATCH_TRANSFORM_FACE_HALF (const int *i1, const int *j1,
 }
 
 
-/* TODO: Extend this for a block-block corner */
 void
 FCLAW2D_CLAWPATCH_TRANSFORM_CORNER (const int *i1, const int *j1,
                                     int *i2, int *j2,
@@ -125,7 +125,7 @@ FCLAW2D_CLAWPATCH_TRANSFORM_CORNER (const int *i1, const int *j1,
 {
     fclaw2d_patch_transform_data_t *tdata = *ptdata;
     const fclaw2d_clawpatch_options_t *clawpatch_opt = 
-                   fclaw2d_clawpatch_get_options(tdata->glob);
+        (fclaw2d_clawpatch_options_t*) tdata->user;
 
     *i2 = *i1;
     *j2 = *j1;
@@ -142,7 +142,9 @@ FCLAW2D_CLAWPATCH_TRANSFORM_CORNER (const int *i1, const int *j1,
     }
     else
     {
-        /* corner within a block */
+        /* Corner within a block or a block-block corner. For block-block
+         * corners, we assume both patches lie in coordinate systems with the
+         * same orientation. */
         FCLAW_ASSERT (tdata->block_iface == -1);
         fclaw2d_patch_transform_corner (tdata->this_patch,
                                         tdata->neighbor_patch,
@@ -150,12 +152,8 @@ FCLAW2D_CLAWPATCH_TRANSFORM_CORNER (const int *i1, const int *j1,
                                         clawpatch_opt->mx, clawpatch_opt->my,
                                         tdata->based, i2, j2);
     }
-    /* Done. */
-    /* TODO: We need to permit that it's a block corner.  In this case,
-     * call fclaw2d_patch_transform_corner with is_block_boundary = 1 */
 }
 
-/* TODO: Extend this for a block-block corner */
 void
 FCLAW2D_CLAWPATCH_TRANSFORM_CORNER_HALF (const int *i1, const int *j1,
                                          int *i2, int *j2,
@@ -163,7 +161,7 @@ FCLAW2D_CLAWPATCH_TRANSFORM_CORNER_HALF (const int *i1, const int *j1,
 {
     fclaw2d_patch_transform_data_t *tdata = *ptdata;
     const fclaw2d_clawpatch_options_t *clawpatch_opt = 
-               fclaw2d_clawpatch_get_options(tdata->glob);
+        (fclaw2d_clawpatch_options_t*) tdata->user;
 
     i2[0] = *i1;
     j2[0] = *j1;
@@ -179,7 +177,9 @@ FCLAW2D_CLAWPATCH_TRANSFORM_CORNER_HALF (const int *i1, const int *j1,
     }
     else
     {
-        /* corner within a block */
+        /* Corner within a block or a block-block corner. For block-block
+         * corners, we assume both patches lie in coordinate systems with the
+         * same orientation. */
         FCLAW_ASSERT (tdata->block_iface == -1);
         fclaw2d_patch_transform_corner2 (tdata->this_patch,
                                          tdata->neighbor_patch,
@@ -187,7 +187,4 @@ FCLAW2D_CLAWPATCH_TRANSFORM_CORNER_HALF (const int *i1, const int *j1,
                                          clawpatch_opt->mx, clawpatch_opt->my,
                                          tdata->based, i2, j2);
     }
-    /* Done */
-    /* TODO: We need to permit that it's a block corner.  In this case,
-     * call fclaw2d_patch_transform_corner2 with is_block_boundary = 1 */
 }

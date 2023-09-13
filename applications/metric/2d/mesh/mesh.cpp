@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
+  Copyright (c) 2012-2023 Carsten Burstedde, Donna Calhoun, Scott Aiton
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -26,8 +26,6 @@
 #include "mesh_user.h"
 
 #include <fclaw2d_forestclaw.h>
-
-static int s_user_package_id = -1;
 
 static void *
 options_register_user (fclaw_app_t * app, void *package, sc_options_t * opt)
@@ -73,16 +71,12 @@ void register_user_options (fclaw_app_t * app,
 static 
 void user_set_options (fclaw2d_global_t* glob, user_options_t* user)
 {
-    FCLAW_ASSERT(s_user_package_id == -1);
-    int id = fclaw_package_container_add_pkg(glob,user);
-    s_user_package_id = id;
+    fclaw2d_global_options_store(glob, "user", user);
 }
 
 const user_options_t* mesh_user_get_options(fclaw2d_global_t* glob)
 {
-    int id = s_user_package_id;
-    return (user_options_t*) 
-            fclaw_package_get_options(glob, id);    
+    return (user_options_t*) fclaw2d_global_get_options(glob, "user");
 }
 
 static
@@ -143,7 +137,6 @@ main (int argc, char **argv)
     fclaw_exit_type_t vexit;
 
     /* Options */
-    sc_options_t                *options;
     user_options_t              suser, *user = &suser;
     amr_options_t               *gparms;
     fclaw2d_clawpatch_options_t *clawpatchopt;
@@ -153,8 +146,6 @@ main (int argc, char **argv)
     fclaw2d_global_t         *glob;
     fclaw2d_domain_t         *domain;
     sc_MPI_Comm mpicomm;
-
-    int retval;
 
     /* Initialize application */
     app = fclaw_app_new (&argc, &argv, user);
@@ -167,8 +158,6 @@ main (int argc, char **argv)
     register_user_options(app,"fclaw_options.ini",user);  /* [user] */
 
     /* Read configuration file(s) and command line, and process options */
-    options = fclaw_app_get_options (app);
-    retval = fclaw_options_read_from_file(options);
     vexit =  fclaw_app_options_parse (app, &first_arg,"fclaw_options.ini.used");
 
     /* at this point gparms is valid */
@@ -185,7 +174,7 @@ main (int argc, char **argv)
     user_set_options (glob, user);
 
     /* Run the program */
-    if (!retval & !vexit)
+    if (!vexit)
     {
         run_program(glob);
     }

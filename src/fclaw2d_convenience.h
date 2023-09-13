@@ -162,7 +162,7 @@ void fclaw2d_domain_list_adapted (fclaw2d_domain_t * old_domain,
                                   fclaw2d_domain_t * new_domain,
                                   int log_priority);
 
-/** Search triples of (block number, x coordinate, y coordinate) in the mesh.
+/** Search triples of (block number, x, y coordinates) in the mesh.
  * The x, y coordinates must be in [0, 1]^2.
  * The input data must be equal on every process: This is a collective call.
  *
@@ -179,10 +179,11 @@ void fclaw2d_domain_list_adapted (fclaw2d_domain_t * old_domain,
  * \param [in] coordinates      An array of elem_size == 2 * sizeof (double) with
  *                              entries (x, y) in [0, 1]^2.  Of these entries,
  *                              there are \b block_offsets[num_blocks] many.
- *                              Currently we do not enforce the x and y ranges
+ *                              We do not enforce the x and y ranges
  *                              and simply do not find any point outside its block.
- * \param [in,out] results      On input, an array of type int and
- *                              \b block_offsets[num_blocks] many (ignored) entries.
+ * \param [in,out] results      On input, an array of type int and an element
+ *                              count of \b block_offsets[num_blocks].
+ *                              The data in \b results is ignored on input.
  *                              On output, an entry will be -1 if the point has
  *                              not been found on this process, or the patch
  *                              number within its block otherwise.
@@ -259,17 +260,7 @@ typedef int (*fclaw2d_integrate_ray_t) (fclaw2d_domain_t * domain,
 void fclaw2d_domain_integrate_rays (fclaw2d_domain_t * domain,
                                     fclaw2d_integrate_ray_t intersect,
                                     sc_array_t * rays,
-                                    sc_array_t * integrals,
-                                    void * user);
-
-/** Return true if \b domain is an artifical domain.
- *
- * This function can be used in \ref fclaw2d_interpolate_point_t callbacks to
- * distinguish domains that were created during a consumer-side partition search
- * (and only contain some meta information) from real domains in a producer-side
- * local search.
- */
-int domain_is_meta (fclaw2d_domain_t * domain);
+                                    sc_array_t * integrals, void *user);
 
 /** Callback function to compute the interpolation data for a point and a patch.
  *
@@ -277,7 +268,8 @@ int domain_is_meta (fclaw2d_domain_t * domain);
  * compute the interpolation data over the whole producer domain for an
  * array of points.
  * It will be called both in a partition search and a local search of the
- * producer domain. Use \ref domain_is_meta, to determine which is the case.
+ * producer domain. Use \ref fclaw2d_domain_is_meta, to determine which is the
+ * case.
  *
  * \param [in] domain           The domain we interpolate on.
  *                              On the producer side, this is a valid forestclaw

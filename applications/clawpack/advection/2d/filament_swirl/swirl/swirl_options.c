@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
+  Copyright (c) 2012-2023 Carsten Burstedde, Donna Calhoun, Scott Aiton
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -24,8 +24,6 @@
 */
 
 #include "swirl_user.h"
-
-#include <fclaw_pointer_map.h>
 
 static void *
 swirl_register (swirl_options_t *user, sc_options_t * opt)
@@ -155,14 +153,10 @@ swirl_options_t* swirl_options_register (fclaw_app_t * app,
 
 void swirl_options_store (fclaw2d_global_t* glob, swirl_options_t* user)
 {
-    FCLAW_ASSERT(fclaw_pointer_map_get(glob->options,"swirl-user") == NULL);
-    fclaw_pointer_map_insert(glob->options, "swirl-user", user, NULL);
+    fclaw2d_global_options_store(glob, "user", user);
 }
 
 const swirl_options_t* swirl_get_options(fclaw2d_global_t* glob)
 {
-    swirl_options_t* user = (swirl_options_t*) 
-                              fclaw_pointer_map_get(glob->options, "swirl-user");
-    FCLAW_ASSERT(user != NULL);
-    return user;   
+    return (swirl_options_t*) fclaw2d_global_get_options(glob, "user");
 }

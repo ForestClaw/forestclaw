@@ -54,6 +54,13 @@ fclaw_options_t* fclaw_options_register (fclaw_app_t * a,
                                          const char *section,
                                          const char *configfile);
 
+/**
+ * @brief Get the packing vtable for the options
+ * 
+ * @return const fclaw_packing_vtable_t* the vtable
+ */
+const fclaw_packing_vtable_t* fclaw_options_get_packing_vtable();
+
 /* These can be called from external routines (in torthem, for example?) */
 fclaw_exit_type_t 
 fclaw_options_postprocess (fclaw_options_t * fclaw_opt);
@@ -236,8 +243,11 @@ struct fclaw_options
     int weighted_partition;            /**< Use weighted partition. */
 
     int is_registered;
+    int is_unpacked; /**< True if options structure was unpacked from buffer */
 
     const char * logging_prefix; /**< prefix presented in logging ie. [prefix] */
+
+    const char * regression_check; /**< filename of regression check values */
 };
 
 #ifdef __cplusplus

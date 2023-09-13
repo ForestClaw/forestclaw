@@ -75,10 +75,13 @@ typedef enum
     FCLAW2D_PATCH_ON_BLOCK_FACE_2 = 0x100,
     /** Face 3 is on a block boundary */
     FCLAW2D_PATCH_ON_BLOCK_FACE_3 = 0x200,
+#if 0
+    /* reserve these bit combinations since they are needed in 3D */
     /** Face 4 is on a block boundary */
     FCLAW2D_PATCH_ON_BLOCK_FACE_4_ONLY_FOR_3D = 0x400,
     /** Face 5 is on a block boundary */
     FCLAW2D_PATCH_ON_BLOCK_FACE_5_ONLY_FOR_3D = 0x800,
+#endif
     /** Patch is on a block boundary */
     FCLAW2D_PATCH_ON_BLOCK_BOUNDARY = 0xFC0
 }
@@ -504,7 +507,8 @@ int fclaw2d_patch_face_transformation_valid (const int ftransform[]);
  *                          we require \a ftransform[8] |= 4.
  * \param [in] mx           Number of cells along x direction of patch.
  * \param [in] my           Number of cells along y direction of patch.
- *                          This function assumes \a mx == \a my.
+ *                          The number of cells must match according to the face
+ *                          transformation.
  * \param [in] based        Indices are 0-based for corners and 1-based for cells.
  * \param [in,out] i        Integer coordinate along x-axis in \a based .. \a mx.
  * \param [in,out] j        Integer coordinate along y-axis in \a based .. \a my.
@@ -527,7 +531,8 @@ void fclaw2d_patch_transform_face (fclaw2d_patch_t * ipatch,
  *                          we require \a ftransform[8] |= 4.
  * \param [in] mx           Number of cells along x direction of patch.
  * \param [in] my           Number of cells along y direction of patch.
- *                          This function assumes \a mx == \a my.
+ *                          The number of cells must match according to the face
+ *                          transformation.
  * \param [in] based        Indices are 0-based for corners and 1-based for cells.
  * \param [in,out] i        FOUR (4) integer coordinates along x-axis in
  *                          \a based .. \a mx.  On input, only the first is used.
@@ -583,15 +588,19 @@ int fclaw2d_patch_corner_neighbors (fclaw2d_domain_t * domain,
 void fclaw2d_patch_corner_swap (int *cornerno, int *rcornerno);
 
 /** Transform a patch coordinate into a neighbor patch's coordinate system.
- * This function assumes that the two patches are of the SAME size.
+ * This function assumes that the two patches are of the SAME size and that the
+ * patches lie in coordinate systems with the same orientation.
  * It is LEGAL to call this function for both local and ghost patches.
+ * It is ILLEGAL to call this function for patches from face-neighboring blocks.
+ * Use \ref fclaw2d_patch_transform_face for such patches instead.
  * \param [in] ipatch       The patch that the input coordinates are relative to.
  * \param [in] opatch       The patch that the output coordinates are relative to.
  * \param [in] icorner      Corner number of this patch to transform across.
+ *                          This function assumes ocorner == icorner ^ 3, so
+ *                          ocorner is the opposite corner of icorner.
  * \param [in] is_block_boundary      Set to true for a block corner.
  * \param [in] mx           Number of cells along x direction of patch.
  * \param [in] my           Number of cells along y direction of patch.
- *                          This function assumes \a mx == \a my.
  * \param [in] based        Indices are 0-based for corners and 1-based for cells.
  * \param [in,out] i        Integer coordinate along x-axis in \a based .. \a mx.
  * \param [in,out] j        Integer coordinate along y-axis in \a based .. \a my.
@@ -603,15 +612,19 @@ void fclaw2d_patch_transform_corner (fclaw2d_patch_t * ipatch,
                                      int based, int *i, int *j);
 
 /** Transform a patch coordinate into a neighbor patch's coordinate system.
- * This function assumes that the neighbor patch is smaller (HALF size).
+ * This function assumes that the neighbor patch is smaller (HALF size) and that
+ * the patches lie in coordinate systems with the same orientation.
  * It is LEGAL to call this function for both local and ghost patches.
+ * It is ILLEGAL to call this function for patches from face-neighboring blocks.
+ * Use \ref fclaw2d_patch_transform_face2 for such patches instead.
  * \param [in] ipatch       The patch that the input coordinates are relative to.
  * \param [in] opatch       The patch that the output coordinates are relative to.
  * \param [in] icorner      Corner number of this patch to transform across.
+ *                          This function assumes ocorner == icorner ^ 3, so
+ *                          ocorner is the opposite corner of icorner.
  * \param [in] is_block_boundary      Set to true for a block corner.
  * \param [in] mx           Number of cells along x direction of patch.
  * \param [in] my           Number of cells along y direction of patch.
- *                          This function assumes \a mx == \a my.
  * \param [in] based        Indices are 0-based for corners and 1-based for cells.
  * \param [in,out] i        FOUR (4) integer coordinates along x-axis in
  *                          \a based .. \a mx.  On input, only the first is used.
@@ -989,6 +1002,31 @@ void fclaw2d_domain_serialization_enter (fclaw2d_domain_t * domain);
  * \param [in] domain           The domain is not modified.
  */
 void fclaw2d_domain_serialization_leave (fclaw2d_domain_t * domain);
+
+///@}
+/* ---------------------------------------------------------------------- */
+///                      @name Meta Domains
+/* ---------------------------------------------------------------------- */
+///@{
+
+/** Return true if \a domain is an artifical domain.
+ *
+ * This function can be used in \ref fclaw2d_interpolate_point_t callbacks to
+ * distinguish domains that were created during a partition search (and only
+ * contain some meta information) from real domains in a local search.
+ */
+int fclaw2d_domain_is_meta (fclaw2d_domain_t * domain);
+
+/** Initialize a meta domain.
+ *
+ * Initializes \a domain in an artificial manner, where the entry mpirank is
+ * used to store arbitrary context information. The remaining entries are
+ * initialized to -1 or NULL.
+ * The resulting domain can be passed to an \ref fclaw2d_interpolate_point_t
+ * in case the domain to interpolate on is not available locally (also see
+ * \ref fclaw2d_overlap_exchange for an example).
+ */
+void fclaw2d_domain_init_meta (fclaw2d_domain_t *domain, int mpirank);
 
 ///@}
 #ifdef __cplusplus

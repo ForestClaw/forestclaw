@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
+  Copyright (c) 2012-2023 Carsten Burstedde, Donna Calhoun, Scott Aiton
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -24,8 +24,6 @@
 */
 
 #include "radial_user.h"
-
-#include <fclaw_pointer_map.h>
 
 static void *
 radial_register (radial_user_options_t *user, sc_options_t * opt)
@@ -97,15 +95,11 @@ radial_user_options_t* radial_options_register (fclaw_app_t * app,
 
 void radial_options_store (fclaw2d_global_t* glob, radial_user_options_t* user)
 {
-    FCLAW_ASSERT(fclaw_pointer_map_get(glob->options,"radial-user") == NULL);
-    fclaw_pointer_map_insert(glob->options, "radial-user", user, NULL);
+    fclaw2d_global_options_store(glob, "radial-user", user);
 }
 
 radial_user_options_t* radial_get_options(fclaw2d_global_t* glob)
 {
-    radial_user_options_t* user = (radial_user_options_t*) 
-                              fclaw_pointer_map_get(glob->options, "radial-user");
-    FCLAW_ASSERT(user != NULL);
-    return user;   
+    return (radial_user_options_t*) fclaw2d_global_get_options(glob, "radial-user");
 }
 

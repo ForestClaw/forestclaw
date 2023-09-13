@@ -231,6 +231,10 @@ function(ForestClawExternalProject)
     list(APPEND FCLAW_CONFIGURE_ARGS -Dmpi=on)
   endif()
 
+  if("clawpatch" IN_LIST FCLAW_COMPONENTS)
+    list(APPEND FCLAW_CONFIGURE_ARGS -Dclawpatch=on)
+  endif()
+
   if("clawpack" IN_LIST FCLAW_COMPONENTS)
     list(APPEND FCLAW_CONFIGURE_ARGS -Dclawpack=on)
   endif()

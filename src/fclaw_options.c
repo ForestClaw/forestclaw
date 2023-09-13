@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
+Copyright (c) 2012-2023 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -23,6 +23,8 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include <fclaw_base.h>
+#include <fclaw_packing.h>
 #include <fclaw_options.h>
 #include <fclaw_timer.h>
 #include <fclaw_mpi.h>
@@ -335,9 +337,14 @@ fclaw_register (fclaw_options_t* fclaw_opt, sc_options_t * opt)
 
     sc_options_add_string (opt, 0, "logging-prefix",
                            &fclaw_opt->logging_prefix, 
-                           0,"prefixed used for logging [NULL]");    
+                           "","prefixed used for logging [NULL]");    
+
+    sc_options_add_string (opt, 0, "regression-check",
+                           &fclaw_opt->regression_check, 
+                           "","filename of expected regresssion values [NULL]");    
 
     fclaw_opt->is_registered = 1;
+    fclaw_opt->is_unpacked = 0;
 
     return NULL;
 }
@@ -414,8 +421,131 @@ fclaw_options_destroy(fclaw_options_t* fclaw_opt)
 
     FCLAW_ASSERT (fclaw_opt->kv_timing_verbosity != NULL);
     sc_keyvalue_destroy (fclaw_opt->kv_timing_verbosity);
+
+    // Strings need to be freed if this was unpacked form buffer
+    if(fclaw_opt->is_unpacked){
+        FCLAW_FREE ((void*) fclaw_opt->run_directory);
+        FCLAW_FREE ((void*) fclaw_opt->scale_string);
+        FCLAW_FREE ((void*) fclaw_opt->shift_string);
+        FCLAW_FREE ((void*) fclaw_opt->tikz_figsize_string);
+        FCLAW_FREE ((void*) fclaw_opt->tikz_plot_prefix);
+        FCLAW_FREE ((void*) fclaw_opt->tikz_plot_suffix);
+        FCLAW_FREE ((void*) fclaw_opt->prefix);
+        FCLAW_FREE ((void*) fclaw_opt->logging_prefix);
+    }
+
+    FCLAW_FREE(fclaw_opt);
 }
 
+static void
+fclaw_options_destroy_void(void* user)
+{
+    fclaw_options_t* fclaw_opt = (fclaw_options_t*) user;
+    fclaw_options_destroy(fclaw_opt);
+}
+
+/* ------------------------------------------------------------------------
+  Options packing
+  ------------------------------------------------------------------------ */
+
+static size_t options_packsize(void* user){
+    fclaw_options_t* opts = (fclaw_options_t*) user;
+
+    size_t size = sizeof(fclaw_options_t);
+    size += fclaw_packsize_string(opts->run_directory);
+    size += fclaw_packsize_string(opts->scale_string);
+    size += fclaw_packsize_string(opts->shift_string);
+    size += 3*sizeof(double); //scale
+    size += 3*sizeof(double); //shift
+    size += fclaw_packsize_string(opts->tikz_figsize_string);
+    size += 2*sizeof(double); //tickz_figsize
+    size += fclaw_packsize_string(opts->tikz_plot_prefix);
+    size += fclaw_packsize_string(opts->tikz_plot_suffix);
+    size += fclaw_packsize_string(opts->prefix);
+    size += fclaw_packsize_string(opts->logging_prefix);
+
+    return size;
+}
+
+static size_t options_pack(void* user, char* buffer){
+    char* buffer_start = buffer;
+
+    fclaw_options_t* opts = (fclaw_options_t*) user;
+
+    //pack entire struct
+    buffer += FCLAW_PACK(*opts, buffer);
+
+    //append arrays to buffer
+    buffer += fclaw_pack_string(opts->run_directory, buffer);
+    buffer += fclaw_pack_string(opts->scale_string, buffer);
+    buffer += fclaw_pack_string(opts->shift_string, buffer);
+    for(size_t i = 0; i < 3; i++){
+        buffer += fclaw_pack_double(opts->scale[i], buffer);
+        buffer += fclaw_pack_double(opts->shift[i], buffer);
+    }
+    buffer += fclaw_pack_string(opts->tikz_figsize_string, buffer);
+    buffer += fclaw_pack_double(opts->tikz_figsize[0], buffer);
+    buffer += fclaw_pack_double(opts->tikz_figsize[1], buffer);
+    buffer += fclaw_pack_string(opts->tikz_plot_prefix, buffer);
+    buffer += fclaw_pack_string(opts->tikz_plot_suffix, buffer);
+    buffer += fclaw_pack_string(opts->prefix, buffer);
+    buffer += fclaw_pack_string(opts->logging_prefix, buffer);
+
+    return buffer-buffer_start;
+}
+
+static size_t options_unpack(char* buffer, void** user){
+    char* buffer_start = buffer;
+
+    fclaw_options_t** opts_ptr = (fclaw_options_t**) user;
+    *opts_ptr = FCLAW_ALLOC(fclaw_options_t,1);
+    fclaw_options_t* opts = *opts_ptr;
+
+    buffer += FCLAW_UNPACK(buffer, opts);
+
+    buffer += fclaw_unpack_string(buffer, (char **) &opts->run_directory);
+    buffer += fclaw_unpack_string(buffer, (char **) &opts->scale_string);
+    buffer += fclaw_unpack_string(buffer, (char **) &opts->shift_string);
+    opts->scale = FCLAW_ALLOC(double,3);
+    opts->shift = FCLAW_ALLOC(double,3);
+    for(size_t i = 0; i < 3; i++){
+        buffer += fclaw_unpack_double(buffer, &opts->scale[i]);
+        buffer += fclaw_unpack_double(buffer, &opts->shift[i]);
+    }
+    buffer += fclaw_unpack_string(buffer, (char **) &opts->tikz_figsize_string);
+    opts->tikz_figsize = FCLAW_ALLOC(double,2);
+    buffer += fclaw_unpack_double(buffer, &opts->tikz_figsize[0]);
+    buffer += fclaw_unpack_double(buffer, &opts->tikz_figsize[1]);
+    buffer += fclaw_unpack_string(buffer, (char **) &opts->tikz_plot_prefix);
+    buffer += fclaw_unpack_string(buffer, (char **) &opts->tikz_plot_suffix);
+    buffer += fclaw_unpack_string(buffer, (char **) &opts->prefix);
+    buffer += fclaw_unpack_string(buffer, (char **) &opts->logging_prefix);
+
+    sc_keyvalue_t *kv = opts->kv_timing_verbosity = sc_keyvalue_new ();
+    sc_keyvalue_set_int (kv, "wall",      FCLAW_TIMER_PRIORITY_WALL);
+    sc_keyvalue_set_int (kv, "summary",   FCLAW_TIMER_PRIORITY_SUMMARY);
+    sc_keyvalue_set_int (kv, "exclusive", FCLAW_TIMER_PRIORITY_EXCLUSIVE);
+    sc_keyvalue_set_int (kv, "counters",  FCLAW_TIMER_PRIORITY_COUNTERS);
+    sc_keyvalue_set_int (kv, "details",   FCLAW_TIMER_PRIORITY_DETAILS);
+    sc_keyvalue_set_int (kv, "extra",     FCLAW_TIMER_PRIORITY_EXTRA);
+    sc_keyvalue_set_int (kv, "all",       FCLAW_TIMER_PRIORITY_EXTRA);
+
+    opts->is_unpacked = 1;
+   
+    return buffer-buffer_start;
+}
+
+static fclaw_packing_vtable_t packing_vt = 
+{
+	options_pack,
+	options_unpack,
+	options_packsize,
+	fclaw_options_destroy_void
+};
+
+const fclaw_packing_vtable_t* fclaw_options_get_packing_vtable(){
+    return &packing_vt;
+}
 
 /* ------------------------------------------------------------------------
   Generic functions - these call the functions above
@@ -478,7 +608,6 @@ options_destroy (fclaw_app_t * a, void *package, void *registered)
 
     /* Destroy option arrays created in post-process */
     fclaw_options_destroy (fclaw_opt);
-    FCLAW_FREE(fclaw_opt);
 }
 
 static const fclaw_app_options_vtable_t options_vtable = {
@@ -487,7 +616,6 @@ static const fclaw_app_options_vtable_t options_vtable = {
     options_check,
     options_destroy
 };
-
 
 /* ---------------------------------------------------------
    Public interface to ForestClaw options
@@ -516,28 +644,16 @@ fclaw_options_t* fclaw_options_register (fclaw_app_t * a,
                                 &options_vtable,
                                 fclaw_opt);
     
+    /* register packing vtable */
+    fclaw_app_register_options_packing_vtable("fclaw2d", &packing_vt);
+
     return fclaw_opt;
 }
 
 
-/* This is still needed as long as the config file option in app isn't yet implemented */
 int fclaw_options_read_from_file(sc_options_t* opt)
 {
-    int retval;
-
-    int fclaw_package_id;
-    fclaw_package_id = fclaw_get_package_id ();
-    retval = sc_options_load (fclaw_package_id, FCLAW_VERBOSITY_ESSENTIAL, opt,
-                              "fclaw_options.ini");
-    if (retval < 0)
-    {
-        fclaw_global_essentialf("Problem reading fclaw_options.ini.\n");
-    }
-    else
-    {
-        fclaw_global_infof ("Reading file fclaw_options.ini.\n");
-    }
-    return retval;
+    return 0;
 }
 
 /* ------------------------------------------------------------------------

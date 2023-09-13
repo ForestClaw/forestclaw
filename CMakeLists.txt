@@ -1,10 +1,13 @@
 cmake_minimum_required(VERSION 3.13...3.20)
 
+include(cmake/GitVersionGen.cmake)
+
 project(FORESTCLAW
   DESCRIPTION "Quadtree/octree adaptive PDE solver based based on p4est."
   HOMEPAGE_URL https://github.com/ForestClaw/forestclaw
   LANGUAGES C CXX Fortran
-  VERSION 1.0.0)
+  VERSION ${FORESTCLAW_VERSION}
+)
 
 include(CTest)
 

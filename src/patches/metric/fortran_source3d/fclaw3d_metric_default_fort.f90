@@ -305,9 +305,9 @@ subroutine fclaw3d_metric_fort_compute_volume_affine(mx,my,mz, mbc, blockno, &
     !! (xd,yd,zd).  The (xd,yd,zd) routines passed may already be defined, 
     !! but get redefined here. 
 
-    do j = -mbc,my+mbc+1
-        do i = -mbc,mx+mbc+1
-            do k = -mbc,mz+mbc+1
+    do j = -mbc,my+mbc+2
+        do i = -mbc,mx+mbc+2
+            do k = -mbc,mz+mbc+2
                 xe = xlower + (i-1)*dx
                 ye = ylower + (j-1)*dy
                 ze = zlower + (k-1)*dz

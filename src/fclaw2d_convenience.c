@@ -370,7 +370,7 @@ fclaw2d_domain_new_disk (sc_MPI_Comm mpicomm,
                               initial_level), NULL);
 }
 
-#endif /* 0 */
+#endif /* P4_TO_P8 */
 
 fclaw2d_domain_t *
 fclaw2d_domain_new_brick (sc_MPI_Comm mpicomm,
@@ -750,8 +750,6 @@ fclaw2d_domain_complete (fclaw2d_domain_t * domain)
     p4est_wrap_complete (wrap);
 }
 
-#ifndef P4_TO_P8
-
 void
 fclaw2d_domain_write_vtk (fclaw2d_domain_t * domain, const char *basename)
 {
@@ -1006,7 +1004,7 @@ search_point_fn (p4est_t * p4est, p4est_topidx_t which_tree,
         /* this is not a leaf */
         return 1;
     }
-    /* new we know that we have found the point in a leaf */
+    /* now we know that we have found the point in a leaf */
 
     FCLAW_ASSERT (0 <= jb && jb < sd->domain->num_blocks);
     block = sd->domain->blocks + jb;
@@ -1152,7 +1150,6 @@ fclaw2d_domain_search_points (fclaw2d_domain_t * domain,
     sc_array_destroy (points);
 }
 
-
 typedef struct fclaw2d_ray_integral
 {
     void *ray;
@@ -1284,6 +1281,8 @@ fclaw2d_domain_integrate_rays (fclaw2d_domain_t * domain,
     sc_array_reset (lints);
 }
 
+/******* code for overlap exchange algorithm *******/
+
 typedef enum comm_tag
 {
     COMM_TAG_CONSDATA = 5526,
@@ -1310,7 +1309,8 @@ typedef struct overlap_point
     void *point;
     int rank;
     size_t id;
-} overlap_point_t;
+}
+overlap_point_t;
 
 typedef struct overlap_producer_comm
 {
@@ -1325,7 +1325,8 @@ typedef struct overlap_producer_comm
     sc_array_t *recv_buffer;
     sc_array_t *recv_reqs;
     sc_array_t *send_reqs;
-} overlap_producer_comm_t;
+}
+overlap_producer_comm_t;
 
 typedef struct overlap_consumer_comm
 {
@@ -1342,7 +1343,8 @@ typedef struct overlap_consumer_comm
     sc_array_t *send_reqs;
     sc_array_t *recv_buffer;
     sc_array_t *recv_reqs;
-} overlap_consumer_comm_t;
+}
+overlap_consumer_comm_t;
 
 typedef struct overlap_global_comm
 {
@@ -1391,20 +1393,6 @@ overlap_consumer_add (overlap_consumer_comm_t * c, void *point, int rank)
     memcpy (sc_array_push (&qi->oqs), &op->id, qi->oqs.elem_size);
 }
 
-int
-domain_is_meta (fclaw2d_domain_t * domain)
-{
-    FCLAW_ASSERT (domain != NULL);
-    if (domain->local_num_patches == -1)
-    {
-        return 1;
-    }
-    else
-    {
-        return 0;
-    }
-}
-
 static int
 interpolate_partition_fn (p4est_t * p4est, p4est_topidx_t which_tree,
                           p4est_quadrant_t * quadrant, int pfirst, int plast,
@@ -1433,16 +1421,9 @@ interpolate_partition_fn (p4est_t * p4est, p4est_topidx_t which_tree,
 
     /* create artifical domain, that only contains mpi and tree structure data */
     domain = FCLAW_ALLOC (fclaw2d_domain_t, 1);
-    memset (domain, 0, sizeof (fclaw2d_domain_t));      /* initialize to zero */
-    domain->local_num_patches = -1;     /* mark as artifical patch */
-    domain->mpicomm = p4est->mpicomm;
-    domain->mpisize = p4est->mpisize;
-    domain->mpirank = (pfirst == plast) ? pfirst : -1;
-
-    /* give access to basic tree structure and connectivity information */
-    domain->pp = c->domain->pp;
-    domain->pp_owned = 0;
-    domain->attributes = c->domain->attributes;
+    /* Todo: works only for congruent communicators. Do we really need all this
+     * information? */
+    fclaw2d_domain_init_meta (domain, (pfirst == plast) ? pfirst : -1);
 
     /* create artifical patch and fill it based on the quadrant */
     patch = &fclaw2d_patch;
@@ -1823,8 +1804,8 @@ consumer_free_communication_data (overlap_consumer_comm_t * c)
         sb = (overlap_buf_t *) sc_array_index (c->send_buffer, bz);
         rb = (overlap_buf_t *) sc_array_index (c->recv_buffer, bz);
         SC_ASSERT (sb->rank == rb->rank);
-        SC_ASSERT (prev_rank < sb->rank);
 #ifdef FCLAW_ENABLE_DEBUG
+        SC_ASSERT (prev_rank < sb->rank);
         prev_rank = sb->rank;
         if (bz == (size_t) c->iconrank)
         {
@@ -2009,7 +1990,3 @@ fclaw2d_overlap_exchange (fclaw2d_domain_t * domain,
     producer_free_communication_data (p);
     sc_array_destroy (iquery_points);
 }
-
-#if 0
-#endif /* !P4_TO_P8 */
-#endif

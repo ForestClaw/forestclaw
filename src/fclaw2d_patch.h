@@ -491,7 +491,7 @@ void fclaw2d_patch_destroy_user_data(struct fclaw2d_global* glob,
  * 
  * @param[in] glob the global context
  * @param[in] patch the patch context
- * @param[in] blockno the block number
+ * @param[in] blockno the block number, -1 if ghost patch
  * @param[in] patchno the patch number
  * @param[in,out] tdata the stransform data structure
  */
@@ -1668,6 +1668,14 @@ void* fclaw2d_patch_metric_patch(struct fclaw2d_global* glob,
  */
 int fclaw2d_patch_get_blockno(struct fclaw2d_patch* this_patch);
 
+/**
+ * @brief Get the patch number
+ *
+ * @param this_patch the patch context
+ * @return int the patch number
+ */
+int fclaw2d_patch_get_patchno(struct fclaw2d_patch* this_patch);
+
 ///@}
 /* ------------------------------------------------------------------------------------ */
 ///                                 @name Misc User Data
@@ -1774,7 +1782,7 @@ int fclaw2d_patch_corner_is_missing(struct fclaw2d_patch* patch,
  * 
  * @param patch the patch context
  */
-void fclaw2d_patch_neighbors_set(struct fclaw2d_patch* patch);
+void fclaw2d_patch_neighbors_set(fclaw2d_patch_t* patch);
 
 /**
  * @brief Reset the neighbor relation data for a patch
@@ -1782,6 +1790,14 @@ void fclaw2d_patch_neighbors_set(struct fclaw2d_patch* patch);
  * @param patch the patch context
  */
 void fclaw2d_patch_neighbors_reset(struct fclaw2d_patch* patch);
+
+/**
+ * @brief Returns true if the patch neighbor information is set
+ *
+ * @param patch the patch context
+ * @return int true if the patch neighbor information is set
+ */
+int fclaw2d_patch_neighbor_type_set(struct fclaw2d_patch* patch);
 
 /**
  * @brief Returns true if a patch has finer neighbors

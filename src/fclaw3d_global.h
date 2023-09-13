@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2023 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -86,6 +86,10 @@ struct fclaw3d_global
     struct fclaw3d_domain *domain;
 
 #if 0
+    /* CB: is this a good place for the accumulator?
+           Would it be possible to add and retrieve it as an anonymous
+           object that does not need to be known to this file? */
+
     struct fclaw3d_diagnostics_accumulator *acc;
 #endif
 
@@ -112,6 +116,32 @@ void fclaw3d_global_store_domain (fclaw3d_global_t* glob,
 void fclaw3d_global_store_map (fclaw3d_global_t* glob,
                                fclaw3d_map_context_t * map);
 
+/**
+ * @brief Pack global structure into buffer
+ * 
+ * @param glob the global structure
+ * @param buffer the buffer to write to
+ * @return size_t number of bytes written
+ */
+size_t fclaw3d_global_pack(const fclaw3d_global_t * glob, char* buffer);
+
+/**
+ * @brief Get the number of bytes needed to pack the global structure
+ * 
+ * @param glob the structure
+ * @return size_t the number of bytes needed to store structure
+ */
+size_t fclaw3d_global_packsize(const fclaw3d_global_t * glob);
+
+/**
+ * @brief Unpack global structure from buffer
+ * 
+ * @param buffer the buffer to read from
+ * @param glob newly create global structure
+ * @return size_t number of bytes read
+ */
+size_t fclaw3d_global_unpack(char* buffer, fclaw3d_global_t** glob);
+
 void fclaw3d_global_iterate_level (fclaw3d_global_t * glob, int level,
                                    fclaw3d_patch_callback_t pcb, void *user);
 
@@ -132,6 +162,23 @@ void fclaw3d_global_iterate_partitioned (fclaw3d_global_t * glob,
                                          struct fclaw3d_domain * new_domain,
                                          fclaw3d_transfer_callback_t tcb,
                                          void *user);
+/**
+ * @brief Store an options structure in the glob
+ * 
+ * @param glob the global context
+ * @param key the key to store the options under
+ * @param options the options structure
+ */
+void fclaw3d_global_options_store (fclaw3d_global_t* glob, const char* key, void* options);
+
+/**
+ * @brief Get an options structure from the glob
+ * 
+ * @param glob the global context
+ * @param key the key to retrieve the options from
+ * @return void* the options
+ */
+void* fclaw3d_global_get_options (fclaw3d_global_t* glob, const char* key);
 
 /**
  * @brief Store a glob variable in static memory
@@ -152,6 +199,20 @@ void fclaw3d_global_unset_global (void);
  */
 fclaw3d_global_t* fclaw3d_global_get_global (void);
 
+/**
+ * @brief
+ *
+ * @param glob
+ */
+void fclaw3d_set_global_context(fclaw3d_global_t *glob);
+
+/**
+ * @brief
+ *
+ * @param glob
+ */
+void fclaw3d_clear_global_context(fclaw3d_global_t *glob);
+
 #ifdef __cplusplus
 #if 0
 {                               /* need this because indent is dumb */
@@ -159,4 +220,4 @@ fclaw3d_global_t* fclaw3d_global_get_global (void);
 }
 #endif
 
-#endif /* FCLAW3D_GLOBAL_H */
+#endif /* !FCLAW3D_GLOBAL_H */
