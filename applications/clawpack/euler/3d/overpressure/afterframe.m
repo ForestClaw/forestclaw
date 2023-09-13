@@ -53,8 +53,8 @@ showpatchborders
     
 % hideslices
 showslices('z',3)
-s = 0.25;
-% axis([-1-s,1+s,-1-s,1+s,-1-s,1+s])
+
+set(gca,'clipping','off')
 
 % -------------------------------------
 % Color axis and color map
@@ -69,12 +69,7 @@ else
     if UserVariable == 1
         if strcmp(UserVariableFile,'pressure') == 1
             % Pressure
-            clim([0.5,1.5])
-%             clim([0.999,1.001])
-%             clim([0.975,1.025])
-%             clim([0.97,1.03])
-        elseif strcmp(UserVariableFile,'speed') == 1
-            clim([0,1e-2]); 
+            clim([0.9,1.1])
         end
     else
         clim([0.95,1.05])
