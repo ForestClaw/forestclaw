@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 TEST_CASE("fc2d_thunderegg_solver_initialize fails with 3d domain")
 {
-	fclaw_domain_t* domain = fclaw3d_domain_new_unitcube(sc_MPI_COMM_WORLD, 0);
+	fclaw_domain_t* domain = fclaw_domain_new_unitcube(sc_MPI_COMM_WORLD, 0);
 	fclaw_global_t* glob = fclaw_global_new();
 	fclaw_global_store_domain(glob, domain);
 

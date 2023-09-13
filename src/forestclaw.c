@@ -29,6 +29,35 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <p4est.h>
 #include <p8est.h>
 
+fclaw_domain_t* 
+fclaw_domain_wrap_2d(fclaw2d_domain_t *domain_2d)
+{
+    fclaw_domain_t* domain = FCLAW_ALLOC_ZERO(fclaw_domain_t,1);
+    domain->dim = 2;
+    domain->d2 = FCLAW_ALLOC_ZERO(fclaw_domain_d2_t,1);
+    domain->d2->domain = domain_2d;
+    return domain;
+}
+fclaw_domain_t* 
+fclaw_domain_wrap_3d(fclaw3d_domain_t *domain_3d)
+{
+    fclaw_domain_t* domain = FCLAW_ALLOC_ZERO(fclaw_domain_t,1);
+    domain->dim = 3;
+    domain->d3 = FCLAW_ALLOC_ZERO(fclaw_domain_d3_t,1);
+    domain->d3->domain = domain_3d;
+    return domain;
+}
+
+int fclaw_patch_edge_neighbors (fclaw_domain_t * domain,
+                                int blockno, int patchno, int edgeno,
+                                int *rproc, int *rblockno, int *rpatchno,
+                                int *redge,
+                                fclaw_patch_relation_t * neighbor_size)
+{
+    return fclaw3d_patch_edge_neighbors(domain->d3->domain,blockno,patchno,edgeno,
+                                        rproc,rblockno,rpatchno,redge,
+                                        (fclaw3d_patch_relation_t*) neighbor_size);
+}
 void
 fclaw_domain_attribute_add (fclaw_domain_t * domain,
                               const char *name, void *attribute)
