@@ -72,10 +72,6 @@ SUBROUTINE clawpack46_rpn3(ixyz,maxm,meqn,mwaves,maux,mbc,mx,ql,qr,  &
     ! Use entropy fix for transonic rarefactions
     LOGICAL, PARAMETER :: efix = .FALSE.
 
-    logical debug, debug_check_rpn
-
-    debug = debug_check_rpn(ixyz,icom,jcom,kcom)
-
     IF (maxmrp < maxm+2*mbc)THEN
         WRITE(6,*) 'need to increase maxmrp in rpn3_euler.f90'
         WRITE(6,*) 'maxmrp: ',maxmrp,' maxm: ',maxm,' mbc: ',mbc
@@ -229,16 +225,6 @@ SUBROUTINE clawpack46_rpn3(ixyz,maxm,meqn,mwaves,maux,mbc,mx,ql,qr,  &
                     apdq(:,i) = apdq(:,i) + s(mws,i)*wave(:,mws,i)
                 ENDIF
             END DO
-
-            block
-                integer m
-                if (debug) then
-                    write(6,108) 'Minus (nomap rpn) : ', ixyz, i
-                    write(6,109) (s(m,i),m=1,3)
-                    write(6,109) (amdq(m,i),m=1,meqn)
-                    write(6,109) 
-                endif 
-            end block
 
         END DO
 

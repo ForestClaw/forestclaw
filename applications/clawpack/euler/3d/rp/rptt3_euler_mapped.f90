@@ -86,25 +86,22 @@ subroutine clawpack46_rptt3_mapped(ixyz,icoor,ilr,impt,maxm,meqn,mwaves,&
     integer i, j, mws, m, i1, info
     double precision uvw2, pres, enth, area
     integer locrot, locarea, irot
-    integer mv,mu,mw
 
-    logical debug, debug_check_rptt
+!!    integer mv,mu,mw
 
-    debug = debug_check_rptt(ixyz,icoor,ilr,impt,icom,jcom,kcom)
-
-    IF(ixyz == 1)THEN
-       mu = 2
-       mv = 3
-       mw = 4
-    ELSE IF(ixyz == 2)THEN
-       mu = 3
-       mv = 4
-       mw = 2
-    ELSE
-       mu = 4
-       mv = 2
-       mw = 3
-    ENDIF
+!!    IF(ixyz == 1)THEN
+!!       mu = 2
+!!       mv = 3
+!!       mw = 4
+!!    ELSE IF(ixyz == 2)THEN
+!!       mu = 3
+!!       mv = 4
+!!       mw = 2
+!!    ELSE
+!!       mu = 4
+!!       mv = 2
+!!       mw = 3
+!!    ENDIF
 
     call get_aux_locations_tt(ixyz,icoor,mcapa,locrot,locarea,irot)
 
@@ -188,19 +185,6 @@ subroutine clawpack46_rptt3_mapped(ixyz,icoor,ilr,impt,maxm,meqn,mwaves,&
             enddo
         enddo
 
-        block
-            integer m
-            double precision area
-            area = 4.0
-            if (debug) then
-                write(6,108) 'Minus (rptt mapped) : ', ixyz,icoor,i 
-                write(6,109) (s_rot(m),m=1,3)
-                write(6,109) (cmbsasdq_cart(m,i),m=1,meqn)
-                write(6,*) ' '
-            endif 
-        end block
-
-
 
         !! # -------------------------------------------------------
         !! # Compute cpbsasdq
@@ -263,25 +247,6 @@ subroutine clawpack46_rptt3_mapped(ixyz,icoor,ilr,impt,maxm,meqn,mwaves,&
             enddo
         enddo
 
-        block
-            integer m
-            double precision area
-            area = 4.0
-            if (debug) then
-                write(6,108) 'Plus (rptt mapped) : ', ixyz,icoor,i 
-                write(6,109) (s_rot(m),m=1,3)
-                write(6,109) (cpbsasdq_cart(m,i),m=1,meqn)
-                write(6,*) ' '
-            endif 
-        end block
-
-
     enddo  !! end of i loop
 
-107     format(3E24.16)
-108     format(A,'ixyz=',I2,'; icoor=',I2,'; i=',I2)
-109     format(5E24.16)
-
-
-    return
 end subroutine clawpack46_rptt3_mapped

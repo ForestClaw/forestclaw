@@ -71,11 +71,6 @@ SUBROUTINE clawpack46_rpt3(ixyz,icoor,imp,maxm,meqn,mwaves,maux,mbc,&
 
     double precision pres
 
-    logical debug, debug_check_rpt
-
-    debug = debug_check_rpt(ixyz,icoor,imp,icom,jcom,kcom)
-
-
     IF (maxmrp < maxm+mbc)THEN
         WRITE(6,*) 'need to increase maxmrp in rpt3_euler.f90'
         WRITE(6,*) 'maxmrp: ',maxmrp,' maxm: ',maxm,' mbc: ',mbc
@@ -216,15 +211,6 @@ SUBROUTINE clawpack46_rpt3(ixyz,icoor,imp,maxm,meqn,mwaves,maux,mbc,&
                bpasdq(:,i) = bpasdq(:,i) + MAX(sb(mws), 0.d0)*waveb(:,mws)
             END DO
 
-            block
-                integer m
-                if (debug) then
-                    write(6,108) 'Minus (nomap rpt) : ', ixyz,icoor,imp,i 
-                    write(6,109) (sb(m),m=1,3)
-                    write(6,109) (bmasdq(m,i),m=1,meqn)
-                endif 
-            end block
-
         END DO
 
     ! Solve Riemann problem in the third coordinate direction
@@ -267,20 +253,7 @@ SUBROUTINE clawpack46_rpt3(ixyz,icoor,imp,maxm,meqn,mwaves,maux,mbc,&
                 bpasdq(:,i) = bpasdq(:,i) + MAX(sb(mws), 0.d0)*waveb(:,mws)
             END DO
 
-            block
-                integer m
-                if (debug) then
-                    write(6,108) 'Minus (nomap rpt) : ', ixyz,icoor,imp, i 
-                    write(6,109) (sb(m),m=1,3)
-                    write(6,109) (bmasdq(m,i),m=1,meqn)
-                endif 
-            end block
-
        END DO
     END IF
-
-108     format(A,'ixyz=',I2,'; icoor=',I2,'; ilr = ',I2,'; i=',I2)
-109     format(5E24.16)
-
 
 END SUBROUTINE clawpack46_rpt3

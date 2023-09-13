@@ -76,11 +76,6 @@ SUBROUTINE clawpack46_rptt3(ixyz,icoor,imp,impt,maxm,meqn,mwaves, &
 
     double precision pres
 
-    logical debug, debug_check_rptt
-
-    debug = debug_check_rptt(ixyz,icoor,imp,impt,icom,jcom,kcom)
- 
-
     IF (maxmrp < maxm+mbc)THEN
        WRITE(6,*) 'need to increase maxmrp in rpn3_neutral_qwave.f90'
        WRITE(6,*) 'maxmrp: ',maxmrp,' maxm: ',maxm,' mbc: ',mbc
@@ -214,16 +209,6 @@ SUBROUTINE clawpack46_rptt3(ixyz,icoor,imp,impt,maxm,meqn,mwaves, &
                 cmbsasdq(:,i) = cmbsasdq(:,i) + MIN(sb(mws), 0.d0)*waveb(:,mws)
                 cpbsasdq(:,i) = cpbsasdq(:,i) + MAX(sb(mws), 0.d0)*waveb(:,mws)
             END DO
-            block
-                integer m
-                if (debug) then
-                    write(6,108) 'Minus (nomap rptt) : ', ixyz,icoor,i 
-                    write(6,107) (sb(m),m=1,3)
-                    write(6,107) a(i), g1a2(i), euv(i)
-                    write(6,109) (cmbsasdq(m,i),m=1,meqn)
-                    write(6,*) ' '
-                endif 
-            end block
 
        END DO
 
@@ -266,22 +251,6 @@ SUBROUTINE clawpack46_rptt3(ixyz,icoor,imp,impt,maxm,meqn,mwaves, &
                 cpbsasdq(:,i) = cpbsasdq(:,i) + MAX(sb(mws), 0.d0)*waveb(:,mws)
             END DO
 
-            block
-                integer m
-                if (debug) then
-                    write(6,108) 'Minus (nomap rptt) : ', ixyz,icoor,i 
-                    write(6,107) (sb(m),m=1,3)
-                    write(6,107) a(i), g1a2(i), euv(i)
-                    write(6,109) (cmbsasdq(m,i),m=1,meqn)
-                    write(6,*) ' '
-                endif 
-            end block
-
         END DO
     END IF
-
-107  format(3E24.16)
-108  format(A,'ixyz=',I2,'; icoor=',I2,'; i=',I2)              
-109  format(5E24.16)
-
 END SUBROUTINE clawpack46_rptt3

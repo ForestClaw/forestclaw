@@ -55,16 +55,12 @@ subroutine clawpack46_rpn3_mapped(ixyz,maxm,meqn,mwaves,maux,mbc,mx,&
     double precision rho2, rhou2, rhov2, rhow2, en2, p2, c2
     double precision s2, df, area, uvw2
 
-    logical debug, debug_check_rpn
-
     data efix /.false./    !# use entropy fix for transonic rarefactions
 
     if (mwaves .ne. 3) then
         write(6,*) '*** Should have mwaves=3 for this Riemann solver'
         stop
     endif
-
-    debug = debug_check_rpn(ixyz,icom,jcom,kcom)
 
     !! Locations in aux arrays
     call get_aux_locations_n(ixyz,mcapa,locrot,locarea)
@@ -316,16 +312,6 @@ subroutine clawpack46_rpn3_mapped(ixyz,maxm,meqn,mwaves,maux,mbc,mx,&
             apdq_cart(m,i) = area*apdq(m)
             amdq_cart(m,i) = area*amdq(m)
         end do
-
-
-        block
-            integer m
-            if (debug) then
-                write(6,108) 'Minus (mapped rpn) : ', ixyz, i
-                write(6,109) (s_rot(m),m=1,3)
-                write(6,109) (amdq_cart(m,i),m=1,meqn)
-            endif 
-        end block
 
 
 !!        do m=1,meqn

@@ -74,26 +74,21 @@ subroutine clawpack46_rpt3_mapped(ixyz,icoor,ilr,maxm,meqn,mwaves,maux,mbc, &
     double precision uvw2, pres, enth, area
     integer info, ii
 
-    integer mu, mv, mw
-
-    logical debug, debug_check_rpt
-
-    debug = debug_check_rpt(ixyz,icoor,ilr,icom,jcom,kcom)
-
-
-    IF (ixyz == 1) THEN
-       mu = 2
-       mv = 3
-       mw = 4
-    ELSE IF (ixyz == 2) THEN
-       mu = 3
-       mv = 4
-       mw = 2
-    ELSE
-       mu = 4
-       mv = 2
-       mw = 3
-    ENDIF
+!!    integer mu, mv, mw
+!!
+!!    IF (ixyz == 1) THEN
+!!       mu = 2
+!!       mv = 3
+!!       mw = 4
+!!    ELSE IF (ixyz == 2) THEN
+!!       mu = 3
+!!       mv = 4
+!!       mw = 2
+!!    ELSE
+!!       mu = 4
+!!       mv = 2
+!!       mw = 3
+!!    ENDIF
 
 
     !! # This just tells us where to find the particular rotation vectors
@@ -174,16 +169,6 @@ subroutine clawpack46_rpt3_mapped(ixyz,icoor,ilr,maxm,meqn,mwaves,maux,mbc, &
             enddo
         enddo
 
-        block
-            integer m
-            if (debug) then
-                write(6,108) 'Minus (mapped rpt) : ', ixyz,icoor,ilr, i 
-                write(6,109) (area*s_rot(m),m=1,3)
-                write(6,109) (bmasdq_cart(m,i),m=1,meqn)
-            endif 
-        end block
-
-
         !! # -------------------------------------------------------
         !! # Compute bpasdq
         !! # -------------------------------------------------------
@@ -256,32 +241,7 @@ subroutine clawpack46_rpt3_mapped(ixyz,icoor,ilr,maxm,meqn,mwaves,maux,mbc, &
             enddo
         enddo
 
-!!        block
-!!            integer m
-!!            double precision area
-!!            if (debug) then
-!!                write(6,108) 'Plus : ', ixyz,icoor,i 
-!!                write(6,109) (s_rot(m)/area,m=1,3)
-!!                do mws=1,mwaves
-!!                    write(6,109) (bpasdq_cart(m,mws),m=1,meqn)
-!!                end do
-!!                write(6,*) ' '
-!!            endif 
-!!        end block
-
-
     enddo  !! end of i loop
-
-108     format(A,'ixyz=',I2,'; icoor=',I2,'; ilr = ',I2,';  i=',I2)
-109     format(5E24.16)
-
-1001    format(A,3E24.16)
-1002    format(A,I5)
-1003    format('icom = ',I5,'; jcom = ',I5,'; kcom = ',I5)
-1005    format('asdq(',I2,') = ',F24.16)
-
-
-
 
     return
 end subroutine clawpack46_rpt3_mapped
