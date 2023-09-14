@@ -92,7 +92,6 @@ typedef struct fclaw_patch_data_d3
     /** The number of patches that meet at each corner */
     int block_corner_count[8];
 } fclaw_patch_data_d3_t;
-
 /**
  * @brief Structure for user patch data
  * 

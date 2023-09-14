@@ -31,6 +31,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <forestclaw.h>
 #include <fclaw_domain.h>
+#include <fclaw2d_domain.h>
+#include <fclaw3d_domain.h>
+#include <fclaw2d_patch.h>
 #include <fclaw_convenience.h>
 
 static 
@@ -38,13 +41,15 @@ void** get_patch_data(fclaw_domain_t *domain)
 {
     if(domain->dim == 2)
     {
-        FCLAW_ASSERT(domain->d2->exchange != NULL);
-        return domain->d2->exchange->patch_data;
+        fclaw2d_domain_wrap_t* wrap = fclaw_domain_get_2d_domain_wrap(domain);
+        FCLAW_ASSERT(wrap->exchange != NULL);
+        return wrap->exchange->patch_data;
     }
     else if (domain->dim == 3)
     {
-        FCLAW_ASSERT(domain->d3->exchange != NULL);
-        return domain->d3->exchange->patch_data;
+        fclaw3d_domain_wrap_t* wrap = fclaw_domain_get_3d_domain_wrap(domain);
+        FCLAW_ASSERT(wrap->exchange != NULL);
+        return wrap->exchange->patch_data;
     }
     else 
     {
@@ -57,13 +62,15 @@ void** get_ghost_data(fclaw_domain_t *domain)
 {
     if(domain->dim == 2)
     {
-        FCLAW_ASSERT(domain->d2->exchange != NULL);
-        return domain->d2->exchange->ghost_data;
+        fclaw2d_domain_wrap_t *wrap = fclaw_domain_get_2d_domain_wrap(domain);
+        FCLAW_ASSERT(wrap->exchange != NULL);
+        return wrap->exchange->ghost_data;
     }
     else if (domain->dim == 3)
     {
-        FCLAW_ASSERT(domain->d3->exchange != NULL);
-        return domain->d3->exchange->ghost_data;
+        fclaw3d_domain_wrap_t *wrap = fclaw_domain_get_3d_domain_wrap(domain);
+        FCLAW_ASSERT(wrap->exchange != NULL);
+        return wrap->exchange->ghost_data;
     }
     else 
     {
@@ -76,11 +83,13 @@ int exchange_allocated(fclaw_domain_t* domain)
 {
     if(domain->dim == 2)
     {
-        return domain->d2->exchange != NULL;
+        fclaw2d_domain_wrap_t* wrap = fclaw_domain_get_2d_domain_wrap(domain);
+        return wrap->exchange != NULL;
     }
     else if (domain->dim == 3)
     {
-        return domain->d3->exchange != NULL;
+        fclaw3d_domain_wrap_t* wrap = fclaw_domain_get_3d_domain_wrap(domain);
+        return wrap->exchange != NULL;
     }
     else 
     {
@@ -113,7 +122,8 @@ void build_remote_ghost_patches(fclaw_global_t* glob)
     {
         ghost_patch = &domain->ghost_patches[i];
 
-        blockno = ghost_patch->patch_2d->u.blockno;
+        fclaw2d_patch_t* patch_2d = fclaw_patch_get_2d_patch(ghost_patch);
+        blockno = patch_2d->u.blockno;
         //TODO 3D?
 
         /* not clear how useful this patchno is.  In any case, it isn't
@@ -159,7 +169,8 @@ unpack_remote_ghost_patches(fclaw_global_t* glob,
 
         if (level >= minlevel-1)
         {
-            int blockno = ghost_patch->patch_2d->u.blockno;
+            fclaw2d_patch_t* patch_2d = fclaw_patch_get_2d_patch(ghost_patch);
+            int blockno = patch_2d->u.blockno;
             //TODO 3D?
 
             int patchno = i;

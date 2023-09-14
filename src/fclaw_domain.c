@@ -25,6 +25,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw_global.h>
 #include <fclaw_domain.h>
+#include <fclaw2d_domain.h>
+#include <fclaw3d_domain.h>
 
 #include <fclaw_convenience.h>  /* Contains domain_destroy and others */
 #include <fclaw_patch.h>
@@ -77,8 +79,7 @@ void fclaw_domain_reset(fclaw_global_t* glob)
     }
 
     // TODO provide function in fclaw_exchange
-    if (((*domain)->dim == 2 && (*domain)->d2->exchange != NULL)
-        || ((*domain)->dim == 3 && (*domain)->d3->exchange != NULL))
+    if (fclaw_domain_exchange_allocated(glob->domain))
     {
         fclaw_exchange_delete(glob);
     }
@@ -87,6 +88,22 @@ void fclaw_domain_reset(fclaw_global_t* glob)
 
     fclaw_domain_destroy(*domain);
     *domain = NULL;
+}
+
+int fclaw_domain_exchange_allocated(fclaw_domain_t *domain)
+{
+    if(domain->dim == 2)
+    {
+        return fclaw_domain_get_2d_domain_wrap(domain)->exchange != NULL;
+    }
+    else if(domain->dim == 3)
+    {
+        return fclaw_domain_get_3d_domain_wrap(domain)->exchange != NULL;
+    }
+    else
+    {
+        SC_ABORT_NOT_REACHED();
+    }
 }
 
 void fclaw_domain_iterate_level_mthread (fclaw_domain_t * domain, int level,

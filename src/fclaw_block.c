@@ -29,6 +29,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw3d_defs.h>
 
 #include <fclaw_patch.h>
+#include <fclaw2d_patch.h>
+#include <fclaw3d_patch.h>
 #include <forestclaw2d.h>
 #include <forestclaw3d.h>
 
@@ -42,7 +44,8 @@ void fclaw_block_get_block_boundary(fclaw_global_t * glob,
         for (int iside = 0; iside < FCLAW2D_NUMFACES; iside++)
         {
             int iface_flags = fclaw2d_patch_block_face_flags[iside];
-            int is_block_face = (patch->patch_3d->flags & iface_flags) != 0;
+            fclaw2d_patch_t* patch_2d = fclaw_patch_get_2d_patch(patch);
+            int is_block_face = (patch_2d->flags & iface_flags) != 0;
 
             /* True for physical and block boundaries across a face */
             intersects_block[iside] = is_block_face;
@@ -53,7 +56,8 @@ void fclaw_block_get_block_boundary(fclaw_global_t * glob,
         for (int iside = 0; iside < FCLAW3D_NUMFACES; iside++)
         {
             int iface_flags = fclaw3d_patch_block_face_flags[iside];
-            int is_block_face = (patch->patch_3d->flags & iface_flags) != 0;
+            fclaw3d_patch_t* patch_3d = fclaw_patch_get_3d_patch(patch);
+            int is_block_face = (patch_3d->flags & iface_flags) != 0;
 
             /* True for physical and block boundaries across a face */
             intersects_block[iside] = is_block_face;

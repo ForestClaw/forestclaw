@@ -26,8 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FORESTCLAW_H
 #define FORESTCLAW_H
 
-#include <forestclaw2d.h>
-#include <forestclaw3d.h>
+#include <fclaw_base.h>
 #include <sc_keyvalue.h>
 
 #ifdef __cplusplus
@@ -63,8 +62,6 @@ typedef struct fclaw_patch fclaw_patch_t;
 struct fclaw_patch
 {
     int dim;                    /**< dimension */
-    fclaw2d_patch_t* patch_2d;        /**< 2D specific information */
-    fclaw3d_patch_t* patch_3d;        /**< 3D specific informaiton */
     /** @{ @brief left/right coordinate */
     double xlower, xupper;
     /** @} */
@@ -76,6 +73,7 @@ struct fclaw_patch
     /** @} */
     int level;                  /**< 0 is root, increases if refined */
 
+    void* wrapped_patch;        /**< opaque pointer to wrapped patch */
     void *user;                 /**< User Pointer */
 };
 
@@ -113,31 +111,6 @@ typedef struct fclaw_block
     void *user;                       /**< User pointer */
 } fclaw_block_t;
 
-/** This structure identify parameters that are copied from a domain
- * to a new domain derived by adaptation or partitioning. */
-typedef struct fclaw_domain_persist
-{
-    int smooth_refine;          /**< Boolean tells us whether to communicate
-                                     the desired refinement level to neighbors. */
-    int smooth_level;           /**< The minimum level that refinement smoothing
-                                     is enabled on.  Use 0 for al levels. */
-}
-fclaw_domain_persist_t;
-
-typedef struct fclaw_domain_d2
-{
-    fclaw2d_domain_t*          domain;
-    fclaw2d_domain_exchange_t* exchange;
-    fclaw2d_domain_indirect_t* indirect;
-} fclaw_domain_d2_t;
-
-typedef struct fclaw_domain_d3
-{
-    fclaw3d_domain_t*          domain;
-    fclaw3d_domain_exchange_t* exchange;
-    fclaw3d_domain_indirect_t* indirect;
-} fclaw_domain_d3_t;
-
 /**
  * @brief The domain structure is a collection of blocks
  * 
@@ -150,8 +123,6 @@ typedef struct fclaw_domain_d3
 struct fclaw_domain
 {
     int dim;                    /**< dimension */
-    fclaw_domain_d2_t* d2;
-    fclaw_domain_d3_t* d3;
     int count_set_patch;
     int count_delete_patch;
 
@@ -159,9 +130,6 @@ struct fclaw_domain
     int mpisize;                /**< MPI size */
     int mpirank;                /**< MPI rank */
     int possible_maxlevel;      /**< theoretical maximum that can be reached */
-
-    fclaw_domain_persist_t p;         /**< Parameters that carry over from
-                                             one domain to a derived one. */
 
     int local_num_patches;      /**< sum of patches over all blocks on this proc */
     /** @{ */
@@ -188,6 +156,7 @@ struct fclaw_domain
 
     sc_keyvalue_t *attributes;  /**< Reserved to store domain attributes */
 
+    void *wrapped_domain;       /**< opaque pointer to wrapped domain */
     void *user; /**< user data pointer */
 };
 

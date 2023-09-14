@@ -63,6 +63,14 @@ void fclaw_domain_reset(struct fclaw_global* glob);
 void fclaw_domain_iterate_level_mthread (struct fclaw_domain * domain, int level,
                                            fclaw_patch_callback_t pcb, void *user);
 
+/**
+ * @brief Check if domain has exchange data allocated
+ * 
+ * @param domain the domain
+ * @return int true if exchange data allocated
+ */
+int fclaw_domain_exchange_allocated(fclaw_domain_t *domain);
+
 /* below are the functions needed for dimension independence */
 
 /** safeguard value for dimension-independent domain */

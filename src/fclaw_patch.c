@@ -32,6 +32,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_defs.h>
 #include <fclaw3d_defs.h>
 
+#include <fclaw2d_patch.h>
+#include <fclaw3d_patch.h>
+
 #include <forestclaw2d.h>
 #include <forestclaw3d.h>
 
@@ -1222,11 +1225,13 @@ fclaw_patch_on_parallel_boundary (const fclaw_patch_t * patch)
 {
     if(patch->dim == 2)
     {
-        return patch->patch_2d->flags & FCLAW2D_PATCH_ON_PARALLEL_BOUNDARY ? 1 : 0;
+        fclaw2d_patch_t* patch_2d = fclaw_patch_get_2d_patch(patch);
+        return patch_2d->flags & FCLAW2D_PATCH_ON_PARALLEL_BOUNDARY ? 1 : 0;
     }
     else 
     {
-        return patch->patch_3d->flags & FCLAW3D_PATCH_ON_PARALLEL_BOUNDARY ? 1 : 0;
+        fclaw3d_patch_t* patch_3d = fclaw_patch_get_3d_patch(patch);
+        return patch_3d->flags & FCLAW3D_PATCH_ON_PARALLEL_BOUNDARY ? 1 : 0;
     }
 }
 

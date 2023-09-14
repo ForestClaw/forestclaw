@@ -61,13 +61,6 @@ fclaw_smooth_t;
 static int
 domain_match (fclaw_domain_t * d1, fclaw_domain_t * d2)
 {
-    FCLAW_ASSERT (d1 != NULL && d2 != NULL);
-
-    if (d1->p.smooth_refine != d2->p.smooth_refine ||
-        d1->p.smooth_level != d2->p.smooth_level)
-    {
-        return 0;
-    }
     return 1;
 }
 
