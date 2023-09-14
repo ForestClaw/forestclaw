@@ -116,7 +116,7 @@ void copy_block(fclaw_block_t* block, fclaw2d_block_t* block_2d)
     block->minlevel = block_2d->minlevel;
     block->maxlevel = block_2d->maxlevel;
 
-    block->patches = FCLAW_ALLOC(fclaw_patch_t, block->num_patches);
+    block->patches = FCLAW_ALLOC_ZERO(fclaw_patch_t, block->num_patches);
     for(int patchno = 0; patchno < block->num_patches; patchno++)
     {
         copy_patch(&block->patches[patchno], &block_2d->patches[patchno]);
