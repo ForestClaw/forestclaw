@@ -25,7 +25,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw_filesystem.h>
 
-#include <fclaw_package.h>
 #include <fclaw_timer.h>
 #include <fclaw_pointer_map.h>
 #include <fclaw_packing.h>

@@ -28,7 +28,6 @@
 
 #include <fclaw_base.h>
 #include <fclaw_domain.h>
-#include <fclaw_package.h>
 #include <fclaw_options.h>
 #include <fclaw_global.h>
 

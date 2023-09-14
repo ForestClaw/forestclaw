@@ -26,7 +26,6 @@ add_library(forestclaw_c OBJECT
   fclaw_options.c 
   fclaw_output.c
   fclaw_patch.c
-  fclaw_package.c 
   fclaw_packing.c 
   fclaw_physical_bc.c
   fclaw_partition.c
@@ -138,7 +137,6 @@ install(FILES
   fclaw_include_all.h 
   fclaw_options.h 
   fclaw_output.h
-  fclaw_package.h 
   fclaw_partition.h
   fclaw_packing.h
   fclaw_patch.h

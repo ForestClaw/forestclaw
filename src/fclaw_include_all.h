@@ -27,7 +27,6 @@
 #define FCLAW_INCLUDE_ALL_H
 
 #include <fclaw_base.h>
-#include <fclaw_package.h>
 #include <fclaw2d_defs.h>
 
 #include <fclaw_patch.h>
