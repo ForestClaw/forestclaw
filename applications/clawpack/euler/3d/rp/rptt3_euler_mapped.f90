@@ -81,11 +81,27 @@ subroutine clawpack46_rptt3_mapped(ixyz,icoor,ilr,impt,maxm,meqn,mwaves,&
     common /comxyzt/ dtcom,dxcom,dycom,dzcom,tcom,icom,jcom,kcom
 
     double precision wave(5,3),s_rot(3), bsasdq(5), uvw(3)
-    double precision uvw_cart(3), rot(9)
+    double precision uvw_cart(3), rot(9), wave_cart(5,3)
 
     integer i, j, mws, m, i1, info
     double precision uvw2, pres, enth, area
     integer locrot, locarea, irot
+
+!!    integer mv,mu,mw
+
+!!    IF(ixyz == 1)THEN
+!!       mu = 2
+!!       mv = 3
+!!       mw = 4
+!!    ELSE IF(ixyz == 2)THEN
+!!       mu = 3
+!!       mv = 4
+!!       mw = 2
+!!    ELSE
+!!       mu = 4
+!!       mv = 2
+!!       mw = 3
+!!    ENDIF
 
     call get_aux_locations_tt(ixyz,icoor,mcapa,locrot,locarea,irot)
 
@@ -109,24 +125,30 @@ subroutine clawpack46_rptt3_mapped(ixyz,icoor,ilr,impt,maxm,meqn,mwaves,&
         !! Set value to avoid compiler warnings
         area = aux2(locarea,i1,1)
         if (icoor .eq. 2) then
+            !! y-like direction
             if (impt .eq. 1) then
+                !! Negative y-like direction
                 do j = 1,9
                     rot(j) = aux2(locrot+j-1,i1,1)
                 enddo
                 area = aux2(locarea,i1,1)
             elseif (impt .eq. 2) then
+                !! Positive y-like direction
                 do j = 1,9
                     rot(j) = aux2(locrot+j-1,i1,3)
                 enddo
                 area = aux2(locarea,i1,3)
             endif
         elseif (icoor .eq. 3) then
+            !! z-like direction
             if (impt .eq. 1) then
+                !! Negative z-like direction
                 do j = 1,9
                     rot(j) = aux1(locrot+j-1,i1,2)
                 enddo
                 area = aux1(locarea,i1,2)
             elseif (impt .eq. 2) then
+                !! Positive z-like direction
                 do j = 1,9
                     rot(j) = aux3(locrot+j-1,i1,2)
                 enddo
@@ -153,21 +175,20 @@ subroutine clawpack46_rptt3_mapped(ixyz,icoor,ilr,impt,maxm,meqn,mwaves,&
 
         do mws = 1,mwaves
             call rotate3_tr(rot,wave(2,mws))
-            s_rot(mws) = area*s_rot(mws)
         enddo
 
         do m=1,meqn
             cmbsasdq_cart(m,i) = 0.d0
             do mws=1,mwaves
                 cmbsasdq_cart(m,i) = cmbsasdq_cart(m,i) & 
-                      + min(s_rot(mws), 0.d0) * wave(m,mws)
+                      + area*min(s_rot(mws), 0.d0) * wave(m,mws)
             enddo
         enddo
+
 
         !! # -------------------------------------------------------
         !! # Compute cpbsasdq
         !! # -------------------------------------------------------
-
 
         !! Set value to avoid compiler warnings
         area = 0
@@ -216,18 +237,16 @@ subroutine clawpack46_rptt3_mapped(ixyz,icoor,ilr,impt,maxm,meqn,mwaves,&
 
         do mws = 1,mwaves
             call rotate3_tr(rot,wave(2,mws))
-            s_rot(mws) = area*s_rot(mws)
         end do
 
         do m=1,meqn
             cpbsasdq_cart(m,i) = 0
             do mws=1,mwaves
                cpbsasdq_cart(m,i) = cpbsasdq_cart(m,i) & 
-                    + max(s_rot(mws),0.d0) * wave(m,mws)
+                    + area*max(s_rot(mws),0.d0) * wave(m,mws)
             enddo
         enddo
 
     enddo  !! end of i loop
 
-    return
 end subroutine clawpack46_rptt3_mapped

@@ -2,7 +2,7 @@ c
 c
 c     ==================================================================
       subroutine flux3(ixyz,maxm,meqn,maux,mbc,mx,
-     &                 q1d,dtdx1d,dtdy,dtdz,aux1,aux2,aux3,
+     &                 q1d,dtdx1d,dtdy1d,dtdz1d,aux1,aux2,aux3,
      &                 faddm,faddp,gadd,hadd,cfl1d,
      &                 wave,s,amdq,apdq,cqxx,
      &                 bmamdq,bmapdq,bpamdq,bpapdq,
@@ -124,7 +124,7 @@ c      use amr_module
 
       integer ixyz, maxm, meqn, maux, mbc, mx, mwaves, mcapa
       integer mthlim(mwaves), method(7)
-      double precision cfl1d, dtdy, dtdz
+      double precision cfl1d
       integer use_fwaves
 
       double precision     q1d(meqn,1-mbc:maxm+mbc)
@@ -170,6 +170,8 @@ c
       double precision  bmcpapdq(meqn,1-mbc:maxm+mbc)
 c
       double precision dtdx1d(1-mbc:maxm+mbc)
+      double precision dtdy1d(1-mbc:maxm+mbc)
+      double precision dtdz1d(1-mbc:maxm+mbc)
       double precision aux1(maux,1-mbc:maxm+mbc, 3)
       double precision aux2(maux,1-mbc:maxm+mbc, 3)
       double precision aux3(maux,1-mbc:maxm+mbc, 3)
@@ -185,14 +187,6 @@ c
 
       integer mw, m, i,m3, m4
       double precision dtdxave
-
-
-      logical debug
-
-      debug = .false.
-      if (ixyz .eq. 1 .and. jcom .eq. 4 .and. kcom .eq. 4) then
-           debug = .true.
-      endif
 
       limit = .false.
       do mw = 1,mwaves
@@ -412,6 +406,7 @@ c
 c     # If the correction wave also propagates in a 3D sense, incorporate
 c     # cpcqxx,... into cmamdq, cpamdq, ... so that it is split also.
 c     
+      !! Isn't clear why this being done. 
       if (m4 .eq. 1) then
           do i = 0, mx+2
               do m = 1, meqn
@@ -422,6 +417,7 @@ c
               end do
           end do
       else if (m4 .eq. 2) then
+         !! Why don't we also update bpapdq2, bpamdq2, bmapdq2, bmamdq2 ?
           do i = 0, mx+2
               do m = 1, meqn
                   cpapdq2(m,i) = cpapdq(m,i) - 3.d0*cpcqxxp(m,i)
@@ -442,16 +438,16 @@ c
       !! args (nomap)  : (ixyz, icoor, imp, impt,
       if (m4 .gt. 0) then
           call rptt3(ixyz,2,2,2,maxm,meqn,mwaves,maux,mbc,mx,
-     &                q1d,q1d,aux1,aux2,aux3,cpapdq2,
+     &                q1d,q1d,aux1,aux2,aux3,cpapdq,
      &                bmcpapdq,bpcpapdq)
           call rptt3(ixyz,2,1,2,maxm,meqn,mwaves,maux,mbc,mx,
-     &                q1d,q1d,aux1,aux2,aux3,cpamdq2,
+     &                q1d,q1d,aux1,aux2,aux3,cpamdq,
      &                bmcpamdq,bpcpamdq)
           call rptt3(ixyz,2,2,1,maxm,meqn,mwaves,maux,mbc,mx,
-     &                q1d,q1d,aux1,aux2,aux3,cmapdq2,
+     &                q1d,q1d,aux1,aux2,aux3,cmapdq,
      &                bmcmapdq,bpcmapdq)
           call rptt3(ixyz,2,1,1,maxm,meqn,mwaves,maux,mbc,mx,
-     &                q1d,q1d,aux1,aux2,aux3,cmamdq2,
+     &                q1d,q1d,aux1,aux2,aux3,cmamdq,
      &                bmcmamdq,bpcmamdq)
       endif
 c     
@@ -480,43 +476,45 @@ c             # correction wave if m4=2) between cells
 c             # only having a corner or edge in common. Yields terms of the
 c             # BCAu_{xzy} and BCAAu_{xxzy}.
 c     
+
+
               if (m4 .gt. 0) then
-c     
+                  !! This contains the correction wave cqxx
                   gadd(m,i,2,0) = gadd(m,i,2,0)
-     &                            + (1.d0/6.d0)*dtdx1d(i-1)*dtdz
+     &                            + (1.d0/6.d0)*dtdx1d(i-1)*dtdz1d(i)
      &                            * (bpcpapdq(m,i) - bpcmapdq(m,i))
                   gadd(m,i,1,0) = gadd(m,i,1,0)
-     &                            + (1.d0/6.d0)*dtdx1d(i)*dtdz
+     &                            + (1.d0/6.d0)*dtdx1d(i)*dtdz1d(i)
      &                            * (bmcpapdq(m,i) - bmcmapdq(m,i))
                   gadd(m,i,2,1) = gadd(m,i,2,1)
-     &                            - (1.d0/6.d0)*dtdx1d(i)*dtdz
+     &                            - (1.d0/6.d0)*dtdx1d(i)*dtdz1d(i)
      &                            * bpcpapdq(m,i)
                   gadd(m,i,1,1) = gadd(m,i,1,1)
-     &                             - (1.d0/6.d0)*dtdx1d(i)*dtdz
+     &                             - (1.d0/6.d0)*dtdx1d(i)*dtdz1d(i)
      &                             * bmcpapdq(m,i)
                   gadd(m,i,2,-1) = gadd(m,i,2,-1)
-     &                             + (1.d0/6.d0)*dtdx1d(i)*dtdz
+     &                             + (1.d0/6.d0)*dtdx1d(i)*dtdz1d(i)
      &                             * bpcmapdq(m,i)
                   gadd(m,i,1,-1) = gadd(m,i,1,-1)
-     &                             + (1.d0/6.d0)*dtdx1d(i)*dtdz
+     &                             + (1.d0/6.d0)*dtdx1d(i)*dtdz1d(i)
      &                             * bmcmapdq(m,i)     
                   gadd(m,i-1,2,0) = gadd(m,i-1,2,0)
-     &                             + (1.d0/6.d0)*dtdx1d(i-1)*dtdz
+     &                             + (1.d0/6.d0)*dtdx1d(i-1)*dtdz1d(i)
      &                             * (bpcpamdq(m,i) - bpcmamdq(m,i))
                   gadd(m,i-1,1,0) = gadd(m,i-1,1,0)
-     &                             + (1.d0/6.d0)*dtdx1d(i-1)*dtdz
+     &                             + (1.d0/6.d0)*dtdx1d(i-1)*dtdz1d(i)
      &                             * (bmcpamdq(m,i) - bmcmamdq(m,i))
                   gadd(m,i-1,2,1) = gadd(m,i-1,2,1)
-     &                             - (1.d0/6.d0)*dtdx1d(i-1)*dtdz
+     &                             - (1.d0/6.d0)*dtdx1d(i-1)*dtdz1d(i)
      &                             * bpcpamdq(m,i)
                   gadd(m,i-1,1,1) = gadd(m,i-1,1,1)
-     &                             - (1.d0/6.d0)*dtdx1d(i-1)*dtdz
+     &                             - (1.d0/6.d0)*dtdx1d(i-1)*dtdz1d(i)
      &                             * bmcpamdq(m,i)
                   gadd(m,i-1,2,-1) = gadd(m,i-1,2,-1)
-     &                             + (1.d0/6.d0)*dtdx1d(i-1)*dtdz
+     &                             + (1.d0/6.d0)*dtdx1d(i-1)*dtdz1d(i)
      &                             * bpcmamdq(m,i)
                   gadd(m,i-1,1,-1) = gadd(m,i-1,1,-1)
-     &                             + (1.d0/6.d0)*dtdx1d(i-1)*dtdz
+     &                             + (1.d0/6.d0)*dtdx1d(i-1)*dtdz1d(i)
      &                             * bmcmamdq(m,i)
 c     
               endif
@@ -605,42 +603,41 @@ c             # only having a corner or edge in common. Yields terms of the
 c             # CBAu_{xzy} and CBAAu_{xxzy}.
 c     
               if (m4 .gt. 0) then
-c     
                   hadd(m,i,2,0)  = hadd(m,i,2,0)
-     &                        + (1.d0/6.d0)*dtdx1d(i)*dtdy
+     &                        + (1.d0/6.d0)*dtdx1d(i)*dtdy1d(i)
      &                        * (bpcpapdq(m,i) - bpcmapdq(m,i))
                   hadd(m,i,1,0)  = hadd(m,i,1,0)
-     &                        + (1.d0/6.d0)*dtdx1d(i)*dtdy
+     &                        + (1.d0/6.d0)*dtdx1d(i)*dtdy1d(i)
      &                        * (bmcpapdq(m,i) - bmcmapdq(m,i))
                   hadd(m,i,2,1)  = hadd(m,i,2,1)
-     &                        - (1.d0/6.d0)*dtdx1d(i)*dtdy
+     &                        - (1.d0/6.d0)*dtdx1d(i)*dtdy1d(i)
      &                        * bpcpapdq(m,i)
                   hadd(m,i,1,1)  = hadd(m,i,1,1)
-     &                        - (1.d0/6.d0)*dtdx1d(i)*dtdy
+     &                        - (1.d0/6.d0)*dtdx1d(i)*dtdy1d(i)
      &                        * bmcpapdq(m,i)
                   hadd(m,i,2,-1) = hadd(m,i,2,-1)
-     &                        + (1.d0/6.d0)*dtdx1d(i)*dtdy
+     &                        + (1.d0/6.d0)*dtdx1d(i)*dtdy1d(i)
      &                        * bpcmapdq(m,i)
                   hadd(m,i,1,-1) = hadd(m,i,1,-1)
-     &                        + (1.d0/6.d0)*dtdx1d(i)*dtdy
+     &                        + (1.d0/6.d0)*dtdx1d(i)*dtdy1d(i)
      &                        * bmcmapdq(m,i)     
                   hadd(m,i-1,2,0)  = hadd(m,i-1,2,0)
-     &                        + (1.d0/6.d0)*dtdx1d(i-1)*dtdy
+     &                        + (1.d0/6.d0)*dtdx1d(i-1)*dtdy1d(i)
      &                        * (bpcpamdq(m,i) - bpcmamdq(m,i))
                   hadd(m,i-1,1,0)  = hadd(m,i-1,1,0)
-     &                        + (1.d0/6.d0)*dtdx1d(i-1)*dtdy
+     &                        + (1.d0/6.d0)*dtdx1d(i-1)*dtdy1d(i)
      &                        * (bmcpamdq(m,i) - bmcmamdq(m,i))
                   hadd(m,i-1,2,1)  = hadd(m,i-1,2,1)
-     &                        - (1.d0/6.d0)*dtdx1d(i-1)*dtdy
+     &                        - (1.d0/6.d0)*dtdx1d(i-1)*dtdy1d(i)
      &                        * bpcpamdq(m,i)
                   hadd(m,i-1,1,1)  = hadd(m,i-1,1,1)
-     &                        - (1.d0/6.d0)*dtdx1d(i-1)*dtdy
+     &                        - (1.d0/6.d0)*dtdx1d(i-1)*dtdy1d(i)
      &                        * bmcpamdq(m,i)
                   hadd(m,i-1,2,-1) = hadd(m,i-1,2,-1)
-     &                        + (1.d0/6.d0)*dtdx1d(i-1)*dtdy
+     &                        + (1.d0/6.d0)*dtdx1d(i-1)*dtdy1d(i)
      &                        * bpcmamdq(m,i)
                   hadd(m,i-1,1,-1) = hadd(m,i-1,1,-1)
-     &                        + (1.d0/6.d0)*dtdx1d(i-1)*dtdy
+     &                        + (1.d0/6.d0)*dtdx1d(i-1)*dtdy1d(i)
      &                        * bmcmamdq(m,i)
 c     
               endif
@@ -660,5 +657,6 @@ c
               endif
           end do meqnh_loop
       end do ih_loop
+
       return
       end

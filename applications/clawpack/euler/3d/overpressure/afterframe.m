@@ -10,14 +10,13 @@ example = parms.example;
 maxelev = parms.maxelev;
 mapping = parms.mapping;
 
-set(gca,'clipping','off')
-
-
-% Set axis
+% -------------------------------------
+% Set axis for mapping
+% -------------------------------------
 parms = read_vars();
 switch mapping
     case 0
-        % No mapping or Cartesian mapping    
+        % No mapping
         axis([-1,1,-1,1,-1,1])
         daspect([1,1,1])
         view(3)
@@ -26,50 +25,69 @@ switch mapping
         if parms.scale_bump > 0
             axis([-2,2,-2,2,parms.minz,parms.maxz])
         else
-            axis([-2,2,-2,2,parms.minz,parms.maxz])
+            axis([-1,1,-1,1,parms.minz,parms.maxz])
         end
         daspect([1,1,1])
         view(3)
     case 2
         % Spherical mappings with extrusion means R > 1
         s = 1 + parms.maxelev;
-        axis([0,1,-1,1,-1,1]*s)
+%         axis([-1,1,-1,1,-1,1]*s)
+        axis([0,2.5,-2,2,-2,2])    
     case {3,4}
         % Spherical mappings with extrusion means R > 1
         s = 1 + parms.maxelev;
-        axis([-1,1,0,1,-1,1]*s)
-        set(gca,'clipping','on')
-        view([43.9086, 6.6000])
-%             view(3)
+        axis([-1,1,-1,1,-1,1]*s)
+        set(gcf,'clipping','off')
+        view(vright)
+%         axis([-1.25,1.25,0,1.25,-1.25,1.25])        
+%         set(gca,'clipping','on')
+%         view([42.8,12.03])
     otherwise
         error("No mapping specified.")
 end
 set(gca,'box','on')
 
+% showgridlines
+showpatchborders
+    
+% hideslices
+showslices('z',3)
 
+set(gca,'clipping','off')
 
-% Set color axis
+% -------------------------------------
+% Color axis and color map
+% -------------------------------------
 if qmin == qmax
     if qmax == 0
         clim([-1,1])
     else
-        clim([-abs(qmax),abs(qmax)])
+         clim([-abs(qmax),abs(qmax)])
     end
 else
     if UserVariable == 1
-        % Pressure
-        if mapping < 2
-            clim([0.8,1.2])
-        else
-            s = 2.5e-3;
-            cl = [1-s,1+s];
-            clim(cl);
+        if strcmp(UserVariableFile,'pressure') == 1
+            % Pressure
+            clim([0.9,1.1])
         end
     else
-        % Density
-        clim([-1,1]*1e-3)
+        clim([0.95,1.05])
     end
 end
+% Color map and axis
+colormap(parula)
+colorbar
+
+cl = clim;
+cv = linspace(cl(1),cl(2),22);    % Try to skip 1
+drawcontourlines(cv)
+setcontourlineprops('linewidth',1);
+
+
+% -------------------------------------
+% Title and labels
+% -------------------------------------
 
 if (UserVariable)
     tstr = sprintf("Pressure : t = %8.2e",t);
@@ -77,20 +95,6 @@ else
     tstr = sprintf("q(%d) : t = %8.2e",mq,t);
 end
 title(tstr);
-
-% Color map and axis
-colormap(parula)
-colorbar
-
-
-if mapping > 2
-    cv = linspace(cl(1),cl(2),24);
-else
-    cv = linspace(0.8,1.2,24);
-end
-drawcontourlines(cv);
-showpatchborders
-    
 
 if mapping <= 1
     prt = false;

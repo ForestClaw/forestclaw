@@ -28,15 +28,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "../all/advection_user.h"
 
 /* ------------- Create the domain --------------------- */
-static
-fclaw_domain_t* create_domain(sc_MPI_Comm mpicomm, 
-                                fclaw_options_t* fclaw_opt, 
-                                user_options_t* user)
+static void
+store_domain_map (fclaw2d_global_t * glob, fclaw_options_t * fclaw_opt,
+                  user_options_t * user)
 {
     /* Mapped, multi-block domain */
-    p4est_connectivity_t     *conn = NULL;
-    fclaw_domain_t         *domain;
-    fclaw2d_map_context_t    *cont = NULL, *brick = NULL;
+    fclaw2d_domain_t *domain = NULL;
+    fclaw2d_map_context_t *cont = NULL, *brick = NULL;
 
     /* ---------------------------------------------------------------
        Mapping geometry
@@ -44,7 +42,7 @@ fclaw_domain_t* create_domain(sc_MPI_Comm mpicomm,
     int mi = fclaw_opt->mi;
     int mj = fclaw_opt->mj;
     int a = fclaw_opt->periodic_x;
-    int b = 0;   /* No periodicity in radial direction */
+    int b = 0;                  /* No periodicity in radial direction */
 
     /* Used locally */
     double pi = M_PI;
@@ -54,19 +52,19 @@ fclaw_domain_t* create_domain(sc_MPI_Comm mpicomm,
     rotate[1] = pi*fclaw_opt->phi/180.0;
 
     /* Annulus */
-    conn = p4est_connectivity_new_brick(mi,mj,a,b);
-    brick = fclaw2d_map_new_brick_conn (conn,mi,mj);
-    cont = fclaw2d_map_new_annulus(brick,
-                                   fclaw_opt->scale,
-                                   rotate,
-                                   user->beta, 
-                                   user->theta);
+    /* Construct and store domain */
+    domain = fclaw2d_domain_new_brick (glob->mpicomm, mi, mj, a, b,
+                                       fclaw_opt->minlevel);
+    fclaw2d_domain_list_levels (domain, FCLAW_VERBOSITY_ESSENTIAL);
+    fclaw2d_domain_list_neighbors (domain, FCLAW_VERBOSITY_DEBUG);
+    fclaw2d_global_store_domain (glob, domain);
 
-    domain = fclaw_domain_wrap_2d(fclaw2d_domain_new_conn_map (mpicomm, fclaw_opt->minlevel, conn, cont));
-
-    fclaw_domain_list_levels(domain, FCLAW_VERBOSITY_ESSENTIAL);
-    fclaw_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);
-    return domain;
+    /* Construct and store map */
+    brick = fclaw2d_map_new_brick (domain, mi, mj, a, b);
+    cont = fclaw2d_map_new_annulus (brick,
+                                    fclaw_opt->scale,
+                                    rotate, user->beta, user->theta);
+    fclaw2d_global_store_map (glob, cont);
 }
 
 static
@@ -111,10 +109,6 @@ main (int argc, char **argv)
     fc2d_clawpack46_options_t   *claw46_opt;
     fc2d_clawpack5_options_t    *claw5_opt;
 
-    fclaw_global_t         *glob;
-    fclaw_domain_t         *domain;
-    sc_MPI_Comm mpicomm;
-
     /* Initialize application */
     app = fclaw_app_new (&argc, &argv, NULL);
 
@@ -132,11 +126,11 @@ main (int argc, char **argv)
     {
         
         /* Options have been checked and are valid */
-        mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
-        domain = create_domain(mpicomm, fclaw_opt, user_opt);
-
-        glob = fclaw_global_new();
-        fclaw_global_store_domain(glob, domain);
+        int size, rank;
+        sc_MPI_Comm mpicomm = fclaw_app_get_mpi_size_rank (app, &size, &rank);
+        fclaw2d_global_t *glob =
+            fclaw2d_global_new_comm (mpicomm, size, rank);
+        store_domain_map (glob, fclaw_opt, user_opt);
 
         fclaw_options_store            (glob, fclaw_opt);
         fclaw_clawpatch_options_store  (glob, clawpatch_opt);

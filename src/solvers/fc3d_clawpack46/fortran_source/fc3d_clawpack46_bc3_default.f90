@@ -256,7 +256,7 @@ subroutine clawpack46_bc3_default(meqn,mbc,mx,my,mz, &
 
 
 !! -------------------------------------------------------
-!!      # bottom bounddary (zlower):
+!!      # bottom boundary (zlower):
 !! -------------------------------------------------------
     goto (500,510,520,530) mthbc(5)+1
     !!  Fall through if mthbc(3) = -1.   Boundary is an internal patch

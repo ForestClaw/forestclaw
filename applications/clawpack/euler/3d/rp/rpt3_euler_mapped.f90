@@ -72,15 +72,15 @@ subroutine clawpack46_rpt3_mapped(ixyz,icoor,ilr,maxm,meqn,mwaves,maux,mbc, &
 
     integer i, j, m, mws, i1, locrot, locarea
     double precision uvw2, pres, enth, area
-    integer info
+    integer info, ii
 
-
-
-!!    IF(ixyz == 1)THEN
+!!    integer mu, mv, mw
+!!
+!!    IF (ixyz == 1) THEN
 !!       mu = 2
 !!       mv = 3
 !!       mw = 4
-!!    ELSE IF(ixyz == 2)THEN
+!!    ELSE IF (ixyz == 2) THEN
 !!       mu = 3
 !!       mv = 4
 !!       mw = 2
@@ -89,7 +89,6 @@ subroutine clawpack46_rpt3_mapped(ixyz,icoor,ilr,maxm,meqn,mwaves,maux,mbc, &
 !!       mv = 2
 !!       mw = 3
 !!    ENDIF
-
 
 
     !! # This just tells us where to find the particular rotation vectors
@@ -135,32 +134,38 @@ subroutine clawpack46_rpt3_mapped(ixyz,icoor,ilr,maxm,meqn,mwaves,maux,mbc, &
         if (info > 0) then
             write(6,*) 'Calling from transverse solve; B^-'
             do j = 1,5
-                write(6,'(E24.16)') asdq(j)
+                write(6,1005) j,asdq(j)
             enddo
             write(6,*) ' '
-            write(6,'(E24.16)') (uvw(j),j=1,3)
+            write(6,*) 'uvw'
+            write(6,1001) (uvw(j),j=1,3)
             write(6,*) ' '
-            write(6,'(E24.16)') (uvw_cart(j),j=1,3)
+            write(6,*) 'uvw_cart'
+            write(6,1001) (uvw_cart(j),j=1,3)
             write(6,*) ' '
-            write(6,*) 'ixyz = ', ixyz
-            write(6,*) 'icoor = ', icoor
-            write(6,*) 'locrot = ', locrot
-            write(6,'(E24.16)') (rot(j),j=1,9)
+            write(6,1001) enth
             write(6,*) ' '
-            write(6,'(E24.16)') enth
+            do ii = 1,9
+               write(6,1001) 'rot = ', rot(ii)
+            enddo
+            write(6,*) ' '
+            write(6,1002) 'ixyz = ', ixyz
+            write(6,1002) 'icoor = ', icoor
+            write(6,1002) 'locrot = ', locrot
+            write(6,*) 'i = ', i
+            write(6,1003) icom, jcom, kcom
+            write(6,*) ' '
             stop
         endif
-
         do mws = 1,mwaves
             call rotate3_tr(rot,wave(2,mws))
-            s_rot(mws) = area*s_rot(mws)
         enddo
 
         do m=1,meqn
             bmasdq_cart(m,i) = 0.d0
             do mws = 1,mwaves
                 bmasdq_cart(m,i) = bmasdq_cart(m,i) & 
-                    + min(s_rot(mws), 0.d0) * wave(m,mws)
+                    + area*min(s_rot(mws), 0.d0) * wave(m,mws)
             enddo
         enddo
 
@@ -181,12 +186,13 @@ subroutine clawpack46_rpt3_mapped(ixyz,icoor,ilr,maxm,meqn,mwaves,maux,mbc, &
                 rot(j) = aux2(locrot+j-1,i1,3)
             enddo
             area = aux2(locarea,i1,3)
-         endif
+        endif
 
         do m = 1,meqn
             asdq(m) = asdq_cart(m,i)
         enddo
         call rotate3(rot,asdq(2))
+
 
         do j = 1,3
             uvw(j) = uvw_cart(j)
@@ -198,36 +204,55 @@ subroutine clawpack46_rpt3_mapped(ixyz,icoor,ilr,maxm,meqn,mwaves,maux,mbc, &
         if (info > 0) then
             write(6,*) 'Calling from transverse solve; B^+'
             do j = 1,5
-                write(6,'(E24.16)') asdq(j)
+                write(6,1005) j, asdq(j)
             enddo
-            write(6,'(E24.16)') (uvw(j),j=1,3)
             write(6,*) ' '
-            write(6,*) 'ixyz = ', ixyz
-            write(6,*) 'icoor = ', icoor
-            write(6,*) 'locrot = ', locrot
-            write(6,'(E24.16)') (rot(j),j=1,9)
+            write(6,*) 'uvw'
+            write(6,1001) (uvw(j),j=1,3)
             write(6,*) ' '
-            write(6,'(E24.16)') enth
+            write(6,1001) 'uvw_cart', (uvw_cart(j),j=1,3)
+            write(6,*) ' '
+            write(6,1001) enth
+            write(6,*) ' '
+            do ii = 1,9
+               write(6,1001) 'rot = ', rot(ii)
+            enddo
+            write(6,*) ' '
+            write(6,1002) 'ixyz = ', ixyz
+            write(6,1002) 'icoor = ', icoor
+            write(6,1002) 'locrot = ', locrot
+            write(6,*) 'i = ', i
+            write(6,1003) icom, jcom, kcom
+            write(6,*) ' '
             stop
         endif
+
 
         do mws = 1,mwaves
             !! rotate waves back to Cartesian
             call rotate3_tr(rot,wave(2,mws))
-
-            !! scale speeds
-            s_rot(mws) = area*s_rot(mws)
         enddo
 
         do m = 1,meqn
             bpasdq_cart(m,i) = 0.d0
             do mws=1,mwaves
                bpasdq_cart(m,i) = bpasdq_cart(m,i) & 
-               + max(s_rot(mws),0.d0) * wave(m,mws)
+               + area*max(s_rot(mws),0.d0) * wave(m,mws)
             enddo
         enddo
 
     enddo  !! end of i loop
+
+108     format(A,'ixyz=',I2,'; icoor=',I2,'; ilr = ',I2,';  i=',I2)
+109     format(5E24.16)
+
+1001    format(A,3E24.16)
+1002    format(A,I5)
+1003    format('icom = ',I5,'; jcom = ',I5,'; kcom = ',I5)
+1005    format('asdq(',I2,') = ',F24.16)
+
+
+
 
     return
 end subroutine clawpack46_rpt3_mapped
