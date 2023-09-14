@@ -25,8 +25,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw_global.h>
 #include <fclaw_domain.h>
-#include <fclaw2d_domain.h>
-#include <fclaw3d_domain.h>
+#include <fclaw2d_wrap.h>
+#include <fclaw3d_wrap.h>
 
 #include <fclaw_convenience.h>  /* Contains domain_destroy and others */
 #include <fclaw_patch.h>

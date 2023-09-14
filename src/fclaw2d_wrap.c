@@ -27,12 +27,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifndef P4_TO_P8
 
-#include <fclaw2d_domain.h>
+#include <fclaw2d_wrap.h>
 #include <fclaw2d_defs.h>
 
 #else
 
-#include <fclaw3d_domain.h>
+#include <fclaw3d_wrap.h>
 #include <fclaw3d_defs.h>
 
 #endif

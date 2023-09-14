@@ -39,7 +39,6 @@ add_library(forestclaw_c OBJECT
   fclaw_vtable.c
 
   fclaw2d_convenience.c
-  fclaw2d_domain.c
   fclaw2d_file.c
   fclaw2d_map.c
   fclaw2d_map_brick.c
@@ -47,6 +46,7 @@ add_library(forestclaw_c OBJECT
   fclaw2d_output_tikz.c
   fclaw2d_patch.c
   fclaw2d_rays.c
+  fclaw2d_wrap.c
   fclaw_update_single_step.c
 
   forestclaw.c
@@ -54,10 +54,10 @@ add_library(forestclaw_c OBJECT
   forestclaw3d.c
 
   fclaw3d_convenience.c
-  fclaw3d_domain.c
   fclaw3d_file.c
   fclaw3d_map.c
   fclaw3d_patch.c
+  fclaw3d_wrap.c
 
   fp_exception_glibc_extension.c
 

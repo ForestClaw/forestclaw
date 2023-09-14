@@ -24,4 +24,4 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include <fclaw2d_to_3d.h>
-#include "fclaw2d_domain.c"
+#include "fclaw2d_wrap.c"

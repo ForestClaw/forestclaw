@@ -27,8 +27,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "fclaw2d_convenience.h"
 #include "fclaw3d_convenience.h"
 #include <fclaw_domain.h>
-#include <fclaw2d_domain.h>
-#include <fclaw3d_domain.h>
+#include <fclaw2d_wrap.h>
+#include <fclaw3d_wrap.h>
 
 fclaw_domain_t *fclaw_domain_new_unitsquare (sc_MPI_Comm mpicomm,
                                              int initial_level)

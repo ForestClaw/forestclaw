@@ -39,7 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_global.h>
 #include <fclaw2d_map.h>
 #include <fclaw2d_map_brick.h>
-#include <fclaw2d_domain.h>
+#include <fclaw2d_wrap.h>
 #include <fclaw_options.h>
 #include <fclaw_patch.h>
 #include <fclaw_vtable.h>
