@@ -45,23 +45,19 @@ static void *
 clawpatch_register(fclaw_clawpatch_options_t *clawpatch_options,
                    sc_options_t * opt)
 {
+    sc_options_add_int (opt, 0, "mx", &clawpatch_options->mx, 8,
+                        "Number of grid cells per patch in x [8]");
+
+    sc_options_add_int (opt, 0, "my", &clawpatch_options->my, 8,
+                        "Number of grid cells per patch in y [8]");
+
     if(clawpatch_options->dim == 2)
     {
-        sc_options_add_int (opt, 0, "mx", &clawpatch_options->d2->mx, 8,
-                            "Number of grid cells per patch in x [8]");
-
-        sc_options_add_int (opt, 0, "my", &clawpatch_options->d2->my, 8,
-                            "Number of grid cells per patch in y [8]");
+        clawpatch_options->mz = 1;
     }
     else
     {
-        sc_options_add_int (opt, 0, "mx", &clawpatch_options->d3->mx, 8,
-                            "Number of grid cells per patch in x [8]");
-
-        sc_options_add_int (opt, 0, "my", &clawpatch_options->d3->my, 8,
-                            "Number of grid cells per patch in y [8]");
-
-        sc_options_add_int (opt, 0, "mz", &clawpatch_options->d3->mz, 1,
+        sc_options_add_int (opt, 0, "mz", &clawpatch_options->mz, 8,
                            "Number of grid cells per patch in z [1]");
     }
 
@@ -116,7 +112,7 @@ clawpatch_postprocess(fclaw_clawpatch_options_t *clawpatch_opt)
 static fclaw_exit_type_t
 clawpatch_check(fclaw_clawpatch_options_t *clawpatch_opt)
 {
-    if (2*clawpatch_opt->mbc > (clawpatch_opt->dim == 2 ? clawpatch_opt->d2->mx : clawpatch_opt->d3->mx))
+    if (2*clawpatch_opt->mbc > clawpatch_opt->mx)
     {
         fclaw_global_essentialf("Clawpatch error : 2*mbc > mx or 2*mbc > my\n");
         return FCLAW_EXIT_ERROR;
@@ -148,20 +144,6 @@ fclaw_clawpatch_options_new (int dim)
 
     clawpatch_options->dim = dim;
 
-    if(dim == 2)
-    {
-        clawpatch_options->d2 = FCLAW_ALLOC_ZERO(struct fclaw_clawpatch_options_2d,1);
-    }
-    else if(dim == 3)
-    {
-        clawpatch_options->d3 = FCLAW_ALLOC_ZERO(struct fclaw_clawpatch_options_3d,1);
-    }
-    else
-    {
-        fclaw_global_essentialf("Clawpatch error : Dimension must be 2 or 3\n");
-        exit(1);
-    }
-
     clawpatch_options->kv_refinement_criteria = kv_refinement_criterea_new();
 
     return clawpatch_options;
@@ -170,15 +152,6 @@ fclaw_clawpatch_options_new (int dim)
 void
 fclaw_clawpatch_options_destroy (fclaw_clawpatch_options_t *clawpatch_opt)
 {
-    if(clawpatch_opt->dim == 2)
-    {
-        FCLAW_FREE(clawpatch_opt->d2);
-    }
-    else if(clawpatch_opt->dim == 3)
-    {
-        FCLAW_FREE(clawpatch_opt->d3);
-    }
-
     if(clawpatch_opt->kv_refinement_criteria != NULL)
     {
         sc_keyvalue_destroy (clawpatch_opt->kv_refinement_criteria);
@@ -196,17 +169,7 @@ clawpatch_destroy_void(void *clawpatch_opt)
 static size_t 
 options_packsize(void* user)
 {
-    fclaw_clawpatch_options_t* opts = (fclaw_clawpatch_options_t*) user;
-    size_t size = sizeof(fclaw_clawpatch_options_t);
-    if(opts->dim == 2)
-    {
-        size += sizeof(struct fclaw_clawpatch_options_2d);
-    }
-    else
-    {
-        size += sizeof(struct fclaw_clawpatch_options_3d);
-    }
-    return size;
+    return sizeof(fclaw_clawpatch_options_t);
 }
 
 static size_t 
@@ -217,15 +180,6 @@ options_pack(void* user, char* buffer)
 
     //pack entire struct
     buffer += FCLAW_PACK(*opts,buffer);
-
-    if(opts->dim == 2)
-    {
-        buffer += FCLAW_PACK(*opts->d2,buffer);
-    }
-    else
-    {
-        buffer += FCLAW_PACK(*opts->d3,buffer);
-    }
 
     return buffer - buffer_start;
 }
@@ -239,18 +193,6 @@ options_unpack(char* buffer, void** user)
     *opts_ptr = FCLAW_ALLOC(fclaw_clawpatch_options_t,1);
 
     buffer += FCLAW_UNPACK(buffer,*opts_ptr);
-    if((*opts_ptr)->dim == 2)
-    {
-        (*opts_ptr)->d2 = FCLAW_ALLOC(struct fclaw_clawpatch_options_2d,1);
-        (*opts_ptr)->d3 = NULL;
-        buffer += FCLAW_UNPACK(buffer,(*opts_ptr)->d2);
-    }
-    else
-    {
-        (*opts_ptr)->d2 = NULL;
-        (*opts_ptr)->d3 = FCLAW_ALLOC(struct fclaw_clawpatch_options_3d,1);
-        buffer += FCLAW_UNPACK(buffer,(*opts_ptr)->d3);
-    }
 
     (*opts_ptr)->kv_refinement_criteria = kv_refinement_criterea_new();
 

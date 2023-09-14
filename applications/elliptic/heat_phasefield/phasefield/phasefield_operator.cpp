@@ -89,7 +89,7 @@ void phasefield_solve(fclaw_global_t *glob)
     Vector<2> f = fc2d_thunderegg_get_vector(glob,RHS);
 
     // get patch size
-    array<int, 2> ns = {clawpatch_opt->d2->mx, clawpatch_opt->d2->my};
+    array<int, 2> ns = {clawpatch_opt->mx, clawpatch_opt->my};
 
     // get p4est structure
     fclaw_domain_t *domain = glob->domain;

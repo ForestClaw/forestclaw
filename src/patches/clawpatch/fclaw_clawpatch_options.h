@@ -62,17 +62,6 @@ struct fclaw_global;
 typedef struct fclaw_clawpatch_options fclaw_clawpatch_options_t;
 
 
-struct fclaw_clawpatch_options_3d
-{
-    int mx; /**< number of cells in the x direction */
-    int my; /**< number of cells in the y direction */
-    int mz; /**< number of cells in the z direction */
-};
-struct fclaw_clawpatch_options_2d
-{
-    int mx; /**< number of cells in the x direction */
-    int my; /**< number of cells in the y direction */
-};
 /**
  * @brief Clawpatch options
  */
@@ -80,8 +69,9 @@ struct fclaw_clawpatch_options
 {
     /* These are constant for all clawpatch's */
     int dim; /**< dimension of clawpatch */
-    struct fclaw_clawpatch_options_2d* d2;
-    struct fclaw_clawpatch_options_3d* d3;
+    int mx; /**< number of cells in the x direction */
+    int my; /**< number of cells in the y direction */
+    int mz; /**< number of cells in the z direction */
     int maux; /**< number of aux equations */
     int mbc; /**< the number of ghost cells */
 

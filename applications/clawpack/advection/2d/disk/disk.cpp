@@ -56,7 +56,7 @@ fclaw_domain_t* create_domain(sc_MPI_Comm mpicomm,
         break;
     case 1:
         /* Map five-patch square to pillow disk. */
-        if (clawpatch_opt->d2->mx*pow_int(2,fclaw_opt->minlevel) < 32)
+        if (clawpatch_opt->mx*pow_int(2,fclaw_opt->minlevel) < 32)
         {
             fclaw_global_essentialf("The five patch mapping requires mx*2^minlevel >= 32\n");
             exit(0);

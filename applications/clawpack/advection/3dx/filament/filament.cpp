@@ -44,7 +44,7 @@ fclaw_domain_t* create_domain(sc_MPI_Comm mpicomm,
     int a = 0; /* non-periodic */
     int b = 0;
 
-    int mx = clawpatch_opt->d3->mx;
+    int mx = clawpatch_opt->mx;
     int minlevel = fclaw_opt->minlevel;
     int check = mi*mx*pow_int(2,minlevel);
 

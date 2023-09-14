@@ -63,13 +63,13 @@ void fclaw2d_clawpatch_time_sync_new (fclaw_global_t* glob,
 
 	if (clawpatch_opt->dim == 2)
 	{
-		mx = clawpatch_opt->d2->mx;
-		my = clawpatch_opt->d2->my;
+		mx = clawpatch_opt->mx;
+		my = clawpatch_opt->my;
 	}
 	else
 	{
-		mx = clawpatch_opt->d3->mx;
-		my = clawpatch_opt->d3->my;
+		mx = clawpatch_opt->mx;
+		my = clawpatch_opt->my;
 	}
 
 	int meqn = clawpatch_opt->meqn;
@@ -113,13 +113,13 @@ void fclaw2d_clawpatch_time_sync_pack_registers(fclaw_global_t *glob,
 
 	if (clawpatch_opt->dim == 2)
 	{
-		mx = clawpatch_opt->d2->mx;
-		my = clawpatch_opt->d2->my;
+		mx = clawpatch_opt->mx;
+		my = clawpatch_opt->my;
 	}
 	else
 	{
-		mx = clawpatch_opt->d3->mx;
-		my = clawpatch_opt->d3->my;
+		mx = clawpatch_opt->mx;
+		my = clawpatch_opt->my;
 	}
 
 	int meqn = clawpatch_opt->meqn;
@@ -223,13 +223,13 @@ void fclaw2d_clawpatch_time_sync_reset(fclaw_global_t *glob,
 
 	if (clawpatch_opt->dim == 2)
 	{
-		mx = clawpatch_opt->d2->mx;
-		my = clawpatch_opt->d2->my;
+		mx = clawpatch_opt->mx;
+		my = clawpatch_opt->my;
 	}
 	else
 	{
-		mx = clawpatch_opt->d3->mx;
-		my = clawpatch_opt->d3->my;
+		mx = clawpatch_opt->mx;
+		my = clawpatch_opt->my;
 	}
 	
 	meqn = clawpatch_opt->meqn;

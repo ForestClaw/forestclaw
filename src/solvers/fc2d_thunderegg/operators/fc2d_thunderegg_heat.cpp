@@ -345,7 +345,7 @@ void fc2d_thunderegg_heat_solve(fclaw_global_t *glob)
     Vector<2> f = fc2d_thunderegg_get_vector(glob,RHS);
 
     // get patch size
-    array<int, 2> ns = {clawpatch_opt->d2->mx, clawpatch_opt->d2->my};
+    array<int, 2> ns = {clawpatch_opt->mx, clawpatch_opt->my};
     int mbc = clawpatch_opt->mbc;
 
     // get p4est structure

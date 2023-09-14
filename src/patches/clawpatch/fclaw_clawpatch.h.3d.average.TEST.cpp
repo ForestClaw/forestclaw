@@ -71,9 +71,9 @@ struct CubeDomain {
         fopts.init_ghostcell = false;
         fclaw_options_store(glob, &fopts);
 
-        opts->d3->mx   = 5;
-        opts->d3->my   = 6;
-        opts->d3->mz   = 7;
+        opts->mx   = 5;
+        opts->my   = 6;
+        opts->mz   = 7;
         opts->mbc  = 2;
         opts->meqn = 1;
         opts->maux = 1;
@@ -103,18 +103,18 @@ struct CubeDomain {
 
 int clawpatch_idx(fclaw_clawpatch_t* clawpatch, int i, int j, int k, int m)
 {
-    int mx = clawpatch->d3->mx;
-    int my = clawpatch->d3->my;
-    int mz = clawpatch->d3->mz;
+    int mx = clawpatch->mx;
+    int my = clawpatch->my;
+    int mz = clawpatch->mz;
     int mbc = clawpatch->mbc;
     int idx = (i+mbc) + (j+mbc)*(mx+2*mbc) + (k+mbc)*(mx+2*mbc)*(my+2*mbc) + m*(mx+2*mbc)*(my+2*mbc)*(mz+2*mbc);
     return idx;
 }
 double fill_function(fclaw_clawpatch_t* clawpatch, int i, int j, int k, int m)
 {
-    double x = clawpatch->d3->xlower + (i+0.5)*clawpatch->d3->dx;
-    double y = clawpatch->d3->ylower + (j+0.5)*clawpatch->d3->dy;
-    double z = clawpatch->d3->zlower + (k+0.5)*clawpatch->d3->dz;
+    double x = clawpatch->xlower + (i+0.5)*clawpatch->dx;
+    double y = clawpatch->ylower + (j+0.5)*clawpatch->dy;
+    double z = clawpatch->zlower + (k+0.5)*clawpatch->dz;
     switch(m)
     {
         case 0:
@@ -140,9 +140,9 @@ TEST_CASE("3d clawpatch average")
     {
         CubeDomain cube(0,1);
 
-        cube.opts->d3->mx   = mx;
-        cube.opts->d3->my   = my;
-        cube.opts->d3->mz   = mz;
+        cube.opts->mx   = mx;
+        cube.opts->my   = my;
+        cube.opts->mz   = mz;
         cube.opts->mbc      = mbc;
         cube.opts->meqn     = 3;
 
@@ -191,9 +191,9 @@ TEST_CASE("3d clawpatch average")
         //in the vtk output
         CubeDomain cube_output(0,0);
 
-        cube_output.opts->d3->mx   = mx+2*mbc;
-        cube_output.opts->d3->my   = my+2*mbc;
-        cube_output.opts->d3->mz   = mz+2*mbc;
+        cube_output.opts->mx   = mx+2*mbc;
+        cube_output.opts->my   = my+2*mbc;
+        cube_output.opts->mz   = mz+2*mbc;
         cube_output.opts->mbc      = mbc;
         cube_output.opts->meqn     = 3;
 
@@ -214,9 +214,9 @@ TEST_CASE("3d clawpatch average")
                 memset(q, 0, sizeof(double)*size);
                 //loop over interior
                 for(int m = 0; m < opts->meqn; m++)
-                for(int k = -opts->mbc; k < opts->d3->mz+opts->mbc; k++)
-                for(int j = -opts->mbc; j < opts->d3->my+opts->mbc; j++)
-                for(int i = -opts->mbc; i < opts->d3->mx+opts->mbc; i++)
+                for(int k = -opts->mbc; k < opts->mz+opts->mbc; k++)
+                for(int j = -opts->mbc; j < opts->my+opts->mbc; j++)
+                for(int i = -opts->mbc; i < opts->mx+opts->mbc; i++)
                 {
                     int idx = clawpatch_idx(clawpatch, i,j,k,m);
                     //fill with some different linear functions
@@ -271,9 +271,9 @@ TEST_CASE("3d clawpatch average")
                 memset(error_q, 0, sizeof(double)*size);
 
                 for(int m = 0; m < opts->meqn; m++)
-                for(int k = 0; k < clawpatch->d3->mz; k++)
-                for(int j = 0; j < clawpatch->d3->my; j++)
-                for(int i = 0; i < clawpatch->d3->mx; i++)
+                for(int k = 0; k < clawpatch->mz; k++)
+                for(int j = 0; j < clawpatch->my; j++)
+                for(int i = 0; i < clawpatch->mx; i++)
                 {
                     int idx = clawpatch_idx(clawpatch, i,j,k,m);
                     int error_idx = clawpatch_idx(error_clawpatch, i+mbc,j+mbc,k+mbc,m);

@@ -69,9 +69,9 @@ FCLAW3D_CLAWPATCH_TRANSFORM_FACE (const int *i1, const int *j1,
     const fclaw_clawpatch_options_t *clawpatch_opt = 
         (fclaw_clawpatch_options_t*) tdata->user;
 
-    int mx = clawpatch_opt->d3->mx;
-    int my = clawpatch_opt->d3->my;
-    int mz = clawpatch_opt->d3->mz;
+    int mx = clawpatch_opt->mx;
+    int my = clawpatch_opt->my;
+    int mz = clawpatch_opt->mz;
 
     *i2 = *i1;
     *j2 = *j1;
@@ -95,9 +95,9 @@ FCLAW3D_CLAWPATCH_TRANSFORM_FACE_HALF (const int *i1, const int *j1, const int* 
     const fclaw_clawpatch_options_t *clawpatch_opt = 
         (fclaw_clawpatch_options_t*) tdata->user;
 
-    int mx = clawpatch_opt->d3->mx;
-    int my = clawpatch_opt->d3->my;
-    int mz = clawpatch_opt->d3->mz;
+    int mx = clawpatch_opt->mx;
+    int my = clawpatch_opt->my;
+    int mz = clawpatch_opt->mz;
 
     i2[0] = *i1;
     j2[0] = *j1;
@@ -119,9 +119,9 @@ FCLAW3D_CLAWPATCH_TRANSFORM_EDGE (const int *i1, const int *j1, const int *k1,
     const fclaw_clawpatch_options_t *clawpatch_opt = 
         (fclaw_clawpatch_options_t*) tdata->user;
 
-    int mx = clawpatch_opt->d3->mx;
-    int my = clawpatch_opt->d3->my;
-    int mz = clawpatch_opt->d3->mz;
+    int mx = clawpatch_opt->mx;
+    int my = clawpatch_opt->my;
+    int mz = clawpatch_opt->mz;
 
     //TODO call fclaw3d_patch_transform_edge
 
@@ -206,9 +206,9 @@ FCLAW3D_CLAWPATCH_TRANSFORM_CORNER (const int *i1, const int *j1, const int *k1,
     const fclaw_clawpatch_options_t *clawpatch_opt = 
         (fclaw_clawpatch_options_t*) tdata->user;
 
-    int mx = clawpatch_opt->d3->mx;
-    int my = clawpatch_opt->d3->my;
-    int mz = clawpatch_opt->d3->mz;
+    int mx = clawpatch_opt->mx;
+    int my = clawpatch_opt->my;
+    int mz = clawpatch_opt->mz;
 
     *i2 = *i1;
     *j2 = *j1;
@@ -247,9 +247,9 @@ FCLAW3D_CLAWPATCH_TRANSFORM_CORNER_HALF (const int *i1, const int *j1, const int
     const fclaw_clawpatch_options_t *clawpatch_opt = 
         (fclaw_clawpatch_options_t*) tdata->user;
 
-    int mx = clawpatch_opt->d3->mx;
-    int my = clawpatch_opt->d3->my;
-    int mz = clawpatch_opt->d3->mz;
+    int mx = clawpatch_opt->mx;
+    int my = clawpatch_opt->my;
+    int mz = clawpatch_opt->mz;
 
     i2[0] = *i1;
     j2[0] = *j1;
@@ -286,9 +286,9 @@ FCLAW3D_CLAWPATCH_TRANSFORM_EDGE_HALF (const int *i1, const int *j1, const int* 
     const fclaw_clawpatch_options_t *clawpatch_opt = 
         (fclaw_clawpatch_options_t*) tdata->user;
 
-    int mx = clawpatch_opt->d3->mx;
-    int my = clawpatch_opt->d3->my;
-    int mz = clawpatch_opt->d3->mz;
+    int mx = clawpatch_opt->mx;
+    int my = clawpatch_opt->my;
+    int mz = clawpatch_opt->mz;
 
     i2[0] = *i1;
     j2[0] = *j1;

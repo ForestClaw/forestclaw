@@ -55,8 +55,8 @@ ThunderEgg::Vector<2> fc2d_thunderegg_get_vector(struct fclaw_global *glob, fc2d
         fclaw_clawpatch_get_options(glob);
 
     std::array<int,3> ns;
-    ns[0] = clawpatch_opt->d2->mx;
-    ns[1] = clawpatch_opt->d2->my;
+    ns[0] = clawpatch_opt->mx;
+    ns[1] = clawpatch_opt->my;
     switch(data_choice){
         case RHS:
           ns[2] = clawpatch_opt->rhs_fields;
@@ -89,8 +89,8 @@ void fc2d_thunderegg_store_vector(struct fclaw_global *glob, fc2d_thunderegg_dat
     fclaw_clawpatch_options_t *clawpatch_opt =
         fclaw_clawpatch_get_options(glob);
 
-    int mx = clawpatch_opt->d2->mx;
-    int my = clawpatch_opt->d2->my;
+    int mx = clawpatch_opt->mx;
+    int my = clawpatch_opt->my;
     int mbc = clawpatch_opt->mbc;
     for(int blockno = 0; blockno < glob->domain->num_blocks; blockno++){
         fclaw_block_t* block = &glob->domain->blocks[blockno];

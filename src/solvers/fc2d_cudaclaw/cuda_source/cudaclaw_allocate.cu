@@ -112,8 +112,8 @@ void cudaclaw_deallocate_fluxes(fclaw_global_t *glob,
 void fc2d_cudaclaw_allocate_buffers(fclaw_global_t *glob)
 {
     fclaw_clawpatch_options_t *clawpatch_opt = fclaw_clawpatch_get_options(glob);
-    int mx = clawpatch_opt->d2->mx;
-    int my = clawpatch_opt->d2->my;
+    int mx = clawpatch_opt->mx;
+    int my = clawpatch_opt->my;
     int mbc = clawpatch_opt->mbc;
     int maux = clawpatch_opt->maux;
     int meqn = clawpatch_opt->meqn;  

@@ -43,17 +43,6 @@ struct fclaw_clawpatch_2d_t
     struct fclaw2d_clawpatch_registers *registers;
 
     fclaw2d_metric_patch_t *mp; /**< the metric data for a patch */
-
-    int mx; /**< number of cells in the x direction */          
-    int my; /**< number of cells in the y direction */  
-
-    double dx; /**< cell spacing in the x direction */
-    double dy; /**< cell spacing in the y direction */
-
-    double xlower; /**< x coordinate of the left edge of the patch */
-    double ylower; /**< y coordinate of the bottom edge of the patch */
-    double xupper; /**< x coordinate of the right edge of the patch */
-    double yupper; /**< y coordinate of the top edge of the patch */
 };
 struct fclaw_clawpatch_3d_t
 {
@@ -61,6 +50,15 @@ struct fclaw_clawpatch_3d_t
     struct fclaw2d_clawpatch_registers *registers;
 
     fclaw3d_metric_patch_t *mp; /**< the metric data for a patch */
+};
+/**
+ * @brief Stores data for each patch
+ */
+struct fclaw_clawpatch_t
+{
+    int dim;
+    fclaw_clawpatch_2d_t* d2;
+    fclaw_clawpatch_3d_t* d3;
 
     int mx; /**< number of cells in the x direction */          
     int my; /**< number of cells in the y direction */  
@@ -76,16 +74,6 @@ struct fclaw_clawpatch_3d_t
     double xupper; /**< x coordinate of the right edge of the patch */
     double yupper; /**< y coordinate of the top edge of the patch */
     double zupper; /**< z coordinate of the top edge of the patch */
-};
-/**
- * @brief Stores data for each patch
- */
-struct fclaw_clawpatch_t
-{
-    int dim;
-    fclaw_clawpatch_2d_t* d2;
-    fclaw_clawpatch_3d_t* d3;
-
     /* Solution data */
     int meqn; /**< number of equations */                   
     FArrayBox griddata; /**< the current solution */

@@ -508,7 +508,7 @@ main (int argc, char **argv)
         c->glob = swirl_glob;
         c->domain = swirl_glob->domain;
         c->num_cells_in_patch =
-            swirl_clawpatch_opt->d2->mx * swirl_clawpatch_opt->d2->my;
+            swirl_clawpatch_opt->mx * swirl_clawpatch_opt->my;
         create_query_points (c);
 
         /* initialize the filament geometry information that is needed for

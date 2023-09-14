@@ -85,8 +85,8 @@ double cudaclaw_step2_batch(fclaw_global_t *glob,
     }
 
     clawpatch_opt = fclaw_clawpatch_get_options(glob);
-    mx = clawpatch_opt->d2->mx;
-    my = clawpatch_opt->d2->my;
+    mx = clawpatch_opt->mx;
+    my = clawpatch_opt->my;
     mbc = clawpatch_opt->mbc;
     maux = clawpatch_opt->maux;
     meqn = clawpatch_opt->meqn;  

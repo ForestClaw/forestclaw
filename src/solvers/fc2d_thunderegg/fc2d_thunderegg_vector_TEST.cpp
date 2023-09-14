@@ -68,8 +68,8 @@ struct QuadDomain {
         fopts.subcycle = true;
         fclaw_options_store(glob, &fopts);
 
-        opts->d2->mx     = 5;
-        opts->d2->my     = 6;
+        opts->mx     = 5;
+        opts->my     = 6;
         opts->mbc        = 2;
         opts->meqn       = 1;
         opts->maux       = 1;
@@ -130,8 +130,8 @@ struct QuadDomainBrick {
         fclaw_options_store(glob, &fopts);
 
 
-        opts->d2->mx     = 5;
-        opts->d2->my     = 6;
+        opts->mx     = 5;
+        opts->my     = 6;
         opts->mbc        = 2;
         opts->meqn       = 1;
         opts->maux       = 1;
@@ -176,8 +176,8 @@ TEST_CASE("fclaw2d_thunderegg_get_vector")
     for(int meqn : {1,2})
     {
         QuadDomain test_data;
-        test_data.opts->d2->mx = mx;
-        test_data.opts->d2->my = my;
+        test_data.opts->mx = mx;
+        test_data.opts->my = my;
         test_data.opts->mbc    = mbc;
         if(data_choice == RHS){
             test_data.opts->rhs_fields = meqn;
@@ -248,8 +248,8 @@ TEST_CASE("fclaw2d_thunderegg_store_vector")
     for(int meqn : {1,2})
     {
         QuadDomain test_data;
-        test_data.opts->d2->mx   = mx;
-        test_data.opts->d2->my   = my;
+        test_data.opts->mx   = mx;
+        test_data.opts->my   = my;
         test_data.opts->mbc  = mbc;
         if(data_choice == RHS){
             test_data.opts->rhs_fields = meqn;
@@ -306,8 +306,8 @@ TEST_CASE("fclaw2d_thunderegg_get_vector multiblock")
     for(int meqn : {1,2})
     {
         QuadDomainBrick test_data;
-        test_data.opts->d2->mx   = mx;
-        test_data.opts->d2->my   = my;
+        test_data.opts->mx   = mx;
+        test_data.opts->my   = my;
         test_data.opts->mbc  = mbc;
         if(data_choice == RHS){
             test_data.opts->rhs_fields = meqn;
@@ -316,8 +316,8 @@ TEST_CASE("fclaw2d_thunderegg_get_vector multiblock")
         }
         test_data.setup();
 
-        int mx = test_data.opts->d2->mx;
-        int my = test_data.opts->d2->my;
+        int mx = test_data.opts->mx;
+        int my = test_data.opts->my;
         int mbc = test_data.opts->mbc;
 
         //set data
@@ -382,8 +382,8 @@ TEST_CASE("fclaw2d_thunderegg_store_vector multiblock")
     for(int meqn : {1,2})
     {
         QuadDomainBrick test_data;
-        test_data.opts->d2->mx = mx;
-        test_data.opts->d2->my = my;
+        test_data.opts->mx = mx;
+        test_data.opts->my = my;
         test_data.opts->mbc    = mbc;
         if(data_choice == RHS){
             test_data.opts->rhs_fields = meqn;

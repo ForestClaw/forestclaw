@@ -72,9 +72,9 @@ struct CubeDomain {
         fopts.init_ghostcell = false;
         fclaw_options_store(glob, &fopts);
 
-        opts->d3->mx   = 5;
-        opts->d3->my   = 6;
-        opts->d3->mz   = 7;
+        opts->mx   = 5;
+        opts->my   = 6;
+        opts->mz   = 7;
         opts->mbc  = 2;
         opts->meqn = 1;
         opts->maux = 1;
@@ -104,18 +104,18 @@ struct CubeDomain {
 
 int clawpatch_idx(fclaw_clawpatch_t* clawpatch, int i, int j, int k, int m)
 {
-    int mx = clawpatch->d3->mx;
-    int my = clawpatch->d3->my;
-    int mz = clawpatch->d3->mz;
+    int mx = clawpatch->mx;
+    int my = clawpatch->my;
+    int mz = clawpatch->mz;
     int mbc = clawpatch->mbc;
     int idx = (i+mbc) + (j+mbc)*(mx+2*mbc) + (k+mbc)*(mx+2*mbc)*(my+2*mbc) + m*(mx+2*mbc)*(my+2*mbc)*(mz+2*mbc);
     return idx;
 }
 double fill_function(fclaw_clawpatch_t* clawpatch, int i, int j, int k, int m)
 {
-    double x = clawpatch->d3->xlower + (i+0.5)*clawpatch->d3->dx;
-    double y = clawpatch->d3->ylower + (j+0.5)*clawpatch->d3->dy;
-    double z = clawpatch->d3->zlower + (k+0.5)*clawpatch->d3->dz;
+    double x = clawpatch->xlower + (i+0.5)*clawpatch->dx;
+    double y = clawpatch->ylower + (j+0.5)*clawpatch->dy;
+    double z = clawpatch->zlower + (k+0.5)*clawpatch->dz;
     switch(m)
     {
         case 0:
@@ -137,45 +137,45 @@ void get_bounds_with_ghost(fclaw_clawpatch_t* clawpatch,
                           int *k_stop)
 {
     *i_start = intersects_bc[0] ? 0 : -clawpatch->mbc;
-    *i_stop  = intersects_bc[1] ? clawpatch->d3->mx : clawpatch->d3->mx + clawpatch->mbc;
+    *i_stop  = intersects_bc[1] ? clawpatch->mx : clawpatch->mx + clawpatch->mbc;
 
     *j_start = intersects_bc[2] ? 0 : -clawpatch->mbc;
-    *j_stop  = intersects_bc[3] ? clawpatch->d3->my : clawpatch->d3->my + clawpatch->mbc;
+    *j_stop  = intersects_bc[3] ? clawpatch->my : clawpatch->my + clawpatch->mbc;
 
     *k_start = intersects_bc[4] ? 0 : -clawpatch->mbc;
-    *k_stop  = intersects_bc[5] ? clawpatch->d3->mz : clawpatch->d3->mz + clawpatch->mbc;
+    *k_stop  = intersects_bc[5] ? clawpatch->mz : clawpatch->mz + clawpatch->mbc;
 }
 
 bool interior_cell(fclaw_clawpatch_t* clawpatch, int i, int j, int k, int m)
 {
-    int mx = clawpatch->d3->mx;
-    int my = clawpatch->d3->my;
-    int mz = clawpatch->d3->mz;
+    int mx = clawpatch->mx;
+    int my = clawpatch->my;
+    int mz = clawpatch->mz;
     return i >= 0 && i < mx && j >= 0 && j < my && k >= 0 && k < mz;
 }
 bool face_ghost_cell(fclaw_clawpatch_t* clawpatch, int i, int j, int k, int m)
 {
-    int mx = clawpatch->d3->mx;
-    int my = clawpatch->d3->my;
-    int mz = clawpatch->d3->mz;
+    int mx = clawpatch->mx;
+    int my = clawpatch->my;
+    int mz = clawpatch->mz;
     return ((i < 0 || i >= mx) && j >= 0 && j < my && k >= 0 && k < mz) ||
            (i >= 0 && i < mx && (j < 0 || j >= my) && k >= 0 && k < mz) ||
            (i >= 0 && i < mx && j >= 0 && j < my && (k < 0 || k >= mz));
 }
 bool edge_ghost_cell(fclaw_clawpatch_t* clawpatch, int i, int j, int k, int m)
 {
-    int mx = clawpatch->d3->mx;
-    int my = clawpatch->d3->my;
-    int mz = clawpatch->d3->mz;
+    int mx = clawpatch->mx;
+    int my = clawpatch->my;
+    int mz = clawpatch->mz;
     return ((i < 0 || i >= mx) && (j < 0 || j >= my) && k >= 0 && k < mz) ||
            ((i < 0 || i >= mx) && j >= 0 && j < my && (k < 0 || k >= mz)) ||
            (i >= 0 && i < mx && (j < 0 || j >= my) && (k < 0 || k >= mz));
 }
 bool corner_ghost_cell(fclaw_clawpatch_t* clawpatch, int i, int j, int k, int m)
 {
-    int mx = clawpatch->d3->mx;
-    int my = clawpatch->d3->my;
-    int mz = clawpatch->d3->mz;
+    int mx = clawpatch->mx;
+    int my = clawpatch->my;
+    int mz = clawpatch->mz;
     return (i < 0 || i >= mx) && (j < 0 || j >= my) && (k < 0 || k >= mz);
 }
 
@@ -193,9 +193,9 @@ TEST_CASE("3d clawpatch ghost filling on uniform cube")
     {
         CubeDomain cube(2,2);
 
-        cube.opts->d3->mx   = mx;
-        cube.opts->d3->my   = my;
-        cube.opts->d3->mz   = mz;
+        cube.opts->mx   = mx;
+        cube.opts->my   = my;
+        cube.opts->mz   = mz;
         cube.opts->mbc      = mbc;
         cube.opts->meqn     = 3;
 
@@ -205,9 +205,9 @@ TEST_CASE("3d clawpatch ghost filling on uniform cube")
         //in the vtk output
         CubeDomain cube_output(2,2);
 
-        cube_output.opts->d3->mx   = mx+2*mbc;
-        cube_output.opts->d3->my   = my+2*mbc;
-        cube_output.opts->d3->mz   = mz+2*mbc;
+        cube_output.opts->mx   = mx+2*mbc;
+        cube_output.opts->my   = my+2*mbc;
+        cube_output.opts->mz   = mz+2*mbc;
         cube_output.opts->mbc      = mbc;
         cube_output.opts->meqn     = 3;
 
@@ -229,9 +229,9 @@ TEST_CASE("3d clawpatch ghost filling on uniform cube")
                 memset(q, 0, sizeof(double)*size);
                 //loop over interior
                 for(int m = 0; m < opts->meqn; m++)
-                for(int k = 0; k < opts->d3->mz; k++)
-                for(int j = 0; j < opts->d3->my; j++)
-                for(int i = 0; i < opts->d3->mx; i++)
+                for(int k = 0; k < opts->mz; k++)
+                for(int j = 0; j < opts->my; j++)
+                for(int i = 0; i < opts->mx; i++)
                 {
                     int idx = clawpatch_idx(clawpatch, i,j,k,m);
                     //fill with some different linear functions
@@ -362,9 +362,9 @@ TEST_CASE("3d ghost fill on cube with refinement")
     {
         CubeDomain cube(2,4);
 
-        cube.opts->d3->mx   = mx;
-        cube.opts->d3->my   = my;
-        cube.opts->d3->mz   = mz;
+        cube.opts->mx   = mx;
+        cube.opts->my   = my;
+        cube.opts->mz   = mz;
         cube.opts->mbc      = mbc;
         cube.opts->meqn     = 3;
 
@@ -440,9 +440,9 @@ TEST_CASE("3d ghost fill on cube with refinement")
         //in the vtk output
         CubeDomain cube_output(2,4);
 
-        cube_output.opts->d3->mx   = mx+2*mbc;
-        cube_output.opts->d3->my   = my+2*mbc;
-        cube_output.opts->d3->mz   = mz+2*mbc;
+        cube_output.opts->mx   = mx+2*mbc;
+        cube_output.opts->my   = my+2*mbc;
+        cube_output.opts->mz   = mz+2*mbc;
         cube_output.opts->mbc      = mbc;
         cube_output.opts->meqn     = 3;
 
@@ -469,9 +469,9 @@ TEST_CASE("3d ghost fill on cube with refinement")
                 memset(q, 0, sizeof(double)*size);
                 //loop over interior
                 for(int m = 0; m < opts->meqn; m++)
-                for(int k = 0; k < opts->d3->mz; k++)
-                for(int j = 0; j < opts->d3->my; j++)
-                for(int i = 0; i < opts->d3->mx; i++)
+                for(int k = 0; k < opts->mz; k++)
+                for(int j = 0; j < opts->my; j++)
+                for(int i = 0; i < opts->mx; i++)
                 {
                     int idx = clawpatch_idx(clawpatch, i,j,k,m);
                     //fill with some different linear functions
@@ -599,9 +599,9 @@ TEST_CASE("3d ghost fill on cube with refinement coarse interior")
     {
         CubeDomain cube(2,3);
 
-        cube.opts->d3->mx   = mx;
-        cube.opts->d3->my   = my;
-        cube.opts->d3->mz   = mz;
+        cube.opts->mx   = mx;
+        cube.opts->my   = my;
+        cube.opts->mz   = mz;
         cube.opts->mbc      = mbc;
         cube.opts->meqn     = 3;
 
@@ -680,9 +680,9 @@ TEST_CASE("3d ghost fill on cube with refinement coarse interior")
         //in the vtk output
         CubeDomain cube_output(2,3);
 
-        cube_output.opts->d3->mx   = mx+2*mbc;
-        cube_output.opts->d3->my   = my+2*mbc;
-        cube_output.opts->d3->mz   = mz+2*mbc;
+        cube_output.opts->mx   = mx+2*mbc;
+        cube_output.opts->my   = my+2*mbc;
+        cube_output.opts->mz   = mz+2*mbc;
         cube_output.opts->mbc      = mbc;
         cube_output.opts->meqn     = 3;
 
@@ -709,9 +709,9 @@ TEST_CASE("3d ghost fill on cube with refinement coarse interior")
                 memset(q, 0, sizeof(double)*size);
                 //loop over interior
                 for(int m = 0; m < opts->meqn; m++)
-                for(int k = 0; k < opts->d3->mz; k++)
-                for(int j = 0; j < opts->d3->my; j++)
-                for(int i = 0; i < opts->d3->mx; i++)
+                for(int k = 0; k < opts->mz; k++)
+                for(int j = 0; j < opts->my; j++)
+                for(int i = 0; i < opts->mx; i++)
                 {
                     int idx = clawpatch_idx(clawpatch, i,j,k,m);
                     //fill with some different linear functions

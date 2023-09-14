@@ -83,9 +83,9 @@ struct SinglePatchDomain {
         fopts.subcycle = true;
         fclaw_options_store(glob, &fopts);
 
-        opts->d3->mx   = 5;
-        opts->d3->my   = 6;
-        opts->d3->mz   = 7;
+        opts->mx   = 5;
+        opts->my   = 6;
+        opts->mz   = 7;
         opts->mbc  = 2;
         opts->meqn = 1;
         opts->maux = 1;
@@ -137,9 +137,9 @@ struct QuadDomain {
         fopts.subcycle = true;
         fclaw_options_store(glob, &fopts);
 
-        opts->d3->mx   = 5;
-        opts->d3->my   = 6;
-        opts->d3->mz   = 7;
+        opts->mx   = 5;
+        opts->my   = 6;
+        opts->mz   = 7;
         opts->mbc  = 2;
         opts->meqn = 1;
         opts->maux = 1;
@@ -272,9 +272,9 @@ TEST_CASE("3dx fclaw_clawpatch patch_build")
         fclaw_options_store(glob, &fopts);
 
         fclaw_clawpatch_options_t* opts = fclaw_clawpatch_options_new(3);
-        opts->d3->mx     = mx;
-        opts->d3->my     = my;
-        opts->d3->mz     = mz;
+        opts->mx     = mx;
+        opts->my     = my;
+        opts->mz     = mz;
         opts->mbc        = mbc;
         opts->meqn       = meqn;
         opts->maux       = maux;
@@ -297,41 +297,41 @@ TEST_CASE("3dx fclaw_clawpatch patch_build")
         fclaw_clawpatch_t* cp = fclaw_clawpatch_get_clawpatch(&domain->blocks[0].patches[0]);
 
         CHECK(cp->meqn == opts->meqn);
-        CHECK(cp->d3->mx == opts->d3->mx);
-        CHECK(cp->d3->my == opts->d3->my);
-        CHECK(cp->d3->mz == opts->d3->mz);
+        CHECK(cp->mx == opts->mx);
+        CHECK(cp->my == opts->my);
+        CHECK(cp->mz == opts->mz);
         CHECK(cp->mbc == opts->mbc);
         CHECK(cp->manifold == fopts.manifold);
         CHECK(cp->d3->mp != nullptr);
 
-        CHECK(cp->d3->xlower == fopts.ax);
-        CHECK(cp->d3->ylower == fopts.ay);
-        CHECK(cp->d3->zlower == fopts.az);
-        CHECK(cp->d3->xupper == fopts.bx);
-        CHECK(cp->d3->yupper == fopts.by);
-        CHECK(cp->d3->zupper == fopts.bz);
-        CHECK(cp->d3->dx == doctest::Approx((cp->d3->xupper-cp->d3->xlower)/opts->d3->mx));
-        CHECK(cp->d3->dy == doctest::Approx((cp->d3->yupper-cp->d3->ylower)/opts->d3->my));
-        CHECK(cp->d3->dz == doctest::Approx((cp->d3->zupper-cp->d3->zlower)/opts->d3->mz));
+        CHECK(cp->xlower == fopts.ax);
+        CHECK(cp->ylower == fopts.ay);
+        CHECK(cp->zlower == fopts.az);
+        CHECK(cp->xupper == fopts.bx);
+        CHECK(cp->yupper == fopts.by);
+        CHECK(cp->zupper == fopts.bz);
+        CHECK(cp->dx == doctest::Approx((cp->xupper-cp->xlower)/opts->mx));
+        CHECK(cp->dy == doctest::Approx((cp->yupper-cp->ylower)/opts->my));
+        CHECK(cp->dz == doctest::Approx((cp->zupper-cp->zlower)/opts->mz));
 
         //BOX DIEMSIONS
 
-        CHECK_BOX_DIMENSIONS(cp->griddata, opts->mbc, opts->d3->mx, opts->d3->my, opts->d3->mz, opts->meqn);
+        CHECK_BOX_DIMENSIONS(cp->griddata, opts->mbc, opts->mx, opts->my, opts->mz, opts->meqn);
         if(build_mode == FCLAW_BUILD_FOR_UPDATE){
-            CHECK_BOX_DIMENSIONS(cp->griddata_last, opts->mbc, opts->d3->mx, opts->d3->my, opts->d3->mz, opts->meqn);
-            CHECK_BOX_DIMENSIONS(cp->griddata_save, opts->mbc, opts->d3->mx, opts->d3->my, opts->d3->mz, opts->meqn);
+            CHECK_BOX_DIMENSIONS(cp->griddata_last, opts->mbc, opts->mx, opts->my, opts->mz, opts->meqn);
+            CHECK_BOX_DIMENSIONS(cp->griddata_save, opts->mbc, opts->mx, opts->my, opts->mz, opts->meqn);
         }else{
             CHECK_BOX_EMPTY(cp->griddata_last);
             CHECK_BOX_EMPTY(cp->griddata_save);
         }
         if(fopts.subcycle){
-            CHECK_BOX_DIMENSIONS(cp->griddata_time_interpolated, opts->mbc, opts->d3->mx, opts->d3->my, opts->d3->mz, opts->meqn);
+            CHECK_BOX_DIMENSIONS(cp->griddata_time_interpolated, opts->mbc, opts->mx, opts->my, opts->mz, opts->meqn);
         }else{
             CHECK_BOX_EMPTY(cp->griddata_time_interpolated);
         }
         if(fopts.compute_error) {
-            CHECK_BOX_DIMENSIONS(cp->griderror, opts->mbc, opts->d3->mx, opts->d3->my, opts->d3->mz, opts->meqn);
-            CHECK_BOX_DIMENSIONS(cp->exactsolution, opts->mbc, opts->d3->mx, opts->d3->my, opts->d3->mz, opts->meqn);
+            CHECK_BOX_DIMENSIONS(cp->griderror, opts->mbc, opts->mx, opts->my, opts->mz, opts->meqn);
+            CHECK_BOX_DIMENSIONS(cp->exactsolution, opts->mbc, opts->mx, opts->my, opts->mz, opts->meqn);
         }else{
             CHECK_BOX_EMPTY(cp->griderror);
             CHECK_BOX_EMPTY(cp->exactsolution);
@@ -339,14 +339,14 @@ TEST_CASE("3dx fclaw_clawpatch patch_build")
         if(opts->rhs_fields == 0){
             CHECK_BOX_EMPTY(cp->rhs);
         }else{
-            CHECK_BOX_DIMENSIONS(cp->rhs, opts->mbc, opts->d3->mx, opts->d3->my, opts->d3->mz, opts->rhs_fields);
+            CHECK_BOX_DIMENSIONS(cp->rhs, opts->mbc, opts->mx, opts->my, opts->mz, opts->rhs_fields);
         }
         if(opts->rhs_fields == 0 || !fopts.compute_error) {
             CHECK_BOX_EMPTY(cp->elliptic_error);
             CHECK_BOX_EMPTY(cp->elliptic_soln);
         }else{
-            CHECK_BOX_DIMENSIONS(cp->elliptic_error, opts->mbc, opts->d3->mx, opts->d3->my, opts->d3->mz, opts->rhs_fields);
-            CHECK_BOX_DIMENSIONS(cp->elliptic_soln, opts->mbc, opts->d3->mx, opts->d3->my, opts->d3->mz, opts->rhs_fields);
+            CHECK_BOX_DIMENSIONS(cp->elliptic_error, opts->mbc, opts->mx, opts->my, opts->mz, opts->rhs_fields);
+            CHECK_BOX_DIMENSIONS(cp->elliptic_soln, opts->mbc, opts->mx, opts->my, opts->mz, opts->rhs_fields);
         }
 
         fclaw_patch_data_delete(glob, &domain->blocks[0].patches[0]);
@@ -439,9 +439,9 @@ TEST_CASE("3dx fclaw_clawpatch_grid_data")
     {
 
         SinglePatchDomain test_data;
-        test_data.opts->d3->mx   = mx;
-        test_data.opts->d3->my   = my;
-        test_data.opts->d3->mz   = mz;
+        test_data.opts->mx   = mx;
+        test_data.opts->my   = my;
+        test_data.opts->mz   = mz;
         test_data.opts->mbc  = mbc;
         test_data.setup();
 
@@ -452,16 +452,16 @@ TEST_CASE("3dx fclaw_clawpatch_grid_data")
         fclaw_clawpatch_grid_data_3d(test_data.glob, &test_data.domain->blocks[0].patches[0],
                                      &mx_out, &my_out, &mz_out, &mbc_out, &xlower, &ylower, &zlower, &dx, &dy, &dz);
 
-        CHECK(mx_out == test_data.opts->d3->mx);
-        CHECK(my_out == test_data.opts->d3->my);
-        CHECK(mz_out == test_data.opts->d3->mz);
+        CHECK(mx_out == test_data.opts->mx);
+        CHECK(my_out == test_data.opts->my);
+        CHECK(mz_out == test_data.opts->mz);
         CHECK(mbc_out == test_data.opts->mbc);
-        CHECK(xlower == cp->d3->xlower);
-        CHECK(ylower == cp->d3->ylower);
-        CHECK(zlower == cp->d3->zlower);
-        CHECK(dx == cp->d3->dx);
-        CHECK(dy == cp->d3->dy);
-        CHECK(dz == cp->d3->dz);
+        CHECK(xlower == cp->xlower);
+        CHECK(ylower == cp->ylower);
+        CHECK(zlower == cp->zlower);
+        CHECK(dx == cp->dx);
+        CHECK(dy == cp->dy);
+        CHECK(dz == cp->dz);
 
     }
 }
@@ -641,9 +641,9 @@ TEST_CASE("3dx fclaw_clawpatch_size")
     for(int meqn : {1,2})
     {
         SinglePatchDomain test_data;
-        test_data.opts->d3->mx   = mx;
-        test_data.opts->d3->my   = my;
-        test_data.opts->d3->mz   = mz;
+        test_data.opts->mx   = mx;
+        test_data.opts->my   = my;
+        test_data.opts->mz   = mz;
         test_data.opts->mbc  = mbc;
         test_data.opts->meqn = meqn;
         test_data.setup();
@@ -792,9 +792,9 @@ TEST_CASE("3dx fclaw_clawpatch setup_timeinterp")
                                            double qcurr[], double qlast[], double qinterp[], 
                                            const double *alpha, const int *ierror)
     {
-        CHECK(*mx == timeinterp_cp->d3->mx);
-        CHECK(*my == timeinterp_cp->d3->my);
-        CHECK(*mz == timeinterp_cp->d3->mz);
+        CHECK(*mx == timeinterp_cp->mx);
+        CHECK(*my == timeinterp_cp->my);
+        CHECK(*mz == timeinterp_cp->mz);
         CHECK(*mbc == timeinterp_cp->mbc);
         CHECK(*meqn == timeinterp_cp->meqn);
         CHECK(*psize == (*mx)*(*my)*(*mz)
@@ -837,17 +837,17 @@ TEST_CASE("3dx fclaw_clawpatch tag4refinement")
                                                    double q[], const double *tag_threshold, const int *init_flag, 
                                                    int *tag_patch)
         {
-            CHECK(*mx == t4r_cp->d3->mx);
-            CHECK(*my == t4r_cp->d3->my);
-            CHECK(*mz == t4r_cp->d3->mz);
+            CHECK(*mx == t4r_cp->mx);
+            CHECK(*my == t4r_cp->my);
+            CHECK(*mz == t4r_cp->mz);
             CHECK(*mbc == t4r_cp->mbc);
             CHECK(*meqn == t4r_cp->meqn);
-            CHECK(*xlower == t4r_cp->d3->xlower);
-            CHECK(*ylower == t4r_cp->d3->ylower);
-            CHECK(*zlower == t4r_cp->d3->zlower);
-            CHECK(*dx == t4r_cp->d3->dx);
-            CHECK(*dy == t4r_cp->d3->dy);
-            CHECK(*dz == t4r_cp->d3->dz);
+            CHECK(*xlower == t4r_cp->xlower);
+            CHECK(*ylower == t4r_cp->ylower);
+            CHECK(*zlower == t4r_cp->zlower);
+            CHECK(*dx == t4r_cp->dx);
+            CHECK(*dy == t4r_cp->dy);
+            CHECK(*dz == t4r_cp->dz);
             CHECK(*blockno == t4r_cp->blockno);
             CHECK(q == t4r_cp->griddata.dataPtr());
             CHECK(*tag_threshold == .90210);
@@ -908,17 +908,17 @@ TEST_CASE("3dx fclaw_clawpatch tag4coarsening")
                                                        double q0[], double q1[], double q2[], double q3[], 
                                                        const double *tag_threshold, const int *init_flag, int *tag_patch)
             {
-                CHECK(*mx == t4c_cp->d3->mx);
-                CHECK(*my == t4c_cp->d3->my);
-                CHECK(*mz == t4c_cp->d3->mz);
+                CHECK(*mx == t4c_cp->mx);
+                CHECK(*my == t4c_cp->my);
+                CHECK(*mz == t4c_cp->mz);
                 CHECK(*mbc == t4c_cp->mbc);
                 CHECK(*meqn == t4c_cp->meqn);
-                CHECK(*xlower == t4c_cp->d3->xlower);
-                CHECK(*ylower == t4c_cp->d3->ylower);
-                CHECK(*zlower == t4c_cp->d3->zlower);
-                CHECK(*dx == t4c_cp->d3->dx);
-                CHECK(*dy == t4c_cp->d3->dy);
-                CHECK(*dz == t4c_cp->d3->dz);
+                CHECK(*xlower == t4c_cp->xlower);
+                CHECK(*ylower == t4c_cp->ylower);
+                CHECK(*zlower == t4c_cp->zlower);
+                CHECK(*dx == t4c_cp->dx);
+                CHECK(*dy == t4c_cp->dy);
+                CHECK(*dz == t4c_cp->dz);
                 CHECK(*blockno == t4c_cp->blockno);
                 CHECK(q0 == t4c_cp->griddata.dataPtr());
                 CHECK(q1 == t4c_cp1->griddata.dataPtr());
@@ -980,9 +980,9 @@ TEST_CASE("3dx fclaw_clawpatch interpolate2fine")
                                                  double qcoarse[], double qfine[], double areacoarse[], double areafine[], 
                                                  const int *igrid, const int *manifold)
     {
-        CHECK(*mx == i2f_cp->d3->mx);
-        CHECK(*my == i2f_cp->d3->my);
-        CHECK(*mz == i2f_cp->d3->mz);
+        CHECK(*mx == i2f_cp->mx);
+        CHECK(*my == i2f_cp->my);
+        CHECK(*mz == i2f_cp->mz);
         CHECK(*mbc == i2f_cp->mbc);
         CHECK(*meqn == i2f_cp->meqn);
 

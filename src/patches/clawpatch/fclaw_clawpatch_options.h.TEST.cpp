@@ -35,9 +35,7 @@ TEST_CASE("fclaw_clawpatch_options_new 2d")
 	fclaw_clawpatch_options_t* opts = fclaw_clawpatch_options_new(2);
 
 	CHECK_EQ(opts->dim,     2);
-	CHECK_NE(opts->d2,      nullptr);
-	CHECK_EQ(opts->d3,      nullptr);
-	CHECK_EQ(opts->d2->mx,  0);
+	CHECK_EQ(opts->mx,  0);
 
 	fclaw_clawpatch_options_destroy(opts);
 }
@@ -47,9 +45,7 @@ TEST_CASE("fclaw_clawpatch_options_new 3d")
 	fclaw_clawpatch_options_t* opts = fclaw_clawpatch_options_new(3);
 
 	CHECK_EQ(opts->dim,     3);
-	CHECK_EQ(opts->d2,      nullptr);
-	CHECK_NE(opts->d3,      nullptr);
-	CHECK_EQ(opts->d3->mx,  0);
+	CHECK_EQ(opts->mx,  0);
 
 	fclaw_clawpatch_options_destroy(opts);
 }
@@ -114,8 +110,8 @@ TEST_CASE("fclaw_clawpatch_options_store fails if called twice on a glob")
 TEST_CASE("2d fclaw_clawpatch_options packing/unpacking")
 {
 	fclaw_clawpatch_options_t* opts = fclaw_clawpatch_options_new(2);
-	opts->d2->mx = 5;
-	opts->d2->my = 6;
+	opts->mx = 5;
+	opts->my = 6;
 	opts->maux = 4;
 	opts->mbc = 3;
 	opts->meqn = 32;
@@ -140,8 +136,8 @@ TEST_CASE("2d fclaw_clawpatch_options packing/unpacking")
 	REQUIRE_NE(output_opts,nullptr);
 
 	CHECK_EQ(output_opts->dim,2);
-	CHECK_EQ(output_opts->d2->mx,opts->d2->mx);
-	CHECK_EQ(output_opts->d2->my,opts->d2->my);
+	CHECK_EQ(output_opts->mx,opts->mx);
+	CHECK_EQ(output_opts->my,opts->my);
 	CHECK_EQ(output_opts->maux,opts->maux);
 	CHECK_EQ(output_opts->mbc,opts->mbc);
 	CHECK_EQ(output_opts->meqn,opts->meqn);
@@ -153,16 +149,15 @@ TEST_CASE("2d fclaw_clawpatch_options packing/unpacking")
 	CHECK_EQ(output_opts->is_registered,opts->is_registered);
 
 	vt->destroy(output_opts);
-	FCLAW_FREE(opts->d2);
 	FCLAW_FREE(opts);
 }
 
 TEST_CASE("3d fclaw_clawpatch_options packing/unpacking")
 {
 	fclaw_clawpatch_options_t* opts = fclaw_clawpatch_options_new(3);
-	opts->d3->mx = 5;
-	opts->d3->my = 6;
-	opts->d3->mz = 3;
+	opts->mx = 5;
+	opts->my = 6;
+	opts->mz = 3;
 	opts->maux = 4;
 	opts->mbc = 3;
 	opts->meqn = 32;
@@ -187,9 +182,9 @@ TEST_CASE("3d fclaw_clawpatch_options packing/unpacking")
 	REQUIRE_NE(output_opts,nullptr);
 
 	CHECK_EQ(output_opts->dim,3);
-	CHECK_EQ(output_opts->d3->mx,opts->d3->mx);
-	CHECK_EQ(output_opts->d3->my,opts->d3->my);
-	CHECK_EQ(output_opts->d3->mz,opts->d3->mz);
+	CHECK_EQ(output_opts->mx,opts->mx);
+	CHECK_EQ(output_opts->my,opts->my);
+	CHECK_EQ(output_opts->mz,opts->mz);
 	CHECK_EQ(output_opts->maux,opts->maux);
 	CHECK_EQ(output_opts->mbc,opts->mbc);
 	CHECK_EQ(output_opts->meqn,opts->meqn);
@@ -201,6 +196,5 @@ TEST_CASE("3d fclaw_clawpatch_options packing/unpacking")
 	CHECK_EQ(output_opts->is_registered,opts->is_registered);
 
 	vt->destroy(output_opts);
-	FCLAW_FREE(opts->d3);
 	FCLAW_FREE(opts);
 }

@@ -76,13 +76,13 @@ FCLAW2D_CLAWPATCH_TRANSFORM_FACE (const int *i1, const int *j1,
     int mx,my;
     if(clawpatch_opt->dim == 2)
     {
-        mx = clawpatch_opt->d2->mx;
-        my = clawpatch_opt->d2->my;
+        mx = clawpatch_opt->mx;
+        my = clawpatch_opt->my;
     }
     else
     {
-        mx = clawpatch_opt->d3->mx;
-        my = clawpatch_opt->d3->my;
+        mx = clawpatch_opt->mx;
+        my = clawpatch_opt->my;
     }
 
     *i2 = *i1;
@@ -108,13 +108,13 @@ FCLAW2D_CLAWPATCH_TRANSFORM_FACE_HALF (const int *i1, const int *j1,
     int mx,my;
     if(clawpatch_opt->dim == 2)
     {
-        mx = clawpatch_opt->d2->mx;
-        my = clawpatch_opt->d2->my;
+        mx = clawpatch_opt->mx;
+        my = clawpatch_opt->my;
     }
     else
     {
-        mx = clawpatch_opt->d3->mx;
-        my = clawpatch_opt->d3->my;
+        mx = clawpatch_opt->mx;
+        my = clawpatch_opt->my;
     }
 
     i2[0] = *i1;
@@ -139,13 +139,13 @@ FCLAW2D_CLAWPATCH_TRANSFORM_CORNER (const int *i1, const int *j1,
     int mx,my;
     if(clawpatch_opt->dim == 2)
     {
-        mx = clawpatch_opt->d2->mx;
-        my = clawpatch_opt->d2->my;
+        mx = clawpatch_opt->mx;
+        my = clawpatch_opt->my;
     }
     else
     {
-        mx = clawpatch_opt->d3->mx;
-        my = clawpatch_opt->d3->my;
+        mx = clawpatch_opt->mx;
+        my = clawpatch_opt->my;
     }
 
     *i2 = *i1;
@@ -187,13 +187,13 @@ FCLAW2D_CLAWPATCH_TRANSFORM_CORNER_HALF (const int *i1, const int *j1,
     int mx,my;
     if(clawpatch_opt->dim == 2)
     {
-        mx = clawpatch_opt->d2->mx;
-        my = clawpatch_opt->d2->my;
+        mx = clawpatch_opt->mx;
+        my = clawpatch_opt->my;
     }
     else
     {
-        mx = clawpatch_opt->d3->mx;
-        my = clawpatch_opt->d3->my;
+        mx = clawpatch_opt->mx;
+        my = clawpatch_opt->my;
     }
 
     i2[0] = *i1;

@@ -892,7 +892,7 @@ fclaw2d_output_write_vtk_debug (fclaw_global_t * glob, const char *basename)
     (void) fclaw2d_vtk_write_file (glob, basename,
                                    clawpatch_opt->mx, clawpatch_opt->my,
 #if PATCH_DIM == 3
-                                   clawpatch_opt->d3->mz,
+                                   clawpatch_opt->mz,
 #endif
                                    clawpatch_opt->meqn,
                                    fclaw_opt->vtkspace, 0,
@@ -915,8 +915,8 @@ void fclaw_clawpatch_output_vtk_to_file (fclaw_global_t * glob, const char* file
     if(clawpatch_opt->dim == 2)
     {
         fclaw_vtk_write_file_2d (glob, filename,
-                                clawpatch_opt->d2->mx, 
-                                clawpatch_opt->d2->my,
+                                clawpatch_opt->mx, 
+                                clawpatch_opt->my,
                                 clawpatch_opt->meqn,
                                 fclaw_opt->vtkspace, 0,
                                 fclaw2d_output_vtk_coordinate_cb,
@@ -926,9 +926,9 @@ void fclaw_clawpatch_output_vtk_to_file (fclaw_global_t * glob, const char* file
     else 
     {
         fclaw_vtk_write_file_3d (glob, filename,
-                                clawpatch_opt->d3->mx, 
-                                clawpatch_opt->d3->my, 
-                                clawpatch_opt->d3->mz,
+                                clawpatch_opt->mx, 
+                                clawpatch_opt->my, 
+                                clawpatch_opt->mz,
                                 clawpatch_opt->meqn,
                                 fclaw_opt->vtkspace, 0,
                                 fclaw3d_output_vtk_coordinate_cb,
