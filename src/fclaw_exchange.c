@@ -223,6 +223,7 @@ void fclaw_exchange_setup(fclaw_global_t* glob,
         {
             if (fclaw_patch_on_parallel_boundary(&domain->blocks[nb].patches[np]))
             {                
+                FCLAW_ASSERT(zz < domain->num_exchange_patches);
                 fclaw_patch_local_ghost_alloc(glob, &patch_data[zz++]);
             }
         }
@@ -350,7 +351,7 @@ void fclaw_exchange_ghost_patches_begin(fclaw_global_t* glob,
 
                 /* Pack q and area into one contingous block */
                 fclaw_patch_local_ghost_pack(glob,this_patch,
-                                             &patch_data[zz++],
+                                             patch_data[zz++],
                                              pack_time_interp);
             }
         }

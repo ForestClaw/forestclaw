@@ -177,6 +177,10 @@ fclaw_domain_t* get_domain(fclaw2d_domain_t* domain_2d)
 static
 fclaw_patch_t* get_patch(fclaw2d_patch_t* patch_2d)
 {
+    if(patch_2d == NULL)
+    {
+        return NULL;
+    }
     FCLAW_ASSERT(patch_2d->user != NULL);
     return (fclaw_patch_t*) patch_2d->user;
 }

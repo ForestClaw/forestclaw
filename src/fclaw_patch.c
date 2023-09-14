@@ -1228,10 +1228,14 @@ fclaw_patch_on_parallel_boundary (const fclaw_patch_t * patch)
         fclaw2d_patch_t* patch_2d = fclaw_patch_get_2d_patch(patch);
         return patch_2d->flags & FCLAW2D_PATCH_ON_PARALLEL_BOUNDARY ? 1 : 0;
     }
-    else 
+    else if(patch->dim == 3) 
     {
         fclaw3d_patch_t* patch_3d = fclaw_patch_get_3d_patch(patch);
         return patch_3d->flags & FCLAW3D_PATCH_ON_PARALLEL_BOUNDARY ? 1 : 0;
+    }
+    else 
+    {
+        SC_ABORT_NOT_REACHED ();
     }
 }
 
