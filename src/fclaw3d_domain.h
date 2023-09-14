@@ -69,6 +69,38 @@ void fclaw3d_patch_callback_wrap(fclaw3d_domain_t * domain,
                                  int blockno, int patchno, void *user);
 
 
+typedef struct fclaw3d_transfer_callback_wrap_user
+{
+    fclaw_transfer_callback_t tcb;
+    void *user;
+} fclaw3d_transfer_callback_wrap_user_t;
+
+
+void
+fclaw3d_transfer_callback_wrap(fclaw3d_domain_t * old_domain,
+                               fclaw3d_patch_t * old_patch,
+                               fclaw3d_domain_t * new_domain,
+                               fclaw3d_patch_t * new_patch,
+                               int blockno,
+                               int old_patchno, int new_patchno,
+                               void *user);
+
+typedef struct fclaw3d_match_callback_wrap_user
+{
+    fclaw_match_callback_t mcb;
+    void *user;
+} fclaw3d_match_callback_wrap_user_t;
+
+void
+fclaw3d_match_callback_wrap(fclaw3d_domain_t * old_domain,
+                            fclaw3d_patch_t * old_patch_3d,
+                            fclaw3d_domain_t * new_domain,
+                            fclaw3d_patch_t * new_patch_3d,
+                            fclaw3d_patch_relation_t newsize,
+                            int blockno,
+                            int old_patchno, int new_patchno,
+                            void *user);
+
 
 #ifdef __cplusplus
 #if 0

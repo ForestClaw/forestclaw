@@ -170,12 +170,14 @@ fclaw_domain_t* fclaw_domain_wrap_2d(fclaw2d_domain_t* domain_2d)
 static
 fclaw_domain_t* get_domain(fclaw2d_domain_t* domain_2d)
 {
+    FCLAW_ASSERT(domain_2d->user != NULL);
     return (fclaw_domain_t*) domain_2d->user;
 }
 
 static
 fclaw_patch_t* get_patch(fclaw2d_patch_t* patch_2d)
 {
+    FCLAW_ASSERT(patch_2d->user != NULL);
     return (fclaw_patch_t*) patch_2d->user;
 }
 
@@ -189,3 +191,52 @@ void fclaw2d_patch_callback_wrap(fclaw2d_domain_t * domain_2d,
     fclaw_patch_t* patch = get_patch(patch_2d);
     wrap->pcb(domain, patch, blockno, patchno, wrap->user);
 }
+
+void
+fclaw2d_transfer_callback_wrap(fclaw2d_domain_t * old_domain_2d,
+                               fclaw2d_patch_t * old_patch_2d,
+                               fclaw2d_domain_t * new_domain_2d,
+                               fclaw2d_patch_t * new_patch_2d,
+                               int blockno,
+                               int old_patchno, int new_patchno,
+                               void *user)
+{
+    fclaw2d_transfer_callback_wrap_user_t* wrap = 
+        (fclaw2d_transfer_callback_wrap_user_t*) user;
+
+    fclaw_domain_t* old_domain = get_domain(old_domain_2d);
+    fclaw_patch_t* old_patch = get_patch(old_patch_2d);
+    fclaw_domain_t* new_domain = get_domain(new_domain_2d);
+    fclaw_patch_t* new_patch = get_patch(new_patch_2d);
+
+    wrap->tcb(old_domain, old_patch,
+              new_domain, new_patch,
+              blockno, old_patchno, new_patchno,
+              wrap->user);
+}
+
+void
+fclaw2d_match_callback_wrap(fclaw2d_domain_t * old_domain_2d,
+                            fclaw2d_patch_t * old_patch_2d,
+                            fclaw2d_domain_t * new_domain_2d,
+                            fclaw2d_patch_t * new_patch_2d,
+                            fclaw2d_patch_relation_t newsize_2d,
+                            int blockno,
+                            int old_patchno, int new_patchno,
+                            void *user)
+{
+    fclaw2d_match_callback_wrap_user_t* wrap = 
+        (fclaw2d_match_callback_wrap_user_t*) user;
+
+    fclaw_domain_t* old_domain = get_domain(old_domain_2d);
+    fclaw_patch_t* old_patch = get_patch(old_patch_2d);
+    fclaw_domain_t* new_domain = get_domain(new_domain_2d);
+    fclaw_patch_t* new_patch = get_patch(new_patch_2d);
+
+    fclaw_patch_relation_t newsize = (fclaw_patch_relation_t) newsize_2d;
+
+    wrap->mcb(old_domain, old_patch, new_domain, new_patch, 
+              newsize, blockno, old_patchno, new_patchno,
+              wrap->user);
+}
+

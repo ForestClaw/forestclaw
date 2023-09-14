@@ -344,5 +344,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define fclaw_domain_wrap_2d               fclaw_domain_wrap_3d
 #define fclaw2d_patch_callback_wrap_user_t fclaw3d_patch_callback_wrap_user_t
 #define fclaw2d_patch_callback_wrap        fclaw3d_patch_callback_wrap
+#define fclaw2d_transfer_callback_wrap_user_t fclaw3d_transfer_callback_wrap_user_t
+#define fclaw2d_transfer_callback_wrap     fclaw3d_transfer_callback_wrap
+#define fclaw2d_match_callback_wrap_user_t fclaw3d_match_callback_wrap_user_t
+#define fclaw2d_match_callback_wrap        fclaw3d_match_callback_wrap
 
 #endif /* !FCLAW2D_TO_3D_H */
