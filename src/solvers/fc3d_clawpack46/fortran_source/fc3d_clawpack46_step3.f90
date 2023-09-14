@@ -74,6 +74,12 @@ subroutine clawpack46_step3(maxm,meqn,maux,mbc,mx,my,mz, &
 
     integer :: block_corner_count(0:3), sweep_dir
 
+    if (maxm .lt. max(mx,my,mz)) then
+        write(6,*) 'step3 : maxm < max(mx,my,mz)'
+        write(6,*) 'mx,my,mz : ', mx,my,mz
+        write(6,*) 'maxm : ', maxm
+        stop
+    endif
 
     !!  # store mesh parameters that may be needed in Riemann solver but not
     !!  # passed in...
@@ -180,6 +186,14 @@ subroutine clawpack46_step3(maxm,meqn,maux,mbc,mx,my,mz, &
 
     kx_loop : do k = 0,mz+1
         jx_loop : do j = 0,my+1
+
+            !! # Store the value of j and k along this slice in the common block
+            !! # comxyt in case it is needed in the Riemann solver (for
+            !!  # variable coefficient problems)
+
+            jcom = j
+            kcom = k
+
             do m = 1,meqn
                 do i = 1-mbc, mx+mbc
                     !! # copy data along a slice into 1d array:
@@ -190,6 +204,8 @@ subroutine clawpack46_step3(maxm,meqn,maux,mbc,mx,my,mz, &
             if (mcapa .gt. 0)  then
                 do i = 1-mbc, mx+mbc
                     dtdx1d(i) = dtdx / aux(i,j,k,mcapa)
+                    dtdy1d(i) = dtdy / aux(i,j,k,mcapa)
+                    dtdz1d(i) = dtdz / aux(i,j,k,mcapa)
                 end do
             endif
 
@@ -209,18 +225,11 @@ subroutine clawpack46_step3(maxm,meqn,maux,mbc,mx,my,mz, &
                 end do
             endif
 
-            !! # Store the value of j and k along this slice in the common block
-            !! # comxyt in case it is needed in the Riemann solver (for
-            !!  # variable coefficient problems)
-
-            jcom = j
-            kcom = k
-
             !! # compute modifications fadd, gadd and hadd to fluxes along
             !! # this slice:
 
             call flux3(1,maxm,meqn,maux,mbc,mx,  & 
-                    q1d,dtdx1d,dtdy,dtdz,aux1,aux2,aux3,  & 
+                    q1d,dtdx1d,dtdy1d,dtdz1d,aux1,aux2,aux3,  & 
                     faddm,faddp,gadd,hadd,cfl1d,  & 
                     work(i0wave),work(i0s),work(i0amdq),  & 
                     work(i0apdq),work(i0cqxx),  & 
@@ -298,6 +307,13 @@ subroutine clawpack46_step3(maxm,meqn,maux,mbc,mx,my,mz, &
     ky_loop : do k = 0, mz+1
         iy_loop : do i = 0, mx+1
 
+            !! # Store the value of i and k along this slice in the common block
+            !! # comxyzt in case it is needed in the Riemann solver (for
+            !! # variable coefficient problems)
+
+            icom = i
+            kcom = k
+
             do m = 1,meqn
                 do j = 1-mbc, my+mbc
                     !! # copy data along a slice into 1d array:
@@ -307,7 +323,9 @@ subroutine clawpack46_step3(maxm,meqn,maux,mbc,mx,my,mz, &
 
             if (mcapa .gt. 0)  then
                 do j = 1-mbc, my+mbc
+                    dtdx1d(j) = dtdx / aux(i,j,k,mcapa)
                     dtdy1d(j) = dtdy / aux(i,j,k,mcapa)
+                    dtdz1d(j) = dtdz / aux(i,j,k,mcapa)
                 end do
             endif
 
@@ -327,18 +345,11 @@ subroutine clawpack46_step3(maxm,meqn,maux,mbc,mx,my,mz, &
                 end do
             endif
 
-            !! # Store the value of i and k along this slice in the common block
-            !! # comxyzt in case it is needed in the Riemann solver (for
-            !! # variable coefficient problems)
-
-            icom = i
-            kcom = k
-
             !! # compute modifications fadd, gadd and hadd to fluxes along this
             !! # slice:
 
             call flux3(2,maxm,meqn,maux,mbc,my, & 
-                    q1d,dtdy1d,dtdz,dtdx,aux1,aux2,aux3, & 
+                    q1d,dtdy1d,dtdz1d,dtdx1d,aux1,aux2,aux3, & 
                     faddm,faddp,gadd,hadd,cfl1d, & 
                     work(i0wave),work(i0s),work(i0amdq), & 
                     work(i0apdq),work(i0cqxx), & 
@@ -421,6 +432,14 @@ subroutine clawpack46_step3(maxm,meqn,maux,mbc,mx,my,mz, &
 
     jz_loop : do j = 0, my+1
         iz_loop : do i = 0, mx+1
+
+            !! # Store the value of i and j along this slice in the common block
+            !! # comxyzt in case it is needed in the Riemann solver (for
+            !! # variable coefficient problems)
+
+            icom = i
+            jcom = j
+
             do m = 1,meqn
                 do k = 1-mbc, mz+mbc
                     !! # copy data along a slice into 1d array:
@@ -430,6 +449,8 @@ subroutine clawpack46_step3(maxm,meqn,maux,mbc,mx,my,mz, &
 
             if (mcapa .gt. 0)  then
                 do k = 1-mbc, mz+mbc
+                    dtdx1d(k) = dtdx / aux(i,j,k,mcapa)
+                    dtdy1d(k) = dtdy / aux(i,j,k,mcapa)
                     dtdz1d(k) = dtdz / aux(i,j,k,mcapa)
                 end do
             endif
@@ -438,30 +459,23 @@ subroutine clawpack46_step3(maxm,meqn,maux,mbc,mx,my,mz, &
                 do  ma = 1,maux
                     do  k = 1-mbc, mz+mbc
                         aux1(ma,k,1) = aux(i-1,j-1,k,ma)
-                        aux1(ma,k,2) = aux(i-1,j,k,ma)
+                        aux1(ma,k,2) = aux(i-1,j,  k,ma)
                         aux1(ma,k,3) = aux(i-1,j+1,k,ma)
-                        aux2(ma,k,1) = aux(i,j-1,k,ma)
-                        aux2(ma,k,2) = aux(i,j,k,ma)
-                        aux2(ma,k,3) = aux(i,j+1,k,ma)
+                        aux2(ma,k,1) = aux(i,j-1,  k,ma)
+                        aux2(ma,k,2) = aux(i,j,    k,ma)
+                        aux2(ma,k,3) = aux(i,j+1,  k,ma)
                         aux3(ma,k,1) = aux(i+1,j-1,k,ma)
-                        aux3(ma,k,2) = aux(i+1,j,k,ma)
+                        aux3(ma,k,2) = aux(i+1,j,  k,ma)
                         aux3(ma,k,3) = aux(i+1,j+1,k,ma)
                     end do
                 end do
             endif
 
-            !! # Store the value of i and j along this slice in the common block
-            !! # comxyzt in case it is needed in the Riemann solver (for
-            !! # variable coefficient problems)
-
-            icom = i
-            jcom = j
-
             !! # compute modifications fadd, gadd and hadd to fluxes along this
             !! # slice:
 
             call flux3(3,maxm,meqn,maux,mbc,mz,  & 
-                    q1d,dtdz1d,dtdx,dtdy,aux1,aux2,aux3, & 
+                    q1d,dtdz1d,dtdx1d,dtdy1d,aux1,aux2,aux3, & 
                     faddm,faddp,gadd,hadd,cfl1d, & 
                     work(i0wave),work(i0s),work(i0amdq), & 
                     work(i0apdq),work(i0cqxx), &
@@ -569,7 +583,7 @@ subroutine fc3d_clawpack46_fix_corners(mx,my,mz, mbc,meqn,q,sweep_dir, &
     ihat(3) = mx+0.5
     jhat(3) = my+0.5
 
-    do kz = 1,mz
+    do kz = 1-mbc,mz+mbc
         do k = 0,3
             if (block_corner_count(k) .ne. 3) then
                 cycle
@@ -609,9 +623,8 @@ subroutine fc3d_clawpack46_fix_corners(mx,my,mz, mbc,meqn,q,sweep_dir, &
                         q(i1,j1,kz,m) = q(idata,jdata,kz,m)
                     end do   !!meqn
                 end do       !! jbc
-            end do           !! ibc
+            end do           !! ibc           
         end do               !! k corner
     end do                   !! kz loop
-
 
 end

@@ -7,6 +7,7 @@ module setprob_mod
     integer manifold, mcapa
     integer init_choice
     double precision gamma, gamma1
+    double precision rhoin, rhoout, pin, pout
     double precision x0, y0, z0, r0, maxelev
     double precision qin(5), qout(5)
 
@@ -18,7 +19,6 @@ subroutine setprob
     implicit none
 
     !! Not needed in a common blocks
-    double precision rhoin, rhoout, pin, pout
     double precision longitude(2), latitude(2)
 
     double precision pi_com, pi2_com
