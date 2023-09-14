@@ -229,9 +229,17 @@ void clawpatch_define(fclaw_global_t* glob,
     const fclaw_clawpatch_options_t *clawpatch_opt = 
                          fclaw_clawpatch_get_options(glob);
 
-    cp->mx = clawpatch_opt->mx;
-    cp->my = clawpatch_opt->my;
-    cp->mz = clawpatch_opt->mz;
+    if(cp->patch_dim == 2)
+    {
+        cp->mx = clawpatch_opt->mx;
+        cp->my = clawpatch_opt->my;
+    }
+    else 
+    {
+        cp->mx = clawpatch_opt->mx;
+        cp->my = clawpatch_opt->my;
+        cp->mz = clawpatch_opt->mz;
+    }
 
     cp->mbc = clawpatch_opt->mbc;
     cp->blockno = blockno;
@@ -258,12 +266,23 @@ void clawpatch_define(fclaw_global_t* glob,
     cp->manifold = fclaw_opt->manifold;
     if (cp->manifold)
     {
-        cp->xlower = patch->xlower;
-        cp->ylower = patch->ylower;
-        cp->zlower = patch->zlower;
-        cp->xupper = patch->xupper;
-        cp->yupper = patch->yupper;
-        cp->zupper = patch->zupper;
+        if(cp->patch_dim == 2)
+        {
+            cp->xlower = patch->xlower;
+            cp->ylower = patch->ylower;
+            cp->xupper = patch->xupper;
+            cp->yupper = patch->yupper;
+        }
+        else 
+        {
+            cp->xlower = patch->xlower;
+            cp->ylower = patch->ylower;
+            cp->zlower = patch->zlower;
+            cp->xupper = patch->xupper;
+            cp->yupper = patch->yupper;
+            cp->zupper = patch->zupper;
+        }
+
     }
     else
     {
@@ -271,17 +290,24 @@ void clawpatch_define(fclaw_global_t* glob,
         double bx = fclaw_opt->bx;
         double ay = fclaw_opt->ay;
         double by = fclaw_opt->by;
-        double az = fclaw_opt->az;
-        double bz = fclaw_opt->bz;
 
-        double xl = patch->xlower;
-        double yl = patch->ylower;
-        double zl = patch->zlower;
-        double xu = patch->xupper;
-        double yu = patch->yupper;
-        double zu = patch->zupper;
+        double xl,yl,xu,yu;
+        if(patch->refine_dim == 2)
+        {
+            xl = patch->xlower;
+            yl = patch->ylower;
+            xu = patch->xupper;
+            yu = patch->yupper;
+        }
+        else 
+        {
+            xl = patch->xlower;
+            yl = patch->ylower;
+            xu = patch->xupper;
+            yu = patch->yupper;
+        }
 
-        double xlower, ylower, xupper, yupper, zlower, zupper;
+        double xlower, ylower, xupper, yupper;
 
         if (is_brick)
         {
@@ -294,35 +320,74 @@ void clawpatch_define(fclaw_global_t* glob,
         {
             xlower = xl;
             ylower = yl;
-            zlower = zl;
             xupper = xu;
             yupper = yu;
-            yupper = yu;
-            zupper = zu;
+        }
+        if(cp->patch_dim == 2)
+        {
+            cp->xlower = ax + (bx - ax)*xlower;
+            cp->xupper = ax + (bx - ax)*xupper;
+            cp->ylower = ay + (by - ay)*ylower;
+            cp->yupper = ay + (by - ay)*yupper;
+        }
+        else 
+        {
+            cp->xlower = ax + (bx - ax)*xlower;
+            cp->xupper = ax + (bx - ax)*xupper;
+            cp->ylower = ay + (by - ay)*ylower;
+            cp->yupper = ay + (by - ay)*yupper;
+            /* Use [az,bz] to scale in z direction.  This should work for 
+            both extruded mesh and octree mesh. */
+            double az = fclaw_opt->az;
+            double bz = fclaw_opt->bz;
+            double zlower = 0;        
+            double zupper = 1;
+            if(patch->refine_dim == 3)
+            {
+                zlower = patch->zlower;
+                zupper = patch->zupper;
+            }
+            cp->zlower = az + (bz - az)*zlower;
+            cp->zupper = az + (bz - az)*zupper;
         }
 
-        cp->xlower = ax + (bx - ax)*xlower;
-        cp->xupper = ax + (bx - ax)*xupper;
-        cp->ylower = ay + (by - ay)*ylower;
-        cp->yupper = ay + (by - ay)*yupper;
-        cp->zlower = az + (bz - az)*zlower;
-        cp->zupper = az + (bz - az)*zupper;
+#if REFINE_DIM == 3
+#error "clawpatch::define : Octrees not yet implemented."
+#endif        
 
     }
 
-    cp->dx = (cp->xupper - cp->xlower)/cp->mx;
-    cp->dy = (cp->yupper - cp->ylower)/cp->my;
-    cp->dz = (cp->zupper - cp->zlower)/cp->mz;
+    if(cp->patch_dim == 2)
+    {
+        cp->dx = (cp->xupper - cp->xlower)/cp->mx;
+        cp->dy = (cp->yupper - cp->ylower)/cp->my;
+    }
+    else 
+    {
+        cp->dx = (cp->xupper - cp->xlower)/cp->mx;
+        cp->dy = (cp->yupper - cp->ylower)/cp->my;
+        cp->dz = (cp->zupper - cp->zlower)/cp->mz;
+    }
 
-    int ll[3];
-    int ur[3];
-    for (int idir = 0; idir < 3; idir++)
+
+
+    int ll[cp->patch_dim];
+    int ur[cp->patch_dim];
+    for (int idir = 0; idir < cp->patch_dim; idir++)
     {
         ll[idir] = 1-cp->mbc;
     }
-    ur[0] = cp->mx + cp->mbc;
-    ur[1] = cp->my + cp->mbc;
-    ur[2] = cp->mz + cp->mbc;
+    if(cp->patch_dim == 2)
+    {
+        ur[0] = cp->mx + cp->mbc;
+        ur[1] = cp->my + cp->mbc;
+    }
+    else
+    {
+        ur[0] = cp->mx + cp->mbc;
+        ur[1] = cp->my + cp->mbc;
+        ur[2] = cp->mz + cp->mbc;
+    }
 
     Box box(ll,ur,cp->patch_dim);    
 
@@ -520,10 +585,19 @@ void clawpatch_setup_timeinterp(fclaw_global_t *glob,
        allocation */
     const fclaw_clawpatch_options_t *clawpatch_opt = fclaw_clawpatch_get_options(glob);
 
-    int mx = clawpatch_opt->mx;
-    int my = clawpatch_opt->my;
-    int mz = clawpatch_opt->mz;
-
+    int mx,my,mz;
+    if(clawpatch_opt->patch_dim == 2)
+    {
+        mx = clawpatch_opt->mx;
+        my = clawpatch_opt->my;
+        mz = 0;
+    }
+    else
+    {
+        mx = clawpatch_opt->mx;
+        my = clawpatch_opt->my;
+        mz = clawpatch_opt->mz;
+    }
     int meqn = clawpatch_opt->meqn;
     int mbc = clawpatch_opt->mbc;
     int mint = clawpatch_opt->interp_stencil_width/2+1;  
@@ -1218,10 +1292,19 @@ size_t clawpatch_ghost_pack_elems(fclaw_global_t* glob)
     const fclaw_clawpatch_options_t *clawpatch_opt = 
                              fclaw_clawpatch_get_options(glob);
 
-    int mx = clawpatch_opt->mx;
-    int my = clawpatch_opt->my;
-    int mz = clawpatch_opt->mz;
-
+    int mx,my,mz;
+    if(clawpatch_opt->patch_dim == 2)
+    {
+        mx = clawpatch_opt->mx;
+        my = clawpatch_opt->my;
+        mz = 1;
+    }
+    else
+    {
+        mx = clawpatch_opt->mx;
+        my = clawpatch_opt->my;
+        mz = clawpatch_opt->mz;
+    }
     int mbc = clawpatch_opt->mbc;
     int meqn = clawpatch_opt->meqn;
 
@@ -1273,9 +1356,19 @@ void clawpatch_ghost_comm(fclaw_global_t* glob,
     const fclaw_clawpatch_options_t *clawpatch_opt = 
                             fclaw_clawpatch_get_options(glob);
 
-    int mx = clawpatch_opt->mx;
-    int my = clawpatch_opt->my;
-    int mz = clawpatch_opt->mz;
+    int mx,my,mz;
+    if(clawpatch_opt->patch_dim == 2)
+    {
+        mx = clawpatch_opt->mx;
+        my = clawpatch_opt->my;
+        mz = 1;
+    }
+    else
+    {
+        mx = clawpatch_opt->mx;
+        my = clawpatch_opt->my;
+        mz = clawpatch_opt->mz;
+    }
 
     int mbc = clawpatch_opt->mbc;
     int meqn = clawpatch_opt->meqn;
