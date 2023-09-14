@@ -25,14 +25,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "correlatedcb_user.h"
 
-fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, 
-                                fclaw_options_t* fclaw_opt,
-                                user_options_t* user_opt)
+void
+store_domain_map (fclaw2d_global_t * glob, fclaw_options_t * fclaw_opt,
+                  user_options_t * user_opt)
 {
     /* Mapped, multi-block domain */
-    p4est_connectivity_t     *conn = NULL;
-    fclaw2d_domain_t         *domain;
-    fclaw2d_map_context_t    *cont = NULL;
+    fclaw2d_domain_t *domain = NULL;
+    fclaw2d_map_context_t *cont = NULL;
 
     /* Used locally */
     double pi = M_PI;
@@ -43,23 +42,24 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm,
 
     switch (user_opt->mapping) {
     case 0:
-        conn = p4est_connectivity_new_cubed();
-        cont = fclaw2d_map_new_cubedsphere(fclaw_opt->scale,
-                                           rotate);
+        domain =
+            fclaw2d_domain_new_cubedsphere (glob->mpicomm,
+                                            fclaw_opt->minlevel);
+        cont = fclaw2d_map_new_cubedsphere (fclaw_opt->scale, rotate);
         break;
     case 1:
-        conn = p4est_connectivity_new_pillow();
-        cont = fclaw2d_map_new_pillowsphere(fclaw_opt->scale,
-                                            rotate);
+        domain =
+            fclaw2d_domain_new_twosphere (glob->mpicomm, fclaw_opt->minlevel);
+        cont = fclaw2d_map_new_pillowsphere (fclaw_opt->scale, rotate);
         break;
     default:
         SC_ABORT_NOT_REACHED (); /* must be checked in torus_checkparms */
     }
 
-    domain = fclaw2d_domain_new_conn_map (mpicomm, fclaw_opt->minlevel, conn, cont);
-    fclaw2d_domain_list_levels(domain, FCLAW_VERBOSITY_ESSENTIAL);
-    fclaw2d_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);  
-    return domain;
+    fclaw2d_domain_list_levels (domain, FCLAW_VERBOSITY_ESSENTIAL);
+    fclaw2d_domain_list_neighbors (domain, FCLAW_VERBOSITY_DEBUG);
+    fclaw2d_global_store_domain (glob, domain);
+    fclaw2d_global_store_map (glob, cont);
 }
 
 
@@ -113,10 +113,6 @@ main (int argc, char **argv)
     fc2d_clawpack46_options_t   *claw46_opt;
     fc2d_clawpack5_options_t    *claw5_opt;
 
-    fclaw2d_global_t            *glob;
-    fclaw2d_domain_t            *domain;
-    sc_MPI_Comm mpicomm;
-
     /* Initialize application */
     app = fclaw_app_new (&argc, &argv, NULL);
 
@@ -134,12 +130,12 @@ main (int argc, char **argv)
     {
         /* Options have been checked and are valid */
 
-        mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
-        domain = create_domain(mpicomm, fclaw_opt, user_opt);
-    
         /* Create global structure which stores the domain, timers, etc */
-        glob = fclaw2d_global_new();
-        fclaw2d_global_store_domain(glob, domain);
+        int size, rank;
+        sc_MPI_Comm mpicomm = fclaw_app_get_mpi_size_rank (app, &size, &rank);
+        fclaw2d_global_t *glob =
+            fclaw2d_global_new_comm (mpicomm, size, rank);
+        store_domain_map (glob, fclaw_opt, user_opt);
 
         /* Store option packages in glob */
         fclaw2d_options_store           (glob, fclaw_opt);
