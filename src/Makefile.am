@@ -25,7 +25,6 @@ libforestclaw_installed_headers = \
 	src/fclaw_include_all.h \
 	src/fclaw_options.h \
 	src/fclaw_output.h \
-	src/fclaw_package.h \
 	src/fclaw_packing.h \
 	src/fclaw_partition.h \
 	src/fclaw_patch.h \
@@ -38,6 +37,7 @@ libforestclaw_installed_headers = \
 	src/fclaw_mpi.h \
 	src/fclaw_math.h \
 	src/fclaw_vtable.h \
+	src/fclaw_wrap.h \
 	\
 	src/fp_exception_glibc_extension.h \
 	\
@@ -49,6 +49,7 @@ libforestclaw_installed_headers = \
 	src/fclaw2d_map_query.h \
 	src/fclaw2d_map_query_defs.h \
 	src/fclaw2d_rays.h \
+	src/fclaw2d_wrap.h \
 	src/fclaw2d_to_3d.h \
 	src/fclaw_update_single_step.h \
 	\
@@ -57,6 +58,7 @@ libforestclaw_installed_headers = \
 	src/fclaw3d_file.h \
 	src/fclaw3d_include_all.h \
 	src/fclaw3d_map.h \
+	src/fclaw3d_wrap.h \
 	\
 	src/forestclaw.h \
 	src/forestclaw2d.h \
@@ -93,7 +95,6 @@ libforestclaw_compiled_sources = \
 	src/fclaw_options.c  \
 	src/fclaw_output.c \
 	src/fclaw_patch.c \
-	src/fclaw_package.c  \
 	src/fclaw_packing.c  \
 	src/fclaw_partition.c \
 	src/fclaw_physical_bc.c \
@@ -112,6 +113,7 @@ libforestclaw_compiled_sources = \
 	src/fclaw2d_map_query.c \
 	src/fclaw2d_output_tikz.c \
 	src/fclaw2d_rays.c \
+	src/fclaw2d_wrap.c \
 	src/fclaw_update_single_step.c \
 	\
 	src/forestclaw.c \
@@ -121,6 +123,7 @@ libforestclaw_compiled_sources = \
 	src/fclaw3d_convenience.c \
 	src/fclaw3d_file.c \
 	src/fclaw3d_map.c \
+	src/fclaw3d_wrap.c \
 	\
 	src/fp_exception_glibc_extension.c \
 	\
