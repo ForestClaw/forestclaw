@@ -61,7 +61,7 @@ void update_q(fclaw_domain_t *domain,
 
     int mx,my,mbc;
     double xlower,ylower,dx,dy;
-    fclaw_clawpatch_grid_data_2d(g->glob,patch,&mx,&my,&mbc,
+    fclaw_clawpatch_2d_grid_data(g->glob,patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
     double* rhs;

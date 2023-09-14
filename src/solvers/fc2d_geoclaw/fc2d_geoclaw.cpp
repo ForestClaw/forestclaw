@@ -100,7 +100,7 @@ void geoclaw_qinit(fclaw_global_t *glob,
 
     int mx,my,mbc;
     double dx,dy,xlower,ylower;
-    fclaw_clawpatch_grid_data_2d(glob,patch,&mx,&my,&mbc,
+    fclaw_clawpatch_2d_grid_data(glob,patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
     int meqn;
@@ -135,7 +135,7 @@ void geoclaw_bc2(fclaw_global_t *glob,
 
     int mx,my,mbc;
     double xlower,ylower,dx,dy;
-    fclaw_clawpatch_grid_data_2d(glob,patch, &mx,&my,&mbc,
+    fclaw_clawpatch_2d_grid_data(glob,patch, &mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
     int maux;
@@ -186,7 +186,7 @@ void geoclaw_setaux(fclaw_global_t *glob,
 
     int mx,my,mbc;
     double xlower,ylower,dx,dy;
-    fclaw_clawpatch_grid_data_2d(glob,patch, &mx,&my,&mbc,
+    fclaw_clawpatch_2d_grid_data(glob,patch, &mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
     int maux;
@@ -220,7 +220,7 @@ void geoclaw_b4step2(fclaw_global_t *glob,
     {
         int mx,my,mbc;
         double xlower,ylower,dx,dy;
-        fclaw_clawpatch_grid_data_2d(glob,patch, &mx,&my,&mbc,
+        fclaw_clawpatch_2d_grid_data(glob,patch, &mx,&my,&mbc,
                                     &xlower,&ylower,&dx,&dy);
 
         int meqn;
@@ -251,7 +251,7 @@ void geoclaw_src2(fclaw_global_t *glob,
 
     int mx,my,mbc;
     double xlower,ylower,dx,dy;
-    fclaw_clawpatch_grid_data_2d(glob,patch, &mx,&my,&mbc,
+    fclaw_clawpatch_2d_grid_data(glob,patch, &mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
     int meqn;
@@ -295,7 +295,7 @@ double geoclaw_step2(fclaw_global_t *glob,
 
     int mx, my, mbc; 
     double xlower, ylower, dx,dy;
-    fclaw_clawpatch_grid_data_2d(glob,patch,&mx,&my,&mbc,
+    fclaw_clawpatch_2d_grid_data(glob,patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
     int meqn;
@@ -404,7 +404,7 @@ int geoclaw_patch_tag4refinement(fclaw_global_t *glob,
 {
     int mx,my,mbc;
     double xlower,ylower,dx,dy;
-    fclaw_clawpatch_grid_data_2d(glob,patch,&mx,&my,&mbc,
+    fclaw_clawpatch_2d_grid_data(glob,patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
     int meqn;
@@ -467,7 +467,7 @@ int geoclaw_patch_tag4coarsening(fclaw_global_t *glob,
         fclaw_clawpatch_soln_data(glob,&fine_patches[igrid],&q[igrid],&meqn);
         fclaw_clawpatch_aux_data(glob,&fine_patches[igrid],&aux[igrid],&maux);
 
-        fclaw_clawpatch_grid_data_2d(glob,&fine_patches[igrid],&mx,&my,&mbc,
+        fclaw_clawpatch_2d_grid_data(glob,&fine_patches[igrid],&mx,&my,&mbc,
                                     &xlower[igrid],&ylower[igrid],&dx,&dy);
     }
 
@@ -510,7 +510,7 @@ void geoclaw_interpolate2fine(fclaw_global_t *glob,
 {
     int mx,my,mbc;
     double xlower,ylower,dx,dy;
-    fclaw_clawpatch_grid_data_2d(glob,coarse_patch,&mx,&my,&mbc,
+    fclaw_clawpatch_2d_grid_data(glob,coarse_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
     int meqn;
@@ -549,7 +549,7 @@ void geoclaw_average2coarse(fclaw_global_t *glob,
     /* Only mx, my are needed here */
     int mx,my,mbc;
     double xlower,ylower,dx,dy;
-    fclaw_clawpatch_grid_data_2d(glob,coarse_patch,&mx,&my,&mbc,
+    fclaw_clawpatch_2d_grid_data(glob,coarse_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
     int meqn;
@@ -594,7 +594,7 @@ void geoclaw_average_face(fclaw_global_t *glob,
 {
     int mx,my,mbc;
     double xlower,ylower,dx,dy;
-    fclaw_clawpatch_grid_data_2d(glob,coarse_patch,&mx,&my,&mbc,
+    fclaw_clawpatch_2d_grid_data(glob,coarse_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
     int meqn;
@@ -642,7 +642,7 @@ void geoclaw_interpolate_face(fclaw_global_t *glob,
 {
     int mx,my,mbc;
     double xlower,ylower,dx,dy;
-    fclaw_clawpatch_grid_data_2d(glob,coarse_patch,&mx,&my,&mbc,
+    fclaw_clawpatch_2d_grid_data(glob,coarse_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
     
     int meqn;
@@ -673,7 +673,7 @@ void geoclaw_average_corner(fclaw_global_t *glob,
 {
     int mx,my,mbc;
     double xlower,ylower,dx,dy;
-    fclaw_clawpatch_grid_data_2d(glob,coarse_patch,&mx,&my,&mbc,
+    fclaw_clawpatch_2d_grid_data(glob,coarse_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
     int meqn;
     double *qcoarse;
@@ -719,7 +719,7 @@ void geoclaw_interpolate_corner(fclaw_global_t* glob,
 {
     int mx,my,mbc;
     double xlower,ylower,dx,dy;
-    fclaw_clawpatch_grid_data_2d(glob,coarse_patch,&mx,&my,&mbc,
+    fclaw_clawpatch_2d_grid_data(glob,coarse_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
     int meqn;
@@ -772,7 +772,7 @@ void geoclaw_local_ghost_pack_aux(fclaw_global_t *glob,
     {
         int mx,my,mbc;
         double xlower,ylower,dx,dy;
-        fclaw_clawpatch_grid_data_2d(glob,patch,&mx,&my,&mbc,
+        fclaw_clawpatch_2d_grid_data(glob,patch,&mx,&my,&mbc,
                                     &xlower,&ylower,&dx,&dy);
 
         int maux;

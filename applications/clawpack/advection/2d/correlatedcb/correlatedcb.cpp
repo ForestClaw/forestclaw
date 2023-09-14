@@ -43,13 +43,13 @@ store_domain_map (fclaw_global_t * glob, fclaw_options_t * fclaw_opt,
     switch (user_opt->mapping) {
     case 0:
         domain =
-            fclaw_domain_new_cubedsphere_2d (glob->mpicomm,
+            fclaw_domain_new_2d_cubedsphere (glob->mpicomm,
                                             fclaw_opt->minlevel);
         cont = fclaw2d_map_new_cubedsphere (fclaw_opt->scale, rotate);
         break;
     case 1:
         domain =
-            fclaw_domain_new_twosphere_2d (glob->mpicomm, fclaw_opt->minlevel);
+            fclaw_domain_new_2d_twosphere (glob->mpicomm, fclaw_opt->minlevel);
         cont = fclaw2d_map_new_pillowsphere (fclaw_opt->scale, rotate);
         break;
     default:

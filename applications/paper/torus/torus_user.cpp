@@ -71,15 +71,15 @@ void torus_patch_setup(fclaw_global_t *glob,
 {
     int mx,my,mbc;
     double xlower,ylower,dx,dy;
-    fclaw_clawpatch_grid_data_2d(glob,patch,&mx,&my,&mbc,
+    fclaw_clawpatch_2d_grid_data(glob,patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
     double *xp, *yp, *zp, *xd, *yd, *zd, *area;
-    fclaw_clawpatch_metric_data_2d(glob,patch,&xp,&yp,&zp,
+    fclaw_clawpatch_2d_metric_data(glob,patch,&xp,&yp,&zp,
                                   &xd,&yd,&zd,&area);
 
     double *edgelengths,*curvature;
-    fclaw_clawpatch_metric_scalar_2d(glob, patch,&area,&edgelengths,
+    fclaw_clawpatch_2d_metric_scalar(glob, patch,&area,&edgelengths,
                                     &curvature);
 
     int maux;
@@ -91,7 +91,7 @@ void torus_patch_setup(fclaw_global_t *glob,
 
 
     double *xnormals,*ynormals,*xtangents,*ytangents,*surfnormals;
-    fclaw_clawpatch_metric_vector_2d(glob,patch,
+    fclaw_clawpatch_2d_metric_vector(glob,patch,
                                     &xnormals, &ynormals,
                                     &xtangents, &ytangents,
                                     &surfnormals);
@@ -127,7 +127,7 @@ void cb_torus_output_ascii (fclaw_domain_t * domain,
     
     int mx,my,mbc;
     double xlower,ylower,dx,dy;
-    fclaw_clawpatch_grid_data_2d(glob,this_patch,&mx,&my,&mbc,
+    fclaw_clawpatch_2d_grid_data(glob,this_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
     int meqn;

@@ -56,7 +56,7 @@ store_domain_map (fclaw_global_t * glob, fclaw_options_t * fclaw_opt,
         /* Map five-patch square to a disk using the pillowdisk.  Input
            parameter alpha needed for five patch square */
         domain =
-            fclaw_domain_new_disk_2d (glob->mpicomm, 0, 0,
+            fclaw_domain_new_2d_disk (glob->mpicomm, 0, 0,
                                      fclaw_opt->minlevel);
         cont =
             fclaw2d_map_new_pillowdisk5 (fclaw_opt->scale, fclaw_opt->shift,

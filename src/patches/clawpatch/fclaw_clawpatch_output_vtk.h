@@ -77,7 +77,7 @@ typedef void (*fclaw_vtk_patch_data_t) (struct fclaw_global * glob,
  *                  Collective with identical value on all ranks.
  */
 int
-fclaw_vtk_write_file_2d (struct fclaw_global * glob, const char *basename,
+fclaw_vtk_write_2d_file (struct fclaw_global * glob, const char *basename,
                          int mx, int my,
                          int meqn,
                          double vtkspace, int vtkwrite,
@@ -101,7 +101,7 @@ fclaw_vtk_write_file_2d (struct fclaw_global * glob, const char *basename,
  *                  Collective with identical value on all ranks.
  */
 int
-fclaw_vtk_write_file_3d (struct fclaw_global * glob, const char *basename,
+fclaw_vtk_write_3d_file (struct fclaw_global * glob, const char *basename,
                          int mx, int my, int mz,
                          int meqn,
                          double vtkspace, int vtkwrite,

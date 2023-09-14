@@ -108,7 +108,7 @@ double cudaclaw5_step2(fclaw_global_t *glob,
 
     fclaw2d_clawpatch_aux_data(glob,this_patch,&aux,&maux);
     fclaw2d_clawpatch_save_current_step(glob, this_patch);
-    fclaw_clawpatch_grid_data_2d(glob,this_patch,&mx,&my,&mbc,
+    fclaw_clawpatch_2d_grid_data(glob,this_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
     fclaw2d_clawpatch_soln_data(glob,this_patch,&qold,&meqn);
 

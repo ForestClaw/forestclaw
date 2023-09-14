@@ -82,7 +82,7 @@ void poisson_rhs(fclaw_global_t *glob,
 
     int mx,my,mbc;
     double dx,dy,xlower,ylower;
-    fclaw_clawpatch_grid_data_2d(glob,patch,&mx,&my,&mbc,
+    fclaw_clawpatch_2d_grid_data(glob,patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
     int mfields;
@@ -121,10 +121,10 @@ void poisson_compute_error(fclaw_global_t *glob,
     {
         int mx, my, mbc;
         double xlower,ylower,dx,dy;
-        fclaw_clawpatch_grid_data_2d(glob,patch,&mx,&my,&mbc,&xlower,
+        fclaw_clawpatch_2d_grid_data(glob,patch,&mx,&my,&mbc,&xlower,
                                     &ylower,&dx,&dy);
 
-        double *area = fclaw_clawpatch_get_area_2d(glob,patch);  /* Might be null */
+        double *area = fclaw_clawpatch_get_2d_area(glob,patch);  /* Might be null */
 
         /* Solution is stored in the RHS */
         double *rhs, *err, *soln;  
@@ -160,7 +160,7 @@ void poisson_conservation_check(fclaw_global_t *glob,
     poisson_error_info_t* error_data = (poisson_error_info_t*) user;
     int mx, my, mbc;
     double xlower,ylower,dx,dy;
-    fclaw_clawpatch_grid_data_2d(glob,patch,&mx,&my,&mbc,
+    fclaw_clawpatch_2d_grid_data(glob,patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
     int mfields;
@@ -172,7 +172,7 @@ void poisson_conservation_check(fclaw_global_t *glob,
 
 
     /* Need a better way to determine which diagnostic to do */
-    double* area = fclaw_clawpatch_get_area_2d(glob,patch);  
+    double* area = fclaw_clawpatch_get_2d_area(glob,patch);  
     clawpatch_vt->d2->fort_conservation_check(&mx, &my, &mbc, &mfields, &dx,&dy,
                                               area, rhs, error_data->rhs,
                                               error_data->c_kahan);
@@ -252,7 +252,7 @@ void cb_poisson_output_ascii(fclaw_domain_t * domain,
     
     int mx,my,mbc;
     double xlower,ylower,dx,dy;
-    fclaw_clawpatch_grid_data_2d(glob,patch,&mx,&my,&mbc,
+    fclaw_clawpatch_2d_grid_data(glob,patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
     double *rhs;
@@ -298,7 +298,7 @@ int poisson_tag4refinement(fclaw_global_t *glob,
 
     int mx,my,mbc;
     double xlower,ylower,dx,dy;
-    fclaw_clawpatch_grid_data_2d(glob,this_patch,&mx,&my,&mbc,
+    fclaw_clawpatch_2d_grid_data(glob,this_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
     double *rhs;
@@ -328,7 +328,7 @@ int poisson_tag4coarsening(fclaw_global_t *glob,
 
     int mx,my,mbc;
     double xlower,ylower,dx,dy;
-    fclaw_clawpatch_grid_data_2d(glob,patch0,&mx,&my,&mbc,
+    fclaw_clawpatch_2d_grid_data(glob,patch0,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
     double *rhs[4];

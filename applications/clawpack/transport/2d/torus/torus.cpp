@@ -50,7 +50,7 @@ void create_domain (fclaw_global_t * glob,
     rotate[1] = pi*fclaw_opt->phi/180.0;
 
     /* create domain topology */
-    domain = fclaw_domain_new_brick_2d (glob->mpicomm, mi, mj, a, b,
+    domain = fclaw_domain_new_2d_brick (glob->mpicomm, mi, mj, a, b,
                                        fclaw_opt->minlevel);
     fclaw_domain_list_levels (domain, FCLAW_VERBOSITY_ESSENTIAL);
     fclaw_domain_list_neighbors (domain, FCLAW_VERBOSITY_DEBUG);

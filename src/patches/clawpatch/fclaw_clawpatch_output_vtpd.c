@@ -17,7 +17,7 @@ WriteVTIHeader(FILE* file, fclaw_global_t * glob, fclaw_patch_t * patch,
 {
     int mx, my, mz, mbc;
     double xlower, ylower, zlower, dx, dy, dz;
-    fclaw_clawpatch_grid_data_3d(glob, patch, 
+    fclaw_clawpatch_3d_grid_data(glob, patch, 
         &mx, &my, &mz, &mbc, 
         &xlower, &ylower, &zlower, 
         &dx, &dy, &dz);
@@ -34,7 +34,7 @@ WriteQDataArray(FILE* file, fclaw_global_t* glob, fclaw_patch_t* patch)
 {
     int mx, my, mz, mbc;
     double xlower, ylower, zlower, dx, dy, dz;
-    fclaw_clawpatch_grid_data_3d(glob, patch, 
+    fclaw_clawpatch_3d_grid_data(glob, patch, 
         &mx, &my, &mz, &mbc, 
         &xlower, &ylower, &zlower, 
         &dx, &dy, &dz);
@@ -82,7 +82,7 @@ AppendQData(FILE* file, fclaw_global_t* glob, fclaw_patch_t* patch)
 {
     int mx, my, mz, mbc;
     double xlower, ylower, zlower, dx, dy, dz;
-    fclaw_clawpatch_grid_data_3d(glob, patch, 
+    fclaw_clawpatch_3d_grid_data(glob, patch, 
         &mx, &my, &mz, &mbc, 
         &xlower, &ylower, &zlower, 
         &dx, &dy, &dz);
@@ -136,7 +136,7 @@ WriteVTIFile(fclaw_domain_t * domain, fclaw_patch_t * patch,
 
     int mx, my, mz, mbc;
     double xlower, ylower, zlower, dx, dy, dz;
-    fclaw_clawpatch_grid_data_3d(glob, patch, 
+    fclaw_clawpatch_3d_grid_data(glob, patch, 
         &mx, &my, &mz, &mbc, 
         &xlower, &ylower, &zlower, 
         &dx, &dy, &dz);

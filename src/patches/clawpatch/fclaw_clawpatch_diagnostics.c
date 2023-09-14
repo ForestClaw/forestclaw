@@ -98,14 +98,14 @@ void cb_compute_diagnostics(fclaw_domain_t *domain,
     fclaw_clawpatch_vtable_t *clawpatch_vt = fclaw_clawpatch_vt(s->glob);
     if(clawpatch_vt->patch_dim == 2)
     {
-        double *area = fclaw_clawpatch_get_area_2d(s->glob,patch);  
+        double *area = fclaw_clawpatch_get_2d_area(s->glob,patch);  
         FCLAW_ASSERT(clawpatch_vt->d2->fort_compute_patch_area != NULL);
-        fclaw_clawpatch_grid_data_2d(s->glob,patch,&mx,&my,&mbc,&xlower,&ylower,&dx,&dy);
+        fclaw_clawpatch_2d_grid_data(s->glob,patch,&mx,&my,&mbc,&xlower,&ylower,&dx,&dy);
         error_data->area += clawpatch_vt->d2->fort_compute_patch_area(&mx,&my,&mbc,&dx,&dy,area);
     }
     else 
     {
-        fclaw_clawpatch_grid_data_3d(s->glob,patch,&mx,&my,&mz, 
+        fclaw_clawpatch_3d_grid_data(s->glob,patch,&mx,&my,&mz, 
                                     &mbc,&xlower,&ylower,&zlower, &dx,&dy,&dz);
 
         // double *volume = fclaw3dx_clawpatch_get_area(s->glob,patch);

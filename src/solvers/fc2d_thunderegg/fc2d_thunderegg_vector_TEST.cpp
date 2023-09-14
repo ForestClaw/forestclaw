@@ -138,7 +138,7 @@ struct QuadDomainBrick {
         opts->rhs_fields = 1;
         fclaw_clawpatch_options_store(glob, opts);
 
-        domain = fclaw_domain_new_brick_2d(sc_MPI_COMM_WORLD, fopts.mi, fopts.mj, 0,0,0);
+        domain = fclaw_domain_new_2d_brick(sc_MPI_COMM_WORLD, fopts.mi, fopts.mj, 0,0,0);
         fclaw_global_store_domain(glob, domain);
 
         map = fclaw2d_map_new_nomap();

@@ -49,12 +49,12 @@ fclaw_1to2 = {
     "fclaw2d_patch_face_transformation_block" : "fclaw_patch_face_transformation_block",
     "fclaw2d_patch_face_transformation_intra" : "fclaw_patch_face_transformation_intra",
     "fclaw2d_patch_face_transformation_valid" : "fclaw_patch_face_transformation_valid",
-    "fclaw2d_patch_transform_face"            : "fclaw_patch_transform_face_2d",
-    "fclaw2d_patch_transform_face2"           : "fclaw_patch_transform_face2_2d",
+    "fclaw2d_patch_transform_face"            : "fclaw_patch_2d_transform_face",
+    "fclaw2d_patch_transform_face2"           : "fclaw_patch_2d_transform_face2",
     "fclaw2d_patch_corner_neighbors"          : "fclaw_patch_corner_neighbors",
     "fclaw2d_patch_corner_swap"               : "fclaw_patch_corner_swap",
-    "fclaw2d_patch_transform_corner"          : "fclaw_patch_transform_corner_2d",
-    "fclaw2d_patch_transform_corner2"         : "fclaw_patch_transform_corner2_2d",
+    "fclaw2d_patch_transform_corner"          : "fclaw_patch_2d_transform_corner",
+    "fclaw2d_patch_transform_corner2"         : "fclaw_patch_2d_transform_corner2",
 
     "fclaw2d_domain_set_refinement"           : "fclaw_domain_set_refinement",
     "fclaw2d_patch_mark_refine"               : "fclaw_patch_mark_refine",
@@ -90,11 +90,11 @@ fclaw_1to2 = {
     #===== ./src/forestclaw2d_convenience.h =====
     "<fclaw2d_convenience.h>"       : "<fclaw_convenience.h>",
     "fclaw2d_domain_new_unitsquare" : "fclaw_domain_new_unitsquare",
-    "fclaw2d_domain_new_torus"      : "fclaw_domain_new_torus_2d",
-    "fclaw2d_domain_new_twosphere"  : "fclaw_domain_new_twosphere_2d",
-    "fclaw2d_domain_new_cubedsphere": "fclaw_domain_new_cubedsphere_2d",
-    "fclaw2d_domain_new_disk"       : "fclaw_domain_new_disk_2d",
-    "fclaw2d_domain_new_brick"      : "fclaw_domain_new_brick_2d",
+    "fclaw2d_domain_new_torus"      : "fclaw_domain_new_2d_torus",
+    "fclaw2d_domain_new_twosphere"  : "fclaw_domain_new_2d_twosphere",
+    "fclaw2d_domain_new_cubedsphere": "fclaw_domain_new_2d_cubedsphere",
+    "fclaw2d_domain_new_disk"       : "fclaw_domain_new_2d_disk",
+    "fclaw2d_domain_new_brick"      : "fclaw_domain_new_2d_brick",
     "fclaw2d_domain_destroy"        : "fclaw_domain_destroy",
 
     "fclaw2d_domain_adapt"               : "fclaw_domain_adapt",
@@ -500,12 +500,12 @@ fclaw_1to2 = {
     "fclaw2d_clawpatch_vt"                   : "fclaw_clawpatch_vt",
     "fclaw2d_clawpatch_vtable"               : "fclaw_clawpatch_vtable",
     "fclaw2d_clawpatch_save_current_step"    : "fclaw_clawpatch_save_current_step",
-    "fclaw2d_clawpatch_grid_data"            : "fclaw_clawpatch_grid_data_2d",
-    "fclaw2d_clawpatch_metric_scalar"        : "fclaw_clawpatch_metric_scalar_2d",
-    "fclaw2d_clawpatch_metric_vector"        : "fclaw_clawpatch_metric_vector_2d",
-    "fclaw2d_clawpatch_metric_data"          : "fclaw_clawpatch_metric_data_2d",
-    "fclaw2d_clawpatch_metric_data2"         : "fclaw_clawpatch_metric_data2_2d",
-    "fclaw2d_clawpatch_get_area"             : "fclaw_clawpatch_get_area_2d",
+    "fclaw2d_clawpatch_grid_data"            : "fclaw_clawpatch_2d_grid_data",
+    "fclaw2d_clawpatch_metric_scalar"        : "fclaw_clawpatch_2d_metric_scalar",
+    "fclaw2d_clawpatch_metric_vector"        : "fclaw_clawpatch_2d_metric_vector",
+    "fclaw2d_clawpatch_metric_data"          : "fclaw_clawpatch_2d_metric_data",
+    "fclaw2d_clawpatch_metric_data2"         : "fclaw_clawpatch_2d_metric_data2",
+    "fclaw2d_clawpatch_get_area"             : "fclaw_clawpatch_get_2d_area",
     "fclaw2d_clawpatch_soln_data"            : "fclaw_clawpatch_soln_data",
     "fclaw2d_clawpatch_aux_data"             : "fclaw_clawpatch_aux_data",
     "fclaw2d_clawpatch_rhs_data"             : "fclaw_clawpatch_rhs_data",
@@ -521,13 +521,13 @@ fclaw_1to2 = {
     "fclaw2d_clawpatch_set_solver_data"      : "fclaw_clawpatch_set_solver_data",
     "fclaw2d_clawpatch_timesync_data"        : "fclaw_clawpatch_timesync_data",
     "fclaw2d_clawpatch_get_q_timesync"       : "fclaw_clawpatch_get_q_timesync",
-    "fclaw2d_clawpatch_get_registers"        : "fclaw_clawpatch_get_registers_2d",
+    "fclaw2d_clawpatch_get_registers"        : "fclaw_clawpatch_get_2d_registers",
 
     #===== ./src/patches/clawpatch/fclaw2d_clawpatch.hpp =====
     "<fclaw2d_clawpatch.hpp>"                : "<fclaw_clawpatch.hpp>",
     "fclaw2d_clawpatch_t"                    : "fclaw_clawpatch_t",
     "fclaw2d_clawpatch_get_clawpatch"        : "fclaw_clawpatch_get_clawpatch",
-    "fclaw2d_clawpatch_get_metric_patch"     : "fclaw_clawpatch_get_metric_patch_2d",
+    "fclaw2d_clawpatch_get_metric_patch"     : "fclaw_clawpatch_get_2d_metric_patch",
 
     #===== ./src/patches/clawpatch/fclaw2d_clawpatch_diagnostics.h =====
     "<fclaw2d_clawpatch_diagnostics.h>"               : "<fclaw_clawpatch_diagnostics.h>",
@@ -556,7 +556,7 @@ fclaw_1to2 = {
     #===== ./src/patches/clawpatch/fclaw2d_clawpatch_output_vtk.h =====
     "<fclaw2d_clawpatch_output_vtk.h>"        : "<fclaw_clawpatch_output_vtk.h>",
     "fclaw2d_vtk_patch_data_t"                : "fclaw_vtk_patch_data_t",
-    "fclaw2d_vtk_write_file"                  : "fclaw_vtk_write_file_2d",
+    "fclaw2d_vtk_write_file"                  : "fclaw_vtk_write_2d_file",
     "fclaw2d_clawpatch_output_vtk"            : "fclaw_clawpatch_output_vtk",
 
     #===== ./src/patches/clawpatch/fclaw2d_clawpatch_pillow.h =====
@@ -575,12 +575,12 @@ fclaw_1to2 = {
     "fclaw3dx_clawpatch_vt"                     : "fclaw_clawpatch_vt",
     "fclaw3dx_clawpatch_vtable"                 : "fclaw_clawpatch_vtable",
     "fclaw3dx_clawpatch_save_current_step"      : "fclaw_clawpatch_save_current_step",
-    "fclaw3dx_clawpatch_grid_data"              : "fclaw_clawpatch_grid_data_3d",
-    "fclaw3d_clawpatch_grid_data"               : "fclaw_clawpatch_grid_data_3d",
-    "fclaw3d_clawpatch_get_volume"              : "fclaw_clawpatch_get_volume_3d",
-    "fclaw3d_clawpatch_metric_scalar"           : "fclaw_clawpatch_metric_scalar_3d",
-    "fclaw3d_clawpatch_metric_basis"            : "fclaw_clawpatch_metric_basis_3d",
-    "fclaw3d_clawpatch_mesh_data"               : "fclaw_clawpatch_mesh_data_3d",
+    "fclaw3dx_clawpatch_grid_data"              : "fclaw_clawpatch_3d_grid_data",
+    "fclaw3d_clawpatch_grid_data"               : "fclaw_clawpatch_3d_grid_data",
+    "fclaw3d_clawpatch_get_volume"              : "fclaw_clawpatch_get_3d_volume",
+    "fclaw3d_clawpatch_metric_scalar"           : "fclaw_clawpatch_3d_metric_scalar",
+    "fclaw3d_clawpatch_metric_basis"            : "fclaw_clawpatch_3d_metric_basis",
+    "fclaw3d_clawpatch_mesh_data"               : "fclaw_clawpatch_3d_mesh_data",
     "fclaw3dx_clawpatch_soln_data"              : "fclaw_clawpatch_soln_data",
     "fclaw3dx_clawpatch_aux_data"               : "fclaw_clawpatch_aux_data",
     "fclaw3dx_clawpatch_rhs_data"               : "fclaw_clawpatch_rhs_data",
@@ -601,7 +601,7 @@ fclaw_1to2 = {
     "<fclaw3dx_clawpatch.hpp>"                  : "<fclaw_clawpatch.hpp>",
     "fclaw3dx_clawpatch_t"                      : "fclaw_clawpatch_t",
     "fclaw3dx_clawpatch_get_clawpatch"          : "fclaw_clawpatch_get_clawpatch",
-    "fclaw3dx_clawpatch_get_metric_patch"       : "fclaw_clawpatch_get_metric_patch_3d",
+    "fclaw3dx_clawpatch_get_metric_patch"       : "fclaw_clawpatch_get_3d_metric_patch",
 
     #===== ./src/patches/clawpatch/fclaw3dx_clawpatch_diagnostics.h =====
     "<fclaw3dx_clawpatch_diagnostics.h>"               : "<fclaw_clawpatch_diagnostics.h>",
@@ -633,7 +633,7 @@ fclaw_1to2 = {
     #===== ./src/patches/clawpatch/fclaw3dx_clawpatch_output_vtk.h =====
     "<fclaw3dx_clawpatch_output_vtk.h>"        : "<fclaw_clawpatch_output_vtk.h>",
     "fclaw3dx_vtk_patch_data_t"                : "fclaw_vtk_patch_data_t",
-    "fclaw3dx_vtk_write_file"                  : "fclaw_vtk_write_file_3d",
+    "fclaw3dx_vtk_write_file"                  : "fclaw_vtk_write_3d_file",
     "fclaw3dx_clawpatch_output_vtk"            : "fclaw_clawpatch_output_vtk",
 
     #===== ./src/patches/clawpatch/fclaw3dx_clawpatch_pillow.h =====

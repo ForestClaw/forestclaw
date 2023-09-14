@@ -65,7 +65,7 @@ void pillow_copy_block_corner(fclaw_global_t* glob,
     {
         int mx,my,mbc;
         double xlower,ylower,dx,dy;
-        fclaw_clawpatch_grid_data_2d(glob,patch,&mx,&my,&mbc,
+        fclaw_clawpatch_2d_grid_data(glob,patch,&mx,&my,&mbc,
                                     &xlower,&ylower,&dx,&dy);
 
         pillow_vt->d2->fort_copy_block_corner(&mx, &my, &mbc, &meqn, 
@@ -76,7 +76,7 @@ void pillow_copy_block_corner(fclaw_global_t* glob,
     {
         int mx,my,mz,mbc;
         double xlower,ylower,zlower,dx,dy,dz;
-        fclaw_clawpatch_grid_data_3d(glob,patch,&mx,&my,&mz,&mbc,
+        fclaw_clawpatch_3d_grid_data(glob,patch,&mx,&my,&mz,&mbc,
                                     &xlower,&ylower,&zlower, &dx, &dy, &dz);
         FCLAW_ASSERT(pillow_vt->d3->fort_copy_block_corner != NULL);
 
@@ -106,8 +106,8 @@ void pillow_average_block_corner(fclaw_global_t *glob,
                                     &qcoarse,&meqn);
     double* qfine = fclaw_clawpatch_get_q(glob,fine_patch);
 
-    double *areacoarse = fclaw_clawpatch_get_area_2d(glob,coarse_patch);
-    double *areafine = fclaw_clawpatch_get_area_2d(glob,fine_patch);
+    double *areacoarse = fclaw_clawpatch_get_2d_area(glob,coarse_patch);
+    double *areafine = fclaw_clawpatch_get_2d_area(glob,fine_patch);
 
     fclaw_clawpatch_pillow_vtable_t* pillow_vt = fclaw_clawpatch_pillow_vt(glob);
 
@@ -116,7 +116,7 @@ void pillow_average_block_corner(fclaw_global_t *glob,
         int mx,my,mbc;
         double xlower,ylower,dx,dy;
 
-        fclaw_clawpatch_grid_data_2d(glob,coarse_patch,&mx,&my,&mbc,
+        fclaw_clawpatch_2d_grid_data(glob,coarse_patch,&mx,&my,&mbc,
                                     &xlower,&ylower,&dx,&dy);
 
 
@@ -129,7 +129,7 @@ void pillow_average_block_corner(fclaw_global_t *glob,
     {
         int mx,my,mz,mbc;
         double xlower,ylower,zlower,dx,dy,dz;
-        fclaw_clawpatch_grid_data_3d(glob,coarse_patch,&mx,&my,&mz, &mbc,
+        fclaw_clawpatch_3d_grid_data(glob,coarse_patch,&mx,&my,&mz, &mbc,
                                     &xlower,&ylower, &zlower, &dx,&dy, &dz);
 
         pillow_vt->d3->fort_average_block_corner(&mx,&my,&mz, &dz, &mbc,&meqn,
@@ -163,7 +163,7 @@ void pillow_interpolate_block_corner(fclaw_global_t* glob,
     {
         int mx,my,mbc;
         double xlower,ylower,dx,dy;
-        fclaw_clawpatch_grid_data_2d(glob,coarse_patch,&mx,&my,&mbc,
+        fclaw_clawpatch_2d_grid_data(glob,coarse_patch,&mx,&my,&mbc,
                                     &xlower,&ylower,&dx,&dy);
 
         pillow_vt->d2->fort_interpolate_block_corner(&mx, &my, &mbc, &meqn,
@@ -174,7 +174,7 @@ void pillow_interpolate_block_corner(fclaw_global_t* glob,
     {
         int mx,my,mz,mbc;
         double xlower,ylower,zlower,dx,dy,dz;
-        fclaw_clawpatch_grid_data_3d(glob,coarse_patch,&mx,&my,&mz, &mbc,
+        fclaw_clawpatch_3d_grid_data(glob,coarse_patch,&mx,&my,&mz, &mbc,
                                     &xlower,&ylower,&zlower, &dx,&dy, &dz);
 
         pillow_vt->d3->fort_interpolate_block_corner(&mx, &my, &mz, &mbc, &meqn,

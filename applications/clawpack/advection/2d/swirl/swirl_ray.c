@@ -176,7 +176,7 @@ int swirl_intersect_ray (fclaw_domain_t *domain,
         /* Get data on current patch */
         int mx,my,mbc;
         double xlower,ylower,dx,dy;    
-        fclaw_clawpatch_grid_data_2d(glob,patch,&mx,&my,&mbc,
+        fclaw_clawpatch_2d_grid_data(glob,patch,&mx,&my,&mbc,
                                     &xlower,&ylower,&dx,&dy);
 
         if (swirl_ray->rtype == SWIRL_RAY_LINE)

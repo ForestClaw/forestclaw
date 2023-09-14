@@ -84,7 +84,7 @@ void clawpack5_setaux(fclaw_global_t *glob,
     double *aux;
 
 
-    fclaw_clawpatch_grid_data_2d(glob,this_patch, &mx,&my,&mbc,
+    fclaw_clawpatch_2d_grid_data(glob,this_patch, &mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
     fclaw_clawpatch_aux_data(glob,this_patch,&aux,&maux);
 
@@ -107,7 +107,7 @@ void clawpack5_qinit(fclaw_global_t *glob,
     double dx,dy,xlower,ylower;
     double *q, *aux;
 
-    fclaw_clawpatch_grid_data_2d(glob,this_patch,&mx,&my,&mbc,
+    fclaw_clawpatch_2d_grid_data(glob,this_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
     fclaw_clawpatch_soln_data(glob,this_patch,&q,&meqn);
@@ -139,7 +139,7 @@ void clawpack5_b4step2(fclaw_global_t *glob,
     double xlower,ylower,dx,dy;
     double *aux,*q;
 
-    fclaw_clawpatch_grid_data_2d(glob,this_patch, &mx,&my,&mbc,
+    fclaw_clawpatch_2d_grid_data(glob,this_patch, &mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
     fclaw_clawpatch_soln_data(glob,this_patch,&q,&meqn);
@@ -170,7 +170,7 @@ void clawpack5_src2(fclaw_global_t *glob,
     double xlower,ylower,dx,dy;
     double *aux,*q;
 
-    fclaw_clawpatch_grid_data_2d(glob,this_patch, &mx,&my,&mbc,
+    fclaw_clawpatch_2d_grid_data(glob,this_patch, &mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
     fclaw_clawpatch_soln_data(glob,this_patch,&q,&meqn);
@@ -202,7 +202,7 @@ void clawpack5_bc2(fclaw_global_t *glob,
     double xlower,ylower,dx,dy;
     double *aux,*q;
 
-    fclaw_clawpatch_grid_data_2d(glob,this_patch, &mx,&my,&mbc,
+    fclaw_clawpatch_2d_grid_data(glob,this_patch, &mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
     fclaw_clawpatch_aux_data(glob,this_patch,&aux,&maux);
@@ -267,7 +267,7 @@ double clawpack5_step2(fclaw_global_t *glob,
 
     fclaw_clawpatch_save_current_step(glob, this_patch);
 
-    fclaw_clawpatch_grid_data_2d(glob,this_patch,&mx,&my,&mbc,
+    fclaw_clawpatch_2d_grid_data(glob,this_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
     fclaw_clawpatch_soln_data(glob,this_patch,&qold,&meqn);
@@ -279,7 +279,7 @@ double clawpack5_step2(fclaw_global_t *glob,
     double cflgrid = 0.0;
 
     fclaw2d_clawpatch_registers_t* cr = 
-          fclaw_clawpatch_get_registers_2d(glob,this_patch);
+          fclaw_clawpatch_get_2d_registers(glob,this_patch);
 
     /* Evaluate fluxes needed in correction terms */
     const fclaw_options_t* fclaw_opt = fclaw_get_options(glob);
@@ -551,10 +551,10 @@ void fc2d_clawpack5_set_capacity(fclaw_global_t *glob,
     clawopt = fc2d_clawpack5_get_options(glob);
     mcapa = clawopt->mcapa;
 
-    fclaw_clawpatch_grid_data_2d(glob,this_patch, &mx,&my,&mbc,
+    fclaw_clawpatch_2d_grid_data(glob,this_patch, &mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
-    area = fclaw_clawpatch_get_area_2d(glob,this_patch);
+    area = fclaw_clawpatch_get_2d_area(glob,this_patch);
 
     fclaw_clawpatch_aux_data(glob,this_patch,&aux,&maux);
     FCLAW_ASSERT(maux >= mcapa && mcapa > 0);

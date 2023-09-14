@@ -48,7 +48,7 @@ void create_domain_map (fclaw_global_t *glob,
         break;
     case 1:
         /* Five patch square : maps to [-1,1]x[-1,1] */
-        domain = fclaw_domain_new_disk_2d (glob->mpicomm, 0, 0, fclaw_opt->minlevel);
+        domain = fclaw_domain_new_2d_disk (glob->mpicomm, 0, 0, fclaw_opt->minlevel);
         cont = fclaw2d_map_new_fivepatch (fclaw_opt->scale,
                                           fclaw_opt->shift, user->alpha);
         break;
@@ -59,7 +59,7 @@ void create_domain_map (fclaw_global_t *glob,
         break;
     case 3:
         /* Pillow disk mapping of the five patch square */
-        domain = fclaw_domain_new_disk_2d (glob->mpicomm, 0, 0, fclaw_opt->minlevel);
+        domain = fclaw_domain_new_2d_disk (glob->mpicomm, 0, 0, fclaw_opt->minlevel);
         cont = fclaw2d_map_new_pillowdisk5 (fclaw_opt->scale, fclaw_opt->shift,
                                             rotate,user->alpha);
         break;

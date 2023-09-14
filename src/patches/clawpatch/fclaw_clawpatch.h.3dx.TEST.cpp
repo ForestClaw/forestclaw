@@ -425,7 +425,7 @@ TEST_CASE("3dx fclaw_clawpatch_get_volume")
 
     //CHECK
     fclaw3d_metric_patch_t* mp = fclaw3dx_clawpatch_get_metric_patch(&test_data.domain->blocks[0].patches[0]);
-    CHECK(fclaw_clawpatch_get_volume_3d(test_data.glob, 
+    CHECK(fclaw_clawpatch_get_3d_volume(test_data.glob, 
                 &test_data.domain->blocks[0].patches[0]) == mp->volume.dataPtr());
 }
 #endif
@@ -449,7 +449,7 @@ TEST_CASE("3dx fclaw_clawpatch_grid_data")
         fclaw_clawpatch_t* cp = fclaw_clawpatch_get_clawpatch(&test_data.domain->blocks[0].patches[0]);
         int mx_out,my_out,mz_out,mbc_out;
         double xlower,ylower,zlower,dx,dy,dz;
-        fclaw_clawpatch_grid_data_3d(test_data.glob, &test_data.domain->blocks[0].patches[0],
+        fclaw_clawpatch_3d_grid_data(test_data.glob, &test_data.domain->blocks[0].patches[0],
                                      &mx_out, &my_out, &mz_out, &mbc_out, &xlower, &ylower, &zlower, &dx, &dy, &dz);
 
         CHECK(mx_out == test_data.opts->mx);

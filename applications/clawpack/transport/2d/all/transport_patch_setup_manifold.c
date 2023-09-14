@@ -34,11 +34,11 @@ void transport_patch_setup_manifold(fclaw_global_t *glob,
 {
     int mx,my,mbc;
     double xlower,ylower,dx,dy;
-    fclaw_clawpatch_grid_data_2d(glob,patch,&mx,&my,&mbc,
+    fclaw_clawpatch_2d_grid_data(glob,patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
     double *area, *edgelengths,*curvature;
-    fclaw_clawpatch_metric_scalar_2d(glob, patch,&area,&edgelengths,
+    fclaw_clawpatch_2d_metric_scalar(glob, patch,&area,&edgelengths,
                                     &curvature);
     int maux;
     double *aux;

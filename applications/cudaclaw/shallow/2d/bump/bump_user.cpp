@@ -83,13 +83,13 @@ void bump_patch_setup(fclaw_global_t *glob,
         return;
     }
 
-    fclaw_clawpatch_grid_data_2d(glob,this_patch,&mx,&my,&mbc,
+    fclaw_clawpatch_2d_grid_data(glob,this_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
     fclaw2d_clawpatch_metric_data(glob,this_patch,&xp,&yp,&zp,
                                   &xd,&yd,&zd,&area);
 
-    fclaw_clawpatch_metric_data2_2d(glob,this_patch,
+    fclaw_clawpatch_2d_metric_data2(glob,this_patch,
                                    &xnormals,&ynormals,
                                    &xtangents,&ytangents,
                                    &surfnormals,&edgelengths,

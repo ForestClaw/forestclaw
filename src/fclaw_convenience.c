@@ -38,7 +38,7 @@ fclaw_domain_t *fclaw_domain_new_unitsquare (sc_MPI_Comm mpicomm,
     return fclaw_domain_wrap_2d(domain2d);
 }
 
-fclaw_domain_t *fclaw_domain_new_torus_2d (sc_MPI_Comm mpicomm,
+fclaw_domain_t *fclaw_domain_new_2d_torus (sc_MPI_Comm mpicomm,
                                             int initial_level)
 {
     fclaw2d_domain_t* domain2d;
@@ -46,7 +46,7 @@ fclaw_domain_t *fclaw_domain_new_torus_2d (sc_MPI_Comm mpicomm,
     return fclaw_domain_wrap_2d(domain2d);
 }
 
-fclaw_domain_t *fclaw_domain_new_twosphere_2d (sc_MPI_Comm mpicomm,
+fclaw_domain_t *fclaw_domain_new_2d_twosphere (sc_MPI_Comm mpicomm,
                                                int initial_level)
 {
     fclaw2d_domain_t* domain2d;
@@ -54,7 +54,7 @@ fclaw_domain_t *fclaw_domain_new_twosphere_2d (sc_MPI_Comm mpicomm,
     return fclaw_domain_wrap_2d(domain2d);
 }
 
-fclaw_domain_t *fclaw_domain_new_cubedsphere_2d (sc_MPI_Comm mpicomm,
+fclaw_domain_t *fclaw_domain_new_2d_cubedsphere (sc_MPI_Comm mpicomm,
                                                  int initial_level)
 {
     fclaw2d_domain_t* domain2d;
@@ -62,7 +62,7 @@ fclaw_domain_t *fclaw_domain_new_cubedsphere_2d (sc_MPI_Comm mpicomm,
     return fclaw_domain_wrap_2d(domain2d);
 }
 
-fclaw_domain_t *fclaw_domain_new_disk_2d (sc_MPI_Comm mpicomm,
+fclaw_domain_t *fclaw_domain_new_2d_disk (sc_MPI_Comm mpicomm,
                                           int periodic_in_x,
                                           int periodic_in_y,
                                           int initial_level)
@@ -73,7 +73,7 @@ fclaw_domain_t *fclaw_domain_new_disk_2d (sc_MPI_Comm mpicomm,
     return fclaw_domain_wrap_2d(domain2d);
 }
 
-fclaw_domain_t *fclaw_domain_new_brick_2d (sc_MPI_Comm mpicomm,
+fclaw_domain_t *fclaw_domain_new_2d_brick (sc_MPI_Comm mpicomm,
                                            int blocks_in_x, int blocks_in_y,
                                            int periodic_in_x,
                                            int periodic_in_y,
@@ -94,7 +94,7 @@ fclaw_domain_t *fclaw_domain_new_unitcube (sc_MPI_Comm mpicomm,
     return fclaw_domain_wrap_3d(domain3d);
 }
 
-fclaw_domain_t *fclaw_domain_new_brick_3d (sc_MPI_Comm mpicomm,
+fclaw_domain_t *fclaw_domain_new_3d_brick (sc_MPI_Comm mpicomm,
                                            int blocks_in_x, int blocks_in_y,
                                            int blocks_in_z,
                                            int periodic_in_x,

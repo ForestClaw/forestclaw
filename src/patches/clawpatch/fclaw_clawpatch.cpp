@@ -1076,7 +1076,7 @@ int clawpatch_tag4refinement(fclaw_global_t *glob,
 
             int mx,my,mbc;
             double xlower,ylower,dx,dy;
-            fclaw_clawpatch_grid_data_2d(glob,patch,&mx,&my,&mbc,
+            fclaw_clawpatch_2d_grid_data(glob,patch,&mx,&my,&mbc,
                                         &xlower,&ylower,&dx,&dy);
             clawpatch_vt->d2->fort_tag4refinement(&mx,&my,&mbc,&meqn,&xlower,&ylower,
                                                   &dx,&dy, &blockno, q,
@@ -1087,7 +1087,7 @@ int clawpatch_tag4refinement(fclaw_global_t *glob,
         {
             int mx,my,mz,mbc;
             double xlower,ylower,zlower,dx,dy,dz;
-            fclaw_clawpatch_grid_data_3d(glob,patch,&mx,&my,&mz, &mbc,
+            fclaw_clawpatch_3d_grid_data(glob,patch,&mx,&my,&mz, &mbc,
                                         &xlower,&ylower,&zlower, &dx,&dy,&dz);
 
             clawpatch_vt->d3->fort_tag4refinement(&mx,&my,&mz, &mbc,&meqn,
@@ -1120,13 +1120,13 @@ int clawpatch_tag4coarsening(fclaw_global_t *glob,
         fclaw_clawpatch_soln_data(glob,&fine_patches[igrid],&q[igrid],&meqn);
         if(clawpatch_vt->patch_dim == 2)
         {
-            fclaw_clawpatch_grid_data_2d(glob,&fine_patches[igrid],&mx,&my,&mbc,
+            fclaw_clawpatch_2d_grid_data(glob,&fine_patches[igrid],&mx,&my,&mbc,
                                         &xlower[igrid],&ylower[igrid],&dx,&dy);
         }
         else 
         {
             /* For extruded meshes, zlower is the same for all patches. */
-            fclaw_clawpatch_grid_data_3d(glob,&fine_patches[igrid],&mx,&my,&mz,&mbc,
+            fclaw_clawpatch_3d_grid_data(glob,&fine_patches[igrid],&mx,&my,&mz,&mbc,
                                         &xlower[igrid],&ylower[igrid],&zlower[igrid],&dx,&dy,&dz);
         }
     }
@@ -2008,7 +2008,7 @@ fclaw_clawpatch_get_clawpatch(fclaw_patch_t* patch)
 
 
 fclaw2d_metric_patch_t* 
-fclaw_clawpatch_get_metric_patch_2d(fclaw_patch_t* patch)
+fclaw_clawpatch_get_2d_metric_patch(fclaw_patch_t* patch)
 {
     return get_metric_patch_2d(patch);
 }
@@ -2019,7 +2019,7 @@ fclaw3d_clawpatch_get_metric_patch(fclaw_patch_t* patch)
     return get_metric_patch_3d(patch);
 }
 
-void fclaw_clawpatch_grid_data_2d(fclaw_global_t* glob,
+void fclaw_clawpatch_2d_grid_data(fclaw_global_t* glob,
                                  fclaw_patch_t* patch,
                                  int* mx, int* my, int* mbc,
                                  double* xlower, double* ylower,
@@ -2035,7 +2035,7 @@ void fclaw_clawpatch_grid_data_2d(fclaw_global_t* glob,
     *dy = cp->dy;
 }
 
-void fclaw_clawpatch_grid_data_3d(fclaw_global_t* glob,
+void fclaw_clawpatch_3d_grid_data(fclaw_global_t* glob,
                                   fclaw_patch_t* patch,
                                   int* mx, int* my, int* mz, int* mbc,
                                   double* xlower, double* ylower,
@@ -2110,7 +2110,7 @@ double *fclaw_clawpatch_get_q(fclaw_global_t* glob,
 }
 
 fclaw2d_clawpatch_registers_t* 
-fclaw_clawpatch_get_registers_2d(fclaw_global_t* glob,
+fclaw_clawpatch_get_2d_registers(fclaw_global_t* glob,
                                 fclaw_patch_t* patch)
 {
     fclaw_clawpatch_t *cp = get_clawpatch(patch);
@@ -2201,19 +2201,19 @@ double* fclaw_clawpatch_get_q_timesync(fclaw_global_t* glob,
     return q_time_sync(patch, time_interp);
 }
 
-double* fclaw_clawpatch_get_area_2d(fclaw_global_t* glob,
+double* fclaw_clawpatch_get_2d_area(fclaw_global_t* glob,
                                  fclaw_patch_t* patch)
 {
     return clawpatch_get_area(glob, patch);
 }
 
-double* fclaw_clawpatch_get_volume_3d(fclaw_global_t* glob,
+double* fclaw_clawpatch_get_3d_volume(fclaw_global_t* glob,
                                      fclaw_patch_t* patch)
 {
     return clawpatch_get_volume(glob, patch);
 }
 
-void fclaw_clawpatch_metric_scalar_2d(fclaw_global_t* glob,
+void fclaw_clawpatch_2d_metric_scalar(fclaw_global_t* glob,
                                      fclaw_patch_t* patch,
                                      double **area, double** edgelengths,
                                      double **curvature)
@@ -2222,7 +2222,7 @@ void fclaw_clawpatch_metric_scalar_2d(fclaw_global_t* glob,
                                 curvature);
 }
 
-void fclaw_clawpatch_metric_vector_2d(struct fclaw_global* glob,
+void fclaw_clawpatch_2d_metric_vector(struct fclaw_global* glob,
                                      struct fclaw_patch* patch,
                                      double **xnormals, double **ynormals,
                                      double **xtangents, double **ytangents,
@@ -2235,7 +2235,7 @@ void fclaw_clawpatch_metric_vector_2d(struct fclaw_global* glob,
 
 
 
-void fclaw_clawpatch_metric_data_2d(fclaw_global_t* glob,
+void fclaw_clawpatch_2d_metric_data(fclaw_global_t* glob,
                                    fclaw_patch_t* patch,
                                    double **xp, double **yp, double **zp,
                                    double **xd, double **yd, double **zd,
@@ -2244,7 +2244,7 @@ void fclaw_clawpatch_metric_data_2d(fclaw_global_t* glob,
     fclaw2d_metric_patch_mesh_data(glob,patch,xp,yp,zp,xd,yd,zd,area);
 }
 
-void fclaw_clawpatch_metric_data2_2d(fclaw_global_t* glob,
+void fclaw_clawpatch_2d_metric_data2(fclaw_global_t* glob,
                                     fclaw_patch_t* patch,
                                     double **xnormals, double **ynormals,
                                     double **xtangents, double **ytangents,
@@ -2256,7 +2256,7 @@ void fclaw_clawpatch_metric_data2_2d(fclaw_global_t* glob,
                                     edgelengths,curvature);
 }
 
-void fclaw_clawpatch_metric_scalar_3d(fclaw_global_t* glob,
+void fclaw_clawpatch_3d_metric_scalar(fclaw_global_t* glob,
                                      fclaw_patch_t* patch,
                                      double **volume, double** faceareas)
 {
@@ -2273,7 +2273,7 @@ void fclaw2d_clawpatch_metric_basis(struct fclaw_global* glob,
 
 
 
-void fclaw_clawpatch_mesh_data_3d(fclaw_global_t* glob,
+void fclaw_clawpatch_3d_mesh_data(fclaw_global_t* glob,
                                  fclaw_patch_t* patch,
                                  double **xp, double **yp, double **zp,
                                  double **xd, double **yd, double **zd,

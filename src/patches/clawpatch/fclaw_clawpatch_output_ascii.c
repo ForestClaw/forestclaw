@@ -69,7 +69,7 @@ void cb_clawpatch_output_ascii (fclaw_domain_t * domain,
         double xlower,ylower,dx,dy;
         FCLAW_ASSERT(clawpatch_vt->d2->fort_output_ascii);
 
-        fclaw_clawpatch_grid_data_2d(glob,patch,&mx,&my,&mbc,
+        fclaw_clawpatch_2d_grid_data(glob,patch,&mx,&my,&mbc,
                                     &xlower,&ylower,&dx,&dy);
         clawpatch_vt->d2->fort_output_ascii(fname,&mx,&my,&meqn,&mbc,
                                             &xlower,&ylower,&dx,&dy,q,
@@ -82,7 +82,7 @@ void cb_clawpatch_output_ascii (fclaw_domain_t * domain,
         double xlower,ylower,zlower,dx,dy,dz;
         FCLAW_ASSERT(clawpatch_vt->d3->fort_output_ascii);
 
-        fclaw_clawpatch_grid_data_3d(glob,patch,&mx,&my,&mz,&mbc,
+        fclaw_clawpatch_3d_grid_data(glob,patch,&mx,&my,&mz,&mbc,
                                      &xlower,&ylower,&zlower,
                                      &dx,&dy,&dz);
         clawpatch_vt->d3->fort_output_ascii(fname,&mx,&my,&mz,&meqn,&mbc,

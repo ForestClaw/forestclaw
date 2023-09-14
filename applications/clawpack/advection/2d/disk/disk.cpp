@@ -62,7 +62,7 @@ store_domain_map (fclaw_global_t * glob, fclaw_options_t * fclaw_opt,
             exit(0);
         }
         domain =
-            fclaw_domain_new_disk_2d (glob->mpicomm, 0, 0,
+            fclaw_domain_new_2d_disk (glob->mpicomm, 0, 0,
                                      fclaw_opt->minlevel);
         cont =
             fclaw2d_map_new_pillowdisk5 (fclaw_opt->scale, fclaw_opt->shift,

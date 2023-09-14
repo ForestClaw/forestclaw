@@ -382,7 +382,7 @@ fclaw_patch_face_transformation_valid (int dim, const int ftransform[])
 }
 
 void 
-fclaw_patch_transform_face_2d (fclaw_patch_t * ipatch,
+fclaw_patch_2d_transform_face (fclaw_patch_t * ipatch,
                                fclaw_patch_t * opatch,
                                const int ftransform[],
                                int mx, int my, int based, int *i, int *j)
@@ -393,7 +393,7 @@ fclaw_patch_transform_face_2d (fclaw_patch_t * ipatch,
 }
 
 void 
-fclaw_patch_transform_face2_2d (fclaw_patch_t * ipatch,
+fclaw_patch_2d_transform_face2 (fclaw_patch_t * ipatch,
                                 fclaw_patch_t * opatch,
                                 const int ftransform[],
                                 int mx, int my, int based, int i[],
@@ -405,7 +405,7 @@ fclaw_patch_transform_face2_2d (fclaw_patch_t * ipatch,
 }
 
 void 
-fclaw_patch_transform_face_3d (fclaw_patch_t * ipatch,
+fclaw_patch_3d_transform_face (fclaw_patch_t * ipatch,
                                fclaw_patch_t * opatch,
                                const int ftransform[],
                                int mx, int my, int mz, int based,
@@ -417,7 +417,7 @@ fclaw_patch_transform_face_3d (fclaw_patch_t * ipatch,
 }
 
 void 
-fclaw_patch_transform_face2_3d (fclaw_patch_t * ipatch,
+fclaw_patch_3d_transform_face2 (fclaw_patch_t * ipatch,
                                 fclaw_patch_t * opatch,
                                 const int ftransform[],
                                 int mx, int my, int mz, int based,
@@ -470,7 +470,7 @@ void fclaw_patch_corner_swap (int dim, int *cornerno, int *rcornerno)
     }
 }
 
-void fclaw_patch_transform_corner_2d (fclaw_patch_t * ipatch,
+void fclaw_patch_2d_transform_corner (fclaw_patch_t * ipatch,
                                       fclaw_patch_t * opatch,
                                       int icorner, int is_block_boundary,
                                       int mx, int my,
@@ -482,7 +482,7 @@ void fclaw_patch_transform_corner_2d (fclaw_patch_t * ipatch,
                                    mx,my,based,i,j);
 }
 
-void fclaw_patch_transform_corner2_2d (fclaw_patch_t * ipatch,
+void fclaw_patch_2d_transform_corner2 (fclaw_patch_t * ipatch,
                                        fclaw_patch_t * opatch,
                                        int icorner, int is_block_boundary,
                                        int mx, int my, int based,
@@ -512,7 +512,7 @@ void fclaw_patch_transform_corner2_2d (fclaw_patch_t * ipatch,
  * \param [in,out] j        Integer coordinate along y-axis in \a based .. \a my.
  * \param [in,out] k        Integer coordinate along z-axis in \a based .. \a mz.
  */
-void fclaw_patch_transform_corner_3d (fclaw_patch_t * ipatch,
+void fclaw_patch_3d_transform_corner (fclaw_patch_t * ipatch,
                                       fclaw_patch_t * opatch,
                                       int icorner, int is_block_boundary,
                                       int mx, int my, int mz,
@@ -524,7 +524,7 @@ void fclaw_patch_transform_corner_3d (fclaw_patch_t * ipatch,
                                    mx,my,mz,based,i,j,k);
 }
 
-void fclaw_patch_transform_corner2_3d (fclaw_patch_t * ipatch,
+void fclaw_patch_3d_transform_corner2 (fclaw_patch_t * ipatch,
                                        fclaw_patch_t * opatch,
                                        int icorner, int is_block_boundary,
                                        int mx, int my, int mz, int based,

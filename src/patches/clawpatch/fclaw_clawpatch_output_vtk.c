@@ -690,7 +690,7 @@ fclaw_vtk_write_file (int dim, fclaw_global_t * glob, const char *basename,
 }
 
 int
-fclaw_vtk_write_file_2d (fclaw_global_t * glob, const char *basename,
+fclaw_vtk_write_2d_file (fclaw_global_t * glob, const char *basename,
                         int mx, int my,
                         int meqn,
                         double vtkspace, int vtkwrite,
@@ -702,7 +702,7 @@ fclaw_vtk_write_file_2d (fclaw_global_t * glob, const char *basename,
 }
 
 int
-fclaw_vtk_write_file_3d (fclaw_global_t * glob, const char *basename,
+fclaw_vtk_write_3d_file (fclaw_global_t * glob, const char *basename,
                         int mx, int my, int mz,
                         int meqn,
                         double vtkspace, int vtkwrite,
@@ -721,7 +721,7 @@ fclaw2d_output_vtk_coordinate_cb (fclaw_global_t * glob,
 {
     int mx,my,mbc;
     double dx,dy,xlower,ylower;
-    fclaw_clawpatch_grid_data_2d(glob,patch,&mx,&my,&mbc,
+    fclaw_clawpatch_2d_grid_data(glob,patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
     const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
@@ -762,7 +762,7 @@ fclaw3d_output_vtk_coordinate_cb (fclaw_global_t * glob,
 {
     int mx,my,mz,mbc;
     double dx,dy,dz,xlower,ylower,zlower;
-    fclaw_clawpatch_grid_data_3d(glob,patch,&mx,&my,&mz, &mbc,
+    fclaw_clawpatch_3d_grid_data(glob,patch,&mx,&my,&mz, &mbc,
                                 &xlower,&ylower,&zlower, &dx,&dy, &dz);
 
     const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
@@ -812,7 +812,7 @@ fclaw2d_output_vtk_value_cb (fclaw_global_t * glob,
     int mx,my,mbc;
     double xlower,ylower,dx,dy;
 
-    fclaw_clawpatch_grid_data_2d(glob,patch,&mx,&my,&mbc,
+    fclaw_clawpatch_2d_grid_data(glob,patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
     const int xlane = mx + 2 * mbc;
@@ -850,7 +850,7 @@ fclaw3d_output_vtk_value_cb (fclaw_global_t * glob,
 
     int mx,my,mz,mbc;
     double xlower,ylower,zlower,dx,dy,dz;
-    fclaw_clawpatch_grid_data_3d(glob,patch,&mx,&my,&mz, &mbc,
+    fclaw_clawpatch_3d_grid_data(glob,patch,&mx,&my,&mz, &mbc,
                                &xlower,&ylower,&zlower, &dx,&dy, &dz);
 
     const int xlane = mx + 2 * mbc;
@@ -914,7 +914,7 @@ void fclaw_clawpatch_output_vtk_to_file (fclaw_global_t * glob, const char* file
 
     if(clawpatch_opt->patch_dim == 2)
     {
-        fclaw_vtk_write_file_2d (glob, filename,
+        fclaw_vtk_write_2d_file (glob, filename,
                                 clawpatch_opt->mx, 
                                 clawpatch_opt->my,
                                 clawpatch_opt->meqn,
@@ -925,7 +925,7 @@ void fclaw_clawpatch_output_vtk_to_file (fclaw_global_t * glob, const char* file
     }
     else 
     {
-        fclaw_vtk_write_file_3d (glob, filename,
+        fclaw_vtk_write_3d_file (glob, filename,
                                 clawpatch_opt->mx, 
                                 clawpatch_opt->my, 
                                 clawpatch_opt->mz,

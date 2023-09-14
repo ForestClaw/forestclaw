@@ -83,7 +83,7 @@ void cudaclaw5_setaux(fclaw_global_t *glob,
     double *aux;
 
 
-    fclaw_clawpatch_grid_data_2d(glob,this_patch, &mx,&my,&mbc,
+    fclaw_clawpatch_2d_grid_data(glob,this_patch, &mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
     fclaw_clawpatch_aux_data(glob,this_patch,&aux,&maux);
 
@@ -106,7 +106,7 @@ void cudaclaw5_qinit(fclaw_global_t *glob,
     double dx,dy,xlower,ylower;
     double *q, *aux;
 
-    fclaw_clawpatch_grid_data_2d(glob,this_patch,&mx,&my,&mbc,
+    fclaw_clawpatch_2d_grid_data(glob,this_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
     fclaw_clawpatch_soln_data(glob,this_patch,&q,&meqn);
@@ -138,7 +138,7 @@ void cudaclaw5_b4step2(fclaw_global_t *glob,
     double xlower,ylower,dx,dy;
     double *aux,*q;
 
-    fclaw_clawpatch_grid_data_2d(glob,this_patch, &mx,&my,&mbc,
+    fclaw_clawpatch_2d_grid_data(glob,this_patch, &mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
     fclaw_clawpatch_soln_data(glob,this_patch,&q,&meqn);
@@ -169,7 +169,7 @@ void cudaclaw5_src2(fclaw_global_t *glob,
     double xlower,ylower,dx,dy;
     double *aux,*q;
 
-    fclaw_clawpatch_grid_data_2d(glob,this_patch, &mx,&my,&mbc,
+    fclaw_clawpatch_2d_grid_data(glob,this_patch, &mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
     fclaw_clawpatch_soln_data(glob,this_patch,&q,&meqn);
@@ -201,7 +201,7 @@ void cudaclaw5_bc2(fclaw_global_t *glob,
     double xlower,ylower,dx,dy;
     double *aux,*q;
 
-    fclaw_clawpatch_grid_data_2d(glob,this_patch, &mx,&my,&mbc,
+    fclaw_clawpatch_2d_grid_data(glob,this_patch, &mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
     fclaw_clawpatch_aux_data(glob,this_patch,&aux,&maux);
@@ -395,10 +395,10 @@ void fc2d_cudaclaw5_set_capacity(fclaw_global_t *glob,
     clawopt = fc2d_cudaclaw5_get_options(glob);
     mcapa = clawopt->mcapa;
 
-    fclaw_clawpatch_grid_data_2d(glob,this_patch, &mx,&my,&mbc,
+    fclaw_clawpatch_2d_grid_data(glob,this_patch, &mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
-    area = fclaw_clawpatch_get_area_2d(glob,this_patch);
+    area = fclaw_clawpatch_get_2d_area(glob,this_patch);
 
     fclaw_clawpatch_aux_data(glob,this_patch,&aux,&maux);
     FCLAW_ASSERT(maux >= mcapa && mcapa > 0);

@@ -38,7 +38,7 @@ void fclaw_clawpatch_diagnostics_cons_default(fclaw_global_t *glob,
                                               void *user)
 {
     error_info_t* error_data = (error_info_t*) user;
-    double* area = fclaw_clawpatch_get_area_2d(glob,patch);  /* Might be null */
+    double* area = fclaw_clawpatch_get_2d_area(glob,patch);  /* Might be null */
 
     int meqn;
     double *q; 
@@ -51,7 +51,7 @@ void fclaw_clawpatch_diagnostics_cons_default(fclaw_global_t *glob,
     if(clawpatch_vt->patch_dim == 2)
     {
         FCLAW_ASSERT(clawpatch_vt->d2->fort_conservation_check != NULL);
-        fclaw_clawpatch_grid_data_2d(glob,patch,&mx,&my,&mbc,
+        fclaw_clawpatch_2d_grid_data(glob,patch,&mx,&my,&mbc,
                                     &xlower,&ylower,&dx,&dy);
         clawpatch_vt->d2->fort_conservation_check(&mx, &my, &mbc, &meqn, &dx,&dy,
                                                   area, q, error_data->mass,
@@ -62,7 +62,7 @@ void fclaw_clawpatch_diagnostics_cons_default(fclaw_global_t *glob,
         FCLAW_ASSERT(clawpatch_vt->d3->fort_conservation_check != NULL);
         int mz;
         double zlower, dz;
-        fclaw_clawpatch_grid_data_3d(glob,patch,&mx,&my,&mz, &mbc,
+        fclaw_clawpatch_3d_grid_data(glob,patch,&mx,&my,&mz, &mbc,
                                     &xlower,&ylower,&zlower, &dx,&dy, &dz);    
         clawpatch_vt->d3->fort_conservation_check(&mx, &my, &mz, &mbc, &meqn, 
                                                   &dx,&dy,&dz,
@@ -82,7 +82,7 @@ void fclaw_clawpatch_diagnostics_error_default(fclaw_global_t *glob,
 
     fclaw_clawpatch_vtable_t *clawpatch_vt = fclaw_clawpatch_vt(glob);
 
-    double *area = fclaw_clawpatch_get_area_2d(glob,patch);  /* Might be null */
+    double *area = fclaw_clawpatch_get_2d_area(glob,patch);  /* Might be null */
     double *q;
     int meqn;
     fclaw_clawpatch_soln_data(glob,patch,&q,&meqn);
@@ -96,7 +96,7 @@ void fclaw_clawpatch_diagnostics_error_default(fclaw_global_t *glob,
         int mx, my, mbc;
         double xlower,ylower,dx,dy;
 
-        fclaw_clawpatch_grid_data_2d(glob,patch,&mx,&my,&mbc,&xlower,&ylower,&dx,&dy);
+        fclaw_clawpatch_2d_grid_data(glob,patch,&mx,&my,&mbc,&xlower,&ylower,&dx,&dy);
 
         clawpatch_vt->d2->fort_compute_patch_error(&blockno, &mx,&my,&mbc,&meqn,&dx,&dy,
                                               &xlower,&ylower, &t, q, error, soln);
@@ -115,7 +115,7 @@ void fclaw_clawpatch_diagnostics_error_default(fclaw_global_t *glob,
 
         int mx, my, mz, mbc;
         double xlower,ylower,zlower,dx,dy,dz;
-        fclaw_clawpatch_grid_data_3d(glob,patch,&mx,&my,&mz, 
+        fclaw_clawpatch_3d_grid_data(glob,patch,&mx,&my,&mz, 
                                     &mbc,&xlower,&ylower,&zlower, 
                                     &dx,&dy,&dz);
         clawpatch_vt->d3->fort_compute_patch_error(&blockno, &mx,&my,&mz,

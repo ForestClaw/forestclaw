@@ -489,7 +489,7 @@ int fclaw_patch_face_transformation_valid (int dim, const int ftransform[]);
  * \param [in,out] i        Integer coordinate along x-axis in \a based .. \a mx.
  * \param [in,out] j        Integer coordinate along y-axis in \a based .. \a my.
  */
-void fclaw_patch_transform_face_2d (fclaw_patch_t * ipatch,
+void fclaw_patch_2d_transform_face (fclaw_patch_t * ipatch,
                                     fclaw_patch_t * opatch,
                                     const int ftransform[],
                                     int mx, int my, int based, int *i, int *j);
@@ -519,7 +519,7 @@ void fclaw_patch_transform_face_2d (fclaw_patch_t * ipatch,
  *                          On output, they are relative to the fine patch and
  *                          stored in order of the children of the coarse patch.
  */
-void fclaw_patch_transform_face2_2d (fclaw_patch_t * ipatch,
+void fclaw_patch_2d_transform_face2 (fclaw_patch_t * ipatch,
                                      fclaw_patch_t * opatch,
                                      const int ftransform[],
                                      int mx, int my, int based, int i[],
@@ -546,7 +546,7 @@ void fclaw_patch_transform_face2_2d (fclaw_patch_t * ipatch,
  * \param [in,out] j        Integer coordinate along y-axis in \a based .. \a my.
  * \param [in,out] k        Integer coordinate along z-axis in \a based .. \a mz.
  */
-void fclaw_patch_transform_face_3d (fclaw_patch_t * ipatch,
+void fclaw_patch_3d_transform_face (fclaw_patch_t * ipatch,
                                     fclaw_patch_t * opatch,
                                     const int ftransform[],
                                     int mx, int my, int mz, int based,
@@ -582,7 +582,7 @@ void fclaw_patch_transform_face_3d (fclaw_patch_t * ipatch,
  *                          On output, they are relative to the fine patch and
  *                          stored in order of the children of the coarse patch.
  */
-void fclaw_patch_transform_face2_3d (fclaw_patch_t * ipatch,
+void fclaw_patch_3d_transform_face2 (fclaw_patch_t * ipatch,
                                      fclaw_patch_t * opatch,
                                      const int ftransform[],
                                      int mx, int my, int mz, int based,
@@ -684,7 +684,7 @@ void fclaw_patch_corner_swap (int dim, int *cornerno, int *rcornerno);
  * \param [in,out] i        Integer coordinate along x-axis in \a based .. \a mx.
  * \param [in,out] j        Integer coordinate along y-axis in \a based .. \a my.
  */
-void fclaw_patch_transform_corner_2d (fclaw_patch_t * ipatch,
+void fclaw_patch_2d_transform_corner (fclaw_patch_t * ipatch,
                                       fclaw_patch_t * opatch,
                                       int icorner, int is_block_boundary,
                                       int mx, int my,
@@ -712,7 +712,7 @@ void fclaw_patch_transform_corner_2d (fclaw_patch_t * ipatch,
  *                          On output, they are relative to the fine patch and
  *                          stored in order of the children of the coarse patch.
  */
-void fclaw_patch_transform_corner2_2d (fclaw_patch_t * ipatch,
+void fclaw_patch_2d_transform_corner2 (fclaw_patch_t * ipatch,
                                        fclaw_patch_t * opatch,
                                        int icorner, int is_block_boundary,
                                        int mx, int my, int based,
@@ -736,7 +736,7 @@ void fclaw_patch_transform_corner2_2d (fclaw_patch_t * ipatch,
  * \param [in,out] j        Integer coordinate along y-axis in \a based .. \a my.
  * \param [in,out] k        Integer coordinate along z-axis in \a based .. \a mz.
  */
-void fclaw_patch_transform_corner_3d (fclaw_patch_t * ipatch,
+void fclaw_patch_3d_transform_corner (fclaw_patch_t * ipatch,
                                       fclaw_patch_t * opatch,
                                       int icorner, int is_block_boundary,
                                       int mx, int my, int mz,
@@ -769,7 +769,7 @@ void fclaw_patch_transform_corner_3d (fclaw_patch_t * ipatch,
  *                          On output, they are relative to the fine patch and
  *                          stored in order of the children of the coarse patch.
  */
-void fclaw_patch_transform_corner2_3d (fclaw_patch_t * ipatch,
+void fclaw_patch_3d_transform_corner2 (fclaw_patch_t * ipatch,
                                        fclaw_patch_t * opatch,
                                        int icorner, int is_block_boundary,
                                        int mx, int my, int mz, int based,

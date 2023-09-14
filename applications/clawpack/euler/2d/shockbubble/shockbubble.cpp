@@ -52,7 +52,7 @@ void create_domain_map (fclaw_global_t *glob,
     b = fclaw_opt->periodic_y;
 
     /* Construct and store domain */
-    domain = fclaw_domain_new_brick_2d (glob->mpicomm, mi, mj, a, b,
+    domain = fclaw_domain_new_2d_brick (glob->mpicomm, mi, mj, a, b,
                                       fclaw_opt->minlevel);
     fclaw_domain_list_levels (domain, FCLAW_VERBOSITY_ESSENTIAL);
     fclaw_domain_list_neighbors (domain, FCLAW_VERBOSITY_DEBUG);

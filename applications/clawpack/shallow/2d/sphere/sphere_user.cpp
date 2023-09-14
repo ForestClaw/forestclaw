@@ -76,11 +76,11 @@ void sphere_patch_manifold_setup(fclaw_domain_t *domain,
 
     fc2d_clawpack46_define_auxarray(domain,this_patch);
 
-    fclaw_clawpatch_grid_data_2d(domain,this_patch,&mx,&my,&mbc,
+    fclaw_clawpatch_2d_grid_data(domain,this_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
     fc2d_clawpack46_aux_data(domain,this_patch,&aux,&maux);
-    fclaw_clawpatch_metric_data2_2d(domain,this_patch,&xnormals,&ynormals,
+    fclaw_clawpatch_2d_metric_data2(domain,this_patch,&xnormals,&ynormals,
                                    &xtangents,&ytangents,&surfnormals,
                                    &edgelengths,&curvature);
 

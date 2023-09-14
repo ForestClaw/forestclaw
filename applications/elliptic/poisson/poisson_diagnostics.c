@@ -98,10 +98,10 @@ void poisson_compute(fclaw_domain_t *domain,
     /* Accumulate area for final computation of error */
     int mx, my, mbc;
     double xlower,ylower,dx,dy;
-    fclaw_clawpatch_grid_data_2d(s->glob,patch,&mx,&my,&mbc,&xlower,&ylower,&dx,&dy);
+    fclaw_clawpatch_2d_grid_data(s->glob,patch,&mx,&my,&mbc,&xlower,&ylower,&dx,&dy);
 
     fclaw_clawpatch_vtable_t *clawpatch_vt = fclaw_clawpatch_vt(s->glob);
-    double *area = fclaw_clawpatch_get_area_2d(s->glob,patch);  
+    double *area = fclaw_clawpatch_get_2d_area(s->glob,patch);  
     FCLAW_ASSERT(clawpatch_vt->d2->fort_compute_patch_area != NULL);
     error_data->area += clawpatch_vt->d2->fort_compute_patch_area(&mx,&my,&mbc,&dx,&dy,area);
 

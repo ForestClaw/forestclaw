@@ -48,7 +48,7 @@ store_domain_map (fclaw_global_t * glob, fclaw_options_t * fclaw_opt,
     case 1:
         /* Square brick domain */
         domain =
-            fclaw_domain_new_brick_2d (glob->mpicomm, mi, mj, a, b,
+            fclaw_domain_new_2d_brick (glob->mpicomm, mi, mj, a, b,
                                       fclaw_opt->minlevel);
         brick = fclaw2d_map_new_brick (domain, mi, mj, a, b);
         
@@ -66,7 +66,7 @@ store_domain_map (fclaw_global_t * glob, fclaw_options_t * fclaw_opt,
         }
         /* Five patch square domain */
         domain =
-            fclaw_domain_new_disk_2d (glob->mpicomm, 0, 0,
+            fclaw_domain_new_2d_disk (glob->mpicomm, 0, 0,
                                      fclaw_opt->minlevel);
         cont =
             fclaw2d_map_new_fivepatch (fclaw_opt->scale, fclaw_opt->shift,
@@ -76,7 +76,7 @@ store_domain_map (fclaw_global_t * glob, fclaw_options_t * fclaw_opt,
         /* bilinear square domain : maps to [-1,1]x[-1,1] */
         FCLAW_ASSERT (mi == 2 && mj == 2);
         domain =
-            fclaw_domain_new_brick_2d (glob->mpicomm, mi, mj, a, b,
+            fclaw_domain_new_2d_brick (glob->mpicomm, mi, mj, a, b,
                                       fclaw_opt->minlevel);
         brick = fclaw2d_map_new_brick (domain, mi, mj, a, b);
         cont = fclaw2d_map_new_bilinear (brick, 

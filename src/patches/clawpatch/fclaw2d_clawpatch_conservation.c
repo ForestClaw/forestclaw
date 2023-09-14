@@ -124,7 +124,7 @@ void fclaw2d_clawpatch_time_sync_pack_registers(fclaw_global_t *glob,
 
 	int meqn = clawpatch_opt->meqn;
 
-	fclaw2d_clawpatch_registers_t* cr = fclaw_clawpatch_get_registers_2d(glob,this_patch);
+	fclaw2d_clawpatch_registers_t* cr = fclaw_clawpatch_get_2d_registers(glob,this_patch);
 
 	int cnt = 0;
     /* Cycle over four edges */
@@ -216,7 +216,7 @@ void fclaw2d_clawpatch_time_sync_reset(fclaw_global_t *glob,
 
 	fclaw_clawpatch_options_t* clawpatch_opt = fclaw_clawpatch_get_options(glob);
 
-	fclaw2d_clawpatch_registers_t* cr = fclaw_clawpatch_get_registers_2d(glob,this_patch);
+	fclaw2d_clawpatch_registers_t* cr = fclaw_clawpatch_get_2d_registers(glob,this_patch);
 
 	int mx;
 	int my;
@@ -331,17 +331,17 @@ void fclaw2d_clawpatch_time_sync_setup(fclaw_global_t* glob,
 	double *area, *edgelengths, *curvature;
 
 	fclaw2d_clawpatch_registers_t *cr = 
-	                       fclaw_clawpatch_get_registers_2d(glob,this_patch);
+	                       fclaw_clawpatch_get_2d_registers(glob,this_patch);
 
 	const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
 
 
     int mx,my,mbc;
     double dx,dy,xlower,ylower;
-	fclaw_clawpatch_grid_data_2d(glob,this_patch,&mx,&my,&mbc,
+	fclaw_clawpatch_2d_grid_data(glob,this_patch,&mx,&my,&mbc,
 	                            &xlower,&ylower,&dx,&dy);
 
-	fclaw_clawpatch_metric_scalar_2d(glob,this_patch,
+	fclaw_clawpatch_2d_metric_scalar(glob,this_patch,
 									&area, &edgelengths,&curvature);
 
     if (fclaw_opt->manifold)
@@ -386,14 +386,14 @@ void fclaw2d_clawpatch_time_sync_f2c(fclaw_global_t* glob,
 
 	int mx,my,mbc;
 	double dx,dy,xlower,ylower;
-	fclaw_clawpatch_grid_data_2d(glob,coarse_patch,&mx,&my,&mbc,
+	fclaw_clawpatch_2d_grid_data(glob,coarse_patch,&mx,&my,&mbc,
 	                            &xlower,&ylower,&dx,&dy);
 
 	fclaw2d_clawpatch_registers_t* crcoarse = 
-	           fclaw_clawpatch_get_registers_2d(glob,coarse_patch);
+	           fclaw_clawpatch_get_2d_registers(glob,coarse_patch);
 
 	fclaw2d_clawpatch_registers_t* crfine = 
-	           fclaw_clawpatch_get_registers_2d(glob,fine_patch);
+	           fclaw_clawpatch_get_2d_registers(glob,fine_patch);
 
 
   	/* create dummy fine grid to handle indexing between blocks */
@@ -450,14 +450,14 @@ void fclaw2d_clawpatch_time_sync_samesize (struct fclaw_global* glob,
 
 	int mx,my,mbc;
 	double dx,dy,xlower,ylower;
-	fclaw_clawpatch_grid_data_2d(glob,this_patch,&mx,&my,&mbc,
+	fclaw_clawpatch_2d_grid_data(glob,this_patch,&mx,&my,&mbc,
 	                            &xlower,&ylower,&dx,&dy);
 
 	fclaw2d_clawpatch_registers_t* crthis = 
-	fclaw_clawpatch_get_registers_2d(glob,this_patch);
+	fclaw_clawpatch_get_2d_registers(glob,this_patch);
 
 	fclaw2d_clawpatch_registers_t* crneighbor = 
-	fclaw_clawpatch_get_registers_2d(glob,neighbor_patch);
+	fclaw_clawpatch_get_2d_registers(glob,neighbor_patch);
 
 	/* create dummy fine grid to handle indexing between blocks */
 	double *qneighbor_dummy = FCLAW_ALLOC_ZERO(double,meqn*(mx+2*mbc)*(my+2*mbc));

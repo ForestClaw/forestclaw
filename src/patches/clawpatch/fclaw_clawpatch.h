@@ -445,7 +445,7 @@ int fclaw_clawpatch_dim(struct fclaw_patch * patch);
  * @param[out] xlower, ylower the lower left coordinate of the patch
  * @param[out] dx, dy the spacings in the x and y directions
  */
-void fclaw_clawpatch_grid_data_2d(struct fclaw_global* glob,
+void fclaw_clawpatch_2d_grid_data(struct fclaw_global* glob,
                                   struct fclaw_patch* patch,
                                   int* mx, 
                                   int* my, 
@@ -465,7 +465,7 @@ void fclaw_clawpatch_grid_data_2d(struct fclaw_global* glob,
  * @param[out] xlower, ylower, zlower the lower bottom left coordinate of the patch
  * @param[out] dx, dy, dz the spacings in the x, y, and z directions
  */
-void fclaw_clawpatch_grid_data_3d(struct fclaw_global* glob,
+void fclaw_clawpatch_3d_grid_data(struct fclaw_global* glob,
                                   struct fclaw_patch* patch,
                                   int* mx, 
                                   int* my, 
@@ -490,7 +490,7 @@ void fclaw_clawpatch_grid_data_3d(struct fclaw_global* glob,
  *             (i,j,2) contains the the left edge length for cell (i,j).
  * @param[out] curvature the curvature for each cell in the patch
  */
-void fclaw_clawpatch_metric_scalar_2d(struct fclaw_global* glob,
+void fclaw_clawpatch_2d_metric_scalar(struct fclaw_global* glob,
                                       struct fclaw_patch* patch,
                                       double **area,
                                       double **edgelengths,
@@ -512,7 +512,7 @@ void fclaw_clawpatch_metric_scalar_2d(struct fclaw_global* glob,
  * @param[out] surfnormals the surface normal for each cell center of the patch
  *             An array of dimension(-mbc:mx+mbc+1,-mbc:my+mbc+1,3)
  */
-void fclaw_clawpatch_metric_vector_2d(struct fclaw_global* glob,
+void fclaw_clawpatch_2d_metric_vector(struct fclaw_global* glob,
                                       struct fclaw_patch* patch,
                                       double **xnormals, 
                                       double **ynormals,
@@ -529,7 +529,7 @@ void fclaw_clawpatch_metric_vector_2d(struct fclaw_global* glob,
  * @param[out] xd, yd, zd the coordinates of the nodes
  * @param[out] area the area of each cell
  */
-void fclaw_clawpatch_metric_data_2d(struct fclaw_global* glob,
+void fclaw_clawpatch_2d_metric_data(struct fclaw_global* glob,
                                     struct fclaw_patch* patch,
                                     double **xp, 
                                     double **yp, 
@@ -559,7 +559,7 @@ void fclaw_clawpatch_metric_data_2d(struct fclaw_global* glob,
  *             (i,j,2) contains the the left edge length for cell (i,j).
  * @param[out] curvature the curvature for each cell in the patch
  */
-void fclaw_clawpatch_metric_data2_2d(struct fclaw_global* glob,
+void fclaw_clawpatch_2d_metric_data2(struct fclaw_global* glob,
                                      struct fclaw_patch* patch,
                                      double **xnormals, 
                                      double **ynormals,
@@ -581,7 +581,7 @@ void fclaw_clawpatch_metric_data2_2d(struct fclaw_global* glob,
  *             (i,j,2) contains the the left edge length for cell (i,j).
  * @param[out] curvature the curvature for each cell in the patch
  */
-void fclaw_clawpatch_metric_scalar_3d(struct fclaw_global* glob,
+void fclaw_clawpatch_3d_metric_scalar(struct fclaw_global* glob,
                                       struct fclaw_patch* patch,
                                       double **volume,
                                       double **faceareas);
@@ -602,7 +602,7 @@ void fclaw_clawpatch_metric_scalar_3d(struct fclaw_global* glob,
  * @param[out] surfnormals the surface normal for each cell center of the patch
  *             An array of dimension(-mbc:mx+mbc+1,-mbc:my+mbc+1,3)
  */
-void fclaw_clawpatch_metric_basis_3d(struct fclaw_global* glob,
+void fclaw_clawpatch_3d_metric_basis(struct fclaw_global* glob,
                                      struct fclaw_patch* patch,
                                      double **xrot, 
                                      double **yrot,
@@ -617,7 +617,7 @@ void fclaw_clawpatch_metric_basis_3d(struct fclaw_global* glob,
  * @param[out] xd, yd, zd the coordinates of the nodes
  * @param[out] area the area of each cell
  */
-void fclaw_clawpatch_mesh_data_3d(struct fclaw_global* glob,
+void fclaw_clawpatch_3d_mesh_data(struct fclaw_global* glob,
                                   struct fclaw_patch* patch,
                                   double **xp, 
                                   double **yp, 
@@ -635,7 +635,7 @@ void fclaw_clawpatch_mesh_data_3d(struct fclaw_global* glob,
  * @param this_patch the patch to get the are for
  * @return double* the area array
  */
-double* fclaw_clawpatch_get_area_2d(struct fclaw_global* glob,
+double* fclaw_clawpatch_get_2d_area(struct fclaw_global* glob,
                                      struct fclaw_patch* patch);
 
 /**
@@ -644,7 +644,7 @@ double* fclaw_clawpatch_get_area_2d(struct fclaw_global* glob,
  * @param this_patch the patch to get the are for
  * @return double* the area array
  */
-double* fclaw_clawpatch_get_volume_3d(struct fclaw_global* glob,
+double* fclaw_clawpatch_get_3d_volume(struct fclaw_global* glob,
                                       struct fclaw_patch* this_patch);
 
 
@@ -827,7 +827,7 @@ double* fclaw_clawpatch_get_q_timesync(struct fclaw_global* glob,
  * @return the registers
  */
 struct fclaw2d_clawpatch_registers* 
-fclaw_clawpatch_get_registers_2d(struct fclaw_global* glob,
+fclaw_clawpatch_get_2d_registers(struct fclaw_global* glob,
                                  struct fclaw_patch* patch);
 
 #ifdef __cplusplus
