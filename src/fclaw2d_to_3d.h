@@ -337,10 +337,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 /* translations for dimension independent wrapper functions/types */
-#define fclaw2d_domain_wrap_t           fclaw3d_domain_wrap_t
-#define fclaw_domain_get_2d_domain_wrap fclaw_domain_get_3d_domain_wrap
-#define fclaw_domain_get_2d_domain      fclaw_domain_get_3d_domain
-#define fclaw_patch_get_2d_patch        fclaw_patch_get_3d_patch
-#define fclaw_domain_wrap_2d            fclaw_domain_wrap_3d
+#define fclaw2d_domain_wrap_t              fclaw3d_domain_wrap_t
+#define fclaw_domain_get_2d_domain_wrap    fclaw_domain_get_3d_domain_wrap
+#define fclaw_domain_get_2d_domain         fclaw_domain_get_3d_domain
+#define fclaw_patch_get_2d_patch           fclaw_patch_get_3d_patch
+#define fclaw_domain_wrap_2d               fclaw_domain_wrap_3d
+#define fclaw2d_patch_callback_wrap_user_t fclaw3d_patch_callback_wrap_user_t
+#define fclaw2d_patch_callback_wrap        fclaw3d_patch_callback_wrap
 
 #endif /* !FCLAW2D_TO_3D_H */

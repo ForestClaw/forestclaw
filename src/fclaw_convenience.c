@@ -114,18 +114,28 @@ void fclaw_domain_destroy (fclaw_domain_t * domain)
 {
     if(domain->dim == 2)
     {
-        fclaw2d_domain_t *domain_2d = fclaw_domain_get_2d_domain(domain);
-        fclaw2d_domain_destroy(domain_2d);
+        fclaw2d_domain_wrap_t* wrap = domain->wrapped_domain;
+        fclaw2d_domain_destroy(wrap->domain);
+        FCLAW_FREE(wrap);
     }
     else if(domain->dim == 3)
     {
-        fclaw3d_domain_t *domain_3d = fclaw_domain_get_3d_domain(domain);
-        fclaw3d_domain_destroy(domain_3d);
+        fclaw3d_domain_wrap_t* wrap = domain->wrapped_domain;
+        fclaw3d_domain_destroy(wrap->domain);
+        FCLAW_FREE(wrap);
     }
     else
     {
         SC_ABORT_NOT_REACHED ();
     }
+    for(int blockno = 0; blockno < domain->num_blocks; ++blockno)
+    {
+        fclaw_block_t *block = &domain->blocks[blockno];
+        FCLAW_FREE(block->patches);
+    }
+    FCLAW_FREE(domain->blocks);
+    FCLAW_FREE(domain->ghost_patches);
+
     FCLAW_FREE(domain);
 }
 

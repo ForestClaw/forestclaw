@@ -542,21 +542,96 @@ void
 fclaw_domain_iterate_level (fclaw_domain_t * domain, int level,
                               fclaw_patch_callback_t pcb, void *user)
 {
-    fclaw_abortf("NOT IMPLIMENTED");
+    if (domain->dim == 2)
+    {
+        fclaw2d_patch_callback_wrap_user_t wrap;
+        wrap.pcb = pcb;
+        wrap.user = user;
+
+        fclaw2d_domain_t* domain_2d = fclaw_domain_get_2d_domain(domain);
+
+        fclaw2d_domain_iterate_level(domain_2d,level,fclaw2d_patch_callback_wrap,
+                                     &wrap);
+    }
+    else if (domain->dim == 3)
+    {
+        fclaw3d_patch_callback_wrap_user_t wrap;
+        wrap.pcb = pcb;
+        wrap.user = user;
+
+        fclaw3d_domain_t* domain_3d = fclaw_domain_get_3d_domain(domain);
+
+        fclaw3d_domain_iterate_level(domain_3d,level,fclaw3d_patch_callback_wrap,
+                                     &wrap);
+    }
+    else
+    {
+        SC_ABORT_NOT_REACHED();
+    }
 }
 
 void
 fclaw_domain_iterate_patches (fclaw_domain_t * domain,
                                 fclaw_patch_callback_t pcb, void *user)
 {
-    fclaw_abortf("NOT IMPLIMENTED");
+    if(domain->dim == 2)
+    {
+        fclaw2d_patch_callback_wrap_user_t wrap;
+        wrap.pcb = pcb;
+        wrap.user = user;
+
+        fclaw2d_domain_t* domain_2d = fclaw_domain_get_2d_domain(domain);
+
+        fclaw2d_domain_iterate_patches(domain_2d,fclaw2d_patch_callback_wrap,
+                                       &wrap);
+    }
+    else if (domain->dim == 3)
+    {
+        fclaw3d_patch_callback_wrap_user_t wrap;
+        wrap.pcb = pcb;
+        wrap.user = user;
+
+        fclaw3d_domain_t* domain_3d = fclaw_domain_get_3d_domain(domain);
+
+        fclaw3d_domain_iterate_patches(domain_3d,fclaw3d_patch_callback_wrap,
+                                       &wrap);
+    }
+    else
+    {
+        SC_ABORT_NOT_REACHED();
+    }
 }
 
 void
 fclaw_domain_iterate_families (fclaw_domain_t * domain,
                                  fclaw_patch_callback_t pcb, void *user)
 {
-    fclaw_abortf("NOT IMPLIMENTED");
+    if(domain->dim == 2)
+    {
+        fclaw2d_patch_callback_wrap_user_t wrap;
+        wrap.pcb = pcb;
+        wrap.user = user;
+
+        fclaw2d_domain_t* domain_2d = fclaw_domain_get_2d_domain(domain);
+
+        fclaw2d_domain_iterate_families(domain_2d,fclaw2d_patch_callback_wrap,
+                                        &wrap);
+    }
+    else if (domain->dim == 3)
+    {
+        fclaw3d_patch_callback_wrap_user_t wrap;
+        wrap.pcb = pcb;
+        wrap.user = user;
+
+        fclaw3d_domain_t* domain_3d = fclaw_domain_get_3d_domain(domain);
+
+        fclaw3d_domain_iterate_families(domain_3d,fclaw3d_patch_callback_wrap,
+                                        &wrap);
+    }
+    else
+    {
+        SC_ABORT_NOT_REACHED();
+    }
 }
 
 

@@ -117,6 +117,11 @@ void copy_block(fclaw_block_t* block, fclaw2d_block_t* block_2d)
 
 fclaw_domain_t* fclaw_domain_wrap_2d(fclaw2d_domain_t* domain_2d)
 {
+    if(domain_2d == NULL)
+    {
+        return NULL;
+    }
+
     fclaw_domain_t* domain = FCLAW_ALLOC_ZERO(fclaw_domain_t, 1);
     domain->dim = FCLAW2D_SPACEDIM;
 
@@ -160,4 +165,27 @@ fclaw_domain_t* fclaw_domain_wrap_2d(fclaw2d_domain_t* domain_2d)
     domain_2d->user = domain;
 
     return domain;
+}
+
+static
+fclaw_domain_t* get_domain(fclaw2d_domain_t* domain_2d)
+{
+    return (fclaw_domain_t*) domain_2d->user;
+}
+
+static
+fclaw_patch_t* get_patch(fclaw2d_patch_t* patch_2d)
+{
+    return (fclaw_patch_t*) patch_2d->user;
+}
+
+void fclaw2d_patch_callback_wrap(fclaw2d_domain_t * domain_2d, 
+                                 fclaw2d_patch_t * patch_2d,
+                                 int blockno, int patchno, void *user)
+{
+    fclaw2d_patch_callback_wrap_user_t* wrap = 
+        (fclaw2d_patch_callback_wrap_user_t*) user;
+    fclaw_domain_t* domain = get_domain(domain_2d);
+    fclaw_patch_t* patch = get_patch(patch_2d);
+    wrap->pcb(domain, patch, blockno, patchno, wrap->user);
 }

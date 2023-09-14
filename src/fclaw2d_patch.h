@@ -33,10 +33,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define FCLAW2D_PATCH_H
 
 #include <forestclaw2d.h>  /* Contains definition of patch-iterator callback */
+#include <forestclaw.h>  /* Contains definition of patch-iterator callback */
 
-struct fclaw_patch;
-
-fclaw2d_patch_t* fclaw_patch_get_2d_patch(const struct fclaw_patch* patch);
+fclaw2d_patch_t* fclaw_patch_get_2d_patch(const fclaw_patch_t* patch);
 
 #ifdef __cplusplus
 #if 0

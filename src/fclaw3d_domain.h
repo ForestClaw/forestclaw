@@ -32,6 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW3D_DOMAIN_H
 #define FCLAW3D_DOMAIN_H
 
+#include <forestclaw.h>
 #include <forestclaw3d.h>  /* Contains definition of patch-iterator callback */
 
 #ifdef __cplusplus
@@ -56,6 +57,18 @@ struct fclaw_domain* fclaw_domain_wrap_3d(fclaw3d_domain_t *domain2d);
 fclaw3d_domain_t* fclaw_domain_get_3d_domain(const struct fclaw_domain* patch);
 
 fclaw3d_domain_wrap_t* fclaw_domain_get_3d_domain_wrap(struct fclaw_domain* domain);
+
+typedef struct fclaw3d_patch_callback_wrap_user
+{
+    fclaw_patch_callback_t pcb;
+    void* user;
+} fclaw3d_patch_callback_wrap_user_t;
+
+void fclaw3d_patch_callback_wrap(fclaw3d_domain_t * domain, 
+                                 fclaw3d_patch_t * patch,
+                                 int blockno, int patchno, void *user);
+
+
 
 #ifdef __cplusplus
 #if 0
