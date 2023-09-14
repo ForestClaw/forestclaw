@@ -43,6 +43,8 @@ extern "C"
 #endif
 #endif
 
+fclaw2d_patch_t* fclaw_patch_get_2d_patch(const fclaw_patch_t* patch);
+
 typedef struct fclaw2d_domain_wrap
 {
     fclaw2d_domain_t*          domain;

@@ -28,8 +28,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_wrap.h>
 #include <fclaw3d_wrap.h>
 #include <fclaw_patch.h>
-#include <fclaw2d_patch.h>
-#include <fclaw3d_patch.h>
 #include <forestclaw2d.h>
 #include <forestclaw3d.h>
 #include <p4est.h>

@@ -33,7 +33,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_domain.h>
 #include <fclaw2d_wrap.h>
 #include <fclaw3d_wrap.h>
-#include <fclaw2d_patch.h>
 #include <fclaw_convenience.h>
 
 static 
