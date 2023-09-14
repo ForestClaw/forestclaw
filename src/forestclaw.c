@@ -542,12 +542,12 @@ void
 fclaw_domain_iterate_level (fclaw_domain_t * domain, int level,
                               fclaw_patch_callback_t pcb, void *user)
 {
+    fclaw_patch_callback_wrap_user_t wrap;
+    wrap.pcb = pcb;
+    wrap.user = user;
+
     if (domain->refine_dim == 2)
     {
-        fclaw2d_patch_callback_wrap_user_t wrap;
-        wrap.pcb = pcb;
-        wrap.user = user;
-
         fclaw2d_domain_t* domain_2d = fclaw_domain_get_2d_domain(domain);
 
         fclaw2d_domain_iterate_level(domain_2d,level,fclaw2d_patch_callback_wrap,
@@ -555,10 +555,6 @@ fclaw_domain_iterate_level (fclaw_domain_t * domain, int level,
     }
     else if (domain->refine_dim == 3)
     {
-        fclaw3d_patch_callback_wrap_user_t wrap;
-        wrap.pcb = pcb;
-        wrap.user = user;
-
         fclaw3d_domain_t* domain_3d = fclaw_domain_get_3d_domain(domain);
 
         fclaw3d_domain_iterate_level(domain_3d,level,fclaw3d_patch_callback_wrap,
@@ -574,12 +570,12 @@ void
 fclaw_domain_iterate_patches (fclaw_domain_t * domain,
                                 fclaw_patch_callback_t pcb, void *user)
 {
+    fclaw_patch_callback_wrap_user_t wrap;
+    wrap.pcb = pcb;
+    wrap.user = user;
+
     if(domain->refine_dim == 2)
     {
-        fclaw2d_patch_callback_wrap_user_t wrap;
-        wrap.pcb = pcb;
-        wrap.user = user;
-
         fclaw2d_domain_t* domain_2d = fclaw_domain_get_2d_domain(domain);
 
         fclaw2d_domain_iterate_patches(domain_2d,fclaw2d_patch_callback_wrap,
@@ -587,10 +583,6 @@ fclaw_domain_iterate_patches (fclaw_domain_t * domain,
     }
     else if (domain->refine_dim == 3)
     {
-        fclaw3d_patch_callback_wrap_user_t wrap;
-        wrap.pcb = pcb;
-        wrap.user = user;
-
         fclaw3d_domain_t* domain_3d = fclaw_domain_get_3d_domain(domain);
 
         fclaw3d_domain_iterate_patches(domain_3d,fclaw3d_patch_callback_wrap,
@@ -606,12 +598,12 @@ void
 fclaw_domain_iterate_families (fclaw_domain_t * domain,
                                  fclaw_patch_callback_t pcb, void *user)
 {
+    fclaw_patch_callback_wrap_user_t wrap;
+    wrap.pcb = pcb;
+    wrap.user = user;
+
     if(domain->refine_dim == 2)
     {
-        fclaw2d_patch_callback_wrap_user_t wrap;
-        wrap.pcb = pcb;
-        wrap.user = user;
-
         fclaw2d_domain_t* domain_2d = fclaw_domain_get_2d_domain(domain);
 
         fclaw2d_domain_iterate_families(domain_2d,fclaw2d_patch_callback_wrap,
@@ -619,10 +611,6 @@ fclaw_domain_iterate_families (fclaw_domain_t * domain,
     }
     else if (domain->refine_dim == 3)
     {
-        fclaw3d_patch_callback_wrap_user_t wrap;
-        wrap.pcb = pcb;
-        wrap.user = user;
-
         fclaw3d_domain_t* domain_3d = fclaw_domain_get_3d_domain(domain);
 
         fclaw3d_domain_iterate_families(domain_3d,fclaw3d_patch_callback_wrap,
@@ -783,12 +771,12 @@ fclaw_patch_mark_coarsen(fclaw_domain_t *domain, int blockno, int patchno)
 void
 fclaw_domain_iterate_adapted(fclaw_domain_t *old_domain, fclaw_domain_t *new_domain, fclaw_match_callback_t mcb, void *user)
 {
+    fclaw_match_callback_wrap_user_t mcb_wrap_user;
+    mcb_wrap_user.mcb = mcb;
+    mcb_wrap_user.user = user;
+
     if(old_domain->refine_dim == 2)
     {
-        fclaw2d_match_callback_wrap_user_t mcb_wrap_user;
-        mcb_wrap_user.mcb = mcb;
-        mcb_wrap_user.user = user;
-
         fclaw2d_domain_t* old_domain_2d = fclaw_domain_get_2d_domain(old_domain);
         fclaw2d_domain_t* new_domain_2d = fclaw_domain_get_2d_domain(new_domain);
 
@@ -799,10 +787,6 @@ fclaw_domain_iterate_adapted(fclaw_domain_t *old_domain, fclaw_domain_t *new_dom
     }
     else if (old_domain->refine_dim == 3)
     {
-        fclaw3d_match_callback_wrap_user_t mcb_wrap_user;
-        mcb_wrap_user.mcb = mcb;
-        mcb_wrap_user.user = user;
-
         fclaw3d_domain_t* old_domain_3d = fclaw_domain_get_3d_domain(old_domain);
         fclaw3d_domain_t* new_domain_3d = fclaw_domain_get_3d_domain(new_domain);
 
@@ -856,12 +840,12 @@ void fclaw_domain_retrieve_after_partition(fclaw_domain_t *domain, void ***patch
 void fclaw_domain_iterate_partitioned(fclaw_domain_t *old_domain, fclaw_domain_t *new_domain, fclaw_transfer_callback_t tcb, void *user)
 {
     FCLAW_ASSERT(old_domain->refine_dim == new_domain->refine_dim);
+    fclaw_transfer_callback_wrap_user_t wrap;
+    wrap.tcb = tcb;
+    wrap.user = user;
+
     if(old_domain->refine_dim == 2)
     {
-        fclaw2d_transfer_callback_wrap_user_t wrap;
-        wrap.tcb = tcb;
-        wrap.user = user;
-
         fclaw2d_domain_t* old_domain_2d = fclaw_domain_get_2d_domain(old_domain);
         fclaw2d_domain_t* new_domain_2d = fclaw_domain_get_2d_domain(new_domain);
         fclaw2d_domain_iterate_partitioned(old_domain_2d,
@@ -871,10 +855,6 @@ void fclaw_domain_iterate_partitioned(fclaw_domain_t *old_domain, fclaw_domain_t
     }
     else if(old_domain->refine_dim == 3)
     {
-        fclaw3d_transfer_callback_wrap_user_t wrap;
-        wrap.tcb = tcb;
-        wrap.user = user;
-
         fclaw3d_domain_t* old_domain_3d = fclaw_domain_get_3d_domain(old_domain);
         fclaw3d_domain_t* new_domain_3d = fclaw_domain_get_3d_domain(new_domain);
         fclaw3d_domain_iterate_partitioned(old_domain_3d,

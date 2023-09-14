@@ -24,15 +24,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 /** 
  * @file
- * @brief Functions needed for an underlying wrapped fclaw3d_domain_t in fclaw_domain_t
+ * @brief Functions needed for wrapped fclaw types
  *        Most users will not need to include the file, unless doing something more advanced.
  */
 
 
-#ifndef FCLAW3D_DOMAIN_H
-#define FCLAW3D_DOMAIN_H
+#ifndef FCLAW3D_WRAP_H
+#define FCLAW3D_WRAP_H
 
-#include <forestclaw.h>
+#include <fclaw_wrap.h>
 #include <forestclaw3d.h>  /* Contains definition of patch-iterator callback */
 
 #ifdef __cplusplus

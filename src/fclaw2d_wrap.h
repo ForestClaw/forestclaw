@@ -24,15 +24,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 /** 
  * @file
- * @brief Functions needed for an underlying wrapped fclaw2d_domain_t in fclaw_domain_t
+ * @brief Functions needed for underlying wrapped types
  *        Most users will not need to include the file, unless doing something more advanced.
  */
 
 
-#ifndef FCLAW2D_DOMAIN_H
-#define FCLAW2D_DOMAIN_H
+#ifndef FCLAW2D_WRAP_H
+#define FCLAW2D_WRAP_H
 
-#include <forestclaw.h>
+#include <fclaw_wrap.h>
 #include <forestclaw2d.h>  /* Contains definition of patch-iterator callback */
 
 #ifdef __cplusplus
@@ -42,8 +42,6 @@ extern "C"
 }                               /* need this because indent is dumb */
 #endif
 #endif
-
-struct fclaw_domain;
 
 typedef struct fclaw2d_domain_wrap
 {
@@ -59,22 +57,9 @@ fclaw2d_domain_t* fclaw_domain_get_2d_domain(const struct fclaw_domain* domain);
 
 fclaw2d_domain_wrap_t* fclaw_domain_get_2d_domain_wrap(struct fclaw_domain* domain);
 
-typedef struct fclaw2d_patch_callback_wrap_user
-{
-    fclaw_patch_callback_t pcb;
-    void* user;
-} fclaw2d_patch_callback_wrap_user_t;
-
 void fclaw2d_patch_callback_wrap(fclaw2d_domain_t * domain, 
                                  fclaw2d_patch_t * patch,
                                  int blockno, int patchno, void *user);
-
-typedef struct fclaw2d_transfer_callback_wrap_user
-{
-    fclaw_transfer_callback_t tcb;
-    void *user;
-} fclaw2d_transfer_callback_wrap_user_t;
-
 
 void
 fclaw2d_transfer_callback_wrap(fclaw2d_domain_t * old_domain,
@@ -84,12 +69,6 @@ fclaw2d_transfer_callback_wrap(fclaw2d_domain_t * old_domain,
                                int blockno,
                                int old_patchno, int new_patchno,
                                void *user);
-
-typedef struct fclaw2d_match_callback_wrap_user
-{
-    fclaw_match_callback_t mcb;
-    void *user;
-} fclaw2d_match_callback_wrap_user_t;
 
 void
 fclaw2d_match_callback_wrap(fclaw2d_domain_t * old_domain,

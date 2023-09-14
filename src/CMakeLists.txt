@@ -153,6 +153,7 @@ install(FILES
   fclaw_mpi.h 
   fclaw_math.h 
   fclaw_vtable.h
+  fclaw_wrap.h
 
   fp_exception_glibc_extension.h 
 
@@ -164,6 +165,7 @@ install(FILES
   fclaw2d_map_query.h
   fclaw2d_map_query_defs.h
   fclaw2d_rays.h
+  fclaw2d_wrap.h
   fclaw2d_to_3d.h
   fclaw_update_single_step.h
 
@@ -172,6 +174,7 @@ install(FILES
   fclaw3d_file.h
   fclaw3d_include_all.h 
   fclaw3d_map.h
+  fclaw3d_wrap.h
 
   forestclaw.h
   forestclaw2d.h 
