@@ -30,11 +30,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /* ------------------------- Start of program ---------------------------- */
 
 static void
-store_domain_map (fclaw2d_global_t * glob, fclaw_options_t * fclaw_opt,
+store_domain_map (fclaw_global_t * glob, fclaw_options_t * fclaw_opt,
                   user_options_t * user)
 {
     /* Mapped, multi-block domain */
-    fclaw2d_domain_t *domain = NULL;
+    fclaw_domain_t *domain = NULL;
     fclaw2d_map_context_t *cont = NULL;
 
     /* Local variables */
@@ -48,7 +48,7 @@ store_domain_map (fclaw2d_global_t * glob, fclaw_options_t * fclaw_opt,
     case 0:
         /* Use [ax,bx]x[ay,by] */
         domain =
-            fclaw2d_domain_new_unitsquare (glob->mpicomm,
+            fclaw_domain_new_unitsquare (glob->mpicomm,
                                            fclaw_opt->minlevel);
         cont = fclaw2d_map_new_nomap ();
         break;
@@ -56,7 +56,7 @@ store_domain_map (fclaw2d_global_t * glob, fclaw_options_t * fclaw_opt,
         /* Map five-patch square to a disk using the pillowdisk.  Input
            parameter alpha needed for five patch square */
         domain =
-            fclaw2d_domain_new_disk (glob->mpicomm, 0, 0,
+            fclaw_domain_new_disk_2d (glob->mpicomm, 0, 0,
                                      fclaw_opt->minlevel);
         cont =
             fclaw2d_map_new_pillowdisk5 (fclaw_opt->scale, fclaw_opt->shift,
@@ -65,7 +65,7 @@ store_domain_map (fclaw2d_global_t * glob, fclaw_options_t * fclaw_opt,
     case 2:
         /* Map single Cartesian square to a pillowdisk */
         domain =
-            fclaw2d_domain_new_unitsquare (glob->mpicomm,
+            fclaw_domain_new_unitsquare (glob->mpicomm,
                                            fclaw_opt->minlevel);
         cont =
             fclaw2d_map_new_pillowdisk (fclaw_opt->scale, fclaw_opt->shift,
@@ -75,10 +75,10 @@ store_domain_map (fclaw2d_global_t * glob, fclaw_options_t * fclaw_opt,
         SC_ABORT_NOT_REACHED ();
     }
 
-    fclaw2d_domain_list_levels (domain, FCLAW_VERBOSITY_ESSENTIAL);
-    fclaw2d_domain_list_neighbors (domain, FCLAW_VERBOSITY_DEBUG);
-    fclaw2d_global_store_domain (glob, domain);
-    fclaw2d_global_store_map (glob, cont);
+    fclaw_domain_list_levels (domain, FCLAW_VERBOSITY_ESSENTIAL);
+    fclaw_domain_list_neighbors (domain, FCLAW_VERBOSITY_DEBUG);
+    fclaw_global_store_domain (glob, domain);
+    fclaw2d_map_store (glob, cont);
 }
 
 static
@@ -153,8 +153,8 @@ main (int argc, char **argv)
         /* Create global structure which stores the domain, timers, etc */
         int size, rank;
         sc_MPI_Comm mpicomm = fclaw_app_get_mpi_size_rank (app, &size, &rank);
-        fclaw2d_global_t *glob =
-            fclaw2d_global_new_comm (mpicomm, size, rank);
+        fclaw_global_t *glob =
+            fclaw_global_new_comm (mpicomm, size, rank);
         store_domain_map (glob, fclaw_opt, user_opt);
 
         /* Store option packages in glob */

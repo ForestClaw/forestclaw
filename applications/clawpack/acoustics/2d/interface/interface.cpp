@@ -37,13 +37,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 static void
 store_domain_map (fclaw_global_t * glob, fclaw_options_t * fclaw_opt)
 {
-    fclaw2d_domain_t *domain = NULL;
+    fclaw_domain_t *domain = NULL;
     domain =
-        fclaw2d_domain_new_unitsquare (glob->mpicomm, fclaw_opt->minlevel);
-    fclaw2d_domain_list_levels (domain, FCLAW_VERBOSITY_ESSENTIAL);
-    fclaw2d_domain_list_neighbors (domain, FCLAW_VERBOSITY_DEBUG);
-    fclaw2d_global_store_domain (glob, domain);
-    fclaw2d_global_store_map (glob, fclaw2d_map_new_nomap ());
+        fclaw_domain_new_unitsquare (glob->mpicomm, fclaw_opt->minlevel);
+    fclaw_domain_list_levels (domain, FCLAW_VERBOSITY_ESSENTIAL);
+    fclaw_domain_list_neighbors (domain, FCLAW_VERBOSITY_DEBUG);
+    fclaw_global_store_domain (glob, domain);
+    fclaw2d_map_store (glob, fclaw2d_map_new_nomap ());
 }
 
 static
@@ -115,8 +115,8 @@ main (int argc, char **argv)
         /* Create global structure which stores the domain, timers, etc */
         int size, rank;
         sc_MPI_Comm mpicomm = fclaw_app_get_mpi_size_rank (app, &size, &rank);
-        fclaw2d_global_t *glob =
-            fclaw2d_global_new_comm (mpicomm, size, rank);
+        fclaw_global_t *glob =
+            fclaw_global_new_comm (mpicomm, size, rank);
         store_domain_map (glob, fclaw_opt);
 
         /* Store option packages in glob */
