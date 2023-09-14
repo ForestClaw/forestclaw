@@ -313,13 +313,13 @@ fclaw_clawpatch_options_register(int dim, fclaw_app_t* app, const char* name, co
 }
 
 fclaw_clawpatch_options_t *
-fclaw_clawpatch_options_register_2d(fclaw_app_t* app, const char* name, const char* configfile)
+fclaw_clawpatch_2d_options_register(fclaw_app_t* app, const char* name, const char* configfile)
 {
     return fclaw_clawpatch_options_register(2,app,name,configfile);
 }
 
 fclaw_clawpatch_options_t *
-fclaw_clawpatch_options_register_3d(fclaw_app_t* app, const char* name, const char* configfile)
+fclaw_clawpatch_3d_options_register(fclaw_app_t* app, const char* name, const char* configfile)
 {
     return fclaw_clawpatch_options_register(3,app,name,configfile);
 }

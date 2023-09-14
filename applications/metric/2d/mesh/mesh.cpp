@@ -151,7 +151,7 @@ main (int argc, char **argv)
 
     /* All libraries that might be needed should be registered here */
     gparms =      fclaw2d_forestclaw_options_register(app,               "fclaw_options.ini");
-    clawpatchopt = fclaw_clawpatch_options_register_2d(app, "clawpatch",  "fclaw_options.ini");
+    clawpatchopt = fclaw_clawpatch_2d_options_register(app, "clawpatch",  "fclaw_options.ini");
     claw46opt =      fc2d_clawpack46_options_register(app, "clawpack46", "fclaw_options.ini");
     claw5opt =        fc2d_clawpack5_options_register(app, "clawpack5",  "fclaw_options.ini");
     register_user_options(app,"fclaw_options.ini",user);  /* [user] */

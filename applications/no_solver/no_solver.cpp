@@ -85,7 +85,7 @@ main (int argc, char **argv)
 
     /* Create new options packages */
     fclaw_opt =                   fclaw_options_register(app,  NULL,       "fclaw_options.ini");
-    clawpatch_opt =   fclaw_clawpatch_options_register_2d(app, "clawpatch", "fclaw_options.ini");
+    clawpatch_opt =   fclaw_clawpatch_2d_options_register(app, "clawpatch", "fclaw_options.ini");
     user_opt =                no_solver_options_register(app,              "fclaw_options.ini");
 
     /* Read configuration file(s) and command line, and process options */

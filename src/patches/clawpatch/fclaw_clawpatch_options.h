@@ -122,7 +122,7 @@ void fclaw_clawpatch_options_destroy (fclaw_clawpatch_options_t *clawpatch_opt);
  * @return fclaw_clawpatch_options_t* a newly allocated options struct
  */
 fclaw_clawpatch_options_t *
-fclaw_clawpatch_options_register_2d(fclaw_app_t* app, const char* name, const char* configfile);
+fclaw_clawpatch_2d_options_register(fclaw_app_t* app, const char* name, const char* configfile);
 
 /**
  * @brief Register 3d options in SC
@@ -133,7 +133,7 @@ fclaw_clawpatch_options_register_2d(fclaw_app_t* app, const char* name, const ch
  * @return fclaw_clawpatch_options_t* a newly allocated options struct
  */
 fclaw_clawpatch_options_t *
-fclaw_clawpatch_options_register_3d(fclaw_app_t* app, const char* name, const char* configfile);
+fclaw_clawpatch_3d_options_register(fclaw_app_t* app, const char* name, const char* configfile);
 
 
 /**

@@ -72,12 +72,12 @@ main (int argc, char **argv)
 
     /* Create new options packages */
     heat_fclaw_opt =                   fclaw_options_register(app, "heat",            "fclaw_options.ini");
-    heat_clawpatch_opt =   fclaw_clawpatch_options_register_2d(app, "heat-clawpatch",  "fclaw_options.ini");
+    heat_clawpatch_opt =   fclaw_clawpatch_2d_options_register(app, "heat-clawpatch",  "fclaw_options.ini");
     heat_mg_opt =            fc2d_thunderegg_options_register(app, "heat-thunderegg", "fclaw_options.ini");
     heat_user_opt =                     heat_options_register(app, "heat-user",       "fclaw_options.ini");  
 
     phasefield_fclaw_opt =                   fclaw_options_register(app, "phasefield",           "fclaw_options.ini");
-    phasefield_clawpatch_opt =   fclaw_clawpatch_options_register_2d(app, "phasefield-clawpatch",  "fclaw_options.ini");
+    phasefield_clawpatch_opt =   fclaw_clawpatch_2d_options_register(app, "phasefield-clawpatch",  "fclaw_options.ini");
     phasefield_mg_opt =            fc2d_thunderegg_options_register(app, "phasefield-thunderegg", "fclaw_options.ini");
     phasefield_user_opt =               phasefield_options_register(app, "phasefield-user",       "fclaw_options.ini");  
 

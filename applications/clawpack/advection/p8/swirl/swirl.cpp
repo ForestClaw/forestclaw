@@ -206,7 +206,7 @@ main (int argc, char **argv)
     fclaw_opt =                   fclaw_options_register(app,  NULL,       "fclaw_options.ini");
 
 #ifdef P8HACK
-    clawpatch_opt =  fclaw_clawpatch_options_register_3d(app, "clawpatch", "fclaw_options.ini");
+    clawpatch_opt =  fclaw_clawpatch_3d_options_register(app, "clawpatch", "fclaw_options.ini");
     claw46_opt =        fc3d_clawpack46_options_register(app, "claw3",     "fclaw_options.ini");
 #endif /* P8HACK */
 

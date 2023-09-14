@@ -63,12 +63,12 @@ main (int argc, char **argv)
     app = fclaw_app_new (&argc, &argv, NULL);
 
     radial_gparms                   = fclaw_options_register(app, "radial",           "fclaw_options.ini");
-    radial_clawpatchopt = fclaw_clawpatch_options_register_2d(app, "radial-clawpatch", "fclaw_options.ini");
+    radial_clawpatchopt = fclaw_clawpatch_2d_options_register(app, "radial-clawpatch", "fclaw_options.ini");
     radial_geoclawopt        = fc2d_geoclaw_options_register(app, "radial-geoclaw",   "fclaw_options.ini");
     radial_user_opt =                radial_options_register(app, "radial-user",      "fclaw_options.ini");  
 
     slosh_fclaw_opt =                   fclaw_options_register(app, "slosh",           "fclaw_options.ini");
-    sloshclawpatch_opt =    fclaw_clawpatch_options_register_2d(app, "slosh-clawpatch", "fclaw_options.ini");
+    sloshclawpatch_opt =    fclaw_clawpatch_2d_options_register(app, "slosh-clawpatch", "fclaw_options.ini");
     slosh_geo_opt =              fc2d_geoclaw_options_register(app, "slosh-geoclaw",   "fclaw_options.ini");
     slosh_user_opt =                    slosh_options_register(app, "slosh-user",      "fclaw_options.ini");  
 

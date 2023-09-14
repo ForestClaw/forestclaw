@@ -90,7 +90,7 @@ main (int argc, char **argv)
 
     /* Create new options packages */
     fclaw_opt =                   fclaw_options_register(app,  NULL,       "fclaw_options.ini");
-    clawpatch_opt =   fclaw_clawpatch_options_register_2d(app, "clawpatch", "fclaw_options.ini");
+    clawpatch_opt =   fclaw_clawpatch_2d_options_register(app, "clawpatch", "fclaw_options.ini");
     geo_opt =              fc2d_geoclaw_options_register(app, "geoclaw",   "fclaw_options.ini");
     user_opt =                    slosh_options_register(app,              "fclaw_options.ini");  
 
