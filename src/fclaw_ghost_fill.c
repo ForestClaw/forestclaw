@@ -163,7 +163,7 @@ void copy2ghost(fclaw_global_t *glob,
     fclaw_global_iterate_level(glob, level, cb_parallel_wrap,
                          (void *) &parallel_mode);
 
-    if(glob->domain->dim == 3)
+    if(glob->domain->refine_dim == 3)
     {
         /* edge exchanges */
         parallel_mode.cb_fill = cb_edge_fill;
@@ -203,7 +203,7 @@ void average2ghost(fclaw_global_t *glob,
     fclaw_global_iterate_level(glob, coarse_level,
                    cb_interface_wrap, (void *) &parallel_mode);
     
-    if(glob->domain->dim ==3)
+    if(glob->domain->refine_dim ==3)
     {
         /* Edge average */
         parallel_mode.cb_fill = cb_edge_fill;
@@ -272,7 +272,7 @@ void interpolate2ghost(fclaw_global_t *glob,
     fclaw_global_iterate_level(glob,coarse_level, cb_interface_wrap,
                                          (void *) &parallel_mode);
 
-    if(glob->domain->dim ==3)
+    if(glob->domain->refine_dim ==3)
     {
         /* Edge interpolate */
         parallel_mode.cb_fill = cb_edge_fill;
@@ -693,14 +693,14 @@ void fclaw_ghost_update_async(fclaw_global_t* glob,
 
 
     /* Average */
-    if(glob->domain->dim==2)
+    if(glob->domain->refine_dim==2)
     average_fine2coarse_ghost(glob,mincoarse,maxcoarse,
                               time_interp,
                               read_parallel_patches,
                               parallel_mode);
 
     /* Copy */
-    if(glob->domain->dim==2)
+    if(glob->domain->refine_dim==2)
     copy_samelevel(glob,minlevel,maxlevel,time_interp,
                    read_parallel_patches,parallel_mode);
 
@@ -723,7 +723,7 @@ void fclaw_ghost_update_async(fclaw_global_t* glob,
     /* --------------------------------------------------------------
         Start send ...
     ------------------------------------------------------------*/
-    if(glob->domain->dim==2)
+    if(glob->domain->refine_dim==2)
     fclaw_exchange_ghost_patches_begin(glob,minlevel,maxlevel,time_interp,
                                          FCLAW_TIMER_GHOSTFILL);
 
@@ -778,7 +778,7 @@ void fclaw_ghost_update_async(fclaw_global_t* glob,
     /* -------------------------------------------------------------
         Receive ghost patches ...
     ------------------------------------------------------------- */
-    if(glob->domain->dim == 2) //TODO 3d
+    if(glob->domain->refine_dim == 2) //TODO 3d
     {
 
     fclaw_exchange_ghost_patches_end(glob,minlevel,maxlevel,time_interp,

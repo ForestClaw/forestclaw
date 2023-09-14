@@ -86,11 +86,11 @@ void get_corner_type(fclaw_global_t* glob,
     fclaw_domain_t *domain = glob->domain;
 
     // p4est has tons of lookup table like this, can be exposed similarly
-    int corner_faces[domain->dim];
+    int corner_faces[domain->refine_dim];
     fclaw_domain_corner_faces(domain, icorner, corner_faces);
 
     /* Both faces are at a physical boundary */
-    int num_phys_faces = get_num_intersections(domain->dim, 
+    int num_phys_faces = get_num_intersections(domain->refine_dim, 
                                                intersects_bdry,
                                                corner_faces);
 
@@ -99,16 +99,16 @@ void get_corner_type(fclaw_global_t* glob,
        (i.e. no reentrant corners). */
     *interior_corner = num_phys_faces == 0;
 
-    int num_block_faces = get_num_intersections(domain->dim, 
+    int num_block_faces = get_num_intersections(domain->refine_dim, 
                                                 intersects_block,
                                                 corner_faces);
     /* Both faces are at a block boundary, physical or not */
-    *is_block_corner = num_block_faces == domain->dim;
+    *is_block_corner = num_block_faces == domain->refine_dim;
 
     *block_iface = -1;
     if (num_block_faces == 1)
     {
-        *block_iface = find_face(domain->dim, intersects_block, corner_faces);
+        *block_iface = find_face(domain->refine_dim, intersects_block, corner_faces);
     }
 }
 
@@ -168,7 +168,7 @@ void get_corner_neighbor(fclaw_global_t *glob,
 
     /* Note : Pillowsphere case does not return a block corner neighbor */
     int ispillowsphere = 0;
-    if(domain->dim == 2)
+    if(domain->refine_dim == 2)
     {
         //TODO 3d
         fclaw2d_map_pillowsphere(glob);
@@ -244,7 +244,7 @@ void get_corner_neighbor(fclaw_global_t *glob,
                interpolation routines can be re-used. */
             int iface1 = block_iface;
             int rface1 = rfaceno;
-            fclaw_patch_face_swap(domain->dim, &iface1, &rface1);
+            fclaw_patch_face_swap(domain->refine_dim, &iface1, &rface1);
             fclaw_patch_transform_blockface(glob, iface1, rface1,
                                               ftransform_finegrid->transform);
 

@@ -829,7 +829,7 @@ fc2d_geoclaw_vtable_t* fc2d_geoclaw_vt(fclaw_global_t* glob)
 
 void fc2d_geoclaw_solver_initialize(fclaw_global_t* glob)
 {
-	if(glob->domain->dim != 2)
+	if(glob->domain->refine_dim != 2)
     {
 		fclaw_abortf("Domain set to 3d. fc2d_geoclaw is only for 2d");
     }
@@ -838,7 +838,7 @@ void fc2d_geoclaw_solver_initialize(fclaw_global_t* glob)
 	fclaw_clawpatch_options_t* clawpatch_opt = fclaw_clawpatch_get_options(glob);
 	fc2d_geoclaw_options_t* geo_opt = fc2d_geoclaw_get_options(glob);
 
-	if(clawpatch_opt->dim != 2)
+	if(clawpatch_opt->patch_dim != 2)
     {
 		fclaw_abortf("Clawpatch dimension set to 3d. fc2d_geoclaw is only for 2d");
     }

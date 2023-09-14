@@ -56,7 +56,7 @@ struct fclaw_clawpatch_3d_t
  */
 struct fclaw_clawpatch_t
 {
-    int dim;
+    int patch_dim;
     fclaw_clawpatch_2d_t* d2;
     fclaw_clawpatch_3d_t* d3;
 

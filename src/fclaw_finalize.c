@@ -173,7 +173,7 @@ void fclaw_finalize(fclaw_global_t* glob)
 
     fclaw_global_essentialf("Finalizing run\n");
     fclaw_diagnostics_finalize(glob);
-    if(glob->domain->dim == 2)
+    if(glob->domain->refine_dim == 2)
     {
         fclaw2d_map_context_t* map = fclaw2d_map_get(glob);
         if (map != NULL) {

@@ -103,7 +103,7 @@ void get_edge_type(fclaw_global_t* glob,
     int num_block_faces = get_num_intersections(intersects_block,
                                                 edge_faces);
     /* Both faces are at a block boundary, physical or not */
-    *is_block_edge = num_block_faces == domain->dim;
+    *is_block_edge = num_block_faces == domain->refine_dim;
 
     *block_iface = -1;
     if (num_block_faces == 1)
@@ -252,7 +252,7 @@ void get_edge_neighbors(fclaw_global_t *glob,
                interpolation routines can be re-used. */
             int iface1 = block_iface;
             int rface1 = rfaceno;
-            fclaw_patch_face_swap(domain->dim, &iface1, &rface1);
+            fclaw_patch_face_swap(domain->refine_dim, &iface1, &rface1);
             fclaw_patch_transform_blockface(glob, iface1, rface1,
                                               ftransform_finegrid->transform);
 

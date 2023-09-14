@@ -51,7 +51,7 @@ clawpatch_register(fclaw_clawpatch_options_t *clawpatch_options,
     sc_options_add_int (opt, 0, "my", &clawpatch_options->my, 8,
                         "Number of grid cells per patch in y [8]");
 
-    if(clawpatch_options->dim == 2)
+    if(clawpatch_options->patch_dim == 2)
     {
         clawpatch_options->mz = 1;
     }
@@ -142,7 +142,7 @@ fclaw_clawpatch_options_new (int dim)
 {
     fclaw_clawpatch_options_t* clawpatch_options = FCLAW_ALLOC_ZERO(fclaw_clawpatch_options_t,1);
 
-    clawpatch_options->dim = dim;
+    clawpatch_options->patch_dim = dim;
 
     clawpatch_options->kv_refinement_criteria = kv_refinement_criterea_new();
 

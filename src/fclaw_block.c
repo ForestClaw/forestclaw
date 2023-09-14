@@ -39,7 +39,7 @@ void fclaw_block_get_block_boundary(fclaw_global_t * glob,
                                       fclaw_patch_t * patch,
                                       int *intersects_block)
 {
-    if(glob->domain->dim == 2)
+    if(glob->domain->refine_dim == 2)
     {
         for (int iside = 0; iside < FCLAW2D_NUMFACES; iside++)
         {

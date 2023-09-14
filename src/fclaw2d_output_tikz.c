@@ -158,7 +158,7 @@ cb_tikz_output (fclaw_domain_t * domain,
 
 void fclaw2d_output_frame_tikz(fclaw_global_t* glob, int iframe)
 {
-    if(glob->domain->dim == 3)
+    if(glob->domain->refine_dim == 3)
     {
         fclaw_global_essentialf("Tikz output not supported in 3d\n");
         exit(1);

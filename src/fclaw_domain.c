@@ -92,11 +92,11 @@ void fclaw_domain_reset(fclaw_global_t* glob)
 
 int fclaw_domain_exchange_allocated(fclaw_domain_t *domain)
 {
-    if(domain->dim == 2)
+    if(domain->refine_dim == 2)
     {
         return fclaw_domain_get_2d_domain_wrap(domain)->exchange != NULL;
     }
-    else if(domain->dim == 3)
+    else if(domain->refine_dim == 3)
     {
         return fclaw_domain_get_3d_domain_wrap(domain)->exchange != NULL;
     }

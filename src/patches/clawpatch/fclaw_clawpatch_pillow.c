@@ -234,9 +234,9 @@ void fclaw_clawpatch_pillow_vtable_initialize(fclaw_global_t* glob,
                                               int claw_version)
 {
     fclaw_clawpatch_options_t* clawpatch_opt = fclaw_clawpatch_get_options(glob);
-    fclaw_clawpatch_pillow_vtable_t *pillow_vt = pillow_vt_new(clawpatch_opt->dim);
+    fclaw_clawpatch_pillow_vtable_t *pillow_vt = pillow_vt_new(clawpatch_opt->patch_dim);
 
-    if(clawpatch_opt->dim == 2)
+    if(clawpatch_opt->patch_dim == 2)
     {
         if (claw_version == 4)
         {

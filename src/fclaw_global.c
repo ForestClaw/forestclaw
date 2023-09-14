@@ -113,7 +113,7 @@ pack_iterator_callback(const char* key, void* value, void* user)
 size_t 
 fclaw_global_pack(const fclaw_global_t * glob, char* buffer)
 {
-    if(glob->domain->dim == 3)
+    if(glob->domain->refine_dim == 3)
     {
         fclaw_abortf("fclaw_global_packsize not implemented for 3d\n");
     }
@@ -141,7 +141,7 @@ packsize_iterator_callback(const char* key, void* value, void* user)
 size_t 
 fclaw_global_packsize(const fclaw_global_t * glob)
 {
-    if(glob->domain->dim == 3)
+    if(glob->domain->refine_dim == 3)
     {
         fclaw_abortf("fclaw_global_packsize not implemented for 3d\n");
     }

@@ -207,7 +207,7 @@ void metric_average_area_from_fine(fclaw_global_t *glob,
                                    int coarse_patchno,
                                    int fine0_patchno)
 {
-    if(glob->domain->dim == 3)
+    if(glob->domain->refine_dim == 3)
     {
         fclaw_abortf("Metric averaging not implemented for oct-trees.\n");
     }

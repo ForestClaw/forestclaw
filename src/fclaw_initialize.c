@@ -80,7 +80,7 @@ void fclaw_initialize(fclaw_global_t *glob)
     const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
 
 	/* This mapping context is needed by fortran mapping functions */
-    if((*domain)->dim == 2)
+    if((*domain)->refine_dim == 2)
     {
 	    fclaw2d_map_context_t *cont = fclaw2d_map_get(glob);
         //TODO set this this somewhere else

@@ -96,7 +96,7 @@ void cb_compute_diagnostics(fclaw_domain_t *domain,
     int mx, my, mz, mbc;
     double xlower,ylower,zlower,dx,dy,dz;
     fclaw_clawpatch_vtable_t *clawpatch_vt = fclaw_clawpatch_vt(s->glob);
-    if(clawpatch_vt->dim == 2)
+    if(clawpatch_vt->patch_dim == 2)
     {
         double *area = fclaw_clawpatch_get_area_2d(s->glob,patch);  
         FCLAW_ASSERT(clawpatch_vt->d2->fort_compute_patch_area != NULL);

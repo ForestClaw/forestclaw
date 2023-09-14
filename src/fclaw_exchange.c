@@ -39,13 +39,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 static 
 void** get_patch_data(fclaw_domain_t *domain)
 {
-    if(domain->dim == 2)
+    if(domain->refine_dim == 2)
     {
         fclaw2d_domain_wrap_t* wrap = fclaw_domain_get_2d_domain_wrap(domain);
         FCLAW_ASSERT(wrap->exchange != NULL);
         return wrap->exchange->patch_data;
     }
-    else if (domain->dim == 3)
+    else if (domain->refine_dim == 3)
     {
         fclaw3d_domain_wrap_t* wrap = fclaw_domain_get_3d_domain_wrap(domain);
         FCLAW_ASSERT(wrap->exchange != NULL);
@@ -60,13 +60,13 @@ void** get_patch_data(fclaw_domain_t *domain)
 static 
 void** get_ghost_data(fclaw_domain_t *domain)
 {
-    if(domain->dim == 2)
+    if(domain->refine_dim == 2)
     {
         fclaw2d_domain_wrap_t *wrap = fclaw_domain_get_2d_domain_wrap(domain);
         FCLAW_ASSERT(wrap->exchange != NULL);
         return wrap->exchange->ghost_data;
     }
-    else if (domain->dim == 3)
+    else if (domain->refine_dim == 3)
     {
         fclaw3d_domain_wrap_t *wrap = fclaw_domain_get_3d_domain_wrap(domain);
         FCLAW_ASSERT(wrap->exchange != NULL);
@@ -81,12 +81,12 @@ void** get_ghost_data(fclaw_domain_t *domain)
 static
 int exchange_allocated(fclaw_domain_t* domain)
 {
-    if(domain->dim == 2)
+    if(domain->refine_dim == 2)
     {
         fclaw2d_domain_wrap_t* wrap = fclaw_domain_get_2d_domain_wrap(domain);
         return wrap->exchange != NULL;
     }
-    else if (domain->dim == 3)
+    else if (domain->refine_dim == 3)
     {
         fclaw3d_domain_wrap_t* wrap = fclaw_domain_get_3d_domain_wrap(domain);
         return wrap->exchange != NULL;

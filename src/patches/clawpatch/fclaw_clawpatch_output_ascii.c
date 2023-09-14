@@ -63,7 +63,7 @@ void cb_clawpatch_output_ascii (fclaw_domain_t * domain,
        the layout of q in memory (i,j,m) or (m,i,j), etc */
     fclaw_clawpatch_vtable_t *clawpatch_vt = fclaw_clawpatch_vt(glob);
 
-    if(clawpatch_vt->dim == 2)
+    if(clawpatch_vt->patch_dim == 2)
     {
         int mx,my,mbc;
         double xlower,ylower,dx,dy;

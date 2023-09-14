@@ -74,7 +74,7 @@ FCLAW2D_CLAWPATCH_TRANSFORM_FACE (const int *i1, const int *j1,
         (fclaw_clawpatch_options_t*) tdata->user;
 
     int mx,my;
-    if(clawpatch_opt->dim == 2)
+    if(clawpatch_opt->patch_dim == 2)
     {
         mx = clawpatch_opt->mx;
         my = clawpatch_opt->my;
@@ -106,7 +106,7 @@ FCLAW2D_CLAWPATCH_TRANSFORM_FACE_HALF (const int *i1, const int *j1,
         (fclaw_clawpatch_options_t*) tdata->user;
 
     int mx,my;
-    if(clawpatch_opt->dim == 2)
+    if(clawpatch_opt->patch_dim == 2)
     {
         mx = clawpatch_opt->mx;
         my = clawpatch_opt->my;
@@ -137,7 +137,7 @@ FCLAW2D_CLAWPATCH_TRANSFORM_CORNER (const int *i1, const int *j1,
         (fclaw_clawpatch_options_t*) tdata->user;
 
     int mx,my;
-    if(clawpatch_opt->dim == 2)
+    if(clawpatch_opt->patch_dim == 2)
     {
         mx = clawpatch_opt->mx;
         my = clawpatch_opt->my;
@@ -185,7 +185,7 @@ FCLAW2D_CLAWPATCH_TRANSFORM_CORNER_HALF (const int *i1, const int *j1,
         (fclaw_clawpatch_options_t*) tdata->user;
 
     int mx,my;
-    if(clawpatch_opt->dim == 2)
+    if(clawpatch_opt->patch_dim == 2)
     {
         mx = clawpatch_opt->mx;
         my = clawpatch_opt->my;

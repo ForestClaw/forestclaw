@@ -358,7 +358,7 @@ struct fclaw_clawpatch_vtable_3d
  */
 struct fclaw_clawpatch_vtable
 {
-    int dim;
+    int patch_dim;
     struct fclaw_clawpatch_vtable_2d* d2;
     struct fclaw_clawpatch_vtable_3d* d3;
 

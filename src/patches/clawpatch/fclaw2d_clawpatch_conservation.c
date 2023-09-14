@@ -61,7 +61,7 @@ void fclaw2d_clawpatch_time_sync_new (fclaw_global_t* glob,
 	int mx;
 	int my;
 
-	if (clawpatch_opt->dim == 2)
+	if (clawpatch_opt->patch_dim == 2)
 	{
 		mx = clawpatch_opt->mx;
 		my = clawpatch_opt->my;
@@ -111,7 +111,7 @@ void fclaw2d_clawpatch_time_sync_pack_registers(fclaw_global_t *glob,
 	int mx;
 	int my;
 
-	if (clawpatch_opt->dim == 2)
+	if (clawpatch_opt->patch_dim == 2)
 	{
 		mx = clawpatch_opt->mx;
 		my = clawpatch_opt->my;
@@ -221,7 +221,7 @@ void fclaw2d_clawpatch_time_sync_reset(fclaw_global_t *glob,
 	int mx;
 	int my;
 
-	if (clawpatch_opt->dim == 2)
+	if (clawpatch_opt->patch_dim == 2)
 	{
 		mx = clawpatch_opt->mx;
 		my = clawpatch_opt->my;

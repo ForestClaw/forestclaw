@@ -40,14 +40,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 fclaw2d_domain_wrap_t* fclaw_domain_get_2d_domain_wrap(fclaw_domain_t* domain)
 {
     FCLAW_ASSERT(domain->wrapped_domain != NULL);
-    FCLAW_ASSERT(domain->dim == FCLAW2D_SPACEDIM);
+    FCLAW_ASSERT(domain->refine_dim == FCLAW2D_SPACEDIM);
     return (fclaw2d_domain_wrap_t*) domain->wrapped_domain;
 }
 
 fclaw2d_domain_t* fclaw_domain_get_2d_domain(const fclaw_domain_t* domain)
 {
     FCLAW_ASSERT(domain->wrapped_domain != NULL);
-    FCLAW_ASSERT(domain->dim == FCLAW2D_SPACEDIM);
+    FCLAW_ASSERT(domain->refine_dim == FCLAW2D_SPACEDIM);
     // cast away const since this won't be modifying the wrapped domain
     fclaw2d_domain_wrap_t* wrap = fclaw_domain_get_2d_domain_wrap((fclaw_domain_t*) domain);
     return wrap->domain;
@@ -56,7 +56,7 @@ fclaw2d_domain_t* fclaw_domain_get_2d_domain(const fclaw_domain_t* domain)
 static
 void copy_patch(fclaw_patch_t* patch, fclaw2d_patch_t* patch_2d)
 {
-    patch->dim = FCLAW2D_SPACEDIM;
+    patch->refine_dim = FCLAW2D_SPACEDIM;
     patch->xlower = patch_2d->xlower;
     patch->xupper = patch_2d->xupper;
     patch->ylower = patch_2d->ylower;
@@ -78,7 +78,7 @@ void copy_patch(fclaw_patch_t* patch, fclaw2d_patch_t* patch_2d)
 static
 void copy_block(fclaw_block_t* block, fclaw2d_block_t* block_2d)
 {
-    block->dim = FCLAW2D_SPACEDIM;
+    block->refine_dim = FCLAW2D_SPACEDIM;
     block->num_patches = block_2d->num_patches;
     block->num_patches_before = block_2d->num_patches_before;
     block->num_exchange_patches = block_2d->num_exchange_patches;
@@ -123,7 +123,7 @@ fclaw_domain_t* fclaw_domain_wrap_2d(fclaw2d_domain_t* domain_2d)
     }
 
     fclaw_domain_t* domain = FCLAW_ALLOC_ZERO(fclaw_domain_t, 1);
-    domain->dim = FCLAW2D_SPACEDIM;
+    domain->refine_dim = FCLAW2D_SPACEDIM;
 
     domain->mpicomm = domain_2d->mpicomm;
     domain->mpisize = domain_2d->mpisize;

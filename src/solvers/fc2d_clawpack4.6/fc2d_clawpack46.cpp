@@ -482,13 +482,13 @@ void clawpack46_vt_destroy(void* vt)
 
 void fc2d_clawpack46_solver_initialize(fclaw_global_t* glob)
 {
-	if(glob->domain->dim != 2)
+	if(glob->domain->refine_dim != 2)
 	{
 		fclaw_abortf("Domain set to 3d. fc2d_clawpack46 is only for 2d");
 	}
 
 	fclaw_clawpatch_options_t* clawpatch_opt = fclaw_clawpatch_get_options(glob);
-	if(clawpatch_opt->dim != 2)
+	if(clawpatch_opt->patch_dim != 2)
 	{
 		fclaw_abortf("Clawpatch dimension set to 3d. fc2d_clawpack46 is only for 2d");
 	}

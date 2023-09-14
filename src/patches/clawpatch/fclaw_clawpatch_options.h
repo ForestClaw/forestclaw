@@ -68,7 +68,7 @@ typedef struct fclaw_clawpatch_options fclaw_clawpatch_options_t;
 struct fclaw_clawpatch_options
 {
     /* These are constant for all clawpatch's */
-    int dim; /**< dimension of clawpatch */
+    int patch_dim; /**< dimension of clawpatch */
     int mx; /**< number of cells in the x direction */
     int my; /**< number of cells in the y direction */
     int mz; /**< number of cells in the z direction */

@@ -912,7 +912,7 @@ void fclaw_clawpatch_output_vtk_to_file (fclaw_global_t * glob, const char* file
     const fclaw_clawpatch_options_t *clawpatch_opt = fclaw_clawpatch_get_options(glob);
 
 
-    if(clawpatch_opt->dim == 2)
+    if(clawpatch_opt->patch_dim == 2)
     {
         fclaw_vtk_write_file_2d (glob, filename,
                                 clawpatch_opt->mx, 

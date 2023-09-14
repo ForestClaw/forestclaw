@@ -40,7 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 fclaw2d_patch_t* fclaw_patch_get_2d_patch(const fclaw_patch_t* patch)
 {
     FCLAW_ASSERT(patch->wrapped_patch != NULL);
-    FCLAW_ASSERT(patch->dim == FCLAW2D_SPACEDIM);
+    FCLAW_ASSERT(patch->refine_dim == FCLAW2D_SPACEDIM);
     // cast away const since this won't be modifying the wrapped patch
     return (fclaw2d_patch_t*) patch->wrapped_patch;
 }

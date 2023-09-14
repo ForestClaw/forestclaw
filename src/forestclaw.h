@@ -61,7 +61,7 @@ typedef struct fclaw_patch fclaw_patch_t;
  */
 struct fclaw_patch
 {
-    int dim;                    /**< dimension */
+    int refine_dim;                    /**< dimension */
     /** @{ @brief left/right coordinate */
     double xlower, xupper;
     /** @} */
@@ -82,7 +82,7 @@ struct fclaw_patch
  */
 typedef struct fclaw_block
 {
-    int dim;                    /**< dimension */
+    int refine_dim;                    /**< dimension */
     int num_patches;            /**< local patches in this block */
     int num_patches_before;     /**< in all previous blocks */
     int num_exchange_patches;   /**< exchange patches in this block */
@@ -122,7 +122,7 @@ typedef struct fclaw_block
  */
 struct fclaw_domain
 {
-    int dim;                    /**< dimension */
+    int refine_dim;                    /**< dimension */
     int count_set_patch;
     int count_delete_patch;
 

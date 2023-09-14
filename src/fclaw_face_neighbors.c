@@ -133,7 +133,7 @@ void get_face_neighbors(fclaw_global_t *glob,
 		int iface1, rface1;
 		iface1 = iface;
 		rface1 = rfaceno;
-		fclaw_patch_face_swap(domain->dim, &iface1,&rface1);
+		fclaw_patch_face_swap(domain->refine_dim, &iface1,&rface1);
 		fclaw_patch_transform_blockface (glob, iface1, rface1,
 										   ftransform_finegrid->transform);
 
@@ -479,7 +479,7 @@ void fclaw_face_neighbor_ghost(fclaw_global_t* glob,
 
 	fclaw_patch_transform_data_t transform_data;
 
-	transform_data.dim = domain->dim;
+	transform_data.dim = domain->refine_dim;
 	transform_data.glob = glob;
 	transform_data.based = 1;      /* cell-centered data in this routine. */
 

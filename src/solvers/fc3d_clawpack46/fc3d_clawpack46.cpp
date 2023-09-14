@@ -122,7 +122,7 @@ void clawpack46_bc3(fclaw_global_t *glob,
 
 	/* Set a local copy of mthbc that can be used for a patch. */
 	int mthbc[6];
-	if(glob->domain->dim == 2)
+	if(glob->domain->refine_dim == 2)
 	{
 		for(int i = 0; i < 6; i++)
 		{
@@ -500,7 +500,7 @@ void fc3d_clawpack46_solver_initialize(fclaw_global_t* glob)
 	fclaw_clawpatch_options_t* clawpatch_opt = fclaw_clawpatch_get_options(glob);
 	fc3d_clawpack46_options_t* clawopt = fc3d_clawpack46_get_options(glob);
 
-	if(clawpatch_opt->dim != 3)
+	if(clawpatch_opt->patch_dim != 3)
 	{
 		fclaw_abortf("Clawpatch dimension set to 2d. fc3d_clawpack46 is only for 3d.");
 	}
