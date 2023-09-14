@@ -34,6 +34,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <forestclaw2d.h>  /* Contains definition of patch-iterator callback */
 
+#ifdef __cplusplus
+extern "C"
+{
+#if 0
+}                               /* need this because indent is dumb */
+#endif
+#endif
+
 struct fclaw_domain;
 
 typedef struct fclaw2d_domain_wrap
@@ -43,6 +51,8 @@ typedef struct fclaw2d_domain_wrap
     fclaw2d_domain_indirect_t* indirect;
 } fclaw2d_domain_wrap_t;
 
+
+struct fclaw_domain* fclaw_domain_wrap_2d(fclaw2d_domain_t *domain2d);
 
 fclaw2d_domain_t* fclaw_domain_get_2d_domain(const struct fclaw_domain* domain);
 

@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -23,6 +23,38 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include <fclaw_domain.h>
 
-#include <fclaw2d_to_3d.h>
-#include "fclaw2d_patch.c"
+#ifndef P4_TO_P8
+
+#include <fclaw2d_domain.h>
+#include <fclaw2d_defs.h>
+
+#else
+
+#include <fclaw3d_domain.h>
+#include <fclaw3d_defs.h>
+
+#endif
+
+fclaw2d_domain_wrap_t* fclaw_domain_get_2d_domain_wrap(fclaw_domain_t* domain)
+{
+    FCLAW_ASSERT(domain->wrapped_domain != NULL);
+    FCLAW_ASSERT(domain->dim == FCLAW2D_SPACEDIM);
+    return (fclaw2d_domain_wrap_t*) domain->wrapped_domain;
+}
+
+fclaw2d_domain_t* fclaw_domain_get_2d_domain(const fclaw_domain_t* domain)
+{
+    FCLAW_ASSERT(domain->wrapped_domain != NULL);
+    FCLAW_ASSERT(domain->dim == FCLAW2D_SPACEDIM);
+    // cast away const since this won't be modifying the wrapped domain
+    fclaw2d_domain_wrap_t* wrap = fclaw_domain_get_2d_domain_wrap((fclaw_domain_t*) domain);
+    return wrap->domain;
+}
+
+fclaw_domain_t* fclaw_domain_wrap_2d(fclaw2d_domain_t* domain_2d)
+{
+    fclaw_domain_t* domain = FCLAW_ALLOC_ZERO(fclaw_domain_t, 1);
+    return domain;
+}

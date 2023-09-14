@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -23,6 +23,24 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include <fclaw_patch.h>
 
-#include <fclaw2d_to_3d.h>
-#include "fclaw2d_patch.c"
+#ifndef P4_TO_P8
+
+#include <fclaw2d_patch.h>
+#include <fclaw2d_defs.h>
+
+#else
+
+#include <fclaw3d_patch.h>
+#include <fclaw3d_defs.h>
+
+#endif
+
+fclaw2d_patch_t* fclaw_patch_get_2d_patch(const fclaw_patch_t* patch)
+{
+    FCLAW_ASSERT(patch->wrapped_patch != NULL);
+    FCLAW_ASSERT(patch->dim == FCLAW2D_SPACEDIM);
+    // cast away const since this won't be modifying the wrapped patch
+    return (fclaw2d_patch_t*) patch->wrapped_patch;
+}

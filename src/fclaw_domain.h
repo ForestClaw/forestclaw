@@ -31,8 +31,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define FCLAW_DOMAIN_H
 
 #include <forestclaw.h>  /* Needed for domain_exchange/domain_indirect info */
-#include <forestclaw2d.h>
-#include <forestclaw3d.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -49,10 +47,6 @@ extern "C"
        toplevel algorithmic function quite naturally outside of domain.
  */
 struct fclaw_global;
-
-fclaw_domain_t* fclaw_domain_wrap_2d(fclaw2d_domain_t *domain2d);
-
-fclaw_domain_t* fclaw_domain_wrap_3d(fclaw3d_domain_t *domain3d);
 
 void fclaw_domain_setup(struct fclaw_global* glob,
                           struct fclaw_domain* new_domain);
