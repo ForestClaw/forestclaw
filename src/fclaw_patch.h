@@ -64,34 +64,6 @@ typedef enum
     FCLAW_BUILD_CUSTOM
 } fclaw_build_mode_t;
 
-
-
-typedef struct fclaw_patch_data_d2
-{
-    /** Neighbor relation on each face */
-    fclaw_patch_relation_t face_neighbors[4];
-    /** Neighbor relation on each corner */
-    fclaw_patch_relation_t corner_neighbors[4];
-    /** True if coner has neighbor */
-    int corners[4];
-    /** The number of patches that meet at each corner */
-    int block_corner_count[4];
-} fclaw_patch_data_d2_t;
-
-typedef struct fclaw_patch_data_d3
-{
-    /** Neighbor relation on each face */
-    fclaw_patch_relation_t face_neighbors[6];
-    /** Neighbor relation on each corner */
-    fclaw_patch_relation_t edge_neighbors[12];
-    /** Neighbor relation on each corner */
-    fclaw_patch_relation_t corner_neighbors[8];
-    /** Edge variables required or not? Feel free to add */
-    /** True if corner has neighbor */
-    int corners[8];
-    /** The number of patches that meet at each corner */
-    int block_corner_count[8];
-} fclaw_patch_data_d3_t;
 /**
  * @brief Structure for user patch data
  * 
@@ -99,13 +71,21 @@ typedef struct fclaw_patch_data_d3
  */
 struct fclaw_patch_data
 {
-    int dim;
-    fclaw_patch_data_d2_t* d2;
-    fclaw_patch_data_d3_t* d3;
+    int refine_dim;
 
     /** Pointer to the core patch structure in the domain */
     const fclaw_patch_t *real_patch;
 
+    /** Neighbor relation on each face */
+    fclaw_patch_relation_t face_neighbors[6];
+    /** Neighbor relation on each edge */
+    fclaw_patch_relation_t edge_neighbors[12];
+    /** Neighbor relation on each corner */
+    fclaw_patch_relation_t corner_neighbors[8];
+    /** True if coner has neighbor */
+    int corners[8];
+    /** The number of patches that meet at each corner */
+    int block_corner_count[8];
     /** True if this patch lies on a coarse-fine interface */
     int on_coarsefine_interface;
     /** True if there are finer neighbors */

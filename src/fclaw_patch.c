@@ -67,16 +67,8 @@ void patch_data_new(fclaw_global_t* glob,
 
     /* Initialize user data */
     fclaw_patch_data_t *pdata = FCLAW_ALLOC_ZERO(fclaw_patch_data_t, 1);
-    if(glob->domain->refine_dim == 2)
-    {
-        pdata->dim = 2;
-        pdata->d2 = FCLAW_ALLOC_ZERO(fclaw_patch_data_d2_t, 1);
-    }
-    else 
-    {
-        pdata->dim = 3;
-        pdata->d3 = FCLAW_ALLOC_ZERO(fclaw_patch_data_d3_t, 1);
-    }
+    pdata->refine_dim = glob->domain->refine_dim;
+
     this_patch->user = (void *) pdata;
 
     pdata->patch_idx = this_patch_idx;
@@ -120,14 +112,6 @@ void fclaw_patch_data_delete(fclaw_global_t *glob,
         patch_vt->patch_delete(pdata->user_patch);
         ++glob->domain->count_delete_patch;
 
-        if(pdata->dim == 2)
-        {
-            FCLAW_FREE(pdata->d2);
-        }
-        else 
-        {
-            FCLAW_FREE(pdata->d3);
-        }
         FCLAW_FREE(pdata);
         this_patch->user = NULL;
     }
@@ -755,14 +739,6 @@ void fclaw_patch_remote_ghost_delete(fclaw_global_t *glob,
         FCLAW_ASSERT(patch_vt->patch_delete != NULL);
         patch_vt->remote_ghost_delete(pdata->user_patch);
 
-        if(pdata->dim == 2)
-        {
-            FCLAW_FREE(pdata->d2);
-        }
-        else 
-        {
-            FCLAW_FREE(pdata->d3);
-        }
         FCLAW_FREE(pdata);
         this_patch->user = NULL;
 
@@ -1062,34 +1038,21 @@ void fclaw_patch_set_face_type(fclaw_patch_t *patch,int iface,
                                  fclaw_patch_relation_t face_type)
 {
     fclaw_patch_data_t *pdata = get_patch_data(patch);
-    if(patch->refine_dim == 2){
-        pdata->d2->face_neighbors[iface] = face_type;
-    } else {
-        pdata->d3->face_neighbors[iface] = face_type;
-    }
+    pdata->face_neighbors[iface] = face_type;
 }
 
 void fclaw_patch_set_corner_type(fclaw_patch_t *patch,int icorner,
                                    fclaw_patch_relation_t corner_type)
 {
     fclaw_patch_data_t *pdata = get_patch_data(patch);
-    if(patch->refine_dim == 2){
-        pdata->d2->corner_neighbors[icorner] = corner_type;
-        pdata->d2->corners[icorner] = 1;
-    } else {
-        pdata->d3->corner_neighbors[icorner] = corner_type;
-        pdata->d3->corners[icorner] = 1;
-    }
+    pdata->corner_neighbors[icorner] = corner_type;
+    pdata->corners[icorner] = 1;
 }
 
 void fclaw_patch_set_missing_corner(fclaw_patch_t *patch,int icorner)
 {
     fclaw_patch_data_t *pdata = get_patch_data(patch);
-    if(patch->refine_dim == 2){
-        pdata->d2->corners[icorner] = 0;
-    } else {
-        pdata->d3->corners[icorner] = 0;
-    }
+    pdata->corners[icorner] = 0;
 }
 
 fclaw_patch_relation_t fclaw_patch_get_face_type(fclaw_patch_t* patch,
@@ -1098,35 +1061,23 @@ fclaw_patch_relation_t fclaw_patch_get_face_type(fclaw_patch_t* patch,
     fclaw_patch_data_t *pdata = get_patch_data(patch);
     FCLAW_ASSERT(pdata->neighbors_set != 0);
     FCLAW_ASSERT(0 <= iface && iface < (patch->refine_dim == 2 ? FCLAW2D_NUMFACES : FCLAW3D_NUMFACES));
-    if(patch->refine_dim == 2){
-        return pdata->d2->face_neighbors[iface];
-    } else {
-        return pdata->d3->face_neighbors[iface];
-    }
+    return pdata->face_neighbors[iface];
 }
 
 fclaw_patch_relation_t fclaw_patch_get_corner_type(fclaw_patch_t* patch,
                                                        int icorner)
 {
     fclaw_patch_data_t *pdata = get_patch_data(patch);
-    FCLAW_ASSERT(pdata->d2->corners[icorner] != 0);
+    FCLAW_ASSERT(pdata->corners[icorner] != 0);
     FCLAW_ASSERT(pdata->neighbors_set != 0);
-    if(patch->refine_dim == 2){
-        return pdata->d2->corner_neighbors[icorner];
-    } else {
-        return pdata->d3->corner_neighbors[icorner];
-    }
+    return pdata->corner_neighbors[icorner];
 }
 
 int fclaw_patch_corner_is_missing(fclaw_patch_t* patch,
                                     int icorner)
 {
     fclaw_patch_data_t *pdata = get_patch_data(patch);
-    if(patch->refine_dim == 2){
-        return !pdata->d2->corners[icorner];
-    } else {
-        return !pdata->d3->corners[icorner];
-    }
+    return !pdata->corners[icorner];
 }
 
 void fclaw_patch_neighbors_set(fclaw_patch_t* patch)
@@ -1136,8 +1087,9 @@ void fclaw_patch_neighbors_set(fclaw_patch_t* patch)
 
     pdata->has_finegrid_neighbors = 0;
     pdata->on_coarsefine_interface = 0;
+    //TODO create functions for these that accept dim as an input
     int num_faces                          = patch->refine_dim == 2 ? FCLAW2D_NUMFACES : FCLAW3D_NUMFACES;
-    fclaw_patch_relation_t* face_neighbors = patch->refine_dim == 2 ? pdata->d2->face_neighbors : pdata->d3->face_neighbors;
+    fclaw_patch_relation_t* face_neighbors = pdata->face_neighbors;
     for (int iface = 0; iface < num_faces; iface++)
     {
         fclaw_patch_relation_t nt;
@@ -1157,7 +1109,7 @@ void fclaw_patch_neighbors_set(fclaw_patch_t* patch)
         for (int iedge = 0; iedge < FCLAW3D_NUMEDGES; iedge++)
         {
             fclaw_patch_relation_t nt;
-            nt = pdata->d3->edge_neighbors[iedge];
+            nt = pdata->edge_neighbors[iedge];
             if (nt == FCLAW_PATCH_HALFSIZE || (nt == FCLAW_PATCH_DOUBLESIZE))
             {
                 pdata->on_coarsefine_interface = 1;
@@ -1173,8 +1125,8 @@ void fclaw_patch_neighbors_set(fclaw_patch_t* patch)
     fclaw_patch_relation_t* corner_neighbors;
     int* corners;
     num_corners      = patch->refine_dim == 2 ? FCLAW2D_NUMCORNERS : FCLAW3D_NUMCORNERS;
-    corner_neighbors = patch->refine_dim == 2 ? pdata->d2->corner_neighbors : pdata->d3->corner_neighbors;
-    corners          = patch->refine_dim == 2 ? pdata->d2->corners : pdata->d3->corners;
+    corner_neighbors = pdata->corner_neighbors;
+    corners          = pdata->corners;
     for (int icorner = 0; icorner < num_corners; icorner++)
     {
         fclaw_patch_relation_t nt;
@@ -1243,14 +1195,7 @@ int* fclaw_patch_block_corner_count(fclaw_global_t* glob,
                                       fclaw_patch_t* this_patch)
 {
     fclaw_patch_data_t *pdata = get_patch_data(this_patch);
-    if(this_patch->refine_dim == 2)
-    {
-        return pdata->d2->block_corner_count;
-    }
-    else
-    {
-        return pdata->d3->block_corner_count;
-    }
+    return pdata->block_corner_count;
 }
 
 void fclaw_patch_set_block_corner_count(fclaw_global_t* glob,
@@ -1258,21 +1203,14 @@ void fclaw_patch_set_block_corner_count(fclaw_global_t* glob,
                                           int icorner, int block_corner_count)
 {
     fclaw_patch_data_t *pdata = get_patch_data(this_patch);
-    if(this_patch->refine_dim == 2)
-    {
-        pdata->d2->block_corner_count[icorner] = block_corner_count;
-    }
-    else
-    {
-        pdata->d3->block_corner_count[icorner] = block_corner_count;
-    }
+    pdata->block_corner_count[icorner] = block_corner_count;
 }
 
 void fclaw_patch_set_edge_type(fclaw_patch_t *patch,int iedge,
                                fclaw_patch_relation_t edge_type)
 {
     fclaw_patch_data_t *pdata = get_patch_data(patch);
-    pdata->d3->edge_neighbors[iedge] = edge_type;
+    pdata->edge_neighbors[iedge] = edge_type;
 }
 
 fclaw_patch_relation_t fclaw_patch_get_edge_type(fclaw_patch_t* patch,
@@ -1281,5 +1219,5 @@ fclaw_patch_relation_t fclaw_patch_get_edge_type(fclaw_patch_t* patch,
     fclaw_patch_data_t *pdata = get_patch_data(patch);
     FCLAW_ASSERT(pdata->neighbors_set != 0);
     FCLAW_ASSERT(0 <= iedge && iedge < FCLAW3D_NUMEDGES);
-    return pdata->d3->edge_neighbors[iedge];
+    return pdata->edge_neighbors[iedge];
 }
