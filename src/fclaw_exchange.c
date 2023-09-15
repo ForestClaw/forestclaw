@@ -121,9 +121,18 @@ void build_remote_ghost_patches(fclaw_global_t* glob)
     {
         ghost_patch = &domain->ghost_patches[i];
 
-        fclaw2d_patch_t* patch_2d = fclaw_patch_get_2d_patch(ghost_patch);
-        blockno = patch_2d->u.blockno;
-        //TODO 3D?
+        //TODO better way
+        if(domain->refine_dim == 2)
+        {
+            fclaw2d_patch_t* patch_2d = fclaw_patch_get_2d_patch(ghost_patch);
+            blockno = patch_2d->u.blockno;
+        }
+        else
+        {
+            fclaw3d_patch_t* patch_3d = fclaw_patch_get_3d_patch(ghost_patch);
+            blockno = patch_3d->u.blockno;
+
+        }
 
         /* not clear how useful this patchno is.  In any case, it isn't
            used in defining the ClawPatch, so probably doesn't
@@ -168,9 +177,18 @@ unpack_remote_ghost_patches(fclaw_global_t* glob,
 
         if (level >= minlevel-1)
         {
-            fclaw2d_patch_t* patch_2d = fclaw_patch_get_2d_patch(ghost_patch);
-            int blockno = patch_2d->u.blockno;
-            //TODO 3D?
+            int blockno;
+            //TODO better way
+            if(domain->refine_dim == 2)
+            {
+                fclaw2d_patch_t* patch_2d = fclaw_patch_get_2d_patch(ghost_patch);
+                blockno = patch_2d->u.blockno;
+            }
+            else
+            {
+                fclaw3d_patch_t* patch_3d = fclaw_patch_get_3d_patch(ghost_patch);
+                blockno = patch_3d->u.blockno;
+            }
 
             int patchno = i;
 

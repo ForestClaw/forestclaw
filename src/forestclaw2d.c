@@ -1109,7 +1109,7 @@ fclaw2d_patch_corner_neighbors (fclaw2d_domain_t * domain,
                              domain->blocks[*rblockno].num_patches));
         /* *INDENT-ON* */
     }
-#ifdef P4_TO_P8
+#ifdef PPPPPP4_TO_P8
     /* workaround for hanging edge corners */
     if(*neighbor_size == FCLAW2D_PATCH_BOUNDARY)
     {

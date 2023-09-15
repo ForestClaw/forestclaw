@@ -693,14 +693,12 @@ void fclaw_ghost_update_async(fclaw_global_t* glob,
 
 
     /* Average */
-    if(glob->domain->refine_dim==2)
     average_fine2coarse_ghost(glob,mincoarse,maxcoarse,
                               time_interp,
                               read_parallel_patches,
                               parallel_mode);
 
     /* Copy */
-    if(glob->domain->refine_dim==2)
     copy_samelevel(glob,minlevel,maxlevel,time_interp,
                    read_parallel_patches,parallel_mode);
 
@@ -723,7 +721,6 @@ void fclaw_ghost_update_async(fclaw_global_t* glob,
     /* --------------------------------------------------------------
         Start send ...
     ------------------------------------------------------------*/
-    if(glob->domain->refine_dim==2)
     fclaw_exchange_ghost_patches_begin(glob,minlevel,maxlevel,time_interp,
                                          FCLAW_TIMER_GHOSTFILL);
 
@@ -778,9 +775,6 @@ void fclaw_ghost_update_async(fclaw_global_t* glob,
     /* -------------------------------------------------------------
         Receive ghost patches ...
     ------------------------------------------------------------- */
-    if(glob->domain->refine_dim == 2) //TODO 3d
-    {
-
     fclaw_exchange_ghost_patches_end(glob,minlevel,maxlevel,time_interp,
                                        FCLAW_TIMER_GHOSTFILL);
 
@@ -791,7 +785,10 @@ void fclaw_ghost_update_async(fclaw_global_t* glob,
         Note : There is no special timer for this call, but checks
         show that ghostfill-(step1+step2+step3+comm) << 1
     ------------------------------------------------------------- */
-    fclaw_face_neighbor_ghost(glob,minlevel,maxlevel,time_interp);
+    if(glob->domain->refine_dim == 2)
+    {
+        fclaw_face_neighbor_ghost(glob,minlevel,maxlevel,time_interp);
+    }
 
     /* -------------------------------------------------------------
         Repeat above, but now with parallel ghost cells.
@@ -851,7 +848,6 @@ void fclaw_ghost_update_async(fclaw_global_t* glob,
                         time_interp,
                         FCLAW_BOUNDARY_ALL);
     fclaw_timer_stop (&glob->timers[FCLAW_TIMER_GHOSTFILL_STEP3]);
-    }
 
     // Stop timing
     fclaw_timer_stop (&glob->timers[FCLAW_TIMER_GHOSTFILL]);

@@ -89,8 +89,21 @@ struct CubeDomain {
 
         fclaw_vtables_initialize(glob);
         fclaw_clawpatch_vtable_initialize(glob, 4);
+        fclaw_patch_vtable_t* patch_vt = fclaw_patch_vt(glob);
+        patch_vt->physical_bc = 
+            [](fclaw_global_t* glob,
+               fclaw_patch_t * patch,
+               int blockno,
+               int patchno,
+               double t,
+               double dt,
+               int intersects_phys_bdry[],
+               int time_interp)
+            {
+                //do nothing
+            };
 
-            }
+    }
     void setup(){
         fclaw_initialize(glob);
     }

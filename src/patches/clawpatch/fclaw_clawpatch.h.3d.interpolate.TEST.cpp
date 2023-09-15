@@ -166,6 +166,18 @@ TEST_CASE("3d clawpatch interpolate")
         {
             return 0;
         };
+        cube_patch_vt->physical_bc = 
+            [](fclaw_global_t* glob,
+               fclaw_patch_t * patch,
+               int blockno,
+               int patchno,
+               double t,
+               double dt,
+               int intersects_phys_bdry[],
+               int time_interp)
+            {
+                //do nothing
+            };
 
         cube.setup();
         CHECK_EQ(cube.glob->domain->global_num_patches, 8);
