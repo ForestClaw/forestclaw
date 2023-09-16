@@ -174,12 +174,12 @@ fclaw3d_patch_edge_neighbors (fclaw2d_domain_t * domain,
 
         /* *INDENT-OFF* */
         FCLAW_ASSERT (rproc[i] == domain->mpirank
-                      || (rpatchno[0] >= 0
-                          && rpatchno[0] < mesh->ghost_num_quadrants));
+                      || (rpatchno[i] >= 0
+                          && rpatchno[i] < mesh->ghost_num_quadrants));
         FCLAW_ASSERT (rproc[i] != domain->mpirank
-                      || (rblockno >= 0 && *rblockno < domain->num_blocks
-                          && rpatchno[0] >= 0
-                          && rpatchno[0] <
+                      || (*rblockno >= 0 && *rblockno < domain->num_blocks
+                          && rpatchno[i] >= 0
+                          && rpatchno[i] <
                              domain->blocks[*rblockno].num_patches));
         /* *INDENT-ON* */
     }
