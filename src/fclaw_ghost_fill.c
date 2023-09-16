@@ -300,6 +300,15 @@ void interpolate2ghost(fclaw_global_t *glob,
     fclaw_global_iterate_level(glob, fine_level, cb_interface_wrap,
                                  (void *) &parallel_mode);
 
+    if(glob->domain->refine_dim == 3)
+    {
+        /* Interpolate to edges at parallel boundaries from coarse grid
+           ghost patches */
+        parallel_mode.cb_fill = cb_edge_fill;
+        fclaw_global_iterate_level(glob, fine_level, cb_interface_wrap,
+                                     (void *) &parallel_mode);
+    }
+
     /* Interpolate to corners at parallel boundaries from coarse grid
        ghost patches */
     parallel_mode.cb_fill = cb_corner_fill;
