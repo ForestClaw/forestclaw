@@ -1052,7 +1052,58 @@ fclaw2d_patch_corner_neighbors (fclaw2d_domain_t * domain,
             *rcorner = cornerno ^ (P4EST_CHILDREN - 1);
         }
     }
+#ifdef P4_TO_P8
+    /* workaround for hanging edge corners */
+    if(qid < 0)
+    {
+        const int* corner_faces = p8est_corner_faces[cornerno];
+        /* traverse across same-size face neirhbors */
+        for(int f = 0; f < 3; f++)
+        {
+            int face = corner_faces[f];
+            p4est_locidx_t f_qid = mesh->quad_to_quad[P4EST_FACES*patchno+corner_faces[f]];
+            int v = mesh->quad_to_face[P4EST_FACES*patchno+corner_faces[f]];
+            /* In the hanigng edge case, the face neighboring quadrant we are trying
+               to traverse will be a sibling, so the quadrant will be local.
+               There should probably be also a check that the quadrants are siblings */
+            if(f_qid >= 0 && f_qid < mesh->local_num_quadrants && v >= 0 && v <= 23)
+            {
+                /* deduce edge from face and corner */
+                int edge_axis = face/2;
+                int lower_0, lower_1;
+                switch(edge_axis)
+                {
+                    case 0:
+                        lower_0 = (cornerno >> 1) & 1;
+                        lower_1 = (cornerno >> 2) & 1;
+                        break;
+                    case 1:
+                        lower_0 = (cornerno >> 0) & 1;
+                        lower_1 = (cornerno >> 2) & 1;
+                        break;
+                    case 2:
+                        lower_0 = (cornerno >> 0) & 1;
+                        lower_1 = (cornerno >> 1) & 1;
+                        break;
+                    default:
+                        FCLAW_ASSERT(0);
+                }
+                int edgeno = edge_axis*4 + lower_1*2 + lower_0;
 
+                p4est_locidx_t qte = mesh->quad_to_edge[P8EST_EDGES * f_qid + edgeno];
+                if (qte >= 0 && qte < mesh->local_num_quadrants + mesh->ghost_num_quadrants)
+                {
+                    /* same size, same block
+                       TODO handle different block */
+                    qid = qte;
+                    *rcorner = cornerno ^ ((1<<3)-1);
+                    break;
+                }
+            }
+        }
+    }
+#endif
+ 
     if (qid < 0)
     {
         /* The value -1 is expected for a corner on the physical boundary */
@@ -1109,62 +1160,7 @@ fclaw2d_patch_corner_neighbors (fclaw2d_domain_t * domain,
                              domain->blocks[*rblockno].num_patches));
         /* *INDENT-ON* */
     }
-#ifdef PPPPPP4_TO_P8
-    /* workaround for hanging edge corners */
-    if(*neighbor_size == FCLAW2D_PATCH_BOUNDARY)
-    {
-        const int* corner_faces = p8est_corner_faces[cornerno];
-        int corner_touches_coarse_face = 0;
-        for(int f = 0; f < 3; f++)
-        {
-            if(mesh->quad_to_face[P4EST_FACES*patchno+corner_faces[f]] > 23)
-            {
-                corner_touches_coarse_face = 1;
-                break;
-            }
-        }
-        if(corner_touches_coarse_face)
-        {
-            const int* corner_edges = p8est_corner_edges[cornerno];
-            for(int i = 0; i < 3; i++)
-            {
-                int edge = corner_edges[i];
-                int edge_rproc[4];
-                int edge_rblockno;
-                int edge_rpatchno[4];
-                int edge_rfaceno;
-                fclaw2d_patch_relation_t  edge_neighbor_size;
-                fclaw3d_patch_edge_neighbors (domain,
-                                              blockno, patchno, edge,
-                                              edge_rproc, &edge_rblockno,
-                                              edge_rpatchno, &edge_rfaceno, &edge_neighbor_size);
-                if(edge_neighbor_size == FCLAW2D_PATCH_SAMESIZE)
-                {
-                    int edge_axis = edge/4;
-                    int upper_edge_axis = cornerno & (1<<edge_axis);
-                    int neighbor_face = edge_axis*2;
-                    if(upper_edge_axis)
-                    {
-                        neighbor_face++;
-                    }
-                    int n_qid = edge_rpatchno[0];
-                    int e =      mesh->quad_to_face[P4EST_FACES*n_qid+neighbor_face];
-                    int n_qid2 = mesh->quad_to_quad[P4EST_FACES*n_qid+neighbor_face];
-                    if(e > 0 && e <= 23)
-                    {
-                        *rproc = domain->mpirank;
-                        *rblockno = blockno;
-                        *rpatchno = n_qid2;
-                        *rcorner = cornerno ^ ((1<<3)-1);
-                        *neighbor_size = FCLAW2D_PATCH_SAMESIZE;
-                        break;
-                    }
-                }
-            }
-        }
-    }
-#endif
-    return *neighbor_size != FCLAW2D_PATCH_BOUNDARY;
+   return *neighbor_size != FCLAW2D_PATCH_BOUNDARY;
 }
 
 void
