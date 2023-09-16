@@ -430,8 +430,6 @@ void cb_edge_fill(fclaw_domain_t *domain,
 
     for (int iedge = 0; iedge < num_edges; iedge++)
     {
-        transform_data.iedge = iedge;
-
         int is_block_edge;
         int is_interior_edge;
         int block_edge_count = 0;
@@ -442,6 +440,7 @@ void cb_edge_fill(fclaw_domain_t *domain,
                         &is_block_edge,
                         &transform_data.block_iface);
 
+        transform_data.iedge = iedge;
         transform_data_finegrid.block_iface = -1;
 
         /* Sets block_corner_count to 0 */
@@ -456,7 +455,7 @@ void cb_edge_fill(fclaw_domain_t *domain,
             int edge_block_idx;
             int neighbor_level;
             int *ref_flag_ptr = &neighbor_level;
-            fclaw_patch_t* edge_patches[2];
+            fclaw_patch_t* neighbor_patches[2];
             int redgeno;
 
             int block_iface = transform_data.block_iface;
@@ -470,7 +469,7 @@ void cb_edge_fill(fclaw_domain_t *domain,
                               block_iface,
                               is_block_edge,
                               &edge_block_idx,
-                              edge_patches,
+                              neighbor_patches,
                               &redgeno,
                               &ref_flag_ptr,
                               &block_edge_count,
@@ -487,7 +486,7 @@ void cb_edge_fill(fclaw_domain_t *domain,
             /* Needed for switching the context */
             transform_data_finegrid.is_block_edge = is_block_edge;
             transform_data_finegrid.iedge = redgeno;
-            transform_data_finegrid.this_patch = edge_patches[0];
+            transform_data_finegrid.this_patch = neighbor_patches[0];
             transform_data_finegrid.neighbor_patch = this_patch;
 
 
@@ -499,85 +498,99 @@ void cb_edge_fill(fclaw_domain_t *domain,
                 */
                 continue;
             }
-
-            int remote_neighbor = fclaw_patch_is_ghost(edge_patches[0]);
-            if (is_coarse && ((read_parallel_patches && remote_neighbor) || !remote_neighbor))
+            /* Parallel distribution keeps siblings on same processor */
+            int remote_neighbor;
+            remote_neighbor = fclaw_patch_is_ghost(neighbor_patches[0]);
+            if (is_coarse)
             {
-                transform_data.neighbor_patch = edge_patches[0];
                 if (neighbor_level == FINER_GRID)
                 {
-                    if (interpolate_to_neighbor && !remote_neighbor)
+                    for (int igrid = 0; igrid < 2; igrid++)
                     {
-                        for(int i=0; i < 2; i++)
+                        remote_neighbor = fclaw_patch_is_ghost(neighbor_patches[igrid]);
+                        int valid_remote = read_parallel_patches && remote_neighbor;
+                        int local_neighbor = !remote_neighbor;
+                        if (!(local_neighbor || valid_remote))
                         {
-                            fclaw_patch_t* coarse_patch = this_patch;
-                            fclaw_patch_t* fine_patch = edge_patches[i];
-                            transform_data.neighbor_patch = fine_patch;
-                            /* No need to interpolate to remote ghost patches. */
-                            fclaw_patch_interpolate_edge(s->glob,
-                                                         coarse_patch,
-                                                         fine_patch,
-                                                         iedge,time_interp,
-                                                         &transform_data);
+                            continue;
                         }
-                    }
-                    else if (average_from_neighbor)
-                    {
-                        for(int i=0; i < 2; i++)
+                        fclaw_patch_t* fine_patch = neighbor_patches[igrid];
+                        fclaw_patch_t *coarse_patch = this_patch;
+                        transform_data.neighbor_patch = neighbor_patches[igrid];
+                        if (interpolate_to_neighbor && !remote_neighbor)
                         {
-                            /* Average even if neighbor is a remote neighbor */
-                            fclaw_patch_t* coarse_patch = this_patch;
-                            fclaw_patch_t* fine_patch = edge_patches[i];
-                            transform_data.neighbor_patch = fine_patch;
-                            fclaw_patch_average_edge(s->glob,
-                                                     coarse_patch,
-                                                     fine_patch,
-                                                     iedge,time_interp,
-                                                     &transform_data);                        
+                            /* interpolate to igrid */
+                            fclaw_patch_interpolate_edge(s->glob,this_patch,fine_patch,
+                                                           iedge,
+                                                           time_interp,
+                                                           &transform_data);
+                        }
+                        else if (average_from_neighbor)
+                        {
+                            /* average from igrid */
+                            fclaw_patch_average_edge(s->glob,coarse_patch,fine_patch,
+                                                       iedge,time_interp,
+                                                       &transform_data);
                         }
                     }
                 }
                 else if (neighbor_level == SAMESIZE_GRID && copy_from_neighbor)
                 {
-                    fclaw_patch_copy_edge(s->glob,
-                                          this_patch,
-                                          edge_patches[0],
+                    /* Copy to same size patch */
+                    fclaw_patch_t *neighbor_patch = neighbor_patches[0];
+                    transform_data.neighbor_patch = neighbor_patch;
+
+                    fclaw_patch_copy_edge(s->glob,this_patch,neighbor_patch,
                                           this_block_idx,
                                           edge_block_idx,
-                                          iedge, time_interp,
-                                          &transform_data);
-                }
+                                          iedge,
+                                          time_interp,&transform_data);
 
-            }  /* End of non-parallel patch case */
-            else if (is_fine && neighbor_level == COARSER_GRID &&
-                     remote_neighbor && read_parallel_patches)
+                    /* We also need to copy _to_ the remote neighbor; switch contexts, but
+                       use ClawPatches that are only in scope here, to avoid
+                       conflicts with above uses of the same variables. This is needed
+                       in case we want to interpolate to adjacent corners on fine grids.*/
+                    if (remote_neighbor)
+                    {
+                        /* Create a new transform so we don't mess up the original one */
+                        int this_iedge = redgeno;
+
+                        fclaw_patch_copy_edge(s->glob,neighbor_patch,this_patch,
+                                              this_block_idx,
+                                              edge_block_idx,
+                                              this_iedge, time_interp,
+                                              &transform_data_finegrid);                            
+                    }
+                }
+            }
+            else if (is_fine && neighbor_level == COARSER_GRID && remote_neighbor
+                     && read_parallel_patches)
             {
-                /* The coarse grid is now the remote patch;  swap contexts and 
-                call same routines above, but with remote patch as the "coarse" 
-                grid */
-                
-                fclaw_patch_t* coarse_patch = edge_patches[0];
+                int iedge_coarse = redgeno;
+
+                /* Swap 'this_patch' (fine grid) and the neighbor patch 
+                (a coarse grid) */
+                fclaw_patch_t* coarse_patch = neighbor_patches[0];
                 fclaw_patch_t* fine_patch = this_patch;
-                int coarse_blockno = edge_block_idx;
-                int fine_blockno = this_patch_idx;
 
-                if (interpolate_to_neighbor)
+                if (average_from_neighbor)
                 {
-                    /* Interpolate from remote coarse grid patch (coarse grid) to
-                       local fine grid patch.  We do not need to average to the 
-                       remote patch corners unless corners are used in the 
-                       interpolation stencil. */
-                    int coarse_iedge = transform_data_finegrid.iedge;
-
-                    fclaw_patch_interpolate_edge(s->glob,
-                                                 coarse_patch,
-                                                 fine_patch,
-                                                 fine_blockno,
-                                                 time_interp,
-                                                 &transform_data_finegrid);
-
+                        /* Average from 'this' grid (fine grid) to remote grid 
+                    (coarse grid) */
+                    fclaw_patch_average_edge(s->glob,coarse_patch,fine_patch,
+                                               iedge_coarse,
+                                               time_interp,
+                                               &transform_data_finegrid);
                 }
-            } /* End of parallel case */
+                else if (interpolate_to_neighbor)
+                {
+                    /* Interpolate from remote neighbor to 'this' patch (the finer grid */
+                    fclaw_patch_interpolate_edge(s->glob,coarse_patch,fine_patch,
+                                                   iedge_coarse,
+                                                   time_interp,
+                                                   &transform_data_finegrid);
+                }
+            }
         }  /* End of 'interior_edge' */
     }  /* End of iedge loop */
 }
