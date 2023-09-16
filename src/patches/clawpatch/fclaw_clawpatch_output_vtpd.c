@@ -66,7 +66,7 @@ WriteQDataArray(FILE* file, fclaw_global_t* glob, fclaw_patch_t* patch)
     fprintf(file, "\t\t\t\t</DataArray>\n");
 
     uint32_t offset = sizeof(uint32_t) + mx * my * mz * meqn * sizeof(float);
-	return offset;
+    return offset;
 }
 
 static void
@@ -127,7 +127,7 @@ WriteVTIFile(fclaw_domain_t * domain, fclaw_patch_t * patch,
     fclaw_global_t* glob = g->glob;
     char *base_name = (char*) g->user;
 
-    const int globalno = glob->domain->blocks[blockno].num_patches_before + patchno;
+    const int globalno = glob->domain->global_num_patches_before + glob->domain->blocks[blockno].num_patches_before + patchno;
 
     char file_name[BUFSIZ];
     snprintf(file_name, BUFSIZ, "%s/%s_%d.vti", base_name, base_name, globalno);
