@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define FCLAW2D_FILE_H
 
 #include <forestclaw2d.h>
-#include <fclaw2d_file_v1.h> /* to set the FCLAW2D_FILE macros publicly */
+#include <fclaw2d_file_v1.h>    /* to set the FCLAW2D_FILE macros publicly */
 
 #ifdef __cplusplus
 extern "C"
@@ -85,7 +85,7 @@ typedef struct fclaw2d_file_context fclaw2d_file_context_t;
  */
 fclaw2d_file_context_t *fclaw2d_file_open_write (const char *filename,
                                                  const char *user_string,
-                                                 fclaw2d_domain_t *domain,
+                                                 fclaw2d_domain_t * domain,
                                                  int *errcode);
 
 /** Write a serial data block to an opened parallel file.
@@ -131,7 +131,7 @@ fclaw2d_file_context_t *fclaw2d_file_open_write (const char *filename,
 fclaw2d_file_context_t *fclaw2d_file_write_block (fclaw2d_file_context_t *
                                                   fc, const char *user_string,
                                                   size_t block_size,
-                                                  sc_array_t *block_data,
+                                                  sc_array_t * block_data,
                                                   int *errcode);
 
 /** Write per-patch data to a parallel output file.
@@ -183,7 +183,7 @@ fclaw2d_file_context_t *fclaw2d_file_write_block (fclaw2d_file_context_t *
 fclaw2d_file_context_t *fclaw2d_file_write_array (fclaw2d_file_context_t *
                                                   fc, const char *user_string,
                                                   size_t patch_size,
-                                                  sc_array_t *patch_data,
+                                                  sc_array_t * patch_data,
                                                   int *errcode);
 
 /** Open a file for reading and read the stored domain.
@@ -223,7 +223,7 @@ fclaw2d_file_context_t *fclaw2d_file_write_array (fclaw2d_file_context_t *
 fclaw2d_file_context_t *fclaw2d_file_open_read (sc_MPI_Comm mpicomm,
                                                 const char *filename,
                                                 char *user_string,
-                                                fclaw2d_domain_t **domain,
+                                                fclaw2d_domain_t ** domain,
                                                 int *errcode);
 
 /** Read a serial data block from an opened file.
@@ -275,7 +275,7 @@ fclaw2d_file_context_t *fclaw2d_file_open_read (sc_MPI_Comm mpicomm,
 fclaw2d_file_context_t *fclaw2d_file_read_block (fclaw2d_file_context_t *
                                                  fc, char *user_string,
                                                  size_t block_size,
-                                                 sc_array_t *block_data,
+                                                 sc_array_t * block_data,
                                                  int *errcode);
 
 /** Read per-patch data from a parallel output file.
@@ -331,7 +331,7 @@ fclaw2d_file_context_t *fclaw2d_file_read_block (fclaw2d_file_context_t *
 fclaw2d_file_context_t *fclaw2d_file_read_array (fclaw2d_file_context_t *
                                                  fc, char *user_string,
                                                  size_t patch_size,
-                                                 sc_array_t *patch_data,
+                                                 sc_array_t * patch_data,
                                                  int *errcode);
 
 /** Close a file opened for parallel write/read and free the context.

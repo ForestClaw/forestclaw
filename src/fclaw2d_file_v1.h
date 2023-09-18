@@ -52,28 +52,47 @@ extern "C"
  */
 typedef enum fclaw2d_file_error_v1
 {
-  FCLAW2D_FILE_ERR_SUCCESS_V1 = sc_MPI_ERR_LASTCODE, /**< file function completed with success */
-  FCLAW2D_FILE_ERR_FILE_V1, /**< invalid file handle */
-  FCLAW2D_FILE_ERR_NOT_SAME_V1, /**< collective arg not identical */
-  FCLAW2D_FILE_ERR_AMODE_V1, /**< access mode error */
-  FCLAW2D_FILE_ERR_NO_SUCH_FILE_V1, /**< file does not exist */
-  FCLAW2D_FILE_ERR_FILE_EXIST_V1, /**< file exists already */
-  FCLAW2D_FILE_ERR_BAD_FILE_V1, /**< invalid file name */
-  FCLAW2D_FILE_ERR_ACCESS_V1, /**< permission denied */
-  FCLAW2D_FILE_ERR_NO_SPACE_V1, /**< not enough space */
-  FCLAW2D_FILE_ERR_QUOTA_V1, /**< quota exceeded */
-  FCLAW2D_FILE_ERR_READ_ONLY_V1, /**< read only file (system) */
-  FCLAW2D_FILE_ERR_IN_USE_V1, /**< file currently open by other process */
-  FCLAW2D_FILE_ERR_IO_V1, /**< other I/O error */
-  FCLAW2D_FILE_ERR_FORMAT_V1,  /**< read file has a wrong format */
-  FCLAW2D_FILE_ERR_SECTION_TYPE_V1, /**< a valid non-matching section type */
-  FCLAW2D_FILE_ERR_CONN_V1, /**< invalid serialized connectivity data */
-  FCLAW2D_FILE_ERR_P4EST_V1, /**< invalid p4est data */
-  FCLAW2D_FILE_ERR_IN_DATA_V1, /**< input data of file function is invalid */
-  FCLAW2D_FILE_ERR_COUNT_V1,   /**< read or write count error that was not
+    FCLAW2D_FILE_ERR_SUCCESS_V1 = sc_MPI_ERR_LASTCODE,
+                                                     /**< file function completed with success */
+    FCLAW2D_FILE_ERR_FILE_V1,
+                            /**< invalid file handle */
+    FCLAW2D_FILE_ERR_NOT_SAME_V1,
+                                /**< collective arg not identical */
+    FCLAW2D_FILE_ERR_AMODE_V1,
+                             /**< access mode error */
+    FCLAW2D_FILE_ERR_NO_SUCH_FILE_V1,
+                                    /**< file does not exist */
+    FCLAW2D_FILE_ERR_FILE_EXIST_V1,
+                                  /**< file exists already */
+    FCLAW2D_FILE_ERR_BAD_FILE_V1,
+                                /**< invalid file name */
+    FCLAW2D_FILE_ERR_ACCESS_V1,
+                              /**< permission denied */
+    FCLAW2D_FILE_ERR_NO_SPACE_V1,
+                                /**< not enough space */
+    FCLAW2D_FILE_ERR_QUOTA_V1,
+                             /**< quota exceeded */
+    FCLAW2D_FILE_ERR_READ_ONLY_V1,
+                                 /**< read only file (system) */
+    FCLAW2D_FILE_ERR_IN_USE_V1,
+                              /**< file currently open by other process */
+    FCLAW2D_FILE_ERR_IO_V1,
+                          /**< other I/O error */
+    FCLAW2D_FILE_ERR_FORMAT_V1,/**< read file has a wrong format */
+    FCLAW2D_FILE_ERR_SECTION_TYPE_V1,
+                                    /**< a valid non-matching section type */
+    FCLAW2D_FILE_ERR_CONN_V1,
+                            /**< invalid serialized connectivity data */
+    FCLAW2D_FILE_ERR_P4EST_V1,
+                             /**< invalid p4est data */
+    FCLAW2D_FILE_ERR_IN_DATA_V1,
+                               /**< input data of file function is invalid */
+    FCLAW2D_FILE_ERR_COUNT_V1, /**< read or write count error that was not
                                  classified as a format error */
-  FCLAW2D_FILE_ERR_UNKNOWN_V1, /**< unknown error */
-  FCLAW2D_FILE_ERR_LASTCODE_V1 /**< to define own error codes for
+    FCLAW2D_FILE_ERR_UNKNOWN_V1,
+                               /**< unknown error */
+    FCLAW2D_FILE_ERR_LASTCODE_V1
+                               /**< to define own error codes for
                                   a higher level application
                                   that is using fclaw2d_file_v1
                                   functions */

@@ -52,28 +52,47 @@ extern "C"
  */
 typedef enum fclaw3d_file_error_v1
 {
-  FCLAW3D_FILE_ERR_SUCCESS_V1 = sc_MPI_ERR_LASTCODE, /**< file function completed with success */
-  FCLAW3D_FILE_ERR_FILE_V1, /**< invalid file handle */
-  FCLAW3D_FILE_ERR_NOT_SAME_V1, /**< collective arg not identical */
-  FCLAW3D_FILE_ERR_AMODE_V1, /**< access mode error */
-  FCLAW3D_FILE_ERR_NO_SUCH_FILE_V1, /**< file does not exist */
-  FCLAW3D_FILE_ERR_FILE_EXIST_V1, /**< file exists already */
-  FCLAW3D_FILE_ERR_BAD_FILE_V1, /**< invalid file name */
-  FCLAW3D_FILE_ERR_ACCESS_V1, /**< permission denied */
-  FCLAW3D_FILE_ERR_NO_SPACE_V1, /**< not enough space */
-  FCLAW3D_FILE_ERR_QUOTA_V1, /**< quota exceeded */
-  FCLAW3D_FILE_ERR_READ_ONLY_V1, /**< read only file (system) */
-  FCLAW3D_FILE_ERR_IN_USE_V1, /**< file currently open by other process */
-  FCLAW3D_FILE_ERR_IO_V1, /**< other I/O error */
-  FCLAW3D_FILE_ERR_FORMAT_V1,  /**< read file has a wrong format */
-  FCLAW3D_FILE_ERR_SECTION_TYPE_V1, /**< a valid non-matching section type */
-  FCLAW3D_FILE_ERR_CONN_V1, /**< invalid serialized connectivity data */
-  FCLAW3D_FILE_ERR_P4EST_V1, /**< invalid p4est data */
-  FCLAW3D_FILE_ERR_IN_DATA_V1, /**< input data of file function is invalid */
-  FCLAW3D_FILE_ERR_COUNT_V1,   /**< read or write count error that was not
+    FCLAW3D_FILE_ERR_SUCCESS_V1 = sc_MPI_ERR_LASTCODE,
+                                                     /**< file function completed with success */
+    FCLAW3D_FILE_ERR_FILE_V1,
+                            /**< invalid file handle */
+    FCLAW3D_FILE_ERR_NOT_SAME_V1,
+                                /**< collective arg not identical */
+    FCLAW3D_FILE_ERR_AMODE_V1,
+                             /**< access mode error */
+    FCLAW3D_FILE_ERR_NO_SUCH_FILE_V1,
+                                    /**< file does not exist */
+    FCLAW3D_FILE_ERR_FILE_EXIST_V1,
+                                  /**< file exists already */
+    FCLAW3D_FILE_ERR_BAD_FILE_V1,
+                                /**< invalid file name */
+    FCLAW3D_FILE_ERR_ACCESS_V1,
+                              /**< permission denied */
+    FCLAW3D_FILE_ERR_NO_SPACE_V1,
+                                /**< not enough space */
+    FCLAW3D_FILE_ERR_QUOTA_V1,
+                             /**< quota exceeded */
+    FCLAW3D_FILE_ERR_READ_ONLY_V1,
+                                 /**< read only file (system) */
+    FCLAW3D_FILE_ERR_IN_USE_V1,
+                              /**< file currently open by other process */
+    FCLAW3D_FILE_ERR_IO_V1,
+                          /**< other I/O error */
+    FCLAW3D_FILE_ERR_FORMAT_V1,/**< read file has a wrong format */
+    FCLAW3D_FILE_ERR_SECTION_TYPE_V1,
+                                    /**< a valid non-matching section type */
+    FCLAW3D_FILE_ERR_CONN_V1,
+                            /**< invalid serialized connectivity data */
+    FCLAW3D_FILE_ERR_P4EST_V1,
+                             /**< invalid p4est data */
+    FCLAW3D_FILE_ERR_IN_DATA_V1,
+                               /**< input data of file function is invalid */
+    FCLAW3D_FILE_ERR_COUNT_V1, /**< read or write count error that was not
                                  classified as a format error */
-  FCLAW3D_FILE_ERR_UNKNOWN_V1, /**< unknown error */
-  FCLAW3D_FILE_ERR_LASTCODE_V1 /**< to define own error codes for
+    FCLAW3D_FILE_ERR_UNKNOWN_V1,
+                               /**< unknown error */
+    FCLAW3D_FILE_ERR_LASTCODE_V1
+                               /**< to define own error codes for
                                   a higher level application
                                   that is using fclaw3d_file_v1
                                   functions */
