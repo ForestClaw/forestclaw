@@ -164,8 +164,10 @@ struct fclaw_options
     int manifold;
     int mi;
     int mj;
+    int mk;
     int periodic_x;
     int periodic_y;
+    int periodic_z;
 
     /* Advanced options */
     int flux_correction;
@@ -201,9 +203,8 @@ struct fclaw_options
     double bx;   /**< Only for the single block, unmapped case */
     double ay;   /**< Only for the single block, unmapped case */
     double by;   /**< Only for the single block, unmapped case */
-    // TODO 
-    double az;
-    double bz;
+    double az;   /**< Only for the single block, unmapped case */
+    double bz;   /**< Only for the single block, unmapped case */
 
     /* Diagnostics */
     int run_user_diagnostics;

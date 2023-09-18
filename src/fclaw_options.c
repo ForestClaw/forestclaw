@@ -305,11 +305,17 @@ fclaw_register (fclaw_options_t* fclaw_opt, sc_options_t * opt)
     sc_options_add_int (opt, 0, "mj", &fclaw_opt->mj, 1,
                         "Number of blocks in y direction  [1]");
 
+    sc_options_add_int (opt, 0, "mk", &fclaw_opt->mk, 1,
+                        "Number of blocks in z direction  [1]");
+
     sc_options_add_bool (opt, 0, "periodic_x", &fclaw_opt->periodic_x, 0,
                         "Periodic in x direction [F]");
 
     sc_options_add_bool (opt, 0, "periodic_y", &fclaw_opt->periodic_y, 0,
                         "Periodic in y direction  [F]");
+
+    sc_options_add_bool (opt, 0, "periodic_z", &fclaw_opt->periodic_z, 0,
+                        "Periodic in z direction  [F]");
 
     fclaw_options_add_double_array (opt,0, "scale",
                                     &fclaw_opt->scale_string, "1 1 1",
