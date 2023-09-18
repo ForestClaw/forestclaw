@@ -271,104 +271,73 @@ void clawpatch_define(fclaw_global_t* glob,
         double bx = fclaw_opt->bx;
         double ay = fclaw_opt->ay;
         double by = fclaw_opt->by;
+        double az = fclaw_opt->az;
+        double bz = fclaw_opt->bz;
 
-        double xl,yl,xu,yu;
-        if(patch->refine_dim == 2)
-        {
-            xl = patch->xlower;
-            yl = patch->ylower;
-            xu = patch->xupper;
-            yu = patch->yupper;
-        }
-        else 
-        {
-            xl = patch->xlower;
-            yl = patch->ylower;
-            xu = patch->xupper;
-            yu = patch->yupper;
-        }
+        double xl = patch->xlower;
+        double yl = patch->ylower;
+        double zl = patch->zlower;
+        double xu = patch->xupper;
+        double yu = patch->yupper;
+        double zu = patch->zupper;
 
-        double xlower, ylower, xupper, yupper;
+        double xlower, ylower, zlower, xupper, yupper, zupper;
 
         if (is_brick)
         {
-            double z;
-            /* Scale to [0,1]x[0,1], based on blockno */
-            fclaw2d_map_c2m_nomap_brick(cont,cp->blockno,xl,yl,&xlower,&ylower,&z);
-            fclaw2d_map_c2m_nomap_brick(cont,cp->blockno,xu,yu,&xupper,&yupper,&z);
+            if(glob->domain->refine_dim == 2)
+            {
+                /* Scale to [0,1]x[0,1], based on blockno */
+                double z;
+                fclaw2d_map_c2m_nomap_brick(cont,cp->blockno,xl,yl,&xlower,&ylower,&z);
+                fclaw2d_map_c2m_nomap_brick(cont,cp->blockno,xu,yu,&xupper,&yupper,&z);
+                zlower = 0;
+                zupper = 1;
+            }
+            else 
+            {
+                //TODO fclaw3d_map_c2m_nomap_brick
+                //hardcoded for now
+                //cp->blockno = ix+iy*fclaw_opt->mi+iz*fclaw_opt->mi*fclaw_opt->mj;
+                int ix = cp->blockno % fclaw_opt->mi;
+                int iy = (cp->blockno / fclaw_opt->mi) % fclaw_opt->mj;
+                int iz = cp->blockno / (fclaw_opt->mi*fclaw_opt->mj);
+            
+            }
         }
         else
         {
             xlower = xl;
             ylower = yl;
+            zlower = zl;
             xupper = xu;
             yupper = yu;
-        }
-        if(cp->patch_dim == 2)
-        {
-            cp->xlower = ax + (bx - ax)*xlower;
-            cp->xupper = ax + (bx - ax)*xupper;
-            cp->ylower = ay + (by - ay)*ylower;
-            cp->yupper = ay + (by - ay)*yupper;
-        }
-        else 
-        {
-            cp->xlower = ax + (bx - ax)*xlower;
-            cp->xupper = ax + (bx - ax)*xupper;
-            cp->ylower = ay + (by - ay)*ylower;
-            cp->yupper = ay + (by - ay)*yupper;
-            /* Use [az,bz] to scale in z direction.  This should work for 
-            both extruded mesh and octree mesh. */
-            double az = fclaw_opt->az;
-            double bz = fclaw_opt->bz;
-            double zlower = 0;        
-            double zupper = 1;
-            if(patch->refine_dim == 3)
-            {
-                zlower = patch->zlower;
-                zupper = patch->zupper;
-            }
-            cp->zlower = az + (bz - az)*zlower;
-            cp->zupper = az + (bz - az)*zupper;
+            zupper = zu;
         }
 
-#if REFINE_DIM == 3
-#error "clawpatch::define : Octrees not yet implemented."
-#endif        
-
+        cp->xlower = ax + (bx - ax)*xlower;
+        cp->xupper = ax + (bx - ax)*xupper;
+        cp->ylower = ay + (by - ay)*ylower;
+        cp->yupper = ay + (by - ay)*yupper;
+        cp->zlower = az + (bz - az)*zlower;
+        cp->zupper = az + (bz - az)*zupper;
     }
 
-    if(cp->patch_dim == 2)
-    {
-        cp->dx = (cp->xupper - cp->xlower)/cp->mx;
-        cp->dy = (cp->yupper - cp->ylower)/cp->my;
-    }
-    else 
-    {
-        cp->dx = (cp->xupper - cp->xlower)/cp->mx;
-        cp->dy = (cp->yupper - cp->ylower)/cp->my;
-        cp->dz = (cp->zupper - cp->zlower)/cp->mz;
-    }
+    cp->dx = (cp->xupper - cp->xlower)/cp->mx;
+    cp->dy = (cp->yupper - cp->ylower)/cp->my;
+    cp->dz = (cp->zupper - cp->zlower)/cp->mz;
 
 
-
-    int ll[cp->patch_dim];
-    int ur[cp->patch_dim];
-    for (int idir = 0; idir < cp->patch_dim; idir++)
+    // bounds for 3d, even if 2d, z bounds will be ignored by Box constructor in 2d
+    int ll[3];
+    int ur[3];
+    for (int idir = 0; idir < 3; idir++)
     {
         ll[idir] = 1-cp->mbc;
     }
-    if(cp->patch_dim == 2)
-    {
-        ur[0] = cp->mx + cp->mbc;
-        ur[1] = cp->my + cp->mbc;
-    }
-    else
-    {
-        ur[0] = cp->mx + cp->mbc;
-        ur[1] = cp->my + cp->mbc;
-        ur[2] = cp->mz + cp->mbc;
-    }
+    ur[0] = cp->mx + cp->mbc;
+    ur[1] = cp->my + cp->mbc;
+    ur[2] = cp->mz + cp->mbc;
 
     Box box(ll,ur,cp->patch_dim);    
 
