@@ -27,10 +27,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_file.h>
 #include <fclaw2d_file_v1.h>
 #include <p4est_algorithms.c>
+#include <p4est_wrap.h>
 #else
 #include <fclaw3d_file.h>
 #include <fclaw3d_file_v1.h>
 #include <p8est_algorithms.c>
+#include <p8est_wrap.h>
 #endif
 
 /* For legacy and compatibility reasons we provide here the first version
@@ -2648,12 +2650,79 @@ fclaw2d_file_open_write (const char *filename,
     FCLAW_ASSERT (filename != NULL);
     FCLAW_ASSERT (user_string != NULL);
     FCLAW_ASSERT (domain != NULL);
+    FCLAW_ASSERT (domain->pp != NULL);
     FCLAW_ASSERT (errcode != NULL);
 
-    /* The functionality must be still implemented. */
-    *errcode = FCLAW2D_FILE_ERR_NOT_IMPLEMENTED;
+    int errcode_internal;
+    p4est_wrap_t *wrap;
+    p4est_t *p4est;
+    fclaw2d_file_context_p4est_v1_t *fc;
+    fclaw2d_file_context_t *fclaw_fc;
+    sc_array_t parameters;
+    uint64_t parameters_buffer[2];
 
-    return NULL;
+    /* get p4est_wrap_t from domain */
+    wrap = (p4est_wrap_t *) domain->pp;
+    p4est = wrap->p4est;
+    FCLAW_ASSERT (p4est_is_valid (p4est));
+
+    /* create the file */
+    fc = fclaw2d_file_open_create_v1 (p4est, filename, user_string,
+                                 &errcode_internal);
+    if (errcode_internal != FCLAW2D_FILE_ERR_SUCCESS_V1)
+    {
+        FCLAW_ASSERT (fc == NULL);
+        /* TODO: Introduce more FCLAW_FILE error codes */
+        *errcode = errcode_internal;
+        return NULL;
+    }
+
+    /* write the connectiviy */
+    fc = fclaw2d_file_write_connectivity_v1 (fc, p4est->connectivity,
+                                        "p4est connectivity",
+                                        &errcode_internal);
+    if (errcode_internal != FCLAW2D_FILE_ERR_SUCCESS_V1)
+    {
+        FCLAW_ASSERT (fc == NULL);
+        /* TODO: Introduce more FCLAW_FILE error codes */
+        *errcode = errcode_internal;
+        return NULL;
+    }
+
+    /* write the p4est */
+    fc = fclaw2d_file_write_p4est_v1 (fc, p4est, "p4est quadrants",
+                                 "p4est quadrant data", 0, &errcode_internal);
+    if (errcode_internal != FCLAW2D_FILE_ERR_SUCCESS_V1)
+    {
+        FCLAW_ASSERT (fc == NULL);
+        /* TODO: Introduce more FCLAW_FILE error codes */
+        *errcode = errcode_internal;
+        return NULL;
+    }
+
+    /* pack parameters for \ref p4est_wrap_new_p4est */
+    parameters_buffer[0] = (uint64_t) wrap->hollow;
+    parameters_buffer[1] = (uint64_t) wrap->btype;
+    sc_array_init_data (&parameters, (void *) parameters_buffer, 2 * 64, 1);
+
+    /* write paramters for \ref p4est_wrap_new_p4est */
+    fc = fclaw2d_file_write_block_v1 (fc, 2 * 64, &parameters,
+                                 "p4est wrap hollow and btype",
+                                 &errcode_internal);
+    if (errcode_internal != FCLAW2D_FILE_ERR_SUCCESS_V1)
+    {
+        FCLAW_ASSERT (fc == NULL);
+        /* TODO: Introduce more FCLAW_FILE error codes */
+        *errcode = errcode_internal;
+        return NULL;
+    }
+
+    /* allocate and set flcaw file context */
+    fclaw_fc = FCLAW_ALLOC (fclaw2d_file_context_t, 1);
+    fclaw_fc->fc = fc;
+    fclaw_fc->domain = domain;
+
+    return fclaw_fc;
 }
 
 fclaw2d_file_context_t *
@@ -2747,10 +2816,20 @@ fclaw2d_file_close (fclaw2d_file_context_t * fc, int *errcode)
     FCLAW_ASSERT (fc != NULL);
     FCLAW_ASSERT (errcode != NULL);
 
-    /* The functionality must be still implemented. */
-    *errcode = FCLAW2D_FILE_ERR_NOT_IMPLEMENTED;
+    int retval, errcode_internal;
 
-    return -1;
+    retval = fclaw2d_file_close_v1 (fc->fc, &errcode_internal);
+    if (errcode_internal != FCLAW2D_FILE_ERR_SUCCESS_V1)
+    {
+        FCLAW_ASSERT (retval != 0);
+        /* TODO: Introduce more FCLAW_FILE error codes */
+        *errcode = errcode_internal;
+        return -1;
+    }
+
+    FCLAW_FREE (fc);
+
+    return 0;
 }
 
 int
