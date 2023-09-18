@@ -302,7 +302,15 @@ void clawpatch_define(fclaw_global_t* glob,
                 int ix = cp->blockno % fclaw_opt->mi;
                 int iy = (cp->blockno / fclaw_opt->mi) % fclaw_opt->mj;
                 int iz = cp->blockno / (fclaw_opt->mi*fclaw_opt->mj);
-            
+
+                fclaw_block_t* block = &glob->domain->blocks[cp->blockno];
+                //map in [0,1] for entire brick
+                xlower = ix/(double)fclaw_opt->mi;
+                xupper = (ix+1)/(double)fclaw_opt->mi;
+                ylower = iy/(double)fclaw_opt->mj;
+                yupper = (iy+1)/(double)fclaw_opt->mj;
+                zlower = iz/(double)fclaw_opt->mk;
+                zupper = (iz+1)/(double)fclaw_opt->mk;
             }
         }
         else
@@ -1297,19 +1305,9 @@ void clawpatch_ghost_comm(fclaw_global_t* glob,
     const fclaw_clawpatch_options_t *clawpatch_opt = 
                             fclaw_clawpatch_get_options(glob);
 
-    int mx,my,mz;
-    if(clawpatch_opt->patch_dim == 2)
-    {
-        mx = clawpatch_opt->mx;
-        my = clawpatch_opt->my;
-        mz = 1;
-    }
-    else
-    {
-        mx = clawpatch_opt->mx;
-        my = clawpatch_opt->my;
-        mz = clawpatch_opt->mz;
-    }
+    int mx = clawpatch_opt->mx;
+    int my = clawpatch_opt->my;
+    int mz = clawpatch_opt->mz;
 
     int mbc = clawpatch_opt->mbc;
     int meqn = clawpatch_opt->meqn;
