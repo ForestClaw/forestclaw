@@ -229,17 +229,9 @@ void clawpatch_define(fclaw_global_t* glob,
     const fclaw_clawpatch_options_t *clawpatch_opt = 
                          fclaw_clawpatch_get_options(glob);
 
-    if(cp->patch_dim == 2)
-    {
-        cp->mx = clawpatch_opt->mx;
-        cp->my = clawpatch_opt->my;
-    }
-    else 
-    {
-        cp->mx = clawpatch_opt->mx;
-        cp->my = clawpatch_opt->my;
-        cp->mz = clawpatch_opt->mz;
-    }
+    cp->mx = clawpatch_opt->mx;
+    cp->my = clawpatch_opt->my;
+    cp->mz = clawpatch_opt->mz;
 
     cp->mbc = clawpatch_opt->mbc;
     cp->blockno = blockno;
@@ -259,30 +251,19 @@ void clawpatch_define(fclaw_global_t* glob,
     {
         is_brick = FCLAW2D_MAP_IS_BRICK(&cont);
     }else {
-        //TODO
-        is_brick = 0;
+        //TODO mappings
+        is_brick = (fclaw_opt->mi > 1) || (fclaw_opt->mj > 1) || (fclaw_opt->mk > 1);
     }
 
     cp->manifold = fclaw_opt->manifold;
     if (cp->manifold)
     {
-        if(cp->patch_dim == 2)
-        {
-            cp->xlower = patch->xlower;
-            cp->ylower = patch->ylower;
-            cp->xupper = patch->xupper;
-            cp->yupper = patch->yupper;
-        }
-        else 
-        {
-            cp->xlower = patch->xlower;
-            cp->ylower = patch->ylower;
-            cp->zlower = patch->zlower;
-            cp->xupper = patch->xupper;
-            cp->yupper = patch->yupper;
-            cp->zupper = patch->zupper;
-        }
-
+        cp->xlower = patch->xlower;
+        cp->ylower = patch->ylower;
+        cp->zlower = patch->zlower;
+        cp->xupper = patch->xupper;
+        cp->yupper = patch->yupper;
+        cp->zupper = patch->zupper;
     }
     else
     {
