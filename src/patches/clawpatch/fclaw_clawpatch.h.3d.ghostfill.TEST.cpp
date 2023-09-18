@@ -47,14 +47,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_forestclaw.h>
 
 namespace {
-struct CubeDomain {
+struct TestData {
     fclaw_global_t* glob;
     fclaw_options_t fopts;
     fclaw_domain_t *domain;
     fclaw3d_map_context_t* map;
     fclaw_clawpatch_options_t* opts;
 
-    CubeDomain(int minlevel, int maxlevel){
+    TestData(fclaw_domain_t* domain, int minlevel, int maxlevel){
         glob = fclaw_global_new();
         opts = fclaw_clawpatch_options_new(3);
         memset(&fopts, 0, sizeof(fopts));
@@ -107,7 +107,7 @@ struct CubeDomain {
     void setup(){
         fclaw_initialize(glob);
     }
-    ~CubeDomain(){
+    ~TestData(){
         fclaw_clawpatch_options_destroy(opts);
         //fclaw_domain_destroy(domain);
         //fclaw3d_map_destroy(map);
@@ -192,6 +192,134 @@ bool corner_ghost_cell(fclaw_clawpatch_t* clawpatch, int i, int j, int k, int m)
     return (i < 0 || i >= mx) && (j < 0 || j >= my) && (k < 0 || k >= mz);
 }
 
+void test_ghost_fill(TestData& cube, TestData& cube_output, std::string output_string)
+{
+    //initialize patches
+    fclaw_global_iterate_patches(
+        cube.glob, 
+        [](fclaw_domain_t * domain, fclaw_patch_t * patch,
+            int blockno, int patchno, void *user)
+        {
+            fclaw_global_iterate_t* g = (fclaw_global_iterate_t*)user;
+            fclaw_clawpatch_options_t* opts = fclaw_clawpatch_get_options(g->glob);
+            fclaw_clawpatch_t* clawpatch = fclaw_clawpatch_get_clawpatch(patch);
+            // clear q
+            double* q = fclaw_clawpatch_get_q(g->glob, patch);
+            int size = fclaw_clawpatch_size(g->glob);
+            memset(q, 0, sizeof(double)*size);
+            //loop over interior
+            for(int m = 0; m < opts->meqn; m++)
+            for(int k = 0; k < opts->mz; k++)
+            for(int j = 0; j < opts->my; j++)
+            for(int i = 0; i < opts->mx; i++)
+            {
+                int idx = clawpatch_idx(clawpatch, i,j,k,m);
+                //fill with some different linear functions
+                q[idx] = fill_function(clawpatch, i, j, k, m);
+            }
+
+        }, 
+        nullptr
+    );
+
+    fclaw_ghost_update(cube.glob, 2, 4, 0, 0, FCLAW_TIMER_NONE);
+
+    //check ghost cells
+    //fill output domain with error
+    struct iterate_t {
+        fclaw_global_t* error_glob;
+        int num_incorrect_interior_cells;
+        int num_incorrect_face_ghost_cells;
+        int num_incorrect_edge_ghost_cells;
+        int num_incorrect_corner_ghost_cells;
+    };
+    iterate_t iterate = {cube_output.glob, 0, 0, 0, 0};
+    fclaw_global_iterate_patches(
+        cube.glob, 
+        [](fclaw_domain_t * domain, fclaw_patch_t * patch,
+            int blockno, int patchno, void *user)
+        {
+            fclaw_global_iterate_t* g = (fclaw_global_iterate_t*)user;
+            iterate_t* iterate = (iterate_t*)g->user;
+            //clawpatch to store error in
+            fclaw_patch_t* error_patch = &iterate->error_glob->domain->blocks[blockno].patches[patchno];  
+            fclaw_clawpatch_t* error_clawpatch = fclaw_clawpatch_get_clawpatch(error_patch);
+            int mbc = error_clawpatch->mbc;
+
+
+            fclaw_clawpatch_options_t* opts = fclaw_clawpatch_get_options(g->glob);
+            fclaw_clawpatch_t* clawpatch = fclaw_clawpatch_get_clawpatch(patch);
+
+            // get q
+            double* q = fclaw_clawpatch_get_q(g->glob, patch);
+            double* error_q = fclaw_clawpatch_get_q(iterate->error_glob, error_patch);
+
+            //get physical boundaries
+            int intersects_bc[fclaw_domain_num_faces(domain)];
+            for(int i=0;i<fclaw_domain_num_faces(domain);i++)
+            {
+                fclaw_patch_relation_t type = fclaw_patch_get_face_type(patch, i);
+                intersects_bc[i] = type == FCLAW_PATCH_BOUNDARY;
+            }
+
+            //clear error q
+            int size = fclaw_clawpatch_size(iterate->error_glob);
+            memset(error_q, 0, sizeof(double)*size);
+
+            //loop over all cells
+            int i_start, i_stop, j_start, j_stop, k_start, k_stop;
+            get_bounds_with_ghost(clawpatch, intersects_bc,&i_start,&i_stop,&j_start,&j_stop,&k_start,&k_stop);
+            for(int m = 0; m < opts->meqn; m++)
+            for(int k = k_start; k < k_stop; k++)
+            for(int j = j_start; j < j_stop; j++)
+            for(int i = i_start; i < i_stop; i++)
+            {
+                int idx = clawpatch_idx(clawpatch, i,j,k,m);
+                int error_idx = clawpatch_idx(error_clawpatch, i+mbc,j+mbc,k+mbc,m);
+                //get expected value
+                double expected = fill_function(clawpatch, i, j, k, m);
+                error_q[error_idx] = expected - q[idx];
+                if(q[idx] != doctest::Approx(expected))
+                {
+                    if(interior_cell(clawpatch, i,j,k,m))
+                    {
+                        iterate->num_incorrect_interior_cells++;
+                    }
+                    else if(face_ghost_cell(clawpatch, i,j,k,m))
+                    {
+                        iterate->num_incorrect_face_ghost_cells++;
+                    }
+                    else if(edge_ghost_cell(clawpatch, i,j,k,m))
+                    {
+                        iterate->num_incorrect_edge_ghost_cells++;
+                    }
+                    else if(corner_ghost_cell(clawpatch, i,j,k,m))
+                    {
+                        iterate->num_incorrect_corner_ghost_cells++;
+                    }
+                    else{
+                        SC_ABORT_NOT_REACHED();
+                    }
+                }
+            }
+
+        }, 
+        &iterate
+    );
+
+    //check that patch was filled correctly
+    CHECK_EQ(iterate.num_incorrect_interior_cells, 0);
+    CHECK_EQ(iterate.num_incorrect_face_ghost_cells, 0);
+    CHECK_EQ(iterate.num_incorrect_edge_ghost_cells, 0);
+    CHECK_EQ(iterate.num_incorrect_corner_ghost_cells, 0);
+
+    //write output if --vtk option passed to test runner
+    if(test_output_vtk())
+    {
+        INFO("Test failed output error to " << output_string << ".vtu");
+        fclaw_clawpatch_output_vtpd_to_file(cube_output.glob,output_string.c_str());
+    }
+}
 
 }// end anonymous namespace
 
@@ -204,161 +332,39 @@ TEST_CASE("3d clawpatch ghost filling on uniform cube")
     for(int mz   : {10})
     for(int mbc  : {1,2,3})
     {
-        CubeDomain cube(2,2);
+        int minlevel = 2;
+        int maxlevel = 2;
+        fclaw_domain_t* domain = fclaw_domain_new_unitcube(sc_MPI_COMM_WORLD, minlevel);
+        TestData test_data(domain,minlevel, maxlevel);
 
-        cube.opts->mx   = mx;
-        cube.opts->my   = my;
-        cube.opts->mz   = mz;
-        cube.opts->mbc      = mbc;
-        cube.opts->meqn     = 3;
+        test_data.opts->mx   = mx;
+        test_data.opts->my   = my;
+        test_data.opts->mz   = mz;
+        test_data.opts->mbc      = mbc;
+        test_data.opts->meqn     = 3;
 
-        cube.setup();
+        test_data.setup();
 
         //create output domain with bigger size, so that we can see ghost cells
         //in the vtk output
-        CubeDomain cube_output(2,2);
+        fclaw_domain_t* domain_out = fclaw_domain_new_unitcube(sc_MPI_COMM_WORLD, minlevel);
+        TestData test_data_out(domain_out, minlevel, maxlevel);
 
-        cube_output.opts->mx   = mx+2*mbc;
-        cube_output.opts->my   = my+2*mbc;
-        cube_output.opts->mz   = mz+2*mbc;
-        cube_output.opts->mbc      = mbc;
-        cube_output.opts->meqn     = 3;
+        test_data_out.opts->mx   = mx+2*mbc;
+        test_data_out.opts->my   = my+2*mbc;
+        test_data_out.opts->mz   = mz+2*mbc;
+        test_data_out.opts->mbc      = mbc;
+        test_data_out.opts->meqn     = 3;
 
-        cube_output.setup();
+        test_data_out.setup();
 
         
-        //initialize patches
-        fclaw_global_iterate_patches(
-            cube.glob, 
-            [](fclaw_domain_t * domain, fclaw_patch_t * patch,
-                int blockno, int patchno, void *user)
-            {
-                fclaw_global_iterate_t* g = (fclaw_global_iterate_t*)user;
-                fclaw_clawpatch_options_t* opts = fclaw_clawpatch_get_options(g->glob);
-                fclaw_clawpatch_t* clawpatch = fclaw_clawpatch_get_clawpatch(patch);
-                // clear q
-                double* q = fclaw_clawpatch_get_q(g->glob, patch);
-                int size = fclaw_clawpatch_size(g->glob);
-                memset(q, 0, sizeof(double)*size);
-                //loop over interior
-                for(int m = 0; m < opts->meqn; m++)
-                for(int k = 0; k < opts->mz; k++)
-                for(int j = 0; j < opts->my; j++)
-                for(int i = 0; i < opts->mx; i++)
-                {
-                    int idx = clawpatch_idx(clawpatch, i,j,k,m);
-                    //fill with some different linear functions
-                    q[idx] = fill_function(clawpatch, i, j, k, m);
-                }
+        char test_no_str[5];
+        snprintf(test_no_str, 5, "%04d", test_no);
+        std::string filename = "3d_ghost_fill_uniform_cube_"+std::string(test_no_str);
 
-            }, 
-            nullptr
-        );
+        test_ghost_fill(test_data, test_data_out, filename);
 
-        fclaw_ghost_update(cube.glob, 2, 2, 0, 0, FCLAW_TIMER_NONE);
-
-        //check ghost cells
-        //fill output domain with error
-        struct iterate_t {
-            fclaw_global_t* error_glob;
-            int num_incorrect_interior_cells;
-            int num_incorrect_face_ghost_cells;
-            int num_incorrect_edge_ghost_cells;
-            int num_incorrect_corner_ghost_cells;
-        };
-        iterate_t iterate = {cube_output.glob, 0, 0, 0, 0};
-        fclaw_global_iterate_patches(
-            cube.glob, 
-            [](fclaw_domain_t * domain, fclaw_patch_t * patch,
-                int blockno, int patchno, void *user)
-            {
-                fclaw_global_iterate_t* g = (fclaw_global_iterate_t*)user;
-                iterate_t* iterate = (iterate_t*)g->user;
-                //clawpatch to store error in
-                fclaw_patch_t* error_patch = &iterate->error_glob->domain->blocks[blockno].patches[patchno];  
-                fclaw_clawpatch_t* error_clawpatch = fclaw_clawpatch_get_clawpatch(error_patch);
-                int mbc = error_clawpatch->mbc;
-
-
-                fclaw_clawpatch_options_t* opts = fclaw_clawpatch_get_options(g->glob);
-                fclaw_clawpatch_t* clawpatch = fclaw_clawpatch_get_clawpatch(patch);
-
-                // get q
-                double* q = fclaw_clawpatch_get_q(g->glob, patch);
-                double* error_q = fclaw_clawpatch_get_q(iterate->error_glob, error_patch);
-
-                //get physical boundaries
-                int intersects_bc[fclaw_domain_num_faces(domain)];
-                for(int i=0;i<fclaw_domain_num_faces(domain);i++)
-                {
-                    fclaw_patch_relation_t type = fclaw_patch_get_face_type(patch, i);
-                    intersects_bc[i] = type == FCLAW_PATCH_BOUNDARY;
-                }
-
-                //clear error q
-                int size = fclaw_clawpatch_size(iterate->error_glob);
-                memset(error_q, 0, sizeof(double)*size);
-
-                //loop over all cells
-                int i_start, i_stop, j_start, j_stop, k_start, k_stop;
-                get_bounds_with_ghost(clawpatch, intersects_bc,&i_start,&i_stop,&j_start,&j_stop,&k_start,&k_stop);
-                for(int m = 0; m < opts->meqn; m++)
-                for(int k = k_start; k < k_stop; k++)
-                for(int j = j_start; j < j_stop; j++)
-                for(int i = i_start; i < i_stop; i++)
-                {
-                    int idx = clawpatch_idx(clawpatch, i,j,k,m);
-                    int error_idx = clawpatch_idx(error_clawpatch, i+mbc,j+mbc,k+mbc,m);
-                    //get expected value
-                    double expected = fill_function(clawpatch, i, j, k, m);
-                    error_q[error_idx] = expected - q[idx];
-                    if(q[idx] != doctest::Approx(expected))
-                    {
-                        if(interior_cell(clawpatch, i,j,k,m))
-                        {
-                            iterate->num_incorrect_interior_cells++;
-                        }
-                        else if(face_ghost_cell(clawpatch, i,j,k,m))
-                        {
-                            iterate->num_incorrect_face_ghost_cells++;
-                        }
-                        else if(edge_ghost_cell(clawpatch, i,j,k,m))
-                        {
-                            iterate->num_incorrect_edge_ghost_cells++;
-                        }
-                        else if(corner_ghost_cell(clawpatch, i,j,k,m))
-                        {
-                            iterate->num_incorrect_corner_ghost_cells++;
-                        }
-                        else{
-                            SC_ABORT_NOT_REACHED();
-                        }
-                    }
-                }
-
-            }, 
-            &iterate
-        );
-
-        //check that patch was filled correctly
-        CHECK_EQ(iterate.num_incorrect_interior_cells, 0);
-        CHECK_EQ(iterate.num_incorrect_face_ghost_cells, 0);
-        CHECK_EQ(iterate.num_incorrect_edge_ghost_cells, 0);
-        CHECK_EQ(iterate.num_incorrect_corner_ghost_cells, 0);
-
-        int num_incorrect_cells = iterate.num_incorrect_interior_cells 
-                                + iterate.num_incorrect_face_ghost_cells 
-                                + iterate.num_incorrect_edge_ghost_cells 
-                                + iterate.num_incorrect_corner_ghost_cells;
-        //if not write output
-        if(test_output_vtk() && num_incorrect_cells >0)
-        {
-            char test_no_str[5];
-            snprintf(test_no_str, 5, "%04d", test_no);
-            std::string filename = "3d_ghost_fill_uniform_cube_"+std::string(test_no_str);
-            INFO("Test failed output error to " << filename << ".vtpd");
-            fclaw_clawpatch_output_vtpd_to_file(cube_output.glob,filename.c_str());
-        }
         test_no++;
 
     }
@@ -373,13 +379,16 @@ TEST_CASE("3d ghost fill on cube with refinement")
     for(int mz   : {8})
     for(int mbc  : {2})
     {
-        CubeDomain cube(2,4);
+        int minlevel = 2;
+        int maxlevel = 3;
+        fclaw_domain_t* domain = fclaw_domain_new_unitcube(sc_MPI_COMM_WORLD, minlevel);
+        TestData test_data(domain,minlevel, maxlevel);
 
-        cube.opts->mx   = mx;
-        cube.opts->my   = my;
-        cube.opts->mz   = mz;
-        cube.opts->mbc      = mbc;
-        cube.opts->meqn     = 3;
+        test_data.opts->mx   = mx;
+        test_data.opts->my   = my;
+        test_data.opts->mz   = mz;
+        test_data.opts->mbc      = mbc;
+        test_data.opts->meqn     = 3;
 
         //refine on if interior patch
         auto tag4refinement 
@@ -424,7 +433,7 @@ TEST_CASE("3d ghost fill on cube with refinement")
               {
                 //do nothing
               };
-        fclaw_patch_vt(cube.glob)->physical_bc
+        fclaw_patch_vt(test_data.glob)->physical_bc
             = [](struct fclaw_global *glob,
                  struct fclaw_patch *this_patch,
                  int blockno,
@@ -440,165 +449,41 @@ TEST_CASE("3d ghost fill on cube with refinement")
 
 
 
-        fclaw_patch_vt(cube.glob)->tag4refinement = tag4refinement;
-        fclaw_patch_vt(cube.glob)->tag4coarsening = tag4coarsening;
+        fclaw_patch_vt(test_data.glob)->tag4refinement = tag4refinement;
+        fclaw_patch_vt(test_data.glob)->tag4coarsening = tag4coarsening;
         // don't want to test interpolation
-        fclaw_clawpatch_vt(cube.glob)->d3->fort_interpolate2fine = fort_interpolate2fine;
+        fclaw_clawpatch_vt(test_data.glob)->d3->fort_interpolate2fine = fort_interpolate2fine;
 
-        CHECK_EQ(cube.glob->domain->global_num_patches, 64);
-        cube.setup();
-        CHECK_EQ(cube.glob->domain->global_num_patches, 127);
+        CHECK_EQ(test_data.glob->domain->global_num_patches, 64);
+        test_data.setup();
+        CHECK_EQ(test_data.glob->domain->global_num_patches, 127);
 
         //create output domain with bigger size, so that we can see ghost cells
         //in the vtk output
-        CubeDomain cube_output(2,4);
+        fclaw_domain_t* domain_out = fclaw_domain_new_unitcube(sc_MPI_COMM_WORLD, minlevel);
+        TestData test_data_out(domain_out, minlevel, maxlevel);
 
-        cube_output.opts->mx   = mx+2*mbc;
-        cube_output.opts->my   = my+2*mbc;
-        cube_output.opts->mz   = mz+2*mbc;
-        cube_output.opts->mbc      = mbc;
-        cube_output.opts->meqn     = 3;
+        test_data_out.opts->mx   = mx+2*mbc;
+        test_data_out.opts->my   = my+2*mbc;
+        test_data_out.opts->mz   = mz+2*mbc;
+        test_data_out.opts->mbc      = mbc;
+        test_data_out.opts->meqn     = 3;
 
-        fclaw_patch_vt(cube_output.glob)->tag4refinement = tag4refinement;
-        fclaw_patch_vt(cube_output.glob)->tag4coarsening = tag4coarsening;
+        fclaw_patch_vt(test_data_out.glob)->tag4refinement = tag4refinement;
+        fclaw_patch_vt(test_data_out.glob)->tag4coarsening = tag4coarsening;
         // don't want to test interpolation
-        fclaw_clawpatch_vt(cube_output.glob)->d3->fort_interpolate2fine = fort_interpolate2fine;
-        CHECK_EQ(cube_output.glob->domain->global_num_patches, 64);
-        cube_output.setup();
-        CHECK_EQ(cube_output.glob->domain->global_num_patches, 127);
+        fclaw_clawpatch_vt(test_data_out.glob)->d3->fort_interpolate2fine = fort_interpolate2fine;
+        CHECK_EQ(test_data_out.glob->domain->global_num_patches, 64);
+        test_data_out.setup();
+        CHECK_EQ(test_data_out.glob->domain->global_num_patches, 127);
 
-        //initialize patches
-        fclaw_global_iterate_patches(
-            cube.glob, 
-            [](fclaw_domain_t * domain, fclaw_patch_t * patch,
-                int blockno, int patchno, void *user)
-            {
-                fclaw_global_iterate_t* g = (fclaw_global_iterate_t*)user;
-                fclaw_clawpatch_options_t* opts = fclaw_clawpatch_get_options(g->glob);
-                fclaw_clawpatch_t* clawpatch = fclaw_clawpatch_get_clawpatch(patch);
-                // clear q
-                double* q = fclaw_clawpatch_get_q(g->glob, patch);
-                int size = fclaw_clawpatch_size(g->glob);
-                memset(q, 0, sizeof(double)*size);
-                //loop over interior
-                for(int m = 0; m < opts->meqn; m++)
-                for(int k = 0; k < opts->mz; k++)
-                for(int j = 0; j < opts->my; j++)
-                for(int i = 0; i < opts->mx; i++)
-                {
-                    int idx = clawpatch_idx(clawpatch, i,j,k,m);
-                    //fill with some different linear functions
-                    q[idx] = fill_function(clawpatch, i, j, k, m);
-                }
+        char test_no_str[5];
+        snprintf(test_no_str, 5, "%04d", test_no);
+        std::string filename = "3d_ghost_fill_uniform_cube_"+std::string(test_no_str);
 
-            }, 
-            nullptr
-        );
+        test_ghost_fill(test_data, test_data_out, filename);
 
-        CHECK_EQ(cube.glob->domain->global_num_patches, 127);
-        fclaw_ghost_update(cube.glob, 2, 4, 0, 0, FCLAW_TIMER_NONE);
-        CHECK_EQ(cube.glob->domain->global_num_patches, 127);
-
-        //check ghost cells
-        //fill output domain with error
-        struct iterate_t {
-            fclaw_global_t* error_glob;
-            int num_incorrect_interior_cells;
-            int num_incorrect_face_ghost_cells;
-            int num_incorrect_edge_ghost_cells;
-            int num_incorrect_corner_ghost_cells;
-        };
-        iterate_t iterate = {cube_output.glob, 0, 0, 0, 0};
-        fclaw_global_iterate_patches(
-            cube.glob, 
-            [](fclaw_domain_t * domain, fclaw_patch_t * patch,
-                int blockno, int patchno, void *user)
-            {
-                fclaw_global_iterate_t* g = (fclaw_global_iterate_t*)user;
-                iterate_t* iterate = (iterate_t*)g->user;
-                //clawpatch to store error in
-                fclaw_patch_t* error_patch = &iterate->error_glob->domain->blocks[blockno].patches[patchno];  
-                fclaw_clawpatch_t* error_clawpatch = fclaw_clawpatch_get_clawpatch(error_patch);
-                int mbc = error_clawpatch->mbc;
-
-
-                fclaw_clawpatch_options_t* opts = fclaw_clawpatch_get_options(g->glob);
-                fclaw_clawpatch_t* clawpatch = fclaw_clawpatch_get_clawpatch(patch);
-
-                // get q
-                double* q = fclaw_clawpatch_get_q(g->glob, patch);
-                double* error_q = fclaw_clawpatch_get_q(iterate->error_glob, error_patch);
-
-                //get physical boundaries
-                int intersects_bc[fclaw_domain_num_faces(domain)];
-                for(int i=0;i<fclaw_domain_num_faces(domain);i++)
-                {
-                    fclaw_patch_relation_t type = fclaw_patch_get_face_type(patch, i);
-                    intersects_bc[i] = type == FCLAW_PATCH_BOUNDARY;
-                }
-
-                //clear error q
-                int size = fclaw_clawpatch_size(iterate->error_glob);
-                memset(error_q, 0, sizeof(double)*size);
-
-                //loop over all cells
-                int i_start, i_stop, j_start, j_stop, k_start, k_stop;
-                get_bounds_with_ghost(clawpatch, intersects_bc,&i_start,&i_stop,&j_start,&j_stop,&k_start,&k_stop);
-                for(int m = 0; m < opts->meqn; m++)
-                for(int k = k_start; k < k_stop; k++)
-                for(int j = j_start; j < j_stop; j++)
-                for(int i = i_start; i < i_stop; i++)
-                {
-                    int idx = clawpatch_idx(clawpatch, i,j,k,m);
-                    int error_idx = clawpatch_idx(error_clawpatch, i+mbc,j+mbc,k+mbc,m);
-                    //get expected value
-                    double expected = fill_function(clawpatch, i, j, k, m);
-                    error_q[error_idx] = expected - q[idx];
-                    if(q[idx] != doctest::Approx(expected))
-                    {
-                        if(interior_cell(clawpatch, i,j,k,m))
-                        {
-                            iterate->num_incorrect_interior_cells++;
-                        }
-                        else if(face_ghost_cell(clawpatch, i,j,k,m))
-                        {
-                            iterate->num_incorrect_face_ghost_cells++;
-                        }
-                        else if(edge_ghost_cell(clawpatch, i,j,k,m))
-                        {
-                            iterate->num_incorrect_edge_ghost_cells++;
-                        }
-                        else if(corner_ghost_cell(clawpatch, i,j,k,m))
-                        {
-                            iterate->num_incorrect_corner_ghost_cells++;
-                        }
-                        else{
-                            SC_ABORT_NOT_REACHED();
-                        }
-                    }
-                }
-
-            }, 
-            &iterate
-        );
-
-        //check that patch was filled correctly
-        CHECK_EQ(iterate.num_incorrect_interior_cells, 0);
-        CHECK_EQ(iterate.num_incorrect_face_ghost_cells, 0);
-        CHECK_EQ(iterate.num_incorrect_edge_ghost_cells, 0);
-        CHECK_EQ(iterate.num_incorrect_corner_ghost_cells, 0);
-
-        //if not write output
-        if(test_output_vtk())
-        {
-            char test_no_str[5];
-            snprintf(test_no_str, 5, "%04d", test_no);
-            std::string filename = "3d_clawpatch_ghost_fill_on_cube_with_refinement_"+std::string(test_no_str);
-            INFO("Test failed output error to " << filename << ".vtu");
-            fclaw_clawpatch_output_vtpd_to_file(cube_output.glob,filename.c_str());
-        }
         test_no++;
-
     }
 
 }
@@ -610,13 +495,16 @@ TEST_CASE("3d ghost fill on cube with refinement coarse interior")
     for(int mz   : {8})
     for(int mbc  : {2})
     {
-        CubeDomain cube(2,3);
+        int minlevel = 2;
+        int maxlevel = 3;
+        fclaw_domain_t* domain = fclaw_domain_new_unitcube(sc_MPI_COMM_WORLD, minlevel);
+        TestData test_data(domain,minlevel, maxlevel);
 
-        cube.opts->mx   = mx;
-        cube.opts->my   = my;
-        cube.opts->mz   = mz;
-        cube.opts->mbc      = mbc;
-        cube.opts->meqn     = 3;
+        test_data.opts->mx   = mx;
+        test_data.opts->my   = my;
+        test_data.opts->mz   = mz;
+        test_data.opts->mbc      = mbc;
+        test_data.opts->meqn     = 3;
 
         //refine on if interior patch
         auto tag4refinement 
@@ -664,7 +552,7 @@ TEST_CASE("3d ghost fill on cube with refinement coarse interior")
               {
                 //do nothing
               };
-        fclaw_patch_vt(cube.glob)->physical_bc
+        fclaw_patch_vt(test_data.glob)->physical_bc
             = [](struct fclaw_global *glob,
                  struct fclaw_patch *this_patch,
                  int blockno,
@@ -680,163 +568,40 @@ TEST_CASE("3d ghost fill on cube with refinement coarse interior")
 
 
 
-        fclaw_patch_vt(cube.glob)->tag4refinement = tag4refinement;
-        fclaw_patch_vt(cube.glob)->tag4coarsening = tag4coarsening;
+        fclaw_patch_vt(test_data.glob)->tag4refinement = tag4refinement;
+        fclaw_patch_vt(test_data.glob)->tag4coarsening = tag4coarsening;
         // don't want to test interpolation
-        fclaw_clawpatch_vt(cube.glob)->d3->fort_interpolate2fine = fort_interpolate2fine;
+        fclaw_clawpatch_vt(test_data.glob)->d3->fort_interpolate2fine = fort_interpolate2fine;
 
-        CHECK_EQ(cube.glob->domain->global_num_patches, 64);
-        cube.setup();
-        CHECK_EQ(cube.glob->domain->global_num_patches, 456);
+        CHECK_EQ(test_data.glob->domain->global_num_patches, 64);
+        test_data.setup();
+        CHECK_EQ(test_data.glob->domain->global_num_patches, 456);
 
         //create output domain with bigger size, so that we can see ghost cells
         //in the vtk output
-        CubeDomain cube_output(2,3);
+        fclaw_domain_t* domain_out = fclaw_domain_new_unitcube(sc_MPI_COMM_WORLD, minlevel);
+        TestData test_data_out(domain_out, minlevel, maxlevel);
 
-        cube_output.opts->mx   = mx+2*mbc;
-        cube_output.opts->my   = my+2*mbc;
-        cube_output.opts->mz   = mz+2*mbc;
-        cube_output.opts->mbc      = mbc;
-        cube_output.opts->meqn     = 3;
+        test_data_out.opts->mx   = mx+2*mbc;
+        test_data_out.opts->my   = my+2*mbc;
+        test_data_out.opts->mz   = mz+2*mbc;
+        test_data_out.opts->mbc      = mbc;
+        test_data_out.opts->meqn     = 3;
 
-        fclaw_patch_vt(cube_output.glob)->tag4refinement = tag4refinement;
-        fclaw_patch_vt(cube_output.glob)->tag4coarsening = tag4coarsening;
+        fclaw_patch_vt(test_data_out.glob)->tag4refinement = tag4refinement;
+        fclaw_patch_vt(test_data_out.glob)->tag4coarsening = tag4coarsening;
         // don't want to test interpolation
-        fclaw_clawpatch_vt(cube_output.glob)->d3->fort_interpolate2fine = fort_interpolate2fine;
-        CHECK_EQ(cube_output.glob->domain->global_num_patches, 64);
-        cube_output.setup();
-        CHECK_EQ(cube_output.glob->domain->global_num_patches, 456);
+        fclaw_clawpatch_vt(test_data_out.glob)->d3->fort_interpolate2fine = fort_interpolate2fine;
+        CHECK_EQ(test_data_out.glob->domain->global_num_patches, 64);
+        test_data_out.setup();
+        CHECK_EQ(test_data_out.glob->domain->global_num_patches, 456);
 
-        //initialize patches
-        fclaw_global_iterate_patches(
-            cube.glob, 
-            [](fclaw_domain_t * domain, fclaw_patch_t * patch,
-                int blockno, int patchno, void *user)
-            {
-                fclaw_global_iterate_t* g = (fclaw_global_iterate_t*)user;
-                fclaw_clawpatch_options_t* opts = fclaw_clawpatch_get_options(g->glob);
-                fclaw_clawpatch_t* clawpatch = fclaw_clawpatch_get_clawpatch(patch);
-                // clear q
-                double* q = fclaw_clawpatch_get_q(g->glob, patch);
-                int size = fclaw_clawpatch_size(g->glob);
-                memset(q, 0, sizeof(double)*size);
-                //loop over interior
-                for(int m = 0; m < opts->meqn; m++)
-                for(int k = 0; k < opts->mz; k++)
-                for(int j = 0; j < opts->my; j++)
-                for(int i = 0; i < opts->mx; i++)
-                {
-                    int idx = clawpatch_idx(clawpatch, i,j,k,m);
-                    //fill with some different linear functions
-                    q[idx] = fill_function(clawpatch, i, j, k, m);
-                }
+        char test_no_str[5];
+        snprintf(test_no_str, 5, "%04d", test_no);
+        std::string filename = "3d_ghost_fill_uniform_cube_"+std::string(test_no_str);
 
-            }, 
-            nullptr
-        );
+        test_ghost_fill(test_data, test_data_out, filename);
 
-        CHECK_EQ(cube.glob->domain->global_num_patches, 456);
-        fclaw_ghost_update(cube.glob, 2, 4, 0, 0, FCLAW_TIMER_NONE);
-        CHECK_EQ(cube.glob->domain->global_num_patches, 456);
-
-        //check ghost cells
-        //fill output domain with error
-        struct iterate_t {
-            fclaw_global_t* error_glob;
-            int num_incorrect_interior_cells;
-            int num_incorrect_face_ghost_cells;
-            int num_incorrect_edge_ghost_cells;
-            int num_incorrect_corner_ghost_cells;
-        };
-        iterate_t iterate = {cube_output.glob, 0, 0, 0, 0};
-        fclaw_global_iterate_patches(
-            cube.glob, 
-            [](fclaw_domain_t * domain, fclaw_patch_t * patch,
-                int blockno, int patchno, void *user)
-            {
-                fclaw_global_iterate_t* g = (fclaw_global_iterate_t*)user;
-                iterate_t* iterate = (iterate_t*)g->user;
-                //clawpatch to store error in
-                fclaw_patch_t* error_patch = &iterate->error_glob->domain->blocks[blockno].patches[patchno];  
-                fclaw_clawpatch_t* error_clawpatch = fclaw_clawpatch_get_clawpatch(error_patch);
-                int mbc = error_clawpatch->mbc;
-
-
-                fclaw_clawpatch_options_t* opts = fclaw_clawpatch_get_options(g->glob);
-                fclaw_clawpatch_t* clawpatch = fclaw_clawpatch_get_clawpatch(patch);
-
-                // get q
-                double* q = fclaw_clawpatch_get_q(g->glob, patch);
-                double* error_q = fclaw_clawpatch_get_q(iterate->error_glob, error_patch);
-
-                //get physical boundaries
-                int intersects_bc[fclaw_domain_num_faces(domain)];
-                for(int i=0;i<fclaw_domain_num_faces(domain);i++)
-                {
-                    fclaw_patch_relation_t type = fclaw_patch_get_face_type(patch, i);
-                    intersects_bc[i] = type == FCLAW_PATCH_BOUNDARY;
-                }
-
-                //clear error q
-                int size = fclaw_clawpatch_size(iterate->error_glob);
-                memset(error_q, 0, sizeof(double)*size);
-
-                //loop over all cells
-                int i_start, i_stop, j_start, j_stop, k_start, k_stop;
-                get_bounds_with_ghost(clawpatch, intersects_bc,&i_start,&i_stop,&j_start,&j_stop,&k_start,&k_stop);
-                for(int m = 0; m < opts->meqn; m++)
-                for(int k = k_start; k < k_stop; k++)
-                for(int j = j_start; j < j_stop; j++)
-                for(int i = i_start; i < i_stop; i++)
-                {
-                    int idx = clawpatch_idx(clawpatch, i,j,k,m);
-                    int error_idx = clawpatch_idx(error_clawpatch, i+mbc,j+mbc,k+mbc,m);
-                    //get expected value
-                    double expected = fill_function(clawpatch, i, j, k, m);
-                    error_q[error_idx] = expected - q[idx];
-                    if(q[idx] != doctest::Approx(expected))
-                    {
-                        if(interior_cell(clawpatch, i,j,k,m))
-                        {
-                            iterate->num_incorrect_interior_cells++;
-                        }
-                        else if(face_ghost_cell(clawpatch, i,j,k,m))
-                        {
-                            iterate->num_incorrect_face_ghost_cells++;
-                        }
-                        else if(edge_ghost_cell(clawpatch, i,j,k,m))
-                        {
-                            iterate->num_incorrect_edge_ghost_cells++;
-                        }
-                        else if(corner_ghost_cell(clawpatch, i,j,k,m))
-                        {
-                            iterate->num_incorrect_corner_ghost_cells++;
-                        }
-                        else{
-                            SC_ABORT_NOT_REACHED();
-                        }
-                    }
-                }
-
-            }, 
-            &iterate
-        );
-
-        //check that patch was filled correctly
-        CHECK_EQ(iterate.num_incorrect_interior_cells, 0);
-        CHECK_EQ(iterate.num_incorrect_face_ghost_cells, 0);
-        CHECK_EQ(iterate.num_incorrect_edge_ghost_cells, 0);
-        CHECK_EQ(iterate.num_incorrect_corner_ghost_cells, 0);
-
-        //if not write output
-        if(test_output_vtk())
-        {
-            char test_no_str[5];
-            snprintf(test_no_str, 5, "%04d", test_no);
-            std::string filename = "3d_clawpatch_ghost_fill_on_cube_with_refinement_coarse_interior"+std::string(test_no_str);
-            INFO("Test failed output error to " << filename << ".vtu");
-            fclaw_clawpatch_output_vtpd_to_file(cube_output.glob,filename.c_str());
-        }
         test_no++;
 
     }
