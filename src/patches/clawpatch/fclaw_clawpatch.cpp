@@ -535,19 +535,10 @@ void clawpatch_setup_timeinterp(fclaw_global_t *glob,
        allocation */
     const fclaw_clawpatch_options_t *clawpatch_opt = fclaw_clawpatch_get_options(glob);
 
-    int mx,my,mz;
-    if(clawpatch_opt->patch_dim == 2)
-    {
-        mx = clawpatch_opt->mx;
-        my = clawpatch_opt->my;
-        mz = 0;
-    }
-    else
-    {
-        mx = clawpatch_opt->mx;
-        my = clawpatch_opt->my;
-        mz = clawpatch_opt->mz;
-    }
+    int mx = clawpatch_opt->mx;
+    int my = clawpatch_opt->my;
+    int mz = clawpatch_opt->mz;
+
     int meqn = clawpatch_opt->meqn;
     int mbc = clawpatch_opt->mbc;
     int mint = clawpatch_opt->interp_stencil_width/2+1;  
