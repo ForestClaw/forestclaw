@@ -53,6 +53,8 @@ struct TestData {
     fclaw_domain_t *domain;
     fclaw3d_map_context_t* map;
     fclaw_clawpatch_options_t* opts;
+    fclaw_patch_vtable_t* patch_vt;
+    fclaw_clawpatch_vtable_t * clawpatch_vt;
 
     TestData(fclaw_domain_t* domain, int minlevel, int maxlevel){
         glob = fclaw_global_new();
@@ -60,6 +62,7 @@ struct TestData {
         memset(&fopts, 0, sizeof(fopts));
         fopts.mi=1;
         fopts.mj=1;
+        fopts.mk=1;
         fopts.minlevel=minlevel;
         fopts.maxlevel=maxlevel;
         fopts.manifold=false;
@@ -81,7 +84,6 @@ struct TestData {
         opts->rhs_fields = 1;
         fclaw_clawpatch_options_store(glob, opts);
 
-        domain = fclaw_domain_new_unitcube(sc_MPI_COMM_WORLD, minlevel);
         fclaw_global_store_domain(glob, domain);
 
         //map = fclaw3d_map_new_nomap();
@@ -89,7 +91,7 @@ struct TestData {
 
         fclaw_vtables_initialize(glob);
         fclaw_clawpatch_vtable_initialize(glob, 4);
-        fclaw_patch_vtable_t* patch_vt = fclaw_patch_vt(glob);
+        patch_vt = fclaw_patch_vt(glob);
         patch_vt->physical_bc = 
             [](fclaw_global_t* glob,
                fclaw_patch_t * patch,
@@ -102,6 +104,8 @@ struct TestData {
             {
                 //do nothing
             };
+
+        clawpatch_vt = fclaw_clawpatch_vt(glob);
 
     }
     void setup(){
@@ -192,7 +196,7 @@ bool corner_ghost_cell(fclaw_clawpatch_t* clawpatch, int i, int j, int k, int m)
     return (i < 0 || i >= mx) && (j < 0 || j >= my) && (k < 0 || k >= mz);
 }
 
-void test_ghost_fill(TestData& cube, TestData& cube_output, std::string output_string)
+void test_ghost_fill(TestData& cube, TestData& cube_output, std::string output_filename)
 {
     //initialize patches
     fclaw_global_iterate_patches(
@@ -316,8 +320,8 @@ void test_ghost_fill(TestData& cube, TestData& cube_output, std::string output_s
     //write output if --vtk option passed to test runner
     if(test_output_vtk())
     {
-        INFO("Test failed output error to " << output_string << ".vtu");
-        fclaw_clawpatch_output_vtpd_to_file(cube_output.glob,output_string.c_str());
+        INFO("Test failed output error to " << output_filename << ".vtpd");
+        fclaw_clawpatch_output_vtpd_to_file(cube_output.glob,output_filename.c_str());
     }
 }
 
@@ -380,7 +384,7 @@ TEST_CASE("3d ghost fill on cube with refinement")
     for(int mbc  : {2})
     {
         int minlevel = 2;
-        int maxlevel = 3;
+        int maxlevel = 4;
         fclaw_domain_t* domain = fclaw_domain_new_unitcube(sc_MPI_COMM_WORLD, minlevel);
         TestData test_data(domain,minlevel, maxlevel);
 
@@ -433,30 +437,16 @@ TEST_CASE("3d ghost fill on cube with refinement")
               {
                 //do nothing
               };
-        fclaw_patch_vt(test_data.glob)->physical_bc
-            = [](struct fclaw_global *glob,
-                 struct fclaw_patch *this_patch,
-                 int blockno,
-                 int patchno,
-                 double t,
-                 double dt,
-                 int *intersects_bc,
-                 int time_interp)
-                 {
-                    //do nothing
-                 };
 
-
-
-
-        fclaw_patch_vt(test_data.glob)->tag4refinement = tag4refinement;
-        fclaw_patch_vt(test_data.glob)->tag4coarsening = tag4coarsening;
+        test_data.patch_vt->tag4refinement = tag4refinement;
+        test_data.patch_vt->tag4coarsening = tag4coarsening;
         // don't want to test interpolation
-        fclaw_clawpatch_vt(test_data.glob)->d3->fort_interpolate2fine = fort_interpolate2fine;
+        test_data.clawpatch_vt->d3->fort_interpolate2fine = fort_interpolate2fine;
 
         CHECK_EQ(test_data.glob->domain->global_num_patches, 64);
         test_data.setup();
         CHECK_EQ(test_data.glob->domain->global_num_patches, 127);
+        domain = fclaw_domain_new_unitcube(sc_MPI_COMM_WORLD, minlevel);
 
         //create output domain with bigger size, so that we can see ghost cells
         //in the vtk output
@@ -469,10 +459,11 @@ TEST_CASE("3d ghost fill on cube with refinement")
         test_data_out.opts->mbc      = mbc;
         test_data_out.opts->meqn     = 3;
 
-        fclaw_patch_vt(test_data_out.glob)->tag4refinement = tag4refinement;
-        fclaw_patch_vt(test_data_out.glob)->tag4coarsening = tag4coarsening;
+        test_data_out.patch_vt->tag4refinement = tag4refinement;
+        test_data_out.patch_vt->tag4coarsening = tag4coarsening;
         // don't want to test interpolation
-        fclaw_clawpatch_vt(test_data_out.glob)->d3->fort_interpolate2fine = fort_interpolate2fine;
+        test_data_out.clawpatch_vt->d3->fort_interpolate2fine = fort_interpolate2fine;
+
         CHECK_EQ(test_data_out.glob->domain->global_num_patches, 64);
         test_data_out.setup();
         CHECK_EQ(test_data_out.glob->domain->global_num_patches, 127);
@@ -552,26 +543,11 @@ TEST_CASE("3d ghost fill on cube with refinement coarse interior")
               {
                 //do nothing
               };
-        fclaw_patch_vt(test_data.glob)->physical_bc
-            = [](struct fclaw_global *glob,
-                 struct fclaw_patch *this_patch,
-                 int blockno,
-                 int patchno,
-                 double t,
-                 double dt,
-                 int *intersects_bc,
-                 int time_interp)
-                 {
-                    //do nothing
-                 };
 
-
-
-
-        fclaw_patch_vt(test_data.glob)->tag4refinement = tag4refinement;
-        fclaw_patch_vt(test_data.glob)->tag4coarsening = tag4coarsening;
+        test_data.patch_vt->tag4refinement = tag4refinement;
+        test_data.patch_vt->tag4coarsening = tag4coarsening;
         // don't want to test interpolation
-        fclaw_clawpatch_vt(test_data.glob)->d3->fort_interpolate2fine = fort_interpolate2fine;
+        test_data.clawpatch_vt->d3->fort_interpolate2fine = fort_interpolate2fine;
 
         CHECK_EQ(test_data.glob->domain->global_num_patches, 64);
         test_data.setup();
@@ -588,10 +564,11 @@ TEST_CASE("3d ghost fill on cube with refinement coarse interior")
         test_data_out.opts->mbc      = mbc;
         test_data_out.opts->meqn     = 3;
 
-        fclaw_patch_vt(test_data_out.glob)->tag4refinement = tag4refinement;
-        fclaw_patch_vt(test_data_out.glob)->tag4coarsening = tag4coarsening;
+        test_data_out.patch_vt->tag4refinement = tag4refinement;
+        test_data_out.patch_vt->tag4coarsening = tag4coarsening;
         // don't want to test interpolation
-        fclaw_clawpatch_vt(test_data_out.glob)->d3->fort_interpolate2fine = fort_interpolate2fine;
+        test_data_out.clawpatch_vt->d3->fort_interpolate2fine = fort_interpolate2fine;
+
         CHECK_EQ(test_data_out.glob->domain->global_num_patches, 64);
         test_data_out.setup();
         CHECK_EQ(test_data_out.glob->domain->global_num_patches, 456);
