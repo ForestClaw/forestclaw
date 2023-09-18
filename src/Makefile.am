@@ -64,7 +64,9 @@ libforestclaw_installed_headers = \
 	src/fclaw_domain.h \
 	src/fclaw_global.h
 
-libforestclaw_internal_headers =
+libforestclaw_internal_headers = \
+	src/fclaw2d_file_v1.h \
+	src/fclaw3d_file_v1.h
 
 # -------------------------------------------------------------------
 # Main source files for ForestClaw are here - these need to be compiled
