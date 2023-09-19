@@ -120,9 +120,8 @@ void get_face_neighbors(fclaw_global_t *glob,
 	if (neighbor_type == FCLAW_PATCH_BOUNDARY)
 	{
 		/* This case should be excluded by earlier checks */
-		printf("get_face_neighbors (fclaw2d_face_neighbors.cpp) : No patch " \
-			   "found\n");
-		exit(0);
+		fclaw_abortf("get_face_neighbors (fclaw2d_face_neighbors.cpp) : No patch " \
+			   		 "found\n");
 	}
 	else
 	{
@@ -171,8 +170,7 @@ void get_face_neighbors(fclaw_global_t *glob,
 		}
 		else
 		{
-			printf ("Illegal fclaw2d_patch_face_neighbors return value\n");
-			exit (1);
+			fclaw_abortf ("Illegal fclaw2d_patch_face_neighbors return value\n");
 		}
 
 		for(ir = 0; ir < num_neighbors; ir++)

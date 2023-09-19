@@ -270,12 +270,11 @@ void get_edge_neighbors(fclaw_global_t *glob,
         }
         else
         {
-            fclaw_global_essentialf("WARNING : this_block_idx = %d\n",this_block_idx);
-            fclaw_global_essentialf("WARNING : corner_block_idx = %d\n",*edge_block_idx);
-            fclaw_global_essentialf("get_corner_neighbors " \
-                                    "(fclaw2d_corner_neighbors.c : " \
-                                    "We should not be here\n");
-            exit(0);
+            fclaw_errorf("WARNING : this_block_idx = %d\n",this_block_idx);
+            fclaw_errorf("WARNING : corner_block_idx = %d\n",*edge_block_idx);
+            fclaw_abortf("get_corner_neighbors " \
+                            "(fclaw2d_corner_neighbors.c : " \
+                            "We should not be here\n");
         }
     }
     else if (!has_edge_neighbor && is_block_edge)
