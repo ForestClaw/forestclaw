@@ -113,8 +113,18 @@ struct fclaw_patch_transform_data
 
     /** Pointer to this patch */
     struct fclaw_patch *this_patch;
+    /** This patch's blockno */
+    int this_blockno;
+    /** This patch's patchno */
+    int this_patchno;
     /** Pointer to the neighbor patch */
     struct fclaw_patch *neighbor_patch;
+    /** Neighbor patch's blockno */
+    int neighbor_blockno;
+    /** Neighbor patch's patchno */
+    int neighbor_patchno;
+    /** Neighbor type */
+    fclaw_patch_relation_t neighbor_type;
     /**
      * @brief Transform array
      * 
