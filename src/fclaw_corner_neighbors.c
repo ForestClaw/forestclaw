@@ -509,16 +509,12 @@ void cb_corner_fill(fclaw_domain_t *domain,
     int average_from_neighbor = filltype->exchange_type == FCLAW_AVERAGE;
     int interpolate_to_neighbor = filltype->exchange_type == FCLAW_INTERPOLATE;
 
+
     int intersects_bdry[num_faces];
-    int intersects_block[num_faces];
-    int is_interior_in_domain;
-    int block_corner_count;
-
-    int icorner;
-
     fclaw_physical_get_bc(s->glob,this_block_idx,this_patch_idx,
                             intersects_bdry);
 
+    int intersects_block[num_faces];
     fclaw_block_get_block_boundary(s->glob, this_patch, intersects_block);
 
     /* Transform data needed at multi-block boundaries */
@@ -546,9 +542,13 @@ void cb_corner_fill(fclaw_domain_t *domain,
                                       &transform_data_finegrid);
 
 
-    for (icorner = 0; icorner < num_corners; icorner++)
+    for (int icorner = 0; icorner < num_corners; icorner++)
     {
-        block_corner_count = 0;
+        int block_corner_count = 0;
+        // get corner type and initialize is_block_* values in transform_data and transform_data_finegrid
+        // block_i* values will be initialized for transform_data
+        // block_i* values will be initialized to -1 for transform_data_finegrid
+        int is_interior_in_domain;
         get_corner_type(s->glob,icorner,
                         intersects_bdry,
                         intersects_block,
