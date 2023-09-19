@@ -34,7 +34,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define FCLAW3D_FILE_H
 
 #include <forestclaw3d.h>
-#include <fclaw3d_file_v1.h>    /* to set the FCLAW3D_FILE macros publicly */
 
 #ifdef __cplusplus
 extern "C"
@@ -44,11 +43,42 @@ extern "C"
 #endif
 #endif
 
-#define FCLAW3D_FILE_USER_STRING_BYTES FCLAW3D_FILE_USER_STRING_BYTES_V1
-#define FCLAW3D_FILE_MAX_BLOCK_SIZE FCLAW3D_FILE_MAX_BLOCK_SIZE_V1
-#define FCLAW3D_FILE_ERR_SUCCESS FCLAW3D_FILE_ERR_SUCCESS_V1
-#define FCLAW3D_FILE_ERR_FORMAT FCLAW3D_FILE_ERR_FORMAT_V1
-#define FCLAW3D_FILE_ERR_NOT_IMPLEMENTED (FCLAW3D_FILE_ERR_LASTCODE_V1 + 1)
+#define FCLAW3D_FILE_USER_STRING_BYTES 48
+#define FCLAW3D_FILE_MAX_BLOCK_SIZE 9999999999999
+#define FCLAW3D_FILE_MAX_FIELD_ENTRY_SIZE 9999999999999
+
+/** Error values for fclaw2d_file functions.
+ */
+typedef enum fclaw3d_file_error
+{
+    FCLAW3D_FILE_ERR_SUCCESS = 0, /**< file function completed with success */
+    FCLAW3D_FILE_ERR_FILE = sc_MPI_ERR_LASTCODE, /**< invalid file handle */
+    FCLAW3D_FILE_ERR_NOT_SAME, /**< collective arg not identical */
+    FCLAW3D_FILE_ERR_AMODE, /**< access mode error */
+    FCLAW3D_FILE_ERR_NO_SUCH_FILE, /**< file does not exist */
+    FCLAW3D_FILE_ERR_FILE_EXIST, /**< file exists already */
+    FCLAW3D_FILE_ERR_BAD_FILE, /**< invalid file name */
+    FCLAW3D_FILE_ERR_ACCESS, /**< permission denied */
+    FCLAW3D_FILE_ERR_NO_SPACE, /**< not enough space */
+    FCLAW3D_FILE_ERR_QUOTA, /**< quota exceeded */
+    FCLAW3D_FILE_ERR_READ_ONLY, /**< read only file (system) */
+    FCLAW3D_FILE_ERR_IN_USE, /**< file currently open by other process */
+    FCLAW3D_FILE_ERR_IO, /**< other I/O error */
+    FCLAW3D_FILE_ERR_FORMAT, /**< read file has a wrong format */
+    FCLAW3D_FILE_ERR_SECTION_TYPE, /**< a valid non-matching section type */
+    FCLAW3D_FILE_ERR_CONN, /**< invalid serialized connectivity data */
+    FCLAW3D_FILE_ERR_P4EST, /**< invalid p4est data */
+    FCLAW3D_FILE_ERR_IN_DATA, /**< input data of file function is invalid */
+    FCLAW3D_FILE_ERR_COUNT, /**< read or write count error that was not
+                                 classified as a format error */
+    FCLAW3D_FILE_ERR_NOT_IMPLEMENTED, /**< functionality is not implemented */
+    FCLAW3D_FILE_ERR_UNKNOWN, /**< unknown error */
+    FCLAW3D_FILE_ERR_LASTCODE /**< to define own error codes for
+                                  a higher level application
+                                  that is using fclaw3d_file
+                                  functions */
+}
+fclaw3d_file_error_t;
 
 /** Opaque context used for writing a fclaw3d data file. */
 typedef struct fclaw3d_file_context fclaw3d_file_context_t;

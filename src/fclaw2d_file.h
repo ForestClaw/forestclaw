@@ -34,7 +34,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define FCLAW2D_FILE_H
 
 #include <forestclaw2d.h>
-#include <fclaw2d_file_v1.h>    /* to set the FCLAW2D_FILE macros publicly */
 
 #ifdef __cplusplus
 extern "C"
@@ -44,11 +43,42 @@ extern "C"
 #endif
 #endif
 
-#define FCLAW2D_FILE_USER_STRING_BYTES FCLAW2D_FILE_USER_STRING_BYTES_V1
-#define FCLAW2D_FILE_MAX_BLOCK_SIZE FCLAW2D_FILE_MAX_BLOCK_SIZE_V1
-#define FCLAW2D_FILE_ERR_SUCCESS FCLAW2D_FILE_ERR_SUCCESS_V1
-#define FCLAW2D_FILE_ERR_FORMAT FCLAW2D_FILE_ERR_FORMAT_V1
-#define FCLAW2D_FILE_ERR_NOT_IMPLEMENTED (FCLAW2D_FILE_ERR_LASTCODE_V1 + 1)
+#define FCLAW2D_FILE_USER_STRING_BYTES 48
+#define FCLAW2D_FILE_MAX_BLOCK_SIZE 9999999999999
+#define FCLAW2D_FILE_MAX_FIELD_ENTRY_SIZE 9999999999999
+
+/** Error values for fclaw2d_file functions.
+ */
+typedef enum fclaw2d_file_error
+{
+    FCLAW2D_FILE_ERR_SUCCESS = 0, /**< file function completed with success */
+    FCLAW2D_FILE_ERR_FILE = sc_MPI_ERR_LASTCODE, /**< invalid file handle */
+    FCLAW2D_FILE_ERR_NOT_SAME, /**< collective arg not identical */
+    FCLAW2D_FILE_ERR_AMODE, /**< access mode error */
+    FCLAW2D_FILE_ERR_NO_SUCH_FILE, /**< file does not exist */
+    FCLAW2D_FILE_ERR_FILE_EXIST, /**< file exists already */
+    FCLAW2D_FILE_ERR_BAD_FILE, /**< invalid file name */
+    FCLAW2D_FILE_ERR_ACCESS, /**< permission denied */
+    FCLAW2D_FILE_ERR_NO_SPACE, /**< not enough space */
+    FCLAW2D_FILE_ERR_QUOTA, /**< quota exceeded */
+    FCLAW2D_FILE_ERR_READ_ONLY, /**< read only file (system) */
+    FCLAW2D_FILE_ERR_IN_USE, /**< file currently open by other process */
+    FCLAW2D_FILE_ERR_IO, /**< other I/O error */
+    FCLAW2D_FILE_ERR_FORMAT, /**< read file has a wrong format */
+    FCLAW2D_FILE_ERR_SECTION_TYPE, /**< a valid non-matching section type */
+    FCLAW2D_FILE_ERR_CONN, /**< invalid serialized connectivity data */
+    FCLAW2D_FILE_ERR_P4EST, /**< invalid p4est data */
+    FCLAW2D_FILE_ERR_IN_DATA, /**< input data of file function is invalid */
+    FCLAW2D_FILE_ERR_COUNT, /**< read or write count error that was not
+                                 classified as a format error */
+    FCLAW2D_FILE_ERR_NOT_IMPLEMENTED, /**< functionality is not implemented */
+    FCLAW2D_FILE_ERR_UNKNOWN, /**< unknown error */
+    FCLAW2D_FILE_ERR_LASTCODE /**< to define own error codes for
+                                  a higher level application
+                                  that is using fclaw2d_file
+                                  functions */
+}
+fclaw2d_file_error_t;
 
 /** Opaque context used for writing a fclaw2d data file. */
 typedef struct fclaw2d_file_context fclaw2d_file_context_t;

@@ -25,13 +25,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifndef P4_TO_P8
 #include <fclaw2d_file.h>
-#include <fclaw2d_file_v1.h>
-#include <p4est_algorithms.c>
+#include <p4est_algorithms.h>
 #include <p4est_wrap.h>
 #else
 #include <fclaw3d_file.h>
-#include <fclaw3d_file_v1.h>
-#include <p8est_algorithms.c>
+#include <p8est_algorithms.h>
 #include <p8est_wrap.h>
 #endif
 
@@ -105,6 +103,44 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
                                                                bytes. */
 #define FCLAW2D_FILE_FIELD_HEADER_BYTES_V1 (2 + FCLAW2D_FILE_ARRAY_METADATA_BYTES_V1 + FCLAW2D_FILE_USER_STRING_BYTES_V1)
                                      /**< number of bytes of one field header */
+#define FCLAW2D_FILE_USER_STRING_BYTES_V1 48 /**< number of user string bytes */
+#define FCLAW2D_FILE_MAX_BLOCK_SIZE_V1 9999999999999 /**< maximal data size of a block */
+#define FCLAW2D_FILE_MAX_FIELD_ENTRY_SIZE_V1 9999999999999 /**< maximal data size per field entry*/
+#define FCLAW2D_FILE_MAX_GLOBAL_QUAD_V1 9999999999999999 /**< maximal number of global quadrants */
+
+/** Error values for fclaw2d_file_v1 functions. These values are dimension
+ * inependent and therefore we do not translate them since they are used only
+ * internal.
+ */
+typedef enum fclaw2d_file_error_v1
+{
+    FCLAW2D_FILE_ERR_SUCCESS_V1 = sc_MPI_ERR_LASTCODE, /**< file function completed with success */
+    FCLAW2D_FILE_ERR_FILE_V1, /**< invalid file handle */
+    FCLAW2D_FILE_ERR_NOT_SAME_V1, /**< collective arg not identical */
+    FCLAW2D_FILE_ERR_AMODE_V1, /**< access mode error */
+    FCLAW2D_FILE_ERR_NO_SUCH_FILE_V1, /**< file does not exist */
+    FCLAW2D_FILE_ERR_FILE_EXIST_V1, /**< file exists already */
+    FCLAW2D_FILE_ERR_BAD_FILE_V1, /**< invalid file name */
+    FCLAW2D_FILE_ERR_ACCESS_V1, /**< permission denied */
+    FCLAW2D_FILE_ERR_NO_SPACE_V1, /**< not enough space */
+    FCLAW2D_FILE_ERR_QUOTA_V1, /**< quota exceeded */
+    FCLAW2D_FILE_ERR_READ_ONLY_V1, /**< read only file (system) */
+    FCLAW2D_FILE_ERR_IN_USE_V1, /**< file currently open by other process */
+    FCLAW2D_FILE_ERR_IO_V1, /**< other I/O error */
+    FCLAW2D_FILE_ERR_FORMAT_V1, /**< read file has a wrong format */
+    FCLAW2D_FILE_ERR_SECTION_TYPE_V1, /**< a valid non-matching section type */
+    FCLAW2D_FILE_ERR_CONN_V1, /**< invalid serialized connectivity data */
+    FCLAW2D_FILE_ERR_P4EST_V1, /**< invalid p4est data */
+    FCLAW2D_FILE_ERR_IN_DATA_V1, /**< input data of file function is invalid */
+    FCLAW2D_FILE_ERR_COUNT_V1, /**< read or write count error that was not
+                                 classified as a format error */
+    FCLAW2D_FILE_ERR_UNKNOWN_V1, /**< unknown error */
+    FCLAW2D_FILE_ERR_LASTCODE_V1 /**< to define own error codes for
+                                  a higher level application
+                                  that is using fclaw2d_file_v1
+                                  functions */
+}
+fclaw2d_file_error_v1_t;
 
 /* Avoid redefinition in translation file */
 #ifdef P4_TO_P8
@@ -2846,6 +2882,92 @@ typedef struct fclaw2d_file_context
 }
 fclaw2d_file_context_t;
 
+/**
+ * This function translates the fclaw2d_file_v1 error codes to fclaw_file
+ * error codes.
+ *
+ * \param [in]  errcode_v1     A fclaw2d_file_v1 error code; see \ref
+ *                             fclaw2d_file_error_v1
+ * \param [in]  errcode        On output a fclaw2d_file errorcode; see \ref
+ *                             fclaw2d_file_error.
+ * \return                     0 in case of success and -1 otherwise         
+ */
+static int
+fclaw2d_file_translate_error_code_v1 (int errcode_v1, int *errcode)
+{
+    FCLAW_ASSERT (errcode != NULL);
+
+    switch (errcode_v1) {
+        case FCLAW2D_FILE_ERR_SUCCESS_V1:
+            *errcode = FCLAW2D_FILE_ERR_SUCCESS;
+            return 0;
+        case FCLAW2D_FILE_ERR_FILE_V1:
+            *errcode = FCLAW2D_FILE_ERR_FILE;
+            return 0;
+        case FCLAW2D_FILE_ERR_NOT_SAME_V1:
+            *errcode = FCLAW2D_FILE_ERR_NOT_SAME;
+            return 0;
+        case FCLAW2D_FILE_ERR_AMODE_V1:
+            *errcode = FCLAW2D_FILE_ERR_AMODE;
+            return 0;
+        case FCLAW2D_FILE_ERR_NO_SUCH_FILE_V1:
+            *errcode = FCLAW2D_FILE_ERR_NO_SUCH_FILE;
+            return 0;
+        case FCLAW2D_FILE_ERR_FILE_EXIST_V1:
+            *errcode = FCLAW2D_FILE_ERR_FILE_EXIST;
+            return 0;
+        case FCLAW2D_FILE_ERR_BAD_FILE_V1:
+            *errcode = FCLAW2D_FILE_ERR_BAD_FILE;
+            return 0;
+        case FCLAW2D_FILE_ERR_ACCESS_V1:
+            *errcode = FCLAW2D_FILE_ERR_ACCESS;
+            return 0;
+        case FCLAW2D_FILE_ERR_NO_SPACE_V1:
+            *errcode = FCLAW2D_FILE_ERR_NO_SPACE;
+            return 0;
+        case FCLAW2D_FILE_ERR_QUOTA_V1:
+            *errcode = FCLAW2D_FILE_ERR_QUOTA;
+            return 0;
+        case FCLAW2D_FILE_ERR_READ_ONLY_V1:
+            *errcode = FCLAW2D_FILE_ERR_READ_ONLY;
+            return 0;
+        case FCLAW2D_FILE_ERR_IN_USE_V1:
+            *errcode = FCLAW2D_FILE_ERR_IN_USE;
+            return 0;
+        case FCLAW2D_FILE_ERR_IO_V1:
+            *errcode = FCLAW2D_FILE_ERR_IO;
+            return 0;
+        case FCLAW2D_FILE_ERR_FORMAT_V1:
+            *errcode = FCLAW2D_FILE_ERR_FORMAT;
+            return 0;
+        case FCLAW2D_FILE_ERR_SECTION_TYPE_V1:
+            *errcode = FCLAW2D_FILE_ERR_SECTION_TYPE;
+            return 0;
+        case FCLAW2D_FILE_ERR_CONN_V1:
+            *errcode = FCLAW2D_FILE_ERR_CONN;
+            return 0;
+        case FCLAW2D_FILE_ERR_P4EST_V1:
+            *errcode = FCLAW2D_FILE_ERR_P4EST;
+            return 0;
+        case FCLAW2D_FILE_ERR_IN_DATA_V1:
+            *errcode = FCLAW2D_FILE_ERR_IN_DATA;
+            return 0;
+        case FCLAW2D_FILE_ERR_COUNT_V1:
+            *errcode = FCLAW2D_FILE_ERR_COUNT;
+            return 0;
+        case FCLAW2D_FILE_ERR_UNKNOWN_V1:
+            *errcode = FCLAW2D_FILE_ERR_UNKNOWN;
+            return 0;
+        case FCLAW2D_FILE_ERR_LASTCODE_V1:
+            *errcode = FCLAW2D_FILE_ERR_LASTCODE;
+            return 0;
+        default:
+            *errcode = FCLAW2D_FILE_ERR_UNKNOWN;
+            return 0;
+    }
+    return 0;
+}
+
 fclaw2d_file_context_t *
 fclaw2d_file_open_write (const char *filename,
                          const char *user_string,
@@ -2873,11 +2995,10 @@ fclaw2d_file_open_write (const char *filename,
     /* create the file */
     fc = fclaw2d_file_open_create_v1 (p4est, filename, user_string,
                                       &errcode_internal);
-    if (errcode_internal != FCLAW2D_FILE_ERR_SUCCESS_V1)
+    fclaw2d_file_translate_error_code_v1 (errcode_internal, errcode);
+    if (*errcode != FCLAW2D_FILE_ERR_SUCCESS)
     {
         FCLAW_ASSERT (fc == NULL);
-        /* TODO: Introduce more FCLAW_FILE error codes */
-        *errcode = errcode_internal;
         return NULL;
     }
 
@@ -2885,11 +3006,10 @@ fclaw2d_file_open_write (const char *filename,
     fc = fclaw2d_file_write_connectivity_v1 (fc, p4est->connectivity,
                                              "p4est connectivity",
                                              &errcode_internal);
-    if (errcode_internal != FCLAW2D_FILE_ERR_SUCCESS_V1)
+    fclaw2d_file_translate_error_code_v1 (errcode_internal, errcode);
+    if (*errcode != FCLAW2D_FILE_ERR_SUCCESS)
     {
         FCLAW_ASSERT (fc == NULL);
-        /* TODO: Introduce more FCLAW_FILE error codes */
-        *errcode = errcode_internal;
         return NULL;
     }
 
@@ -2897,28 +3017,27 @@ fclaw2d_file_open_write (const char *filename,
     fc = fclaw2d_file_write_p4est_v1 (fc, p4est, "p4est quadrants",
                                       "p4est quadrant data", 0,
                                       &errcode_internal);
-    if (errcode_internal != FCLAW2D_FILE_ERR_SUCCESS_V1)
+    fclaw2d_file_translate_error_code_v1 (errcode_internal, errcode);
+    if (*errcode != FCLAW2D_FILE_ERR_SUCCESS)
     {
         FCLAW_ASSERT (fc == NULL);
-        /* TODO: Introduce more FCLAW_FILE error codes */
-        *errcode = errcode_internal;
         return NULL;
     }
 
     /* pack parameters for \ref p4est_wrap_new_p4est */
     parameters_buffer[0] = (uint64_t) wrap->hollow;
     parameters_buffer[1] = (uint64_t) wrap->btype;
-    sc_array_init_data (&parameters, (void *) parameters_buffer, 2 * 64, 1);
+    sc_array_init_data (&parameters, (void *) parameters_buffer,
+                        2 * sizeof (uint64_t), 1);
 
     /* write paramters for \ref p4est_wrap_new_p4est */
-    fc = fclaw2d_file_write_block_v1 (fc, 2 * 64, &parameters,
+    fc = fclaw2d_file_write_block_v1 (fc, 2 * sizeof (uint64_t), &parameters,
                                       "p4est wrap hollow and btype",
                                       &errcode_internal);
-    if (errcode_internal != FCLAW2D_FILE_ERR_SUCCESS_V1)
+    fclaw2d_file_translate_error_code_v1 (errcode_internal, errcode);
+    if (*errcode != FCLAW2D_FILE_ERR_SUCCESS)
     {
         FCLAW_ASSERT (fc == NULL);
-        /* TODO: Introduce more FCLAW_FILE error codes */
-        *errcode = errcode_internal;
         return NULL;
     }
 
@@ -3024,11 +3143,10 @@ fclaw2d_file_close (fclaw2d_file_context_t * fc, int *errcode)
     int retval, errcode_internal;
 
     retval = fclaw2d_file_close_v1 (fc->fc, &errcode_internal);
-    if (errcode_internal != FCLAW2D_FILE_ERR_SUCCESS_V1)
+    fclaw2d_file_translate_error_code_v1 (errcode_internal, errcode);
+    if (*errcode != FCLAW2D_FILE_ERR_SUCCESS)
     {
         FCLAW_ASSERT (retval != 0);
-        /* TODO: Introduce more FCLAW_FILE error codes */
-        *errcode = errcode_internal;
         return -1;
     }
 
