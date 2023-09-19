@@ -123,78 +123,26 @@ FCLAW3D_CLAWPATCH_TRANSFORM_EDGE (const int *i1, const int *j1, const int *k1,
     int my = clawpatch_opt->my;
     int mz = clawpatch_opt->mz;
 
-    //TODO call fclaw3d_patch_transform_edge
+    *i2 = *i1;
+    *j2 = *j1;
+    *k2 = *k1;
+    if (tdata->is_block_face)
+    {
+        /* block-face but not a block-corner */
+        fclaw_patch_3d_transform_face (tdata->this_patch,
+                                       tdata->neighbor_patch, tdata->transform,
+                                       mx, my, mz,
+                                       tdata->based, i2, j2, k2);
+    }
+    else
+    {
+        fclaw_patch_3d_transform_edge (tdata->this_patch,
+                                       tdata->neighbor_patch, 
+                                       tdata->block_iedge,
+                                       tdata->is_block_edge,
+                                       mx, my, mz,
+                                       tdata->based, i2, j2, k2);
 
-    // axis that edge lies along
-    int axis = tdata->iedge/4;
-    if(axis == 0)
-    {
-        //x axis
-        *i2 = *i1;
-        int upper_y = tdata->iedge & 0x1;
-        if(upper_y)
-        {
-            *j2 = *j1-my;
-        }
-        else
-        {
-            *j2 = *j1+my;
-        }
-        int upper_z = tdata->iedge & 0x2;
-        if(upper_z)
-        {
-            *k2 = *k1-mz;
-        }
-        else
-        {
-            *k2 = *k1+mz;
-        }
-    }
-    else if(axis == 1)
-    {
-        //y axis
-        *j2 = *j1;
-        int upper_x = tdata->iedge & 0x1;
-        if(upper_x)
-        {
-            *i2 = *i1-mx;
-        }
-        else
-        {
-            *i2 = *i1+mx;
-        }
-        int upper_z = tdata->iedge & 0x2;
-        if(upper_z)
-        {
-            *k2 = *k1-mz;
-        }
-        else
-        {
-            *k2 = *k1+mz;
-        }
-    }
-    else if(axis == 2)
-    {
-        //z axis
-        *k2 = *k1;
-        int upper_x = tdata->iedge & 0x1;
-        if(upper_x)
-        {
-            *i2 = *i1-mx;
-        }
-        else
-        {
-            *i2 = *i1+mx;
-        }
-        int upper_y = tdata->iedge & 0x2;
-        if(upper_y)
-        {
-            *j2 = *j1-my;
-        }
-        else
-        {
-            *j2 = *j1+my;
-        }
     }
 }
 void
@@ -216,9 +164,6 @@ FCLAW3D_CLAWPATCH_TRANSFORM_CORNER (const int *i1, const int *j1, const int *k1,
     if (tdata->is_block_face)
     {
         /* block-face but not a block-corner */
-#if 0
-        FCLAW_ASSERT (tdata->block_iface < 4);
-#endif
         fclaw_patch_3d_transform_face (tdata->this_patch,
                                        tdata->neighbor_patch, tdata->transform,
                                        mx, my, mz,
@@ -310,13 +255,24 @@ FCLAW3D_CLAWPATCH_TRANSFORM_EDGE_HALF (const int *i1, const int *j1, const int* 
     int my = clawpatch_opt->my;
     int mz = clawpatch_opt->mz;
 
-    i2[0] = *i1;
-    j2[0] = *j1;
-    k2[0] = *k1;
-    //intra block transform for now
-    fclaw_patch_3d_transform_face2 (tdata->this_patch,
-                                    tdata->neighbor_patch,
-                                    tdata->transform, 
-                                    mx, my, mz,
-                                    tdata->based, i2, j2, k2);
+    *i2 = *i1;
+    *j2 = *j1;
+    *k2 = *k1;
+    if (tdata->is_block_face)
+    {
+        fclaw_patch_3d_transform_face2 (tdata->this_patch,
+                                        tdata->neighbor_patch, tdata->transform,
+                                        mx, my, mz,
+                                        tdata->based, i2, j2, k2);
+    }
+    else
+    {
+        fclaw_patch_3d_transform_edge2 (tdata->this_patch,
+                                        tdata->neighbor_patch, 
+                                        tdata->block_iedge,
+                                        tdata->is_block_edge,
+                                        mx, my, mz,
+                                        tdata->based, i2, j2, k2);
+
+    }
 }
