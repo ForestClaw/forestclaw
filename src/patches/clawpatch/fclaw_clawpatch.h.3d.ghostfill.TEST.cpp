@@ -162,7 +162,6 @@ void get_bounds_with_ghost(fclaw_clawpatch_t* clawpatch,
     *k_start = intersects_bc[4] ? 0 : -clawpatch->mbc;
     *k_stop  = intersects_bc[5] ? clawpatch->mz : clawpatch->mz + clawpatch->mbc;
 }
-
 bool interior_cell(fclaw_clawpatch_t* clawpatch, int i, int j, int k, int m)
 {
     int mx = clawpatch->mx;
@@ -196,6 +195,56 @@ bool corner_ghost_cell(fclaw_clawpatch_t* clawpatch, int i, int j, int k, int m)
     return (i < 0 || i >= mx) && (j < 0 || j >= my) && (k < 0 || k >= mz);
 }
 
+void init_patch(fclaw_global_t* glob, fclaw_patch_t* patch)
+{
+    fclaw_clawpatch_options_t* opts = fclaw_clawpatch_get_options(glob);
+    fclaw_clawpatch_t* clawpatch = fclaw_clawpatch_get_clawpatch(patch);
+    // clear q
+    double* q = fclaw_clawpatch_get_q(glob, patch);
+    int size = fclaw_clawpatch_size(glob);
+    memset(q, 0, sizeof(double)*size);
+    //fill entire patch
+    for(int m = 0; m < opts->meqn; m++)
+    for(int k = -opts->mbc; k < opts->mz+opts->mbc; k++)
+    for(int j = -opts->mbc; j < opts->my+opts->mbc; j++)
+    for(int i = -opts->mbc; i < opts->mx+opts->mbc; i++)
+    {
+        int idx = clawpatch_idx(clawpatch, i,j,k,m);
+        //fill with some different linear functions
+        q[idx] = fill_function(clawpatch, i, j, k, m);
+    }
+
+    //get physical boundaries
+    int intersects_bc[fclaw_domain_num_faces(glob->domain)];
+    for(int i=0;i<fclaw_domain_num_faces(glob->domain);i++)
+    {
+        fclaw_patch_relation_t type = fclaw_patch_get_face_type(patch, i);
+        intersects_bc[i] = type == FCLAW_PATCH_BOUNDARY;
+    }
+
+    //zero out bounds with ghost
+    int i_start, i_stop, j_start, j_stop, k_start, k_stop;
+    get_bounds_with_ghost(clawpatch, intersects_bc,&i_start,&i_stop,&j_start,&j_stop,&k_start,&k_stop);
+    for(int m = 0; m < opts->meqn; m++)
+    for(int k = k_start; k < k_stop; k++)
+    for(int j = j_start; j < j_stop; j++)
+    for(int i = i_start; i < i_stop; i++)
+    {
+        int idx = clawpatch_idx(clawpatch, i,j,k,m);
+        q[idx]=0;
+    }
+
+    //fill interior
+    for(int m = 0; m < opts->meqn; m++)
+    for(int k = 0; k < opts->mz; k++)
+    for(int j = 0; j < opts->my; j++)
+    for(int i = 0; i < opts->mx; i++)
+    {
+        int idx = clawpatch_idx(clawpatch, i,j,k,m);
+        //fill with some different linear functions
+        q[idx] = fill_function(clawpatch, i, j, k, m);
+    }
+}
 void test_ghost_fill(TestData& tdata, TestData& tdata_out, std::string output_filename)
 {
     //initialize patches
@@ -205,23 +254,7 @@ void test_ghost_fill(TestData& tdata, TestData& tdata_out, std::string output_fi
             int blockno, int patchno, void *user)
         {
             fclaw_global_iterate_t* g = (fclaw_global_iterate_t*)user;
-            fclaw_clawpatch_options_t* opts = fclaw_clawpatch_get_options(g->glob);
-            fclaw_clawpatch_t* clawpatch = fclaw_clawpatch_get_clawpatch(patch);
-            // clear q
-            double* q = fclaw_clawpatch_get_q(g->glob, patch);
-            int size = fclaw_clawpatch_size(g->glob);
-            memset(q, 0, sizeof(double)*size);
-            //loop over interior
-            for(int m = 0; m < opts->meqn; m++)
-            for(int k = 0; k < opts->mz; k++)
-            for(int j = 0; j < opts->my; j++)
-            for(int i = 0; i < opts->mx; i++)
-            {
-                int idx = clawpatch_idx(clawpatch, i,j,k,m);
-                //fill with some different linear functions
-                q[idx] = fill_function(clawpatch, i, j, k, m);
-            }
-
+            init_patch(g->glob, patch);
         }, 
         nullptr
     );
