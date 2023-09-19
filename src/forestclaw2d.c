@@ -1087,7 +1087,7 @@ fclaw2d_patch_corner_neighbors (fclaw2d_domain_t * domain,
         {
             /* traverse across same-size face neighbor */
             p4est_locidx_t f_qid = mesh->quad_to_quad[P4EST_FACES*local_num+face];
-            int v = mesh->quad_to_face[P4EST_FACES*patchno+face];
+            int v = mesh->quad_to_face[P4EST_FACES*local_num+face];
 
             /* In the hanging edge case, the face neighboring quadrant we are trying
                to traverse will be a sibling, so the quadrant will be local. */
@@ -1107,9 +1107,10 @@ fclaw2d_patch_corner_neighbors (fclaw2d_domain_t * domain,
                     p4est_locidx_t cstart = fclaw2d_array_index_locidx (mesh->edge_offset, qte);
                     p4est_locidx_t cend = fclaw2d_array_index_locidx (mesh->edge_offset, qte + 1);
                     int8_t e = *(int8_t *) sc_array_index_int (mesh->edge_edge, (int) cstart);
-                    FCLAW_ASSERT (cstart + 1 == cend);
                     if(cstart + 1 == cend && e >= 0 && e <= 24)
                     {
+                        /* TODO this can be rotated 
+                           check that it is not for now */
                         FCLAW_ASSERT(((e%12)^3) == edge);
                         /* same-size different block */
                         qid = fclaw2d_array_index_locidx (mesh->edge_quad, (int) cstart);
