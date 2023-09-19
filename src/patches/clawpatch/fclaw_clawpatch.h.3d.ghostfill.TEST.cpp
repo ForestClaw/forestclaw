@@ -679,8 +679,8 @@ TEST_CASE("3d clawpatch ghost fill on 2x2x2 brick with refinement on one block")
     for(int mbc  : {2})
     for(int block_to_refine = 0; block_to_refine < 8; block_to_refine++)
     {
-        int minlevel = 2;
-        int maxlevel = 3;
+        int minlevel = 1;
+        int maxlevel = 2;
         fclaw_domain_t* domain = fclaw_domain_new_3d_brick(sc_MPI_COMM_WORLD, 2, 2, 2, 0, 0, 0, minlevel);
         TestData test_data(domain,minlevel, maxlevel);
 
@@ -787,8 +787,8 @@ TEST_CASE("3d clawpatch ghost fill on 2x2x2 brick with refinement on all but one
     for(int mbc  : {2})
     for(int block_to_leave_coarse = 0; block_to_leave_coarse < 8; block_to_leave_coarse++)
     {
-        int minlevel = 2;
-        int maxlevel = 3;
+        int minlevel = 1;
+        int maxlevel = 2;
         fclaw_domain_t* domain = fclaw_domain_new_3d_brick(sc_MPI_COMM_WORLD, 2, 2, 2, 0, 0, 0, minlevel);
         TestData test_data(domain,minlevel, maxlevel);
 
@@ -895,8 +895,121 @@ TEST_CASE("3d clawpatch ghost fill on 2x2x2 brick with refinement coarse interio
     for(int mbc  : {2})
     for(int block_to_leave_coarse = 0; block_to_leave_coarse < 8; block_to_leave_coarse++)
     {
-        int minlevel = 2;
-        int maxlevel = 3;
+        int minlevel = 1;
+        int maxlevel = 2;
+        fclaw_domain_t* domain = fclaw_domain_new_3d_brick(sc_MPI_COMM_WORLD, 2, 2, 2, 0, 0, 0, minlevel);
+        TestData test_data(domain,minlevel, maxlevel);
+
+        test_data.fopts.mi = 2;
+        test_data.fopts.mj = 2;
+        test_data.fopts.mk = 2;
+        test_data.opts->mx   = mx;
+        test_data.opts->my   = my;
+        test_data.opts->mz   = mz;
+        test_data.opts->mbc      = mbc;
+        test_data.opts->meqn     = 3;
+
+        test_data.glob->user = &block_to_leave_coarse;
+
+        //refine on if interior patch
+        auto tag4refinement 
+          = [](fclaw_global_t* glob,
+               fclaw_patch_t * patch,
+               int blockno,
+               int patchno,
+               int initflag)
+        {
+            fclaw_clawpatch_t* cp = fclaw_clawpatch_get_clawpatch(patch);
+            int* block_to_leave_coarse = (int*)glob->user;
+            int retval = (blockno != *block_to_leave_coarse)
+                ||!((cp->xlower == doctest::Approx(0.5) || cp->xupper == doctest::Approx(0.5))
+                && (cp->ylower == doctest::Approx(0.5) || cp->yupper == doctest::Approx(0.5))
+                && (cp->zlower == doctest::Approx(0.5) || cp->zupper == doctest::Approx(0.5)));
+            return retval;
+        };
+        auto tag4coarsening
+          = [](fclaw_global_t* glob,
+               fclaw_patch_t * patch,
+               int blockno,
+               int patchno,
+               int initflag)
+        {
+            return 0;
+        };
+        auto fort_interpolate2fine
+          =[](const int* mx, 
+              const int* my, 
+              const int* mz,
+              const int* mbc, 
+              const int* meqn,
+              double qcoarse[], 
+              double qfine[],
+              double areacoarse[], 
+              double areafine[],
+              const int* igrid, 
+              const int* manifold)
+              {
+                //do nothing
+              };
+
+        test_data.patch_vt->tag4refinement = tag4refinement;
+        test_data.patch_vt->tag4coarsening = tag4coarsening;
+        // don't want to test interpolation
+        test_data.clawpatch_vt->d3->fort_interpolate2fine = fort_interpolate2fine;
+
+        CHECK_EQ(test_data.glob->domain->global_num_patches, 8*8);
+        test_data.setup();
+        CHECK_EQ(test_data.glob->domain->global_num_patches, 505);
+        domain = fclaw_domain_new_unitcube(sc_MPI_COMM_WORLD, minlevel);
+
+        //create output domain with bigger size, so that we can see ghost cells
+        //in the vtk output
+        fclaw_domain_t* domain_out = fclaw_domain_new_3d_brick(sc_MPI_COMM_WORLD, 2, 2, 2, 0, 0, 0, minlevel);
+        TestData test_data_out(domain_out, minlevel, maxlevel);
+
+        test_data_out.fopts.mi = 2;
+        test_data_out.fopts.mj = 2;
+        test_data_out.fopts.mk = 2;
+        test_data_out.opts->mx   = mx+2*mbc;
+        test_data_out.opts->my   = my+2*mbc;
+        test_data_out.opts->mz   = mz+2*mbc;
+        test_data_out.opts->mbc      = mbc;
+        test_data_out.opts->meqn     = 3;
+
+        test_data_out.glob->user = &block_to_leave_coarse;
+
+        test_data_out.patch_vt->tag4refinement = tag4refinement;
+        test_data_out.patch_vt->tag4coarsening = tag4coarsening;
+        // don't want to test interpolation
+        test_data_out.clawpatch_vt->d3->fort_interpolate2fine = fort_interpolate2fine;
+
+        CHECK_EQ(test_data_out.glob->domain->global_num_patches, 8*8);
+        test_data_out.setup();
+        CHECK_EQ(test_data_out.glob->domain->global_num_patches, 505);
+
+        char test_no_str[5];
+        snprintf(test_no_str, 5, "%04d", test_no);
+        std::string filename = "3d_clawpatch_ghost_fill_on_2x2x2_brick_with_refinement_coarse_interior_"+std::string(test_no_str);
+
+        test_ghost_fill(test_data, test_data_out, filename);
+
+        test_no++;
+    }
+
+}
+
+TEST_CASE("3d clawpatch ghost fill on 2x2x2 brick with refinement 2")
+{
+    // This test will catch hanging edge case across block faces also
+    int test_no= 0;
+    for(int mx   : {8})
+    for(int my   : {8})
+    for(int mz   : {8})
+    for(int mbc  : {2})
+    for(int block_to_leave_coarse = 0; block_to_leave_coarse < 8; block_to_leave_coarse++)
+    {
+        int minlevel = 1;
+        int maxlevel = 2;
         fclaw_domain_t* domain = fclaw_domain_new_3d_brick(sc_MPI_COMM_WORLD, 2, 2, 2, 0, 0, 0, minlevel);
         TestData test_data(domain,minlevel, maxlevel);
 
@@ -959,7 +1072,7 @@ TEST_CASE("3d clawpatch ghost fill on 2x2x2 brick with refinement coarse interio
 
         CHECK_EQ(test_data.glob->domain->global_num_patches, 8*8);
         test_data.setup();
-        CHECK_EQ(test_data.glob->domain->global_num_patches, 8*8*8-7);
+        CHECK_EQ(test_data.glob->domain->global_num_patches, 113);
         domain = fclaw_domain_new_unitcube(sc_MPI_COMM_WORLD, minlevel);
 
         //create output domain with bigger size, so that we can see ghost cells
@@ -985,11 +1098,11 @@ TEST_CASE("3d clawpatch ghost fill on 2x2x2 brick with refinement coarse interio
 
         CHECK_EQ(test_data_out.glob->domain->global_num_patches, 8*8);
         test_data_out.setup();
-        CHECK_EQ(test_data_out.glob->domain->global_num_patches, 8*8*8*8-7);
+        CHECK_EQ(test_data_out.glob->domain->global_num_patches, 113);
 
         char test_no_str[5];
         snprintf(test_no_str, 5, "%04d", test_no);
-        std::string filename = "3d_clawpatch_ghost_fill_on_2x2x2_brick_with_refinement_coarse_interior_"+std::string(test_no_str);
+        std::string filename = "3d_clawpatch_ghost_fill_on_2x2x2_brick_with_refinement_2_"+std::string(test_no_str);
 
         test_ghost_fill(test_data, test_data_out, filename);
 

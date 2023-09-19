@@ -1089,7 +1089,7 @@ fclaw2d_patch_corner_neighbors (fclaw2d_domain_t * domain,
             p4est_locidx_t f_qid = mesh->quad_to_quad[P4EST_FACES*local_num+face];
             int v = mesh->quad_to_face[P4EST_FACES*patchno+face];
 
-            /* In the hanigng edge case, the face neighboring quadrant we are trying
+            /* In the hanging edge case, the face neighboring quadrant we are trying
                to traverse will be a sibling, so the quadrant will be local. */
             if(f_qid >= 0 && f_qid < mesh->local_num_quadrants && v >= 0 && v <= 23)
             {
@@ -1102,16 +1102,19 @@ fclaw2d_patch_corner_neighbors (fclaw2d_domain_t * domain,
                 }
                 else if(qte >= 0)
                 {
-                    ///* possibly same-size different block */
-                    //p4est_locidx_t offset = qte - (mesh->local_num_quadrants + mesh->ghost_num_quadrants);
-                    //int8_t e = *(int8_t *) sc_array_index_int (mesh->edge_offset, (int) offset);
-                    //if(e >= 0 && e <= 23)
-                    //{
-                    //    FCLAW_ASSERT(((e%12)^3) == edge);
-                    //    /* same-size different block */
-                    //    qid = fclaw2d_array_index_locidx (mesh->edge_quad, (int) offset);
-                    //    *rcorner = cornerno ^ (P8EST_CHILDREN - 1);
-                    //}
+                    /* possibly same-size different block */
+                    qte -= mesh->local_num_quadrants + mesh->ghost_num_quadrants;
+                    p4est_locidx_t cstart = fclaw2d_array_index_locidx (mesh->edge_offset, qte);
+                    p4est_locidx_t cend = fclaw2d_array_index_locidx (mesh->edge_offset, qte + 1);
+                    int8_t e = *(int8_t *) sc_array_index_int (mesh->edge_edge, (int) cstart);
+                    FCLAW_ASSERT (cstart + 1 == cend);
+                    if(cstart + 1 == cend && e >= 0 && e <= 24)
+                    {
+                        FCLAW_ASSERT(((e%12)^3) == edge);
+                        /* same-size different block */
+                        qid = fclaw2d_array_index_locidx (mesh->edge_quad, (int) cstart);
+                        *rcorner = cornerno ^ (P8EST_CHILDREN - 1);
+                    }
                 }
             }
         }
