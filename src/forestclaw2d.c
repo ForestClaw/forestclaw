@@ -1054,50 +1054,51 @@ fclaw2d_patch_corner_neighbors (fclaw2d_domain_t * domain,
     }
 #ifdef P4_TO_P8
     /* workaround for hanging edge corners */
-    if(qid < 0)
+    if(qid == -1)
     {
+        fclaw3d_block_t *block = &domain->blocks[blockno];
+        fclaw3d_patch_t *patch = &block->patches[patchno];
+        int childid = fclaw3d_patch_childid (patch);
+        int edge;
+        int face;
+        const int* corner_edges = p8est_corner_edges[cornerno];
         const int* corner_faces = p8est_corner_faces[cornerno];
-        /* traverse across same-size face neirhbors */
-        for(int f = 0; f < 3; f++)
+
+        switch (childid ^ cornerno)
         {
-            int face = corner_faces[f];
-            p4est_locidx_t f_qid = mesh->quad_to_quad[P4EST_FACES*patchno+corner_faces[f]];
-            int v = mesh->quad_to_face[P4EST_FACES*patchno+corner_faces[f]];
+        case 1:
+            edge = corner_edges[0]; /* hanging on edge parallel to x */
+            face = corner_faces[0];
+            break;
+        case 2:
+            edge = corner_edges[1]; /* hanging on edge parallel to y */
+            face = corner_faces[1];
+            break;
+        case 4:
+            edge = corner_edges[2]; /* hanging on edge parallel to z */
+            face = corner_faces[2];
+            break;
+        default:
+            /* 3, 5, 6 is hanging on face; 0 or 7 is not hanging at all */
+            edge = -1;
+        }
+
+        if(edge != -1)
+        {
+            /* traverse across same-size face neighbor */
+            p4est_locidx_t f_qid = mesh->quad_to_quad[P4EST_FACES*patchno+face];
+            int v = mesh->quad_to_face[P4EST_FACES*patchno+face];
+
             /* In the hanigng edge case, the face neighboring quadrant we are trying
-               to traverse will be a sibling, so the quadrant will be local.
-               There should probably be also a check that the quadrants are siblings */
+               to traverse will be a sibling, so the quadrant will be local. */
             if(f_qid >= 0 && f_qid < mesh->local_num_quadrants && v >= 0 && v <= 23)
             {
-                /* deduce edge from face and corner */
-                int edge_axis = face/2;
-                int lower_0, lower_1;
-                switch(edge_axis)
-                {
-                    case 0:
-                        lower_0 = (cornerno >> 1) & 1;
-                        lower_1 = (cornerno >> 2) & 1;
-                        break;
-                    case 1:
-                        lower_0 = (cornerno >> 0) & 1;
-                        lower_1 = (cornerno >> 2) & 1;
-                        break;
-                    case 2:
-                        lower_0 = (cornerno >> 0) & 1;
-                        lower_1 = (cornerno >> 1) & 1;
-                        break;
-                    default:
-                        FCLAW_ASSERT(0);
-                }
-                int edgeno = edge_axis*4 + lower_1*2 + lower_0;
-
-                p4est_locidx_t qte = mesh->quad_to_edge[P8EST_EDGES * f_qid + edgeno];
+                p4est_locidx_t qte = mesh->quad_to_edge[P8EST_EDGES * f_qid + edge];
                 if (qte >= 0 && qte < mesh->local_num_quadrants + mesh->ghost_num_quadrants)
                 {
-                    /* same size, same block
-                       TODO handle different block */
+                    /* same size, same block */
                     qid = qte;
                     *rcorner = cornerno ^ ((1<<3)-1);
-                    break;
                 }
             }
         }
