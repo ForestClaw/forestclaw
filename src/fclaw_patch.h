@@ -161,16 +161,18 @@ struct fclaw_patch_transform_data
     int icorner;
     /** The edge that the neighboring patch is on. */
     int iedge;
+    /** The face that the neighboring patch is on */
+    int iface;
 
-    /** True if neighbor is interior */
-    int is_interior;
-    /** True if patch is on a block corner */
+    /** True if neighbor is across a block corner */
     int is_block_corner;
-    /** True if patch is on a block edge */
+    /** True if neighbor is accross a block edge */
     int is_block_edge;
-    /** -1 for unless on block edge and not on block corner */
+    /** True if neighbor is across a block face */
+    int is_block_face;
+    /** -1 for unless neighbor is across a block edge */
     int block_iedge;   
-    /** -1 for unless on block face and not block edge or block corner */
+    /** -1 for unless neighbor is across a block face */
     int block_iface; 
 
     /** Pointer to the glboal context */
