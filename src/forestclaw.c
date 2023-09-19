@@ -429,6 +429,30 @@ fclaw_patch_3d_transform_face2 (fclaw_patch_t * ipatch,
 }
 
 
+void fclaw_patch_3d_transform_edge (fclaw_patch_t * ipatch,
+                                      fclaw_patch_t * opatch,
+                                      int iedge, int is_block_boundary,
+                                      int mx, int my, int mz,
+                                      int based, int *i, int *j, int *k)
+{
+    fclaw3d_patch_t* ipatch_3d = fclaw_patch_get_3d_patch(ipatch);
+    fclaw3d_patch_t* opatch_3d = fclaw_patch_get_3d_patch(opatch);
+    fclaw3d_patch_transform_edge(ipatch_3d,opatch_3d,iedge,is_block_boundary,
+                                   mx,my,mz,based,i,j,k);
+}
+
+void fclaw_patch_3d_transform_edge2 (fclaw_patch_t * ipatch,
+                                       fclaw_patch_t * opatch,
+                                       int iedge, int is_block_boundary,
+                                       int mx, int my, int mz, int based,
+                                       int i[], int j[], int k[])
+{
+    fclaw3d_patch_t* ipatch_3d = fclaw_patch_get_3d_patch(ipatch);
+    fclaw3d_patch_t* opatch_3d = fclaw_patch_get_3d_patch(opatch);
+    fclaw3d_patch_transform_edge2(ipatch_3d,opatch_3d,iedge,is_block_boundary,
+                                    mx,my,mz,based,i,j,k);
+}
+
 int 
 fclaw_patch_corner_neighbors(fclaw_domain_t *domain, int blockno, int patchno, int cornerno, int *rproc, int *rblockno, int *rpatchno, int *rcorner, fclaw_patch_relation_t *neighbor_size)
 {
