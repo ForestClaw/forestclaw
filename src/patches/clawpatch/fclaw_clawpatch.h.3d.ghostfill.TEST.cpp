@@ -679,8 +679,8 @@ TEST_CASE("3d clawpatch ghost fill on 2x2x2 brick with refinement on one block")
     for(int mbc  : {2})
     for(int block_to_refine = 0; block_to_refine < 8; block_to_refine++)
     {
-        int minlevel = 1;
-        int maxlevel = 2;
+        int minlevel = 2;
+        int maxlevel = 3;
         fclaw_domain_t* domain = fclaw_domain_new_3d_brick(sc_MPI_COMM_WORLD, 2, 2, 2, 0, 0, 0, minlevel);
         TestData test_data(domain,minlevel, maxlevel);
 
@@ -736,9 +736,9 @@ TEST_CASE("3d clawpatch ghost fill on 2x2x2 brick with refinement on one block")
         // don't want to test interpolation
         test_data.clawpatch_vt->d3->fort_interpolate2fine = fort_interpolate2fine;
 
-        CHECK_EQ(test_data.glob->domain->global_num_patches, 8*8);
+        CHECK_EQ(test_data.glob->domain->global_num_patches, 8*(8*8));
         test_data.setup();
-        CHECK_EQ(test_data.glob->domain->global_num_patches, 8*7 + 8*8);
+        CHECK_EQ(test_data.glob->domain->global_num_patches, 8*(8*7 + 8*8));
         domain = fclaw_domain_new_unitcube(sc_MPI_COMM_WORLD, minlevel);
 
         //create output domain with bigger size, so that we can see ghost cells
@@ -762,9 +762,9 @@ TEST_CASE("3d clawpatch ghost fill on 2x2x2 brick with refinement on one block")
         // don't want to test interpolation
         test_data_out.clawpatch_vt->d3->fort_interpolate2fine = fort_interpolate2fine;
 
-        CHECK_EQ(test_data_out.glob->domain->global_num_patches, 8*8);
+        CHECK_EQ(test_data_out.glob->domain->global_num_patches, 8*(8*8));
         test_data_out.setup();
-        CHECK_EQ(test_data_out.glob->domain->global_num_patches, 8*7 + 8*8);
+        CHECK_EQ(test_data_out.glob->domain->global_num_patches, 8*(8*7 + 8*8));
 
         char test_no_str[5];
         snprintf(test_no_str, 5, "%04d", test_no);
