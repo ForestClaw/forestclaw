@@ -288,11 +288,10 @@ void get_corner_neighbor_2d(fclaw_global_t *glob,
                             int block_iface,
                             int *corner_block_idx,
                             fclaw_patch_t** corner_patch,
-                            int *rcornerno,
                             int **ref_flag_ptr,
                             int *block_corner_count,
-                            fclaw_patch_transform_data_t* ftransform,
-                            fclaw_patch_transform_data_t* ftransform_finegrid)
+                            fclaw_patch_transform_data_t* tdata,
+                            fclaw_patch_transform_data_t* tdata_finegrid)
 {
     fclaw_domain_t *domain = glob->domain;
     /* See what p4est thinks we have for corners, and consider four cases */
@@ -317,13 +316,13 @@ void get_corner_neighbor_2d(fclaw_global_t *glob,
                                        &rproc_corner,
                                        corner_block_idx,
                                        &corner_patch_idx,
-                                       rcornerno,
+                                       &tdata_finegrid->icorner,
                                        &neighbor_type);
 
     fclaw_timer_stop (&glob->timers[FCLAW_TIMER_NEIGHBOR_SEARCH]);    
 
     *block_corner_count = 0;  /* Assume we are not at a block corner */
-    if (has_corner_neighbor && ftransform->is_block_corner)
+    if (has_corner_neighbor && tdata->is_block_corner)
     {
         /* Case 1 : 4 or more patches meet at a block corner.
         This case does NOT include the pillowgrid.   */
@@ -331,11 +330,11 @@ void get_corner_neighbor_2d(fclaw_global_t *glob,
 
         /* No block corner transforms yet, so we use the 
         interior 'default' transforms. */
-        fclaw_patch_transform_blockface_intra (glob, ftransform->transform);
+        fclaw_patch_transform_blockface_intra (glob, tdata->transform);
         fclaw_patch_transform_blockface_intra
-            (glob, ftransform_finegrid->transform);
+            (glob, tdata_finegrid->transform);
     }
-    else if (!has_corner_neighbor && !ftransform->is_block_corner)
+    else if (!has_corner_neighbor && !tdata->is_block_corner)
     {
         /* Case 2 : 'icorner' is a hanging node */
         /* We do not return valid transformation objects! */
@@ -343,7 +342,7 @@ void get_corner_neighbor_2d(fclaw_global_t *glob,
         *corner_patch = NULL;
         return;
     }
-    else if (has_corner_neighbor && !ftransform->is_block_corner)
+    else if (has_corner_neighbor && !tdata->is_block_corner)
     {
         /* Case 3 : 'icorner' is an interior corner, at a block edge,
          or we are on a periodic block.  Need to return a valid
@@ -371,7 +370,7 @@ void get_corner_neighbor_2d(fclaw_global_t *glob,
             FCLAW_ASSERT(rblockno == *corner_block_idx);
 
             /* Get encoding of transforming a neighbor coordinate across a face */
-            fclaw_patch_transform_blockface (glob, block_iface, rfaceno, ftransform->transform);
+            fclaw_patch_transform_blockface (glob, block_iface, rfaceno, tdata->transform);
 
             /* Get transform needed to swap parallel ghost patch with fine
                grid on-proc patch.  This is done so that averaging and
@@ -380,18 +379,18 @@ void get_corner_neighbor_2d(fclaw_global_t *glob,
             int rface1 = rfaceno;
             fclaw_patch_face_swap(domain->refine_dim, &iface1, &rface1);
             fclaw_patch_transform_blockface(glob, iface1, rface1,
-                                              ftransform_finegrid->transform);
+                                              tdata_finegrid->transform);
 
-            ftransform_finegrid->block_iface = iface1;
+            tdata_finegrid->block_iface = iface1;
         }
         else if (this_block_idx == *corner_block_idx)
         {
             /* Both patches are in the same block, so we set the transform to
                a default transform.  This could be the case for periodic boundaries. */
             *block_corner_count = 4;  /* assume four for now */
-            fclaw_patch_transform_blockface_intra (glob, ftransform->transform);
+            fclaw_patch_transform_blockface_intra (glob, tdata->transform);
             fclaw_patch_transform_blockface_intra
-                (glob, ftransform_finegrid->transform);
+                (glob, tdata_finegrid->transform);
 
         }
         else
@@ -403,7 +402,7 @@ void get_corner_neighbor_2d(fclaw_global_t *glob,
                             "We should not be here\n");
         }
     }
-    else if (!has_corner_neighbor && ftransform->is_block_corner)
+    else if (!has_corner_neighbor && tdata->is_block_corner)
     {
         /* Case 4 : Pillow sphere case or cubed sphere  */
         if (!ispillowsphere)
@@ -449,7 +448,7 @@ void get_corner_neighbor_2d(fclaw_global_t *glob,
                 igrid = 0;
             }
 
-            *rcornerno = icorner;    /* This wasn't being set! */
+            tdata->icorner = icorner;    /* This wasn't being set! */
             corner_patch_idx = rpatchno[igrid];
             rproc_corner = rproc[igrid];
         }
@@ -568,7 +567,6 @@ void cb_corner_fill(fclaw_domain_t *domain,
             int neighbor_level;
             int *ref_flag_ptr = &neighbor_level;
             fclaw_patch_t *corner_patch;
-            int rcornerno;
 
             int  block_iface = transform_data.block_iface;
 
@@ -581,7 +579,6 @@ void cb_corner_fill(fclaw_domain_t *domain,
                                 block_iface,
                                 &corner_block_idx,
                                 &corner_patch,
-                                &rcornerno,
                                 &ref_flag_ptr,
                                 &block_corner_count,
                                 &transform_data,
@@ -593,7 +590,6 @@ void cb_corner_fill(fclaw_domain_t *domain,
 
 
             /* Needed for switching the context */
-            transform_data_finegrid.icorner = rcornerno;
             transform_data_finegrid.this_patch = corner_patch;
             transform_data_finegrid.neighbor_patch = this_patch;
             
