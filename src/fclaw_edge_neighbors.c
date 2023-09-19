@@ -73,7 +73,7 @@ void get_edge_type(fclaw_global_t* glob,
                    int intersects_block[],
                    int *is_interior_in_domain,
                    fclaw_patch_transform_data_t* tdata,
-                   fclaw_patch_transform_data_t* tdata_fine)
+                   fclaw_patch_transform_data_t* tdata_nbr)
 {
     fclaw_domain_t *domain = glob->domain;
 
@@ -81,13 +81,13 @@ void get_edge_type(fclaw_global_t* glob,
     tdata->iedge = iedge;
     tdata->iface = -1;
 
-    tdata_fine->icorner = -1;
-    tdata_fine->iedge = -1;
-    tdata_fine->iface = -1;
+    tdata_nbr->icorner = -1;
+    tdata_nbr->iedge = -1;
+    tdata_nbr->iface = -1;
     
     //can't be corner
     tdata->is_block_corner = 0;
-    tdata_fine->is_block_corner = 0;
+    tdata_nbr->is_block_corner = 0;
 
     // p4est has tons of lookup table like this, can be exposed similarly
     int edge_faces[2];
@@ -105,7 +105,7 @@ void get_edge_type(fclaw_global_t* glob,
     int num_block_faces = get_num_intersections(intersects_block,
                                                 edge_faces);
     /* Both faces are at a block boundary, physical or not */
-    tdata->is_block_edge = num_block_faces == domain->refine_dim;
+    tdata->is_block_edge = num_block_faces == 2;
     if(tdata->is_block_edge)
     {
         tdata->block_iedge = iedge;
@@ -122,11 +122,11 @@ void get_edge_type(fclaw_global_t* glob,
         tdata->block_iface = find_face(intersects_block, edge_faces);
     }
 
-    //set fine tdata
-    tdata_fine->is_block_edge = tdata->is_block_edge;
-    tdata_fine->is_block_face = tdata->is_block_face;
-    tdata_fine->block_iedge = -1;
-    tdata_fine->block_iface = -1;
+    //set nbr tdata
+    tdata_nbr->is_block_edge = tdata->is_block_edge;
+    tdata_nbr->is_block_face = tdata->is_block_face;
+    tdata_nbr->block_iedge = -1;
+    tdata_nbr->block_iface = -1;
 }
 
 
@@ -178,6 +178,7 @@ get_edge_neighbors(fclaw_global_t *glob,
     edge_neighbors_t retval;
     /* assume it is a valid neighbor for now */
     retval.is_valid_neighbor = 1;
+
     fclaw_domain_t *domain = glob->domain;
     const int num_face_neighbors = fclaw_domain_num_children(domain)/2;
 
