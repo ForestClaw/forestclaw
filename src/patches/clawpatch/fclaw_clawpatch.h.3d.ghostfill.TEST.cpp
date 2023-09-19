@@ -196,11 +196,11 @@ bool corner_ghost_cell(fclaw_clawpatch_t* clawpatch, int i, int j, int k, int m)
     return (i < 0 || i >= mx) && (j < 0 || j >= my) && (k < 0 || k >= mz);
 }
 
-void test_ghost_fill(TestData& cube, TestData& cube_output, std::string output_filename)
+void test_ghost_fill(TestData& tdata, TestData& tdata_out, std::string output_filename)
 {
     //initialize patches
     fclaw_global_iterate_patches(
-        cube.glob, 
+        tdata.glob, 
         [](fclaw_domain_t * domain, fclaw_patch_t * patch,
             int blockno, int patchno, void *user)
         {
@@ -226,7 +226,7 @@ void test_ghost_fill(TestData& cube, TestData& cube_output, std::string output_f
         nullptr
     );
 
-    fclaw_ghost_update(cube.glob, 2, 4, 0, 0, FCLAW_TIMER_NONE);
+    fclaw_ghost_update(tdata.glob, tdata.fopts.minlevel, tdata.fopts.maxlevel, 0, 0, FCLAW_TIMER_NONE);
 
     //check ghost cells
     //fill output domain with error
@@ -237,9 +237,9 @@ void test_ghost_fill(TestData& cube, TestData& cube_output, std::string output_f
         int num_incorrect_edge_ghost_cells;
         int num_incorrect_corner_ghost_cells;
     };
-    iterate_t iterate = {cube_output.glob, 0, 0, 0, 0};
+    iterate_t iterate = {tdata_out.glob, 0, 0, 0, 0};
     fclaw_global_iterate_patches(
-        cube.glob, 
+        tdata.glob, 
         [](fclaw_domain_t * domain, fclaw_patch_t * patch,
             int blockno, int patchno, void *user)
         {
@@ -321,7 +321,7 @@ void test_ghost_fill(TestData& cube, TestData& cube_output, std::string output_f
     if(test_output_vtk())
     {
         INFO("Test failed output error to " << output_filename << ".vtpd");
-        fclaw_clawpatch_output_vtpd_to_file(cube_output.glob,output_filename.c_str());
+        fclaw_clawpatch_output_vtpd_to_file(tdata_out.glob,output_filename.c_str());
     }
 }
 
@@ -646,8 +646,8 @@ TEST_CASE("3d clawpatch ghost fill on 2x2x2 brick with refinement on one block")
     for(int mbc  : {2})
     for(int block_to_refine = 0; block_to_refine < 8; block_to_refine++)
     {
-        int minlevel = 2;
-        int maxlevel = 3;
+        int minlevel = 1;
+        int maxlevel = 2;
         fclaw_domain_t* domain = fclaw_domain_new_3d_brick(sc_MPI_COMM_WORLD, 2, 2, 2, 0, 0, 0, minlevel);
         TestData test_data(domain,minlevel, maxlevel);
 
