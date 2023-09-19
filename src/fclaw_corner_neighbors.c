@@ -188,116 +188,6 @@ void get_corner_type(fclaw_global_t* glob,
 
    Case No. | has_corner_neighbor  |  block_boundary_type
    --------------------------------------------------------
-      1     |       T              |    interior
-      2     |       T              |    block_corner
-      3     |       T              |    block_edge
-      4     |       T              |    block_face
-      5     |       F              |    interior
-      6     |       F              |    block_corner
-      7     |       F              |    block_edge
-      8     |       F              |    block_face
-
-    Case 1 : Interior corner 
-    Case 2 : Corner neighbor across block corner
-    Case 3 : Corner neighbor across block edge
-    Case 4 : Corner neighbor across block face
-    Case 5-8 : Invalid, not curerntly supported
-   ------------------------------------------------------ */
-
-static
-void get_corner_neighbor_3d(fclaw_global_t *glob,
-                            int this_block_idx,
-                            int this_patch_idx,
-                            fclaw_patch_t* this_patch,
-                            int icorner,
-                            int block_iface,
-                            int *corner_block_idx,
-                            fclaw_patch_t** corner_patch,
-                            int *rcornerno,
-                            int **ref_flag_ptr,
-                            int *block_corner_count,
-                            fclaw_patch_transform_data_t* ftransform,
-                            fclaw_patch_transform_data_t* ftransform_finegrid)
-{
-    fclaw_domain_t *domain = glob->domain;
-    /* See what p4est thinks we have for corners, and consider four cases */
-    int rproc_corner;
-    int corner_patch_idx;
-    fclaw_patch_relation_t neighbor_type;
-
-    /* Note : Pillowsphere case does not return a block corner neighbor */
-    fclaw_timer_start (&glob->timers[FCLAW_TIMER_NEIGHBOR_SEARCH]);
-    int has_corner_neighbor =
-        fclaw_patch_corner_neighbors(domain,
-                                       this_block_idx,
-                                       this_patch_idx,
-                                       icorner,
-                                       &rproc_corner,
-                                       corner_block_idx,
-                                       &corner_patch_idx,
-                                       rcornerno,
-                                       &neighbor_type);
-
-    fclaw_timer_stop (&glob->timers[FCLAW_TIMER_NEIGHBOR_SEARCH]);    
-
-    *block_corner_count = 0;  /* Assume we are not at a block corner */
-    if (has_corner_neighbor)
-    {
-        /* Cases 1-4: */
-        *block_corner_count = 4;  /* assume four for now */
-
-        /* TODO: use interior for now, this needs to be changed when we want to use something other than brick */
-        fclaw_patch_transform_blockface_intra (glob, ftransform->transform);
-        fclaw_patch_transform_blockface_intra (glob, ftransform_finegrid->transform);
-    }
-    else
-    {
-        /* Cases 5-8 : not supported */
-        /* We do not return valid transformation objects! */
-        *ref_flag_ptr = NULL;
-        *corner_patch = NULL;
-        return;
-    }
-
-    /* ---------------------------------------------------------------------
-       We have a valid neighbor and possibly a transform. We just now need
-       to get a pointer to the neighbor patch (which may be a parallel patch)
-       and the relative level (-1,0,1).
-       --------------------------------------------------------------------- */
-
-    if (domain->mpirank != rproc_corner)
-    {
-        *corner_patch = &domain->ghost_patches[corner_patch_idx];
-    }
-    else
-    {
-        fclaw_block_t *neighbor_block = &domain->blocks[*corner_block_idx];
-        *corner_patch = &neighbor_block->patches[corner_patch_idx];
-    }
-
-    if (neighbor_type == FCLAW_PATCH_HALFSIZE)
-    {
-        **ref_flag_ptr = 1;
-    }
-    else if (neighbor_type == FCLAW_PATCH_SAMESIZE)
-    {
-        **ref_flag_ptr = 0;
-    }
-    else /* FCLAW2D_PATCH_DOUBLESIZE */
-    {
-        **ref_flag_ptr = -1;
-    }
-}
-/* --------------------------------------------------------
-   Four cases to consider.   The 'has_corner_neighbor'
-   value is returned from p4est.  The assumption going
-   into this routine is that we have found a valid
-   interior corner (not a corner on a physical boundary).
-   The corner than satisfies one of the following four
-   cases.
-
-   Case No. | has_corner_neighbor  |  block_boundary_type
-   --------------------------------------------------------
       1     |       T              |    is_block_corner
       2     |       T              |    is_block_edge
       3     |       T              |    is_block_face
@@ -324,12 +214,12 @@ void get_corner_neighbor_3d(fclaw_global_t *glob,
    ------------------------------------------------------ */
 
 static
-void get_corner_neighbor_2d(fclaw_global_t *glob,
-                            int icorner,
-                            int *is_valid_neighbor,
-                            int *block_corner_count,
-                            fclaw_patch_transform_data_t* tdata,
-                            fclaw_patch_transform_data_t* tdata_fine)
+void get_corner_neighbor(fclaw_global_t *glob,
+                         int icorner,
+                         int *is_valid_neighbor,
+                         int *block_corner_count,
+                         fclaw_patch_transform_data_t* tdata,
+                         fclaw_patch_transform_data_t* tdata_fine)
 {
     fclaw_domain_t *domain = glob->domain;
     /* assume neighbor is valid for now*/
@@ -660,7 +550,7 @@ void cb_corner_fill(fclaw_domain_t *domain,
 
             int is_valid_neighbor;
 
-            get_corner_neighbor_2d(s->glob,
+            get_corner_neighbor(s->glob,
                                    icorner,
                                    &is_valid_neighbor,
                                    &block_corner_count,
