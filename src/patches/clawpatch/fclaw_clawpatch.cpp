@@ -303,7 +303,6 @@ void clawpatch_define(fclaw_global_t* glob,
                 int iy = (cp->blockno / fclaw_opt->mi) % fclaw_opt->mj;
                 int iz = cp->blockno / (fclaw_opt->mi*fclaw_opt->mj);
 
-                fclaw_block_t* block = &glob->domain->blocks[cp->blockno];
                 //map in [0,1] for entire brick
                 xlower = ix/(double)fclaw_opt->mi;
                 xupper = (ix+1)/(double)fclaw_opt->mi;
