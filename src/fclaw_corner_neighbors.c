@@ -39,8 +39,7 @@ static
 int get_num_intersections(int dim,int intersects[], int faces[])
 {
     int num_intersections = 0;
-    int i;
-    for (i = 0; i < dim; i++)
+    for (int i = 0; i < dim; i++)
     {
         if (intersects[faces[i]])
         {
@@ -53,8 +52,7 @@ int get_num_intersections(int dim,int intersects[], int faces[])
 static
 int find_face(int dim, int intersects[], int faces[])
 {
-    int i;
-    for (i = 0; i < dim; i++)
+    for (int i = 0; i < dim; i++)
     {
         if (intersects[faces[i]])
         {
@@ -65,11 +63,10 @@ int find_face(int dim, int intersects[], int faces[])
 }
 
 static
-int find_edge(int dim, int intersects[], int faces[])
+int find_edge(int corner, int intersects[], int faces[])
 {
-    int i;
     int non_intersecting_face = -1;
-    for (i = 0; i < dim; i++)
+    for (int i = 0; i < 3; i++)
     {
         if (!intersects[faces[i]])
         {
@@ -86,16 +83,26 @@ int find_edge(int dim, int intersects[], int faces[])
         case 0:
             face_0 = faces[1];
             face_1 = faces[2];
+            break;
         case 1:
             face_0 = faces[0];
             face_1 = faces[2];
+            break;
         case 2:
             face_0 = faces[0];
             face_1 = faces[1];
+            break;
     }
-    int lower_0 = face_0 % 2;
-    int lower_1 = face_1 % 2;
-    int edge = 4*edge_axis + 2*lower_1 + lower_0;
+    FCLAW_ASSERT(face_0 != non_intersecting_face);
+    FCLAW_ASSERT(face_1 != non_intersecting_face);
+
+    int upper_0 = face_0 % 2;
+    int upper_1 = face_1 % 2;
+
+    int edge = 4*edge_axis + 2*upper_1 + upper_0;
+
+    FCLAW_ASSERT(edge >= 0 && edge < 12);
+
     return edge;
 }
 
@@ -159,7 +166,7 @@ void get_corner_type(fclaw_global_t* glob,
         tdata->block_iedge = -1;
         if(tdata->is_block_edge)
         {
-            tdata->block_iedge = find_edge(domain->refine_dim, intersects_block, corner_faces);
+            tdata->block_iedge = find_edge(icorner, intersects_block, corner_faces);
         }
     }
 
