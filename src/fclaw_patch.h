@@ -162,6 +162,8 @@ struct fclaw_patch_transform_data
     /** The edge that the neighboring patch is on. */
     int iedge;
 
+    /** True if neighbor is interior */
+    int is_interior;
     /** True if patch is on a block corner */
     int is_block_corner;
     /** True if patch is on a block edge */

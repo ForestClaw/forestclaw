@@ -74,14 +74,27 @@ int find_face(int dim, int intersects[], int faces[])
     return -1;
 }
 
+/**
+ * @brief Get the corner type for a patch
+ * 
+ * @param glob the global context
+ * @param icorner the corner to get the cornertype on
+ * @param intersects_bdry Size 4 for 2D, 6 for 3D. True if patch intersects a boundary on a face
+ * @param intersects_block Size 4 for 2D, 6 for 3D. True if patch intersects a block boundary on a face
+ * @param interior_corner Returns true if the corner is interior to a block
+ * @param ftransform The ftransform object to fill in
+ *                      This will fill in the is_block_corner, is_block_edge, is_block_face, block_iface, block_iedge, and block_iface fields.
+ * @param ftransform_fine The ftransform object to fill in
+ *                      This will fill in the is_block_corner, is_block_edge, and is_block_face fields.
+ *                      block_iface, block_iedge, and block_iface fields will be filled in by get_corner_neighbor.
+ */
 static
 void get_corner_type(fclaw_global_t* glob,
                      int icorner,
                      int intersects_bdry[],
                      int intersects_block[],
                      int *interior_corner,
-                     int *is_block_corner,
-                     int *block_iface)
+                     fclaw_patch_transform_data_t* ftransform)
 {
     fclaw_domain_t *domain = glob->domain;
 
@@ -103,16 +116,125 @@ void get_corner_type(fclaw_global_t* glob,
                                                 intersects_block,
                                                 corner_faces);
     /* Both faces are at a block boundary, physical or not */
-    *is_block_corner = num_block_faces == domain->refine_dim;
+    ftransform->is_block_corner = num_block_faces == domain->refine_dim;
 
-    *block_iface = -1;
+    ftransform->block_iface = -1;
     if (num_block_faces == 1)
     {
-        *block_iface = find_face(domain->refine_dim, intersects_block, corner_faces);
+        ftransform->block_iface = find_face(domain->refine_dim, intersects_block, corner_faces);
     }
 }
 
+/* --------------------------------------------------------
+   Four cases to consider.   The 'has_corner_neighbor'
+   value is returned from p4est.  The assumption going
+   into this routine is that we have found a valid
+   interior corner (not a corner on a physical boundary).
+   The corner than satisfies one of the following four
+   cases.
 
+   Case No. | has_corner_neighbor  |  block_boundary_type
+   --------------------------------------------------------
+      1     |       T              |    interior
+      2     |       T              |    block_corner
+      3     |       T              |    block_edge
+      4     |       T              |    block_face
+      5     |       F              |    interior
+      6     |       F              |    block_corner
+      7     |       F              |    block_edge
+      8     |       F              |    block_face
+
+    Case 1 : Interior corner 
+    Case 2 : Corner neighbor across block corner
+    Case 3 : Corner neighbor across block edge
+    Case 4 : Corner neighbor across block face
+    Case 5-8 : Invalid, not curerntly supported
+   ------------------------------------------------------ */
+
+static
+void get_corner_neighbor_3d(fclaw_global_t *glob,
+                            int this_block_idx,
+                            int this_patch_idx,
+                            fclaw_patch_t* this_patch,
+                            int icorner,
+                            int block_iface,
+                            int *corner_block_idx,
+                            fclaw_patch_t** corner_patch,
+                            int *rcornerno,
+                            int **ref_flag_ptr,
+                            int *block_corner_count,
+                            fclaw_patch_transform_data_t* ftransform,
+                            fclaw_patch_transform_data_t* ftransform_finegrid)
+{
+    fclaw_domain_t *domain = glob->domain;
+    /* See what p4est thinks we have for corners, and consider four cases */
+    int rproc_corner;
+    int corner_patch_idx;
+    fclaw_patch_relation_t neighbor_type;
+
+    /* Note : Pillowsphere case does not return a block corner neighbor */
+    fclaw_timer_start (&glob->timers[FCLAW_TIMER_NEIGHBOR_SEARCH]);
+    int has_corner_neighbor =
+        fclaw_patch_corner_neighbors(domain,
+                                       this_block_idx,
+                                       this_patch_idx,
+                                       icorner,
+                                       &rproc_corner,
+                                       corner_block_idx,
+                                       &corner_patch_idx,
+                                       rcornerno,
+                                       &neighbor_type);
+
+    fclaw_timer_stop (&glob->timers[FCLAW_TIMER_NEIGHBOR_SEARCH]);    
+
+    *block_corner_count = 0;  /* Assume we are not at a block corner */
+    if (has_corner_neighbor)
+    {
+        /* Cases 1-4: */
+        *block_corner_count = 4;  /* assume four for now */
+
+        /* TODO: use interior for now, but this should be generalized */
+        fclaw_patch_transform_blockface_intra (glob, ftransform->transform);
+        fclaw_patch_transform_blockface_intra (glob, ftransform_finegrid->transform);
+    }
+    else
+    {
+        /* Case 3-4 : not supported */
+        /* We do not return valid transformation objects! */
+        *ref_flag_ptr = NULL;
+        *corner_patch = NULL;
+        return;
+    }
+
+    /* ---------------------------------------------------------------------
+       We have a valid neighbor and possibly a transform. We just now need
+       to get a pointer to the neighbor patch (which may be a parallel patch)
+       and the relative level (-1,0,1).
+       --------------------------------------------------------------------- */
+
+    if (domain->mpirank != rproc_corner)
+    {
+        *corner_patch = &domain->ghost_patches[corner_patch_idx];
+    }
+    else
+    {
+        fclaw_block_t *neighbor_block = &domain->blocks[*corner_block_idx];
+        *corner_patch = &neighbor_block->patches[corner_patch_idx];
+    }
+
+    if (neighbor_type == FCLAW_PATCH_HALFSIZE)
+    {
+        **ref_flag_ptr = 1;
+    }
+    else if (neighbor_type == FCLAW_PATCH_SAMESIZE)
+    {
+        **ref_flag_ptr = 0;
+    }
+    else /* FCLAW2D_PATCH_DOUBLESIZE */
+    {
+        **ref_flag_ptr = -1;
+    }
+}
 /* --------------------------------------------------------
    Four cases to consider.   The 'has_corner_neighbor'
    value is returned from p4est.  The assumption going
@@ -145,20 +267,19 @@ void get_corner_type(fclaw_global_t* glob,
    ------------------------------------------------------ */
 
 static
-void get_corner_neighbor(fclaw_global_t *glob,
-                         int this_block_idx,
-                         int this_patch_idx,
-                         fclaw_patch_t* this_patch,
-                         int icorner,
-                         int block_iface,
-                         int is_block_corner,
-                         int *corner_block_idx,
-                         fclaw_patch_t** corner_patch,
-                         int *rcornerno,
-                         int **ref_flag_ptr,
-                         int *block_corner_count,
-                         fclaw_patch_transform_data_t* ftransform,
-                         fclaw_patch_transform_data_t* ftransform_finegrid)
+void get_corner_neighbor_2d(fclaw_global_t *glob,
+                            int this_block_idx,
+                            int this_patch_idx,
+                            fclaw_patch_t* this_patch,
+                            int icorner,
+                            int block_iface,
+                            int *corner_block_idx,
+                            fclaw_patch_t** corner_patch,
+                            int *rcornerno,
+                            int **ref_flag_ptr,
+                            int *block_corner_count,
+                            fclaw_patch_transform_data_t* ftransform,
+                            fclaw_patch_transform_data_t* ftransform_finegrid)
 {
     fclaw_domain_t *domain = glob->domain;
     /* See what p4est thinks we have for corners, and consider four cases */
@@ -189,7 +310,7 @@ void get_corner_neighbor(fclaw_global_t *glob,
     fclaw_timer_stop (&glob->timers[FCLAW_TIMER_NEIGHBOR_SEARCH]);    
 
     *block_corner_count = 0;  /* Assume we are not at a block corner */
-    if (has_corner_neighbor && is_block_corner)
+    if (has_corner_neighbor && ftransform->is_block_corner)
     {
         /* Case 1 : 4 or more patches meet at a block corner.
         This case does NOT include the pillowgrid.   */
@@ -201,7 +322,7 @@ void get_corner_neighbor(fclaw_global_t *glob,
         fclaw_patch_transform_blockface_intra
             (glob, ftransform_finegrid->transform);
     }
-    else if (!has_corner_neighbor && !is_block_corner)
+    else if (!has_corner_neighbor && !ftransform->is_block_corner)
     {
         /* Case 2 : 'icorner' is a hanging node */
         /* We do not return valid transformation objects! */
@@ -209,7 +330,7 @@ void get_corner_neighbor(fclaw_global_t *glob,
         *corner_patch = NULL;
         return;
     }
-    else if (has_corner_neighbor && !is_block_corner)
+    else if (has_corner_neighbor && !ftransform->is_block_corner)
     {
         /* Case 3 : 'icorner' is an interior corner, at a block edge,
          or we are on a periodic block.  Need to return a valid
@@ -269,7 +390,7 @@ void get_corner_neighbor(fclaw_global_t *glob,
                             "We should not be here\n");
         }
     }
-    else if (!has_corner_neighbor && is_block_corner)
+    else if (!has_corner_neighbor && ftransform->is_block_corner)
     {
         /* Case 4 : Pillow sphere case or cubed sphere  */
         if (!ispillowsphere)
@@ -377,7 +498,6 @@ void cb_corner_fill(fclaw_domain_t *domain,
 
     int intersects_bdry[num_faces];
     int intersects_block[num_faces];
-    int is_block_corner;
     int is_interior_corner;
     int block_corner_count;
 
@@ -420,8 +540,7 @@ void cb_corner_fill(fclaw_domain_t *domain,
                         intersects_bdry,
                         intersects_block,
                         &is_interior_corner,
-                        &is_block_corner,
-                        &transform_data.block_iface);
+                        &transform_data);
 
         transform_data.icorner = icorner;
         transform_data_finegrid.icorner = icorner;
@@ -442,16 +561,14 @@ void cb_corner_fill(fclaw_domain_t *domain,
             int rcornerno;
 
             int  block_iface = transform_data.block_iface;
-            transform_data.is_block_corner = is_block_corner;
 
             corner_block_idx = -1;
-            get_corner_neighbor(s->glob,
+            get_corner_neighbor_2d(s->glob,
                                 this_block_idx,
                                 this_patch_idx,
                                 this_patch,
                                 icorner,
                                 block_iface,
-                                is_block_corner,
                                 &corner_block_idx,
                                 &corner_patch,
                                 &rcornerno,
@@ -464,10 +581,9 @@ void cb_corner_fill(fclaw_domain_t *domain,
             fclaw_patch_set_block_corner_count(s->glob, this_patch,
                                                  icorner,block_corner_count);
 
-            transform_data.is_block_corner = is_block_corner;
 
             /* Needed for switching the context */
-            transform_data_finegrid.is_block_corner = is_block_corner;
+            transform_data_finegrid.is_block_corner = transform_data.is_block_corner;
             transform_data_finegrid.icorner = rcornerno;
             transform_data_finegrid.this_patch = corner_patch;
             transform_data_finegrid.neighbor_patch = this_patch;
@@ -500,7 +616,7 @@ void cb_corner_fill(fclaw_domain_t *domain,
                                                        fine_patch,
                                                        coarse_blockno,
                                                        fine_blockno,
-                                                       is_block_corner,
+                                                       transform_data.is_block_corner,
                                                        icorner,time_interp,
                                                        &transform_data);
                     }
@@ -514,7 +630,7 @@ void cb_corner_fill(fclaw_domain_t *domain,
                                                    fine_patch,
                                                    coarse_blockno,
                                                    fine_blockno,
-                                                   is_block_corner,
+                                                   transform_data.is_block_corner,
                                                    icorner,time_interp,
                                                    &transform_data);                        
                     }
@@ -526,7 +642,7 @@ void cb_corner_fill(fclaw_domain_t *domain,
                                             corner_patch,
                                             this_block_idx,
                                             corner_block_idx,
-                                            is_block_corner,
+                                            transform_data.is_block_corner,
                                             icorner, time_interp,
                                             &transform_data);
                 }
@@ -557,7 +673,7 @@ void cb_corner_fill(fclaw_domain_t *domain,
                                                    fine_patch,
                                                    coarse_blockno,
                                                    fine_blockno,
-                                                   is_block_corner,
+                                                   transform_data.is_block_corner,
                                                    coarse_icorner,time_interp,
                                                    &transform_data_finegrid);
 
