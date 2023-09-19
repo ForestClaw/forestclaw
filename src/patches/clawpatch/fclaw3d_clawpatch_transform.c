@@ -264,7 +264,7 @@ FCLAW3D_CLAWPATCH_TRANSFORM_CORNER_HALF (const int *i1, const int *j1, const int
     i2[0] = *i1;
     j2[0] = *j1;
     k2[0] = *k1;
-    if (tdata->block_iface >= 0)
+    if (tdata->is_block_face)
     {
         /* block-face but not a block-corner. */
         fclaw_patch_3d_transform_face2 (tdata->this_patch,
@@ -272,6 +272,16 @@ FCLAW3D_CLAWPATCH_TRANSFORM_CORNER_HALF (const int *i1, const int *j1, const int
                                         tdata->transform, 
                                         mx, my, mz,
                                         tdata->based, i2, j2, k2);
+    }
+    else if (tdata->is_block_edge)
+    {
+        fclaw_patch_3d_transform_edge2 (tdata->this_patch,
+                                        tdata->neighbor_patch, 
+                                        tdata->block_iedge,
+                                        tdata->is_block_edge,
+                                        mx, my, mz,
+                                        tdata->based, i2, j2, k2);
+
     }
     else
     {
