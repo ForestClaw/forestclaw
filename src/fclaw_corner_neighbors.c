@@ -64,6 +64,41 @@ int find_face(int dim, int intersects[], int faces[])
     return -1;
 }
 
+static
+int find_edge(int dim, int intersects[], int faces[])
+{
+    int i;
+    int non_intersecting_face = -1;
+    for (i = 0; i < dim; i++)
+    {
+        if (!intersects[faces[i]])
+        {
+            non_intersecting_face = faces[i];
+            break;
+        }
+    }
+    FCLAW_ASSERT(non_intersecting_face >= 0);
+    int edge_axis = non_intersecting_face / 2;
+    int face_0;
+    int face_1;
+    switch(edge_axis)
+    {
+        case 0:
+            face_0 = faces[1];
+            face_1 = faces[2];
+        case 1:
+            face_0 = faces[0];
+            face_1 = faces[2];
+        case 2:
+            face_0 = faces[0];
+            face_1 = faces[1];
+    }
+    int lower_0 = face_0 % 2;
+    int lower_1 = face_1 % 2;
+    int edge = 4*edge_axis + 2*lower_1 + lower_0;
+    return edge;
+}
+
 /**
  * @brief Get the corner type for a patch
  * 
@@ -112,6 +147,21 @@ void get_corner_type(fclaw_global_t* glob,
                                                 corner_faces);
     /* Both faces are at a block boundary, physical or not */
     tdata->is_block_corner = num_block_faces == domain->refine_dim;
+
+    if(domain->refine_dim == 2)
+    {
+        tdata->is_block_edge = 0;
+        tdata->block_iedge = -1;
+    }
+    else
+    {
+        tdata->is_block_edge = num_block_faces == 2;
+        tdata->block_iedge = -1;
+        if(tdata->is_block_edge)
+        {
+            tdata->block_iedge = find_edge(domain->refine_dim, intersects_block, corner_faces);
+        }
+    }
 
     tdata->is_block_face = num_block_faces == 1;
     tdata->block_iface = -1;
@@ -246,22 +296,26 @@ void get_corner_neighbor_3d(fclaw_global_t *glob,
    The corner than satisfies one of the following four
    cases.
 
-   Case No. | has_corner_neighbor  |  is_block_corner
+   Case No. | has_corner_neighbor  |  block_boundary_type
    --------------------------------------------------------
-      1     |       T              |        T
+      1     |       T              |    is_block_corner
+      2     |       T              |    is_block_edge
+      3     |       T              |    is_block_face
+      4     |       T              |    interior
       2     |       F              |        F
       3     |       T              |        F
       4     |       F              |        T
 
-    Case 1 : In this case, 4 or more patches meet at a block
+    Case 1-2 : In this case, 4 or more patches meet at a
              corner. No transforms are yet available, so we 
              assume that at block corners, the patches all 
              have the same orientation.
+    Case 3 : Corner is either is on block face.
+             The transform is well-defined.
+    Case 4 : Corner is either interior to a block.
+             The transform is well-defined.
     Case 2 : Corner is at a hanging node and has no valid
              adjacent corner.
-    Case 3 : Corner is either interior to a block, or on a
-             block edge.  In each case, the transform is
-             well-defined.
     Case 4 : Either 3 patches meet at a corner, in which
              case we don't have an adjacent corner, or we are
              on a pillow grid, in which case we have a 
@@ -318,55 +372,86 @@ void get_corner_neighbor_2d(fclaw_global_t *glob,
         fclaw_patch_transform_blockface_intra
             (glob, tdata_fine->transform);
     }
-    else if (!has_corner_neighbor && !tdata->is_block_corner)
+    else if (has_corner_neighbor && tdata->is_block_edge)
     {
-        /* Case 2 : 'icorner' is a hanging node */
-        /* We do not return valid transformation objects! */
-        *is_valid_neighbor = 0;
-        return;
+        FCLAW_ASSERT(domain->refine_dim == 3);
+        /* The corner is on a block face (but is not a block corner).
+           Compute a transform between blocks. First, get the
+           remote face number.  The remote face number encodes the
+           orientation, so we have 0 <= rfaceno < 8 */
+
+        //int rfaceno;
+        //int rproc[2];
+        //int rpatchno[2];
+        //int rblockno;  /* Should equal *corner_block_idx, above. */
+        //fclaw_patch_edge_neighbors(domain,
+        //                             tdata->this_blockno,
+        //                             tdata->this_patchno,
+        //                             tdata->block_iface,
+        //                             rproc,
+        //                             &rblockno,
+        //                             rpatchno,
+        //                             &rfaceno);
+
+        //FCLAW_ASSERT(rblockno == tdata->neighbor_blockno);
+
+        ///* Get encoding of transforming a neighbor coordinate across a face */
+        //fclaw_patch_transform_blockface (glob, tdata->block_iface, rfaceno, tdata->transform);
+        fclaw_patch_transform_blockface_intra(glob, tdata->transform);
+
+        /* Get transform needed to swap parallel ghost patch with fine
+           grid on-proc patch.  This is done so that averaging and
+           interpolation routines can be re-used. */
+        //int iface1 = tdata->block_iface;
+        //int rface1 = rfaceno;
+        //fclaw_patch_face_swap(domain->refine_dim, &iface1, &rface1);
+        //TODO edge transforms
+        fclaw_patch_transform_blockface_intra(glob, tdata_fine->transform);
+
+        tdata_fine->block_iedge = tdata_fine->block_iedge ^ 3;
+    }
+    else if (has_corner_neighbor && tdata->is_block_face)
+    {
+        /* The corner is on a block face (but is not a block corner).
+           Compute a transform between blocks. First, get the
+           remote face number.  The remote face number encodes the
+           orientation, so we have 0 <= rfaceno < 8 */
+
+        int rfaceno;
+        int rproc[4]; // overallocate for 3d
+        int rpatchno[4];
+        int rblockno;  /* Should equal *corner_block_idx, above. */
+        fclaw_patch_face_neighbors(domain,
+                                     tdata->this_blockno,
+                                     tdata->this_patchno,
+                                     tdata->block_iface,
+                                     rproc,
+                                     &rblockno,
+                                     rpatchno,
+                                     &rfaceno);
+
+        FCLAW_ASSERT(rblockno == tdata->neighbor_blockno);
+
+        /* Get encoding of transforming a neighbor coordinate across a face */
+        fclaw_patch_transform_blockface (glob, tdata->block_iface, rfaceno, tdata->transform);
+
+        /* Get transform needed to swap parallel ghost patch with fine
+           grid on-proc patch.  This is done so that averaging and
+           interpolation routines can be re-used. */
+        int iface1 = tdata->block_iface;
+        int rface1 = rfaceno;
+        fclaw_patch_face_swap(domain->refine_dim, &iface1, &rface1);
+        fclaw_patch_transform_blockface(glob, iface1, rface1,
+                                          tdata_fine->transform);
+
+        tdata_fine->block_iface = iface1;
     }
     else if (has_corner_neighbor && !tdata->is_block_corner)
     {
-        /* Case 3 : 'icorner' is an interior corner, at a block edge,
-         or we are on a periodic block.  Need to return a valid
+        /* Case 4 : 'icorner' is an interior corner,
+         or we are on a periodic single block.  Need to return a valid
          transform in 'ftransform' */
-        /* block_iface is the block number at the of the neighbor? */
-        if (tdata->block_iface >= 0)
-        {
-            /* The corner is on a block edge (but is not a block corner).
-               Compute a transform between blocks. First, get the
-               remote face number.  The remote face number encodes the
-               orientation, so we have 0 <= rfaceno < 8 */
-            int rfaceno;
-            int rproc[4]; // overallocate for 3d
-            int rpatchno[4];
-            int rblockno;  /* Should equal *corner_block_idx, above. */
-            fclaw_patch_face_neighbors(domain,
-                                         tdata->this_blockno,
-                                         tdata->this_patchno,
-                                         tdata->block_iface,
-                                         rproc,
-                                         &rblockno,
-                                         rpatchno,
-                                         &rfaceno);
-
-            FCLAW_ASSERT(rblockno == tdata->neighbor_blockno);
-
-            /* Get encoding of transforming a neighbor coordinate across a face */
-            fclaw_patch_transform_blockface (glob, tdata->block_iface, rfaceno, tdata->transform);
-
-            /* Get transform needed to swap parallel ghost patch with fine
-               grid on-proc patch.  This is done so that averaging and
-               interpolation routines can be re-used. */
-            int iface1 = tdata->block_iface;
-            int rface1 = rfaceno;
-            fclaw_patch_face_swap(domain->refine_dim, &iface1, &rface1);
-            fclaw_patch_transform_blockface(glob, iface1, rface1,
-                                              tdata_fine->transform);
-
-            tdata_fine->block_iface = iface1;
-        }
-        else if (tdata->this_blockno == tdata->neighbor_blockno)
+        if (tdata->this_blockno == tdata->neighbor_blockno)
         {
             /* Both patches are in the same block, so we set the transform to
                a default transform.  This could be the case for periodic boundaries. */
@@ -387,7 +472,15 @@ void get_corner_neighbor_2d(fclaw_global_t *glob,
     }
     else if (!has_corner_neighbor && tdata->is_block_corner)
     {
-        /* Case 4 : Pillow sphere case or cubed sphere  */
+        /* Case 4 : In 2d: Pillow sphere case or cubed sphere
+           In 3D: not yet supported */
+        if(domain->refine_dim == 3)
+        {
+            *block_corner_count = 0;
+            *is_valid_neighbor = 0;
+            return;
+        }
+
         if (!ispillowsphere)
         {
             *block_corner_count = 3;
@@ -399,6 +492,7 @@ void get_corner_neighbor_2d(fclaw_global_t *glob,
         }
         else
         {
+            /* return face neighbor as corner neighbor */
             *block_corner_count = 2;
             has_corner_neighbor = 1;
             int rpatchno[4]; // overallocate for 3d
@@ -434,6 +528,13 @@ void get_corner_neighbor_2d(fclaw_global_t *glob,
             tdata->neighbor_patchno = rpatchno[igrid];
             rproc_corner = rproc[igrid];
         }
+    }
+    else if (!has_corner_neighbor)
+    {
+        /* 'icorner' is a hanging node or not yet supported */
+        /* We do not return valid transformation objects! */
+        *is_valid_neighbor = 0;
+        return;
     }
 
     /* ---------------------------------------------------------------------
