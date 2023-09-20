@@ -26,10 +26,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef P4_TO_P8
 #include <fclaw2d_file.h>
 #include <p4est_algorithms.h>
+#include <p4est_bits.h>
+#include <p4est_communication.h>
 #include <p4est_wrap.h>
 #else
 #include <fclaw3d_file.h>
 #include <p8est_algorithms.h>
+#include <p8est_bits.h>
+#include <p8est_communication.h>
 #include <p8est_wrap.h>
 #endif
 
