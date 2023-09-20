@@ -541,7 +541,7 @@ fclaw2d_file_error_cleanup_v1 (sc_MPI_File * file)
  * \param [in] p4est          Valid forest.
  * \param [in] filename       Path to parallel file that is to be created.
  * \param [in] user_string    A user string that is written to the file header.
- *                            Only \ref FCLAW2D_FILE_USER_STRING_BYTES_V1
+ *                            Only \ref FCLAW2D_FILE_USER_STRING_BYTES_V1 -1
  *                            bytes without NUL-termination are
  *                            written to the file. If the user gives less
  *                            bytes the user_string in the file header is padded

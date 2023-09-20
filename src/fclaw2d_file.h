@@ -43,9 +43,9 @@ extern "C"
 #endif
 #endif
 
-#define FCLAW2D_FILE_USER_STRING_BYTES 48
-#define FCLAW2D_FILE_MAX_BLOCK_SIZE 9999999999999
-#define FCLAW2D_FILE_MAX_FIELD_ENTRY_SIZE 9999999999999
+#define FCLAW2D_FILE_USER_STRING_BYTES 48 /**< number of user string bytes */
+#define FCLAW2D_FILE_MAX_BLOCK_SIZE ((1000 * 1000 * 1000 * 1000 * 10) - 1) /**< maximal data size of a block */
+#define FCLAW2D_FILE_MAX_FIELD_ENTRY_SIZE ((1000 * 1000 * 1000 * 1000 * 10) - 1) /**< maximal data size per field entry*/
 
 /** Error values for fclaw2d_file functions.
  */
@@ -99,12 +99,13 @@ typedef struct fclaw2d_file_context fclaw2d_file_context_t;
  * errors.
  *
  * \param [in] filename    Path to parallel file that is to be created.
- * \param [in] user_string A user string that is written to the file header.
- *                         Only \ref FCLAW2D_FILE_USER_STRING_BYTES
- *                         bytes without NUL-termination are
- *                         written to the file. If the user gives less
- *                         bytes the user_string in the file header is padded
- *                         by spaces.
+ * \param [in] user_string A user string that is written to the file header
+ *                         haveing FCLAW2D_FILE_USER_STRING_BYTES bytes including
+ *                         the NUL-termination. Only \ref
+ *                         FCLAW2D_FILE_USER_STRING_BYTES - 1 bytes, i.e. without
+ *                         NUL-termination are written to the file. If the user
+ *                         gives less bytes the user_string in the file header
+ *                         is padded by spaces.
  * \param [in]   domain    The underlying p4est is used for the metadata of the
  *                         the created file and the \b domain is written to the
  *                         file.
@@ -134,12 +135,13 @@ fclaw2d_file_context_t *fclaw2d_file_open_write (const char *filename,
  * \param [in, out] fc          Context previously created by \ref
  *                              fclaw2d_file_open_write.  It keeps track
  *                              of the data sets written one after another.
- * \param [in]      user_string A user string that is written to the file.
- *                              Only \ref FCLAW2D_FILE_USER_STRING_BYTES
- *                              bytes without NUL-termination are
- *                              written to the file. If the user gives less
- *                              bytes the user_string in the file header is padded
- *                              by spaces.
+ * \param [in] user_string      A user string that is written to the section header
+ *                              haveing FCLAW2D_FILE_USER_STRING_BYTES bytes
+ *                              including the NUL-termination. Only \ref
+ *                              FCLAW2D_FILE_USER_STRING_BYTES - 1 bytes, i.e.
+ *                              without NUL-termination are written to the file.
+ *                              If the user gives less bytes the user_string in
+ *                              the section header is padded by spaces.
  * \param [in]      block_size  The size of the block in bytes. May be equal to
  *                              0. In this case the section header and the padding
  *                              is still written. This function returns the passed
@@ -181,12 +183,13 @@ fclaw2d_file_context_t *fclaw2d_file_write_block (fclaw2d_file_context_t *
  * \param [in, out] fc          Context previously created by \ref
  *                              fclaw2d_file_open_write.  It keeps track
  *                              of the data sets written one after another.
- * \param [in]      user_string A user string that is written to the file.
- *                              Only \ref FCLAW2D_FILE_USER_STRING_BYTES
- *                              bytes without NUL-termination are
- *                              written to the file. If the user gives less
- *                              bytes the user_string in the file header is padded
- *                              by spaces.
+ * \param [in] user_string      A user string that is written to the section header
+ *                              haveing FCLAW2D_FILE_USER_STRING_BYTES bytes
+ *                              including the NUL-termination. Only \ref
+ *                              FCLAW2D_FILE_USER_STRING_BYTES - 1 bytes, i.e.
+ *                              without NUL-termination are written to the file.
+ *                              If the user gives less bytes the user_string in
+ *                              the section header is padded by spaces.
  * \param [in]      patch_size  The number of bytes per patch. This number
  *                              must coincide with \b patch_data->elem_size.
  * \param [in]      patch_data  An array of the length number of local patches
