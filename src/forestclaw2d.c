@@ -1828,10 +1828,6 @@ struct fclaw2d_domain_indirect
     fclaw2d_domain_exchange_t *e;
 };
 
-/* These static functions are unused in 3D as long as the 3D case is not
- * implemented.
- */
-#ifndef P4_TO_P8
 static void
 indirect_encode (p4est_ghost_t * ghost, int mpirank,
                  int *rproc, int *rpatchno)
@@ -1863,22 +1859,23 @@ indirect_match (int *pi,
     FCLAW_ASSERT (rpatchno != NULL && rfaceno != NULL);
 
     *rproc = pi;
-    *rblockno = pi + 2;
-    *rpatchno = pi + 3;
-    *rfaceno = pi + 5;
+    *rblockno = pi + P4EST_HALF;
+    *rpatchno = pi + P4EST_HALF + 1;
+    *rfaceno = pi + P4EST_CHILDREN + 1; /* P4EST_CHILDREN == 2 * P4EST_HALF */
 }
-#endif
+
 
 fclaw2d_domain_indirect_t *
 fclaw2d_domain_indirect_begin (fclaw2d_domain_t * domain)
 {
-#ifndef P4_TO_P8
     int num_exc;
     int neall, nb, ne, np;
     int face;
     int *pbdata, *pi;
     int *rproc, *rblockno, *rpatchno, *rfaceno;
+    int face_info_size;
     size_t data_size;
+    int sf;
     fclaw2d_block_t *block;
     fclaw2d_domain_indirect_t *ind;
     fclaw2d_patch_relation_t prel;
@@ -1886,7 +1883,8 @@ fclaw2d_domain_indirect_begin (fclaw2d_domain_t * domain)
     p4est_ghost_t *ghost = p4est_wrap_get_ghost (wrap);
 
     num_exc = domain->num_exchange_patches;
-    data_size = P4EST_FACES * 6 * sizeof (int);
+    face_info_size = 2 + P4EST_CHILDREN;        /* P4EST_CHILDREN == 2 * P4EST_HALF */
+    data_size = P4EST_FACES * face_info_size * sizeof (int);
 
     /* allocate internal state for this operation */
     ind = FCLAW_ALLOC_ZERO (fclaw2d_domain_indirect_t, 1);
@@ -1894,7 +1892,7 @@ fclaw2d_domain_indirect_begin (fclaw2d_domain_t * domain)
     ind->e = fclaw2d_domain_allocate_before_exchange (domain, data_size);
 
     /* loop through exchange patches and fill their neighbor information */
-    pbdata = pi = FCLAW_ALLOC (int, num_exc * P4EST_FACES * 6);
+    pbdata = pi = FCLAW_ALLOC (int, num_exc * P4EST_FACES * face_info_size);
     for (neall = 0, nb = 0; nb < domain->num_blocks; ++nb)
     {
         block = domain->blocks + nb;
@@ -1917,19 +1915,24 @@ fclaw2d_domain_indirect_begin (fclaw2d_domain_t * domain)
                                  &rproc[0], &rpatchno[0]);
                 if (prel == FCLAW2D_PATCH_HALFSIZE)
                 {
-                    indirect_encode
-                        (ghost, domain->mpirank, &rproc[1], &rpatchno[1]);
+                    for (sf = 1; sf < P4EST_HALF; sf++)
+                    {
+                        indirect_encode
+                            (ghost, domain->mpirank, &rproc[sf],
+                             &rpatchno[sf]);
+                    }
                     *rfaceno |= 1 << 26;
                 }
                 else if (prel == FCLAW2D_PATCH_DOUBLESIZE)
                 {
                     *rfaceno |= 1 << 27;
                 }
-                pi += 6;
+                pi += face_info_size;
             }
         }
     }
-    FCLAW_ASSERT ((int) (pi - pbdata) == neall * P4EST_FACES * 6);
+    FCLAW_ASSERT ((int) (pi - pbdata) ==
+                  neall * P4EST_FACES * face_info_size);
     FCLAW_ASSERT (neall == num_exc);
 
     /* post messages */
@@ -1940,19 +1943,11 @@ fclaw2d_domain_indirect_begin (fclaw2d_domain_t * domain)
     FCLAW_FREE (pbdata);
 
     return ind;
-#else
-    FCLAW_ASSERT (domain != NULL);
-
-    /* The 3D case is currently not implemented. */
-
-    return NULL;
-#endif
 }
 
 /* These static functions are unused in 3D as long as the 3D case is not
  * implemented.
  */
-#ifndef P4_TO_P8
 static uint64_t
 pli_make_key (int p, int rpatchno)
 {
@@ -2025,13 +2020,11 @@ indirect_decode (sc_hash_t * pli_hash, uint64_t * pli_keys,
 
     return good;
 }
-#endif
 
 void
 fclaw2d_domain_indirect_end (fclaw2d_domain_t * domain,
                              fclaw2d_domain_indirect_t * ind)
 {
-#ifndef P4_TO_P8
     int ndgp;
     int good, good2;
     int p, ng;
@@ -2042,6 +2035,8 @@ fclaw2d_domain_indirect_end (fclaw2d_domain_t * domain,
     int face;
     int *rproc, *rblockno, *rpatchno, *rfaceno;
     int *pi;
+    int face_info_size;
+    int sf;
     uint64_t *pli_keys, *plik;
     sc_hash_t *pli_hash;
     p4est_wrap_t *wrap = (p4est_wrap_t *) domain->pp;
@@ -2081,6 +2076,7 @@ fclaw2d_domain_indirect_end (fclaw2d_domain_t * domain,
     fclaw2d_domain_ghost_exchange_end (domain, ind->e);
 
     /* go through ghosts a second time, now working on received data */
+    face_info_size = 2 + P4EST_CHILDREN;        /* P4EST_CHILDREN == 2 * P4EST_HALF */
     for (ng = 0, p = 0; p < domain->mpisize; ++p)
     {
         for (; ng < (int) ghost->proc_offsets[p + 1]; ++ng)
@@ -2104,14 +2100,19 @@ fclaw2d_domain_indirect_end (fclaw2d_domain_t * domain,
                               (0 <= rpatchno[0] && rpatchno[0] < ndgp));
                 if (*rfaceno & (1 << 26))
                 {
-                    /* check second of two halfsize neighbors */
-                    FCLAW_ASSERT (rproc[1] != p);
-                    good2 = indirect_decode (pli_hash, pli_keys,
-                                             domain->mpisize, domain->mpirank,
-                                             &rproc[1], &rpatchno[1]);
-                    good = good || good2;
-                    FCLAW_ASSERT ((rproc[1] == -1 && rpatchno[1] == -1) ||
-                                  (0 <= rpatchno[1] && rpatchno[1] < ndgp));
+                    /* check remaining of P4EST_HALF halfsize neighbors */
+                    for (sf = 1; sf < P4EST_HALF; sf++)
+                    {
+                        FCLAW_ASSERT (rproc[sf] != p);
+                        good2 = indirect_decode (pli_hash, pli_keys,
+                                                 domain->mpisize,
+                                                 domain->mpirank, &rproc[sf],
+                                                 &rpatchno[sf]);
+                        good = good || good2;
+                        FCLAW_ASSERT ((rproc[sf] == -1 && rpatchno[sf] == -1)
+                                      || (0 <= rpatchno[sf]
+                                          && rpatchno[sf] < ndgp));
+                    }
                 }
 
                 /* no match on this face; we pretend a boundary situation */
@@ -2119,12 +2120,15 @@ fclaw2d_domain_indirect_end (fclaw2d_domain_t * domain,
                 {
                     FCLAW_ASSERT (rproc[0] == -1);
                     FCLAW_ASSERT (rpatchno[0] == -1);
-                    rproc[1] = rpatchno[1] = -1;
+                    for (sf = 1; sf < P4EST_HALF; sf++)
+                    {
+                        rproc[sf] = rpatchno[sf] = -1;
+                    }
                     *rfaceno &= ~(3 << 26);
                 }
 
                 /* move to the next face data item */
-                pi += 6;
+                pi += face_info_size;
             }
         }
     }
@@ -2136,27 +2140,18 @@ fclaw2d_domain_indirect_end (fclaw2d_domain_t * domain,
 
     /* now we allow queries on the ghost data */
     ind->ready = 1;
-#else
-    FCLAW_ASSERT (domain != NULL);
-
-    /* The 3D case is currently not implemented. That is why we assert on ind
-     * beging NULL as it is currently always returned by
-     * fclaw3d_domain_indirect_begin.
-     */
-    FCLAW_ASSERT (ind == NULL);
-#endif
 }
 
 fclaw2d_patch_relation_t
 fclaw2d_domain_indirect_neighbors (fclaw2d_domain_t * domain,
                                    fclaw2d_domain_indirect_t * ind,
-                                   int ghostno, int faceno, int rproc[2],
-                                   int *rblockno, int rpatchno[2],
-                                   int *rfaceno)
+                                   int ghostno, int faceno,
+                                   int rproc[P4EST_HALF], int *rblockno,
+                                   int rpatchno[P4EST_HALF], int *rfaceno)
 {
-#ifndef P4_TO_P8
     int *pi;
     int *grproc, *grblockno, *grpatchno, *grfaceno;
+    int sf;
     fclaw2d_patch_relation_t prel;
 
     FCLAW_ASSERT (ind != NULL && ind->ready);
@@ -2166,7 +2161,7 @@ fclaw2d_domain_indirect_neighbors (fclaw2d_domain_t * domain,
     FCLAW_ASSERT (0 <= faceno && faceno < P4EST_FACES);
 
     /* check the type of neighbor situation */
-    pi = (int *) ind->e->ghost_data[ghostno] + 6 * faceno;
+    pi = (int *) ind->e->ghost_data[ghostno] + (2 + P4EST_CHILDREN) * faceno;
     indirect_match (pi, &grproc, &grblockno, &grpatchno, &grfaceno);
     *rblockno = *grblockno;
     FCLAW_ASSERT (0 <= *rblockno && *rblockno < domain->num_blocks);
@@ -2177,10 +2172,11 @@ fclaw2d_domain_indirect_neighbors (fclaw2d_domain_t * domain,
         if (grproc[0] == -1)
         {
             /* optimize for the most likely case */
-            FCLAW_ASSERT (grproc[0] == -1 && grpatchno[0] == -1);
-            FCLAW_ASSERT (grproc[1] == -1 && grpatchno[1] == -1);
-            rproc[0] = rpatchno[0] = -1;
-            rproc[1] = rpatchno[1] = -1;
+            for (sf = 0; sf < P4EST_HALF; sf++)
+            {
+                FCLAW_ASSERT (grproc[sf] == -1 && grpatchno[sf] == -1);
+                rproc[sf] = rpatchno[sf] = -1;
+            }
             return FCLAW2D_PATCH_BOUNDARY;
         }
         else
@@ -2203,10 +2199,11 @@ fclaw2d_domain_indirect_neighbors (fclaw2d_domain_t * domain,
     }
 
     /* aslign the remaining output values */
-    rproc[0] = grproc[0];
-    rproc[1] = grproc[1];
-    rpatchno[0] = grpatchno[0];
-    rpatchno[1] = grpatchno[1];
+    for (sf = 0; sf < P4EST_HALF; sf++)
+    {
+        rproc[sf] = grproc[sf];
+        rpatchno[sf] = grpatchno[sf];
+    }
 #ifdef FCLAW_ENABLE_DEBUG
     if (rproc[0] != -1)
     {
@@ -2215,47 +2212,31 @@ fclaw2d_domain_indirect_neighbors (fclaw2d_domain_t * domain,
         FCLAW_ASSERT (0 <= rpatchno[0] &&
                       rpatchno[0] < domain->num_ghost_patches);
     }
-    if (prel == FCLAW2D_PATCH_HALFSIZE && rproc[1] != -1)
+    for (sf = 1; sf < P4EST_HALF; sf++)
     {
-        FCLAW_ASSERT (0 <= rproc[1] && rproc[1] < domain->mpisize);
-        FCLAW_ASSERT (rproc[1] != domain->mpirank);
-        FCLAW_ASSERT (0 <= rpatchno[1] &&
-                      rpatchno[1] < domain->num_ghost_patches);
+        if (prel == FCLAW2D_PATCH_HALFSIZE && rproc[sf] != -1)
+        {
+            FCLAW_ASSERT (0 <= rproc[sf] && rproc[sf] < domain->mpisize);
+            FCLAW_ASSERT (rproc[sf] != domain->mpirank);
+            FCLAW_ASSERT (0 <= rpatchno[sf] &&
+                          rpatchno[sf] < domain->num_ghost_patches);
+        }
     }
 #endif
 
     /* and return */
     return prel;
-#else
-    /* Since the 3D case is currently not implemented it is not valid to call
-     * this function.
-     */
-    SC_ABORT_NOT_REACHED ();
-
-    /* This code has no meaning. It is never reached. */
-    return FCLAW2D_PATCH_BOUNDARY;
-#endif
 }
 
 void
 fclaw2d_domain_indirect_destroy (fclaw2d_domain_t * domain,
                                  fclaw2d_domain_indirect_t * ind)
 {
-#ifndef P4_TO_P8
     FCLAW_ASSERT (ind != NULL && ind->ready);
     FCLAW_ASSERT (domain == ind->domain);
 
     fclaw2d_domain_free_after_exchange (domain, ind->e);
     FCLAW_FREE (ind);
-#else
-    FCLAW_ASSERT (domain != NULL);
-
-    /* The 3D case is currently not implemented. That is why we assert on ind
-     * beging NULL as it is currently always returned by
-     * fclaw3d_domain_indirect_begin.
-     */
-    FCLAW_ASSERT (ind == NULL);
-#endif
 }
 
 void
