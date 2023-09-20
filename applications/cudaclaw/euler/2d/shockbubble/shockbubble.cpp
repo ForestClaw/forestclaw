@@ -49,8 +49,8 @@ fclaw_domain_t* create_domain(sc_MPI_Comm mpicomm,
     brick = fclaw2d_map_new_brick_conn (conn,mi,mj);
     cont = fclaw2d_map_new_nomap_brick(brick);
 
-    domain = fclaw2d_domain_new_conn_map (mpicomm, 
-                                          fclaw_opt->minlevel, conn, cont);
+    domain = fclaw_domain_wrap_2d(fclaw2d_domain_new_conn_map (mpicomm, 
+                                          fclaw_opt->minlevel, conn, cont));
     fclaw_domain_list_levels(domain, FCLAW_VERBOSITY_ESSENTIAL);
     fclaw_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);  
     return domain;    
