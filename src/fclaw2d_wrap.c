@@ -295,13 +295,15 @@ fclaw_domain_t* domain_wrap_meta(fclaw2d_domain_t* domain_2d)
     /* Only the mpi-information
        (mpicomm, mpisize and mpirank) should be copied */
     fclaw_domain_t* domain = FCLAW_ALLOC_ZERO(fclaw_domain_t, 1);
+    fclaw2d_domain_wrap_t* domain_wrap = FCLAW_ALLOC_ZERO(fclaw2d_domain_wrap_t, 1);
+    domain_wrap->domain = domain_2d;
 
     domain->refine_dim = FCLAW2D_SPACEDIM;
     domain->mpicomm = domain_2d->mpicomm;
     domain->mpisize = domain_2d->mpisize;
     domain->mpirank = domain_2d->mpirank;
     domain->attributes = domain_2d->attributes;
-    domain->wrapped_domain = domain_2d;
+    domain->wrapped_domain = domain_wrap;
     domain_2d->user = domain;
 
     return domain;
@@ -353,6 +355,8 @@ fclaw2d_interpolate_point_wrap (fclaw2d_domain_t * domain_2d,
 
     if(domain_is_meta)
     {
+        fclaw2d_domain_wrap_t* domain_wrap = fclaw_domain_get_2d_domain_wrap(domain);
+        FCLAW_FREE(domain_wrap);
         FCLAW_FREE(domain);
         domain_2d->user = NULL;
     }
