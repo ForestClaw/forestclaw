@@ -735,6 +735,7 @@ check_for_unused_options(fclaw_app_t* a, const char* savefile, sc_array_t* filen
                             fclaw_global_productionf("%s has unused option %s.\n", filename, keys[i_key]);
                         }
                     }
+                    free (keys);
                 }
                 else
                 {
@@ -751,6 +752,7 @@ check_for_unused_options(fclaw_app_t* a, const char* savefile, sc_array_t* filen
         iniparser_freedict(ini);
     }
     sc_array_destroy(ini_files);
+    iniparser_freedict (save_ini);
 }
 
 fclaw_exit_type_t
