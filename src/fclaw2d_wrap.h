@@ -82,6 +82,13 @@ fclaw2d_match_callback_wrap(fclaw2d_domain_t * old_domain,
                             int old_patchno, int new_patchno,
                             void *user);
 
+int 
+fclaw2d_intersect_wrap (fclaw2d_domain_t * domain,
+                        fclaw2d_patch_t * patch,
+                        int blockno, int patchno,
+                        void *ray, double *integral,
+                        void *user);
+
 #ifdef __cplusplus
 #if 0
 {

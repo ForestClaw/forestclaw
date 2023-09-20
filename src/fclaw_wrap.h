@@ -33,6 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define FCLAW_WRAP_H
 
 #include <forestclaw.h>
+#include <fclaw_convenience.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -59,6 +60,12 @@ typedef struct fclaw_match_callback_wrap_user
     fclaw_match_callback_t mcb;
     void *user;
 } fclaw_match_callback_wrap_user_t;
+
+typedef struct fclaw_integrate_ray_wrap_user
+{
+    fclaw_integrate_ray_t intersect;
+    void *user;
+} fclaw_integrate_ray_wrap_user_t;
 
 #ifdef __cplusplus
 #if 0

@@ -347,40 +347,13 @@ void fclaw_domain_search_points (fclaw_domain_t * domain,
     }
 }
 
-typedef struct intersect_wrap_user
-{
-    fclaw_integrate_ray_t intersect;
-    void *user;
-} intersect_wrap_user_t;
-
-static int 
-intersect_wrap_2d (fclaw2d_domain_t * domain,
-                   fclaw2d_patch_t * patch,
-                   int blockno, int patchno,
-                   void *ray, double *integral,
-                   void *user)
-{
-    // TODO
-    return 0;
-}
-static int 
-intersect_wrap_3d (fclaw3d_domain_t * domain,
-                   fclaw3d_patch_t * patch,
-                   int blockno, int patchno,
-                   void *ray, double *integral,
-                   void *user)
-{
-    // TODO
-    return 0;
-}
-
 void fclaw_domain_integrate_rays (fclaw_domain_t * domain,
                                   fclaw_integrate_ray_t intersect,
                                   sc_array_t * rays,
                                   sc_array_t * integrals,
                                   void * user)
 {
-    intersect_wrap_user_t wrap_user;
+    fclaw_integrate_ray_wrap_user_t wrap_user;
     wrap_user.intersect = intersect;
     wrap_user.user = user;
 
@@ -388,14 +361,14 @@ void fclaw_domain_integrate_rays (fclaw_domain_t * domain,
     {
         fclaw2d_domain_t *domain_2d = fclaw_domain_get_2d_domain(domain);
 
-        fclaw2d_domain_integrate_rays(domain_2d,intersect_wrap_2d,
+        fclaw2d_domain_integrate_rays(domain_2d,fclaw2d_intersect_wrap,
                                       rays,integrals,&wrap_user);
     }
     else if(domain->refine_dim == 3)
     {
         fclaw3d_domain_t *domain_3d = fclaw_domain_get_3d_domain(domain);
 
-        fclaw3d_domain_integrate_rays(domain_3d,intersect_wrap_3d,
+        fclaw3d_domain_integrate_rays(domain_3d,fclaw3d_intersect_wrap,
                                       rays,integrals,&wrap_user);
     }
     else

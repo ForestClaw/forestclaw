@@ -102,6 +102,12 @@ fclaw3d_match_callback_wrap(fclaw3d_domain_t * old_domain,
                             int old_patchno, int new_patchno,
                             void *user);
 
+int 
+fclaw3d_intersect_wrap (fclaw3d_domain_t * domain,
+                        fclaw3d_patch_t * patch,
+                        int blockno, int patchno,
+                        void *ray, double *integral,
+                        void *user);
 
 #ifdef __cplusplus
 #if 0

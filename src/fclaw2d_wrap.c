@@ -252,3 +252,20 @@ fclaw2d_match_callback_wrap(fclaw2d_domain_t * old_domain_2d,
               wrap->user);
 }
 
+int 
+fclaw2d_intersect_wrap (fclaw2d_domain_t * domain,
+                        fclaw2d_patch_t * patch,
+                        int blockno, int patchno,
+                        void *ray, double *integral,
+                        void *user)
+{
+    fclaw_integrate_ray_wrap_user_t* wrap = 
+        (fclaw_integrate_ray_wrap_user_t*) user;
+
+    fclaw_domain_t* domain_2d = get_domain(domain);
+    fclaw_patch_t* patch_2d = get_patch(patch);
+
+    return wrap->intersect(domain_2d, patch_2d, blockno, patchno, ray, integral,
+                           wrap->user);
+}
+
