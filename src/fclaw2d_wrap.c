@@ -300,6 +300,7 @@ fclaw_domain_t* domain_wrap_meta(fclaw2d_domain_t* domain_2d)
     domain->mpicomm = domain_2d->mpicomm;
     domain->mpisize = domain_2d->mpisize;
     domain->mpirank = domain_2d->mpirank;
+    domain->attributes = domain_2d->attributes;
     domain->wrapped_domain = domain_2d;
     domain_2d->user = domain;
 
