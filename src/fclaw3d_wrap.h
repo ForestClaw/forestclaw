@@ -109,6 +109,12 @@ fclaw3d_intersect_wrap (fclaw3d_domain_t * domain,
                         void *ray, double *integral,
                         void *user);
 
+int
+fclaw3d_interpolate_point_wrap (fclaw3d_domain_t * domain,
+                                fclaw3d_patch_t * patch,
+                                int blockno, int patchno,
+                                void *point, void *user);
+
 #ifdef __cplusplus
 #if 0
 {

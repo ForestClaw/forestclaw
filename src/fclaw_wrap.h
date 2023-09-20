@@ -67,6 +67,12 @@ typedef struct fclaw_integrate_ray_wrap_user
     void *user;
 } fclaw_integrate_ray_wrap_user_t;
 
+typedef struct fclaw_interpolate_pointer_wrap_user
+{
+    fclaw_interpolate_point_t interpolate;
+    void *user;
+} fclaw_interpolate_point_user_wrap_t;
+
 #ifdef __cplusplus
 #if 0
 {

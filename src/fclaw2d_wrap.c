@@ -269,3 +269,11 @@ fclaw2d_intersect_wrap (fclaw2d_domain_t * domain,
                            wrap->user);
 }
 
+int
+fclaw2d_interpolate_point_wrap (fclaw2d_domain_t * domain,
+                                fclaw2d_patch_t * patch,
+                                int blockno, int patchno,
+                                void *point, void *user)
+{
+    fclaw_abortf("NOT IMPLEMENTED\n");
+}

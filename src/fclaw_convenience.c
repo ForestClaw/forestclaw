@@ -377,38 +377,12 @@ void fclaw_domain_integrate_rays (fclaw_domain_t * domain,
     }
 }
 
-typedef struct overlap_wrap_user
-{
-    fclaw_interpolate_point_t interpolate;
-    void *user;
-} overlap_wrap_user_t;
-
-static int
-overlap_wrap_2d (fclaw2d_domain_t * domain,
-                 fclaw2d_patch_t * patch,
-                 int blockno, int patchno,
-                 void *point, void *user)
-{
-    // TODO
-    return 0;
-}
-
-static int
-overlap_wrap_3d (fclaw3d_domain_t * domain,
-                 fclaw3d_patch_t * patch,
-                 int blockno, int patchno,
-                 void *point, void *user)
-{
-    // TODO
-    return 0;
-}
-
 void fclaw_overlap_exchange (fclaw_domain_t * domain,
                              sc_array_t * query_points,
                              fclaw_interpolate_point_t interpolate,
                              void *user)
 {
-    overlap_wrap_user_t wrap_user;
+    fclaw_interpolate_point_user_wrap_t wrap_user;
     wrap_user.interpolate = interpolate;
     wrap_user.user = user;
 
@@ -416,13 +390,13 @@ void fclaw_overlap_exchange (fclaw_domain_t * domain,
     {
         fclaw2d_domain_t *domain_2d = fclaw_domain_get_2d_domain(domain);
 
-        fclaw2d_overlap_exchange(domain_2d,query_points,overlap_wrap_2d,user);
+        fclaw2d_overlap_exchange(domain_2d,query_points,fclaw2d_interpolate_point_wrap,&wrap_user);
     }
     else if(domain->refine_dim == 3)
     {
         fclaw3d_domain_t *domain_3d = fclaw_domain_get_3d_domain(domain);
 
-        fclaw3d_overlap_exchange(domain_3d,query_points,overlap_wrap_3d,user);
+        fclaw3d_overlap_exchange(domain_3d,query_points,fclaw3d_interpolate_point_wrap,&wrap_user);
     }
     else
     {
