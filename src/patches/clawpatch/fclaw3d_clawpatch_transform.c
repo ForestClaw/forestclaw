@@ -138,7 +138,7 @@ FCLAW3D_CLAWPATCH_TRANSFORM_EDGE (const int *i1, const int *j1, const int *k1,
     {
         fclaw_patch_3d_transform_edge (tdata->this_patch,
                                        tdata->neighbor_patch, 
-                                       tdata->block_iedge,
+                                       tdata->iedge,
                                        tdata->is_block_edge,
                                        mx, my, mz,
                                        tdata->based, i2, j2, k2);
@@ -269,7 +269,7 @@ FCLAW3D_CLAWPATCH_TRANSFORM_EDGE_HALF (const int *i1, const int *j1, const int* 
     {
         fclaw_patch_3d_transform_edge2 (tdata->this_patch,
                                         tdata->neighbor_patch, 
-                                        tdata->block_iedge,
+                                        tdata->iedge,
                                         tdata->is_block_edge,
                                         mx, my, mz,
                                         tdata->based, i2, j2, k2);
