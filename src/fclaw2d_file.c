@@ -119,6 +119,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define FCLAW2D_FILE_MAX_FIELD_ENTRY_SIZE_V1 9999999999999 /**< maximal data size per field entry*/
 #define FCLAW2D_FILE_MAX_GLOBAL_QUAD_V1 9999999999999999 /**< maximal number of global quadrants */
 
+#define FCLAW2D_FILE_HEADER_STRING_V1 "p4est data file v1"
+
 #ifndef P4_TO_P8
 #define FCLAW2D_FILE_STRING_V1 "fclaw2d_file_v1" /**< fclaw2d_file_v1 string */
 #else
@@ -622,8 +624,8 @@ fclaw2d_file_open_create_v1 (p4est_t * p4est, const char *filename,
         snprintf (metadata,
                   FCLAW2D_FILE_METADATA_BYTES_V1 + FCLAW2D_FILE_BYTE_DIV_V1 +
                   1, "%.7s\n%-23s\n%-47s\n%.16lld\n%-14s\n",
-                  FCLAW2D_FILE_MAGIC_NUMBER_V1, p4est_version (), user_string,
-                  (long long) p4est->global_num_quadrants, "");
+                  FCLAW2D_FILE_MAGIC_NUMBER_V1, FCLAW2D_FILE_HEADER_STRING_V1,
+                  user_string, (long long) p4est->global_num_quadrants, "");
         mpiret =
             sc_io_write_at (file_context->file, 0, metadata,
                             FCLAW2D_FILE_METADATA_BYTES_V1 +
