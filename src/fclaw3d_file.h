@@ -98,13 +98,17 @@ typedef struct fclaw3d_file_context fclaw3d_file_context_t;
  * Without MPI I/O the function may abort on file system dependent
  * errors.
  *
- * \param [in] filename    Path to parallel file that is to be created.
- * \param [in] user_string A user string that is written to the file header.
- *                         Only \ref FCLAW3D_FILE_USER_STRING_BYTES
- *                         bytes without NUL-termination are
- *                         written to the file. If the user gives less
- *                         bytes the user_string in the file header is padded
- *                         by spaces.
+ * \param [in] filename    Path to parallel file base name that is to be created.
+ *                         This means that the user shall not pass the file
+ *                         extension since the file extension is specified by
+ *                         fclaw3d_file to '.f3d'.
+ * \param [in] user_string A user string that is written to the file header
+ *                         haveing FCLAW3D_FILE_USER_STRING_BYTES bytes including
+ *                         the NUL-termination. Only \ref
+ *                         FCLAW3D_FILE_USER_STRING_BYTES - 1 bytes, i.e. without
+ *                         NUL-termination are written to the file. If the user
+ *                         gives less bytes the user_string in the file header
+ *                         is padded by spaces.
  * \param [in]   domain    The underlying p8est is used for the metadata of the
  *                         the created file and the \b domain is written to the
  *                         file.
@@ -134,12 +138,13 @@ fclaw3d_file_context_t *fclaw3d_file_open_write (const char *filename,
  * \param [in, out] fc          Context previously created by \ref
  *                              fclaw3d_file_open_write.  It keeps track
  *                              of the data sets written one after another.
- * \param [in]      user_string A user string that is written to the file.
- *                              Only \ref FCLAW3D_FILE_USER_STRING_BYTES
- *                              bytes without NUL-termination are
- *                              written to the file. If the user gives less
- *                              bytes the user_string in the file header is padded
- *                              by spaces.
+ * \param [in]      user_string A user string that is written to the section header
+ *                              haveing FCLAW3D_FILE_USER_STRING_BYTES bytes
+ *                              including the NUL-termination. Only \ref
+ *                              FCLAW3D_FILE_USER_STRING_BYTES - 1 bytes, i.e.
+ *                              without NUL-termination are written to the file.
+ *                              If the user gives less bytes the user_string in
+ *                              the section header is padded by spaces.
  * \param [in]      block_size  The size of the block in bytes. May be equal to
  *                              0. In this case the section header and the padding
  *                              is still written. This function returns the passed
@@ -181,12 +186,13 @@ fclaw3d_file_context_t *fclaw3d_file_write_block (fclaw3d_file_context_t *
  * \param [in, out] fc          Context previously created by \ref
  *                              fclaw3d_file_open_write.  It keeps track
  *                              of the data sets written one after another.
- * \param [in]      user_string A user string that is written to the file.
- *                              Only \ref FCLAW3D_FILE_USER_STRING_BYTES
- *                              bytes without NUL-termination are
- *                              written to the file. If the user gives less
- *                              bytes the user_string in the file header is padded
- *                              by spaces.
+ * \param [in]      user_string A user string that is written to the section header
+ *                              haveing FCLAW3D_FILE_USER_STRING_BYTES bytes
+ *                              including the NUL-termination. Only \ref
+ *                              FCLAW3D_FILE_USER_STRING_BYTES - 1 bytes, i.e.
+ *                              without NUL-termination are written to the file.
+ *                              If the user gives less bytes the user_string in
+ *                              the section header is padded by spaces.
  * \param [in]      patch_size  The number of bytes per patch. This number
  *                              must coincide with \b patch_data->elem_size.
  * \param [in]      patch_data  An array of the length number of local patches
@@ -238,7 +244,10 @@ fclaw3d_file_context_t *fclaw3d_file_write_array (fclaw3d_file_context_t *
  * \param [in]  mpicomm       MPI communicator that is used to read the file and
  *                            is used for potential other reading operations of
  *                            MPI communicator dependent objects.
- * \param [in]  filename      The path to the file that is opened.
+ * \param [in]  filename      The path to the base name file that is opened.
+ *                            This means that the user shall not pass the file
+ *                            extension since the extension ('f3d') is added by
+ *                            fclaw3d_file.
  * \param [out] user_string   At least \ref FCLAW3D_FILE_USER_STRING_BYTES
  *                            bytes. The user string is written
  *                            to the passed array including padding spaces

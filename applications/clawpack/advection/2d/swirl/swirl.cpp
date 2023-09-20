@@ -83,7 +83,7 @@ void run_program(fclaw2d_global_t* glob)
      * the workflow must be extended by providing buffers with the required
      * data and the functions may be called at a more suitable place.
      */
-    fc = fclaw2d_file_open_write ("swirl_io_test.p4d", "ForestClaw data file",
+    fc = fclaw2d_file_open_write ("swirl_io_test", "ForestClaw data file",
                                   glob->domain, &errcode);
 
     retval = fclaw2d_file_close (fc, &errcode);

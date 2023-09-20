@@ -37,6 +37,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <p8est_wrap.h>
 #endif
 
+#ifndef P4_TO_P8
+#define FCLAW2D_FILE_EXT "f2d" /**< file extension of fclaw2d data files */
+#else
+#define FCLAW3D_FILE_EXT "f3d" /**< file extension of fclaw3d data files */
+#endif
+
 /* For legacy and compatibility reasons we provide here the first version
  * of the file format that was originally implemented in p4est in p4est_io.c.
  * The origin of the these function is also the reason why we still use
@@ -2990,6 +2996,8 @@ fclaw2d_file_open_write (const char *filename,
     fclaw2d_file_context_t *fclaw_fc;
     sc_array_t parameters;
     uint64_t parameters_buffer[2];
+    int  buf_size;
+    char *buf;
 
     /* get p4est_wrap_t from domain */
     wrap = (p4est_wrap_t *) domain->pp;
@@ -2997,8 +3005,13 @@ fclaw2d_file_open_write (const char *filename,
     FCLAW_ASSERT (p4est_is_valid (p4est));
 
     /* create the file */
-    fc = fclaw2d_file_open_create_v1 (p4est, filename, user_string,
+    buf_size = strlen (filename) + strlen ("." FCLAW2D_FILE_EXT) + 1;
+    buf = FCLAW_ALLOC (char, buf_size);
+    sc_strcopy (buf, (size_t) buf_size, filename);
+    strcat (buf, "." FCLAW2D_FILE_EXT);
+    fc = fclaw2d_file_open_create_v1 (p4est, buf, user_string,
                                       &errcode_internal);
+    FCLAW_FREE (buf);
     fclaw2d_file_translate_error_code_v1 (errcode_internal, errcode);
     if (*errcode != FCLAW2D_FILE_ERR_SUCCESS)
     {

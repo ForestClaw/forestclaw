@@ -98,7 +98,10 @@ typedef struct fclaw2d_file_context fclaw2d_file_context_t;
  * Without MPI I/O the function may abort on file system dependent
  * errors.
  *
- * \param [in] filename    Path to parallel file that is to be created.
+ * \param [in] filename    Path to parallel file base name that is to be created.
+ *                         This means that the user shall not pass the file
+ *                         extension since the file extension is specified by
+ *                         fclaw2d_file to '.f2d'.
  * \param [in] user_string A user string that is written to the file header
  *                         haveing FCLAW2D_FILE_USER_STRING_BYTES bytes including
  *                         the NUL-termination. Only \ref
@@ -241,7 +244,10 @@ fclaw2d_file_context_t *fclaw2d_file_write_array (fclaw2d_file_context_t *
  * \param [in]  mpicomm       MPI communicator that is used to read the file and
  *                            is used for potential other reading operations of
  *                            MPI communicator dependent objects.
- * \param [in]  filename      The path to the file that is opened.
+ * \param [in]  filename      The path to the base name file that is opened.
+ *                            This means that the user shall not pass the file
+ *                            extension since the extension ('f2d') is added by
+ *                            fclaw2d_file.
  * \param [out] user_string   At least \ref FCLAW2D_FILE_USER_STRING_BYTES
  *                            bytes. The user string is written
  *                            to the passed array including padding spaces
