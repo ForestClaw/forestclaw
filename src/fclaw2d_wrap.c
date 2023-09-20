@@ -289,11 +289,72 @@ fclaw2d_intersect_wrap (fclaw2d_domain_t * domain_2d,
     return retval;
 }
 
+static
+fclaw_domain_t* domain_wrap_meta(fclaw2d_domain_t* domain_2d)
+{
+    /* Only the mpi-information
+       (mpicomm, mpisize and mpirank) should be copied */
+    fclaw_domain_t* domain = FCLAW_ALLOC_ZERO(fclaw_domain_t, 1);
+
+    domain->refine_dim = FCLAW2D_SPACEDIM;
+    domain->mpicomm = domain_2d->mpicomm;
+    domain->mpisize = domain_2d->mpisize;
+    domain->mpirank = domain_2d->mpirank;
+    domain->wrapped_domain = domain_2d;
+    domain_2d->user = domain;
+
+    return domain;
+}
+
 int
-fclaw2d_interpolate_point_wrap (fclaw2d_domain_t * domain,
-                                fclaw2d_patch_t * patch,
+fclaw2d_interpolate_point_wrap (fclaw2d_domain_t * domain_2d,
+                                fclaw2d_patch_t * patch_2d,
                                 int blockno, int patchno,
                                 void *point, void *user)
 {
-    fclaw_abortf("NOT IMPLEMENTED\n");
+    fclaw_interpolate_point_user_wrap_t* wrap = 
+        (fclaw_interpolate_point_user_wrap_t*) user;
+
+    fclaw_domain_t* domain;
+
+    int domain_is_meta = fclaw2d_domain_is_meta(domain_2d);
+    if(domain_is_meta)
+    {
+        domain = domain_wrap_meta(domain_2d);
+    }
+    else
+    {
+        domain = get_domain(domain_2d);
+    }
+
+    fclaw_patch_t* patch;
+
+    /* if it's a leaf the user data will be set to the dim_ind patch */
+    int artificial_patch = (patch_2d->user == NULL);
+    if(artificial_patch)
+    {
+        patch = FCLAW_ALLOC_ZERO(fclaw_patch_t, 1);
+        copy_patch(patch, patch_2d);
+    }
+    else
+    {
+        patch = get_patch(patch_2d);
+    }
+
+    int retval = wrap->interpolate(domain, patch, blockno, patchno, point,
+                                   wrap->user);
+
+    if(artificial_patch)
+    {
+        FCLAW_FREE(patch);
+        patch_2d->user = NULL;
+    }
+
+    if(domain_is_meta)
+    {
+        FCLAW_FREE(domain);
+        domain_2d->user = NULL;
+    }
+
+    return retval;
 }
