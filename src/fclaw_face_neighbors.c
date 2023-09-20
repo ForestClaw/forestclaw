@@ -30,8 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_face_neighbors.h>
 
 #include <fclaw_global.h>
-#include <fclaw2d_defs.h>
-#include <fclaw3d_defs.h>
+#include <fclaw_defs.h>
 #include <fclaw_domain.h>
 
 #include <fclaw_block.h>
@@ -467,8 +466,8 @@ void fclaw_face_neighbor_ghost(fclaw_global_t* glob,
 	const fclaw_options_t *gparms = fclaw_get_options(glob);
 	int refratio = gparms->refratio;
 
-	int rproc[2];
-	int rpatchno[2];
+	int rproc[4];
+	int rpatchno[4];
 	int rblockno;
 	int rfaceno;
 	int i, iface, igrid;
@@ -510,7 +509,7 @@ void fclaw_face_neighbor_ghost(fclaw_global_t* glob,
 		                                  i,
 		                                  &transform_data);
 
-		for (iface = 0; iface < FCLAW2D_NUMFACES; iface++)
+		for (iface = 0; iface < FCLAW_NUMFACES(domain->refine_dim); iface++)
 		{
 			int idir = iface/2;
 
@@ -530,7 +529,7 @@ void fclaw_face_neighbor_ghost(fclaw_global_t* glob,
 				/* We have a neighbor ghost patch that came from a
 				   different proc */
 
-				int intersects_block[FCLAW2D_NUMFACES];
+				int intersects_block[FCLAW3D_NUMFACES];
 				fclaw_block_get_block_boundary(glob, this_ghost_patch,
 										       intersects_block);
 				int is_block_face = intersects_block[iface];
@@ -556,7 +555,7 @@ void fclaw_face_neighbor_ghost(fclaw_global_t* glob,
 				else if (neighbor_type == FCLAW_PATCH_HALFSIZE)
 				{
 					/* Average from fine grid neighbor */
-					for (igrid = 0; igrid < FCLAW2D_NUMFACENEIGHBORS; igrid++)
+					for (igrid = 0; igrid < FCLAW_NUMFACENEIGHBORS(domain->refine_dim); igrid++)
 					{
 						if (rpatchno[igrid] != -1)
 						{
