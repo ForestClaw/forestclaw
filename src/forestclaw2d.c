@@ -1090,7 +1090,8 @@ fclaw2d_patch_corner_neighbors (fclaw2d_domain_t * domain,
             int v = mesh->quad_to_face[P4EST_FACES*local_num+face];
 
             /* In the hanging edge case, the face neighboring quadrant we are trying
-               to traverse will be a sibling, so the quadrant will be local. */
+               to traverse will need to be local. If there is ever a partitioning
+               where this isn't the case, then the workaround can't be performed. */
             if(f_qid >= 0 && f_qid < mesh->local_num_quadrants && v >= 0 && v <= 23)
             {
                 p4est_locidx_t qte = mesh->quad_to_edge[P8EST_EDGES * f_qid + edge];
