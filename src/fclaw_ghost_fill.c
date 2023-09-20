@@ -794,10 +794,7 @@ void fclaw_ghost_update_async(fclaw_global_t* glob,
         Note : There is no special timer for this call, but checks
         show that ghostfill-(step1+step2+step3+comm) << 1
     ------------------------------------------------------------- */
-    if(glob->domain->refine_dim == 2)
-    {
-        fclaw_face_neighbor_ghost(glob,minlevel,maxlevel,time_interp);
-    }
+    fclaw_face_neighbor_ghost(glob,minlevel,maxlevel,time_interp);
 
     /* -------------------------------------------------------------
         Repeat above, but now with parallel ghost cells.
