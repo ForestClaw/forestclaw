@@ -68,12 +68,12 @@ struct fclaw_patch
     /** @{ @brief front/back coordinate */
     double ylower, yupper;
     /** @} */
-    /** @{ @brief bottom/top coordinate. For 2D refinement, these are always set to 0,1 respectively? TODO */
+    /** @{ @brief bottom/top coordinate. For 2D refinement, these are always set to 0,1 respectively. */
     double zlower, zupper;
     /** @} */
     int level;                  /**< 0 is root, increases if refined */
 
-    void* wrapped_patch;        /**< opaque pointer to wrapped patch */
+    void* llp;                  /**< opaque pointer to low level fclaw2d_patch_t or fclaw3d_patch_t */
     void *user;                 /**< User Pointer */
 };
 
@@ -156,7 +156,7 @@ struct fclaw_domain
 
     sc_keyvalue_t *attributes;  /**< Reserved to store domain attributes */
 
-    void *wrapped_domain;       /**< opaque pointer to wrapped domain */
+    void *lld;       /**< opaque pointer to low level domain data */
     void *user; /**< user data pointer */
 };
 

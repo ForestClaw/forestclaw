@@ -39,22 +39,22 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 fclaw2d_patch_t* fclaw_patch_get_2d_patch(const fclaw_patch_t* patch)
 {
-    FCLAW_ASSERT(patch->wrapped_patch != NULL);
+    FCLAW_ASSERT(patch->llp != NULL);
     FCLAW_ASSERT(patch->refine_dim == FCLAW2D_SPACEDIM);
     // cast away const since this won't be modifying the wrapped patch
-    return (fclaw2d_patch_t*) patch->wrapped_patch;
+    return (fclaw2d_patch_t*) patch->llp;
 }
 
 fclaw2d_domain_wrap_t* fclaw_domain_get_2d_domain_wrap(fclaw_domain_t* domain)
 {
-    FCLAW_ASSERT(domain->wrapped_domain != NULL);
+    FCLAW_ASSERT(domain->lld != NULL);
     FCLAW_ASSERT(domain->refine_dim == FCLAW2D_SPACEDIM);
-    return (fclaw2d_domain_wrap_t*) domain->wrapped_domain;
+    return (fclaw2d_domain_wrap_t*) domain->lld;
 }
 
 fclaw2d_domain_t* fclaw_domain_get_2d_domain(const fclaw_domain_t* domain)
 {
-    FCLAW_ASSERT(domain->wrapped_domain != NULL);
+    FCLAW_ASSERT(domain->lld != NULL);
     FCLAW_ASSERT(domain->refine_dim == FCLAW2D_SPACEDIM);
     // cast away const since this won't be modifying the wrapped domain
     fclaw2d_domain_wrap_t* wrap = fclaw_domain_get_2d_domain_wrap((fclaw_domain_t*) domain);
@@ -79,7 +79,7 @@ void copy_patch(fclaw_patch_t* patch, fclaw2d_patch_t* patch_2d)
 
 
     patch->level = patch_2d->level;
-    patch->wrapped_patch = patch_2d;
+    patch->llp = patch_2d;
     patch_2d->user = patch;
 }
 
@@ -168,7 +168,7 @@ fclaw_domain_t* fclaw_domain_wrap_2d(fclaw2d_domain_t* domain_2d)
 
     fclaw2d_domain_wrap_t* wrap = FCLAW_ALLOC_ZERO(fclaw2d_domain_wrap_t, 1);
     wrap->domain = domain_2d;
-    domain->wrapped_domain = wrap;
+    domain->lld = wrap;
 
     domain_2d->user = domain;
 
@@ -303,7 +303,7 @@ fclaw_domain_t* domain_wrap_meta(fclaw2d_domain_t* domain_2d)
     domain->mpisize = domain_2d->mpisize;
     domain->mpirank = domain_2d->mpirank;
     domain->attributes = domain_2d->attributes;
-    domain->wrapped_domain = domain_wrap;
+    domain->lld = domain_wrap;
     domain_2d->user = domain;
 
     return domain;
