@@ -305,7 +305,8 @@ void get_corner_neighbor(fclaw_global_t *glob,
         //TODO edge transforms
         fclaw_patch_transform_blockface_intra(glob, tdata_fine->transform);
 
-        tdata_fine->block_iedge = tdata_fine->block_iedge ^ 3;
+        //TODO update this for rotation
+        tdata_fine->block_iedge = tdata->block_iedge ^ 3;
     }
     else if (has_corner_neighbor && tdata->is_block_face)
     {
