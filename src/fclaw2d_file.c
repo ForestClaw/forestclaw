@@ -2990,7 +2990,7 @@ fclaw2d_file_translate_error_code_v1 (int errcode_v1, int *errcode)
 
 fclaw2d_file_context_t *
 fclaw2d_file_open_write (const char *filename,
-                         const char *user_string,
+                         const char *user_string, int write_partition,
                          fclaw2d_domain_t * domain, int *errcode)
 {
     FCLAW_ASSERT (filename != NULL);
@@ -3111,9 +3111,8 @@ fclaw2d_file_write_array (fclaw2d_file_context_t *
 }
 
 fclaw2d_file_context_t *
-fclaw2d_file_open_read (sc_MPI_Comm mpicomm,
-                        const char *filename,
-                        char *user_string,
+fclaw2d_file_open_read (const char *filename, char *user_string,
+                        sc_MPI_Comm mpicomm, int read_partition,
                         fclaw2d_domain_t ** domain, int *errcode)
 {
     FCLAW_ASSERT (filename != NULL);

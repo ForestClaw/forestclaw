@@ -86,7 +86,7 @@ void run_program(fclaw2d_global_t* glob)
     /** WARNING: This is work in progress and currently not a valid example
      * workflow.
     */
-    fc = fclaw2d_file_open_write ("swirl_io_test", "ForestClaw data file",
+    fc = fclaw2d_file_open_write ("swirl_io_test", "ForestClaw data file", 0,
                                   glob->domain, &errcode);
 
     fclaw2d_file_close (fc, &errcode);

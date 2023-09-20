@@ -103,12 +103,16 @@ typedef struct fclaw2d_file_context fclaw2d_file_context_t;
  *                         extension since the file extension is specified by
  *                         fclaw2d_file to '.f2d'.
  * \param [in] user_string A user string that is written to the file header
- *                         haveing FCLAW2D_FILE_USER_STRING_BYTES bytes including
+ *                         having FCLAW2D_FILE_USER_STRING_BYTES bytes including
  *                         the NUL-termination. Only \ref
  *                         FCLAW2D_FILE_USER_STRING_BYTES - 1 bytes, i.e. without
  *                         NUL-termination are written to the file. If the user
  *                         gives less bytes the user_string in the file header
  *                         is padded by spaces.
+ * \param [in]  write_partition A Boolean to decide whether the partition is
+ *                         written to disk. The filename of the partition file
+ *                         is derivated from the given filename. Currently,
+ *                         this flag does not have any effect.
  * \param [in]   domain    The underlying p4est is used for the metadata of the
  *                         the created file and the \b domain is written to the
  *                         file.
@@ -119,6 +123,7 @@ typedef struct fclaw2d_file_context fclaw2d_file_context_t;
  */
 fclaw2d_file_context_t *fclaw2d_file_open_write (const char *filename,
                                                  const char *user_string,
+                                                 int write_partition,
                                                  fclaw2d_domain_t * domain,
                                                  int *errcode);
 
@@ -139,7 +144,7 @@ fclaw2d_file_context_t *fclaw2d_file_open_write (const char *filename,
  *                              fclaw2d_file_open_write.  It keeps track
  *                              of the data sets written one after another.
  * \param [in] user_string      A user string that is written to the section header
- *                              haveing FCLAW2D_FILE_USER_STRING_BYTES bytes
+ *                              having FCLAW2D_FILE_USER_STRING_BYTES bytes
  *                              including the NUL-termination. Only \ref
  *                              FCLAW2D_FILE_USER_STRING_BYTES - 1 bytes, i.e.
  *                              without NUL-termination are written to the file.
@@ -187,7 +192,7 @@ fclaw2d_file_context_t *fclaw2d_file_write_block (fclaw2d_file_context_t *
  *                              fclaw2d_file_open_write.  It keeps track
  *                              of the data sets written one after another.
  * \param [in] user_string      A user string that is written to the section header
- *                              haveing FCLAW2D_FILE_USER_STRING_BYTES bytes
+ *                              having FCLAW2D_FILE_USER_STRING_BYTES bytes
  *                              including the NUL-termination. Only \ref
  *                              FCLAW2D_FILE_USER_STRING_BYTES - 1 bytes, i.e.
  *                              without NUL-termination are written to the file.
@@ -241,9 +246,6 @@ fclaw2d_file_context_t *fclaw2d_file_write_array (fclaw2d_file_context_t *
  * Without MPI I/O the function may abort on file system dependent
  * errors.
  *
- * \param [in]  mpicomm       MPI communicator that is used to read the file and
- *                            is used for potential other reading operations of
- *                            MPI communicator dependent objects.
  * \param [in]  filename      The path to the base name file that is opened.
  *                            This means that the user shall not pass the file
  *                            extension since the extension ('f2d') is added by
@@ -252,6 +254,19 @@ fclaw2d_file_context_t *fclaw2d_file_write_array (fclaw2d_file_context_t *
  *                            bytes. The user string is written
  *                            to the passed array including padding spaces
  *                            and a trailing NUL-termination.
+ * \param [in]  mpicomm       MPI communicator that is used to read the file and
+ *                            is used for potential other reading operations of
+ *                            MPI communicator dependent objects.
+ * \param [in]  read_partition A Boolean to decide if the partition is read
+ *                            from file. If the partition is read, it is used
+ *                            for the parallel I/O operations and stored in the
+ *                            returned \b domain. If the MPI size and the
+ *                            partition size do not coincide a partition for the
+ *                            current MPI size is computed. For \b read_partition
+ *                            false a uniform partition with respect to the
+ *                            quadrant count is computed and used.
+ *                            The function call results in an error if there
+ *                            is no partition to read.
  * \param [out] domain        Newly allocated domain that is read from the file.
  * \param [out] errcode       An errcode that can be interpreted by
  *                            \ref fclaw2d_file_error_string.
@@ -259,9 +274,10 @@ fclaw2d_file_context_t *fclaw2d_file_write_array (fclaw2d_file_context_t *
  *                            and eventually closing the file. NULL in
  *                            case of error.
  */
-fclaw2d_file_context_t *fclaw2d_file_open_read (sc_MPI_Comm mpicomm,
-                                                const char *filename,
+fclaw2d_file_context_t *fclaw2d_file_open_read (const char *filename,
                                                 char *user_string,
+                                                sc_MPI_Comm mpicomm,
+                                                int read_partition,
                                                 fclaw2d_domain_t ** domain,
                                                 int *errcode);
 
