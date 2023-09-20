@@ -114,13 +114,13 @@ void fclaw_domain_destroy (fclaw_domain_t * domain)
 {
     if(domain->refine_dim == 2)
     {
-        fclaw2d_domain_wrap_t* wrap = domain->wrapped_domain;
+        fclaw2d_domain_wrap_t* wrap = fclaw_domain_get_2d_domain_wrap(domain);
         fclaw2d_domain_destroy(wrap->domain);
         FCLAW_FREE(wrap);
     }
     else if(domain->refine_dim == 3)
     {
-        fclaw3d_domain_wrap_t* wrap = domain->wrapped_domain;
+        fclaw3d_domain_wrap_t* wrap = fclaw_domain_get_3d_domain_wrap(domain);
         fclaw3d_domain_destroy(wrap->domain);
         FCLAW_FREE(wrap);
     }
