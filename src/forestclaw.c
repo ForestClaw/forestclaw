@@ -1124,10 +1124,3 @@ int fclaw_domain_is_meta (fclaw_domain_t * domain)
         SC_ABORT_NOT_REACHED();
     }
 }
-
-void fclaw_domain_init_meta (fclaw_domain_t *domain, int mpirank)
-{
-    fclaw_abortf("NOT IMPLIMENTED\n");
-}
-
-

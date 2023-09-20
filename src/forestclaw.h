@@ -1150,17 +1150,6 @@ void fclaw_domain_indirect_destroy (fclaw_domain_t * domain);
  */
 int fclaw_domain_is_meta (fclaw_domain_t * domain);
 
-/** Initialize a meta domain.
- *
- * Initializes \a domain in an artificial manner, where the entry mpirank is
- * used to store arbitrary context information. The remaining entries are
- * initialized to -1 or NULL.
- * The resulting domain can be passed to an \ref fclaw_interpolate_point_t
- * in case the domain to interpolate on is not available locally (also see
- * \ref fclaw_overlap_exchange for an example).
- */
-void fclaw_domain_init_meta (fclaw_domain_t *domain, int mpirank);
-
 ///@}
 #ifdef __cplusplus
 #if 0
