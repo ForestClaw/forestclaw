@@ -23,12 +23,10 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "fclaw2d_rays.h"
+#include "fclaw_rays.h"
 #include "fclaw_global.h"
 #include "fclaw_options.h"
 #include "fclaw_diagnostics.h"
-
-#include "fclaw2d_convenience.h"
 
 #include <fclaw_pointer_map.h>
 
@@ -41,7 +39,7 @@ typedef struct fclaw2d_ray_acc
     int num_rays;
     //sc_array_t *rays;
     //sc_array_t *integrals;
-    fclaw2d_ray_t *rays;
+    fclaw_ray_t *rays;
 } fclaw2d_ray_acc_t;
 
 
@@ -51,10 +49,10 @@ typedef struct fclaw2d_ray_acc
 /* Do I need this level of indirection? */
 static
 void ray_allocate_and_define(fclaw_global_t* glob, 
-                             fclaw2d_ray_t **rays, 
+                             fclaw_ray_t **rays, 
                              int *num_rays)
 {
-    const fclaw2d_ray_vtable_t* ray_vt = fclaw2d_ray_vt(glob);
+    const fclaw_ray_vtable_t* ray_vt = fclaw_ray_vt(glob);
 
     FCLAW_ASSERT(ray_vt->allocate_and_define != NULL);
     ray_vt->allocate_and_define(glob, rays, num_rays);    
@@ -62,10 +60,10 @@ void ray_allocate_and_define(fclaw_global_t* glob,
 
 static
 void ray_deallocate(fclaw_global_t* glob, 
-                    fclaw2d_ray_t **rays, 
+                    fclaw_ray_t **rays, 
                     int *num_rays)
 {
-    const fclaw2d_ray_vtable_t* ray_vt = fclaw2d_ray_vt(glob);
+    const fclaw_ray_vtable_t* ray_vt = fclaw_ray_vt(glob);
 
     FCLAW_ASSERT(ray_vt->deallocate != NULL);
     ray_vt->deallocate(glob, rays, num_rays);    
@@ -94,10 +92,10 @@ void ray_initialize(fclaw_global_t* glob, void** acc)
         ray_allocate_and_define(glob, &ray_acc->rays, &num_rays);
 
         /* We initialize untrustworthy to 0 */
-        fclaw2d_ray_t *rays = ray_acc->rays;
+        fclaw_ray_t *rays = ray_acc->rays;
         for (i =0; i < num_rays; i++)
         {
-            fclaw2d_ray_t *ray = &rays[i];
+            fclaw_ray_t *ray = &rays[i];
             ray->untrustworthy = 0;
         }
     }
@@ -138,8 +136,8 @@ void ray_reset(fclaw_global_t *glob, void*acc)
 
     /* We reset untrustworthy to 0 */
     int i, num_rays;
-    fclaw2d_ray_t *ray;
-    fclaw2d_ray_t *rays = ray_acc->rays;
+    fclaw_ray_t *ray;
+    fclaw_ray_t *rays = ray_acc->rays;
     num_rays = ray_acc->num_rays;
     for (i =0; i < num_rays; i++)
     {
@@ -163,13 +161,13 @@ void ray_integrate(fclaw_global_t *glob, void *acc)
     /* Copy arrays stored in accumulator to an sc_array */
     int i, num_rays;
     double intval;
-    fclaw2d_ray_t *ray, *fclaw_ray;
-    sc_array_t  *sc_rays = sc_array_new (sizeof (fclaw2d_ray_t));
+    fclaw_ray_t *ray, *fclaw_ray;
+    sc_array_t  *sc_rays = sc_array_new (sizeof (fclaw_ray_t));
     num_rays = ray_acc->num_rays;
     for(i = 0; i < num_rays; i++)
     {
         /* Add one ray to sc_rays;  return newly pushed array */
-        fclaw_ray = (fclaw2d_ray_t *) sc_array_push (sc_rays);
+        fclaw_ray = (fclaw_ray_t *) sc_array_push (sc_rays);
 
         /* Set data for ray */
         fclaw_ray->num = ray_acc->rays[i].num;
@@ -179,20 +177,20 @@ void ray_integrate(fclaw_global_t *glob, void *acc)
 
     sc_array_t *integrals = sc_array_new_count (sizeof (double), num_rays);
 
-    const fclaw2d_ray_vtable_t* ray_vt = fclaw2d_ray_vt(glob);
+    const fclaw_ray_vtable_t* ray_vt = fclaw_ray_vt(glob);
 
     /* This does a compute and a gather. */
     fclaw_domain_integrate_rays(glob->domain, ray_vt->integrate, 
                                   sc_rays, integrals, glob);
 
     /* Copy integral value back to fclaw2d_ray_t */
-    fclaw2d_ray_t *rays = ray_acc->rays;
+    fclaw_ray_t *rays = ray_acc->rays;
     for(i = 0; i < num_rays; i++)
     {
         /* Return values from integrals */
         intval = *((double*) sc_array_index_int(integrals,i));
 
-        fclaw_ray = (fclaw2d_ray_t*)sc_array_index_int(sc_rays, i);
+        fclaw_ray = (fclaw_ray_t*)sc_array_index_int(sc_rays, i);
 
         /* Update rays stored in accumulator so we can report values later */
         ray = &rays[i];
@@ -219,9 +217,9 @@ void ray_gather(fclaw_global_t *glob, void* acc, int init_flag)
 
     /* we check if the rays yielded trustworthy results on all processes */
     int i, *local_untrustworthy, *global_untrustworthy;
-    fclaw2d_ray_t *ray;
+    fclaw_ray_t *ray;
     int num_rays = ray_acc->num_rays;
-    fclaw2d_ray_t *rays = ray_acc->rays;
+    fclaw_ray_t *rays = ray_acc->rays;
 
     local_untrustworthy = FCLAW_ALLOC (int, num_rays);
     for (i = 0; i < num_rays; i++)
@@ -274,9 +272,9 @@ void ray_finalize(fclaw_global_t *glob, void** acc)
 /* ---------------------------------- Virtual table  ---------------------------------- */
 
 static
-fclaw2d_ray_vtable_t* fclaw2d_ray_vt_new()
+fclaw_ray_vtable_t* fclaw2d_ray_vt_new()
 {
-    return (fclaw2d_ray_vtable_t*) FCLAW_ALLOC_ZERO (fclaw2d_ray_vtable_t, 1);
+    return (fclaw_ray_vtable_t*) FCLAW_ALLOC_ZERO (fclaw_ray_vtable_t, 1);
 }
 
 static
@@ -300,7 +298,7 @@ fclaw2d_ray_vtable_t* fclaw2d_ray_vt()
 }
 #endif
 
-void fclaw2d_ray_vtable_initialize(fclaw_global_t *glob)
+void fclaw_ray_vtable_initialize(fclaw_global_t *glob)
 {
     fclaw_diagnostics_vtable_t * diag_vt = fclaw_diagnostics_vt(glob);
     diag_vt->ray_init_diagnostics     = ray_initialize;    
@@ -309,7 +307,7 @@ void fclaw2d_ray_vtable_initialize(fclaw_global_t *glob)
     diag_vt->ray_reset_diagnostics    = ray_reset;
     diag_vt->ray_finalize_diagnostics = ray_finalize;
 
-    fclaw2d_ray_vtable_t* rays_vt = fclaw2d_ray_vt_new(); 
+    fclaw_ray_vtable_t* rays_vt = fclaw2d_ray_vt_new(); 
 
     FCLAW_ASSERT(fclaw_pointer_map_get(glob->vtables,"fclaw2d_rays") == NULL);
     fclaw_pointer_map_insert(glob->vtables, "fclaw2d_rays", rays_vt, fclaw2d_ray_vt_destroy);
@@ -321,9 +319,9 @@ void fclaw2d_ray_vtable_initialize(fclaw_global_t *glob)
 /* ---------------------------- Get Access Functions ---------------------------------- */
 
 
-fclaw2d_ray_vtable_t* fclaw2d_ray_vt(fclaw_global_t* glob)
+fclaw_ray_vtable_t* fclaw_ray_vt(fclaw_global_t* glob)
 {
-    fclaw2d_ray_vtable_t* ray_vt = (fclaw2d_ray_vtable_t*) 
+    fclaw_ray_vtable_t* ray_vt = (fclaw_ray_vtable_t*) 
                                 fclaw_pointer_map_get(glob->vtables, "fclaw2d_rays");
     FCLAW_ASSERT(ray_vt != NULL);
     FCLAW_ASSERT(ray_vt->is_set != 0);
@@ -331,13 +329,13 @@ fclaw2d_ray_vtable_t* fclaw2d_ray_vt(fclaw_global_t* glob)
 }
 
 
-fclaw2d_ray_t* fclaw2d_ray_allocate_rays(int num_rays)
+fclaw_ray_t* fclaw_ray_allocate_rays(int num_rays)
 {
-    fclaw2d_ray_t* rays = FCLAW_ALLOC(fclaw2d_ray_t,num_rays);
+    fclaw_ray_t* rays = FCLAW_ALLOC(fclaw_ray_t,num_rays);
     return rays;
 }
 
-int fclaw2d_ray_deallocate_rays(fclaw2d_ray_t **rays)
+int fclaw_ray_deallocate_rays(fclaw_ray_t **rays)
 {
     FCLAW_ASSERT(*rays != NULL);
     FCLAW_FREE(*rays);
@@ -347,7 +345,7 @@ int fclaw2d_ray_deallocate_rays(fclaw2d_ray_t **rays)
 
 
 /* Routines that operate on a single array */
-void fclaw2d_ray_set_ray(fclaw2d_ray_t *r, 
+void fclaw_ray_set_ray(fclaw_ray_t *r, 
                          int id, 
                          void* user_ray){
     /* User calls this to set ray data */
@@ -357,7 +355,7 @@ void fclaw2d_ray_set_ray(fclaw2d_ray_t *r,
 
 
 
-void* fclaw2d_ray_get_ray(fclaw2d_ray_t *r, 
+void* fclaw_ray_get_ray(fclaw_ray_t *r, 
                           int *id)
 {
     *id = r->num;

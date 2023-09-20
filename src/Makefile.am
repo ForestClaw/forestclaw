@@ -48,7 +48,7 @@ libforestclaw_installed_headers = \
 	src/fclaw2d_map_brick.h \
 	src/fclaw2d_map_query.h \
 	src/fclaw2d_map_query_defs.h \
-	src/fclaw2d_rays.h \
+	src/fclaw_rays.h \
 	src/fclaw2d_wrap.h \
 	src/fclaw2d_to_3d.h \
 	src/fclaw_update_single_step.h \
@@ -112,7 +112,7 @@ libforestclaw_compiled_sources = \
 	src/fclaw2d_map_brick.c \
 	src/fclaw2d_map_query.c \
 	src/fclaw2d_output_tikz.c \
-	src/fclaw2d_rays.c \
+	src/fclaw_rays.c \
 	src/fclaw2d_wrap.c \
 	src/fclaw_update_single_step.c \
 	\

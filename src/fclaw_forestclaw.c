@@ -30,7 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_vtable.h>
 #include <fclaw_diagnostics.h>
 #include <fclaw_gauges.h>
-#include <fclaw2d_rays.h>
+#include <fclaw_rays.h>
 
 #include <fclaw_elliptic_solver.h>
 
@@ -41,7 +41,7 @@ void fclaw_vtables_initialize(fclaw_global_t *glob)
     fclaw_diagnostics_vtable_initialize(glob);
     fclaw_elliptic_vtable_initialize(glob);
     fclaw_gauges_vtable_initialize(glob);
-    fclaw2d_ray_vtable_initialize(glob);
+    fclaw_ray_vtable_initialize(glob);
 }
 
 void fclaw_problem_setup(fclaw_global_t *glob)

@@ -24,7 +24,7 @@
 */
 
 #include "swirl_user.h"
-#include <fclaw2d_rays.h>
+#include <fclaw_rays.h>
 
 #include "../all/advection_user.h"
 
@@ -78,7 +78,7 @@ const int swirl_nlines = 3;
 /* Virtual function for setting rays */
 static void
 swirl_allocate_and_define_rays (fclaw_global_t * glob,
-                                fclaw2d_ray_t ** rays, int *num_rays)
+                                fclaw_ray_t ** rays, int *num_rays)
 {
     int i;
 
@@ -88,8 +88,8 @@ swirl_allocate_and_define_rays (fclaw_global_t * glob,
        generic ray type is left opaque. This is destroy in matching FREE,
        below. */
 
-    *rays = fclaw2d_ray_allocate_rays(*num_rays);
-    fclaw2d_ray_t *ray_vec = *rays;
+    *rays = fclaw_ray_allocate_rays(*num_rays);
+    fclaw_ray_t *ray_vec = *rays;
     for (i = 0; i < swirl_nlines; ++i)
     {
 #ifndef STAR_OF_RAYS
@@ -131,31 +131,31 @@ swirl_allocate_and_define_rays (fclaw_global_t * glob,
                      sr->r.line.parallel == sr->r.line.dominant);
 
         /* Assign ray to diagnostics item */
-        fclaw2d_ray_t *ray = &ray_vec[i];
-        fclaw2d_ray_set_ray (ray, i + 1, sr);
+        fclaw_ray_t *ray = &ray_vec[i];
+        fclaw_ray_set_ray (ray, i + 1, sr);
     }
 }
 
 static
 void swirl_deallocate_rays(fclaw_global_t *glob,
-                           fclaw2d_ray_t** rays,
+                           fclaw_ray_t** rays,
                            int* num_rays)
 {
     int i;
-    fclaw2d_ray_t *ray_vec = *rays;
+    fclaw_ray_t *ray_vec = *rays;
 
     for(i = 0; i < *num_rays; i++)
     {
         /* Retrieve rays set above and deallocate them */
         int id;
-        fclaw2d_ray_t *ray = &ray_vec[i];
-        swirl_ray_t *rs = (swirl_ray_t*) fclaw2d_ray_get_ray(ray, &id);
+        fclaw_ray_t *ray = &ray_vec[i];
+        swirl_ray_t *rs = (swirl_ray_t*) fclaw_ray_get_ray(ray, &id);
         FCLAW_ASSERT (rs != NULL);
         FCLAW_FREE (rs);
         rs = NULL;
     }
     /* Match FCLAW_ALLOC, above */
-    *num_rays = fclaw2d_ray_deallocate_rays(rays);
+    *num_rays = fclaw_ray_deallocate_rays(rays);
 }
 
 /** This function checks if a linear ray intersects a patch.
@@ -241,9 +241,9 @@ swirl_intersect_ray (fclaw_domain_t *domain, fclaw_patch_t *patch,
     double dt, rayni[2];
 
     /* assert that ray is a valid swirl_ray_t */
-    fclaw2d_ray_t *fclaw_ray = (fclaw2d_ray_t *) ray;
+    fclaw_ray_t *fclaw_ray = (fclaw_ray_t *) ray;
 
-    swirl_ray_t *swirl_ray = (swirl_ray_t*) fclaw2d_ray_get_ray(fclaw_ray,&id);
+    swirl_ray_t *swirl_ray = (swirl_ray_t*) fclaw_ray_get_ray(fclaw_ray,&id);
     FCLAW_ASSERT(swirl_ray != NULL);
     FCLAW_ASSERT(swirl_ray->rtype == SWIRL_RAY_LINE); /* Circles not there yet. */
     FCLAW_ASSERT (integral != NULL && *integral == 0.); /* documented precondition */
@@ -364,7 +364,7 @@ swirl_intersect_ray (fclaw_domain_t *domain, fclaw_patch_t *patch,
 void swirl_initialize_rays(fclaw_global_t* glob)
 {
     /* Set up rays */
-    fclaw2d_ray_vtable_t* rays_vt = fclaw2d_ray_vt(glob);
+    fclaw_ray_vtable_t* rays_vt = fclaw_ray_vt(glob);
 
     rays_vt->allocate_and_define = swirl_allocate_and_define_rays;
     rays_vt->deallocate = swirl_deallocate_rays;

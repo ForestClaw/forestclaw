@@ -688,7 +688,31 @@ fclaw_1to2 = {
     "<fclaw3dx_clawpatch_fort.h>"                  : "<fclaw3d_clawpatch_fort.h>",
 
     #===== ./src/patches/clawpatch/fclaw3dx_clawpatch46_fort.h =====
-    "<fclaw3dx_clawpatch46_fort.h>"                : "<fclaw3d_clawpatch46_fort.h>"
+    "<fclaw3dx_clawpatch46_fort.h>"                : "<fclaw3d_clawpatch46_fort.h>",
+
+    #===== ./src/fclaw2d_rays.h =====
+    "<fclaw2d_rays.h>"                             : "<fclaw_rays.h>",
+    "fclaw2d_ray_vtable"                           : "fclaw_ray_vtable",
+    "fclaw2d_ray_vtable_t"                         : "fclaw_ray_vtable_t",
+    "fclaw2d_ray"                                  : "fclaw_ray",
+    "fclaw2d_ray_t"                                : "fclaw_ray_t",
+    "fclaw2d_ray_allocate_and_define_t"            : "fclaw_ray_allocate_and_define_t",
+    "fclaw2d_ray_deallocate_t"                     : "fclaw_ray_deallocate_t",
+    "fclaw2d_ray_create_files_t"                   : "fclaw_ray_create_files_t",
+    "fclaw2d_ray_normalize_t"                      : "fclaw_ray_normalize_t",
+    "fclaw2d_ray_update_t"                         : "fclaw_ray_update_t",
+    "fclaw2d_ray_print_t"                          : "fclaw_ray_print_t",
+    "fclaw2d_ray_destroy_buffer_data_t"            : "fclaw_ray_destroy_buffer_data_t",
+    "fclaw2d_ray_vtable"                           : "fclaw_ray_vtable",
+    "fclaw2d_ray_vtable_t"                         : "fclaw_ray_vtable_t",
+    "fclaw2d_ray_allocate_and_define"              : "fclaw_ray_allocate_and_define",
+    "fclaw2d_ray_deallocate"                       : "fclaw_ray_deallocate",
+    "fclaw2d_ray_set_ray"                          : "fclaw_ray_set_ray",
+    "fclaw2d_ray_get_ray"                          : "fclaw_ray_get_ray",
+    "fclaw2d_ray_vt"                               : "fclaw_ray_vt",
+    "fclaw2d_ray_vtable_initialize"                : "fclaw_ray_vtable_initialize",
+    "fclaw2d_ray_allocate_rays"                    : "fclaw_ray_allocate_rays",
+    "fclaw2d_ray_deallocate_rays"                  : "fclaw_ray_deallocate_rays"
 
 }
 
