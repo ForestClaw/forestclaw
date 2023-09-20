@@ -253,8 +253,8 @@ fclaw2d_match_callback_wrap(fclaw2d_domain_t * old_domain_2d,
 }
 
 int 
-fclaw2d_intersect_wrap (fclaw2d_domain_t * domain,
-                        fclaw2d_patch_t * patch,
+fclaw2d_intersect_wrap (fclaw2d_domain_t * domain_2d,
+                        fclaw2d_patch_t * patch_2d,
                         int blockno, int patchno,
                         void *ray, double *integral,
                         void *user)
@@ -262,11 +262,31 @@ fclaw2d_intersect_wrap (fclaw2d_domain_t * domain,
     fclaw_integrate_ray_wrap_user_t* wrap = 
         (fclaw_integrate_ray_wrap_user_t*) user;
 
-    fclaw_domain_t* domain_2d = get_domain(domain);
-    fclaw_patch_t* patch_2d = get_patch(patch);
+    fclaw_domain_t* domain = get_domain(domain_2d);
+    fclaw_patch_t* patch;
 
-    return wrap->intersect(domain_2d, patch_2d, blockno, patchno, ray, integral,
-                           wrap->user);
+    /* if it's a leaf the user data will be set to the dim_ind patch */
+    int artificial_patch = (patch_2d->user == NULL);
+    if(artificial_patch)
+    {
+        patch = FCLAW_ALLOC_ZERO(fclaw_patch_t, 1);
+        copy_patch(patch, patch_2d);
+    }
+    else
+    {
+        patch = get_patch(patch_2d);
+    }
+
+    int retval = wrap->intersect(domain, patch, blockno, patchno, ray, integral,
+                                 wrap->user);
+    
+    if(artificial_patch)
+    {
+        FCLAW_FREE(patch);
+        patch_2d->user = NULL;
+    }
+
+    return retval;
 }
 
 int
