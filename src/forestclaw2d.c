@@ -1861,7 +1861,7 @@ indirect_match (int *pi,
     *rproc = pi;
     *rblockno = pi + P4EST_HALF;
     *rpatchno = pi + P4EST_HALF + 1;
-    *rfaceno = pi + P4EST_CHILDREN + 1; /* P4EST_CHILDREN == 2 * P4EST_HALF */
+    *rfaceno = pi + P4EST_HALF + 1 + P4EST_HALF;
 }
 
 
@@ -1883,7 +1883,7 @@ fclaw2d_domain_indirect_begin (fclaw2d_domain_t * domain)
     p4est_ghost_t *ghost = p4est_wrap_get_ghost (wrap);
 
     num_exc = domain->num_exchange_patches;
-    face_info_size = 2 + P4EST_CHILDREN;        /* P4EST_CHILDREN == 2 * P4EST_HALF */
+    face_info_size = 2 + 2 * P4EST_HALF;
     data_size = P4EST_FACES * face_info_size * sizeof (int);
 
     /* allocate internal state for this operation */
@@ -2076,7 +2076,7 @@ fclaw2d_domain_indirect_end (fclaw2d_domain_t * domain,
     fclaw2d_domain_ghost_exchange_end (domain, ind->e);
 
     /* go through ghosts a second time, now working on received data */
-    face_info_size = 2 + P4EST_CHILDREN;        /* P4EST_CHILDREN == 2 * P4EST_HALF */
+    face_info_size = 2 + 2 * P4EST_HALF;
     for (ng = 0, p = 0; p < domain->mpisize; ++p)
     {
         for (; ng < (int) ghost->proc_offsets[p + 1]; ++ng)
@@ -2161,7 +2161,7 @@ fclaw2d_domain_indirect_neighbors (fclaw2d_domain_t * domain,
     FCLAW_ASSERT (0 <= faceno && faceno < P4EST_FACES);
 
     /* check the type of neighbor situation */
-    pi = (int *) ind->e->ghost_data[ghostno] + (2 + P4EST_CHILDREN) * faceno;
+    pi = (int *) ind->e->ghost_data[ghostno] + (2 + 2 * P4EST_HALF) * faceno;
     indirect_match (pi, &grproc, &grblockno, &grpatchno, &grfaceno);
     *rblockno = *grblockno;
     FCLAW_ASSERT (0 <= *rblockno && *rblockno < domain->num_blocks);
