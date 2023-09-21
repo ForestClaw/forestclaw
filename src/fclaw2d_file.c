@@ -40,7 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef P4_TO_P8
 #define FCLAW2D_FILE_EXT "f2d" /**< file extension of fclaw2d data files */
 #else
-#define FCLAW2D_FILE_EXT    FCLAW3D_FILE_EXT    
+#define FCLAW2D_FILE_EXT    FCLAW3D_FILE_EXT
 #define FCLAW3D_FILE_EXT "f3d" /**< file extension of fclaw3d data files */
 #endif
 
@@ -2910,7 +2910,7 @@ fclaw2d_file_context_t;
  *                             fclaw2d_file_error_v1
  * \param [in]  errcode        On output a fclaw2d_file errorcode; see \ref
  *                             fclaw2d_file_error.
- * \return                     0 in case of success and -1 otherwise         
+ * \return                     0 in case of success and -1 otherwise.
  */
 static int
 fclaw2d_file_translate_error_code_v1 (int errcode_v1, int *errcode)
