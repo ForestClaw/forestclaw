@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 fclaw_1to2 = {
 
     #===== ./src/forestclaw2d.h =====
@@ -716,12 +718,16 @@ fclaw_1to2 = {
 
 }
 
-import os
 import glob
-import pygments
-from pygments import highlight
-from pygments.lexers import CppLexer
-from pygments.formatters import NullFormatter
+import argparse
+try:
+    import pygments
+except ModuleNotFoundError:
+    print("The 'pygments' module is not installed.")
+    print("This is needed for tokenizing the source code.")
+    print("You can install it by running 'pip install pygments' or 'pip3 install pygments'.")
+    exit(1)  # Exit the script with an error code
+import pygments.lexers
 from pygments.token import Token
 
 def replace_identifiers_and_includes(filepath, code, identifier_map):
@@ -762,10 +768,10 @@ def process_directory(root_dir, identifier_map):
                 f.write(new_code)
 
 
-# Root directory where your C++ files are stored
-root_dir = './'
-
-# Process all C++ files in the directory and subdirectories
-print("Processing files...")
-process_directory(root_dir, fclaw_1to2)
-print("Done!")
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="A simple script to demonstrate argparse.")
+    parser.add_argument("-d", "--directory", help="directory to recursively update files in", required=True)
+    args = parser.parse_args()
+    print("Processing files...")
+    process_directory(args.directory, fclaw_1to2)
+    print("Done!")
