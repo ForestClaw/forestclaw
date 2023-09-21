@@ -18,38 +18,40 @@ subroutine get_aux_locations_t(ixyz,icoor,mcapa,locrot,locarea)
     integer ixyz, icoor, locrot, locarea, mcapa
     integer nxyz
 
-    nxyz = 0
-    if (ixyz .eq. 1) then
-        if (icoor .eq. 2) then
-            !! # transverse solve is y-like
-            !! # y-like direction is a y-face
-            nxyz = 2
-        elseif (icoor .eq. 3) then
-            !! # transverse solve is z-like
-            !! # z-like direction is a z-face
-            nxyz = 3
-        endif
-    elseif (ixyz .eq. 2) then
-        if (icoor .eq. 2) then
-            !! # transverse solve is y-like
-            !! # y-like direction is a z-face
-            nxyz = 3
-        else
-            !! # transverse solve is z-like
-            !! # y-like direction is an x-face
-            nxyz = 1
-        endif
-    elseif (ixyz .eq. 3) then
-        if (icoor .eq. 2) then
-            !! # transverse solve is y-like
-            !! # y-like direction is an x-face
-            nxyz = 1
-        elseif (icoor .eq. 3) then
-            !! # transverse solve is z-like
-            !! # z-like direction is a y-face
-            nxyz = 2
-        endif
-    endif
+!!    nxyz = 0
+!!    if (ixyz .eq. 1) then
+!!        if (icoor .eq. 2) then
+!!            !! # transverse solve is y-like
+!!            !! # y-like direction is a y-face
+!!            nxyz = 2
+!!        elseif (icoor .eq. 3) then
+!!            !! # transverse solve is z-like
+!!            !! # z-like direction is a z-face
+!!            nxyz = 3
+!!        endif
+!!    elseif (ixyz .eq. 2) then
+!!        if (icoor .eq. 2) then
+!!            !! # transverse solve is y-like
+!!            !! # y-like direction is a z-face
+!!            nxyz = 3
+!!        else
+!!            !! # transverse solve is z-like
+!!            !! # y-like direction is an x-face
+!!            nxyz = 1
+!!        endif
+!!    elseif (ixyz .eq. 3) then
+!!        if (icoor .eq. 2) then
+!!            !! # transverse solve is y-like
+!!            !! # y-like direction is an x-face
+!!            nxyz = 1
+!!        elseif (icoor .eq. 3) then
+!!            !! # transverse solve is z-like
+!!            !! # z-like direction is a y-face
+!!            nxyz = 2
+!!        endif
+!!    endif
+
+    nxyz = mod(ixyz-1 + icoor-1,3) + 1
 
     locarea = mcapa + nxyz
     locrot = mcapa + 4 + (nxyz-1)*9
@@ -65,35 +67,37 @@ subroutine get_aux_locations_tt(ixyz,icoor,mcapa,locrot,locarea,irot)
     integer ixyz, icoor, locrot, locarea,mcapa, irot
     integer nxyz
 
-    nxyz = 0
-    if (ixyz .eq. 1) then
-        !! # (x-like, y-like, z-like) = (x,y,z)
-        if (icoor .eq. 2) then
-            !! # transverse solve is y-like solve
-            nxyz = 2
-        elseif (icoor .eq. 3) then
-            !! # transverse solve is z-like solve
-            nxyz = 3
-        endif
-    elseif (ixyz .eq. 2) then
-        !! # (x-like, y-like, z-like) = (y,z,x)
-        if (icoor .eq. 2) then
-            !! # transverse solve is z-like solve
-            nxyz = 3
-        elseif (icoor .eq. 3) then
-            !! # transverse solve is x-like solve
-            nxyz = 1
-        endif
-    elseif (ixyz .eq. 3) then
-        !! # (x-like, y-like, z-like) = (z,x,y)
-        if (icoor .eq. 2) then
-            !! # transverse solve is x-like solve
-            nxyz = 1
-        elseif (icoor .eq. 3) then
-            !! # transverse solve is y-like solve
-            nxyz = 2
-        endif
-    endif
+!!    nxyz = 0
+!!    if (ixyz .eq. 1) then
+!!        !! # (x-like, y-like, z-like) = (x,y,z)
+!!        if (icoor .eq. 2) then
+!!            !! # transverse solve is y-like solve
+!!            nxyz = 2
+!!        elseif (icoor .eq. 3) then
+!!            !! # transverse solve is z-like solve
+!!            nxyz = 3
+!!        endif
+!!    elseif (ixyz .eq. 2) then
+!!        !! # (x-like, y-like, z-like) = (y,z,x)
+!!        if (icoor .eq. 2) then
+!!            !! # transverse solve is z-like solve
+!!            nxyz = 3
+!!        elseif (icoor .eq. 3) then
+!!            !! # transverse solve is x-like solve
+!!            nxyz = 1
+!!        endif
+!!    elseif (ixyz .eq. 3) then
+!!        !! # (x-like, y-like, z-like) = (z,x,y)
+!!        if (icoor .eq. 2) then
+!!            !! # transverse solve is x-like solve
+!!            nxyz = 1
+!!        elseif (icoor .eq. 3) then
+!!            !! # transverse solve is y-like solve
+!!            nxyz = 2
+!!        endif
+!!    endif
+
+    nxyz = mod(ixyz-1 + icoor-1,3) + 1
 
     locarea = mcapa + nxyz
     locrot = mcapa + 4 + (nxyz-1)*9
@@ -101,7 +105,7 @@ subroutine get_aux_locations_tt(ixyz,icoor,mcapa,locrot,locarea,irot)
 
 end subroutine get_aux_locations_tt
 
-
+!! Normal, tangential and binormal stored row-wise.
 subroutine rotate3(rot,velcomps)
     implicit none
 

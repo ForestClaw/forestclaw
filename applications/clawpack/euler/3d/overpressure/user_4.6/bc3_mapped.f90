@@ -260,7 +260,7 @@ subroutine clawpack46_bc3(meqn,mbc,mx,my,mz, &
 
 
 !! -------------------------------------------------------
-!!      # bottom bounddary (zlower):
+!!      # bottom boundary (zlower):
 !! -------------------------------------------------------
     goto (500,510,520,530) mthbc(5)+1
     !!  Fall through if mthbc(3) = -1.   Boundary is an internal patch
@@ -301,12 +301,24 @@ subroutine clawpack46_bc3(meqn,mbc,mx,my,mz, &
 
 530 continue
 !!     # solid wall (assumes 4'rd component is velocity or momentum in y):
-      do m=1,meqn
-         do kbc=1,mbc
+    do m=1,meqn
+        do kbc=1,mbc
             do i = 1-mbc, mx+mbc
                do j = 1-mbc, my+mbc
                   q(i,j,1-kbc,m) = q(i,j,kbc,m)
                 end do 
+            end do
+        end do
+    end do
+
+    do ibc=1,mbc
+        do jbc=1,mbc
+            do kbc = 1,mbc
+                if (q(1-ibc,my+jbc,1-kbc,1) .eq. 0) then
+!!                    write(6,*) 'q(-1:0,17:18,-1:0,1) .eq. 0'
+!!                    write(6,*) q(1-ibc,my+jbc,1-kbc,1)
+!!                    write(6,*) ' '
+                endif
             end do
         end do
     end do

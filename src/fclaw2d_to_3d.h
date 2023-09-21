@@ -61,6 +61,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define fclaw2d_match_callback_t        fclaw3d_match_callback_t
 #define fclaw2d_transfer_callback_t     fclaw3d_transfer_callback_t
 #define fclaw2d_domain_exchange_t       fclaw3d_domain_exchange_t
+#define fclaw2d_domain_indirect         fclaw3d_domain_indirect
+#define fclaw2d_domain_indirect_t       fclaw3d_domain_indirect_t
 #define fclaw2d_integrate_ray_t         fclaw3d_integrate_ray_t
 #define fclaw2d_interpolate_point_t     fclaw3d_interpolate_point_t
 #define fclaw2d_build_mode_t            fclaw3d_build_mode_t
@@ -175,6 +177,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define fclaw2d_domain_num_face_corners     fclaw3d_domain_num_face_corners
 #define fclaw2d_domain_num_orientations fclaw3d_num_orientations
 #define fclaw2d_domain_corner_faces     fclaw3d_domain_corner_faces
+#define fclaw2d_domain_indirect_begin   fclaw3d_domain_indirect_begin
+#define fclaw2d_domain_indirect_neighbors fclaw3d_domain_indirect_neighbors
+#define fclaw2d_domain_indirect_end     fclaw3d_domain_indirect_end
+#define fclaw2d_domain_indirect_destroy fclaw3d_domain_indirect_destroy
 #define fclaw2d_patch_corner_dimension  fclaw3d_patch_corner_dimension
 #define fclaw2d_patch_childid           fclaw3d_patch_childid
 #define fclaw2d_patch_is_first_sibling  fclaw3d_patch_is_first_sibling

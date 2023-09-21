@@ -225,9 +225,8 @@ SUBROUTINE clawpack46_rpn3(ixyz,maxm,meqn,mwaves,maux,mbc,mx,ql,qr,  &
                     apdq(:,i) = apdq(:,i) + s(mws,i)*wave(:,mws,i)
                 ENDIF
             END DO
+
         END DO
-
-
 
     ELSE
         !! With entropy fix
@@ -322,5 +321,9 @@ SUBROUTINE clawpack46_rpn3(ixyz,maxm,meqn,mwaves,maux,mbc,mx,ql,qr,  &
         END DO
 
     END IF ! Entropy fix
+
+108     format(A,'ixyz=',I2, ';  imp = ',I2, ';  i = ', I2)
+109     format(5E24.16)
+
 
 END SUBROUTINE clawpack46_rpn3
