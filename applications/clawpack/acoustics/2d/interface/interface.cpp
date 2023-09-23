@@ -42,7 +42,6 @@ create_domain_map (fclaw2d_global_t * glob)
     fclaw2d_domain_t *domain = 
         fclaw2d_domain_new_unitsquare (glob->mpicomm, fclaw_opt->minlevel);
 
-
     /* Store the domain in the glob struct */
     fclaw2d_global_store_domain (glob, domain);
 
@@ -126,7 +125,6 @@ main (int argc, char **argv)
         sc_MPI_Comm mpicomm = fclaw_app_get_mpi_size_rank (app, &size, &rank);
         fclaw2d_global_t *glob =
             fclaw2d_global_new_comm (mpicomm, size, rank);
-        create_domain_map (glob);
 
         /* Store option packages in glob */
         fclaw2d_options_store           (glob, fclaw_opt);
@@ -134,6 +132,9 @@ main (int argc, char **argv)
         fc2d_clawpack46_options_store   (glob, claw46_opt);
         fc2d_clawpack5_options_store    (glob, claw5_opt);
         interface_options_store         (glob, user_opt);
+
+        /* Create and store domain */
+        create_domain_map (glob);
 
         run_program(glob);
         
