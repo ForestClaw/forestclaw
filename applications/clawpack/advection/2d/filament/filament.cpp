@@ -156,10 +156,12 @@ main (int argc, char **argv)
     claw5_opt           = fc2d_clawpack5_options_register(app, "clawpack5",  "fclaw_options.ini");
     user_opt =                  filament_options_register(app,               "fclaw_options.ini");  
 
+#if 0
     /* Read configuration file(s) */
     sc_options_t *options = fclaw_app_get_options (app);
 
     int retval = fclaw_options_read_from_file(options);
+#endif    
 
     fclaw_exit_type_t vexit;
     int first_arg;
@@ -168,6 +170,7 @@ main (int argc, char **argv)
     if (!vexit)
     {
         /* Options have been checked and are valid */
+
 
         /* Create glob */
         int size, rank;
