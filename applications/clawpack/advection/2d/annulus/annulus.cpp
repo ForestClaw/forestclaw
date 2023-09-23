@@ -49,18 +49,15 @@ void create_domain(fclaw2d_global_t *glob)
     rotate[1] = pi*fclaw_opt->phi/180.0;
 
     /* Annulus : Mapped, multi-block domain */
-    // p4est_connectivity_t *conn = NULL;
-    // conn = p4est_connectivity_new_brick(mi,mj,a,b);
-
     fclaw2d_domain_t *domain = 
                fclaw2d_domain_new_brick(glob->mpicomm, mi, mj, a, b,
                                         fclaw_opt->minlevel);
 
+    /* Create mapping context (annulus based on a brick) */
+    const user_options_t *user = (user_options_t*) annulus_get_options(glob);
+
     fclaw2d_map_context_t *brick =
               fclaw2d_map_new_brick(domain, mi, mj, a, b);
-
-    /* Create mapping context */
-    const user_options_t *user = (user_options_t*) annulus_get_options(glob);
 
     fclaw2d_map_context_t *cont = 
             fclaw2d_map_new_annulus(brick,
@@ -116,8 +113,6 @@ main (int argc, char **argv)
     /* Initialize application */
     fclaw_app_t *app = fclaw_app_new (&argc, &argv, NULL);
 
-    /* Options */
-
     /* Register options packages */
     fclaw_options_t  *fclaw_opt;
     fclaw2d_clawpatch_options_t *clawpatch_opt;
@@ -131,9 +126,9 @@ main (int argc, char **argv)
     claw5_opt =      fc2d_clawpack5_options_register    (app, "clawpack5",  "fclaw_options.ini");
     user_opt =       annulus_options_register           (app,"fclaw_options.ini");
 
-    fclaw_exit_type_t vexit;
     int first_arg;
-    vexit =  fclaw_app_options_parse (app, &first_arg,"fclaw_options.ini.used");
+    fclaw_exit_type_t vexit = 
+        fclaw_app_options_parse (app, &first_arg,"fclaw_options.ini.used");
 
     if (!vexit)
     {        
@@ -141,7 +136,7 @@ main (int argc, char **argv)
 
         /* Create glob */
         int size, rank;
-        sc_MPI_Comm mpicomm = fclaw_app_get_mpi_size_rank (app, &size, &rank);
+        sc_MPI_Comm mpicomm = fclaw_app_get_mpi_size_rank (app, &size, &rank);        
         fclaw2d_global_t *glob = fclaw2d_global_new_comm (mpicomm, size, rank);
 
         fclaw2d_options_store            (glob, fclaw_opt);
