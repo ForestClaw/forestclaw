@@ -39,7 +39,6 @@ void create_domain(fclaw2d_global_t *glob)
     fclaw2d_map_context_t *cont = NULL;
     fclaw2d_domain_t *domain = NULL;
 
-
     const user_options_t *user_opt = correlatedcb_get_options(glob);
     switch (user_opt->mapping) {
     case 0:
@@ -56,6 +55,7 @@ void create_domain(fclaw2d_global_t *glob)
     default:
         SC_ABORT_NOT_REACHED (); /* must be checked in torus_checkparms */
     }
+
     /* Store mapping in the glob */
     fclaw2d_global_store_map (glob, cont);            
 
@@ -120,12 +120,6 @@ main (int argc, char **argv)
     claw5_opt =          fc2d_clawpack5_options_register(app, "clawpack5",  "fclaw_options.ini");
     user_opt =             correlatedcb_options_register(app, "fclaw_options.ini");  
 
-    /* Create new options packages */
-    sc_options_t *options = fclaw_app_get_options (app);
-
-    /* Read configuration file(s) and command line, and process options */
-    int retval = fclaw_options_read_from_file(options);
-
     int first_arg;
     fclaw_exit_type_t vexit;
     vexit =  fclaw_app_options_parse (app, &first_arg,"fclaw_options.ini.used");
@@ -133,6 +127,7 @@ main (int argc, char **argv)
     if (!vexit)
     {
         /* Options have been checked and are valid */
+        
         /* Create glob */
         int size, rank;
         sc_MPI_Comm mpicomm = fclaw_app_get_mpi_size_rank (app, &size, &rank);

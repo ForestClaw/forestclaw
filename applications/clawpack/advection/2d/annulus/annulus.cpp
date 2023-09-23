@@ -119,31 +119,23 @@ main (int argc, char **argv)
     /* Options */
 
     /* Register options packages */
-    fclaw_options_t  *fclaw_opt = 
-                   fclaw_options_register(app,  NULL,"fclaw_options.ini");
-
-    fclaw2d_clawpatch_options_t *clawpatch_opt = 
-          fclaw2d_clawpatch_options_register(app, "clawpatch","fclaw_options.ini");
-
-    fc2d_clawpack46_options_t *claw46_opt = 
-          fc2d_clawpack46_options_register(app, "clawpack46", "fclaw_options.ini");
-
-    fc2d_clawpack5_options_t *claw5_opt = 
-         fc2d_clawpack5_options_register(app, "clawpack5",  "fclaw_options.ini");
-
+    fclaw_options_t  *fclaw_opt;
+    fclaw2d_clawpatch_options_t *clawpatch_opt;
+    fc2d_clawpack46_options_t *claw46_opt;
+    fc2d_clawpack5_options_t *claw5_opt;
     user_options_t *user_opt;
-    user_opt = annulus_options_register(app,"fclaw_options.ini");
 
-    /* Read configuration file(s) */
-    sc_options_t *options = fclaw_app_get_options (app);
-
-    int retval = fclaw_options_read_from_file(options);
+    fclaw_opt =      fclaw_options_register             (app,  NULL,"fclaw_options.ini");
+    clawpatch_opt =  fclaw2d_clawpatch_options_register (app, "clawpatch","fclaw_options.ini");
+    claw46_opt =     fc2d_clawpack46_options_register   (app, "clawpack46", "fclaw_options.ini");
+    claw5_opt =      fc2d_clawpack5_options_register    (app, "clawpack5",  "fclaw_options.ini");
+    user_opt =       annulus_options_register           (app,"fclaw_options.ini");
 
     fclaw_exit_type_t vexit;
     int first_arg;
     vexit =  fclaw_app_options_parse (app, &first_arg,"fclaw_options.ini.used");
 
-    if (!retval & !vexit)
+    if (!vexit)
     {        
         /* Options have been checked and are valid */
 
