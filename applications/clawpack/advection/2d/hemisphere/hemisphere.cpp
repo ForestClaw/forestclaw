@@ -25,35 +25,62 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "hemisphere_user.h"
 
+/* ------------- Create the domain --------------------- */
 static
-fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, 
-                                fclaw_options_t* fclaw_opt,
-                                user_options_t* user_opt)
-{
-    /* Mapped, multi-block domain */
-    p4est_connectivity_t     *conn = NULL;
-    fclaw2d_domain_t         *domain;
-    fclaw2d_map_context_t    *cont = NULL;
+void create_domain(fclaw2d_global_t *glob)
 
+{
     /* Used locally */
+    const fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
     double pi = M_PI;
     double rotate[2];
-
     rotate[0] = pi*fclaw_opt->theta/180.0;
     rotate[1] = 0;
 
+#if 0
+    const fclaw2d_clawpatch_options_t *clawpatch_opt = 
+           fclaw2d_clawpatch_get_options(glob);
 
+    int mi = fclaw_opt->mi;
+    int mx = clawpatch_opt->mx;
+    int minlevel = fclaw_opt->minlevel;
+#endif    
+
+    /* Mapped, multi-block domain */
+    fclaw2d_domain_t *domain;
+    fclaw2d_map_context_t *cont = NULL;
+
+    user_options_t *user_opt = (user_options_t*) hemisphere_get_options(glob);
     switch (user_opt->example) {
     case 0:
-        conn = p4est_connectivity_new_disk (0, 0);
-        cont = fclaw2d_map_new_pillowsphere5(fclaw_opt->scale,
-                                             rotate,
-                                             user_opt->alpha);
+#if 0    
+        /* We should really be checking this - to avoid problems with ghost cells at 
+           the triple points in the mapping 
+        */
+        if (mi*mx*pow_int(2,minlevel) < 32)
+        {
+            fclaw_global_essentialf("The five patch mapping requires mi*mx*2^minlevel > 32\n");
+            exit(0);
+
+        }
+#endif        
+        /* Five patch square domain */
+        domain =
+            fclaw2d_domain_new_disk(glob->mpicomm, 0, 0,
+                                    fclaw_opt->minlevel);
+        cont =
+            fclaw2d_map_new_pillowsphere5(fclaw_opt->scale, 
+                                          rotate,
+                                          user_opt->alpha);
         break;
 
     case 1:
         /* Map unit square to disk using mapc2m_disk.f */
-        conn = p4est_connectivity_new_unitsquare();
+        /* Map unit square to the pillow disk using mapc2m_pillowdisk.f */
+        domain =
+            fclaw2d_domain_new_unitsquare (glob->mpicomm,
+                                           fclaw_opt->minlevel);
+
         cont = fclaw2d_map_new_pillowsphere(fclaw_opt->scale,
                                             rotate);
         break;
@@ -61,10 +88,16 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm,
         SC_ABORT_NOT_REACHED (); /* must be checked in torus_checkparms */
     }
 
-    domain = fclaw2d_domain_new_conn_map (mpicomm, fclaw_opt->minlevel, conn, cont);
+
+    /* Store mapping in the glob */
+    fclaw2d_global_store_map (glob, cont);            
+
+    /* Store the domain in the glob */
+    fclaw2d_global_store_domain(glob, domain);
+
+    /* print out some info */
     fclaw2d_domain_list_levels(domain, FCLAW_VERBOSITY_ESSENTIAL);
     fclaw2d_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);  
-    return domain;
 }
 
 static
@@ -98,9 +131,8 @@ void run_program(fclaw2d_global_t* glob)
 int
 main (int argc, char **argv)
 {
-    fclaw_app_t *app;
-    int first_arg;
-    fclaw_exit_type_t vexit;
+    /* Initialize application */
+    fclaw_app_t *app = fclaw_app_new (&argc, &argv, NULL);
 
     /* Options */
     user_options_t              *user_opt;
@@ -108,13 +140,6 @@ main (int argc, char **argv)
     fclaw2d_clawpatch_options_t *clawpatch_opt;
     fc2d_clawpack46_options_t   *claw46_opt;
     fc2d_clawpack5_options_t    *claw5_opt;
-
-    fclaw2d_global_t            *glob;
-    fclaw2d_domain_t            *domain;
-    sc_MPI_Comm mpicomm;
-
-    /* Initialize application */
-    app = fclaw_app_new (&argc, &argv, NULL);
 
     /* Create new options packages */
     fclaw_opt =                   fclaw_options_register(app,  NULL,        "fclaw_options.ini");
@@ -124,18 +149,18 @@ main (int argc, char **argv)
     user_opt =               hemisphere_options_register(app,               "fclaw_options.ini");  
 
     /* Read configuration file(s) and command line, and process options */
-    vexit =  fclaw_app_options_parse (app, &first_arg,"fclaw_options.ini.used");
+    int first_arg;
+    fclaw_exit_type_t vexit = 
+           fclaw_app_options_parse (app, &first_arg,"fclaw_options.ini.used");
 
     if (!vexit)
     {
 
         /* Options have been checked and are valid */
-        mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
-        domain = create_domain(mpicomm, fclaw_opt, user_opt);
-
-        /* Create global structure which stores the domain, timers, etc */
-        glob = fclaw2d_global_new();
-        fclaw2d_global_store_domain(glob, domain);
+        /* Create glob */
+        int size, rank;
+        sc_MPI_Comm mpicomm = fclaw_app_get_mpi_size_rank (app, &size, &rank);
+        fclaw2d_global_t *glob = fclaw2d_global_new_comm (mpicomm, size, rank);
 
         /* Store option packages in glob */
         fclaw2d_options_store           (glob, fclaw_opt);
@@ -143,6 +168,8 @@ main (int argc, char **argv)
         fc2d_clawpack46_options_store   (glob, claw46_opt);
         fc2d_clawpack5_options_store    (glob, claw5_opt);
         hemisphere_options_store        (glob, user_opt);
+
+        create_domain(glob);
 
         /* Run the program */
         run_program(glob);
