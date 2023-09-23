@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
+Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -23,55 +23,44 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <fclaw_pointer_map.h>
-#include <map>
-#include <string>
+#ifndef FCLAW3D_EXCHANGE_H
+#define FCLAW3D_EXCHANGE_H
 
-namespace
+#include <fclaw_timer.h>
+
+#ifdef __cplusplus
+extern "C"
 {
-    struct value
-    {
-        void* pointer = nullptr;
-        fclaw_pointer_map_value_destroy_t destroy = nullptr;
-    };
+#if 0
 }
+#endif
+#endif
 
-struct fclaw_pointer_map
-{
-    std::map<std::string, value> map;
-};
+struct fclaw3d_global;
 
-fclaw_pointer_map_t* fclaw_pointer_map_new()
+void fclaw3d_exchange_setup(struct fclaw3d_global* glob,
+                            fclaw3d_timer_names_t running);
+
+void fclaw3d_exchange_delete(struct fclaw3d_global* glob);
+
+void fclaw3d_exchange_ghost_patches_begin(struct fclaw3d_global* glob,
+                                          int minlevel,
+                                          int maxlevel,
+                                          int time_interp,
+                                          fclaw3d_timer_names_t running);
+
+void fclaw3d_exchange_ghost_patches_end(struct fclaw3d_global* glob,
+                                        int minlevel,
+                                        int maxlevel,
+                                        int time_interp,
+                                        fclaw3d_timer_names_t running);
+
+
+#ifdef __cplusplus
+#if 0
 {
-    return new fclaw_pointer_map();
+#endif
 }
+#endif
 
-void fclaw_pointer_map_destroy(fclaw_pointer_map_t* map)
-{
-    std::map<std::string, value>::iterator it = map->map.begin();
-    while(it != map->map.end()){
-        if(it->second.destroy != nullptr)
-            it->second.destroy(it->second.pointer);
-        ++it;
-    }
-    delete map;
-}
-
-void fclaw_pointer_map_insert(fclaw_pointer_map_t* map, 
-                              const char* key, 
-                              void* pointer, 
-                              fclaw_pointer_map_value_destroy_t destroy)
-{
-    value& v = map->map[key];
-    if(v.destroy){
-        v.destroy(v.pointer);
-    }
-    v.pointer = pointer;
-    v.destroy = destroy;
-}
-
-void* fclaw_pointer_map_get(fclaw_pointer_map_t* map, const char* key)
-{
-    return map->map[key].pointer;
-}
-
+#endif

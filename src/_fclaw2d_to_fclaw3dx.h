@@ -79,6 +79,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define fclaw2d_clawpatch_get_options fclaw3dx_clawpatch_get_options
 #define fclaw2d_clawpatch_set_refinement_criteria fclaw3dx_clawpatch_set_refinement_criteria
 #define fclaw2d_clawpatch_get_refinement_criteria fclaw3dx_clawpatch_get_refinement_criteria
+#define fclaw2d_clawpatch_options_get_packing_vtable fclaw3dx_clawpatch_options_get_packing_vtable
 
 //fclaw2d_clawpatch_output_ascii.h
 #define cb_clawpatch_output_ascii fclaw3dx_clawpatch_output_ascii_cb

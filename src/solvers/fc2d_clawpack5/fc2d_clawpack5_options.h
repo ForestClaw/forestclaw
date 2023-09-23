@@ -64,6 +64,7 @@ struct fc2d_clawpack5_options
     int vtk_out;
 
     int is_registered;
+    int is_unpacked;
 };
 
 
@@ -93,6 +94,12 @@ void CLAWPACK5_SET_AMR_MODULE(const int* mwaves_in, const int* mcapa_in,
                     const int mthlim_in[], const int method_in[], 
                     const int *use_fwaves);
 
+/**
+ * @brief Get the packing vtable for fc2d_clawpack5_options_t
+ * 
+ * @return const fclaw_packing_vtable_t* the vtable
+ */
+const fclaw_packing_vtable_t* fc2d_clawpack5_options_get_packing_vtable();
 
 #ifdef __cplusplus
 #if 0

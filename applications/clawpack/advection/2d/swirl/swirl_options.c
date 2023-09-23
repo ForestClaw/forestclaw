@@ -25,6 +25,10 @@
 
 #include "swirl_user.h"
 
+#include <fclaw_base.h>
+#include <fclaw_pointer_map.h>
+#include <fclaw_packing.h>
+
 static void *
 swirl_register (user_options_t *user, sc_options_t * opt)
 {
@@ -58,8 +62,47 @@ swirl_check (user_options_t *user)
 static void
 swirl_destroy(user_options_t *user)
 {
-    /* Nothing to destroy */
+    FCLAW_FREE (user);
 }
+
+static void
+swirl_destroy_void(void *user)
+{
+    swirl_destroy((user_options_t*) user);
+}
+
+static size_t 
+options_packsize(void* user)
+{
+    return sizeof(user_options_t);
+}
+
+static size_t 
+options_pack(void* user, char* buffer)
+{
+    user_options_t* opts = (user_options_t*) user;
+
+    //pack entire struct
+    return FCLAW_PACK(*opts, buffer);
+}
+
+static size_t 
+options_unpack(char* buffer, void** user)
+{
+    user_options_t** opts_ptr = (user_options_t**) user;
+
+    *opts_ptr = FCLAW_ALLOC(user_options_t,1);
+
+    return FCLAW_UNPACK(buffer, *opts_ptr);
+}
+
+static fclaw_packing_vtable_t packing_vt = 
+{
+	options_pack,
+	options_unpack,
+	options_packsize,
+	swirl_destroy_void
+};
 
 /* ------- Generic option handling routines that call above routines ----- */
 static void*
@@ -121,8 +164,6 @@ options_destroy (fclaw_app_t * app, void *package, void *registered)
     FCLAW_ASSERT (user->is_registered);
 
     swirl_destroy (user);
-
-    FCLAW_FREE (user);
 }
 
 
@@ -147,6 +188,9 @@ user_options_t* swirl_options_register (fclaw_app_t * app,
                                 user);
 
     fclaw_app_set_attribute(app,"user",user);
+
+    fclaw_app_register_options_packing_vtable("user", &packing_vt);
+
     return user;
 }
 

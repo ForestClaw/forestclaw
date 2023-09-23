@@ -25,10 +25,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw_pointer_map.h>
 
+#ifndef P4_TO_P8
 #include <fclaw2d_patch.h>
-
 #include <fclaw2d_global.h>
 #include <fclaw2d_domain.h>
+#include <fclaw2d_defs.h>
+#else
+#include <fclaw3d_patch.h>
+#include <fclaw3d_global.h>
+#include <fclaw3d_domain.h>
+#include <fclaw3d_defs.h>
+#endif
 
 struct fclaw2d_patch_transform_data;
 
@@ -338,7 +345,7 @@ void fclaw2d_patch_copy_face(fclaw2d_global_t* glob,
 							 fclaw2d_patch_t *neighbor_patch,
 							 int iface,
 							 int time_interp,
-							 struct fclaw2d_patch_transform_data *transform_data)
+							 fclaw2d_patch_transform_data_t *transform_data)
 {
 	fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt(glob);
 	FCLAW_ASSERT(patch_vt->copy_face != NULL);
@@ -356,7 +363,7 @@ void fclaw2d_patch_average_face(fclaw2d_global_t* glob,
 								int refratio,
 								int time_interp,
 								int igrid,
-								struct fclaw2d_patch_transform_data* transform_data)
+								fclaw2d_patch_transform_data_t* transform_data)
 {
 	fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt(glob);
 	FCLAW_ASSERT(patch_vt->average_face != NULL);
@@ -376,7 +383,7 @@ void fclaw2d_patch_interpolate_face(fclaw2d_global_t* glob,
 									int refratio,
 									int time_interp,
 									int igrid,
-									struct fclaw2d_patch_transform_data* transform_data)
+									fclaw2d_patch_transform_data_t* transform_data)
 {
 	fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt(glob);
 	FCLAW_ASSERT(patch_vt->interpolate_face != NULL);
@@ -394,7 +401,7 @@ void fclaw2d_patch_copy_corner(fclaw2d_global_t* glob,
 							   int is_block_corner,
 							   int icorner,
 							   int time_interp,
-							   struct fclaw2d_patch_transform_data *transform_data)
+							   fclaw2d_patch_transform_data_t *transform_data)
 {
 	fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt(glob);
 	if (!is_block_corner)
@@ -421,7 +428,7 @@ void fclaw2d_patch_average_corner(fclaw2d_global_t* glob,
 								  int is_block_corner,
 								  int coarse_corner,
 								  int time_interp,
-								  struct fclaw2d_patch_transform_data* transform_data)
+								  fclaw2d_patch_transform_data_t* transform_data)
 {
 	fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt(glob);
 	if (!is_block_corner)
@@ -450,7 +457,7 @@ void fclaw2d_patch_interpolate_corner(fclaw2d_global_t* glob,
 									  int is_block_corner,
 									  int coarse_corner,
 									  int time_interp,
-									  struct fclaw2d_patch_transform_data
+									  fclaw2d_patch_transform_data_t
 									  *transform_data)
 {
 	fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt(glob);
@@ -477,10 +484,10 @@ void fclaw2d_patch_interpolate_corner(fclaw2d_global_t* glob,
 
 /* -------------------------- Transform functions ------------------------------------- */
 
-void fclaw2d_patch_transform_init_data(struct fclaw2d_global* glob,
-									   struct fclaw2d_patch* patch,
+void fclaw2d_patch_transform_init_data(fclaw2d_global_t* glob,
+									   fclaw2d_patch_t* patch,
 									   int blockno, int patchno,
-									   struct fclaw2d_patch_transform_data *ftransform)
+									   fclaw2d_patch_transform_data_t *ftransform)
 {
 	fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt(glob);
 	FCLAW_ASSERT(patch_vt->transform_init_data != NULL);
@@ -488,7 +495,7 @@ void fclaw2d_patch_transform_init_data(struct fclaw2d_global* glob,
 }
 
 /* This is the transform at block faces.  */
-void fclaw2d_patch_transform_blockface(struct fclaw2d_global* glob,
+void fclaw2d_patch_transform_blockface(fclaw2d_global_t* glob,
 	                                   int faceno, int rfaceno,
 									   int ftransform[])
 {
@@ -498,7 +505,7 @@ void fclaw2d_patch_transform_blockface(struct fclaw2d_global* glob,
 }
 
 /* Transform within a block, where we only have the identity transform */
-void fclaw2d_patch_transform_blockface_intra(struct fclaw2d_global* glob,
+void fclaw2d_patch_transform_blockface_intra(fclaw2d_global_t* glob,
 	                                         int ftransform[])
 {
 	fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt(glob);
@@ -753,7 +760,7 @@ void fclaw2d_patch_time_sync_samesize(fclaw2d_global_t* glob,
                                       fclaw2d_patch_t *this_patch,
                                       fclaw2d_patch_t *neighbor_patch,
                                       int iface, int idir,
-                                      struct fclaw2d_patch_transform_data *transform_data)
+                                      fclaw2d_patch_transform_data_t *transform_data)
 
 {
 	fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt(glob);
@@ -889,7 +896,7 @@ void fclaw2d_patch_set_user_data(fclaw2d_global_t* glob,
 
 
 void* fclaw2d_patch_metric_patch(fclaw2d_global_t* glob,
-                                 struct fclaw2d_patch *patch)
+                                 fclaw2d_patch_t *patch)
 {
 	fclaw2d_patch_vtable_t* patch_vt = fclaw2d_patch_vt(glob);    
 	FCLAW_ASSERT(patch_vt->metric_patch != NULL);
@@ -945,7 +952,7 @@ fclaw2d_patch_relation_t fclaw2d_patch_get_face_type(fclaw2d_patch_t* patch,
 {
 	fclaw2d_patch_data_t *pdata = get_patch_data(patch);
 	FCLAW_ASSERT(pdata->neighbors_set != 0);
-	FCLAW_ASSERT(0 <= iface && iface < 4);
+	FCLAW_ASSERT(0 <= iface && iface < FCLAW2D_NUMFACES);
 	return pdata->face_neighbors[iface];
 }
 
@@ -968,12 +975,15 @@ int fclaw2d_patch_corner_is_missing(fclaw2d_patch_t* patch,
 void fclaw2d_patch_neighbors_set(fclaw2d_patch_t* patch)
 {
 	int iface, icorner;
+#ifdef P4_TO_P8
+	int iedge;
+#endif
 	fclaw2d_patch_data_t *pdata = get_patch_data(patch);
 	FCLAW_ASSERT(pdata->neighbors_set == 0);
 
 	pdata->has_finegrid_neighbors = 0;
 	pdata->on_coarsefine_interface = 0;
-	for (iface = 0; iface < 4; iface++)
+	for (iface = 0; iface < FCLAW2D_NUMFACES; iface++)
 	{
 		fclaw2d_patch_relation_t nt;
 		nt = pdata->face_neighbors[iface];
@@ -987,7 +997,23 @@ void fclaw2d_patch_neighbors_set(fclaw2d_patch_t* patch)
 		}
 	}
 
-	for (icorner = 0; icorner < 4; icorner++)
+#ifdef P4_TO_P8
+	for (iedge = 0; iedge < FCLAW3D_NUMEDGES; iedge++)
+	{
+		fclaw2d_patch_relation_t nt;
+		nt = pdata->edge_neighbors[iedge];
+		if (nt == FCLAW2D_PATCH_HALFSIZE || (nt == FCLAW2D_PATCH_DOUBLESIZE))
+		{
+			pdata->on_coarsefine_interface = 1;
+			if (nt == FCLAW2D_PATCH_HALFSIZE)
+			{
+				pdata->has_finegrid_neighbors = 1;
+			}
+		}
+	}
+#endif
+
+	for (icorner = 0; icorner < FCLAW2D_NUMCORNERS; icorner++)
 	{
 		fclaw2d_patch_relation_t nt;
 		int has_corner = pdata->corners[icorner];

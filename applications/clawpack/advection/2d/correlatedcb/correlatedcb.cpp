@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
+Copyright (c) 2012-2023 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -36,30 +36,28 @@ void create_domain(fclaw2d_global_t *glob)
     rotate[0] = pi*fclaw_opt->theta/180.0;
     rotate[1] = 0;
 
-    p4est_connectivity_t *conn = NULL;
     fclaw2d_map_context_t *cont = NULL;
+    fclaw2d_domain_t *domain = NULL;
+
 
     const user_options_t *user_opt = correlatedcb_get_options(glob);
     switch (user_opt->mapping) {
     case 0:
-        conn = p4est_connectivity_new_cubed();
-        cont = fclaw2d_map_new_cubedsphere(fclaw_opt->scale,
-                                           rotate);
+        domain =
+            fclaw2d_domain_new_cubedsphere (glob->mpicomm,
+                                            fclaw_opt->minlevel);
+        cont = fclaw2d_map_new_cubedsphere (fclaw_opt->scale, rotate);
         break;
     case 1:
-        conn = p4est_connectivity_new_pillow();
-        cont = fclaw2d_map_new_pillowsphere(fclaw_opt->scale,
-                                            rotate);
+        domain =
+            fclaw2d_domain_new_twosphere (glob->mpicomm, fclaw_opt->minlevel);
+        cont = fclaw2d_map_new_pillowsphere (fclaw_opt->scale, rotate);
         break;
     default:
         SC_ABORT_NOT_REACHED (); /* must be checked in torus_checkparms */
     }
     /* Store mapping in the glob */
     fclaw2d_global_store_map (glob, cont);            
-
-    /* Create domain */
-    fclaw2d_domain_t *domain = 
-        fclaw2d_domain_new_conn(glob->mpicomm, fclaw_opt->minlevel, conn);
 
     /* Store the domain in the glob */
     fclaw2d_global_store_domain(glob, domain);
@@ -110,14 +108,13 @@ main (int argc, char **argv)
     /* Initialize application */
     fclaw_app_t *app = fclaw_app_new (&argc, &argv, NULL);
 
-    /* Options */
     fclaw2d_clawpatch_options_t *clawpatch_opt;
     fc2d_clawpack46_options_t   *claw46_opt;
     fc2d_clawpack5_options_t    *claw5_opt;
     fclaw_options_t *fclaw_opt;
     user_options_t *user_opt; 
 
-    fclaw_opt =                   fclaw_options_register(app,  NULL, "fclaw_options.ini");
+    fclaw_opt =      fclaw_options_register(app,  NULL, "fclaw_options.ini");
     clawpatch_opt =   fclaw2d_clawpatch_options_register(app, "clawpatch",  "fclaw_options.ini");
     claw46_opt =        fc2d_clawpack46_options_register(app, "clawpack46", "fclaw_options.ini");
     claw5_opt =          fc2d_clawpack5_options_register(app, "clawpack5",  "fclaw_options.ini");
@@ -133,7 +130,7 @@ main (int argc, char **argv)
     fclaw_exit_type_t vexit;
     vexit =  fclaw_app_options_parse (app, &first_arg,"fclaw_options.ini.used");
 
-    if (!retval & !vexit)
+    if (!vexit)
     {
         /* Options have been checked and are valid */
         /* Create glob */

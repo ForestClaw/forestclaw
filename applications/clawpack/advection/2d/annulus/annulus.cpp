@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
+Copyright (c) 2012-2023 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -39,7 +39,7 @@ void create_domain(fclaw2d_global_t *glob)
     int mi = fclaw_opt->mi;
     int mj = fclaw_opt->mj;
     int a = fclaw_opt->periodic_x;
-    int b = 0;   /* No periodicity in radial direction */
+    int b = 0;                  /* No periodicity in radial direction */
 
     /* Used locally */
     double pi = M_PI;
@@ -49,28 +49,28 @@ void create_domain(fclaw2d_global_t *glob)
     rotate[1] = pi*fclaw_opt->phi/180.0;
 
     /* Annulus : Mapped, multi-block domain */
-    p4est_connectivity_t *conn = NULL;
-    conn = p4est_connectivity_new_brick(mi,mj,a,b);
+    // p4est_connectivity_t *conn = NULL;
+    // conn = p4est_connectivity_new_brick(mi,mj,a,b);
 
-    fclaw2d_map_context_t *brick = NULL;
-    brick = fclaw2d_map_new_brick_conn (conn,mi,mj);
+    fclaw2d_domain_t *domain = 
+               fclaw2d_domain_new_brick(glob->mpicomm, mi, mj, a, b,
+                                        fclaw_opt->minlevel);
+
+    fclaw2d_map_context_t *brick =
+              fclaw2d_map_new_brick(domain, mi, mj, a, b);
 
     /* Create mapping context */
     const user_options_t *user = (user_options_t*) annulus_get_options(glob);
 
-    fclaw2d_map_context_t *cont = NULL;
-    cont = fclaw2d_map_new_annulus(brick,
-                                   fclaw_opt->scale,
-                                   rotate,
-                                   user->beta, 
-                                   user->theta);
+    fclaw2d_map_context_t *cont = 
+            fclaw2d_map_new_annulus(brick,
+                                    fclaw_opt->scale,
+                                    rotate,
+                                    user->beta, 
+                                    user->theta);
 
     /* Store mapping in the glob */
     fclaw2d_global_store_map (glob, cont);            
-
-    /* Create domain */
-    fclaw2d_domain_t *domain = 
-        fclaw2d_domain_new_conn(glob->mpicomm, fclaw_opt->minlevel, conn);
 
     /* Store the domain in the glob */
     fclaw2d_global_store_domain(glob, domain);

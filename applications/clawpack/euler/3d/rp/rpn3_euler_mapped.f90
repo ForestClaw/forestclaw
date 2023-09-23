@@ -55,7 +55,7 @@ subroutine clawpack46_rpn3_mapped(ixyz,maxm,meqn,mwaves,maux,mbc,mx,&
     double precision rho2, rhou2, rhov2, rhow2, en2, p2, c2
     double precision s2, df, area, uvw2
 
-    data efix /.true./    !# use entropy fix for transonic rarefactions
+    data efix /.false./    !# use entropy fix for transonic rarefactions
 
     if (mwaves .ne. 3) then
         write(6,*) '*** Should have mwaves=3 for this Riemann solver'
@@ -67,34 +67,50 @@ subroutine clawpack46_rpn3_mapped(ixyz,maxm,meqn,mwaves,maux,mbc,mx,&
 
     do i = 2-mbc, mx+mbc
 
+        !! Get correct ql and qr. 
         do m = 1,meqn
-            ql(m) = ql_cart(m,i)
-            qr(m) = qr_cart(m,i-1)
+            qr(m) = ql_cart(m,i)
+            ql(m) = qr_cart(m,i-1)
         enddo
 
-        !!# Use Roe averaged values for normal solves
-        if (qr(1) .lt. 0) then
-            write(6,*) 'qr(1) < 0; ', qr(1)
+
+        if (ql(1) .lt. 0 .or. qr(1) .lt. 0) then
+            write(6,'(A)') 'In rpn3'
+            write(6,1001) 'rhol = ',ql(1)
+            write(6,1001) 'rhor = ',qr(1)
+            do ii = 1,5
+               write(6,1005) ii,ql(ii)
+            enddo
+            write(6,*) ' '
+            do ii = 1,5
+               write(6,1006) ii,qr(ii)
+            enddo
+            write(6,*) ' '
+            do ii = 1,9
+               write(6,1001) 'rot = ', rot(ii)
+            enddo
+            write(6,1002) 'locarea = ', locarea
+            write(6,1002) 'locrot = ', locrot
+            write(6,1002) 'ixyz = ', ixyz
+            write(6,1002) 'i = ', i
+            write(6,1003) icom, jcom, kcom
             stop
         endif
-         if (ql(1) .lt. 0) then
-            write(6,*) 'ql(1) < 0; ', ql(1)
-            stop
-        endif
+
 
         !! We can use unrotated values here, since we only use 
         !! norm of velocity.
-        rhsqrtl = sqrt(qr(1))
-        rhsqrtr = sqrt(ql(1))
+        rhsqrtl = sqrt(ql(1))
+        rhsqrtr = sqrt(qr(1))
         rhsq2 = rhsqrtl + rhsqrtr
 
-        uvw2 = qr(2)**2 + qr(3)**2 + qr(4)**2
-        pl = gamma1*(qr(5) - 0.5d0*uvw2/qr(1))
-
         uvw2 = ql(2)**2 + ql(3)**2 + ql(4)**2
-        pr = gamma1*(ql(5) - 0.5d0*(uvw2)/ql(1))
+        pl = gamma1*(ql(5) - 0.5d0*uvw2/ql(1))
 
-        enth = (((qr(5)+pl)/rhsqrtl + (ql(5)+pr)/rhsqrtr)) / rhsq2
+        uvw2 = qr(2)**2 + qr(3)**2 + qr(4)**2
+        pr = gamma1*(qr(5) - 0.5d0*uvw2/qr(1))
+
+        enth = (((qr(5)+pr)/rhsqrtr + (ql(5)+pl)/rhsqrtl)) / rhsq2
 
 
         !! --------------- Use rotated values in Riemann solve ------------
@@ -103,12 +119,12 @@ subroutine clawpack46_rpn3_mapped(ixyz,maxm,meqn,mwaves,maux,mbc,mx,&
         enddo
 
         do j = 1,3
-            uvw(j) = (qr(j+1)/rhsqrtl + ql(j+1)/rhsqrtr) / rhsq2
+            uvw(j) = (qr(j+1)/rhsqrtr + ql(j+1)/rhsqrtl) / rhsq2
         enddo
         call rotate3(rot,uvw)
 
         do j = 1,meqn
-            delta(j) = ql(j) - qr(j)
+            delta(j) = qr(j) - ql(j)
         enddo
         call rotate3(rot,delta(2))
 
@@ -121,41 +137,50 @@ subroutine clawpack46_rpn3_mapped(ixyz,maxm,meqn,mwaves,maux,mbc,mx,&
             write(6,'(A)') 'In rpn3'
             write(6,1001) 'rhol = ',qr_cart(1,i-1)
             write(6,1001) 'rhor = ',ql_cart(1,i)
+            write(6,*) ' '
             write(6,1001) 'ul   = ',qr_cart(2,i-1)/qr_cart(1,i-1)
             write(6,1001) 'ur   = ',ql_cart(2,i)/ql_cart(1,i)
+            write(6,*) ' '
             write(6,1001) 'pl   = ',pl
             write(6,1001) 'pr   = ',pr
+            write(6,*) ' '
             do ii = 1,5
-               write(6,1001) 'ql = ', ql(ii)
+               write(6,1005) ii,ql(ii)
             enddo
             write(6,*) ' '
             do ii = 1,5
-               write(6,1001) 'qr = ', qr(ii)
+               write(6,1006) ii,qr(ii)
             enddo
             write(6,*) ' '
             do ii = 1,9
                write(6,1001) 'rot = ', rot(ii)
             enddo
-            write(6,*) 'locarea = ', locarea
-            write(6,*) 'locrot = ', locrot
-            write(6,*) 'ixyz = ', ixyz
-            write(6,'(A,I5)') 'i = ', i
+            write(6,*)' '
+            write(6,1002) 'locarea = ', locarea
+            write(6,1002) 'locrot = ', locrot
+            write(6,1002) 'ixyz = ', ixyz
+            write(6,1002) 'i = ', i
+            write(6,1003) icom, jcom, kcom
             stop
         endif
 1001    format(A,2E16.8)
+1002    format(A,I5)
+1003    format('icom = ',I5,'; jcom = ',I5,'; kcom = ',I5)
+1005    format('ql(',I2,') = ',E24.16)
+1006    format('qr(',I2,') = ',E24.16)
 
         if (efix) then
 
             !! # check 1-wave:
             !! ---------------
 
-            rho_im1 = qr(1)
-            uvw2 = qr(2)**2 + qr(3)**2 + qr(4)**2
-            pim1 = gamma1*(qr(5) - 0.5d0*uvw2/rho_im1)
+            rho_im1 = ql(1)
+            uvw2 = ql(2)**2 + ql(3)**2 + ql(4)**2
+            pim1 = gamma1*(ql(5) - 0.5d0*uvw2/rho_im1)
             cim1 = sqrt(gamma*pim1/rho_im1)
 
             !! # u-c in left state (cell i-1)
-            s0 = qr(2)/rho_im1 - cim1 
+            s0 = ql(2)/rho_im1 - cim1 
 
 
             !! # check for fully supersonic case:
@@ -165,11 +190,11 @@ subroutine clawpack46_rpn3_mapped(ixyz,maxm,meqn,mwaves,maux,mbc,mx,&
                 amdq = 0.d0
                 !! right_going = .true.
             else
-                rho1 = qr(1) + wave(1,1)
-                rhou1 = qr(2) + wave(2,1)
-                rhov1 = qr(3) + wave(3,1)
-                rhow1 = qr(4) + wave(4,1)
-                en1 = qr(5) + wave(5,1)
+                rho1 = ql(1) + wave(1,1)
+                rhou1 = ql(2) + wave(2,1)
+                rhov1 = ql(3) + wave(3,1)
+                rhow1 = ql(4) + wave(4,1)
+                en1 = ql(5) + wave(5,1)
                 uvw2 = rhou1**2 + rhov1**2 + rhow1**2
                 p1 = gamma1*(en1 - 0.5d0*uvw2/rho1)
                 c1 = sqrt(gamma*p1/rho1)
@@ -209,23 +234,23 @@ subroutine clawpack46_rpn3_mapped(ixyz,maxm,meqn,mwaves,maux,mbc,mx,&
            !! # check 3-wave:
            !! ---------------
 
-            rhoi = ql(1)
-            uvw2 = ql(2)**2 + ql(3)**2 + ql(4)**2
-            pi = gamma1*(ql(5) - 0.5d0*(uvw2) / rhoi)
-            ci = dsqrt(gamma*pi/rhoi)
+            rhoi = qr(1)
+            uvw2 = qr(2)**2 + qr(3)**2 + qr(4)**2
+            pi = gamma1*(qr(5) - 0.5d0*uvw2 / rhoi)
+            ci = sqrt(gamma*pi/rhoi)
 
             !! # u+c in right state  (cell i)
-            s3 = ql(2)/rhoi + ci     
+            s3 = qr(2)/rhoi + ci     
 
-            rho2 = ql(1) - wave(1,3)
-            rhou2 = ql(2) - wave(2,3)
-            rhov2 = ql(3) - wave(3,3)
-            rhow2 = ql(4) - wave(4,3)
-            en2 = ql(5) - wave(5,3)
+            rho2 = qr(1) - wave(1,3)
+            rhou2 = qr(2) - wave(2,3)
+            rhov2 = qr(3) - wave(3,3)
+            rhow2 = qr(4) - wave(4,3)
+            en2 = qr(5) - wave(5,3)
 
             uvw2 = rhou2**2 + rhov2**2 + rhow2**2
-            p2 = gamma1*(en2 - 0.5d0*(uvw2)/rho2)
-            c2 = dsqrt(gamma*p2/rho2)
+            p2 = gamma1*(en2 - 0.5d0*uvw2/rho2)
+            c2 = sqrt(gamma*p2/rho2)
             s2 = rhou2/rho2 + c2        !# u+c to left of 3-wave
             if (s2 .lt. 0.d0 .and. s3 .gt. 0.d0 ) then
                 !! # transonic rarefaction in the 3-wave
@@ -275,6 +300,7 @@ subroutine clawpack46_rpn3_mapped(ixyz,maxm,meqn,mwaves,maux,mbc,mx,&
             enddo 
         enddo
 
+        !! We only scale speeds here
         area = auxl(locarea,i)
         do mws = 1,mwaves
             s(mws,i) = area*s_rot(mws)
@@ -298,6 +324,9 @@ subroutine clawpack46_rpn3_mapped(ixyz,maxm,meqn,mwaves,maux,mbc,mx,&
 !!        enddo
 
     enddo  !! end of i loop over 1d sweep array
+
+108     format(A,'ixyz=',I2,'; i = ',I2)
+109     format(5E24.16)
 
     return
 end subroutine clawpack46_rpn3_mapped
@@ -332,8 +361,7 @@ subroutine solve_riemann(uvw,enth,delta,wave,s,info)
     g1a2 = gamma1 / c2
     euv = enth - u2v2w2
 
-    a4 = g1a2 * (euv*delta(1) + u*delta(2) + v*delta(3) + w*delta(4) & 
-                 - delta(5))
+    a4 = g1a2 * (euv*delta(1) + u*delta(2) + v*delta(3) + w*delta(4) - delta(5))
     a2 = delta(3) - v*delta(1)
     a3 = delta(4) - w*delta(1)
     a5 = (delta(2) + (a-u)*delta(1) - a*a4) / (2.d0*a)

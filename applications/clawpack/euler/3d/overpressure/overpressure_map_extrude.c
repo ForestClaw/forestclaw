@@ -68,7 +68,7 @@ overpressure_map_3dx(fclaw2d_map_context_t * cont, int blockno,
             double f = (midz-minz)/(maxz-minz);
             if (zc < f)
             {                
-                double zlow = minz + scale_bump*exp(-30*rp2);
+                double zlow = minz + scale_bump*exp(-10*rp2);
                 *zp = zlow  + (midz-zlow)*(zc/f);
             }
             else

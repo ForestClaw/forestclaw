@@ -28,11 +28,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "../all/advection_user.h"
 
 static
-//fclaw2d_domain_t* 
 void create_domain(fclaw2d_global_t *glob)
 {
-
     const fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
+
     int mi = fclaw_opt->mi;
     int mj = fclaw_opt->mj;
     int minlevel = fclaw_opt->minlevel;
@@ -45,15 +44,17 @@ void create_domain(fclaw2d_global_t *glob)
     int a = 0; /* non-periodic */
     int b = 0;
     
-    p4est_connectivity_t *conn = NULL;
     fclaw2d_map_context_t    *cont = NULL, *brick = NULL;
+    fclaw2d_domain_t *domain = NULL;
 
     user_options_t *user = (user_options_t*) filament_get_options(glob);
     switch (user->example) {
     case 1:
         /* Square brick domain */
-        conn = p4est_connectivity_new_brick(mi,mj,a,b);
-        brick = fclaw2d_map_new_brick_conn (conn,mi,mj);
+        domain =
+            fclaw2d_domain_new_brick (glob->mpicomm, mi, mj, a, b,
+                                      fclaw_opt->minlevel);
+        brick = fclaw2d_map_new_brick (domain, mi, mj, a, b);
         
         /* Square in [-1,1]x[-1,1], shifted by (1,1,0) */
         cont = fclaw2d_map_new_cart(brick,
@@ -68,16 +69,20 @@ void create_domain(fclaw2d_global_t *glob)
 
         }
         /* Five patch square domain */
-        conn = p4est_connectivity_new_disk (a,b);
-        cont = fclaw2d_map_new_fivepatch (fclaw_opt->scale,
-                                          fclaw_opt->shift,
-                                          user->alpha);
+        domain =
+            fclaw2d_domain_new_disk (glob->mpicomm, 0, 0,
+                                     fclaw_opt->minlevel);
+        cont =
+            fclaw2d_map_new_fivepatch (fclaw_opt->scale, fclaw_opt->shift,
+                                       user->alpha);
         break;
     case 3:
         /* bilinear square domain : maps to [-1,1]x[-1,1] */
-        FCLAW_ASSERT(mi == 2 && mj == 2);
-        conn = p4est_connectivity_new_brick(mi,mj,a,b);
-        brick = fclaw2d_map_new_brick_conn (conn,mi,mj);
+        FCLAW_ASSERT (mi == 2 && mj == 2);
+        domain =
+            fclaw2d_domain_new_brick (glob->mpicomm, mi, mj, a, b,
+                                      fclaw_opt->minlevel);
+        brick = fclaw2d_map_new_brick (domain, mi, mj, a, b);
         cont = fclaw2d_map_new_bilinear (brick, 
                                          fclaw_opt->scale,
                                          fclaw_opt->shift, 
@@ -91,12 +96,10 @@ void create_domain(fclaw2d_global_t *glob)
     /* Store mapping in the glob */
     fclaw2d_global_store_map (glob, cont);            
     
-    /* Create new domain with connectivity */
-    fclaw2d_domain_t *domain = fclaw2d_domain_new_conn(glob->mpicomm, 
-                                                       fclaw_opt->minlevel, conn);    
-
+    /* Store domain in glob */
     fclaw2d_global_store_domain(glob, domain);
 
+    /* Print out some domain info */
     fclaw2d_domain_list_levels(domain, FCLAW_VERBOSITY_ESSENTIAL);
     fclaw2d_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);
 
@@ -133,8 +136,6 @@ void run_program(fclaw2d_global_t* glob)
     fclaw2d_finalize(glob);
 }
 
-
-
 int
 main (int argc, char **argv)
 {
@@ -164,7 +165,7 @@ main (int argc, char **argv)
     int first_arg;
     vexit =  fclaw_app_options_parse (app, &first_arg,"fclaw_options.ini.used");
 
-    if (!retval & !vexit)
+    if (!vexit)
     {
         /* Options have been checked and are valid */
 
