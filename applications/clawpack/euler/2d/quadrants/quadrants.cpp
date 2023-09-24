@@ -37,28 +37,39 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fc2d_clawpack5.h>
 
 static
-void create_domain_map (fclaw2d_global_t *glob,
-                        fclaw_options_t* fclaw_opt)
+void create_domain(fclaw2d_global_t *glob)
 {
-    fclaw2d_domain_t         *domain;
-    domain = fclaw2d_domain_new_unitsquare (glob->mpicomm, fclaw_opt->minlevel);
+    /* ---------------------------------------------------------------
+       Mapping geometry
+       --------------------------------------------------------------- */
+    const fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
+
+    fclaw2d_domain_t *domain = 
+        fclaw2d_domain_new_unitsquare(glob->mpicomm, 
+                                      fclaw_opt->minlevel);
+
+    fclaw2d_map_context_t *cont = fclaw2d_map_new_nomap();
+
+    /* Store mapping in the glob */
+    fclaw2d_global_store_map (glob, cont);            
+
+    /* Store the domain in the glob */
+    fclaw2d_global_store_domain(glob, domain);
+
+    /* print out some info */
     fclaw2d_domain_list_levels(domain, FCLAW_VERBOSITY_ESSENTIAL);
     fclaw2d_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);
-    fclaw2d_global_store_domain (glob, domain);
-    fclaw2d_global_store_map (glob, fclaw2d_map_new_nomap ());
 }
 
 static
 void run_program(fclaw2d_global_t* glob)
 {
-    const user_options_t  *user_opt;
-
     /* ---------------------------------------------------------------
        Set domain data.
        --------------------------------------------------------------- */
     fclaw2d_domain_data_new(glob->domain);
 
-    user_opt = quadrants_get_options(glob);
+    const user_options_t *user_opt = quadrants_get_options(glob);
 
     /* Initialize virtual table for ForestClaw */
     fclaw2d_vtables_initialize(glob);
@@ -86,9 +97,7 @@ void run_program(fclaw2d_global_t* glob)
 int
 main (int argc, char **argv)
 {
-    fclaw_app_t *app;
-    int first_arg;
-    fclaw_exit_type_t vexit;
+    fclaw_app_t *app = fclaw_app_new (&argc, &argv, NULL);
 
     /* Options */
     user_options_t              *user_opt;
@@ -96,13 +105,6 @@ main (int argc, char **argv)
     fclaw2d_clawpatch_options_t *clawpatch_opt;
     fc2d_clawpack46_options_t   *claw46_opt;
     fc2d_clawpack5_options_t    *claw5_opt;
-
-    fclaw2d_global_t            *glob;
-    fclaw2d_domain_t            *domain;
-    sc_MPI_Comm mpicomm;
-
-    /* Initialize application */
-    app = fclaw_app_new (&argc, &argv, NULL);
 
     /* Create new options packages */
     fclaw_opt =                   fclaw_options_register(app,  NULL,        "fclaw_options.ini");
@@ -112,18 +114,18 @@ main (int argc, char **argv)
     user_opt =                quadrants_options_register(app,               "fclaw_options.ini");
 
     /* Read configuration file(s) and command line, and process options */
-    vexit =  fclaw_app_options_parse (app, &first_arg,"fclaw_options.ini.used");
+    int first_arg;
+    fclaw_exit_type_t vexit = 
+        fclaw_app_options_parse (app, &first_arg,"fclaw_options.ini.used");
 
     /* Run the program */
     if (!vexit)
     {
         /* Options have been checked and are valid */
-
         /* Create global structure which stores the domain, timers, etc */
         int size, rank;
-        mpicomm = fclaw_app_get_mpi_size_rank (app, &size, &rank);
-        glob = fclaw2d_global_new_comm (mpicomm, size, rank);
-        create_domain_map (glob, fclaw_opt);
+        sc_MPI_Comm mpicomm = fclaw_app_get_mpi_size_rank (app, &size, &rank);
+        fclaw2d_global_t * glob = fclaw2d_global_new_comm (mpicomm, size, rank);
 
          /* Store option packages in glob */
         fclaw2d_options_store           (glob, fclaw_opt);
@@ -131,6 +133,9 @@ main (int argc, char **argv)
         fc2d_clawpack46_options_store   (glob, claw46_opt);
         fc2d_clawpack5_options_store    (glob, claw5_opt);
         quadrants_options_store         (glob, user_opt);
+
+        /* Create domain and store domain in glob */
+        create_domain(glob);
 
         run_program(glob);
 
