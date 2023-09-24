@@ -37,44 +37,49 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fc2d_clawpack5.h>
 
 static
-void create_domain_map (fclaw2d_global_t *glob,
-                        fclaw_options_t *fclaw_opt)
+void create_domain(fclaw2d_global_t *glob)
 {
-    /* Mapped, multi-block domain */
-    fclaw2d_domain_t         *domain = NULL;
-    fclaw2d_map_context_t    *cont = NULL, *brick = NULL;
-
-    /* Build a rectangle that may have periodic boundaries */
-    int                       mi, mj, a, b;
-    mi = fclaw_opt->mi;
-    mj = fclaw_opt->mj;
-    a = fclaw_opt->periodic_x;
-    b = fclaw_opt->periodic_y;
+    /* ---------------------------------------------------------------
+       Mapping geometry
+       --------------------------------------------------------------- */
+    const fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
+    int mi = fclaw_opt->mi;
+    int mj = fclaw_opt->mj;
+    int a = fclaw_opt->periodic_x;
+    int b = fclaw_opt->periodic_y;
 
     /* Construct and store domain */
-    domain = fclaw2d_domain_new_brick (glob->mpicomm, mi, mj, a, b,
-                                      fclaw_opt->minlevel);
+    fclaw2d_domain_t *domain = 
+        fclaw2d_domain_new_brick(glob->mpicomm, mi, mj, a, b,
+                                 fclaw_opt->minlevel);
+
+    /* Construct brick mapping */
+    fclaw2d_map_context_t *brick = 
+        fclaw2d_map_new_brick(domain, mi, mj, a, b);
+
+    fclaw2d_map_context_t *cont = 
+        fclaw2d_map_new_nomap_brick (brick);
+
+    /* Store mapping in the glob */
+    fclaw2d_global_store_map (glob, cont);            
+
+    /* Store the domain in the glob */
+    fclaw2d_global_store_domain(glob, domain);
+
+    /* print out some info */
     fclaw2d_domain_list_levels (domain, FCLAW_VERBOSITY_ESSENTIAL);
     fclaw2d_domain_list_neighbors (domain, FCLAW_VERBOSITY_DEBUG);
-    fclaw2d_global_store_domain (glob, domain);
-
-    /* Construct and store map */
-    brick = fclaw2d_map_new_brick (domain, mi, mj, a, b);
-    cont = fclaw2d_map_new_nomap_brick (brick);
-    fclaw2d_global_store_map (glob, cont);
 }
 
 static
 void run_program(fclaw2d_global_t* glob)
 {
-    const user_options_t  *user_opt;
-
     /* ---------------------------------------------------------------
        Set domain data.
        --------------------------------------------------------------- */
     fclaw2d_domain_data_new(glob->domain);
 
-    user_opt = shockbubble_get_options(glob);
+    const user_options_t *user_opt = shockbubble_get_options(glob);
 
     /* Initialize virtual table for ForestClaw */
     fclaw2d_vtables_initialize(glob);
@@ -102,9 +107,8 @@ void run_program(fclaw2d_global_t* glob)
 int
 main (int argc, char **argv)
 {
-    fclaw_app_t *app;
-    int first_arg;
-    fclaw_exit_type_t vexit;
+    /* Initialize application */
+    fclaw_app_t *app = fclaw_app_new (&argc, &argv, NULL);
 
     /* Options */
     user_options_t              *user_opt;
@@ -112,9 +116,6 @@ main (int argc, char **argv)
     fclaw2d_clawpatch_options_t *clawpatch_opt;
     fc2d_clawpack46_options_t   *claw46_opt;
     fc2d_clawpack5_options_t    *claw5_opt;
-
-    /* Initialize application */
-    app = fclaw_app_new (&argc, &argv, NULL);
 
     /* Create new options packages */
     fclaw_opt =                   fclaw_options_register(app,  NULL,        "fclaw_options.ini");
@@ -124,16 +125,16 @@ main (int argc, char **argv)
     user_opt =              shockbubble_options_register(app,               "fclaw_options.ini");
 
     /* Read configuration file(s) and command line, and process options */
-    vexit =  fclaw_app_options_parse (app, &first_arg,"fclaw_options.ini.used");
+    int first_arg;
+    fclaw_exit_type_t vexit = 
+        fclaw_app_options_parse (app, &first_arg,"fclaw_options.ini.used");
 
     if (!vexit)
     {
         /* Options have been checked and are valid */
-
         int size, rank;
         sc_MPI_Comm mpicomm = fclaw_app_get_mpi_size_rank (app, &size, &rank);
         fclaw2d_global_t * glob = fclaw2d_global_new_comm (mpicomm, size, rank);
-        create_domain_map (glob, fclaw_opt);
 
         /* Store option packages in glob */
         fclaw2d_options_store           (glob, fclaw_opt);
@@ -141,6 +142,9 @@ main (int argc, char **argv)
         fc2d_clawpack46_options_store   (glob, claw46_opt);
         fc2d_clawpack5_options_store    (glob, claw5_opt);
         shockbubble_options_store       (glob, user_opt);
+
+        /* Create domain and store domain in glob */
+        create_domain(glob);
 
         /* Run the program */
         run_program(glob);
