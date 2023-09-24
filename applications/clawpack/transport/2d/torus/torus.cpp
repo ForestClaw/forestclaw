@@ -26,12 +26,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "torus_user.h"
 
 static
-void create_domain (fclaw2d_global_t * glob,
-                    fclaw_options_t* fclaw_opt, user_options_t* user)
+void create_domain (fclaw2d_global_t * glob)
 {
-    /* Mapped, multi-block domain */
-    fclaw2d_domain_t         *domain = NULL;
-    fclaw2d_map_context_t    *cont = NULL, *brick = NULL;
+    const fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
 
     /* ---------------------------------------------------------------
        Mapping geometry
@@ -49,34 +46,42 @@ void create_domain (fclaw2d_global_t * glob,
     rotate[0] = pi*fclaw_opt->theta/180.0;
     rotate[1] = pi*fclaw_opt->phi/180.0;
 
-    /* create domain topology */
-    domain = fclaw2d_domain_new_brick (glob->mpicomm, mi, mj, a, b,
-                                       fclaw_opt->minlevel);
+    /* Mapped, multi-block domain */
+    fclaw2d_domain_t  *domain = 
+        fclaw2d_domain_new_brick (glob->mpicomm, mi, mj, a, b,
+                                  fclaw_opt->minlevel);
+    /* Create brick mapping */
+    fclaw2d_map_context_t *brick =
+        fclaw2d_map_new_brick(domain, mi, mj, a, b);
+
+    const user_options_t *user = torus_get_options(glob);
+    fclaw2d_map_context *cont  = 
+        fclaw2d_map_new_torus(brick,
+                              fclaw_opt->scale,
+                              rotate,
+                              user->alpha,
+                              user->beta);
+
+    /* Store mapping in the glob */
+    fclaw2d_global_store_map (glob, cont);            
+
+    /* Store the domain in the glob */
+    fclaw2d_global_store_domain(glob, domain);
+
+    /* print out some info */
     fclaw2d_domain_list_levels (domain, FCLAW_VERBOSITY_ESSENTIAL);
     fclaw2d_domain_list_neighbors (domain, FCLAW_VERBOSITY_DEBUG);
-    fclaw2d_global_store_domain (glob, domain);
-
-    /* This does both the regular torus and the twisted torus */
-    brick = fclaw2d_map_new_brick (domain, mi, mj, a, b);
-    cont  = fclaw2d_map_new_torus(brick,
-                                  fclaw_opt->scale,
-                                  rotate,
-                                  user->alpha,
-                                  user->beta);
-    fclaw2d_global_store_map (glob, cont);
 }
 
 static
 void run_program(fclaw2d_global_t* glob)
 {
-    const user_options_t  *user;
-
     /* ---------------------------------------------------------------
        Set domain data.
        --------------------------------------------------------------- */
     fclaw2d_domain_data_new(glob->domain);
 
-    user = torus_get_options(glob);
+    const user_options_t *user = torus_get_options(glob);
 
     /* Initialize virtual table for ForestClaw */
     fclaw2d_vtables_initialize(glob);
@@ -111,9 +116,8 @@ void run_program(fclaw2d_global_t* glob)
 int
 main (int argc, char **argv)
 {
-    fclaw_app_t *app;
-    int first_arg;
-    fclaw_exit_type_t vexit;
+    /* Initialize application */
+    fclaw_app_t *app = fclaw_app_new (&argc, &argv, NULL);
 
     /* Options */
     user_options_t              *user;
@@ -122,8 +126,6 @@ main (int argc, char **argv)
     fc2d_clawpack46_options_t   *claw46_opt;
     fc2d_clawpack5_options_t    *claw5_opt;
 
-    /* Initialize application */
-    app = fclaw_app_new (&argc, &argv, NULL);
 
     /* Create new options packages */
     fclaw_opt =                   fclaw_options_register(app,  NULL,        "fclaw_options.ini");
@@ -133,7 +135,9 @@ main (int argc, char **argv)
     user =                        torus_options_register(app,               "fclaw_options.ini");  
 
     /* Read configuration file(s) and command line, and process options */
-    vexit =  fclaw_app_options_parse (app, &first_arg,"fclaw_options.ini.used");
+    int first_arg;
+    fclaw_exit_type_t vexit = 
+        fclaw_app_options_parse (app, &first_arg,"fclaw_options.ini.used");
 
     if (!vexit)
     {
@@ -143,7 +147,6 @@ main (int argc, char **argv)
         int size, rank;
         sc_MPI_Comm mpicomm = fclaw_app_get_mpi_size_rank (app, &size, &rank);
         fclaw2d_global_t *glob = fclaw2d_global_new_comm (mpicomm, size, rank);
-        create_domain (glob, fclaw_opt, user);
 
         /* Store option packages in glob */
         fclaw2d_options_store           (glob, fclaw_opt);
@@ -151,6 +154,9 @@ main (int argc, char **argv)
         fc2d_clawpack46_options_store   (glob, claw46_opt);
         fc2d_clawpack5_options_store    (glob, claw5_opt);
         torus_options_store             (glob, user);
+
+        /* Create domain and store domain in glob */
+        create_domain(glob);
 
         /* Run the program */
         run_program(glob);
