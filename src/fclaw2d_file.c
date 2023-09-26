@@ -358,6 +358,8 @@ fcaw2d_file_get_padding_string_v1 (size_t num_bytes, size_t divisor,
     }
 }
 
+/** currently unused */
+#if 0
 static int
 fclaw2d_file_check_file_metadata_v1 (sc_MPI_Comm mpicomm,
                                      const char *filename,
@@ -474,6 +476,7 @@ fclaw2d_file_check_file_metadata_v1 (sc_MPI_Comm mpicomm,
 
     return (error_flag) ? FCLAW2D_FILE_ERR_FORMAT_V1 : sc_MPI_SUCCESS;
 }
+#endif
 
 /** Close an MPI file or its libsc-internal replacement in case of an error.
  * \param [in,out]  file    A sc_MPI_file
@@ -661,6 +664,8 @@ fclaw2d_file_open_create_v1 (p4est_t * p4est, const char *filename,
     return file_context;
 }
 
+/** currently unused */
+#if 0
 /** Open a file for reading without knowing the p4est that is associated
  * with the mesh-related data in the file (cf. \ref fclaw2d_file_open_read_v1).
  * For more general comments on open_read see the documentation of
@@ -749,7 +754,10 @@ fclaw2d_file_open_read_ext_v1 (sc_MPI_Comm mpicomm, const char *filename,
     fclaw2d_file_error_code_v1 (*errcode, errcode);
     return file_context;
 }
+#endif
 
+/** currently unused */
+#if 0
 /** Open a file for reading and read its user string on rank zero.
  * The user string is broadcasted to all ranks after reading.
  * The file must exist and be at least of the size of the file header.
@@ -824,6 +832,7 @@ fclaw2d_file_open_read_v1 (p4est_t * p4est, const char *filename,
     fclaw2d_file_error_code_v1 (*errcode, errcode);
     return fc;
 }
+#endif
 
 /** Write a block section to an opened file.
  * This function requires an opened file context.
@@ -992,6 +1001,8 @@ fclaw2d_file_write_block_v1 (fclaw2d_file_context_p4est_v1_t * fc,
     return fc;
 }
 
+/** currently unused */
+#if 0
 /** Collectivly read and check block metadata.
  * If user_string == NULL data_size is not compared to
  * read_data_size.
@@ -1190,7 +1201,10 @@ fclaw2d_file_read_block_metadata_v1 (fclaw2d_file_context_p4est_v1_t * fc,
 
     return fc;
 }
+#endif
 
+/** currently unused */
+#if 0
 /** Read a header block from an opened file.
  * This function requires an opened file context.
  * The header data is read on rank 0.
@@ -1347,6 +1361,7 @@ fclaw2d_file_read_block_v1 (fclaw2d_file_context_p4est_v1_t * fc,
     fclaw2d_file_error_code_v1 (*errcode, errcode);
     return fc;
 }
+#endif
 
 /** Write one (more) per-quadrant data set to a parallel output file.
  *
@@ -1535,6 +1550,8 @@ fclaw2d_file_write_field_v1 (fclaw2d_file_context_p4est_v1_t * fc,
     return fc;
 }
 
+/** currently unused */
+#if 0
 /** Read a data field and specify the partition for reading in parallel.
  * See also the documentation of \ref fclaw2d_file_read_field_v1.
  *
@@ -1647,7 +1664,10 @@ fclaw2d_file_read_field_ext_v1 (fclaw2d_file_context_p4est_v1_t * fc,
     fclaw2d_file_error_code_v1 (*errcode, errcode);
     return fc;
 }
+#endif
 
+/** currently unused */
+#if 0
 /** Read one (more) per-quadrant data set from a parallel input file.
  * This function requires an opened file context.
  * This function requires the appropriate number of readable bytes.
@@ -1763,6 +1783,7 @@ fclaw2d_file_read_field_v1 (fclaw2d_file_context_p4est_v1_t * fc,
     fclaw2d_file_error_code_v1 (*errcode, errcode);
     return retfc;
 }
+#endif
 
 /** A data type that encodes the metadata of one data block in a fclaw2d data file.
  */
@@ -1775,6 +1796,8 @@ typedef struct fclaw2d_file_section_metadata_v1
 }
 fclaw2d_file_section_metadata_v1_t;
 
+/** currently unused */
+#if 0
 /** Read metadata information of a file written by a matching forest.
  * Matching refers to the global count of quadrants; partition is irrelevant.
  *
@@ -2088,6 +2111,7 @@ fclaw2d_file_info_v1 (p4est_t * p4est, const char *filename,
     fclaw2d_file_error_code_v1 (*errcode, errcode);
     return 0;
 }
+#endif
 
 /** Converts a error code (MPI or libsc error) into a fclaw2d_file error code.
  * This function turns MPI error codes into MPI error classes if
@@ -2427,6 +2451,8 @@ fclaw2d_file_write_p4est_v1 (fclaw2d_file_context_p4est_v1_t * fc,
     return fc;
 }
 
+/** currently unused */
+#if 0
 /** Convert read data to a p4est.
  *
  * \param [in] mpicomm    MPI communicator of the p4est.
@@ -2486,7 +2512,10 @@ fclaw2d_file_data_to_p4est (sc_MPI_Comm mpicomm, int mpisize,
     }
     return ptemp;
 }
+#endif
 
+/** currently unused */
+#if 0
 /** Read a p4est to an opened file using the MPI communicator of \a fc.
  *
  * \param [in,out] fc         Context previously created by \ref
@@ -2701,6 +2730,7 @@ fclaw2d_file_read_p4est_v1 (fclaw2d_file_context_p4est_v1_t * fc,
     sc_array_reset (&quad_data);
     return fc;
 }
+#endif
 
 /** Write a connectivity to an opened file.
  * This function writes two block sections to the opened file.
@@ -2772,6 +2802,8 @@ fclaw2d_file_write_connectivity_v1 (fclaw2d_file_context_p4est_v1_t * fc,
     return fc;
 }
 
+/** currently unused */
+#if 0
 /** Read a connectivity from an opened file.
  * This function reads two block sections from the opened file.
  * The first block contains the size of the serialized connectivity data
@@ -2857,6 +2889,7 @@ fclaw2d_file_read_connectivity_v1 (fclaw2d_file_context_p4est_v1_t * fc,
 
     return fc;
 }
+#endif
 
 /** Close a file opened for parallel write/read and free the context.
  *
@@ -3057,7 +3090,7 @@ fclaw2d_file_open_write (const char *filename,
     sc_array_init_data (&parameters, (void *) parameters_buffer,
                         2 * sizeof (uint64_t), 1);
 
-    /* write paramters for \ref p4est_wrap_new_p4est */
+    /* write parameters for \ref p4est_wrap_new_p4est */
     fc = fclaw2d_file_write_block_v1 (fc, 2 * sizeof (uint64_t), &parameters,
                                       "p4est wrap hollow and btype",
                                       &errcode_internal);
