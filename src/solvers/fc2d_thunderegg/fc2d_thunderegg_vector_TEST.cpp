@@ -30,6 +30,7 @@
 #include <fclaw2d_clawpatch46_fort.h>
 #include <fclaw2d_clawpatch_output_ascii.h>
 #include <fclaw2d_diagnostics.h>
+#include <fclaw2d_map_brick.h>
 #include <fclaw2d_forestclaw.h>
 #include <fclaw2d_global.h>
 #include <fclaw2d_domain.h>
@@ -47,10 +48,15 @@ struct QuadDomain {
     fclaw2d_global_t* glob;
     fclaw_options_t fopts;
     fclaw2d_domain_t *domain;
+    fclaw2d_map_context_t *map;
     fclaw2d_clawpatch_options_t opts;
 
     QuadDomain(){
-        glob = fclaw2d_global_new();
+        int rank;
+        int size;
+        sc_MPI_Comm_rank(sc_MPI_COMM_WORLD, &rank);
+        sc_MPI_Comm_size(sc_MPI_COMM_WORLD, &size);
+        glob = fclaw2d_global_new_comm(sc_MPI_COMM_WORLD, rank, size);
 
         fclaw2d_vtables_initialize(glob);
         fclaw2d_clawpatch_vtable_initialize(glob, 4);
@@ -67,9 +73,11 @@ struct QuadDomain {
         fopts.compute_error = true;
         fopts.subcycle = true;
 
-        domain = create_test_domain(sc_MPI_COMM_WORLD,&fopts);
-        fclaw2d_global_store_domain(glob, domain);
+        domain = fclaw2d_domain_new_unitsquare(glob->mpicomm,fopts.minlevel);
+        map = fclaw2d_map_new_nomap();
         fclaw2d_options_store(glob, &fopts);
+        fclaw2d_global_store_domain(glob, domain);
+        fclaw2d_global_store_map(glob, map);
 
         memset(&opts, 0, sizeof(opts));
         opts.mx   = 5;
@@ -102,10 +110,15 @@ struct QuadDomainBrick {
     fclaw2d_global_t* glob;
     fclaw_options_t fopts;
     fclaw2d_domain_t *domain;
+    fclaw2d_map_context_t *map;
     fclaw2d_clawpatch_options_t opts;
 
     QuadDomainBrick(){
-        glob = fclaw2d_global_new();
+        int rank;
+        int size;
+        sc_MPI_Comm_rank(sc_MPI_COMM_WORLD, &rank);
+        sc_MPI_Comm_size(sc_MPI_COMM_WORLD, &size);
+        glob = fclaw2d_global_new_comm(sc_MPI_COMM_WORLD, rank, size);
 
         fclaw2d_vtables_initialize(glob);
         fclaw2d_clawpatch_vtable_initialize(glob, 4);
@@ -122,8 +135,12 @@ struct QuadDomainBrick {
         fopts.compute_error = true;
         fopts.subcycle = true;
 
-        domain = create_test_domain(sc_MPI_COMM_WORLD,&fopts);
+        domain = fclaw2d_domain_new_brick(glob->mpicomm,fopts.mi,fopts.mj,0,0,fopts.minlevel);
+        fclaw2d_map_context_t *brick =
+              fclaw2d_map_new_brick(domain, fopts.mi, fopts.mj, 0, 0);
+        map = fclaw2d_map_new_nomap_brick(brick);
         fclaw2d_global_store_domain(glob, domain);
+        fclaw2d_global_store_map(glob, map);
         fclaw2d_options_store(glob, &fopts);
 
         memset(&opts, 0, sizeof(opts));
