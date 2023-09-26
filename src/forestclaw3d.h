@@ -1060,7 +1060,7 @@ void fclaw3d_domain_indirect_end (fclaw3d_domain_t * domain,
  * \param [in] faceno           Number of the ghost patch's face to look across.
  * \param [out] rproc           Processor number of neighbor patches.  Exception 1:
  *                              If the neighbor is a bigger patch, rproc[1] contains
- *                              the number of the small patch as one of two half faces,
+ *                              the number of the small patch as one of four half faces,
  *                              but only if the neighbor fits the above criteria.
  *                              Exception 2: For non-indirect patches, set it to -1.
  * \param [out] rblockno        The number of the neighbor block.
@@ -1075,8 +1075,8 @@ void fclaw3d_domain_indirect_end (fclaw3d_domain_t * domain,
 fclaw3d_patch_relation_t
 fclaw3d_domain_indirect_neighbors (fclaw3d_domain_t * domain,
                                    fclaw3d_domain_indirect_t * ind,
-                                   int ghostno, int faceno, int rproc[2],
-                                   int *rblockno, int rpatchno[2],
+                                   int ghostno, int faceno, int rproc[4],
+                                   int *rblockno, int rpatchno[4],
                                    int *rfaceno);
 
 /** Destroy all context data for indirect ghost neighbor patches.
