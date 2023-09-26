@@ -233,9 +233,9 @@ fclaw2d_file_context_t *fclaw2d_file_write_array (fclaw2d_file_context_t *
  *
  * This is a collective function.
  * If the file has wrong metadata the function reports the error using
- * /ref P4EST_LERRORF, collectively close the file and deallocate
+ * P4EST_LERRORF, collectively close the file and deallocate
  * the file context. In this case the function returns NULL on all ranks.
- * The wrong file format or a wrong file header causes \ref P4EST_FILE_ERR_FORMAT
+ * The wrong file format or a wrong file header causes \ref FCLAW2D_FILE_ERR_FORMAT
  * as errcode.
  *
  * After calling this function the user can continue reading the opened file

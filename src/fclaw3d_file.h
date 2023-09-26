@@ -43,9 +43,9 @@ extern "C"
 #endif
 #endif
 
-#define FCLAW3D_FILE_USER_STRING_BYTES 48
-#define FCLAW3D_FILE_MAX_BLOCK_SIZE 9999999999999
-#define FCLAW3D_FILE_MAX_FIELD_ENTRY_SIZE 9999999999999
+#define FCLAW3D_FILE_USER_STRING_BYTES 48 /**< number of user string bytes */
+#define FCLAW3D_FILE_MAX_BLOCK_SIZE ((1000 * 1000 * 1000 * 1000 * 10) - 1) /**< maximal data size of a block */
+#define FCLAW3D_FILE_MAX_FIELD_ENTRY_SIZE ((1000 * 1000 * 1000 * 1000 * 10) - 1) /**< maximal data size per field entry*/
 
 /** Error values for fclaw2d_file functions.
  */
@@ -233,9 +233,9 @@ fclaw3d_file_context_t *fclaw3d_file_write_array (fclaw3d_file_context_t *
  *
  * This is a collective function.
  * If the file has wrong metadata the function reports the error using
- * /ref P8EST_LERRORF, collectively close the file and deallocate
+ * P8EST_LERRORF, collectively close the file and deallocate
  * the file context. In this case the function returns NULL on all ranks.
- * The wrong file format or a wrong file header causes \ref P8EST_FILE_ERR_FORMAT
+ * The wrong file format or a wrong file header causes \ref FCLAW3D_FILE_ERR_FORMAT
  * as errcode.
  *
  * After calling this function the user can continue reading the opened file
