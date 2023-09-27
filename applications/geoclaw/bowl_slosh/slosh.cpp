@@ -26,20 +26,21 @@
 #include "slosh_user.h"
 
 static
-fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, fclaw_options_t* gparms)
+void create_domain(fclaw2d_global_t* glob)
 {
-    /* Mapped, multi-block domain */
-    p4est_connectivity_t     *conn = NULL;
-    fclaw2d_domain_t         *domain;
-    fclaw2d_map_context_t    *cont = NULL;
+    fclaw_options_t *fclaw_opts = fclaw2d_get_options(glob);
 
-    conn = p4est_connectivity_new_unitsquare();
-    cont = fclaw2d_map_new_nomap();
+    /* Size is set by [ax,bx] x [ay, by], set in .ini file */
+    fclaw2d_domain_t *domain = 
+        fclaw2d_domain_new_unitsquare(glob->mpicomm, fclaw_opts->minlevel);
+    fclaw2d_map_context_t* cont = fclaw2d_map_new_nomap();
 
-    domain = fclaw2d_domain_new_conn_map (mpicomm, gparms->minlevel, conn, cont);
+    /* store domain and map in glob */
+    fclaw2d_global_store_domain(glob, domain);
+    fclaw2d_global_store_map(glob, cont);
+
     fclaw2d_domain_list_levels(domain, FCLAW_VERBOSITY_ESSENTIAL);
-    fclaw2d_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);  
-    return domain;
+    fclaw2d_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);
 }
 
 static
@@ -73,22 +74,14 @@ void run_program(fclaw2d_global_t* glob)
 int
 main (int argc, char **argv)
 {
-    fclaw_app_t *app;
-    int first_arg;
-    fclaw_exit_type_t vexit;
+    /* Initialize application */
+    fclaw_app_t *app = fclaw_app_new (&argc, &argv, NULL);
 
     /* Options */
     user_options_t              *user_opt;
     fclaw_options_t             *fclaw_opt;
     fclaw2d_clawpatch_options_t *clawpatch_opt;
     fc2d_geoclaw_options_t      *geo_opt;
-
-    fclaw2d_global_t            *glob;
-    fclaw2d_domain_t            *domain;
-    sc_MPI_Comm mpicomm;
-
-    /* Initialize application */
-    app = fclaw_app_new (&argc, &argv, NULL);
 
     /* Create new options packages */
     fclaw_opt =                   fclaw_options_register(app,  NULL,       "fclaw_options.ini");
@@ -97,23 +90,26 @@ main (int argc, char **argv)
     user_opt =                    slosh_options_register(app,              "fclaw_options.ini");  
 
     /* Read configuration file(s) and command line, and process options */
+    int first_arg;
+    fclaw_exit_type_t vexit;
     vexit =  fclaw_app_options_parse (app, &first_arg,"fclaw_options.ini.used");
 
     /* Run the program */
     if (!vexit)
     {
-        mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
-        domain = create_domain(mpicomm, fclaw_opt);
+        int size, rank;
+        sc_MPI_Comm mpicomm = fclaw_app_get_mpi_size_rank (app, &size, &rank);
     
         /* Create global structure which stores the domain, timers, etc */
-        glob = fclaw2d_global_new();
-        fclaw2d_global_store_domain(glob, domain);
+        fclaw2d_global_t *glob = fclaw2d_global_new_comm(mpicomm, size, rank);
 
         /* Store option packages in glob */
         fclaw2d_options_store           (glob, fclaw_opt);
         fclaw2d_clawpatch_options_store (glob, clawpatch_opt);
         fc2d_geoclaw_options_store      (glob, geo_opt);
         slosh_options_store             (glob, user_opt);
+
+        create_domain(glob);
 
         run_program(glob);
         
