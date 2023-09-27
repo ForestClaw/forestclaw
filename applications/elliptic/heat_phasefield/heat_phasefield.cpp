@@ -104,7 +104,7 @@ main (int argc, char **argv)
         fc2d_thunderegg_options_store    (phasefield_glob, phasefield_mg_opt);
         phasefield_options_store            (phasefield_glob, phasefield_user_opt);
 
-        phasefield_create_domain(heat_glob);
+        phasefield_create_domain(phasefield_glob);
 
         phasefield_run_program(phasefield_glob);
 
