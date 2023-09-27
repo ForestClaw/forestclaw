@@ -23,8 +23,6 @@
  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "fclaw2d_convenience.h"
-#include "fclaw2d_map.h"
 #include "swirl_user.h"
 
 #include <fc2d_cuda_profiler.h>
