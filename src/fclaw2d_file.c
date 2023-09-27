@@ -3044,8 +3044,6 @@ fclaw2d_file_open_write (const char *filename,
     p4est_t *p4est;
     fclaw2d_file_context_p4est_v1_t *fc;
     fclaw2d_file_context_t *fclaw_fc;
-    sc_array_t parameters;
-    uint64_t parameters_buffer[2];
     int  buf_size;
     char *buf;
 
@@ -3083,23 +3081,6 @@ fclaw2d_file_open_write (const char *filename,
     /* write the p4est */
     fc = fclaw2d_file_write_p4est_v1 (fc, p4est, "p4est quadrants",
                                       "p4est quadrant data", 0,
-                                      &errcode_internal);
-    fclaw2d_file_translate_error_code_v1 (errcode_internal, errcode);
-    if (*errcode != FCLAW2D_FILE_ERR_SUCCESS)
-    {
-        FCLAW_ASSERT (fc == NULL);
-        return NULL;
-    }
-
-    /* pack parameters for \ref p4est_wrap_new_p4est */
-    parameters_buffer[0] = (uint64_t) wrap->hollow;
-    parameters_buffer[1] = (uint64_t) wrap->btype;
-    sc_array_init_data (&parameters, (void *) parameters_buffer,
-                        2 * sizeof (uint64_t), 1);
-
-    /* write parameters for \ref p4est_wrap_new_p4est */
-    fc = fclaw2d_file_write_block_v1 (fc, 2 * sizeof (uint64_t), &parameters,
-                                      "p4est wrap hollow and btype",
                                       &errcode_internal);
     fclaw2d_file_translate_error_code_v1 (errcode_internal, errcode);
     if (*errcode != FCLAW2D_FILE_ERR_SUCCESS)
