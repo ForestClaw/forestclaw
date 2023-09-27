@@ -385,7 +385,7 @@ fclaw2d_file_check_file_metadata_v1 (sc_MPI_Comm mpicomm,
     {
         if (rank == 0)
         {
-            P4EST_LERROR ("Error reading. Wrong file header format.\n");
+            fclaw_errorf ("%s", "Error reading. Wrong file header format.\n");
         }
         return FCLAW2D_FILE_ERR_FORMAT_V1;
     }
@@ -394,7 +394,7 @@ fclaw2d_file_check_file_metadata_v1 (sc_MPI_Comm mpicomm,
     if (strcmp (metadata, FCLAW2D_FILE_MAGIC_NUMBER_V1))
     {
         /* TODO: check for wrong endianness */
-        P4EST_LERRORF
+        fclaw_errorf
             ("Error reading <%s>. Wrong magic number (in file = %s, magic number = %s).\n",
              filename, metadata, FCLAW2D_FILE_MAGIC_NUMBER_V1);
         error_flag = 1;
@@ -407,7 +407,7 @@ fclaw2d_file_check_file_metadata_v1 (sc_MPI_Comm mpicomm,
     {
         if (rank == 0)
         {
-            P4EST_LERROR ("Error reading. Wrong file header format.\n");
+            fclaw_errorf ("%s", "Error reading. Wrong file header format.\n");
         }
         return FCLAW2D_FILE_ERR_FORMAT_V1;
     }
@@ -419,7 +419,7 @@ fclaw2d_file_check_file_metadata_v1 (sc_MPI_Comm mpicomm,
     {
         if (rank == 0)
         {
-            P4EST_LERROR (FCLAW2D_FILE_STRING_V1
+            fclaw_errorf ("%s", FCLAW2D_FILE_STRING_V1
                           " : Error reading. Wrong file header format.\n");
         }
         return FCLAW2D_FILE_ERR_FORMAT_V1;
@@ -432,7 +432,7 @@ fclaw2d_file_check_file_metadata_v1 (sc_MPI_Comm mpicomm,
     {
         if (rank == 0)
         {
-            P4EST_LERROR (FCLAW2D_FILE_STRING_V1
+            fclaw_errorf ("%s", FCLAW2D_FILE_STRING_V1
                           " : Error reading. Wrong file header format.\n");
         }
         return FCLAW2D_FILE_ERR_FORMAT_V1;
@@ -454,7 +454,7 @@ fclaw2d_file_check_file_metadata_v1 (sc_MPI_Comm mpicomm,
     {
         if (rank == 0)
         {
-            P4EST_LERROR (FCLAW2D_FILE_STRING_V1
+            fclaw_errorf ("%s", FCLAW2D_FILE_STRING_V1
                           " : Error reading. Wrong file header format.\n");
         }
         return FCLAW2D_FILE_ERR_FORMAT_V1;
@@ -468,7 +468,7 @@ fclaw2d_file_check_file_metadata_v1 (sc_MPI_Comm mpicomm,
     *global_num_quadrants = (p4est_gloidx_t) read_global_num_quads;
     if (read_global_num_quads < 0)
     {
-        P4EST_LERRORF (FCLAW2D_FILE_STRING_V1
+        fclaw_errorf (FCLAW2D_FILE_STRING_V1
                        " : Error reading <%s>. Negative global number of quadrants.\n",
                        filename);
         error_flag = 1;
@@ -763,7 +763,7 @@ fclaw2d_file_open_read_ext_v1 (sc_MPI_Comm mpicomm, const char *filename,
  * The file must exist and be at least of the size of the file header.
  *
  * If the file has wrong metadata the function reports the error using
- * /ref P4EST_LERRORF, collectively close the file and deallocate
+ * \ref fclaw_errorf, collectively close the file and deallocate
  * the file context. In this case the function returns NULL on all ranks.
  * The wrong file format or a wrong file header causes \ref FCLAW2D_FILE_ERR_FORMAT_V1
  * as errcode.
@@ -808,7 +808,7 @@ fclaw2d_file_open_read_v1 (p4est_t * p4est, const char *filename,
     {
         if (p4est->mpirank == 0)
         {
-            P4EST_LERRORF (FCLAW2D_FILE_STRING_V1 " open_read: global number of "
+            fclaw_errorf (FCLAW2D_FILE_STRING_V1 " open_read: global number of "
                            "quadrants mismatch (in file = %lld,"
                            " by parameter = %lld)\n",
                            (long long) global_num_quadrants,
@@ -1060,12 +1060,12 @@ fclaw2d_file_read_block_metadata_v1 (fclaw2d_file_context_p4est_v1_t * fc,
         {
             if (invalid_block)
             {
-                P4EST_LERROR (FCLAW2D_FILE_STRING_V1
+                fclaw_errorf ("%s", FCLAW2D_FILE_STRING_V1
                               ": Error reading. Invalid data section type.\n");
             }
             else
             {
-                P4EST_LERROR (FCLAW2D_FILE_STRING_V1
+                fclaw_errorf ("%s", FCLAW2D_FILE_STRING_V1
                               ": Error reading. Wrong data section type.\n");
             }
         }
@@ -1087,7 +1087,7 @@ fclaw2d_file_read_block_metadata_v1 (fclaw2d_file_context_p4est_v1_t * fc,
     {
         if (rank == 0)
         {
-            P4EST_LERROR (FCLAW2D_FILE_STRING_V1
+            fclaw_errorf ("%s", FCLAW2D_FILE_STRING_V1
                           ": Error reading. Wrong section header format.\n");
         }
         fclaw2d_file_error_cleanup_v1 (&fc->file);
@@ -1105,7 +1105,7 @@ fclaw2d_file_read_block_metadata_v1 (fclaw2d_file_context_p4est_v1_t * fc,
     {
         if (rank == 0)
         {
-            P4EST_LERRORF (FCLAW2D_FILE_STRING_V1
+            fclaw_errorf (FCLAW2D_FILE_STRING_V1
                            ": Error reading. Wrong section data size (in file = %ld, by parameter = %ld).\n",
                            *read_data_size, data_size);
         }
@@ -1122,7 +1122,7 @@ fclaw2d_file_read_block_metadata_v1 (fclaw2d_file_context_p4est_v1_t * fc,
         {
             if (rank == 0)
             {
-                P4EST_LERROR (FCLAW2D_FILE_STRING_V1
+                fclaw_errorf ("%s", FCLAW2D_FILE_STRING_V1
                               ": Error reading. Wrong section header format.\n");
             }
             fclaw2d_file_error_cleanup_v1 (&fc->file);
@@ -1190,7 +1190,7 @@ fclaw2d_file_read_block_metadata_v1 (fclaw2d_file_context_p4est_v1_t * fc,
         /* wrong padding format */
         if (rank == 0)
         {
-            P4EST_LERROR (FCLAW2D_FILE_STRING_V1
+            fclaw_errorf ("%s", FCLAW2D_FILE_STRING_V1
                           ": Error reading. Wrong padding format.\n");
         }
         fclaw2d_file_error_cleanup_v1 (&fc->file);
@@ -1214,7 +1214,7 @@ fclaw2d_file_read_block_metadata_v1 (fclaw2d_file_context_p4est_v1_t * fc,
  *
  * The passed header_size is compared to the header_size stored in the file.
  * If the values do not equal each other, the function reports details via
- * /ref P4EST_LERRORF and closes and deallocate the file context. The return
+ * \ref fclaw_errorf and closes and deallocate the file context. The return
  * value in this case is NULL.
  * If the block header information is not matching the passed parameters
  * the function sets \ref FCLAW2D_FILE_ERR_FORMAT_V1 for errcode.
@@ -1312,7 +1312,7 @@ fclaw2d_file_read_block_v1 (fclaw2d_file_context_p4est_v1_t * fc,
         /* report wrong file size, collectively close the file and deallocate fc */
         if (rank == 0)
         {
-            P4EST_LERROR (FCLAW2D_FILE_STRING_V1
+            fclaw_errorf ("%s", FCLAW2D_FILE_STRING_V1
                           ": Error reading. File has less bytes than the user wants to read.\n");
         }
         mpiret = fclaw2d_file_close_v1 (fc, &mpiret);
@@ -1612,7 +1612,7 @@ fclaw2d_file_read_field_ext_v1 (fclaw2d_file_context_p4est_v1_t * fc,
         /* report wrong file size, collectively close the file and deallocate fc */
         if (rank == 0)
         {
-            P4EST_LERROR (FCLAW2D_FILE_STRING_V1
+            fclaw_errorf ("%s", FCLAW2D_FILE_STRING_V1
                           ": Error reading. File has less bytes than the user wants to read.\n");
         }
         mpiret = fclaw2d_file_close_v1 (fc, &mpiret);
@@ -1809,7 +1809,7 @@ fclaw2d_file_section_metadata_v1_t;
  *
  * If the number of bytes that the user intend to read is larger than the number
  * bytes left in the file, the function prints out an information about this
- * situation using P4EST_LERROR. In this case the function reads the bytes
+ * situation using \ref fclaw_errorf. In this case the function reads the bytes
  * that are possible to read but returns NULL to indicate an error.
  * If the file or block header information is not matching the passed parameters
  * the function sets \ref FCLAW2D_FILE_ERR_FORMAT_V1 for errcode.
@@ -1921,7 +1921,7 @@ fclaw2d_file_info_v1 (p4est_t * p4est, const char *filename,
     {
         if (p4est->mpirank == 0)
         {
-            P4EST_LERROR (FCLAW2D_FILE_STRING_V1
+            fclaw_errorf ("%s", FCLAW2D_FILE_STRING_V1
                           " file_info: read count error for file metadata reading");
         }
         *errcode = FCLAW2D_FILE_ERR_COUNT_V1;
@@ -1953,7 +1953,7 @@ fclaw2d_file_info_v1 (p4est_t * p4est, const char *filename,
     {
         if (p4est->mpirank == 0)
         {
-            P4EST_LERROR (FCLAW2D_FILE_STRING_V1
+            fclaw_errorf ("%s", FCLAW2D_FILE_STRING_V1
                           " file_info: global number of quadrant mismatch");
         }
         *errcode = FCLAW2D_FILE_ERR_FORMAT_V1;
@@ -2077,7 +2077,7 @@ fclaw2d_file_info_v1 (p4est_t * p4est, const char *filename,
                 || block_metadata[num_pad_bytes - 1] != '\n')
             {
                 /* the last entry is incomplete and is therefore removed */
-                P4EST_LERROR (FCLAW2D_FILE_STRING_V1
+                fclaw_errorf ("%s", FCLAW2D_FILE_STRING_V1
                               " file_info: stop parsing file and discard last element "
                               "due to wrong padding format.\n");
                 sc_array_rewind (data_sections,
