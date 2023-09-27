@@ -59,7 +59,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * File Header (96 bytes):
  * 7 bytes magic number (p{4,8}data0) and 1 byte new line char.
- * 23 bytes p4est version string* and 1 byte new line char.
+ * 23 bytes p4est file version string* and 1 byte new line char.
  * 47 bytes user string*  and 1 byte new line char.
  * 16 bytes number of global quadrants.
  *

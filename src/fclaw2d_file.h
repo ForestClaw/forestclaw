@@ -44,8 +44,8 @@ extern "C"
 #endif
 
 #define FCLAW2D_FILE_USER_STRING_BYTES 48 /**< number of user string bytes */
-#define FCLAW2D_FILE_MAX_BLOCK_SIZE ((1000 * 1000 * 1000 * 1000 * 10) - 1) /**< maximal data size of a block */
-#define FCLAW2D_FILE_MAX_FIELD_ENTRY_SIZE ((1000 * 1000 * 1000 * 1000 * 10) - 1) /**< maximal data size per field entry*/
+#define FCLAW2D_FILE_MAX_BLOCK_SIZE ((1000L * 1000L * 1000L * 1000L * 10L) - 1L) /**< maximal data size of a block */
+#define FCLAW2D_FILE_MAX_FIELD_ENTRY_SIZE ((1000L * 1000L * 1000L * 1000L * 10L) - 1L) /**< maximal data size per field entry*/
 
 /** Error values for fclaw2d_file functions.
  */
