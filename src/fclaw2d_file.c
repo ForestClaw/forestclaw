@@ -167,6 +167,28 @@ fclaw2d_file_error_v1_t;
 #define fclaw2d_file_context_p4est_v1            fclaw3d_file_context_p8est_v1
 #endif
 
+/** Translate dimension-dependent static functions. These IO functions are
+ * dimension dependent in the sense that their API depends directly or
+ * indirectly on p4est/p8est
+ */
+#ifdef P4_TO_P8
+#define fclaw2d_file_open_create_v1   fclaw3d_file_open_create_v1
+#define fclaw2d_file_open_read_ext_v1 fclaw3d_file_open_read_ext_v1
+#define fclaw2d_file_open_read_v1     fclaw3d_file_open_read_v1
+#define fclaw2d_file_write_block_v1   fclaw3d_file_write_block_v1
+#define fclaw2d_file_read_block_metadata_v1 fclaw3d_file_read_block_metadata_v1
+#define fclaw2d_file_read_block_v1    fclaw3d_file_read_block_v1
+#define fclaw2d_file_write_field_v1   fclaw3d_file_write_field_v1
+#define fclaw2d_file_read_field_ext_v1 fclaw3d_file_read_field_ext_v1
+#define fclaw2d_file_read_field_v1    fclaw2d_file_read_field_v1
+#define fclaw2d_file_info_v1          fclaw3d_file_info_v1
+#define fclaw2d_file_write_p4est_v1   fclaw3d_file_write_p4est_v1
+#define fclaw2d_file_read_p4est_v1    fclaw3d_file_read_p4est_v1
+#define fclaw2d_file_write_connectivity_v1 fclaw3d_file_write_connectivity_v1
+#define fclaw2d_file_read_connectivity_v1 fclaw3d_file_read_connectivity_v1
+#define fclaw2d_file_close_v1         fclaw3d_file_close_v1
+#endif
+
 /** The file context for for fclaw2d data files associated to a p4est. */
 typedef struct fclaw2d_file_context_p4est_v1
 {
