@@ -34,7 +34,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define FCLAW3D_FILE_H
 
 #include <forestclaw3d.h>
-#include <p8est_io.h> /* to set the FCLAW3D_FILE macros publicly */
 
 #ifdef __cplusplus
 extern "C"
@@ -44,11 +43,42 @@ extern "C"
 #endif
 #endif
 
-#define FCLAW3D_FILE_USER_STRING_BYTES P8EST_FILE_USER_STRING_BYTES
-#define FCLAW3D_FILE_MAX_BLOCK_SIZE P8EST_FILE_MAX_BLOCK_SIZE
-#define FCLAW3D_FILE_ERR_SUCCESS P8EST_FILE_ERR_SUCCESS
-#define FCLAW3D_FILE_ERR_FORMAT P8EST_FILE_ERR_FORMAT
-#define FCLAW3D_FILE_ERR_NOT_IMPLEMENTED (P8EST_FILE_ERR_LASTCODE + 1)
+#define FCLAW3D_FILE_USER_STRING_BYTES 48 /**< number of user string bytes */
+#define FCLAW3D_FILE_MAX_BLOCK_SIZE ((1000 * 1000 * 1000 * 1000 * 10) - 1) /**< maximal data size of a block */
+#define FCLAW3D_FILE_MAX_FIELD_ENTRY_SIZE ((1000 * 1000 * 1000 * 1000 * 10) - 1) /**< maximal data size per field entry*/
+
+/** Error values for fclaw2d_file functions.
+ */
+typedef enum fclaw3d_file_error
+{
+    FCLAW3D_FILE_ERR_SUCCESS = 0, /**< file function completed with success */
+    FCLAW3D_FILE_ERR_FILE = sc_MPI_ERR_LASTCODE, /**< invalid file handle */
+    FCLAW3D_FILE_ERR_NOT_SAME, /**< collective arg not identical */
+    FCLAW3D_FILE_ERR_AMODE, /**< access mode error */
+    FCLAW3D_FILE_ERR_NO_SUCH_FILE, /**< file does not exist */
+    FCLAW3D_FILE_ERR_FILE_EXIST, /**< file exists already */
+    FCLAW3D_FILE_ERR_BAD_FILE, /**< invalid file name */
+    FCLAW3D_FILE_ERR_ACCESS, /**< permission denied */
+    FCLAW3D_FILE_ERR_NO_SPACE, /**< not enough space */
+    FCLAW3D_FILE_ERR_QUOTA, /**< quota exceeded */
+    FCLAW3D_FILE_ERR_READ_ONLY, /**< read only file (system) */
+    FCLAW3D_FILE_ERR_IN_USE, /**< file currently open by other process */
+    FCLAW3D_FILE_ERR_IO, /**< other I/O error */
+    FCLAW3D_FILE_ERR_FORMAT, /**< read file has a wrong format */
+    FCLAW3D_FILE_ERR_SECTION_TYPE, /**< a valid non-matching section type */
+    FCLAW3D_FILE_ERR_CONN, /**< invalid serialized connectivity data */
+    FCLAW3D_FILE_ERR_P4EST, /**< invalid p4est data */
+    FCLAW3D_FILE_ERR_IN_DATA, /**< input data of file function is invalid */
+    FCLAW3D_FILE_ERR_COUNT, /**< read or write count error that was not
+                                 classified as a format error */
+    FCLAW3D_FILE_ERR_NOT_IMPLEMENTED, /**< functionality is not implemented */
+    FCLAW3D_FILE_ERR_UNKNOWN, /**< unknown error */
+    FCLAW3D_FILE_ERR_LASTCODE /**< to define own error codes for
+                                  a higher level application
+                                  that is using fclaw3d_file
+                                  functions */
+}
+fclaw3d_file_error_t;
 
 /** Opaque context used for writing a fclaw3d data file. */
 typedef struct fclaw3d_file_context fclaw3d_file_context_t;
@@ -61,20 +91,28 @@ typedef struct fclaw3d_file_context fclaw3d_file_context_t;
  * is written to the file.
  *
  * The opened file can be used to write to the file using the functions
- * \ref fclaw3d_file_write_block, \ref fclaw3d_file_write_array and functions
- * in other files operating on \ref fclaw3d_file_context_t.
+ * \ref fclaw3d_file_write_block, \ref fclaw3d_file_write_array and
+ * potentially other functions operating on \ref fclaw3d_file_context_t that
+ * may be implemented on the top of the current fclaw3d_file routines.
  *
  * This function does not abort on MPI I/O errors but returns NULL.
  * Without MPI I/O the function may abort on file system dependent
  * errors.
  *
- * \param [in] filename    Path to parallel file that is to be created.
- * \param [in] user_string A user string that is written to the file header.
- *                         Only \ref FCLAW3D_FILE_USER_STRING_BYTES
- *                         bytes without NUL-termination are
- *                         written to the file. If the user gives less
- *                         bytes the user_string in the file header is padded
- *                         by spaces.
+ * \param [in] filename    Path to parallel file base name that is to be created.
+ *                         This means that the user shall not pass the file
+ *                         extension since the file extension is specified by
+ *                         fclaw3d_file to '.f3d'.
+ * \param [in] user_string A NUL-terminated user string that is written to the
+ *                         file header having FCLAW3D_FILE_USER_STRING_BYTES
+ *                         bytes including the NUL-termination. Shorter
+ *                         user strings are padded by spaces in the file header.
+ *                         Too long user strings result in an error with the
+ *                         error code \ref FCLAW3D_FILE_ERR_IN_DATA.
+ * \param [in]  write_partition A Boolean to decide whether the partition is
+ *                         written to disk. The filename of the partition file
+ *                         is derived from the given filename. Currently,
+ *                         this flag does not have any effect.
  * \param [in]   domain    The underlying p8est is used for the metadata of the
  *                         the created file and the \b domain is written to the
  *                         file.
@@ -85,7 +123,8 @@ typedef struct fclaw3d_file_context fclaw3d_file_context_t;
  */
 fclaw3d_file_context_t *fclaw3d_file_open_write (const char *filename,
                                                  const char *user_string,
-                                                 fclaw3d_domain_t *domain,
+                                                 int write_partition,
+                                                 fclaw3d_domain_t * domain,
                                                  int *errcode);
 
 /** Write a serial data block to an opened parallel file.
@@ -93,7 +132,6 @@ fclaw3d_file_context_t *fclaw3d_file_open_write (const char *filename,
  * This is a collective function.
  * This function writes a serial data block to the opened file.
  *
- * The block data and its metadata is written on rank 0.
  * The number of block bytes must be less or equal \ref
  * FCLAW3D_FILE_MAX_BLOCK_SIZE.
  *
@@ -104,12 +142,13 @@ fclaw3d_file_context_t *fclaw3d_file_open_write (const char *filename,
  * \param [in, out] fc          Context previously created by \ref
  *                              fclaw3d_file_open_write.  It keeps track
  *                              of the data sets written one after another.
- * \param [in]      user_string A user string that is written to the file.
- *                              Only \ref FCLAW3D_FILE_USER_STRING_BYTES
- *                              bytes without NUL-termination are
- *                              written to the file. If the user gives less
- *                              bytes the user_string in the file header is padded
- *                              by spaces.
+ * \param [in]      user_string A NUL-terminated user string that is written to
+ *                              the section header having
+ *                              FCLAW3D_FILE_USER_STRING_BYTES bytes including
+ *                              the NUL-termination. Shorter user strings are
+ *                              padded by spaces in the section header. Too long
+ *                              user strings result in an error with the error
+ *                              code \ref FCLAW3D_FILE_ERR_IN_DATA.
  * \param [in]      block_size  The size of the block in bytes. May be equal to
  *                              0. In this case the section header and the padding
  *                              is still written. This function returns the passed
@@ -131,7 +170,7 @@ fclaw3d_file_context_t *fclaw3d_file_open_write (const char *filename,
 fclaw3d_file_context_t *fclaw3d_file_write_block (fclaw3d_file_context_t *
                                                   fc, const char *user_string,
                                                   size_t block_size,
-                                                  sc_array_t *block_data,
+                                                  sc_array_t * block_data,
                                                   int *errcode);
 
 /** Write per-patch data to a parallel output file.
@@ -151,12 +190,13 @@ fclaw3d_file_context_t *fclaw3d_file_write_block (fclaw3d_file_context_t *
  * \param [in, out] fc          Context previously created by \ref
  *                              fclaw3d_file_open_write.  It keeps track
  *                              of the data sets written one after another.
- * \param [in]      user_string A user string that is written to the file.
- *                              Only \ref FCLAW3D_FILE_USER_STRING_BYTES
- *                              bytes without NUL-termination are
- *                              written to the file. If the user gives less
- *                              bytes the user_string in the file header is padded
- *                              by spaces.
+ * \param [in]      user_string A NUL-terminated user string that is written to
+ *                              the section header having
+ *                              FCLAW3D_FILE_USER_STRING_BYTES bytes including
+ *                              the NUL-termination. Shorter user strings are
+ *                              padded by spaces in the section header. Too long
+ *                              user strings result in an error with the error
+ *                              code \ref FCLAW3D_FILE_ERR_IN_DATA.
  * \param [in]      patch_size  The number of bytes per patch. This number
  *                              must coincide with \b patch_data->elem_size.
  * \param [in]      patch_data  An array of the length number of local patches
@@ -171,8 +211,8 @@ fclaw3d_file_context_t *fclaw3d_file_write_block (fclaw3d_file_context_t *
  *                              order of the patches. For \b patch_size == 0
  *                              the function writes an empty array. The section
  *                              header and the padding is still written.
- *                              In this case errcode is set to \ref
- *                              FCLAW3D_FILE_ERR_SUCCESS.
+ *                              In this case the function passes successfully and
+ *                              \b errcode is set to \ref FCLAW3D_FILE_ERR_SUCCESS.
  * \param [out]     errcode     An errcode that can be interpreted by
  *                              \ref fclaw3d_file_error_string.
  * \return                      Return a pointer to input context or NULL in case
@@ -183,36 +223,51 @@ fclaw3d_file_context_t *fclaw3d_file_write_block (fclaw3d_file_context_t *
 fclaw3d_file_context_t *fclaw3d_file_write_array (fclaw3d_file_context_t *
                                                   fc, const char *user_string,
                                                   size_t patch_size,
-                                                  sc_array_t *patch_data,
+                                                  sc_array_t * patch_data,
                                                   int *errcode);
 
 /** Open a file for reading and read the stored domain.
- * The user string is broadcasted to all ranks after reading on rank 0.
+ * The user string is broadcasted to all ranks after reading.
  * The file must exist and be at least of the size of the file header.
  *
  * This is a collective function.
  * If the file has wrong metadata the function reports the error using
- * /ref P8EST_LERRORF, collectively close the file and deallocate
+ * \ref fclaw_errorf, collectively closes the file and deallocates
  * the file context. In this case the function returns NULL on all ranks.
- * The wrong file format or a wrong file header causes \ref P8EST_FILE_ERR_FORMAT
+ * The wrong file format or a wrong file header causes \ref FCLAW3D_FILE_ERR_FORMAT
  * as errcode.
  *
  * After calling this function the user can continue reading the opened file
  * by calling \ref fclaw3d_file_read_block, \ref fclaw3d_file_read_array and
- * functions in other files operating on \ref fclaw3d_file_context_t.
+ * potentially other functions operating on \ref fclaw3d_file_context_t that
+ * may be implemented on the top of the current fclaw3d_file routines.
  *
  * This function does not abort on MPI I/O errors but returns NULL.
  * Without MPI I/O the function may abort on file system dependent
  * errors.
  *
- * \param [in]  mpicomm       MPI communicator that is used to read the file and
- *                            is used for potential other reading operations of
- *                            MPI communicator dependent objects.
- * \param [in]  filename      The path to the file that is opened.
+ * \param [in]  filename      The path to the base name file that is opened.
+ *                            This means that the user shall not pass the file
+ *                            extension since the extension ('f3d') is added by
+ *                            fclaw3d_file.
  * \param [out] user_string   At least \ref FCLAW3D_FILE_USER_STRING_BYTES
  *                            bytes. The user string is written
  *                            to the passed array including padding spaces
  *                            and a trailing NUL-termination.
+ * \param [in]  mpicomm       MPI communicator that is used to read the file and
+ *                            is used for potential other reading operations of
+ *                            MPI communicator dependent objects.
+ * \param [in]  read_partition A Boolean to decide if the partition is read
+ *                            from file. If the partition is read, it is used
+ *                            for the parallel I/O operations and stored in the
+ *                            returned \b domain. If the MPI size and the
+ *                            partition size do not coincide a partition for the
+ *                            current MPI size is computed. For \b read_partition
+ *                            false a uniform partition with respect to the
+ *                            quadrant count is computed and used.
+ *                            The function call results in an error if there
+ *                            is no partition to read.
+ *                            Currently, this flag does not have any effect.
  * \param [out] domain        Newly allocated domain that is read from the file.
  * \param [out] errcode       An errcode that can be interpreted by
  *                            \ref fclaw3d_file_error_string.
@@ -220,10 +275,11 @@ fclaw3d_file_context_t *fclaw3d_file_write_array (fclaw3d_file_context_t *
  *                            and eventually closing the file. NULL in
  *                            case of error.
  */
-fclaw3d_file_context_t *fclaw3d_file_open_read (sc_MPI_Comm mpicomm,
-                                                const char *filename,
+fclaw3d_file_context_t *fclaw3d_file_open_read (const char *filename,
                                                 char *user_string,
-                                                fclaw3d_domain_t **domain,
+                                                sc_MPI_Comm mpicomm,
+                                                int read_partition,
+                                                fclaw3d_domain_t ** domain,
                                                 int *errcode);
 
 /** Read a serial data block from an opened file.
@@ -231,11 +287,10 @@ fclaw3d_file_context_t *fclaw3d_file_open_read (sc_MPI_Comm mpicomm,
  * This is a collective function.
  *
  * This function requires an opened file context.
- * The data block and its metadata is read on rank 0.
  *
  * The passed \b block_size is compared to the block size stored in the file.
- * If the values do not equal each other, the function reports details closes
- * and deallocate the file context. The return value in this case is NULL.
+ * If the values do not equal each other, the function reports details, closes
+ * and deallocates the file context. The return value in this case is NULL.
  * If the data block section header information is not matching the passed
  * parameters the function sets \ref FCLAW3D_FILE_ERR_FORMAT for errcode.
  *
@@ -275,7 +330,7 @@ fclaw3d_file_context_t *fclaw3d_file_open_read (sc_MPI_Comm mpicomm,
 fclaw3d_file_context_t *fclaw3d_file_read_block (fclaw3d_file_context_t *
                                                  fc, char *user_string,
                                                  size_t block_size,
-                                                 sc_array_t *block_data,
+                                                 sc_array_t * block_data,
                                                  int *errcode);
 
 /** Read per-patch data from a parallel output file.
@@ -331,7 +386,7 @@ fclaw3d_file_context_t *fclaw3d_file_read_block (fclaw3d_file_context_t *
 fclaw3d_file_context_t *fclaw3d_file_read_array (fclaw3d_file_context_t *
                                                  fc, char *user_string,
                                                  size_t patch_size,
-                                                 sc_array_t *patch_data,
+                                                 sc_array_t * patch_data,
                                                  int *errcode);
 
 /** Close a file opened for parallel write/read and free the context.
@@ -355,7 +410,7 @@ int fclaw3d_file_close (fclaw3d_file_context_t * fc, int *errcode);
 /** Turn fclaw3d_file errcode into a string.
  *
  * \param [in] errcode      An errcode that is output by a
- *                          fclaw_file function.
+ *                          fclaw3d_file function.
  * \param [in,out] string   At least sc_MPI_MAX_ERROR_STRING bytes.
  * \param [out] resultlen   Length of string on return.
  * \return                  0 on success or
