@@ -2201,7 +2201,8 @@ fclaw2d_file_error_code_v1 (int errcode, int *fclaw2d_errcode)
 
     default:
         /* errcode may be MPI version 1.1 error code */
-        return sc_MPI_Error_class (errcode, fclaw2d_errcode);
+        *fclaw2d_errcode = FCLAW2D_FILE_ERR_UNKNOWN_V1;
+        return FCLAW2D_FILE_ERR_SUCCESS_V1;
     }
 }
 
@@ -2221,9 +2222,8 @@ fclaw2d_file_error_string_v1 (int errclass, char *string, int *resultlen)
     const char *tstr = NULL;
 
     FCLAW_ASSERT (resultlen != NULL);
-    FCLAW_ASSERT ((sc_MPI_SUCCESS <= errclass && errclass < sc_MPI_ERR_LASTCODE)
-                 || (FCLAW2D_FILE_ERR_SUCCESS_V1 <= errclass
-                     && errclass < FCLAW2D_FILE_ERR_LASTCODE_V1));
+    FCLAW_ASSERT (FCLAW2D_FILE_ERR_SUCCESS_V1 <= errclass
+                  && errclass < FCLAW2D_FILE_ERR_LASTCODE_V1);
 
     if (string == NULL || resultlen == NULL)
     {
@@ -2286,8 +2286,8 @@ fclaw2d_file_error_string_v1 (int errclass, char *string, int *resultlen)
         return sc_MPI_Error_string (sc_MPI_ERR_UNKNOWN, string, resultlen);
 
     default:
-        /* errcode may be MPI version 1.1 error code */
-        return sc_MPI_Error_string (errclass, string, resultlen);
+        /* no valid fclaw2d file error code */
+        SC_ABORT_NOT_REACHED ();
     }
     FCLAW_ASSERT (tstr != NULL);
 
@@ -3015,14 +3015,7 @@ fclaw2d_file_translate_error_code_v1 (int errcode_v1, int *errcode)
             *errcode = FCLAW2D_FILE_ERR_LASTCODE;
             return 0;
         default:
-            if (sc_MPI_SUCCESS <= errcode_v1 &&
-                errcode_v1 < sc_MPI_ERR_LASTCODE) {
-                /* assumed to be an MPI error code */
-                *errcode = errcode_v1;
-            }
-            else {
-                *errcode = FCLAW2D_FILE_ERR_UNKNOWN;
-            }
+            *errcode = FCLAW2D_FILE_ERR_UNKNOWN;
             return 0;
     }
     return 0;
