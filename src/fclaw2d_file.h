@@ -107,6 +107,8 @@ typedef struct fclaw2d_file_context fclaw2d_file_context_t;
  *                         file header having FCLAW2D_FILE_USER_STRING_BYTES
  *                         bytes including the NUL-termination. Shorter
  *                         user strings are padded by spaces in the file header.
+ *                         Too long user strings result in an error with the
+ *                         error code \ref FCLAW2D_FILE_ERR_IN_DATA.
  * \param [in]  write_partition A Boolean to decide whether the partition is
  *                         written to disk. The filename of the partition file
  *                         is derived from the given filename. Currently,
@@ -144,7 +146,9 @@ fclaw2d_file_context_t *fclaw2d_file_open_write (const char *filename,
  *                              the section header having
  *                              FCLAW2D_FILE_USER_STRING_BYTES bytes including
  *                              the NUL-termination. Shorter user strings are
- *                              padded by spaces in the section header.
+ *                              padded by spaces in the section header. Too long
+ *                              user strings result in an error with the error
+ *                              code \ref FCLAW2D_FILE_ERR_IN_DATA.
  * \param [in]      block_size  The size of the block in bytes. May be equal to
  *                              0. In this case the section header and the padding
  *                              is still written. This function returns the passed
@@ -190,7 +194,9 @@ fclaw2d_file_context_t *fclaw2d_file_write_block (fclaw2d_file_context_t *
  *                              the section header having
  *                              FCLAW2D_FILE_USER_STRING_BYTES bytes including
  *                              the NUL-termination. Shorter user strings are
- *                              padded by spaces in the section header.
+ *                              padded by spaces in the section header. Too long
+ *                              user strings result in an error with the error
+ *                              code \ref FCLAW2D_FILE_ERR_IN_DATA.
  * \param [in]      patch_size  The number of bytes per patch. This number
  *                              must coincide with \b patch_data->elem_size.
  * \param [in]      patch_data  An array of the length number of local patches
