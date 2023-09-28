@@ -550,6 +550,36 @@ fclaw2d_file_error_cleanup_v1 (sc_MPI_File * file)
     return -1;
 }
 
+static int
+fclaw2d_file_check_user_string (const char *user_string)
+{
+    int terminal_nul;
+    char copied_user_string[FCLAW2D_FILE_USER_STRING_BYTES_V1];
+
+    /* copy user string */
+    sc_strcopy (copied_user_string, FCLAW2D_FILE_USER_STRING_BYTES_V1, user_string);
+
+    if (strlen (copied_user_string) < FCLAW2D_FILE_USER_STRING_BYTES_V1 - 1) {
+        /* user_string is nul-terminated */
+        return 0;
+    }
+
+    FCLAW_ASSERT (strlen (copied_user_string) ==
+                  FCLAW2D_FILE_USER_STRING_BYTES_V1 - 1);
+
+    /* check for nul at last byte position of user string */
+    terminal_nul = user_string[FCLAW2D_FILE_USER_STRING_BYTES_V1 - 1] == '\0';
+
+    if (!terminal_nul) {
+        /* user_string is not nul-terminated */
+        return -1;
+    }
+    else {
+        /* user_string is nul-terminated */
+        return 0;
+    }
+}
+
 /** Begin writing file header and saving data blocks into a parallel file.
  *
  * This function creates a new file or overwrites an existing one.
@@ -607,7 +637,7 @@ fclaw2d_file_open_create_v1 (p4est_t * p4est, const char *filename,
     FCLAW_ASSERT (filename != NULL);
     FCLAW_ASSERT (errcode != NULL);
 
-    if (!(strlen (user_string) < FCLAW2D_FILE_USER_STRING_BYTES_V1))
+    if (fclaw2d_file_check_user_string (user_string))
     {
         /* invalid user string */
         *errcode = FCLAW2D_FILE_ERR_IN_DATA_V1;
@@ -914,7 +944,7 @@ fclaw2d_file_write_block_v1 (fclaw2d_file_context_p4est_v1_t * fc,
     FCLAW_ASSERT (block_data->elem_count == 1);
     FCLAW_ASSERT (errcode != NULL);
 
-    if (!(strlen (user_string) < FCLAW2D_FILE_USER_STRING_BYTES_V1))
+    if (fclaw2d_file_check_user_string (user_string))
     {
         /* invalid user string */
         *errcode = FCLAW2D_FILE_ERR_IN_DATA_V1;
@@ -1450,7 +1480,7 @@ fclaw2d_file_write_field_v1 (fclaw2d_file_context_p4est_v1_t * fc,
     FCLAW_ASSERT (quadrant_size == quadrant_data->elem_size);
     FCLAW_ASSERT (errcode != NULL);
 
-    if (!(strlen (user_string) < FCLAW2D_FILE_USER_STRING_BYTES_V1))
+    if (fclaw2d_file_check_user_string (user_string))
     {
         *errcode = FCLAW2D_FILE_ERR_IN_DATA_V1;
         FCLAW2D_FILE_CHECK_NULL_V1 (*errcode, fc,
