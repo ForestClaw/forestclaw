@@ -28,6 +28,7 @@
 
 #include "../all/advection_user.h"
 
+#define FCLAW_SWIRL_IO_DEMO 0
 
 static
 void create_domain_map (fclaw2d_global_t *glob, fclaw_options_t* gparms)
@@ -47,7 +48,7 @@ void create_domain_map (fclaw2d_global_t *glob, fclaw_options_t* gparms)
 static
 void run_program(fclaw2d_global_t* glob)
 {
-#if 0
+#if FCLAW_SWIRL_IO_DEMO
     int errcode;
     fclaw2d_file_context_t *fc;
 #endif
@@ -80,7 +81,7 @@ void run_program(fclaw2d_global_t* glob)
     fclaw2d_initialize(glob);
     fclaw2d_run(glob);
 
-#if 0
+#if FCLAW_SWIRL_IO_DEMO
     /* Example usage of forestclaw file functions. This is just for
      * demonstration purposes. For an actual restart functionality in ForestClaw
      * the workflow must be extended by providing buffers with the required
