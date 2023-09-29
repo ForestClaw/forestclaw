@@ -37,9 +37,8 @@
 int
 main (int argc, char **argv)
 {
-    fclaw_app_t *app;
-    int first_arg;
-    fclaw_exit_type_t vexit;
+    /* Initialize application */
+    fclaw_app_t *app = fclaw_app_new (&argc, &argv, NULL);
 
     /* Options */
 
@@ -53,14 +52,6 @@ main (int argc, char **argv)
     fclaw2d_clawpatch_options_t *sloshclawpatch_opt;
     fc2d_geoclaw_options_t      *slosh_geo_opt;
 
-    sc_MPI_Comm                 mpicomm;
-    fclaw2d_domain_t            *radial_domain;
-    fclaw2d_global_t            *radial_glob;
-    fclaw2d_global_t            *slosh_glob;
-    fclaw2d_domain_t            *slosh_domain;
-
-    /* Initialize application */
-    app = fclaw_app_new (&argc, &argv, NULL);
 
     radial_gparms                   = fclaw_options_register(app, "radial",           "fclaw_options.ini");
     radial_clawpatchopt = fclaw2d_clawpatch_options_register(app, "radial-clawpatch", "fclaw_options.ini");
@@ -73,37 +64,40 @@ main (int argc, char **argv)
     slosh_user_opt =                    slosh_options_register(app, "slosh-user",      "fclaw_options.ini");  
 
     /* Read configuration file(s) and command line, and process options */
+    int first_arg;
+    fclaw_exit_type_t vexit;
     vexit =  fclaw_app_options_parse (app, &first_arg,"fclaw_options.ini.used");
 
     if (!vexit)
     {
-        mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
-        radial_domain = radial_create_domain(mpicomm, radial_gparms);
+        int size, rank;
+        sc_MPI_Comm mpicomm = fclaw_app_get_mpi_size_rank (app, &size, &rank);
     
-        radial_glob = fclaw2d_global_new();
-        fclaw2d_global_store_domain(radial_glob, radial_domain);
+        fclaw2d_global_t *radial_glob = fclaw2d_global_new_comm(mpicomm, size, rank);
 
         fclaw2d_options_store           (radial_glob, radial_gparms);
         fclaw2d_clawpatch_options_store (radial_glob, radial_clawpatchopt);
         fc2d_geoclaw_options_store      (radial_glob, radial_geoclawopt);
         radial_options_store            (radial_glob, radial_user_opt);
 
+        radial_create_domain(radial_glob);
+
         /* Run the program */
         radial_run_program(radial_glob);
 
         fclaw2d_global_destroy(radial_glob);
 
-        slosh_domain = slosh_create_domain(mpicomm, slosh_fclaw_opt);
     
         /* Create global structure which stores the domain, timers, etc */
-        slosh_glob = fclaw2d_global_new();
-        fclaw2d_global_store_domain(slosh_glob, slosh_domain);
+        fclaw2d_global_t *slosh_glob = fclaw2d_global_new_comm(mpicomm, size, rank);
 
         /* Store option packages in glob */
         fclaw2d_options_store           (slosh_glob, slosh_fclaw_opt);
         fclaw2d_clawpatch_options_store (slosh_glob, sloshclawpatch_opt);
         fc2d_geoclaw_options_store      (slosh_glob, slosh_geo_opt);
         slosh_options_store             (slosh_glob, slosh_user_opt);
+
+        slosh_create_domain(slosh_glob);
 
         slosh_run_program(slosh_glob);
         

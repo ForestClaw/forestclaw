@@ -43,38 +43,24 @@
 int
 main (int argc, char **argv)
 {
-    fclaw_app_t *app;
-    int first_arg;
-    fclaw_exit_type_t vexit;
+    /* Initialize application */
+    fclaw_app_t *app = fclaw_app_new (&argc, &argv, NULL);
 
-    /* Options */
+    /* Create new options packages */
     fclaw_options_t             *heat_fclaw_opt;
-
     fclaw2d_clawpatch_options_t *heat_clawpatch_opt;
     fc2d_thunderegg_options_t   *heat_mg_opt;
     heat_options_t              *heat_user_opt;
 
-    fclaw2d_global_t            *heat_glob;
-    fclaw2d_domain_t            *heat_domain;
-
-    fclaw_options_t             *phasefield_fclaw_opt;
-
-    fclaw2d_clawpatch_options_t *phasefield_clawpatch_opt;
-    fc2d_thunderegg_options_t   *phasefield_mg_opt;
-    phasefield_options_t        *phasefield_user_opt;
-
-    fclaw2d_global_t            *phasefield_glob;
-    fclaw2d_domain_t            *phasefield_domain;
-    sc_MPI_Comm mpicomm;
-
-    /* Initialize application */
-    app = fclaw_app_new (&argc, &argv, NULL);
-
-    /* Create new options packages */
     heat_fclaw_opt =                   fclaw_options_register(app, "heat",            "fclaw_options.ini");
     heat_clawpatch_opt =   fclaw2d_clawpatch_options_register(app, "heat-clawpatch",  "fclaw_options.ini");
     heat_mg_opt =            fc2d_thunderegg_options_register(app, "heat-thunderegg", "fclaw_options.ini");
     heat_user_opt =                     heat_options_register(app, "heat-user",       "fclaw_options.ini");  
+
+    fclaw_options_t             *phasefield_fclaw_opt;
+    fclaw2d_clawpatch_options_t *phasefield_clawpatch_opt;
+    fc2d_thunderegg_options_t   *phasefield_mg_opt;
+    phasefield_options_t        *phasefield_user_opt;
 
     phasefield_fclaw_opt =                   fclaw_options_register(app, "phasefield",           "fclaw_options.ini");
     phasefield_clawpatch_opt =   fclaw2d_clawpatch_options_register(app, "phasefield-clawpatch",  "fclaw_options.ini");
@@ -82,19 +68,19 @@ main (int argc, char **argv)
     phasefield_user_opt =               phasefield_options_register(app, "phasefield-user",       "fclaw_options.ini");  
 
     /* Read configuration file(s) and command line, and process options */
+    int first_arg;
+    fclaw_exit_type_t vexit;
     vexit =  fclaw_app_options_parse (app, &first_arg,"fclaw_options.ini.used");
 
     /* Run the program */
     if (!vexit)
     {
         /* Options have been checked and are valid */
-
-        mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
-        heat_domain = heat_create_domain(mpicomm, heat_fclaw_opt);
+        int size, rank;
+        sc_MPI_Comm mpicomm = fclaw_app_get_mpi_size_rank (app, &size, &rank);
     
         /* Create global structure which stores the domain, timers, etc */
-        heat_glob = fclaw2d_global_new();
-        fclaw2d_global_store_domain(heat_glob, heat_domain);
+        fclaw2d_global_t *heat_glob = fclaw2d_global_new_comm(mpicomm, size, rank);
 
         /* Store option packages in glob */
         fclaw2d_options_store           (heat_glob, heat_fclaw_opt);
@@ -102,20 +88,23 @@ main (int argc, char **argv)
         fc2d_thunderegg_options_store    (heat_glob, heat_mg_opt);
         heat_options_store            (heat_glob, heat_user_opt);
 
+        heat_create_domain(heat_glob);
+
         heat_run_program(heat_glob);
 
         fclaw2d_global_destroy(heat_glob);        
-        phasefield_domain = phasefield_create_domain(mpicomm, phasefield_fclaw_opt);
+
     
         /* Create global structure which stores the domain, timers, etc */
-        phasefield_glob = fclaw2d_global_new();
-        fclaw2d_global_store_domain(phasefield_glob, phasefield_domain);
+        fclaw2d_global_t *phasefield_glob = fclaw2d_global_new_comm(mpicomm, size, rank);
 
         /* Store option packages in glob */
         fclaw2d_options_store           (phasefield_glob, phasefield_fclaw_opt);
         fclaw2d_clawpatch_options_store (phasefield_glob, phasefield_clawpatch_opt);
         fc2d_thunderegg_options_store    (phasefield_glob, phasefield_mg_opt);
         phasefield_options_store            (phasefield_glob, phasefield_user_opt);
+
+        phasefield_create_domain(phasefield_glob);
 
         phasefield_run_program(phasefield_glob);
 
