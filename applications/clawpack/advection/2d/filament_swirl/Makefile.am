@@ -7,8 +7,9 @@ TESTS += applications/clawpack/advection/2d/filament_swirl/regressions.sh
 
 applications_clawpack_advection_2d_filament_swirl_filament_swirl_COMMON_SOURCES = \
 	applications/clawpack/advection/2d/filament_swirl/user_run.c \
+	applications/clawpack/advection/2d/filament_swirl/overlap.c \
 	applications/clawpack/advection/2d/filament_swirl/psi.f \
-	applications/clawpack/advection/2d/filament_swirl/filament/filament.cpp \
+	applications/clawpack/advection/2d/filament_swirl/filament.cpp \
 	applications/clawpack/advection/2d/filament_swirl/filament/filament_options.c \
 	applications/clawpack/advection/2d/filament_swirl/filament/filament_user.cpp \
 	applications/clawpack/advection/2d/filament_swirl/filament/filament_user.h \
@@ -20,7 +21,7 @@ applications_clawpack_advection_2d_filament_swirl_filament_swirl_COMMON_SOURCES 
 	applications/clawpack/advection/2d/filament_swirl/swirl/swirl_user.cpp \
 	applications/clawpack/advection/2d/filament_swirl/swirl/swirl_user.h \
 	applications/clawpack/advection/2d/filament_swirl/swirl/swirl_options.c \
-	applications/clawpack/advection/2d/filament_swirl/swirl/swirl.cpp \
+	applications/clawpack/advection/2d/filament_swirl/swirl.cpp \
 	applications/clawpack/advection/2d/filament_swirl/swirl/psi.f \
 	applications/clawpack/advection/2d/filament_swirl/swirl/setprob.f \
 	applications/clawpack/advection/2d/filament_swirl/swirl/user_4.6/qinit.f \
