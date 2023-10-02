@@ -918,7 +918,9 @@ fclaw2d_domain_indirect_t
 /** End sending messages to determine neighbors of ghost patches.
  * This call must not be interleaved with any ghost_exchange calls.
  * When this function returns, the necessary information is complete
- * and \ref fclaw2d_domain_indirect_neighbors may be called any number of times.
+ * and \ref fclaw2d_domain_indirect_face_neighbors
+ * and \ref fclaw2d_domain_indirect_corner_neighbor
+ * may be called any number of times.
  * \param [in] domain           Must be the same domain used in the begin call.
  * \param [in,out] ind          Must be returned by an earlier call to
  *                              \ref fclaw2d_domain_indirect_begin
@@ -928,9 +930,9 @@ void fclaw2d_domain_indirect_end (fclaw2d_domain_t * domain,
                                   fclaw2d_domain_indirect_t * ind);
 
 /** Call this analogously to \ref fclaw2d_domain_face_neighbors.
- * We only return an indirect ghost neighbor patch:  This is defined as a ghost
- * patch that is neighbor to the calling ghost patch and belongs to a processor
- * that is neither the owner of that ghost patch nor our own processor.
+ * Return an indirect face neighbor patch:  It is defined as a ghost patch
+ * that is face neighbor to the calling ghost patch and belongs to a process
+ * that is neither the owner of that ghost patch nor our own process.
  * \param [in] domain           Must be the same domain used in begin and end.
  * \param [in] ind              Must have been initialized by \ref
  *                              fclaw2d_domain_indirect_end.
@@ -951,11 +953,21 @@ void fclaw2d_domain_indirect_end (fclaw2d_domain_t * domain,
  *                              \ref FCLAW2D_PATCH_BOUNDARY.
  */
 fclaw2d_patch_relation_t
-fclaw2d_domain_indirect_neighbors (fclaw2d_domain_t * domain,
-                                   fclaw2d_domain_indirect_t * ind,
-                                   int ghostno, int faceno, int rproc[2],
-                                   int *rblockno, int rpatchno[2],
-                                   int *rfaceno);
+fclaw2d_domain_indirect_face_neighbors (fclaw2d_domain_t * domain,
+                                        fclaw2d_domain_indirect_t * ind,
+                                        int ghostno, int faceno, int rproc[2],
+                                        int *rblockno, int rpatchno[2],
+                                        int *rfaceno);
+
+/** To do: add documentation analogous to \ref
+ * fclaw2d_domain_indirect_face_neighbors.
+ */
+fclaw2d_patch_relation_t
+fclaw2d_domain_indirect_corner_neighbor (fclaw2d_domain_t * domain,
+                                         fclaw2d_domain_indirect_t * ind,
+                                         int ghostno, int cornerno, int *rproc,
+                                         int *rblockno, int *rpatchno,
+                                         int *rcornerno);
 
 /** Destroy all context data for indirect ghost neighbor patches.
  * \param [in] domain           Must be the same domain used in begin and end.

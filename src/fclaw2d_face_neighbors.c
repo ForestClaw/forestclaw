@@ -513,7 +513,7 @@ void fclaw2d_face_neighbor_ghost(fclaw2d_global_t* glob,
 			   exchange face data before being thrown over proc fence.
 			*/
 			fclaw2d_patch_relation_t neighbor_type =
-				fclaw2d_domain_indirect_neighbors(domain,
+				fclaw2d_domain_indirect_face_neighbors(domain,
 												  ind,
 												  this_ghost_idx,
 												  iface,rproc,
