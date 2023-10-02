@@ -156,7 +156,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define fclaw2d_domain_num_orientations fclaw3d_num_orientations
 #define fclaw2d_domain_corner_faces     fclaw3d_domain_corner_faces
 #define fclaw2d_domain_indirect_begin   fclaw3d_domain_indirect_begin
-#define fclaw2d_domain_indirect_neighbors fclaw3d_domain_indirect_neighbors
+#define fclaw2d_domain_indirect_face_neighbors fclaw3d_domain_indirect_face_neighbors
 #define fclaw2d_domain_indirect_end     fclaw3d_domain_indirect_end
 #define fclaw2d_domain_indirect_destroy fclaw3d_domain_indirect_destroy
 #define fclaw2d_patch_corner_dimension  fclaw3d_patch_corner_dimension
