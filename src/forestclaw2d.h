@@ -929,7 +929,7 @@ fclaw2d_domain_indirect_t
 void fclaw2d_domain_indirect_end (fclaw2d_domain_t * domain,
                                   fclaw2d_domain_indirect_t * ind);
 
-/** Call this analogously to \ref fclaw2d_domain_face_neighbors.
+/** Call this analogously to \ref fclaw2d_patch_face_neighbors.
  * Return an indirect face neighbor patch:  It is defined as a ghost patch
  * that is face neighbor to the calling ghost patch and belongs to a process
  * that is neither the owner of that ghost patch nor our own process.
@@ -947,7 +947,7 @@ void fclaw2d_domain_indirect_end (fclaw2d_domain_t * domain,
  * \param [out] rpatchno        Only for indirect ghost patches, we store
  *                              the number relative to our ghost patch array.
  *                              For all other patches, this is -1.
- * \param [out] faceno          The face number and orientation of the neighbor(s).
+ * \param [out] rfaceno         The face number and orientation of the neighbor(s).
  * \return                      Only for indirect ghost patches, the size of the
  *                              neighbor(s).  For all others, we set this to
  *                              \ref FCLAW2D_PATCH_BOUNDARY.
@@ -959,8 +959,25 @@ fclaw2d_domain_indirect_face_neighbors (fclaw2d_domain_t * domain,
                                         int *rblockno, int rpatchno[2],
                                         int *rfaceno);
 
-/** To do: add documentation analogous to \ref
- * fclaw2d_domain_indirect_face_neighbors.
+/** Call this analogously to \ref fclaw2d_patch_corner_neighbors.
+ * Return an indirect corner neighbor patch:  It is defined as a ghost patch
+ * that is corner neighbor to the calling ghost patch and belongs to a process
+ * that is neither the owner of that ghost patch nor our own process.
+ * \param [in] domain           Must be the same domain used in begin and end.
+ * \param [in] ind              Must have been initialized by \ref
+ *                              fclaw2d_domain_indirect_end.
+ * \param [in] ghostno          Number of the ghost patch whose neighbor we seek.
+ * \param [in] cornerno         Number of the ghost patch's corner to look across.
+ * \param [out] rproc           Processor number of neighbor patch.
+ *                              Exception: For non-indirect patches, set it to -1.
+ * \param [out] rblockno        The number of the neighbor block.
+ * \param [out] rpatchno        Only for indirect ghost patches, we store
+ *                              the number relative to our ghost patch array.
+ *                              For all other patches, this is -1.
+ * \param [out] rcornerno       The corner number of the neighbor.
+ * \return                      Only for indirect ghost patches, the size of the
+ *                              neighbor.  For all others, we set this to
+ *                              \ref FCLAW2D_PATCH_BOUNDARY.
  */
 fclaw2d_patch_relation_t
 fclaw2d_domain_indirect_corner_neighbor (fclaw2d_domain_t * domain,

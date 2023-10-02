@@ -1051,7 +1051,7 @@ fclaw3d_domain_indirect_t
 void fclaw3d_domain_indirect_end (fclaw3d_domain_t * domain,
                                   fclaw3d_domain_indirect_t * ind);
 
-/** Call this analogously to \ref fclaw3d_domain_face_neighbors.
+/** Call this analogously to \ref fclaw3d_patch_face_neighbors.
  * We only return an indirect ghost neighbor patch:  This is defined as a ghost
  * patch that is neighbor to the calling ghost patch and belongs to a processor
  * that is neither the owner of that ghost patch nor our own processor.
@@ -1069,7 +1069,7 @@ void fclaw3d_domain_indirect_end (fclaw3d_domain_t * domain,
  * \param [out] rpatchno        Only for indirect ghost patches, we store
  *                              the number relative to our ghost patch array.
  *                              For all other patches, this is -1.
- * \param [out] faceno          The face number and orientation of the neighbor(s).
+ * \param [out] rfaceno         The face number and orientation of the neighbor(s).
  * \return                      Only for indirect ghost patches, the size of the
  *                              neighbor(s).  For all others, we set this to
  *                              \ref FCLAW3D_PATCH_BOUNDARY.
