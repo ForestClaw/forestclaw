@@ -1059,6 +1059,7 @@ fclaw2d_patch_corner_neighbors (fclaw2d_domain_t * domain,
         /* Currently we also return this for five- and more-corners */
         *neighbor_size = FCLAW2D_PATCH_BOUNDARY;
         *rcorner = -1;
+        *rblockno = blockno;
     }
     else
     {
