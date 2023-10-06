@@ -25,6 +25,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "bump_user.h"
 
+#include <fclaw2d_clawpatch.h>
+
+#include <fc2d_clawpack46.h>
+
+
+#include "../../../../clawpack/shallow/2d/rp/shallow_user_fort.h"
+
 
 static
 void bump_problem_setup(fclaw2d_global_t* glob)
@@ -34,12 +41,27 @@ void bump_problem_setup(fclaw2d_global_t* glob)
     if (glob->mpirank == 0)
     {
         FILE *f = fopen("setprob.data","w");
-        fprintf(f,  "%-24.16f   %s",user->gravity,"\% gravity\n");
+        if(user->cuda != 0)
+        {
+            fprintf(f,  "%-24.16f   %s",user->gravity,"\% gravity\n");
+        }
+        else
+        {
+            fprintf(f,  "%-24d   %s",   user->example,"\% example\n");
+            fprintf(f,  "%-24.16f   %s",user->gravity,"\% gravity\n");
+        }
         fclose(f);
     }
     fclaw2d_domain_barrier (glob->domain);
 
-    setprob_cuda();
+    if(user->cuda != 0)
+    {
+        setprob_cuda();
+    }
+    else
+    {
+       BUMP_SETPROB(); 
+    }
 }
 
 
@@ -47,20 +69,31 @@ void bump_link_solvers(fclaw2d_global_t *glob)
 {
     fclaw2d_vtable_t *vt = fclaw2d_vt(glob);
     vt->problem_setup = &bump_problem_setup;  /* Version-independent */
+    fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt(glob);
 
-    //const user_options_t* user = bump_get_options(glob);
+    const user_options_t* user = bump_get_options(glob);
+    if(user->cuda == 0)
+    {
+        fc2d_clawpack46_vtable_t *claw46_vt = fc2d_clawpack46_vt(glob);
+        claw46_vt->fort_qinit     = &CUDACLAW_QINIT;
+        claw46_vt->fort_rpn2      = &CLAWPACK46_RPN2;
+        claw46_vt->fort_rpt2      = &CLAWPACK46_RPT2;
+        claw46_vt->fort_rpn2_cons = &RPN2_CONS_UPDATE;
+    }
+    else
+    {
+        fc2d_cudaclaw_vtable_t *cuclaw_vt = fc2d_cudaclaw_vt(glob);
+        cuclaw_vt->fort_qinit  = &CUDACLAW_QINIT;
 
-    fc2d_cudaclaw_vtable_t *cuclaw_vt = fc2d_cudaclaw_vt(glob);
-    cuclaw_vt->fort_qinit  = &CUDACLAW_QINIT;
+        bump_assign_rpn2(&cuclaw_vt->cuda_rpn2);
+        FCLAW_ASSERT(cuclaw_vt->cuda_rpn2 != NULL);
 
-    bump_assign_rpn2(&cuclaw_vt->cuda_rpn2);
-    FCLAW_ASSERT(cuclaw_vt->cuda_rpn2 != NULL);
+        bump_assign_rpt2(&cuclaw_vt->cuda_rpt2);
+        FCLAW_ASSERT(cuclaw_vt->cuda_rpt2 != NULL);
 
-    bump_assign_rpt2(&cuclaw_vt->cuda_rpt2);
-    FCLAW_ASSERT(cuclaw_vt->cuda_rpt2 != NULL);
-
-    bump_assign_speeds(&cuclaw_vt->cuda_speeds);
-    FCLAW_ASSERT(cuclaw_vt->cuda_speeds != NULL);
+        bump_assign_speeds(&cuclaw_vt->cuda_speeds);
+        FCLAW_ASSERT(cuclaw_vt->cuda_speeds != NULL);
+    }
 }
 
 
