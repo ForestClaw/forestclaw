@@ -9,7 +9,7 @@ __device__ double psi(double x, double y)
     return (pow(sin(M_PI*x),2) * pow(sin(M_PI*y),2)) / M_PI;
 } 
 
-void setprob()
+void setprob_cuda()
 {
     double period;
     FILE *f = fopen("setprob.data","r");
