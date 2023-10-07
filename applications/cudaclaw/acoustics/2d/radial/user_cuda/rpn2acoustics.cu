@@ -10,17 +10,31 @@ __constant__ double s_z;
 void setprob_cuda()
 {
     double rho, bulk;
-    FILE *f = fopen("setprob.data","r");
-    fscanf(f,"%lf",&rho);
-    fscanf(f,"%lf",&bulk);
+    int i = 0;
+    char * line = NULL, *p = NULL, *eptr;
+    size_t len = 0;
+    ssize_t read;
+    double arr[2];
+    
+    FILE *f =  fopen("setprob.data","r");
+    
+    while ((read = getline(&line, &len, f)) != -1) 
+    {
+        p =strtok(line, " "); // get first word
+        arr[i] = strtod(p,&eptr);  // convert to double
+        i++; 
+    }
     fclose(f);
+
+    rho = arr[0];
+    bulk = arr[1];
 
     double c,z;
     c = sqrt(bulk/rho);
     z = c*rho;
     
     CHECK(cudaMemcpyToSymbol(s_rho,  &rho, sizeof(double)));
-    CHECK(cudaMemcpyToSymbol(s_bulk, &rho, sizeof(double)));
+    CHECK(cudaMemcpyToSymbol(s_bulk, &bulk, sizeof(double)));
     CHECK(cudaMemcpyToSymbol(s_c,    &c,   sizeof(double)));
     CHECK(cudaMemcpyToSymbol(s_z,    &z,   sizeof(double)));
 }
