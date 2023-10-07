@@ -107,7 +107,7 @@ void cudaclaw_compute_speeds(const int mx,   const int my,
     double maxcfl = 0;
 
 
-#if 0
+#if 1
     if (b4step2 != NULL)
     {
         for(int thread_index = threadIdx.x; thread_index < num_ifaces; thread_index += blockDim.x)
@@ -116,13 +116,13 @@ void cudaclaw_compute_speeds(const int mx,   const int my,
             int iy = thread_index/ifaces_x;
 
             int I = (iy + 1)*ys + (ix + 1);  /* Start at one cell from left/bottom */
-
+            double *const qr    = start;          /* meqn   */
             for(int mq = 0; mq < meqn; mq++)
             {
                 int I_q = I + mq*zs;
                 qr[mq] = qold[I_q];  
             }
-
+            double *const auxr   = qr      + meqn;         /* maux        */
             for(int m = 0; m < maux; m++)
             {
                 /* In case aux is already set */
@@ -284,7 +284,7 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
 
     double maxcfl = 0;
 
-#if 0
+#if 1
     if (b4step2 != NULL)
     {
         for(int thread_index = threadIdx.x; thread_index < num_ifaces; thread_index += blockDim.x)
@@ -293,13 +293,13 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
             int iy = thread_index/ifaces_x;
 
             int I = (iy + 1)*ys + (ix + 1);  /* Start at one cell from left/bottom */
-
+            double *const qr    = start;          /* meqn   */
             for(int mq = 0; mq < meqn; mq++)
             {
                 int I_q = I + mq*zs;
                 qr[mq] = qold[I_q];  
             }
-
+            double *const auxr   = qr      + meqn;         /* maux        */
             for(int m = 0; m < maux; m++)
             {
                 /* In case aux is already set */

@@ -287,7 +287,7 @@ double cudaclaw_update(fclaw2d_global_t *glob,
     double maxcfl;
 
     /* ------------------------------- Call b4step2 ----------------------------------- */
-#if 0
+#if 1
     if (cudaclaw_vt->b4step2 != NULL)
     {
         fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_ADVANCE_B4STEP2]);       
@@ -523,7 +523,7 @@ void fc2d_cudaclaw_src2(fclaw2d_global_t* glob,
                           double t,
                           double dt)
 {
-    cudaclaw_src2(glob,this_patch,this_block_idx,this_block_idx,t,dt);
+    cudaclaw_src2(glob,this_patch,this_block_idx,this_patch_idx,t,dt);
 }
 
 
@@ -563,7 +563,7 @@ void fc2d_cudaclaw_bc2(fclaw2d_global_t *glob,
                          int intersects_bc[],
                          int time_interp)
 {
-    cudaclaw_bc2(glob,this_patch,this_block_idx,this_block_idx,t,dt,
+    cudaclaw_bc2(glob,this_patch,this_block_idx,this_patch_idx,t,dt,
                    intersects_bc,time_interp);
 }
 
