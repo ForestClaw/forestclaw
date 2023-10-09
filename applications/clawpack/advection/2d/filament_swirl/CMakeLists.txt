@@ -28,11 +28,12 @@ add_library(filament_swirl_f OBJECT
 )
 
 add_library(filament_swirl_common OBJECT 
+  filament.cpp
+  swirl.cpp
+  overlap.c
   user_run.c
-  filament/filament.cpp
   filament/filament_options.c 
   filament/filament_user.cpp 
-  swirl/swirl.cpp 
   swirl/swirl_user.cpp 
   swirl/swirl_options.c
   ${all}/advection_patch_setup_manifold.c

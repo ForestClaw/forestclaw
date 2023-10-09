@@ -104,13 +104,11 @@ options_postprocess (fclaw_app_t * a, void *package, void *registered)
 static fclaw_exit_type_t
 options_check(fclaw_app_t *app, void *package,void *registered)
 {
-    user_options_t           *user_opt;
-
     FCLAW_ASSERT (app != NULL);
     FCLAW_ASSERT (package != NULL);
     FCLAW_ASSERT(registered == NULL);
 
-    user_opt = (user_options_t*) package;
+    user_options_t *user_opt = (user_options_t*) package;
     return disk_check(user_opt);
 }
 
@@ -167,6 +165,7 @@ const user_options_t* disk_get_options(fclaw2d_global_t* glob)
     return (user_options_t*) fclaw2d_global_get_options(glob,"user");
 }
 
+#if 0
 void disk_global_post_process(fclaw_options_t *fclaw_opt,
                               fclaw2d_clawpatch_options_t *clawpatch_opt,
                               user_options_t *user_opt)
@@ -178,6 +177,7 @@ void disk_global_post_process(fclaw_options_t *fclaw_opt,
             exit(0);
         }
 }
+#endif
 
 
 

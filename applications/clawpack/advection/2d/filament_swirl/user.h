@@ -26,21 +26,26 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef USER_H
 #define USER_H
 
+#include "../all/advection_user.h"
+
+#include <fclaw_filesystem.h>
+#include <fclaw_base.h>
+
+#include <fclaw2d_forestclaw.h>
+#include <fclaw2d_global.h>
+
+
 #ifdef __cplusplus
 extern "C"
 {
-#if 0
-}
-#endif
 #endif
 
+// Why is this here?
 typedef struct fclaw2d_global fclaw2d_global_t;
+
 void user_run(fclaw2d_global_t *globs[],int nglobs);
 
 #ifdef __cplusplus
-#if 0
-{
-#endif
 }
 #endif
 

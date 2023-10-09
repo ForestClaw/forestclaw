@@ -31,18 +31,26 @@
 #define FCLAW_SWIRL_IO_DEMO 0
 
 static
-void create_domain_map (fclaw2d_global_t *glob, fclaw_options_t* gparms)
+void create_domain(fclaw2d_global_t *glob)
 {
+    const fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
+
     /* Mapped, multi-block domain */
-    fclaw2d_domain_t         *domain = NULL;
-    domain = fclaw2d_domain_new_unitsquare (glob->mpicomm, gparms->minlevel);
-    fclaw2d_domain_list_levels(domain, FCLAW_VERBOSITY_ESSENTIAL);
-    fclaw2d_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);
-    fclaw2d_global_store_domain (glob, domain);
+    fclaw2d_domain_t *domain = 
+          fclaw2d_domain_new_unitsquare(glob->mpicomm, 
+                                        fclaw_opt->minlevel);
+    /* Create "empty" mapping */
+    fclaw2d_map_context_t* cont = fclaw2d_map_new_nomap();
+
+    /* Store domain in the glob */
+    fclaw2d_global_store_domain(glob, domain);
 
     /* Map unit square to disk using mapc2m_disk.f */
-    gparms->manifold = 0;
-    fclaw2d_global_store_map (glob, fclaw2d_map_new_nomap ());
+    fclaw2d_global_store_map (glob, cont);
+
+    /* Print out some info */
+    fclaw2d_domain_list_levels(domain, FCLAW_VERBOSITY_ESSENTIAL);
+    fclaw2d_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);
 }
 
 static
@@ -58,12 +66,11 @@ void run_program(fclaw2d_global_t* glob)
        --------------------------------------------------------------- */
     fclaw2d_domain_data_new(glob->domain);
 
-    const user_options_t *user_opt = swirl_get_options(glob);
-
     /* Initialize virtual table for ForestClaw */
     fclaw2d_vtables_initialize(glob);
 
     /* Initialize virtual tables for solvers */
+    const user_options_t *user_opt = swirl_get_options(glob);
     if (user_opt->claw_version == 4)
     {
         fc2d_clawpack46_solver_initialize(glob);
@@ -102,9 +109,8 @@ void run_program(fclaw2d_global_t* glob)
 int
 main (int argc, char **argv)
 {
-    int first_arg;
-    fclaw_app_t *app;
-    fclaw_exit_type_t vexit;
+    /* Initialize application */
+    fclaw_app_t *app = fclaw_app_new (&argc, &argv, NULL);
 
     /* Options */
     user_options_t              *user_opt;
@@ -112,9 +118,6 @@ main (int argc, char **argv)
     fclaw2d_clawpatch_options_t *clawpatch_opt;
     fc2d_clawpack46_options_t   *claw46_opt;
     fc2d_clawpack5_options_t    *claw5_opt;
-
-    /* Initialize application */
-    app = fclaw_app_new (&argc, &argv, NULL);
 
     /* Create new options packages */
     fclaw_opt =                   fclaw_options_register(app,  NULL,        "fclaw_options.ini");
@@ -124,18 +127,17 @@ main (int argc, char **argv)
     user_opt =                    swirl_options_register(app,               "fclaw_options.ini");
 
     /* Read configuration file(s) and command line, and process options */
+    int first_arg;
+    fclaw_exit_type_t vexit;
     vexit =  fclaw_app_options_parse (app, &first_arg,"fclaw_options.ini.used");
 
     /* Run the program */
     if (!vexit)
     {
-        /* Options have been checked and are valid */
-
         /* Create global structure which stores the domain, timers, etc */
         int size, rank;
         sc_MPI_Comm mpicomm = fclaw_app_get_mpi_size_rank (app, &size, &rank);
         fclaw2d_global_t *glob = fclaw2d_global_new_comm (mpicomm, size, rank);
-        create_domain_map (glob, fclaw_opt);
 
         /* Store option packages in glob */
         fclaw2d_options_store           (glob, fclaw_opt);
@@ -148,6 +150,9 @@ main (int argc, char **argv)
         //fclaw2d_global_pack(glob,buffer);
         //fclaw2d_global_t* glob2;
         //fclaw2d_global_unpack(buffer, &glob2);
+
+        /* Create and store domain */
+        create_domain(glob);
 
         run_program(glob);
 

@@ -27,23 +27,27 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "../all/advection_user.h"
 
-static void
-store_domain_map (fclaw2d_global_t * glob, fclaw_options_t * fclaw_opt,
-                  user_options_t * user,
-                  fclaw2d_clawpatch_options_t * clawpatch_opt)
+static
+void create_domain(fclaw2d_global_t *glob)
 {
-    /* Mapped, multi-block domain */
-    fclaw2d_domain_t *domain = NULL;
-    fclaw2d_map_context_t *cont = NULL, *brick = NULL;
+    const fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
 
     int mi = fclaw_opt->mi;
     int mj = fclaw_opt->mj;
+    int minlevel = fclaw_opt->minlevel;
+
+    fclaw2d_clawpatch_options_t *clawpatch_opt = 
+                 fclaw2d_clawpatch_get_options(glob);
+    int mx = clawpatch_opt->mx;
+
+    /* Assume non-periodic domain */
     int a = 0; /* non-periodic */
     int b = 0;
-
-    int mx = clawpatch_opt->mx;
-    int minlevel = fclaw_opt->minlevel;
     
+    fclaw2d_map_context_t    *cont = NULL, *brick = NULL;
+    fclaw2d_domain_t *domain = NULL;
+
+    user_options_t *user = (user_options_t*) filament_get_options(glob);
     switch (user->example) {
     case 1:
         /* Square brick domain */
@@ -89,25 +93,30 @@ store_domain_map (fclaw2d_global_t * glob, fclaw_options_t * fclaw_opt,
         SC_ABORT_NOT_REACHED ();
     }
 
-    fclaw2d_domain_list_levels (domain, FCLAW_VERBOSITY_ESSENTIAL);
-    fclaw2d_domain_list_neighbors (domain, FCLAW_VERBOSITY_DEBUG);
-    fclaw2d_global_store_domain (glob, domain);
-    fclaw2d_global_store_map (glob, cont);
+    /* Store mapping in the glob */
+    fclaw2d_global_store_map (glob, cont);            
+    
+    /* Store domain in glob */
+    fclaw2d_global_store_domain(glob, domain);
+
+    /* Print out some domain info */
+    fclaw2d_domain_list_levels(domain, FCLAW_VERBOSITY_ESSENTIAL);
+    fclaw2d_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);
+
 }
 
 static
 void run_program(fclaw2d_global_t* glob)
 {
-    user_options_t             *user;
-
-    user = (user_options_t*) filament_get_options(glob);
+    user_options_t *user = (user_options_t*) filament_get_options(glob);
 
 
     /* ---------------------------------------------------------------
        Set domain data.
        --------------------------------------------------------------- */
+    /* Create domain data */
     fclaw2d_domain_data_new(glob->domain);
-
+    
     /* Initialize virtual table for ForestClaw */
     fclaw2d_vtables_initialize(glob);
 
@@ -127,15 +136,13 @@ void run_program(fclaw2d_global_t* glob)
     fclaw2d_finalize(glob);
 }
 
-
-
 int
 main (int argc, char **argv)
 {
-    fclaw_app_t *app;
-    int first_arg;
-    fclaw_exit_type_t vexit;
+    /* Initialize application */
+    fclaw_app_t *app = fclaw_app_new (&argc, &argv, NULL);
 
+    /* Register packages */
     /* Options */
     user_options_t              *user_opt;
     fclaw_options_t             *fclaw_opt;
@@ -143,33 +150,42 @@ main (int argc, char **argv)
     fc2d_clawpack46_options_t   *claw46_opt;
     fc2d_clawpack5_options_t    *claw5_opt;
 
-    /* Initialize application */
-    app = fclaw_app_new (&argc, &argv, NULL);
-
-    /* Register packages */
     fclaw_opt                    = fclaw_options_register(app,  NULL,        "fclaw_options.ini");
     clawpatch_opt    = fclaw2d_clawpatch_options_register(app, "clawpatch",  "fclaw_options.ini");
     claw46_opt         = fc2d_clawpack46_options_register(app, "clawpack46", "fclaw_options.ini");
     claw5_opt           = fc2d_clawpack5_options_register(app, "clawpack5",  "fclaw_options.ini");
     user_opt =                  filament_options_register(app,               "fclaw_options.ini");  
 
+#if 0
     /* Read configuration file(s) */
+    sc_options_t *options = fclaw_app_get_options (app);
+
+    int retval = fclaw_options_read_from_file(options);
+#endif    
+
+    fclaw_exit_type_t vexit;
+    int first_arg;
     vexit =  fclaw_app_options_parse (app, &first_arg,"fclaw_options.ini.used");
 
     if (!vexit)
     {
         /* Options have been checked and are valid */
+
+
+        /* Create glob */
         int size, rank;
         sc_MPI_Comm mpicomm = fclaw_app_get_mpi_size_rank (app, &size, &rank);
-        fclaw2d_global_t *glob =
-            fclaw2d_global_new_comm (mpicomm, size, rank);
-        store_domain_map (glob, fclaw_opt, user_opt, clawpatch_opt);
+        fclaw2d_global_t *glob = fclaw2d_global_new_comm (mpicomm, size, rank);
 
+        /* Store options in glob */
         fclaw2d_options_store            (glob, fclaw_opt);
         fclaw2d_clawpatch_options_store  (glob, clawpatch_opt);
         fc2d_clawpack46_options_store    (glob, claw46_opt);
         fc2d_clawpack5_options_store     (glob, claw5_opt);
         filament_options_store           (glob, user_opt);
+            
+        /* Create domain and store domain in glob */
+        create_domain(glob);
 
         run_program(glob);
 

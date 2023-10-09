@@ -28,26 +28,25 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "../all/advection_user.h"
 
 static
-fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, 
-                                fclaw_options_t* fclaw_opt, 
-                                user_options_t* user,
-                                fclaw3dx_clawpatch_options_t* clawpatch_opt,
-                                fc3d_clawpack46_options_t *claw3_opt)
+void create_domain(fclaw2d_global_t *glob)
 {
-    /* Mapped, multi-block domain */
-    p4est_connectivity_t     *conn = NULL;
-    fclaw2d_domain_t         *domain;
-    fclaw2d_map_context_t    *cont = NULL, *brick = NULL;
-    
+    const fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);    
     int mi = fclaw_opt->mi;
     int mj = fclaw_opt->mj;    
     int a = 0; /* non-periodic */
     int b = 0;
 
+    fclaw3dx_clawpatch_options_t *clawpatch_opt = 
+                 fclaw3dx_clawpatch_get_options(glob);
     int mx = clawpatch_opt->mx;
     int minlevel = fclaw_opt->minlevel;
     int check = mi*mx*pow_int(2,minlevel);
 
+    fclaw2d_map_context_t *cont, *brick;
+    fclaw2d_domain_t *domain = NULL;
+
+    fc3d_clawpack46_options_t *claw3_opt = fc3d_clawpack46_get_options(glob);
+    const user_options_t *user = filament_get_options(glob);
     switch (user->example) 
     {
     case 0:
@@ -55,8 +54,14 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm,
         FCLAW_ASSERT(fclaw_opt->manifold == 0);
 
         /* Size is set by [ax,bx] x [ay, by], set in .ini file */
-        conn = p4est_connectivity_new_brick(mi,mj,a,b);
-        brick = fclaw2d_map_new_brick_conn (conn,mi,mj);
+        /* Mapped, multi-block domain */
+        domain =
+            fclaw2d_domain_new_brick (glob->mpicomm, mi, mj, a, b,
+                                     fclaw_opt->minlevel);
+        /* Size is set by [ax,bx] x [ay, by], set in .ini file */            
+        brick = fclaw2d_map_new_brick(domain,mi,mj,a,b);
+
+        
         cont = fclaw2d_map_new_nomap_brick(brick);
         break;
 
@@ -64,13 +69,18 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm,
         /* Square brick domain */
         FCLAW_ASSERT(fclaw_opt->manifold != 0);
         /* Square brick domain */
-        conn = p4est_connectivity_new_brick(mi,mj,a,b);
-        brick = fclaw2d_map_new_brick_conn (conn,mi,mj);
-        /* Square in [-1,1]x[-1,1], shifted by (1,1,0) */
+
+        /* Cartesian square domain */
+        domain =
+            fclaw2d_domain_new_brick (glob->mpicomm, mi, mj, a, b,
+                                     fclaw_opt->minlevel);
+
+        brick = fclaw2d_map_new_brick(domain,mi,mj,a,b);
+
+        /* Square in [-1,1]x[-1,1], scaled/shifted to [0,1]x[0,1] */
         cont = fclaw2d_map_new_cart(brick,
                                     fclaw_opt->scale,
                                     fclaw_opt->shift);
-
         break;
     case 2:
         FCLAW_ASSERT(fclaw_opt->manifold != 0);
@@ -82,23 +92,29 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm,
 
         }
         /* Five patch square domain */
-        conn = p4est_connectivity_new_disk (0, 0);
-        cont = fclaw2d_map_new_fivepatch (fclaw_opt->scale,
-                                          fclaw_opt->shift,
-                                          user->alpha);
+        domain =
+            fclaw2d_domain_new_disk(glob->mpicomm, 0,0,
+                                    fclaw_opt->minlevel);
 
+        cont = fclaw2d_map_new_fivepatch(fclaw_opt->scale,
+                                         fclaw_opt->shift,
+                                         user->alpha);
         break;
 
     case 3:
         /* bilinear square domain : maps to [-1,1]x[-1,1] */
         FCLAW_ASSERT(mi == 2 && mj == 2);
         FCLAW_ASSERT(fclaw_opt->manifold != 0);
-        conn = p4est_connectivity_new_brick(mi,mj,a,b);
-        brick = fclaw2d_map_new_brick_conn (conn,mi,mj);
-        cont = fclaw2d_map_new_bilinear (brick, 
-                                         fclaw_opt->scale,
-                                         fclaw_opt->shift, 
-                                         user->center);
+        domain =
+            fclaw2d_domain_new_brick(glob->mpicomm, mi, mj, a, b,
+                                     fclaw_opt->minlevel);
+
+        brick = fclaw2d_map_new_brick (domain, mi, mj, a, b);
+
+        cont = fclaw2d_map_new_bilinear(brick, 
+                                        fclaw_opt->scale,
+                                        fclaw_opt->shift, 
+                                        user->center);
         break;
 
     default:
@@ -106,23 +122,23 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm,
     }
 
     if (user->example > 0)
-    {
         filament_map_extrude(cont,user->maxelev);
-    }
-    
-    domain = fclaw2d_domain_new_conn_map (mpicomm, fclaw_opt->minlevel, conn, cont);
+
+    /* Store mapping in the glob */
+    fclaw2d_global_store_map (glob, cont);            
+
+    /* Store the domain in the glob */
+    fclaw2d_global_store_domain(glob, domain);
+
+    /* print out some info */    
     fclaw2d_domain_list_levels(domain, FCLAW_VERBOSITY_ESSENTIAL);
     fclaw2d_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);
-    
-    return domain;    
 }
 
 static
 void run_program(fclaw2d_global_t* glob)
 {
-    user_options_t             *user;
-
-    user = (user_options_t*) filament_get_options(glob);
+    user_options_t *user = (user_options_t*) filament_get_options(glob);
 
 
     /* ---------------------------------------------------------------
@@ -155,22 +171,14 @@ void run_program(fclaw2d_global_t* glob)
 int
 main (int argc, char **argv)
 {
-    fclaw_app_t *app;
-    int first_arg;
-    fclaw_exit_type_t vexit;
+    /* Initialize application */
+    fclaw_app_t *app = fclaw_app_new (&argc, &argv, NULL);
 
     /* Options */
     user_options_t               *user_opt;
     fclaw_options_t              *fclaw_opt;
     fclaw3dx_clawpatch_options_t *clawpatch_opt;
     fc3d_clawpack46_options_t    *claw46_opt;
-
-    fclaw2d_global_t         *glob;
-    fclaw2d_domain_t         *domain;
-    sc_MPI_Comm mpicomm;
-
-    /* Initialize application */
-    app = fclaw_app_new (&argc, &argv, NULL);
 
     /* Register packages */
     fclaw_opt                    = fclaw_options_register(app,  NULL,        "fclaw_options.ini");
@@ -179,26 +187,24 @@ main (int argc, char **argv)
     user_opt =                  filament_options_register(app,               "fclaw_options.ini");  
 
     /* Read configuration file(s) */
+    int first_arg;
+    fclaw_exit_type_t vexit;
     vexit =  fclaw_app_options_parse (app, &first_arg,"fclaw_options.ini.used");
 
     if (!vexit)
     {
         /* Options have been checked and are valid */
-
-        mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
-        domain = create_domain(mpicomm, 
-                               fclaw_opt, 
-                               user_opt,
-                               clawpatch_opt,
-                               claw46_opt);
-            
-        glob = fclaw2d_global_new();
-        fclaw2d_global_store_domain(glob, domain);
+        int size, rank;
+        sc_MPI_Comm mpicomm = fclaw_app_get_mpi_size_rank (app, &size, &rank);
+        fclaw2d_global_t *glob = fclaw2d_global_new_comm (mpicomm, size, rank);
 
         fclaw2d_options_store            (glob, fclaw_opt);
         fclaw3dx_clawpatch_options_store  (glob, clawpatch_opt);
         fc3d_clawpack46_options_store    (glob, claw46_opt);
         filament_options_store           (glob, user_opt);
+
+        /* Create domain and store domain in glob */
+        create_domain(glob);
 
         run_program(glob);
 

@@ -233,13 +233,20 @@ fclaw2d_global_store_domain (fclaw2d_global_t* glob, fclaw2d_domain_t* domain)
     glob->mpisize = domain->mpisize;
     glob->mpirank = domain->mpirank;
 
+#if 0   
     /*
      * This is an assignment that might get removed in the future.
      * There is a separate function, fclow2d_global_store_map (see below),
      * wich accomplishes this without accessing the domain attributes.
      */
-    glob->cont = (fclaw2d_map_context_t*)
+    
+    fclaw2d_map_context_t *cont = (fclaw2d_map_context_t*)
            fclaw2d_domain_attribute_access (glob->domain, "fclaw_map_context", NULL);
+
+    FCLAW_ASSERT(cont != NULL);
+
+    glob->cont = cont;
+#endif           
 }
 
 void

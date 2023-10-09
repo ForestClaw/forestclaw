@@ -28,17 +28,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "../all/advection_user.h"
 
 /* ------------- Create the domain --------------------- */
-static void
-store_domain_map (fclaw2d_global_t * glob, fclaw_options_t * fclaw_opt,
-                  user_options_t * user)
+static
+void create_domain(fclaw2d_global_t *glob)
 {
-    /* Mapped, multi-block domain */
-    fclaw2d_domain_t *domain = NULL;
-    fclaw2d_map_context_t *cont = NULL, *brick = NULL;
 
     /* ---------------------------------------------------------------
        Mapping geometry
        --------------------------------------------------------------- */
+    const fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
     int mi = fclaw_opt->mi;
     int mj = fclaw_opt->mj;
     int a = fclaw_opt->periodic_x;
@@ -46,25 +43,38 @@ store_domain_map (fclaw2d_global_t * glob, fclaw_options_t * fclaw_opt,
 
     /* Used locally */
     double pi = M_PI;
-    double rotate[2];
 
+    double rotate[2];
     rotate[0] = pi*fclaw_opt->theta/180.0;
     rotate[1] = pi*fclaw_opt->phi/180.0;
 
-    /* Annulus */
-    /* Construct and store domain */
-    domain = fclaw2d_domain_new_brick (glob->mpicomm, mi, mj, a, b,
-                                       fclaw_opt->minlevel);
-    fclaw2d_domain_list_levels (domain, FCLAW_VERBOSITY_ESSENTIAL);
-    fclaw2d_domain_list_neighbors (domain, FCLAW_VERBOSITY_DEBUG);
-    fclaw2d_global_store_domain (glob, domain);
+    /* Annulus : Mapped, multi-block domain */
+    fclaw2d_domain_t *domain = 
+               fclaw2d_domain_new_brick(glob->mpicomm, mi, mj, a, b,
+                                        fclaw_opt->minlevel);
 
-    /* Construct and store map */
-    brick = fclaw2d_map_new_brick (domain, mi, mj, a, b);
-    cont = fclaw2d_map_new_annulus (brick,
+    /* Create mapping context (annulus based on a brick) */
+    const user_options_t *user = (user_options_t*) annulus_get_options(glob);
+
+    fclaw2d_map_context_t *brick =
+              fclaw2d_map_new_brick(domain, mi, mj, a, b);
+
+    fclaw2d_map_context_t *cont = 
+            fclaw2d_map_new_annulus(brick,
                                     fclaw_opt->scale,
-                                    rotate, user->beta, user->theta);
-    fclaw2d_global_store_map (glob, cont);
+                                    rotate,
+                                    user->beta, 
+                                    user->theta);
+
+    /* Store mapping in the glob */
+    fclaw2d_global_store_map (glob, cont);            
+
+    /* Store the domain in the glob */
+    fclaw2d_global_store_domain(glob, domain);
+
+    /* print out some info */
+    fclaw2d_domain_list_levels(domain, FCLAW_VERBOSITY_ESSENTIAL);
+    fclaw2d_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);
 }
 
 static
@@ -100,45 +110,43 @@ void run_program(fclaw2d_global_t* glob)
 int
 main (int argc, char **argv)
 {
-    int first_arg;
-    fclaw_app_t *app;
-    fclaw_exit_type_t vexit;
-
-    /* Options */
-    user_options_t              *user_opt;
-    fclaw_options_t             *fclaw_opt;
-    fclaw2d_clawpatch_options_t *clawpatch_opt;
-    fc2d_clawpack46_options_t   *claw46_opt;
-    fc2d_clawpack5_options_t    *claw5_opt;
-
     /* Initialize application */
-    app = fclaw_app_new (&argc, &argv, NULL);
+    fclaw_app_t *app = fclaw_app_new (&argc, &argv, NULL);
 
-    /* Register packages */
-    fclaw_opt                  = fclaw_options_register(app,  NULL,        "fclaw_options.ini");
-    clawpatch_opt  = fclaw2d_clawpatch_options_register(app, "clawpatch",  "fclaw_options.ini");
-    claw46_opt       = fc2d_clawpack46_options_register(app, "clawpack46", "fclaw_options.ini");
-    claw5_opt         = fc2d_clawpack5_options_register(app, "clawpack5",  "fclaw_options.ini");
-    user_opt                 = annulus_options_register(app,               "fclaw_options.ini");
+    /* Register options packages */
+    fclaw_options_t  *fclaw_opt;
+    fclaw2d_clawpatch_options_t *clawpatch_opt;
+    fc2d_clawpack46_options_t *claw46_opt;
+    fc2d_clawpack5_options_t *claw5_opt;
+    user_options_t *user_opt;
 
-    /* Read configuration file(s) */
-    vexit =  fclaw_app_options_parse (app, &first_arg,"fclaw_options.ini.used");
+    fclaw_opt =      fclaw_options_register             (app,  NULL,"fclaw_options.ini");
+    clawpatch_opt =  fclaw2d_clawpatch_options_register (app, "clawpatch","fclaw_options.ini");
+    claw46_opt =     fc2d_clawpack46_options_register   (app, "clawpack46", "fclaw_options.ini");
+    claw5_opt =      fc2d_clawpack5_options_register    (app, "clawpack5",  "fclaw_options.ini");
+    user_opt =       annulus_options_register           (app,"fclaw_options.ini");
+
+    int first_arg;
+    fclaw_exit_type_t vexit = 
+        fclaw_app_options_parse (app, &first_arg,"fclaw_options.ini.used");
 
     if (!vexit)
-    {
-        
+    {        
         /* Options have been checked and are valid */
+
+        /* Create glob */
         int size, rank;
-        sc_MPI_Comm mpicomm = fclaw_app_get_mpi_size_rank (app, &size, &rank);
-        fclaw2d_global_t *glob =
-            fclaw2d_global_new_comm (mpicomm, size, rank);
-        store_domain_map (glob, fclaw_opt, user_opt);
+        sc_MPI_Comm mpicomm = fclaw_app_get_mpi_size_rank (app, &size, &rank);        
+        fclaw2d_global_t *glob = fclaw2d_global_new_comm (mpicomm, size, rank);
 
         fclaw2d_options_store            (glob, fclaw_opt);
         fclaw2d_clawpatch_options_store  (glob, clawpatch_opt);
         fc2d_clawpack46_options_store    (glob, claw46_opt);
         fc2d_clawpack5_options_store     (glob, claw5_opt);
         annulus_options_store            (glob, user_opt);
+
+        /* Create domain and store domain in glob */
+        create_domain(glob);
 
         run_program(glob);
 
