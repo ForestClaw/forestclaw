@@ -618,9 +618,12 @@ TEST_CASE("3d clawpatch ghost fill on cube with refinement coarse interior")
 
 }
 
-TEST_CASE("3d clawpatch ghost fill on uniform 2x2x2 brick")
+TEST_CASE("3d clawpatch ghost fill on uniform brick")
 {
     int test_no= 0;
+    for(int mi   : {1,2,3})
+    for(int mj   : {1,2,3})
+    for(int mk   : {1,2,3})
     for(int mx   : {10})
     for(int my   : {10})
     for(int mz   : {10})
@@ -628,12 +631,12 @@ TEST_CASE("3d clawpatch ghost fill on uniform 2x2x2 brick")
     {
         int minlevel = 2;
         int maxlevel = 2;
-        fclaw_domain_t* domain = fclaw_domain_new_3d_brick(sc_MPI_COMM_WORLD, 2, 2, 2, 0, 0, 0, minlevel);
+        fclaw_domain_t* domain = fclaw_domain_new_3d_brick(sc_MPI_COMM_WORLD, mi, mj, mk, 0, 0, 0, minlevel);
         TestData test_data(domain,minlevel, maxlevel);
 
-        test_data.fopts.mi = 2;
-        test_data.fopts.mj = 2;
-        test_data.fopts.mk = 2;
+        test_data.fopts.mi = mi;
+        test_data.fopts.mj = mj;
+        test_data.fopts.mk = mk;
         test_data.opts->mx   = mx;
         test_data.opts->my   = my;
         test_data.opts->mz   = mz;
@@ -644,12 +647,12 @@ TEST_CASE("3d clawpatch ghost fill on uniform 2x2x2 brick")
 
         //create output domain with bigger size, so that we can see ghost cells
         //in the vtk output
-        fclaw_domain_t* domain_out = fclaw_domain_new_3d_brick(sc_MPI_COMM_WORLD, 2, 2, 2, 0, 0, 0, minlevel);
+        fclaw_domain_t* domain_out = fclaw_domain_new_3d_brick(sc_MPI_COMM_WORLD, mi, mj, mk, 0, 0, 0, minlevel);
         TestData test_data_out(domain_out, minlevel, maxlevel);
 
-        test_data_out.fopts.mi = 2;
-        test_data_out.fopts.mj = 2;
-        test_data_out.fopts.mk = 2;
+        test_data_out.fopts.mi = mi;
+        test_data_out.fopts.mj = mj;
+        test_data_out.fopts.mk = mk;
         test_data_out.opts->mx   = mx+2*mbc;
         test_data_out.opts->my   = my+2*mbc;
         test_data_out.opts->mz   = mz+2*mbc;
