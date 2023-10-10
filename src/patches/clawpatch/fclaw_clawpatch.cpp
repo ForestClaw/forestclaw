@@ -298,29 +298,19 @@ void clawpatch_define(fclaw_global_t* glob,
             {
                 //TODO fclaw3d_map_c2m_nomap_brick
                 //hardcoded for now
-                //cp->blockno = ix+iy*fclaw_opt->mi+iz*fclaw_opt->mi*fclaw_opt->mj;
-                int ix = cp->blockno % fclaw_opt->mi;
-                int iy = (cp->blockno / fclaw_opt->mi) % fclaw_opt->mj;
-                int iz = cp->blockno / (fclaw_opt->mi*fclaw_opt->mj);
+                fclaw_block_t *block = &glob->domain->blocks[blockno];
 
                 //map in [0,1] for entire brick
-                double block_xlower = ix/(double)fclaw_opt->mi;
-                double block_xupper = (ix+1)/(double)fclaw_opt->mi;
-                double block_ylower = iy/(double)fclaw_opt->mj;
-                double block_yupper = (iy+1)/(double)fclaw_opt->mj;
-                double block_zlower = iz/(double)fclaw_opt->mk;
-                double block_zupper = (iz+1)/(double)fclaw_opt->mk;
+                double block_xlower = block->vertices[0];
+                double block_ylower = block->vertices[1];
+                double block_zlower = block->vertices[2];
 
-                double block_xscale = block_xupper - block_xlower;
-                double block_yscale = block_yupper - block_ylower;
-                double block_zscale = block_zupper - block_zlower;
-
-                xlower = block_xlower + block_xscale*xl;
-                xupper = block_xlower + block_xscale*xu;
-                ylower = block_ylower + block_yscale*yl;
-                yupper = block_ylower + block_yscale*yu;
-                zlower = block_zlower + block_zscale*zl;
-                zupper = block_zlower + block_zscale*zu;
+                xlower = (block_xlower + xl)/(double)fclaw_opt->mi;
+                xupper = (block_xlower + xu)/(double)fclaw_opt->mi;
+                ylower = (block_ylower + yl)/(double)fclaw_opt->mj;
+                yupper = (block_ylower + yu)/(double)fclaw_opt->mj;
+                zlower = (block_zlower + zl)/(double)fclaw_opt->mk;
+                zupper = (block_zlower + zu)/(double)fclaw_opt->mk;
             }
         }
         else
