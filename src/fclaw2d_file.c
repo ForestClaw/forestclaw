@@ -380,8 +380,6 @@ fcaw2d_file_get_padding_string_v1 (size_t num_bytes, size_t divisor,
     }
 }
 
-/** currently unused */
-#if 0
 static int
 fclaw2d_file_check_file_metadata_v1 (sc_MPI_Comm mpicomm,
                                      const char *filename,
@@ -498,7 +496,6 @@ fclaw2d_file_check_file_metadata_v1 (sc_MPI_Comm mpicomm,
 
     return (error_flag) ? FCLAW2D_FILE_ERR_FORMAT_V1 : sc_MPI_SUCCESS;
 }
-#endif
 
 /** Close an MPI file or its libsc-internal replacement in case of an error.
  * \param [in,out]  file    A sc_MPI_file
@@ -716,8 +713,6 @@ fclaw2d_file_open_create_v1 (p4est_t * p4est, const char *filename,
     return file_context;
 }
 
-/** currently unused */
-#if 0
 /** Open a file for reading without knowing the p4est that is associated
  * with the mesh-related data in the file (cf. \ref fclaw2d_file_open_read_v1).
  * For more general comments on open_read see the documentation of
@@ -806,7 +801,6 @@ fclaw2d_file_open_read_ext_v1 (sc_MPI_Comm mpicomm, const char *filename,
     fclaw2d_file_error_code_v1 (*errcode, errcode);
     return file_context;
 }
-#endif
 
 /** currently unused */
 #if 0
@@ -1718,7 +1712,6 @@ fclaw2d_file_read_field_ext_v1 (fclaw2d_file_context_p4est_v1_t * fc,
 }
 #endif
 
-/** currently unused */
 #if 0
 /** Read one (more) per-quadrant data set from a parallel input file.
  * This function requires an opened file context.
@@ -3089,7 +3082,7 @@ fclaw2d_file_open_write (const char *filename,
     p4est_t *p4est;
     fclaw2d_file_context_p4est_v1_t *fc;
     fclaw2d_file_context_t *fclaw_fc;
-    int  buf_size;
+    int buf_size;
     char *buf;
 
     /* get p4est_wrap_t from domain */
@@ -3186,10 +3179,37 @@ fclaw2d_file_open_read (const char *filename, char *user_string,
     FCLAW_ASSERT (domain != NULL);
     FCLAW_ASSERT (errcode != NULL);
 
-    /* The functionality must be still implemented. */
-    *errcode = FCLAW2D_FILE_ERR_NOT_IMPLEMENTED;
+    int errcode_internal;
+    int buf_size;
+    char *buf;
+    p4est_gloidx_t global_num_quadrants;
+    fclaw2d_file_context_p4est_v1_t *p4est_fc;
+    fclaw2d_file_context_t *fclaw_fc;
 
-    return NULL;
+    /* open the given file */
+    buf_size = strlen (filename) + strlen ("." FCLAW2D_FILE_EXT) + 1;
+    buf = FCLAW_ALLOC (char, buf_size);
+    sc_strcopy (buf, (size_t) buf_size, filename);
+    strcat (buf, "." FCLAW2D_FILE_EXT);
+    p4est_fc = fclaw2d_file_open_read_ext_v1 (mpicomm, buf, user_string,
+                                              &global_num_quadrants,
+                                              &errcode_internal);
+    FCLAW_FREE (buf);
+    fclaw2d_file_translate_error_code_v1 (errcode_internal, errcode);
+    if (*errcode != FCLAW2D_FILE_ERR_SUCCESS)
+    {
+        FCLAW_ASSERT (p4est_fc == NULL);
+        return NULL;
+    }
+
+    /* read the p4est connectivity */
+    /* TODO */
+
+    fclaw_fc = FCLAW_ALLOC (fclaw2d_file_context_t, 1);
+    fclaw_fc->fc = p4est_fc;
+    fclaw_fc->domain = NULL;
+
+    return fclaw_fc;
 }
 
 fclaw2d_file_context_t *

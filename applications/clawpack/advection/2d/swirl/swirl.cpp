@@ -28,7 +28,7 @@
 
 #include "../all/advection_user.h"
 
-#define FCLAW_SWIRL_IO_DEMO 0
+#define FCLAW_SWIRL_IO_DEMO 1
 
 static
 void create_domain(fclaw2d_global_t *glob)
@@ -59,6 +59,8 @@ void run_program(fclaw2d_global_t* glob)
 #if FCLAW_SWIRL_IO_DEMO
     int errcode;
     fclaw2d_file_context_t *fc;
+    char read_user_string[FCLAW2D_FILE_USER_STRING_BYTES + 1];
+    fclaw2d_domain_t *read_domain;
 #endif
 
     /* ---------------------------------------------------------------
@@ -99,6 +101,12 @@ void run_program(fclaw2d_global_t* glob)
     */
     fc = fclaw2d_file_open_write ("swirl_io_test", "ForestClaw data file", 0,
                                   glob->domain, &errcode);
+
+    fclaw2d_file_close (fc, &errcode);
+
+    fc = fclaw2d_file_open_read ("swirl_io_test", read_user_string,
+                                 glob->domain->mpicomm, 0, &read_domain,
+                                 &errcode);
 
     fclaw2d_file_close (fc, &errcode);
 #endif
