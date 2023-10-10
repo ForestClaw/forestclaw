@@ -113,7 +113,8 @@ struct TestData {
     }
     ~TestData(){
         fclaw_clawpatch_options_destroy(opts);
-        //fclaw_domain_destroy(domain);
+        fclaw_domain_reset(glob);
+        //fclaw_domain_destroy(glob->domain);
         //fclaw3d_map_destroy(map);
         fclaw_global_destroy(glob);
     }
