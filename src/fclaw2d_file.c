@@ -489,8 +489,8 @@ fclaw2d_file_check_file_metadata_v1 (sc_MPI_Comm mpicomm,
     if (read_global_num_quads < 0)
     {
         fclaw_errorf (FCLAW2D_FILE_STRING_V1
-                       " : Error reading <%s>. Negative global number of quadrants.\n",
-                       filename);
+                      " : Error reading <%s>. Negative global number of quadrants.\n",
+                      filename);
         error_flag = 1;
     }
 
@@ -554,9 +554,11 @@ fclaw2d_file_check_user_string (const char *user_string)
     char copied_user_string[FCLAW2D_FILE_USER_STRING_BYTES_V1];
 
     /* copy user string */
-    sc_strcopy (copied_user_string, FCLAW2D_FILE_USER_STRING_BYTES_V1, user_string);
+    sc_strcopy (copied_user_string, FCLAW2D_FILE_USER_STRING_BYTES_V1,
+                user_string);
 
-    if (strlen (copied_user_string) < FCLAW2D_FILE_USER_STRING_BYTES_V1 - 1) {
+    if (strlen (copied_user_string) < FCLAW2D_FILE_USER_STRING_BYTES_V1 - 1)
+    {
         /* user_string is nul-terminated */
         return 0;
     }
@@ -567,11 +569,13 @@ fclaw2d_file_check_user_string (const char *user_string)
     /* check for nul at last byte position of user string */
     terminal_nul = user_string[FCLAW2D_FILE_USER_STRING_BYTES_V1 - 1] == '\0';
 
-    if (!terminal_nul) {
+    if (!terminal_nul)
+    {
         /* user_string is not nul-terminated */
         return -1;
     }
-    else {
+    else
+    {
         /* user_string is nul-terminated */
         return 0;
     }
@@ -854,11 +858,12 @@ fclaw2d_file_open_read_v1 (p4est_t * p4est, const char *filename,
     {
         if (p4est->mpirank == 0)
         {
-            fclaw_errorf (FCLAW2D_FILE_STRING_V1 " open_read: global number of "
-                           "quadrants mismatch (in file = %lld,"
-                           " by parameter = %lld)\n",
-                           (long long) global_num_quadrants,
-                           (long long) p4est->global_num_quadrants);
+            fclaw_errorf (FCLAW2D_FILE_STRING_V1
+                          " open_read: global number of "
+                          "quadrants mismatch (in file = %lld,"
+                          " by parameter = %lld)\n",
+                          (long long) global_num_quadrants,
+                          (long long) p4est->global_num_quadrants);
         }
         fclaw2d_file_close_v1 (fc, errcode);
         FCLAW2D_FILE_CHECK_NULL_V1 (*errcode, fc,
@@ -1152,8 +1157,8 @@ fclaw2d_file_read_block_metadata_v1 (fclaw2d_file_context_p4est_v1_t * fc,
         if (rank == 0)
         {
             fclaw_errorf (FCLAW2D_FILE_STRING_V1
-                           ": Error reading. Wrong section data size (in file = %ld, by parameter = %ld).\n",
-                           *read_data_size, data_size);
+                          ": Error reading. Wrong section data size (in file = %ld, by parameter = %ld).\n",
+                          *read_data_size, data_size);
         }
         fclaw2d_file_error_cleanup_v1 (&fc->file);
         FCLAW_FREE (fc);
@@ -2083,9 +2088,8 @@ fclaw2d_file_info_v1 (p4est_t * p4est, const char *filename,
                         FCLAW2D_FILE_USER_STRING_BYTES_V1,
                         &block_metadata[FCLAW2D_FILE_ARRAY_METADATA_BYTES_V1 +
                                         2]);
-            FCLAW_ASSERT (current_member->
-                          user_string[FCLAW2D_FILE_USER_STRING_BYTES_V1 -
-                                      1] == '\0');
+            FCLAW_ASSERT (current_member->user_string
+                          [FCLAW2D_FILE_USER_STRING_BYTES_V1 - 1] == '\0');
 
             /* get padding bytes of the current block */
             if (current_member->block_type == 'F')
@@ -2648,8 +2652,8 @@ fclaw2d_file_read_p4est_v1 (fclaw2d_file_context_p4est_v1_t * fc,
         *errcode = FCLAW2D_FILE_ERR_P4EST_V1;
         sc_array_reset (&pertree_arr);
         FCLAW2D_FILE_CHECK_NULL_V1 (*errcode, fc,
-                                    FCLAW2D_FILE_STRING_V1 " file_read_" P4EST_STRING,
-                                    errcode);
+                                    FCLAW2D_FILE_STRING_V1 " file_read_"
+                                    P4EST_STRING, errcode);
     }
     for (jt = 0; jt < conn->num_trees; ++jt)
     {
@@ -2667,8 +2671,8 @@ fclaw2d_file_read_p4est_v1 (fclaw2d_file_context_p4est_v1_t * fc,
         *errcode = FCLAW2D_FILE_ERR_P4EST_V1;
         sc_array_reset (&pertree_arr);
         FCLAW2D_FILE_CHECK_NULL_V1 (*errcode, fc,
-                                    FCLAW2D_FILE_STRING_V1 " file_read_" P4EST_STRING,
-                                    errcode);
+                                    FCLAW2D_FILE_STRING_V1 " file_read_"
+                                    P4EST_STRING, errcode);
     }
 
     gfq = FCLAW_ALLOC (p4est_gloidx_t, mpisize + 1);
@@ -2763,8 +2767,8 @@ fclaw2d_file_read_p4est_v1 (fclaw2d_file_context_p4est_v1_t * fc,
         sc_array_reset (&quadrants);
         sc_array_reset (&quad_data);
         FCLAW2D_FILE_CHECK_NULL_V1 (*errcode, fc,
-                                    FCLAW2D_FILE_STRING_V1 " file_read_" P4EST_STRING,
-                                    errcode);
+                                    FCLAW2D_FILE_STRING_V1 " file_read_"
+                                    P4EST_STRING, errcode);
     }
 
     /* clean up und return */
@@ -2925,8 +2929,8 @@ fclaw2d_file_read_connectivity_v1 (fclaw2d_file_context_p4est_v1_t * fc,
         /* close, dealloc file and set specific error code */
         *errcode = FCLAW2D_FILE_ERR_CONN_V1;
         FCLAW2D_FILE_CHECK_NULL_V1 (*errcode, fc,
-                                    FCLAW2D_FILE_STRING_V1 " file_read_connectivity",
-                                    errcode);
+                                    FCLAW2D_FILE_STRING_V1
+                                    " file_read_connectivity", errcode);
     }
 
     /* clean up */
@@ -2995,73 +2999,74 @@ fclaw2d_file_translate_error_code_v1 (int errcode_v1, int *errcode)
 {
     FCLAW_ASSERT (errcode != NULL);
 
-    switch (errcode_v1) {
-        case FCLAW2D_FILE_ERR_SUCCESS_V1:
-            *errcode = FCLAW2D_FILE_ERR_SUCCESS;
-            return 0;
-        case FCLAW2D_FILE_ERR_FILE_V1:
-            *errcode = FCLAW2D_FILE_ERR_FILE;
-            return 0;
-        case FCLAW2D_FILE_ERR_NOT_SAME_V1:
-            *errcode = FCLAW2D_FILE_ERR_NOT_SAME;
-            return 0;
-        case FCLAW2D_FILE_ERR_AMODE_V1:
-            *errcode = FCLAW2D_FILE_ERR_AMODE;
-            return 0;
-        case FCLAW2D_FILE_ERR_NO_SUCH_FILE_V1:
-            *errcode = FCLAW2D_FILE_ERR_NO_SUCH_FILE;
-            return 0;
-        case FCLAW2D_FILE_ERR_FILE_EXIST_V1:
-            *errcode = FCLAW2D_FILE_ERR_FILE_EXIST;
-            return 0;
-        case FCLAW2D_FILE_ERR_BAD_FILE_V1:
-            *errcode = FCLAW2D_FILE_ERR_BAD_FILE;
-            return 0;
-        case FCLAW2D_FILE_ERR_ACCESS_V1:
-            *errcode = FCLAW2D_FILE_ERR_ACCESS;
-            return 0;
-        case FCLAW2D_FILE_ERR_NO_SPACE_V1:
-            *errcode = FCLAW2D_FILE_ERR_NO_SPACE;
-            return 0;
-        case FCLAW2D_FILE_ERR_QUOTA_V1:
-            *errcode = FCLAW2D_FILE_ERR_QUOTA;
-            return 0;
-        case FCLAW2D_FILE_ERR_READ_ONLY_V1:
-            *errcode = FCLAW2D_FILE_ERR_READ_ONLY;
-            return 0;
-        case FCLAW2D_FILE_ERR_IN_USE_V1:
-            *errcode = FCLAW2D_FILE_ERR_IN_USE;
-            return 0;
-        case FCLAW2D_FILE_ERR_IO_V1:
-            *errcode = FCLAW2D_FILE_ERR_IO;
-            return 0;
-        case FCLAW2D_FILE_ERR_FORMAT_V1:
-            *errcode = FCLAW2D_FILE_ERR_FORMAT;
-            return 0;
-        case FCLAW2D_FILE_ERR_SECTION_TYPE_V1:
-            *errcode = FCLAW2D_FILE_ERR_SECTION_TYPE;
-            return 0;
-        case FCLAW2D_FILE_ERR_CONN_V1:
-            *errcode = FCLAW2D_FILE_ERR_CONN;
-            return 0;
-        case FCLAW2D_FILE_ERR_P4EST_V1:
-            *errcode = FCLAW2D_FILE_ERR_P4EST;
-            return 0;
-        case FCLAW2D_FILE_ERR_IN_DATA_V1:
-            *errcode = FCLAW2D_FILE_ERR_IN_DATA;
-            return 0;
-        case FCLAW2D_FILE_ERR_COUNT_V1:
-            *errcode = FCLAW2D_FILE_ERR_COUNT;
-            return 0;
-        case FCLAW2D_FILE_ERR_UNKNOWN_V1:
-            *errcode = FCLAW2D_FILE_ERR_UNKNOWN;
-            return 0;
-        case FCLAW2D_FILE_ERR_LASTCODE_V1:
-            *errcode = FCLAW2D_FILE_ERR_LASTCODE;
-            return 0;
-        default:
-            *errcode = FCLAW2D_FILE_ERR_UNKNOWN;
-            return 0;
+    switch (errcode_v1)
+    {
+    case FCLAW2D_FILE_ERR_SUCCESS_V1:
+        *errcode = FCLAW2D_FILE_ERR_SUCCESS;
+        return 0;
+    case FCLAW2D_FILE_ERR_FILE_V1:
+        *errcode = FCLAW2D_FILE_ERR_FILE;
+        return 0;
+    case FCLAW2D_FILE_ERR_NOT_SAME_V1:
+        *errcode = FCLAW2D_FILE_ERR_NOT_SAME;
+        return 0;
+    case FCLAW2D_FILE_ERR_AMODE_V1:
+        *errcode = FCLAW2D_FILE_ERR_AMODE;
+        return 0;
+    case FCLAW2D_FILE_ERR_NO_SUCH_FILE_V1:
+        *errcode = FCLAW2D_FILE_ERR_NO_SUCH_FILE;
+        return 0;
+    case FCLAW2D_FILE_ERR_FILE_EXIST_V1:
+        *errcode = FCLAW2D_FILE_ERR_FILE_EXIST;
+        return 0;
+    case FCLAW2D_FILE_ERR_BAD_FILE_V1:
+        *errcode = FCLAW2D_FILE_ERR_BAD_FILE;
+        return 0;
+    case FCLAW2D_FILE_ERR_ACCESS_V1:
+        *errcode = FCLAW2D_FILE_ERR_ACCESS;
+        return 0;
+    case FCLAW2D_FILE_ERR_NO_SPACE_V1:
+        *errcode = FCLAW2D_FILE_ERR_NO_SPACE;
+        return 0;
+    case FCLAW2D_FILE_ERR_QUOTA_V1:
+        *errcode = FCLAW2D_FILE_ERR_QUOTA;
+        return 0;
+    case FCLAW2D_FILE_ERR_READ_ONLY_V1:
+        *errcode = FCLAW2D_FILE_ERR_READ_ONLY;
+        return 0;
+    case FCLAW2D_FILE_ERR_IN_USE_V1:
+        *errcode = FCLAW2D_FILE_ERR_IN_USE;
+        return 0;
+    case FCLAW2D_FILE_ERR_IO_V1:
+        *errcode = FCLAW2D_FILE_ERR_IO;
+        return 0;
+    case FCLAW2D_FILE_ERR_FORMAT_V1:
+        *errcode = FCLAW2D_FILE_ERR_FORMAT;
+        return 0;
+    case FCLAW2D_FILE_ERR_SECTION_TYPE_V1:
+        *errcode = FCLAW2D_FILE_ERR_SECTION_TYPE;
+        return 0;
+    case FCLAW2D_FILE_ERR_CONN_V1:
+        *errcode = FCLAW2D_FILE_ERR_CONN;
+        return 0;
+    case FCLAW2D_FILE_ERR_P4EST_V1:
+        *errcode = FCLAW2D_FILE_ERR_P4EST;
+        return 0;
+    case FCLAW2D_FILE_ERR_IN_DATA_V1:
+        *errcode = FCLAW2D_FILE_ERR_IN_DATA;
+        return 0;
+    case FCLAW2D_FILE_ERR_COUNT_V1:
+        *errcode = FCLAW2D_FILE_ERR_COUNT;
+        return 0;
+    case FCLAW2D_FILE_ERR_UNKNOWN_V1:
+        *errcode = FCLAW2D_FILE_ERR_UNKNOWN;
+        return 0;
+    case FCLAW2D_FILE_ERR_LASTCODE_V1:
+        *errcode = FCLAW2D_FILE_ERR_LASTCODE;
+        return 0;
+    default:
+        *errcode = FCLAW2D_FILE_ERR_UNKNOWN;
+        return 0;
     }
     return 0;
 }
