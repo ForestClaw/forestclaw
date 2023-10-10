@@ -27,6 +27,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fc2d_cuda_profiler.h>
 
+#include <fclaw2d_include_all.h>
+
+#include <fclaw2d_clawpatch_options.h>
+#include <fclaw2d_clawpatch.h>
+
+#include <fc2d_clawpack46_options.h>
+
+#include <fc2d_clawpack46.h>
+
 static
 void create_domain(fclaw2d_global_t* glob)
 {
@@ -69,28 +78,41 @@ void run_program(fclaw2d_global_t* glob)
     /* Initialize virtual table for ForestClaw */
     fclaw2d_vtables_initialize(glob);
 
-    fc2d_cudaclaw_options_t *clawopt = fc2d_cudaclaw_get_options(glob);
+    if (user_opt->cuda == 1)
+    {
+        fc2d_cudaclaw_options_t *clawopt = fc2d_cudaclaw_get_options(glob);
 
-    fc2d_cudaclaw_initialize_GPUs(glob);
+        fc2d_cudaclaw_initialize_GPUs(glob);
 
-    /* this has to be done after GPUs have been initialized */
-    cudaclaw_set_method_parameters(clawopt->order, clawopt->mthlim, clawopt->mwaves,
-                                   clawopt->use_fwaves);
-    fc2d_cudaclaw_solver_initialize(glob);
+        /* this has to be done after GPUs have been initialized */
+        cudaclaw_set_method_parameters(clawopt->order, clawopt->mthlim, clawopt->mwaves,
+                                    clawopt->use_fwaves);
+        fc2d_cudaclaw_solver_initialize(glob);
+    }   
+    else
+    {
+          fc2d_clawpack46_solver_initialize(glob);
+    }
 
     shockbubble_link_solvers(glob);
 
     /* ---------------------------------------------------------------
        Run
        --------------------------------------------------------------- */
-    PROFILE_CUDA_GROUP("Allocate GPU and GPU buffers",1);
-    fc2d_cudaclaw_allocate_buffers(glob);
+    if (user_opt->cuda == 1)
+    {
+        PROFILE_CUDA_GROUP("Allocate GPU and GPU buffers",1);
+        fc2d_cudaclaw_allocate_buffers(glob);
+    }
 
     fclaw2d_initialize(glob);
     fclaw2d_run(glob);
 
-    PROFILE_CUDA_GROUP("De-allocate GPU and GPU buffers",1);
-    fc2d_cudaclaw_deallocate_buffers(glob);
+    if (user_opt->cuda == 1)
+    {
+        PROFILE_CUDA_GROUP("De-allocate GPU and GPU buffers",1);
+        fc2d_cudaclaw_deallocate_buffers(glob);
+    }
 
     fclaw2d_finalize(glob);
 }
@@ -105,11 +127,13 @@ main (int argc, char **argv)
     user_options_t              *user_opt;
     fclaw_options_t             *fclaw_opt;
     fclaw2d_clawpatch_options_t *clawpatch_opt;
+    fc2d_clawpack46_options_t   *claw46_opt;
     fc2d_cudaclaw_options_t     *cuclaw_opt;
 
     /* Create new options packages */
     fclaw_opt =                   fclaw_options_register(app,  NULL,       "fclaw_options.ini");
     clawpatch_opt =   fclaw2d_clawpatch_options_register(app, "clawpatch", "fclaw_options.ini");
+    claw46_opt =   fc2d_clawpack46_options_register(app,"clawpack46","fclaw_options.ini");
     cuclaw_opt =          fc2d_cudaclaw_options_register(app, "cudaclaw",  "fclaw_options.ini");
     user_opt =              shockbubble_options_register(app,              "fclaw_options.ini");  
 
@@ -130,6 +154,7 @@ main (int argc, char **argv)
         /* Store option packages in glob */
         fclaw2d_options_store           (glob, fclaw_opt);
         fclaw2d_clawpatch_options_store (glob, clawpatch_opt);
+        fc2d_clawpack46_options_store   (glob, claw46_opt);
         fc2d_cudaclaw_options_store     (glob, cuclaw_opt);
         shockbubble_options_store       (glob, user_opt);
 
