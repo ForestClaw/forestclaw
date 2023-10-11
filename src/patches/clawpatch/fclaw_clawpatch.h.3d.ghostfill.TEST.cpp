@@ -35,6 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_domain.h>
 #include <fclaw_patch.h>
 #include <fclaw3d_map.h>
+#include <fclaw2d_map.h>
 #include <fclaw_convenience.h>
 #include <fclaw3d_metric.hpp>
 #include <fclaw3d_metric.h>
@@ -51,7 +52,8 @@ struct TestData {
     fclaw_global_t* glob;
     fclaw_options_t fopts;
     fclaw_domain_t *domain;
-    fclaw3d_map_context_t* map;
+    fclaw3d_map_context_t* map3d;
+    fclaw2d_map_context_t* map;
     fclaw_clawpatch_options_t* opts;
     fclaw_patch_vtable_t* patch_vt;
     fclaw_clawpatch_vtable_t * clawpatch_vt;
@@ -86,6 +88,11 @@ struct TestData {
 
         fclaw_global_store_domain(glob, domain);
 
+        if(domain->refine_dim == 2)
+        {
+            map = fclaw2d_map_new_nomap();
+            fclaw2d_map_store(glob, map);
+        }
         //map = fclaw3d_map_new_nomap();
         //fclaw_global_store_map_3d(glob, map);
 
@@ -361,6 +368,136 @@ void test_ghost_fill(TestData& tdata, TestData& tdata_out, std::string output_fi
 
 }// end anonymous namespace
 
+//TODO move this somewhere else
+TEST_CASE("3d clawpatch ghost pack/unpack")
+{
+    for(int mx   : {8,9,10})
+    for(int my   : {8,9,10})
+    for(int mz   : {8,9,10})
+    for(int mbc  : {1,2})
+    {
+        int minlevel = 1;
+        int maxlevel = 1;
+        fclaw_domain_t* domain = fclaw_domain_new_unitcube(sc_MPI_COMM_WORLD, minlevel);
+        TestData test_data(domain,minlevel, maxlevel);
+
+        test_data.opts->mx   = mx;
+        test_data.opts->my   = my;
+        test_data.opts->mz   = mz;
+        test_data.opts->mbc  = mbc;
+        test_data.opts->meqn = 3;
+
+        test_data.setup();
+
+        size_t expected_packsize = 
+            ((mx+2*mbc)*(my+2*mbc)*(mz+2*mbc) -(mx-2*mbc*2)*(my-2*mbc*2)*(mz-2*mbc*2)) //1-interior
+                                    *3*sizeof(double);
+        
+        REQUIRE_EQ(fclaw_patch_ghost_packsize(test_data.glob), expected_packsize);
+
+        fclaw_patch_t * patch = &test_data.glob->domain->blocks[0].patches[0];
+        fclaw_clawpatch_t* clawpatch = fclaw_clawpatch_get_clawpatch(patch);
+        double * q = fclaw_clawpatch_get_q(test_data.glob, patch);
+
+        for(int m = 0; m < 3; m++)
+        for(int k = -mbc; k < mz+mbc; k++)
+        for(int j = -mbc; j < my+mbc; j++)
+        for(int i = -mbc; i < mx+mbc; i++)
+        {
+            int idx = clawpatch_idx(clawpatch, i,j,k,m);
+            //fill with some different linear functions
+            q[idx] = fill_function(clawpatch, i, j, k, m);
+        }
+
+        double pack_buffer[expected_packsize/sizeof(double)];
+        fclaw_patch_local_ghost_pack(test_data.glob, patch, pack_buffer,0);
+
+        memset(q, 0, sizeof(double)*fclaw_clawpatch_size(test_data.glob));
+
+        fclaw_patch_remote_ghost_unpack(test_data.glob,patch, 0,0,pack_buffer,0);
+
+        for(int m = 0; m < test_data.opts->meqn; m++)
+        for(int k = -mbc; k < test_data.opts->mz+mbc; k++)
+        for(int j = -mbc; j < test_data.opts->my+mbc; j++)
+        for(int i = -mbc; i < test_data.opts->mx+mbc; i++)
+        {
+            int idx = clawpatch_idx(clawpatch, i,j,k,m);
+            if((i>=2*mbc && i < mx-2*mbc) && (j>=2*mbc && j < my-2*mbc)&& (k>=2*mbc && k < mz-2*mbc))
+            {
+                CHECK_EQ(q[idx], 0);
+            }
+            else 
+            {
+                CHECK_EQ(q[idx], fill_function(clawpatch, i, j, k, m));
+            }
+        }
+    }
+}
+TEST_CASE("3dx clawpatch ghost pack/unpack")
+{
+    for(int mx   : {8,9,10})
+    for(int my   : {8,9,10})
+    for(int mz   : {8,9,10})
+    for(int mbc  : {1,2})
+    {
+        int minlevel = 1;
+        int maxlevel = 1;
+        fclaw_domain_t* domain = fclaw_domain_new_unitsquare(sc_MPI_COMM_WORLD, minlevel);
+        TestData test_data(domain,minlevel, maxlevel);
+
+        test_data.opts->mx   = mx;
+        test_data.opts->my   = my;
+        test_data.opts->mz   = mz;
+        test_data.opts->mbc  = mbc;
+        test_data.opts->meqn = 3;
+
+        test_data.setup();
+
+        INFO("mx="<<mx<<" my="<<my<<" mz="<<mz<<" mbc="<<mbc);
+        size_t expected_packsize = 
+            ((mx+2*mbc)*(my+2*mbc)*(mz+2*mbc) - (mx-2*mbc*2)*(my-2*mbc*2)*(mz+2*mbc)) //whole-interior
+                                    *3*sizeof(double);
+        
+        REQUIRE_EQ(fclaw_patch_ghost_packsize(test_data.glob), expected_packsize);
+
+        fclaw_patch_t * patch = &test_data.glob->domain->blocks[0].patches[0];
+        fclaw_clawpatch_t* clawpatch = fclaw_clawpatch_get_clawpatch(patch);
+        double * q = fclaw_clawpatch_get_q(test_data.glob, patch);
+
+        for(int m = 0; m < 3; m++)
+        for(int k = -mbc; k < mz+mbc; k++)
+        for(int j = -mbc; j < my+mbc; j++)
+        for(int i = -mbc; i < mx+mbc; i++)
+        {
+            int idx = clawpatch_idx(clawpatch, i,j,k,m);
+            //fill with some different linear functions
+            q[idx] = fill_function(clawpatch, i, j, k, m);
+        }
+
+        double pack_buffer[expected_packsize/sizeof(double)];
+        fclaw_patch_local_ghost_pack(test_data.glob, patch, pack_buffer,0);
+
+        memset(q, 0, sizeof(double)*fclaw_clawpatch_size(test_data.glob));
+
+        fclaw_patch_remote_ghost_unpack(test_data.glob,patch, 0,0,pack_buffer,0);
+
+        for(int m = 0; m < test_data.opts->meqn; m++)
+        for(int k = -mbc; k < test_data.opts->mz+mbc; k++)
+        for(int j = -mbc; j < test_data.opts->my+mbc; j++)
+        for(int i = -mbc; i < test_data.opts->mx+mbc; i++)
+        {
+            int idx = clawpatch_idx(clawpatch, i,j,k,m);
+            if((i>=2*mbc && i < mx-2*mbc) && (j>=2*mbc && j < my-2*mbc))
+            {
+                CHECK_EQ(q[idx], 0);
+            }
+            else 
+            {
+                CHECK_EQ(q[idx], fill_function(clawpatch, i, j, k, m));
+            }
+        }
+    }
+}
 
 TEST_CASE("3d clawpatch ghost fill on uniform cube")
 {
