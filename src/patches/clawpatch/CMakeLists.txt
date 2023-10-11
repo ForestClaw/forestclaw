@@ -52,6 +52,7 @@ add_library(clawpatch_f OBJECT
   fort3_4.6/fclaw3dx_clawpatch46_average.f90 
   fort3_4.6/fclaw3dx_clawpatch46_copy.f90 
   fort3_4.6/fclaw3dx_clawpatch46_interpolate.f90 
+  fort3_4.6/fclaw3dx_clawpatch46_local_ghost_pack.f90 
   fort3_4.6/fclaw3dx_clawpatch46_pillowsphere.f90 
 
   ${metric}/fortran_source2d/fclaw2d_metric_default_fort.f90

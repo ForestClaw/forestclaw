@@ -1282,11 +1282,17 @@ size_t clawpatch_ghost_pack_elems(fclaw_global_t* glob)
     int wg = (2*nghost + mx)*(2*nghost + my);  /* Whole grid     */
     int hole = (mx - 2*mint)*(my - 2*mint);    /* Hole in center */
 
-    if(clawpatch_opt->patch_dim == 3)
+    if(glob->domain->refine_dim == 2 && clawpatch_opt->patch_dim == 3)
     {
         wg *= (mz + 2*nghost);
         hole *= (mz + 2*nghost);  
     }
+    else if (clawpatch_opt->patch_dim == 3)
+    {
+        wg *= (mz + 2*nghost);
+        hole *= (mz - 2*mint);  
+    }
+
     FCLAW_ASSERT(hole >= 0);
 
     size_t psize = (wg - hole)*(meqn + packarea + packextra) + frsize;
@@ -1347,11 +1353,17 @@ void clawpatch_ghost_comm(fclaw_global_t* glob,
     int wg = (2*nghost + mx)*(2*nghost + my);
     int hole = (mx - 2*mint)*(my - 2*mint);  /* Hole in center */
 
-    if(clawpatch_opt->patch_dim == 3)
+    if(patch->refine_dim == 2 && clawpatch_opt->patch_dim == 3)
     {
         wg *= (mz + 2*nghost);
         hole *= (mz + 2*nghost);  
     }
+    else if(clawpatch_opt->patch_dim == 3)
+    {
+        wg *= (mz + 2*nghost);
+        hole *= (mz - 2*mint);  
+    }
+
     FCLAW_ASSERT(hole >= 0);
 
     size_t psize = (wg - hole)*(meqn + packarea + packextra) + frsize;
@@ -1688,7 +1700,7 @@ void initialize_3dx_claw46_fort_vt(fclaw_clawpatch_vtable_t* clawpatch_vt)
     clawpatch_vt->d3->fort_interpolate_corner    = FCLAW3DX_CLAWPATCH46_FORT_INTERPOLATE_CORNER;
 
     clawpatch_vt->local_ghost_pack_aux           = NULL;
-    clawpatch_vt->d3->fort_local_ghost_pack      = FCLAW3D_CLAWPATCH46_FORT_LOCAL_GHOST_PACK;
+    clawpatch_vt->d3->fort_local_ghost_pack      = FCLAW3DX_CLAWPATCH46_FORT_LOCAL_GHOST_PACK;
 
     clawpatch_vt->d3->fort_timeinterp            = FCLAW3D_CLAWPATCH46_FORT_TIMEINTERP;
 }

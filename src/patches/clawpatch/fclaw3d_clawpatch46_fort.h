@@ -664,6 +664,23 @@ void FCLAW3D_CLAWPATCH46_FORT_COMPUTE_ERROR_NORM (int* blockno,
 
 /* ----------------------------- Parallel ghost patches  ------------------------------ */
 
+/** Fortran subroutine name */
+#define FCLAW3DX_CLAWPATCH46_FORT_LOCAL_GHOST_PACK \
+          FCLAW_F77_FUNC(fclaw3dx_clawpatch46_fort_local_ghost_pack, \
+                         FCLAW3DX_CLAWPATCH46_FORT_LOCAL_GHOST_PACK)
+/** @copydoc fclaw3d_clawpatch46_fort_local_ghost_pack() */
+void FCLAW3DX_CLAWPATCH46_FORT_LOCAL_GHOST_PACK(const int *mx, 
+                                                const int *my, 
+                                                const int* mz,
+                                                const int *mbc,
+                                                const int *meqn, 
+                                                const int *mint,
+                                                double qdata[], 
+                                                double area[],
+                                                double qpack[], 
+                                                const int *psize,
+                                                const int *packmode, 
+                                                int *ierror);
 
 /** Fortran subroutine name */
 #define FCLAW3D_CLAWPATCH46_FORT_LOCAL_GHOST_PACK \
