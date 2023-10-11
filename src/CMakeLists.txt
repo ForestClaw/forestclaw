@@ -12,6 +12,8 @@ add_library(forestclaw_c OBJECT
   fclaw_math.c
   fclaw_timer.c
   fclaw_mpi.c
+  fclaw_convenience.c
+  forestclaw.c
   fclaw2d_block.c
   fclaw2d_options.c
   fclaw2d_global.c
@@ -44,6 +46,7 @@ add_library(forestclaw_c OBJECT
   fclaw2d_farraybox.cpp
   fclaw2d_output_tikz.c
   fclaw2d_file.c
+  fclaw2d_wrap.c
   forestclaw2d.c
   forestclaw3d.c
   fclaw3d_convenience.c
@@ -54,6 +57,7 @@ add_library(forestclaw_c OBJECT
   fclaw3d_exchange.c
   fclaw3d_options.c
   fclaw3d_file.c
+  fclaw3d_wrap.c
   fp_exception_glibc_extension.c
   mappings/fclaw2d_map_nomap.c
   mappings/fclaw2d_map_nomap_brick.c
@@ -123,6 +127,8 @@ install(FILES
 	fclaw_gauges.h 
 	fclaw_mpi.h 
 	fclaw_math.h 
+	fclaw_wrap.h 
+  fclaw_convenience.h
 	forestclaw2d.h 
 	fp_exception_glibc_extension.h 
   fclaw2d_include_all.h 
