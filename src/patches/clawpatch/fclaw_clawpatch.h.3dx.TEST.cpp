@@ -218,7 +218,7 @@ TEST_CASE("3dx fclaw_clawpatch_vtable_initialize")
     CHECK(clawpatch_vt->d3->fort_timeinterp             == &FCLAW3D_CLAWPATCH46_FORT_TIMEINTERP);
 
     //ghot packing
-    CHECK(clawpatch_vt->d3->fort_local_ghost_pack       == &FCLAW3D_CLAWPATCH46_FORT_LOCAL_GHOST_PACK);
+    CHECK(clawpatch_vt->d3->fort_local_ghost_pack       == &FCLAW3DX_CLAWPATCH46_FORT_LOCAL_GHOST_PACK);
     CHECK(clawpatch_vt->local_ghost_pack_aux            == NULL);
 
     //diagnostics
