@@ -59,10 +59,7 @@ libforestclaw_installed_headers = \
 	src/fclaw3d_global.h \
 	src/fclaw3d_convenience.h \
 	src/fclaw3d_map.h \
-	src/fclaw3d_file.h \
-        src/fclaw_patch.h \
-	src/fclaw_domain.h \
-	src/fclaw_global.h
+	src/fclaw3d_file.h
 
 libforestclaw_internal_headers =
 
@@ -123,8 +120,6 @@ libforestclaw_compiled_sources = \
 	src/fclaw3d_global.c \
 	src/fclaw3d_map.c \
 	src/fclaw3d_file.c \
-	src/fclaw_domain.c \
-	src/fclaw_global.c \
 	src/fp_exception_glibc_extension.c \
 	src/mappings/context.f \
 	src/mappings/scale_rot_map.f \
