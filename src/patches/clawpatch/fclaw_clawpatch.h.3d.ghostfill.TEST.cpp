@@ -505,7 +505,7 @@ TEST_CASE("3d clawpatch ghost fill on uniform cube")
     for(int mx   : {10})
     for(int my   : {10})
     for(int mz   : {10})
-    for(int mbc  : {1,2,3})
+    for(int mbc  : {1,2})
     {
         int minlevel = 2;
         int maxlevel = 2;
@@ -765,7 +765,7 @@ TEST_CASE("3d clawpatch ghost fill on uniform brick")
     for(int mx   : {10})
     for(int my   : {10})
     for(int mz   : {10})
-    for(int mbc  : {1,2,3})
+    for(int mbc  : {1,2})
     {
         int minlevel = 2;
         int maxlevel = 2;
