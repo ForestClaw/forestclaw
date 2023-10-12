@@ -19,6 +19,11 @@ libforestclaw_installed_headers = \
 	src/fclaw_convenience.h \
 	src/forestclaw.h \
 	src/forestclaw2d.h \
+  	src/fclaw_diagnostics.h \
+  	src/fclaw_domain.h \
+  	src/fclaw_patch.h \
+  	src/fclaw_exchange.h \
+  	src/fclaw_global.h \
 	src/fp_exception_glibc_extension.h \
 	src/fclaw2d_include_all.h \
 	src/fclaw2d_defs.h \
@@ -83,6 +88,10 @@ libforestclaw_compiled_sources = \
 	src/fclaw_math.c \
 	src/fclaw_timer.c \
 	src/fclaw_mpi.c \
+    src/fclaw_domain.c \
+    src/fclaw_patch.c \
+    src/fclaw_exchange.c \
+    src/fclaw_diagnostics.c \
 	src/fclaw_convenience.c \
 	src/forestclaw.c \
 	src/fclaw2d_block.c \

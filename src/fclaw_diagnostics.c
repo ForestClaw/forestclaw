@@ -23,19 +23,19 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <fclaw2d_diagnostics.h>
+#include <fclaw_diagnostics.h>
 
-#include <fclaw2d_global.h>
-#include <fclaw2d_domain.h>
-#include <fclaw2d_options.h>
+#include <fclaw_global.h>
+#include <fclaw_domain.h>
+#include <fclaw_options.h>
 
 #include <fclaw_gauges.h>
 #include <fclaw_pointer_map.h>
 
 static
-fclaw2d_diagnostics_vtable_t* diagnostics_vt_new()
+fclaw_diagnostics_vtable_t* diagnostics_vt_new()
 {
-    return (fclaw2d_diagnostics_vtable_t*) FCLAW_ALLOC_ZERO (fclaw2d_diagnostics_vtable_t, 1);
+    return (fclaw_diagnostics_vtable_t*) FCLAW_ALLOC_ZERO (fclaw_diagnostics_vtable_t, 1);
 }
 
 static
@@ -48,22 +48,25 @@ void diagnostics_vt_destroy(void* vt)
     Public interface
     ------------------------------------------------ */
 
-fclaw2d_diagnostics_vtable_t* fclaw2d_diagnostics_vt(fclaw2d_global_t* glob)
+fclaw_diagnostics_vtable_t* fclaw_diagnostics_vt(fclaw_global_t* glob)
 {
-	fclaw2d_diagnostics_vtable_t* diagnostics_vt = (fclaw2d_diagnostics_vtable_t*) 
+	fclaw_diagnostics_vtable_t* diagnostics_vt = (fclaw_diagnostics_vtable_t*) 
 	   							fclaw_pointer_map_get(glob->vtables, "fclaw2d_diagnostics");
-	FCLAW_ASSERT(diagnostics_vt != NULL);
+	if(diagnostics_vt == NULL)
+    {
+        fclaw_abortf("fclaw_diagnostics_vt : diagnostics vtable not initialized\n");
+    }
 	FCLAW_ASSERT(diagnostics_vt->is_set != 0);
     return diagnostics_vt;
 }
 
 /* global_maximum is in forestclaw2d.c */
-double fclaw2d_domain_global_minimum (fclaw2d_domain_t* domain, double d)
+double fclaw_domain_global_minimum (fclaw_domain_t* domain, double d)
 {
     double neg_d;
     double maxvalue;
     neg_d = -d;
-    maxvalue = fclaw2d_domain_global_maximum(domain,neg_d);
+    maxvalue = fclaw_domain_global_maximum(domain,neg_d);
     return -maxvalue;
 }
 
@@ -75,26 +78,34 @@ double fclaw2d_domain_global_minimum (fclaw2d_domain_t* domain, double d)
    Note that the check for whether the user has specified diagnostics
    to run is done here, not in fclaw2d_run.cpp
    ---------------------------------------------------------------- */
-void fclaw2d_diagnostics_vtable_initialize(fclaw2d_global_t* glob)
+void fclaw_diagnostics_vtable_initialize(fclaw_global_t* glob)
 {
 
-    fclaw2d_diagnostics_vtable_t *diag_vt = diagnostics_vt_new();
+    fclaw_diagnostics_vtable_t *diag_vt = diagnostics_vt_new();
 
     /* Function pointers all set to zero, since diag_vt has static storage */
 
     diag_vt->is_set = 1;
 
-	FCLAW_ASSERT(fclaw_pointer_map_get(glob->vtables,"fclaw2d_diagnostics") == NULL);
+	if(fclaw_pointer_map_get(glob->vtables,"fclaw2d_diagnostics") != NULL)
+    {
+        fclaw_abortf("fclaw_diagnostics_vtable_initialize : diagnostics vtable already initialized\n");
+    }
 	fclaw_pointer_map_insert(glob->vtables, "fclaw2d_diagnostics", diag_vt, diagnostics_vt_destroy);
 }
 
-
-void fclaw2d_diagnostics_initialize(fclaw2d_global_t *glob)
+static void acc_destroy(void* acc)
 {
-    fclaw2d_diagnostics_vtable_t *diag_vt = fclaw2d_diagnostics_vt(glob);
+    FCLAW_FREE(acc);
+}
 
-    fclaw2d_diagnostics_accumulator_t *acc = glob->acc;
-    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+void fclaw_diagnostics_initialize(fclaw_global_t *glob)
+{
+    fclaw_diagnostics_vtable_t *diag_vt = fclaw_diagnostics_vt(glob);
+
+    fclaw_diagnostics_accumulator_t *acc = FCLAW_ALLOC (fclaw_diagnostics_accumulator_t, 1);
+    fclaw_global_attribute_store(glob, "acc", acc, acc_destroy);
+    const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
 
     /* Return an error accumulator */
     if (diag_vt->patch_init_diagnostics != NULL)
@@ -119,17 +130,18 @@ void fclaw2d_diagnostics_initialize(fclaw2d_global_t *glob)
 
 
 /* Collect statistics in the accumulator */
-void fclaw2d_diagnostics_gather(fclaw2d_global_t *glob,
+void fclaw_diagnostics_gather(fclaw_global_t *glob,
                                 int init_flag)
 {
-    fclaw2d_diagnostics_accumulator_t *acc = glob->acc;
-    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
-    fclaw2d_diagnostics_vtable_t *diag_vt = fclaw2d_diagnostics_vt(glob);
+    fclaw_diagnostics_accumulator_t *acc = 
+        (fclaw_diagnostics_accumulator_t *) fclaw_global_get_attribute(glob, "acc");
+    const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
+    fclaw_diagnostics_vtable_t *diag_vt = fclaw_diagnostics_vt(glob);
 
     /* -----------------------------------------------------
        Compute diagnostics on all local patches
        ----------------------------------------------------- */
-    fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_DIAGNOSTICS]);
+    fclaw_timer_start (&glob->timers[FCLAW_TIMER_DIAGNOSTICS]);
 
 
     /* Patch diagnostics */
@@ -152,13 +164,13 @@ void fclaw2d_diagnostics_gather(fclaw2d_global_t *glob,
     if (fclaw_opt->run_user_diagnostics != 0 && diag_vt->user_compute_diagnostics != NULL)
         diag_vt->user_compute_diagnostics(glob,acc->user_accumulator);
 
-    fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_DIAGNOSTICS]);
+    fclaw_timer_stop (&glob->timers[FCLAW_TIMER_DIAGNOSTICS]);
 
 
     /* ---------------------------------------------------------
        Gather all of the statistics (requires communication)
        --------------------------------------------------------- */
-    fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_DIAGNOSTICS_COMM]);
+    fclaw_timer_start (&glob->timers[FCLAW_TIMER_DIAGNOSTICS_COMM]);
 
     if (diag_vt->patch_gather_diagnostics != NULL)
         diag_vt->patch_gather_diagnostics(glob,acc->patch_accumulator,init_flag);
@@ -175,18 +187,19 @@ void fclaw2d_diagnostics_gather(fclaw2d_global_t *glob,
     if (fclaw_opt->run_user_diagnostics != 0 && diag_vt->user_gather_diagnostics != NULL)
         diag_vt->user_gather_diagnostics(glob,acc->user_accumulator,init_flag);
 
-    fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_DIAGNOSTICS_COMM]);
+    fclaw_timer_stop (&glob->timers[FCLAW_TIMER_DIAGNOSTICS_COMM]);
 
-    fclaw2d_diagnostics_reset(glob);
+    fclaw_diagnostics_reset(glob);
 }
 
-void fclaw2d_diagnostics_reset(fclaw2d_global_t *glob)
+void fclaw_diagnostics_reset(fclaw_global_t *glob)
 {
-    fclaw2d_diagnostics_accumulator_t *acc = glob->acc;
-    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
-    fclaw2d_diagnostics_vtable_t *diag_vt = fclaw2d_diagnostics_vt(glob);
+    fclaw_diagnostics_accumulator_t *acc = 
+            (fclaw_diagnostics_accumulator_t*) fclaw_global_get_attribute(glob, "acc");
+    const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
+    fclaw_diagnostics_vtable_t *diag_vt = fclaw_diagnostics_vt(glob);
 
-    fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_DIAGNOSTICS]);
+    fclaw_timer_start (&glob->timers[FCLAW_TIMER_DIAGNOSTICS]);
 
     if (diag_vt->patch_reset_diagnostics != NULL)
         diag_vt->patch_reset_diagnostics(glob,acc->patch_accumulator);
@@ -203,16 +216,17 @@ void fclaw2d_diagnostics_reset(fclaw2d_global_t *glob)
     if (fclaw_opt->run_user_diagnostics != 0 && diag_vt->user_reset_diagnostics != NULL)
         diag_vt->user_reset_diagnostics(glob,acc->user_accumulator);
 
-    fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_DIAGNOSTICS]);
+    fclaw_timer_stop (&glob->timers[FCLAW_TIMER_DIAGNOSTICS]);
 }
 
-void fclaw2d_diagnostics_finalize(fclaw2d_global_t *glob)
+void fclaw_diagnostics_finalize(fclaw_global_t *glob)
 {
-    fclaw2d_diagnostics_accumulator_t *acc = glob->acc;
-    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
-    fclaw2d_diagnostics_vtable_t *diag_vt = fclaw2d_diagnostics_vt(glob);
+    fclaw_diagnostics_accumulator_t *acc =
+            (fclaw_diagnostics_accumulator_t*) fclaw_global_get_attribute(glob, "acc");
+    const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
+    fclaw_diagnostics_vtable_t *diag_vt = fclaw_diagnostics_vt(glob);
 
-    fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_DIAGNOSTICS]);
+    fclaw_timer_start (&glob->timers[FCLAW_TIMER_DIAGNOSTICS]);
 
     if (diag_vt->patch_finalize_diagnostics != NULL)
         diag_vt->patch_finalize_diagnostics(glob,&acc->patch_accumulator);
@@ -229,6 +243,6 @@ void fclaw2d_diagnostics_finalize(fclaw2d_global_t *glob)
     if (fclaw_opt->run_user_diagnostics != 0 && diag_vt->user_finalize_diagnostics != NULL)
         diag_vt->user_finalize_diagnostics(glob,&acc->user_accumulator);
 
-    fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_DIAGNOSTICS]);
+    fclaw_timer_stop (&glob->timers[FCLAW_TIMER_DIAGNOSTICS]);
 }
 

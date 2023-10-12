@@ -27,10 +27,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * Domain structures and routines
  */
 
-#ifndef FCLAW2D_DOMAIN_H
-#define FCLAW2D_DOMAIN_H
+#ifndef FCLAW_DOMAIN_H
+#define FCLAW_DOMAIN_H
 
-#include <forestclaw2d.h>  /* Needed for domain_exchange/domain_indirect info */
+#include <forestclaw.h>  /* Needed for domain_exchange/domain_indirect info */
 
 #ifdef __cplusplus
 extern "C"
@@ -46,33 +46,33 @@ extern "C"
        Deleting patch and exchange data in domain_reset might go into a
        toplevel algorithmic function quite naturally outside of domain.
  */
-struct fclaw2d_global;
+struct fclaw_global;
 
-typedef struct fclaw2d_domain_data
-{
-    /* Debug counters and timers */
-    int count_set_patch;
-    int count_delete_patch;
+void fclaw_domain_setup(struct fclaw_global* glob,
+                          struct fclaw_domain* new_domain);
 
-    fclaw2d_domain_exchange_t *domain_exchange;
-    fclaw2d_domain_indirect_t *domain_indirect;
-
-} fclaw2d_domain_data_t;
-
-void fclaw2d_domain_data_new(struct fclaw2d_domain *domain);
-
-void fclaw2d_domain_data_delete(struct fclaw2d_domain* domain);
-
-void fclaw2d_domain_setup(struct fclaw2d_global* glob,
-                          struct fclaw2d_domain* new_domain);
-
-void fclaw2d_domain_reset(struct fclaw2d_global* glob);
-
-fclaw2d_domain_data_t* fclaw2d_domain_get_data(struct fclaw2d_domain *domain);
+void fclaw_domain_reset(struct fclaw_global* glob);
 
 /* OpenMP iterator (not part of forestclaw2d.h */
-void fclaw2d_domain_iterate_level_mthread (struct fclaw2d_domain * domain, int level,
-                                           fclaw2d_patch_callback_t pcb, void *user);
+void fclaw_domain_iterate_level_mthread (struct fclaw_domain * domain, int level,
+                                           fclaw_patch_callback_t pcb, void *user);
+
+/**
+ * @brief Check if domain has exchange data allocated
+ * 
+ * @param domain the domain
+ * @return int true if exchange data allocated
+ */
+int fclaw_domain_exchange_allocated(fclaw_domain_t *domain);
+
+/* below are the functions needed for dimension independence */
+
+/** safeguard value for dimension-independent domain */
+#define FCLAW2D_DOMAIN_MAGIC 0x56780202
+
+void fclaw2d_domain_iterate_cb
+  (fclaw_domain_t * d2, fclaw_patch_t * patch,
+   int blockno, int patchno, void *user);
 
 #ifdef __cplusplus
 #if 0

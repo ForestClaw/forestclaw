@@ -13,6 +13,11 @@ add_library(forestclaw_c OBJECT
   fclaw_timer.c
   fclaw_mpi.c
   fclaw_convenience.c
+  fclaw_global.c
+  fclaw_domain.c
+  fclaw_patch.c
+  fclaw_exchange.c
+  fclaw_diagnostics.c
   forestclaw.c
   fclaw2d_block.c
   fclaw2d_options.c
@@ -128,7 +133,13 @@ install(FILES
 	fclaw_mpi.h 
 	fclaw_math.h 
 	fclaw_wrap.h 
+	fclaw_global.h
   fclaw_convenience.h
+  fclaw_diagnostics.h
+  fclaw_domain.h
+  fclaw_patch.h
+  fclaw_exchange.h
+  fclaw_global.h
 	forestclaw2d.h 
 	fp_exception_glibc_extension.h 
   fclaw2d_include_all.h 

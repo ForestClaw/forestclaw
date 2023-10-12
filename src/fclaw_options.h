@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW_OPTIONS_H
 #define FCLAW_OPTIONS_H
 
-#include <fclaw_base.h>
+#include <fclaw_global.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -164,8 +164,10 @@ struct fclaw_options
     int manifold;
     int mi;
     int mj;
+    int mk;
     int periodic_x;
     int periodic_y;
+    int periodic_z;
 
     /* Advanced options */
     int flux_correction;
@@ -201,9 +203,8 @@ struct fclaw_options
     double bx;   /**< Only for the single block, unmapped case */
     double ay;   /**< Only for the single block, unmapped case */
     double by;   /**< Only for the single block, unmapped case */
-    // TODO 
-    double az;
-    double bz;
+    double az;   /**< Only for the single block, unmapped case */
+    double bz;   /**< Only for the single block, unmapped case */
 
     /* Diagnostics */
     int run_user_diagnostics;
@@ -249,6 +250,10 @@ struct fclaw_options
 
     const char * regression_check; /**< filename of regression check values */
 };
+
+void fclaw_options_store (struct fclaw_global *glob, struct fclaw_options* fclaw_opt);
+
+fclaw_options_t* fclaw_get_options(struct fclaw_global *glob);
 
 #ifdef __cplusplus
 }

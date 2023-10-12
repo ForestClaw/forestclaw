@@ -25,44 +25,36 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw_filesystem.h>
 
-#include <fclaw_package.h>
 #include <fclaw_timer.h>
 #include <fclaw_pointer_map.h>
 #include <fclaw_packing.h>
 
-#ifndef P4_TO_P8
 #include <fclaw2d_defs.h>
-#include <fclaw2d_global.h>
-#include <fclaw2d_options.h>
+#include <fclaw_global.h>
+#include <fclaw_options.h>
 
-#include <fclaw2d_domain.h>
-#include <fclaw2d_diagnostics.h>
+#include <fclaw_domain.h>
+#include <fclaw_diagnostics.h>
 #include <fclaw2d_map.h>
-#else
-#include <fclaw3d_defs.h>
-#include <fclaw3d_global.h>
-
-#include <fclaw3d_domain.h>
-/* figure out dimension-independent diagnostics */
-#include <fclaw3d_map.h>
-#endif
 
 /* much of this will eventually move into fclaw_global.c */
 
-fclaw2d_global_t* fclaw2d_global_new (void)
+fclaw_global_t* fclaw_global_new (void)
 {
-    fclaw2d_global_t *glob;
+    fclaw_global_t *glob;
 
-    glob = FCLAW_ALLOC (fclaw2d_global_t, 1);
+    glob = FCLAW_ALLOC (fclaw_global_t, 1);
 
     /* these variables need to be set after calling this function */
     glob->mpicomm = sc_MPI_COMM_NULL;
     glob->mpisize = 0;
     glob->mpirank = -1;
 
-    glob->pkg_container = fclaw_package_container_new ();
+    glob->domain = NULL;
+
     glob->vtables = fclaw_pointer_map_new ();
     glob->options = fclaw_pointer_map_new ();
+    glob->attributes = fclaw_pointer_map_new ();
 
     glob->count_amr_advance = 0;
     glob->count_ghost_exchange = 0;
@@ -75,24 +67,18 @@ fclaw2d_global_t* fclaw2d_global_new (void)
     glob->count_single_step = 0;
     glob->count_elliptic_grids = 0;
     glob->curr_time = 0;
-    glob->cont = NULL;
-
-#ifndef P4_TO_P8
-    /* think about how this can work independent of dimension */
-    glob->acc = FCLAW_ALLOC (fclaw2d_diagnostics_accumulator_t, 1);
-#endif /* P4_TO_P8 */
 
     return glob;
 }
 
-fclaw2d_global_t* fclaw2d_global_new_comm (sc_MPI_Comm mpicomm,
+fclaw_global_t* fclaw_global_new_comm (sc_MPI_Comm mpicomm,
                                            int mpisize, int mpirank)
 {
-    fclaw2d_global_t *glob = fclaw2d_global_new ();
+    fclaw_global_t *glob = fclaw_global_new ();
 
     /*
      * Set the communicator.
-     * With the current code, overridden by fclaw2d_global_store_domain.
+     * With the current code, overridden by fclaw_global_store_domain.
      * Maybe we should streamline this in the future.
      */
     glob->mpicomm = mpicomm;
@@ -101,9 +87,6 @@ fclaw2d_global_t* fclaw2d_global_new_comm (sc_MPI_Comm mpicomm,
 
     return glob;
 }
-
-#ifndef P4_TO_P8
-// packing unpacking functions only 2d for now
 
 static void check_vt(fclaw_packing_vtable_t* vt, const char* name)
 {
@@ -127,8 +110,12 @@ pack_iterator_callback(const char* key, void* value, void* user)
 }
 
 size_t 
-fclaw2d_global_pack(const fclaw2d_global_t * glob, char* buffer)
+fclaw_global_pack(const fclaw_global_t * glob, char* buffer)
 {
+    if(glob->domain->refine_dim == 3)
+    {
+        fclaw_abortf("fclaw_global_packsize not implemented for 3d\n");
+    }
     const char* buffer_start = buffer;
 
     buffer += fclaw_pack_double(glob->curr_time, buffer);
@@ -151,19 +138,23 @@ packsize_iterator_callback(const char* key, void* value, void* user)
 }
 
 size_t 
-fclaw2d_global_packsize(const fclaw2d_global_t * glob)
+fclaw_global_packsize(const fclaw_global_t * glob)
 {
+    if(glob->domain->refine_dim == 3)
+    {
+        fclaw_abortf("fclaw_global_packsize not implemented for 3d\n");
+    }
     size_t options_size = sizeof(size_t);
     fclaw_pointer_map_iterate(glob->options, packsize_iterator_callback, &options_size);
     return 2*sizeof(double) + options_size;
 }
 
 size_t 
-fclaw2d_global_unpack(char* buffer, fclaw2d_global_t ** glob_ptr)
+fclaw_global_unpack(char* buffer, fclaw_global_t ** glob_ptr)
 {
     char* buffer_start = buffer;
 
-	fclaw2d_global_t* glob = fclaw2d_global_new();
+	fclaw_global_t* glob = fclaw_global_new();
     *glob_ptr = glob;
 
     buffer += fclaw_unpack_double(buffer,&glob->curr_time);
@@ -187,160 +178,139 @@ fclaw2d_global_unpack(char* buffer, fclaw2d_global_t ** glob_ptr)
     return buffer-buffer_start;
 }
 
-#endif
-
 void
-fclaw2d_global_store_domain (fclaw2d_global_t* glob, fclaw2d_domain_t* domain)
+fclaw_global_store_domain (fclaw_global_t* glob, fclaw_domain_t* domain)
 {
     glob->domain = domain;
-
-    /* this is redundant if global has been created with a communicator */
-    if (glob->mpisize > 0) {
-        /* double-check for extra paranoia */
-        FCLAW_ASSERT (glob->mpisize == domain->mpisize);
-        FCLAW_ASSERT (glob->mpirank == domain->mpirank);
-    }
-    glob->mpicomm = domain->mpicomm;
-    glob->mpisize = domain->mpisize;
-    glob->mpirank = domain->mpirank;
-
-#if 0   
-    /*
-     * This is an assignment that might get removed in the future.
-     * There is a separate function, fclow2d_global_store_map (see below),
-     * wich accomplishes this without accessing the domain attributes.
-     */
-    
-    fclaw2d_map_context_t *cont = (fclaw2d_map_context_t*)
-           fclaw2d_domain_attribute_access (glob->domain, "fclaw_map_context", NULL);
-
-    FCLAW_ASSERT(cont != NULL);
-
-    glob->cont = cont;
-#endif           
 }
 
-void
-fclaw2d_global_store_map (fclaw2d_global_t* glob,
-                          fclaw2d_map_context_t * map)
-{
-    glob->cont = map;
-}
 
 void
-fclaw2d_global_destroy (fclaw2d_global_t * glob)
+fclaw_global_destroy (fclaw_global_t * glob)
 {
     FCLAW_ASSERT (glob != NULL);
 
-    if(glob->pkg_container != NULL) fclaw_package_container_destroy ((fclaw_package_container_t *)glob->pkg_container);
-    if(glob->vtables != NULL) fclaw_pointer_map_destroy (glob->vtables);
-    if(glob->options != NULL) fclaw_pointer_map_destroy (glob->options);
+    fclaw_pointer_map_destroy (glob->vtables);
+    fclaw_pointer_map_destroy (glob->options);
+    fclaw_pointer_map_destroy (glob->attributes);
 
-#ifndef P4_TO_P8
-    FCLAW_FREE (glob->acc);
-#endif
     FCLAW_FREE (glob);
 }
 
-void fclaw2d_global_iterate_level (fclaw2d_global_t * glob, int level,
-                                   fclaw2d_patch_callback_t pcb, void *user)
+void fclaw_global_iterate_level (fclaw_global_t * glob, int level,
+                                   fclaw_patch_callback_t pcb, void *user)
 {
-    fclaw2d_global_iterate_t g;
+    fclaw_global_iterate_t g;
     g.glob = glob;
     g.user = user;
-    fclaw2d_domain_iterate_level (glob->domain, level, pcb, &g);
+    fclaw_domain_iterate_level (glob->domain, level, pcb, &g);
 }
 
-void fclaw2d_global_iterate_patches (fclaw2d_global_t * glob,
-                                     fclaw2d_patch_callback_t pcb, void *user)
+void fclaw_global_iterate_patches (fclaw_global_t * glob,
+                                     fclaw_patch_callback_t pcb, void *user)
 {
-    fclaw2d_global_iterate_t g;
+    fclaw_global_iterate_t g;
     g.glob = glob;
     g.user = user;
-    fclaw2d_domain_iterate_patches (glob->domain, pcb, &g);
+    fclaw_domain_iterate_patches (glob->domain, pcb, &g);
 }
 
-void fclaw2d_global_iterate_families (fclaw2d_global_t * glob,
-                                      fclaw2d_patch_callback_t pcb, void *user)
+void fclaw_global_iterate_families (fclaw_global_t * glob,
+                                      fclaw_patch_callback_t pcb, void *user)
 {
-    fclaw2d_global_iterate_t g;
+    fclaw_global_iterate_t g;
     g.glob = glob;
     g.user = user;
-    fclaw2d_domain_iterate_families (glob->domain, pcb, &g);
+    fclaw_domain_iterate_families (glob->domain, pcb, &g);
 }
 
-void fclaw2d_global_iterate_adapted (fclaw2d_global_t * glob, fclaw2d_domain_t* new_domain,
-                                     fclaw2d_match_callback_t mcb, void *user)
+void fclaw_global_iterate_adapted (fclaw_global_t * glob, fclaw_domain_t* new_domain,
+                                     fclaw_match_callback_t mcb, void *user)
 {
-    fclaw2d_global_iterate_t g;
+    fclaw_global_iterate_t g;
     g.glob = glob;
     g.user = user;
-    fclaw2d_domain_iterate_adapted (glob->domain, new_domain,mcb,&g);
+    fclaw_domain_iterate_adapted (glob->domain, new_domain,mcb,&g);
 }
 
-void fclaw2d_global_iterate_level_mthread (fclaw2d_global_t * glob, int level,
-                                           fclaw2d_patch_callback_t pcb, void *user)
+void fclaw_global_iterate_level_mthread (fclaw_global_t * glob, int level,
+                                           fclaw_patch_callback_t pcb, void *user)
 {
-    fclaw2d_global_iterate_t g;
+    fclaw_global_iterate_t g;
     g.glob = glob;
     g.user = user;
-    fclaw2d_domain_iterate_level_mthread (glob->domain, level,pcb,&g);
+    fclaw_domain_iterate_level_mthread (glob->domain, level,pcb,&g);
 }
 
-void fclaw2d_global_iterate_partitioned (fclaw2d_global_t * glob,
-                                         fclaw2d_domain_t * new_domain,
-                                         fclaw2d_transfer_callback_t tcb,
+void fclaw_global_iterate_partitioned (fclaw_global_t * glob,
+                                         fclaw_domain_t * new_domain,
+                                         fclaw_transfer_callback_t tcb,
                                          void *user)
 {
-    fclaw2d_global_iterate_t g;
+    fclaw_global_iterate_t g;
     g.glob = glob;
     g.user = user;
-    fclaw2d_domain_iterate_partitioned (glob->domain,new_domain,tcb,&g);
+    fclaw_domain_iterate_partitioned (glob->domain,new_domain,tcb,&g);
 }
 
-void fclaw2d_global_options_store (fclaw2d_global_t* glob, const char* key, void* options)
+void fclaw_global_options_store (fclaw_global_t* glob, const char* key, void* options)
 {
     
-    FCLAW_ASSERT(fclaw_pointer_map_get(glob->options,key) == NULL);
+    if(fclaw_pointer_map_get(glob->options,key) != NULL)
+    {
+        fclaw_abortf("Options %s already stored in glob\n", key);
+    }
     fclaw_pointer_map_insert(glob->options, key, options, NULL);
 }
 
-void* fclaw2d_global_get_options (fclaw2d_global_t* glob, const char* key)
+void* fclaw_global_get_options (fclaw_global_t* glob, const char* key)
 {
     
     void* options = fclaw_pointer_map_get(glob->options, key);
-    FCLAW_ASSERT(options != NULL);
+    if(options == NULL)
+    {
+        fclaw_abortf("Options %s not found in glob\n", key);
+    }
     return options;   
 }
 
-static fclaw2d_global_t* fclaw2d_global_glob = NULL;
-
-void fclaw2d_global_set_global (fclaw2d_global_t* glob)
+void fclaw_global_attribute_store (fclaw_global_t* glob, 
+                                     const char* key, 
+                                     void* options,
+                                     fclaw_pointer_map_value_destroy_t destroy)
 {
-    FCLAW_ASSERT (fclaw2d_global_glob == NULL);
-    fclaw2d_global_glob = glob;
+    
+    fclaw_pointer_map_insert(glob->attributes, key, options, destroy);
 }
 
-void fclaw2d_global_unset_global (void)
+void* fclaw_global_get_attribute (fclaw_global_t* glob, const char* key)
 {
-    FCLAW_ASSERT (fclaw2d_global_glob != NULL);
-    fclaw2d_global_glob = NULL;
+    
+    return fclaw_pointer_map_get(glob->attributes, key);
 }
 
-fclaw2d_global_t* fclaw2d_global_get_global (void)
+static fclaw_global_t* fclaw_global_glob = NULL;
+
+void fclaw_global_set_static (fclaw_global_t* glob)
 {
-    FCLAW_ASSERT(fclaw2d_global_glob != NULL);
-    return fclaw2d_global_glob;
+    fclaw_global_glob = glob;
 }
 
-// Only 2d for now need fclaw2d_options
-#ifndef P4_TO_P8
+void fclaw_global_clear_static (void)
+{
+    fclaw_global_glob = NULL;
+}
+
+fclaw_global_t* fclaw_global_get_static_global (void)
+{
+    return fclaw_global_glob;
+}
 
 static char* old_path = NULL;
 
-void fclaw2d_set_global_context(fclaw2d_global_t *glob)
+void fclaw_set_global_context(fclaw_global_t *glob)
 {
-    fclaw_options_t* opts = fclaw2d_get_options(glob);
+    fclaw_options_t* opts = fclaw_get_options(glob);
     fclaw_set_logging_prefix(opts->logging_prefix);
 
     // Change run directory
@@ -351,7 +321,7 @@ void fclaw2d_set_global_context(fclaw2d_global_t *glob)
     }
 }
 
-void fclaw2d_clear_global_context(fclaw2d_global_t *glob)
+void fclaw_clear_global_context(fclaw_global_t *glob)
 {
     fclaw_set_logging_prefix(NULL);
 
@@ -362,5 +332,3 @@ void fclaw2d_clear_global_context(fclaw2d_global_t *glob)
         old_path = NULL;
     }
 }
-
-#endif

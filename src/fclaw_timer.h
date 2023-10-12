@@ -139,6 +139,97 @@ void fclaw2d_timer_stop_threadsafe(fclaw2d_timer_t *timer);
 /* Use keyword 'struct' to avoid circular dependencies */
 void fclaw2d_timer_report(struct fclaw2d_global* glob);
 
+
+/* diemsnion independent definitions
+   they are the same, but should be named fclaw_ for consistency */
+typedef enum
+{
+    FCLAW_TIMER_NONE = -1,
+    FCLAW_TIMER_INIT,
+    FCLAW_TIMER_ADVANCE,
+    FCLAW_TIMER_ELLIPTIC_SOLVE,
+    FCLAW_TIMER_GHOSTFILL,
+    FCLAW_TIMER_REGRID,
+    FCLAW_TIMER_DIAGNOSTICS,
+    FCLAW_TIMER_OUTPUT,
+    FCLAW_TIMER_GHOSTPATCH_COMM,
+    FCLAW_TIMER_ADAPT_COMM,
+    FCLAW_TIMER_PARTITION_COMM,
+    FCLAW_TIMER_DIAGNOSTICS_COMM,
+    FCLAW_TIMER_CFL_COMM,
+    FCLAW_TIMER_WALLTIME,
+    FCLAW_TIMER_UNACCOUNTED,
+    FCLAW_TIMER_ADVANCE_STEPS_COUNTER,
+    FCLAW_TIMER_ELLIPTIC_GRIDS_COUNTER,
+    FCLAW_TIMER_GRIDS_PER_PROC,
+    FCLAW_TIMER_GRIDS_INTERIOR,
+    FCLAW_TIMER_GRIDS_LOCAL_BOUNDARY,
+    FCLAW_TIMER_GRIDS_REMOTE_BOUNDARY,
+    FCLAW_TIMER_REGRID_BUILD,
+    FCLAW_TIMER_REGRID_TAGGING,
+    FCLAW_TIMER_TIMESYNC,
+    FCLAW_TIMER_GHOSTPATCH_BUILD,
+    FCLAW_TIMER_PARTITION,
+    FCLAW_TIMER_PARTITION_BUILD,
+    FCLAW_TIMER_ADVANCE_STEP2,
+    FCLAW_TIMER_ADVANCE_B4STEP2,
+    FCLAW_TIMER_GHOSTFILL_COPY,
+    FCLAW_TIMER_GHOSTFILL_AVERAGE,
+    FCLAW_TIMER_GHOSTFILL_INTERP,
+    FCLAW_TIMER_GHOSTFILL_PHYSBC,
+    FCLAW_TIMER_GHOSTFILL_STEP1,
+    FCLAW_TIMER_GHOSTFILL_STEP2,
+    FCLAW_TIMER_GHOSTFILL_STEP3,
+    FCLAW_TIMER_NEIGHBOR_SEARCH,
+    FCLAW_TIMER_LOCAL_COMM,
+    FCLAW_TIMER_GLOBAL_COMM,
+    FCLAW_TIMER_CUDA_ALLOCATE,
+    FCLAW_TIMER_CUDA_MEMCOPY_H2H,
+    FCLAW_TIMER_CUDA_MEMCOPY_H2D,
+    FCLAW_TIMER_CUDA_MEMCOPY_D2H,
+    FCLAW_TIMER_EXTRA1,
+    FCLAW_TIMER_EXTRA2,
+    FCLAW_TIMER_EXTRA3,
+    FCLAW_TIMER_EXTRA4,
+    FCLAW_TIMER_COUNT
+} fclaw_timer_names_t;
+
+
+/* Priority levels for printing timer statistics */
+#define  FCLAW_TIMER_PRIORITY_WALL        7
+#define  FCLAW_TIMER_PRIORITY_SUMMARY     6
+#define  FCLAW_TIMER_PRIORITY_EXCLUSIVE   5
+#define  FCLAW_TIMER_PRIORITY_COUNTERS    4
+#define  FCLAW_TIMER_PRIORITY_ADVANCE     3
+#define  FCLAW_TIMER_PRIORITY_CUDA        2
+#define  FCLAW_TIMER_PRIORITY_DETAILS     1
+#define  FCLAW_TIMER_PRIORITY_EXTRA       0
+
+typedef struct
+{
+    int running;
+    double started, stopped;
+    double cumulative;
+}
+fclaw_timer_t;
+
+double fclaw_timer_wtime (void);
+
+void fclaw_timer_init (fclaw_timer_t *timer);
+
+void fclaw_timer_start (fclaw_timer_t *timer);
+
+void fclaw_timer_stop (fclaw_timer_t *timer);
+
+void fclaw_timer_start_threadsafe(fclaw_timer_t *timer);
+
+void fclaw_timer_stop_threadsafe(fclaw_timer_t *timer);
+
+//TODO move this to global
+struct fclaw_global;
+/* Use keyword 'struct' to avoid circular dependencies */
+void fclaw_timer_report(struct fclaw_global* glob);
+
 #ifdef __cplusplus
 #if 0
 {                               /* need this because indent is dumb */

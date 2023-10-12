@@ -23,8 +23,8 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FCLAW2D_EXCHANGE_H
-#define FCLAW2D_EXCHANGE_H
+#ifndef FCLAW_EXCHANGE_H
+#define FCLAW_EXCHANGE_H
 
 #include <fclaw_timer.h>
 
@@ -36,24 +36,24 @@ extern "C"
 #endif
 #endif
 
-struct fclaw2d_global;
+struct fclaw_global;
 
-void fclaw2d_exchange_setup(struct fclaw2d_global* glob,
-                            fclaw2d_timer_names_t running);
+void fclaw_exchange_setup(struct fclaw_global* glob,
+                            fclaw_timer_names_t running);
 
-void fclaw2d_exchange_delete(struct fclaw2d_global* glob);
+void fclaw_exchange_delete(struct fclaw_global* glob);
 
-void fclaw2d_exchange_ghost_patches_begin(struct fclaw2d_global* glob,
+void fclaw_exchange_ghost_patches_begin(struct fclaw_global* glob,
                                           int minlevel,
                                           int maxlevel,
                                           int time_interp,
-                                          fclaw2d_timer_names_t running);
+                                          fclaw_timer_names_t running);
 
-void fclaw2d_exchange_ghost_patches_end(struct fclaw2d_global* glob,
+void fclaw_exchange_ghost_patches_end(struct fclaw_global* glob,
                                         int minlevel,
                                         int maxlevel,
                                         int time_interp,
-                                        fclaw2d_timer_names_t running);
+                                        fclaw_timer_names_t running);
 
 
 #ifdef __cplusplus
