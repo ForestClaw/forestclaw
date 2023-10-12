@@ -24,17 +24,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include <fclaw2d_advance.h>
+#include <fclaw_advance.h>
 #include <fclaw_math.h>
 
-#include <fclaw2d_timeinterp.h>
-#include <fclaw2d_ghost_fill.h>
-#include <fclaw2d_update_single_step.h>
-#include <fclaw2d_options.h>
-#include <fclaw2d_global.h>
-#include <fclaw2d_vtable.h>
+#include <fclaw_timeinterp.h>
+#include <fclaw_ghost_fill.h>
+#include <fclaw_update_single_step.h>
+#include <fclaw_options.h>
+#include <fclaw_global.h>
+#include <fclaw_vtable.h>
 
-#include <fclaw2d_time_sync.h>
+#include <fclaw_time_sync.h>
 
 
 typedef struct fclaw2d_level_data
@@ -52,12 +52,12 @@ typedef struct fclaw2d_level_data
 typedef fclaw2d_level_data_t fclaw2d_timestep_counters;
 
 static
-void initialize_timestep_counters(fclaw2d_global_t* glob,
+void initialize_timestep_counters(fclaw_global_t* glob,
 								  fclaw2d_timestep_counters **ts_counter_ptr,
 								  double t_init, double dt)
 {
-	fclaw2d_domain_t *domain = glob->domain;
-	const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+	fclaw_domain_t *domain = glob->domain;
+	const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
 	fclaw2d_timestep_counters *ts_counter;
 	int level;
 
@@ -150,7 +150,7 @@ int timeinterp_level(fclaw2d_timestep_counters *ts_counter, int maxlevel)
 }
 
 static
-double compute_alpha(fclaw2d_global_t *glob,
+double compute_alpha(fclaw_global_t *glob,
 					 fclaw2d_timestep_counters *ts_counter,
 					 int level)
 {
@@ -174,25 +174,25 @@ double compute_alpha(fclaw2d_global_t *glob,
    ---------------------------------------------------------- */
 
 static
-double update_level_solution(fclaw2d_global_t *glob,
+double update_level_solution(fclaw_global_t *glob,
 							 int level,
 							 double t, double dt)
 {
 	/* There might not be any grids at this level */
-	double cfl = fclaw2d_update_single_step(glob,level,t,dt);
+	double cfl = fclaw_update_single_step(glob,level,t,dt);
 
 	return cfl;
 }
 
 static
-double advance_level(fclaw2d_global_t *glob,
+double advance_level(fclaw_global_t *glob,
 					 const int level,
 					 const int curr_fine_step,
 					 double maxcfl,
 					 fclaw2d_timestep_counters* ts_counter)
 {
-	fclaw2d_domain_t* domain = glob->domain;
-	const fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
+	fclaw_domain_t* domain = glob->domain;
+	const fclaw_options_t* fclaw_opt = fclaw_get_options(glob);
 	double t_level = ts_counter[level].current_time;
 	double dt_level = ts_counter[level].dt_step;
 
@@ -227,9 +227,9 @@ double advance_level(fclaw2d_global_t *glob,
 				fclaw_global_infof("Time interpolating level %d using alpha = %5.2f\n",
 								   coarser_level,alpha);
 
-				fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_EXTRA1]);
-				fclaw2d_timeinterp(glob,coarser_level,alpha);
-				fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_EXTRA1]);
+				fclaw_timer_start (&glob->timers[FCLAW_TIMER_EXTRA1]);
+				fclaw_timeinterp(glob,coarser_level,alpha);
+				fclaw_timer_stop (&glob->timers[FCLAW_TIMER_EXTRA1]);
 			}
 		}
 	}
@@ -244,15 +244,15 @@ double advance_level(fclaw2d_global_t *glob,
    Main routine : Called from fclaw2d_run.
    ------------------------------------------------------------- */
 
-double fclaw2d_advance_all_levels(fclaw2d_global_t *glob,
+double fclaw_advance_all_levels(fclaw_global_t *glob,
 								  double t_curr, double dt)
 {
-	fclaw2d_domain_t* domain = glob->domain;
+	fclaw_domain_t* domain = glob->domain;
 
 	int level;
-	fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_ADVANCE]);
+	fclaw_timer_start (&glob->timers[FCLAW_TIMER_ADVANCE]);
 
-	const fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
+	const fclaw_options_t* fclaw_opt = fclaw_get_options(glob);
 	fclaw2d_timestep_counters *ts_counter;
 
 	initialize_timestep_counters(glob,&ts_counter,t_curr,dt);
@@ -291,15 +291,15 @@ double fclaw2d_advance_all_levels(fclaw2d_global_t *glob,
 				int time_interp = 1;
 
 				/* Do conservative fix up here */
-				fclaw2d_ghost_update(glob,
+				fclaw_ghost_update(glob,
 									 time_interp_level+1,
 									 maxlevel,
 									 sync_time,
 									 time_interp,
-									 FCLAW2D_TIMER_ADVANCE);
+									 FCLAW_TIMER_ADVANCE);
 				if (fclaw_opt->time_sync)
 			    {
-			    	fclaw2d_time_sync(glob,time_interp_level+1,maxlevel);
+			    	fclaw_time_sync(glob,time_interp_level+1,maxlevel);
 			    }
 			}
 			else
@@ -307,15 +307,15 @@ double fclaw2d_advance_all_levels(fclaw2d_global_t *glob,
 				/* End up here is we are doing global time stepping but return from 
 				   advance after 2^(maxlevel-minlevel) time steps. */
 				int time_interp = 0;
-				fclaw2d_ghost_update(glob,
+				fclaw_ghost_update(glob,
 									 minlevel,
 									 maxlevel,
 									 sync_time,
 									 time_interp,
-									 FCLAW2D_TIMER_ADVANCE);
+									 FCLAW_TIMER_ADVANCE);
 				if (fclaw_opt->time_sync)
 			    {
-				    fclaw2d_time_sync(glob,minlevel,maxlevel);
+				    fclaw_time_sync(glob,minlevel,maxlevel);
 			    }
 			}
 		}
@@ -331,19 +331,19 @@ double fclaw2d_advance_all_levels(fclaw2d_global_t *glob,
 
 	double sync_time =  ts_counter[maxlevel].current_time;
 	int time_interp = 0;
-	fclaw2d_ghost_update(glob,minlevel,maxlevel,sync_time,
-						 time_interp,FCLAW2D_TIMER_ADVANCE);
+	fclaw_ghost_update(glob,minlevel,maxlevel,sync_time,
+						 time_interp,FCLAW_TIMER_ADVANCE);
 
 	if (fclaw_opt->time_sync)
 	{
 	    /* This is the final synchronization not covered in fine_steps loop */
-		fclaw2d_time_sync(glob,minlevel,maxlevel);
+		fclaw_time_sync(glob,minlevel,maxlevel);
 	}
 
 	delete_timestep_counters(&ts_counter);
 
 	/* Stop the timer */
-	fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_ADVANCE]);
+	fclaw_timer_stop (&glob->timers[FCLAW_TIMER_ADVANCE]);
 
 	/* Count total grids on this processor */
 	glob->count_grids_per_proc +=  domain->local_num_patches;

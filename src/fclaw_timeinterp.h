@@ -23,8 +23,8 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FCLAW2D_TIMEINTERP_H
-#define FCLAW2D_TIMEINTERP_H
+#ifndef FCLAW_TIMEINTERP_H
+#define FCLAW_TIMEINTERP_H
 
 #include <fclaw_base.h>    /* Defines FCLAW_F77_FUNC */
 
@@ -36,9 +36,9 @@ extern "C"
 #endif
 #endif
 
-struct fclaw2d_global;
+struct fclaw_global;
 
-void fclaw2d_timeinterp(struct fclaw2d_global *glob,
+void fclaw_timeinterp(struct fclaw_global *glob,
                        int level, double alpha);
 
 #define FCLAW2D_TIMEINTERP_FORT FCLAW_F77_FUNC (fclaw2d_timeinterp_fort, \

@@ -34,6 +34,10 @@ libforestclaw_installed_headers = \
     src/fclaw_regrid.h \
   	src/fclaw_vtable.h \
   	src/fclaw_output.h \
+	src/fclaw_advance.h \
+  	src/fclaw_timeinterp.h \
+  	src/fclaw_update_single_step.h \
+  	src/fclaw_time_sync.h \
 	src/fp_exception_glibc_extension.h \
 	src/fclaw2d_include_all.h \
 	src/fclaw2d_defs.h \
@@ -113,6 +117,10 @@ libforestclaw_compiled_sources = \
     src/fclaw_regrid.c \
   	src/fclaw_vtable.c \
   	src/fclaw_output.c \
+	src/fclaw_advance.c \
+  	src/fclaw_timeinterp.c \
+  	src/fclaw_update_single_step.c \
+  	src/fclaw_time_sync.c \
 	src/forestclaw.c \
 	src/fclaw2d_block.c \
 	src/fclaw2d_options.c \

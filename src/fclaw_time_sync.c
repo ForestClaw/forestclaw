@@ -23,18 +23,19 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <fclaw2d_time_sync.h>
+#include <fclaw_time_sync.h>
 
-#include <fclaw2d_global.h>
-#include <fclaw2d_ghost_fill.h>
-#include <fclaw2d_patch.h>
-#include <fclaw2d_options.h>
-#include <fclaw2d_exchange.h>
+#include <fclaw_global.h>
+#include <fclaw_patch.h>
+#include <fclaw_options.h>
+#include <fclaw_exchange.h>
+#include <fclaw_ghost_fill.h>
+#include <fclaw_face_neighbors.h>
 
 typedef struct fclaw2d_time_sync_info
 {
     /** The type of reset to perform */
-    fclaw2d_time_sync_type_t reset_mode;
+    fclaw_time_sync_type_t reset_mode;
     /** The type of reset to perform */
     int coarse_level;
     /** The type of reset to perform */
@@ -45,84 +46,84 @@ typedef struct fclaw2d_time_sync_info
 
 
 static 
-void cb_time_sync_reset(fclaw2d_domain_t *domain,
-                        fclaw2d_patch_t *this_patch,
+void cb_time_sync_reset(fclaw_domain_t *domain,
+                        fclaw_patch_t *this_patch,
                         int this_block_idx,
                         int this_patch_idx,
                         void *user)
 {
-	fclaw2d_global_iterate_t* g = (fclaw2d_global_iterate_t*) user;
-	fclaw2d_global_t *glob = (fclaw2d_global_t*) g->glob;
+	fclaw_global_iterate_t* g = (fclaw_global_iterate_t*) user;
+	fclaw_global_t *glob = (fclaw_global_t*) g->glob;
 
 	fclaw2d_time_sync_info_t *tstype = (fclaw2d_time_sync_info_t*) g->user;
 
 	int reset_mode = tstype->reset_mode;
 	int coarse_level = tstype->coarse_level;
 
-	fclaw2d_patch_time_sync_reset(glob,this_patch,coarse_level,reset_mode);
+	fclaw_patch_time_sync_reset(glob,this_patch,coarse_level,reset_mode);
 
 }
 
 static
-void time_sync_reset (fclaw2d_global_t* glob,
+void time_sync_reset (fclaw_global_t* glob,
                       int coarse_level, int reset_mode)
 {
 	fclaw2d_time_sync_info_t ts_info;
 
-	ts_info.reset_mode = (fclaw2d_time_sync_type_t) reset_mode;
+	ts_info.reset_mode = (fclaw_time_sync_type_t) reset_mode;
 	ts_info.coarse_level = coarse_level;
 
-	fclaw2d_global_iterate_level(glob, coarse_level, 
+	fclaw_global_iterate_level(glob, coarse_level, 
 	                             cb_time_sync_reset, &ts_info);
 
-	if (reset_mode == FCLAW2D_TIME_SYNC_RESET_F2C)
+	if (reset_mode == FCLAW_TIME_SYNC_RESET_F2C)
 	{
-		fclaw2d_global_iterate_level(glob, coarse_level+1, 
+		fclaw_global_iterate_level(glob, coarse_level+1, 
 		                             cb_time_sync_reset, &ts_info);
 	}
 
 }
 
 static
-void copy_at_blockbdry(fclaw2d_global_t *glob,
+void copy_at_blockbdry(fclaw_global_t *glob,
 					   int level,
 					   int read_parallel_patches,
-					   fclaw2d_ghost_fill_parallel_mode_t ghost_mode)
+					   fclaw_ghost_fill_parallel_mode_t ghost_mode)
 {
-	fclaw2d_exchange_info_t e_info;
-	e_info.exchange_type = FCLAW2D_TIME_SYNC_SAMESIZE;
-	e_info.grid_type = FCLAW2D_IS_COARSE;
+	fclaw_exchange_info_t e_info;
+	e_info.exchange_type = FCLAW_TIME_SYNC_SAMESIZE;
+	e_info.grid_type = FCLAW_IS_COARSE;
 	e_info.time_interp = 0;
 	e_info.read_parallel_patches = read_parallel_patches;
 
-	fclaw2d_global_iterate_level(glob, level, cb_face_fill,
+	fclaw_global_iterate_level(glob, level, fclaw_face_fill_cb,
 						 &e_info);    
 }
 
 
 static
-void fine2coarse(fclaw2d_global_t *glob,
+void fine2coarse(fclaw_global_t *glob,
 				int level,
 				int read_parallel_patches,
-				fclaw2d_ghost_fill_parallel_mode_t ghost_mode)
+				fclaw_ghost_fill_parallel_mode_t ghost_mode)
 {
-	fclaw2d_exchange_info_t e_info;
-	e_info.exchange_type = FCLAW2D_TIME_SYNC_F2C;
-	e_info.grid_type = FCLAW2D_IS_COARSE;
+	fclaw_exchange_info_t e_info;
+	e_info.exchange_type = FCLAW_TIME_SYNC_F2C;
+	e_info.grid_type = FCLAW_IS_COARSE;
 	e_info.time_interp = 0;
 	e_info.read_parallel_patches = read_parallel_patches;
 
-	fclaw2d_global_iterate_level(glob, level, cb_face_fill, &e_info);
+	fclaw_global_iterate_level(glob, level, fclaw_face_fill_cb, &e_info);
 }
 
 static
-void correct_coarse_cells(fclaw2d_global_t *glob, 
+void correct_coarse_cells(fclaw_global_t *glob, 
                           int minlevel, 
                           int read_parallel_patches,
-                          fclaw2d_ghost_fill_parallel_mode_t ghost_mode)
+                          fclaw_ghost_fill_parallel_mode_t ghost_mode)
 
 {
-	fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+	fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
 
 	/* This step accounts for any metric discontinuities at block boundaries
 	   between grids at the same level */
@@ -132,7 +133,7 @@ void correct_coarse_cells(fclaw2d_global_t *glob,
 		copy_at_blockbdry(glob,level,
 						  read_parallel_patches,ghost_mode);
 
-		time_sync_reset(glob, level, FCLAW2D_TIME_SYNC_RESET_SAMESIZE);
+		time_sync_reset(glob, level, FCLAW_TIME_SYNC_RESET_SAMESIZE);
 
 		/* Correct coarser grids with corrections from coarse/fine grids */
 		if (level < fclaw_opt->maxlevel)
@@ -142,23 +143,23 @@ void correct_coarse_cells(fclaw2d_global_t *glob,
 			            read_parallel_patches,ghost_mode);
 
 			/* Clear registers at coarse/fine interface */
-			time_sync_reset(glob, level, FCLAW2D_TIME_SYNC_RESET_F2C);
+			time_sync_reset(glob, level, FCLAW_TIME_SYNC_RESET_F2C);
 		}
 	}
 	for(int level = fclaw_opt->maxlevel; level >= minlevel; level--)
 	{
 		/* Clear registers at physical level;  These are not used
      	   in sychronization, but will accumulate throughout simulation.  */
-		time_sync_reset(glob, level, FCLAW2D_TIME_SYNC_RESET_PHYS);		
+		time_sync_reset(glob, level, FCLAW_TIME_SYNC_RESET_PHYS);		
 	}
 }
 
 
-void fclaw2d_time_sync(fclaw2d_global_t *glob, int minlevel, int maxlevel)
+void fclaw_time_sync(fclaw_global_t *glob, int minlevel, int maxlevel)
 {
 
 
-	fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_TIMESYNC]);
+	fclaw_timer_start (&glob->timers[FCLAW_TIMER_TIMESYNC]);
 
 #if 0
 	int time_interp = 0;
@@ -168,10 +169,10 @@ void fclaw2d_time_sync(fclaw2d_global_t *glob, int minlevel, int maxlevel)
 		for registers needed for conservation.
 	-----------------------------------------------------------------*/
 	fclaw2d_exchange_ghost_patches_begin(glob,minlevel,maxlevel,time_interp,
-										 FCLAW2D_TIMER_TIMESYNC);
+										 FCLAW_TIMER_TIMESYNC);
 
 	fclaw2d_exchange_ghost_patches_end(glob,minlevel,maxlevel,time_interp,
-									   FCLAW2D_TIMER_TIMESYNC);
+									   FCLAW_TIMER_TIMESYNC);
 
 	/* Three-way corner exchanges */
 	fclaw2d_face_neighbor_ghost(glob,minlevel,maxlevel,time_interp);
@@ -191,13 +192,13 @@ void fclaw2d_time_sync(fclaw2d_global_t *glob, int minlevel, int maxlevel)
 
 	/* Indicates that we should read only interior, only boundary, or all patches
 	on a local processor */
-	fclaw2d_ghost_fill_parallel_mode_t parallel_mode =
-		   FCLAW2D_BOUNDARY_ALL;    
+	fclaw_ghost_fill_parallel_mode_t parallel_mode =
+		   FCLAW_BOUNDARY_ALL;    
 
 	correct_coarse_cells(glob,minlevel,read_parallel_patches,parallel_mode);
 
 
-	fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_TIMESYNC]);
+	fclaw_timer_stop (&glob->timers[FCLAW_TIMER_TIMESYNC]);
 
 }
 

@@ -23,22 +23,22 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <fclaw2d_timeinterp.h>
-#include <fclaw2d_patch.h>
-#include <fclaw2d_global.h>
+#include <fclaw_timeinterp.h>
+#include <fclaw_patch.h>
+#include <fclaw_global.h>
 
 static
-void cb_setup_time_interp(fclaw2d_domain_t *domain,
-                          fclaw2d_patch_t *this_patch,
+void cb_setup_time_interp(fclaw_domain_t *domain,
+                          fclaw_patch_t *this_patch,
                           int blockno,
                           int patchno,
                           void *user)
 {
-    fclaw2d_global_iterate_t *s = (fclaw2d_global_iterate_t*) user;
-    if (fclaw2d_patch_has_finegrid_neighbors(this_patch))
+    fclaw_global_iterate_t *s = (fclaw_global_iterate_t*) user;
+    if (fclaw_patch_has_finegrid_neighbors(this_patch))
     {
         double alpha = *((double*) s->user);
-        fclaw2d_patch_setup_timeinterp(s->glob,this_patch,alpha);
+        fclaw_patch_setup_timeinterp(s->glob,this_patch,alpha);
     }
 }
 
@@ -48,10 +48,10 @@ void cb_setup_time_interp(fclaw2d_domain_t *domain,
    via interpolating and averaging) ghost cell values.
    -------------------------------------------------------------------- */
 
-void fclaw2d_timeinterp(fclaw2d_global_t *glob,
+void fclaw_timeinterp(fclaw_global_t *glob,
                         int level,double alpha)
 {
     /* Store time interpolated data into m_griddata_time_sync. */
-    fclaw2d_global_iterate_level(glob,level,cb_setup_time_interp,
+    fclaw_global_iterate_level(glob,level,cb_setup_time_interp,
                                  (void *) &alpha);
 }

@@ -24,8 +24,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-#ifndef FCLAW2D_TIME_SYNC_H
-#define FCLAW2D_TIME_SYNC_H
+#ifndef FCLAW_TIME_SYNC_H
+#define FCLAW_TIME_SYNC_H
 
 #ifdef __cplusplus
 extern "C"
@@ -36,7 +36,7 @@ extern "C"
 #endif
 
 
-struct fclaw2d_global;
+struct fclaw_global;
 
 /** 
  *  @file
@@ -46,14 +46,14 @@ struct fclaw2d_global;
 /**
  * @brief The type of reset to perform
  */
-typedef enum fclaw2d_time_sync_type
+typedef enum fclaw_time_sync_type
 {   /** Reset registers at coarse-fine boundaries */
-    FCLAW2D_TIME_SYNC_RESET_F2C = 1,   
+    FCLAW_TIME_SYNC_RESET_F2C = 1,   
     /** Reset registers between same size grids */
-    FCLAW2D_TIME_SYNC_RESET_SAMESIZE,  
+    FCLAW_TIME_SYNC_RESET_SAMESIZE,  
     /** Reset registers at physical boundary */
-    FCLAW2D_TIME_SYNC_RESET_PHYS             
-} fclaw2d_time_sync_type_t;
+    FCLAW_TIME_SYNC_RESET_PHYS             
+} fclaw_time_sync_type_t;
 
 
 /**
@@ -67,7 +67,7 @@ typedef enum fclaw2d_time_sync_type
  * @param minlevel the minimum level
  * @param maxlevel the maximmum level
  */
-void fclaw2d_time_sync(struct fclaw2d_global *glob, int minlevel, int maxlevel);
+void fclaw_time_sync(struct fclaw_global *glob, int minlevel, int maxlevel);
 
 
 #ifdef __cplusplus
