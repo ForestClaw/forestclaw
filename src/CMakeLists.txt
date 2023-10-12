@@ -18,6 +18,16 @@ add_library(forestclaw_c OBJECT
   fclaw_patch.c
   fclaw_exchange.c
   fclaw_diagnostics.c
+  fclaw_ghost_fill.c
+  fclaw_corner_neighbors.c
+  fclaw_edge_neighbors.c
+  fclaw_face_neighbors.c
+  fclaw_block.c
+  fclaw_physical_bc.c
+  fclaw_partition.c
+  fclaw_regrid.c
+  fclaw_vtable.c
+  fclaw_gauges.c
   forestclaw.c
   fclaw2d_block.c
   fclaw2d_options.c
@@ -140,6 +150,15 @@ install(FILES
   fclaw_patch.h
   fclaw_exchange.h
   fclaw_global.h
+  fclaw_ghost_fill.h
+  fclaw_corner_neighbors.h
+  fclaw_edge_neighbors.h
+  fclaw_face_neighbors.h
+  fclaw_block.h
+  fclaw_physical_bc.h
+  fclaw_partition.h
+  fclaw_regrid.h
+  fclaw_vtable.h
 	forestclaw2d.h 
 	fp_exception_glibc_extension.h 
   fclaw2d_include_all.h 

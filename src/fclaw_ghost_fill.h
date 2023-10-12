@@ -23,8 +23,8 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FCLAW2D_GHOST_FILL_H
-#define FCLAW2D_GHOST_FILL_H
+#ifndef FCLAW_GHOST_FILL_H
+#define FCLAW_GHOST_FILL_H
 
 #include <fclaw_timer.h>    /* Needed for definition of timer names */
 
@@ -36,78 +36,66 @@ extern "C"
 #endif
 #endif
 
-struct fclaw2d_global;
-struct fclaw2d_domain;
-struct fclaw2d_patch;
+struct fclaw_global;
+struct fclaw_domain;
+struct fclaw_patch;
 
 /** 
  *  @file
  *  Routines needed to fill in ghost cells
  */
 
-typedef enum fclaw2d_ghost_fill_parallel_mode
+typedef enum fclaw_ghost_fill_parallel_mode
 {
-	FCLAW2D_BOUNDARY_INTERIOR_ONLY = 0,  /* Don't read parallel patches */
-	FCLAW2D_BOUNDARY_GHOST_ONLY,         /* read parallel patches */
-	FCLAW2D_BOUNDARY_ALL,                 /* read parallel patches */
-	FCLAW2D_BOUNDARY_LOCAL_ALL,
-} fclaw2d_ghost_fill_parallel_mode_t;
+	FCLAW_BOUNDARY_INTERIOR_ONLY = 0,  /* Don't read parallel patches */
+	FCLAW_BOUNDARY_GHOST_ONLY,         /* read parallel patches */
+	FCLAW_BOUNDARY_ALL,                 /* read parallel patches */
+	FCLAW_BOUNDARY_LOCAL_ALL,
+} fclaw_ghost_fill_parallel_mode_t;
 
 
-typedef enum fclaw2d_exchange_type
+typedef enum fclaw_exchange_type
 {
-	FCLAW2D_COPY = 1,
-	FCLAW2D_AVERAGE,
-	FCLAW2D_INTERPOLATE,
-	FCLAW2D_TIME_SYNC_F2C,
-	FCLAW2D_TIME_SYNC_SAMESIZE,
-} fclaw2d_exchange_type_t;
+	FCLAW_COPY = 1,
+	FCLAW_AVERAGE,
+	FCLAW_INTERPOLATE,
+	FCLAW_TIME_SYNC_F2C,
+	FCLAW_TIME_SYNC_SAMESIZE,
+} fclaw_exchange_type_t;
 
 /** enum for which type of grid is being filled */
-typedef enum fclaw2d_grid_type
+typedef enum fclaw_grid_type
 {
 	/** fill ghost cells for coarser neighbor grid */
-	FCLAW2D_IS_COARSE = 1,
+	FCLAW_IS_COARSE = 1,
 	/** fill ghost cells for finer neighbor grid */
-	FCLAW2D_IS_FINE,
-} fclaw2d_grid_type_t;
+	FCLAW_IS_FINE,
+} fclaw_grid_type_t;
 
-typedef struct fclaw2d_exchange_info
+typedef struct fclaw_exchange_info
 {
 	int time_interp;
 	int level;
 	int read_parallel_patches;   /* before we have done a parallel exchange */
-	fclaw2d_exchange_type_t exchange_type;
-	fclaw2d_grid_type_t grid_type;
+	fclaw_exchange_type_t exchange_type;
+	fclaw_grid_type_t grid_type;
 	int has_fine_grid_neighbor;
 
-} fclaw2d_exchange_info_t;
+} fclaw_exchange_info_t;
 
-void cb_corner_fill(struct fclaw2d_domain *domain,
-					struct fclaw2d_patch *this_patch,
-					int this_block_idx,
-					int this_patch_idx,
-					void *user);
+void fclaw_ghost_update(struct fclaw_global* glob,
+						int fine_level,
+						int coarse_level,
+						double sync_time,
+						int time_interp,
+						fclaw_timer_names_t running);
 
-void cb_face_fill(struct fclaw2d_domain *domain,
-				  struct fclaw2d_patch *this_patch,
-				  int this_block_idx,
-				  int this_patch_idx,
-				  void *user);
-
-void fclaw2d_ghost_update(struct fclaw2d_global* glob,
-						  int fine_level,
-						  int coarse_level,
-						  double sync_time,
-						  int time_interp,
-						  fclaw2d_timer_names_t running);
-
-void fclaw2d_ghost_update_async(struct fclaw2d_global* glob,
-								int fine_level,
-								int coarse_level,
-								double sync_time,
-								int time_interp,
-								fclaw2d_timer_names_t running);
+void fclaw_ghost_update_async(struct fclaw_global* glob,
+							  int fine_level,
+							  int coarse_level,
+							  double sync_time,
+							  int time_interp,
+							  fclaw_timer_names_t running);
 
 /**
  * <summary>Complete exchange of all ghost patches at all levels.</summary>
@@ -124,12 +112,12 @@ void fclaw2d_ghost_update_async(struct fclaw2d_global* glob,
  *   the logic here is considerably simpler than for the partial
  *   update used in intermediate steps in the subcycled case.
  **/
-void fclaw2d_ghost_update_nonasync(struct fclaw2d_global* glob,
-								   int fine_level,
-								   int coarse_level,
-								   double sync_time,
-								   int time_interp,
-								   fclaw2d_timer_names_t running);
+void fclaw_ghost_update_nonasync(struct fclaw_global* glob,
+								 int fine_level,
+								 int coarse_level,
+								 double sync_time,
+								 int time_interp,
+								 fclaw_timer_names_t running);
 
 /**
  * <summary>Complete exchange of all ghost patches at all levels.</summary>
@@ -146,10 +134,10 @@ void fclaw2d_ghost_update_nonasync(struct fclaw2d_global* glob,
  *   the logic here is considerably simpler than for the partial
  *   update used in intermediate steps in the subcycled case.
  **/
-void fclaw2d_face_neighbor_ghost(struct fclaw2d_global* glob,
-								 int minlevel,
-								 int maxlevel,
-								 int time_interp);
+void fclaw_face_neighbor_ghost(struct fclaw_global* glob,
+						       int minlevel,
+							   int maxlevel,
+							   int time_interp);
 
 #ifdef __cplusplus
 #if 0

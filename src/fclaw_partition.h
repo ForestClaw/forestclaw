@@ -23,8 +23,8 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FCLAW2D_PARTITION_H
-#define FCLAW2D_PARTITION_H
+#ifndef FCLAW_PARTITION_H
+#define FCLAW_PARTITION_H
 
 #include <fclaw_timer.h>
 
@@ -36,10 +36,10 @@ extern "C"
 #endif
 #endif
 
-struct fclaw2d_domain;
+struct fclaw_domain;
 
-void fclaw2d_partition_domain(struct fclaw2d_global* glob, 
-                              fclaw2d_timer_names_t running);
+void fclaw_parition_domain(struct fclaw_global* glob, 
+                           fclaw_timer_names_t running);
 
 #ifdef __cplusplus
 #if 0

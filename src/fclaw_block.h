@@ -23,8 +23,8 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FCLAW2D_BLOCK_H
-#define FCLAW2D_BLOCK_H
+#ifndef FCLAW_BLOCK_H
+#define FCLAW_BLOCK_H
 
 #ifdef __cplusplus
 extern "C"
@@ -34,12 +34,12 @@ extern "C"
 #endif
 #endif
 
-struct fclaw2d_global;
-struct fclaw2d_patch;
+struct fclaw_global;
+struct fclaw_patch;
 
 void 
-fclaw2d_block_get_block_boundary(struct fclaw2d_global * glob,
-                                 struct fclaw2d_patch * patch,
+fclaw_block_get_block_boundary(struct fclaw_global * glob,
+                                 struct fclaw_patch * patch,
                                  int *intersects_block);
 
 #ifdef __cplusplus

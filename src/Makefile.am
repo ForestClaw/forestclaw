@@ -24,6 +24,16 @@ libforestclaw_installed_headers = \
   	src/fclaw_patch.h \
   	src/fclaw_exchange.h \
   	src/fclaw_global.h \
+	src/fclaw_ghost_fill.h \
+    src/fclaw_corner_neighbors.h \
+    src/fclaw_edge_neighbors.h \
+    src/fclaw_face_neighbors.h \
+    src/fclaw_block.h \
+    src/fclaw_physical_bc.h \
+    src/fclaw_partition.h \
+    src/fclaw_regrid.h \
+  	src/fclaw_vtable.h \
+  	src/fclaw_output.h \
 	src/fp_exception_glibc_extension.h \
 	src/fclaw2d_include_all.h \
 	src/fclaw2d_defs.h \
@@ -93,6 +103,16 @@ libforestclaw_compiled_sources = \
     src/fclaw_exchange.c \
     src/fclaw_diagnostics.c \
 	src/fclaw_convenience.c \
+	src/fclaw_ghost_fill.c \
+    src/fclaw_corner_neighbors.c \
+    src/fclaw_edge_neighbors.c \
+    src/fclaw_face_neighbors.c \
+    src/fclaw_block.c \
+    src/fclaw_physical_bc.c \
+    src/fclaw_partition.c \
+    src/fclaw_regrid.c \
+  	src/fclaw_vtable.c \
+  	src/fclaw_output.c \
 	src/forestclaw.c \
 	src/fclaw2d_block.c \
 	src/fclaw2d_options.c \

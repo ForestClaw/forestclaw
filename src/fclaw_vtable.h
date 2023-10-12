@@ -23,8 +23,8 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FCLAW2D_VTABLE_H
-#define FCLAW2D_VTABLE_H
+#ifndef FCLAW_VTABLE_H
+#define FCLAW_VTABLE_H
 
 #ifdef __cplusplus
 extern "C"
@@ -39,8 +39,8 @@ extern "C"
  *  @brief ForestClaw vtable
  */
 
-struct fclaw2d_global;
-struct fclaw2d_patch;
+struct fclaw_global;
+struct fclaw_patch;
 
 /* ---------------------------------- Typedefs ---------------------------------------- */  
 /**
@@ -48,7 +48,7 @@ struct fclaw2d_patch;
  * 
  * @param glob the global context
  */
-typedef void (*fclaw2d_problem_setup_t)(struct fclaw2d_global *glob);
+typedef void (*fclaw_problem_setup_t)(struct fclaw_global *glob);
 
 /**
  * @brief Sets up common blocks in Fortran
@@ -56,34 +56,34 @@ typedef void (*fclaw2d_problem_setup_t)(struct fclaw2d_global *glob);
  * @param glob the global context
  * @param iframe frame number
  */
-typedef void (*fclaw2d_output_frame_t)(struct fclaw2d_global * glob, int iframe);
+typedef void (*fclaw_output_frame_t)(struct fclaw_global * glob, int iframe);
 
 /**
  * @brief Called after each regridding
  *  
  * @param glob the global context
  */
-typedef void (*fclaw2d_after_regrid_t)(struct fclaw2d_global *glob);
+typedef void (*fclaw_after_regrid_t)(struct fclaw_global *glob);
 
 /* ------------------------------------ vtable ---------------------------------------- */  
 /**
  * @brief vtable for general ForestClaw functions
  */
-typedef struct fclaw2d_vtable
+typedef struct fclaw_vtable
 {
 	/** @brief sets up common blocks in Fortran */
-	fclaw2d_problem_setup_t              problem_setup;
+	fclaw_problem_setup_t              problem_setup;
 
 	/** @brief called after each regridding */
-	fclaw2d_after_regrid_t               after_regrid;
+	fclaw_after_regrid_t               after_regrid;
 
 	/** @brief called for output */
-	fclaw2d_output_frame_t               output_frame;
+	fclaw_output_frame_t               output_frame;
 
 	/** @brief true if vtable is set */
 	int is_set;
 
-} fclaw2d_vtable_t;
+} fclaw_vtable_t;
 
 
 /**
@@ -91,21 +91,21 @@ typedef struct fclaw2d_vtable
  * 
  * @param glob the global context
  */
-fclaw2d_vtable_t* fclaw2d_vt(struct fclaw2d_global* glob);
+fclaw_vtable_t* fclaw_vt(struct fclaw_global* glob);
 
 /**
  * @brief Initialize fclaw2d vtable
  * 
  * @param glob the global context
  */
-void fclaw2d_vtable_initialize(struct fclaw2d_global* glob);
+void fclaw_vtable_initialize(struct fclaw_global* glob);
 
 /**
  * @brief Called after each regridding
  * 
  * @param glob the global context
  */
-void fclaw2d_after_regrid(struct fclaw2d_global *glob);
+void fclaw_after_regrid(struct fclaw_global *glob);
 
 #ifdef __cplusplus
 #if 0

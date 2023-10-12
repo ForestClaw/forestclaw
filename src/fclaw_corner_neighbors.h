@@ -23,8 +23,8 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FCLAW2D_CORNER_NEIGHBORS_H
-#define FCLAW2D_CORNER_NEIGHBORS_H
+#ifndef FCLAW_CORNER_NEIGHBORS_H
+#define FCLAW_CORNER_NEIGHBORS_H
 
 #include <fclaw_base.h>
 
@@ -36,16 +36,16 @@ extern "C"
 #endif
 #endif
 
-struct fclaw2d_global;
-struct fclaw2d_domain;
-struct fclaw2d_patch;
+struct fclaw_global;
+struct fclaw_domain;
+struct fclaw_patch;
 
 
-void cb_corner_fill(struct fclaw2d_domain *domain,
-                    struct fclaw2d_patch *this_patch,
-                    int this_block_idx,
-                    int this_patch_idx,
-                    void *user);
+void fclaw_corner_fill_cb(struct fclaw_domain *domain,
+                          struct fclaw_patch *this_patch,
+                          int this_block_idx,
+                          int this_patch_idx,
+                          void *user);
 
 #ifdef __cplusplus
 #if 0

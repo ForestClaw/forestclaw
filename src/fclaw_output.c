@@ -23,19 +23,19 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <fclaw2d_output.h>
-#include <fclaw2d_global.h>
-#include <fclaw2d_options.h>
-#include <fclaw2d_vtable.h>
+#include <fclaw_output.h>
+#include <fclaw_global.h>
+#include <fclaw_options.h>
+#include <fclaw_vtable.h>
 
 /* -----------------------------------------------------------------------
     Public interface
     -------------------------------------------------------------------- */
 
 void
-fclaw2d_output_frame (fclaw2d_global_t * glob, int iframe)
+fclaw_output_frame (fclaw_global_t * glob, int iframe)
 {
-    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+    const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
 
     double time;
     time = glob->curr_time;
@@ -43,12 +43,12 @@ fclaw2d_output_frame (fclaw2d_global_t * glob, int iframe)
 
     if (fclaw_opt->output != 0)
     {
-        fclaw2d_vtable_t *vt = fclaw2d_vt(glob);
+        fclaw_vtable_t *vt = fclaw_vt(glob);
 
         FCLAW_ASSERT(vt->output_frame != NULL);
 
         /* Record output time */
-        fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_OUTPUT]);
+        fclaw_timer_start (&glob->timers[FCLAW_TIMER_OUTPUT]);
 
         /* User or solver set output file */
         fclaw_global_essentialf("Output Frame %4d  at time %16.8e\n\n",
@@ -56,7 +56,7 @@ fclaw2d_output_frame (fclaw2d_global_t * glob, int iframe)
         vt->output_frame(glob,iframe);
 
         /* Record output time */
-        fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_OUTPUT]);
+        fclaw_timer_stop (&glob->timers[FCLAW_TIMER_OUTPUT]);
     }
     else
     {

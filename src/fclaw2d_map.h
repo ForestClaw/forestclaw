@@ -28,6 +28,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw_base.h>
 #include <fclaw2d_map_query_defs.h>
+#include <fclaw_global.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -132,6 +133,8 @@ struct fclaw2d_map_context
     void *user_data;
 };
 
+fclaw2d_map_context_t
+ * fclaw2d_map_get(fclaw_global_t* glob);
 
 void set_scale(fclaw2d_map_context_t* cont, const double scale[]);
 void set_shift(fclaw2d_map_context_t* cont, const double shift[]);
