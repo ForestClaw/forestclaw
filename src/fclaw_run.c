@@ -23,16 +23,16 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <fclaw2d_patch.h>
+#include <fclaw_patch.h>
 
-#include <fclaw2d_forestclaw.h>
-#include <fclaw2d_global.h>
-#include <fclaw2d_options.h>
-#include <fclaw2d_advance.h>
-#include <fclaw2d_regrid.h>
-#include <fclaw2d_output.h>
-#include <fclaw2d_diagnostics.h>
-#include <fclaw2d_vtable.h>
+#include <fclaw_forestclaw.h>
+#include <fclaw_global.h>
+#include <fclaw_options.h>
+#include <fclaw_advance.h>
+#include <fclaw_regrid.h>
+#include <fclaw_output.h>
+#include <fclaw_diagnostics.h>
+#include <fclaw_vtable.h>
 
 #include "fclaw_math.h"
 
@@ -44,40 +44,40 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     ----------------------------------------------------------------- */
 
 static
-void cb_restore_time_step(fclaw2d_domain_t *domain,
-                          fclaw2d_patch_t *this_patch,
+void cb_restore_time_step(fclaw_domain_t *domain,
+                          fclaw_patch_t *this_patch,
                           int this_block_idx,
                           int this_patch_idx,
                           void *user)
 {
-    fclaw2d_global_iterate_t* s = (fclaw2d_global_iterate_t*) user;
-    fclaw2d_patch_restore_step(s->glob,this_patch);
+    fclaw_global_iterate_t* s = (fclaw_global_iterate_t*) user;
+    fclaw_patch_restore_step(s->glob,this_patch);
 }
 
 static
-void restore_time_step(fclaw2d_global_t *glob)
+void restore_time_step(fclaw_global_t *glob)
 {
-    fclaw2d_global_iterate_patches(glob,cb_restore_time_step,(void *) NULL);
+    fclaw_global_iterate_patches(glob,cb_restore_time_step,(void *) NULL);
 
-    //fclaw_options_t *fopt = fclaw2d_get_options(glob);
+    //fclaw_options_t *fopt = fclaw_get_options(glob);
     //fclaw2d_time_sync_reset(glob,fopt->minlevel,fopt->maxlevel,0);
 }
 
 static
-void cb_save_time_step(fclaw2d_domain_t *domain,
-                       fclaw2d_patch_t *this_patch,
+void cb_save_time_step(fclaw_domain_t *domain,
+                       fclaw_patch_t *this_patch,
                        int this_block_idx,
                        int this_patch_idx,
                        void *user)
 {
-    fclaw2d_global_iterate_t* s = (fclaw2d_global_iterate_t*) user;
-    fclaw2d_patch_save_step(s->glob,this_patch);
+    fclaw_global_iterate_t* s = (fclaw_global_iterate_t*) user;
+    fclaw_patch_save_step(s->glob,this_patch);
 }
 
 static
-void save_time_step(fclaw2d_global_t *glob)
+void save_time_step(fclaw_global_t *glob)
 {
-    fclaw2d_global_iterate_patches(glob,cb_save_time_step,(void *) NULL);
+    fclaw_global_iterate_patches(glob,cb_save_time_step,(void *) NULL);
 }
 
 
@@ -85,16 +85,16 @@ void save_time_step(fclaw2d_global_t *glob)
    Output style 1
    Output times are at times [0,dT, 2*dT, 3*dT,...,Tfinal], where dT = tfinal/nout
    -------------------------------------------------------------------------------- */
-static void outstyle_0(fclaw2d_global_t *glob)
+static void outstyle_0(fclaw_global_t *glob)
 {
 
     int iframe;
 
     iframe = 0;
-    fclaw2d_output_frame(glob,iframe);
+    fclaw_output_frame(glob,iframe);
 
     int init_flag = 1;
-    fclaw2d_diagnostics_gather(glob,init_flag);
+    fclaw_diagnostics_gather(glob,init_flag);
     init_flag = 0;
 
     /* Here is where we might include a call to a static solver, for, say,
@@ -117,19 +117,19 @@ static void outstyle_0(fclaw2d_global_t *glob)
    Output times are at times [0,dT, 2*dT, 3*dT,...,Tfinal], where dT = tfinal/nout
    -------------------------------------------------------------------------------- */
 static
-void outstyle_1(fclaw2d_global_t *glob)
+void outstyle_1(fclaw_global_t *glob)
 {
-    fclaw2d_domain_t** domain = &glob->domain;
+    fclaw_domain_t** domain = &glob->domain;
 
     /* Set error to 0 */
     int init_flag = 1;  /* Store anything that needs to be stored */
-    fclaw2d_diagnostics_gather(glob,init_flag);
+    fclaw_diagnostics_gather(glob,init_flag);
     init_flag = 0;
 
     int iframe = 0;
-    fclaw2d_output_frame(glob,iframe);
+    fclaw_output_frame(glob,iframe);
 
-    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+    const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
 
     double final_time = fclaw_opt->tfinal;
     int nout = fclaw_opt->nout;
@@ -196,15 +196,15 @@ void outstyle_1(fclaw2d_global_t *glob)
                 }
             }
             glob->curr_dt = dt_step;  
-            double maxcfl_step = fclaw2d_advance_all_levels(glob, t_curr,dt_step);
+            double maxcfl_step = fclaw_advance_all_levels(glob, t_curr,dt_step);
 
             if (fclaw_opt->reduce_cfl)
             {
                 /* If we are taking a variable time step, we have to reduce the 
                    maxcfl so that every processor takes the same size dt */
-                fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_CFL_COMM]);
-                maxcfl_step = fclaw2d_domain_global_maximum (*domain, maxcfl_step);
-                fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_CFL_COMM]);                
+                fclaw_timer_start (&glob->timers[FCLAW_TIMER_CFL_COMM]);
+                maxcfl_step = fclaw_domain_global_maximum (*domain, maxcfl_step);
+                fclaw_timer_stop (&glob->timers[FCLAW_TIMER_CFL_COMM]);                
             }
 
 
@@ -275,7 +275,7 @@ void outstyle_1(fclaw2d_global_t *glob)
 
             if (fclaw_opt->advance_one_step)
             {
-                fclaw2d_diagnostics_gather(glob, init_flag);                
+                fclaw_diagnostics_gather(glob, init_flag);                
             }
 
             if (fclaw_opt->regrid_interval > 0)
@@ -283,41 +283,41 @@ void outstyle_1(fclaw2d_global_t *glob)
                 if (n_inner % fclaw_opt->regrid_interval == 0)
                 {
                     fclaw_global_infof("regridding at step %d\n",n);
-                    fclaw2d_regrid(glob);
+                    fclaw_regrid(glob);
                 }
             }
         }
 
         /* Output file at every outer loop iteration */
-        fclaw2d_diagnostics_gather(glob, init_flag);
+        fclaw_diagnostics_gather(glob, init_flag);
         glob->curr_time = t_curr;
         iframe++;
-        fclaw2d_output_frame(glob,iframe);
+        fclaw_output_frame(glob,iframe);
     }
 }
 
 #if 0
-static void outstyle_2(fclaw2d_global_t *glob)
+static void outstyle_2(fclaw_global_t *glob)
 {
-    // fclaw2d_domain_t** domain = &glob->domain;
+    // fclaw_domain_t** domain = &glob->domain;
     // Output time at specific time steps.
 }
 #endif
 
 static
-void outstyle_3(fclaw2d_global_t *glob)
+void outstyle_3(fclaw_global_t *glob)
 {
-    fclaw2d_domain_t** domain = &glob->domain;
+    fclaw_domain_t** domain = &glob->domain;
 
     int init_flag = 1;
-    fclaw2d_diagnostics_gather(glob,init_flag);
+    fclaw_diagnostics_gather(glob,init_flag);
     init_flag = 0;
 
     int iframe = 0;
-    fclaw2d_output_frame(glob,iframe);
+    fclaw_output_frame(glob,iframe);
 
 
-    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+    const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
     double initial_dt = fclaw_opt->initial_dt;
 
 
@@ -368,16 +368,16 @@ void outstyle_3(fclaw2d_global_t *glob)
 
         /* Get current domain data since it may change during regrid */
         glob->curr_dt = dt_step;
-        double maxcfl_step = fclaw2d_advance_all_levels(glob, t_curr,dt_step);
+        double maxcfl_step = fclaw_advance_all_levels(glob, t_curr,dt_step);
 
         /* This is a collective communication - everybody needs to wait here. */
         if (fclaw_opt->reduce_cfl)
         {
             /* If we are taking a variable time step, we have to reduce the 
                maxcfl so that every processor takes the same size dt */
-            fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_CFL_COMM]);
-            maxcfl_step = fclaw2d_domain_global_maximum (*domain, maxcfl_step);
-            fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_CFL_COMM]);     
+            fclaw_timer_start (&glob->timers[FCLAW_TIMER_CFL_COMM]);
+            maxcfl_step = fclaw_domain_global_maximum (*domain, maxcfl_step);
+            fclaw_timer_stop (&glob->timers[FCLAW_TIMER_CFL_COMM]);     
         }
 
         double tc = t_curr + dt_step;
@@ -427,7 +427,7 @@ void outstyle_3(fclaw2d_global_t *glob)
             if (n % nregrid_interval == 0)
             {
                 fclaw_global_infof("regridding at step %d\n",n);
-                fclaw2d_regrid(glob);
+                fclaw_regrid(glob);
             }
         }
 
@@ -439,26 +439,26 @@ void outstyle_3(fclaw2d_global_t *glob)
         if (n % nstep_inner == 0)
         {
             iframe++;
-            fclaw2d_diagnostics_gather(glob,init_flag);
-            fclaw2d_output_frame(glob,iframe);
+            fclaw_diagnostics_gather(glob,init_flag);
+            fclaw_output_frame(glob,iframe);
         }
     }
 }
 
 
 static
-void outstyle_4(fclaw2d_global_t *glob)
+void outstyle_4(fclaw_global_t *glob)
 {
 
     /* Write out an initial time file */
     int iframe = 0;
-    fclaw2d_output_frame(glob,iframe);
+    fclaw_output_frame(glob,iframe);
 
     int init_flag = 1;
-    fclaw2d_diagnostics_gather(glob,init_flag);
+    fclaw_diagnostics_gather(glob,init_flag);
     init_flag = 0;
 
-    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+    const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
     double initial_dt = fclaw_opt->initial_dt;
     int nstep_outer = fclaw_opt->nout;
     int nstep_inner = fclaw_opt->nstep;
@@ -471,7 +471,7 @@ void outstyle_4(fclaw2d_global_t *glob)
     while (n < nstep_outer)
     {
         /* Get current domain data since it may change during regrid */
-        fclaw2d_advance_all_levels(glob, t_curr, dt_minlevel);
+        fclaw_advance_all_levels(glob, t_curr, dt_minlevel);
 
         int level2print = (fclaw_opt->advance_one_step && fclaw_opt->outstyle_uses_maxlevel) ?
                           fclaw_opt->maxlevel : fclaw_opt->minlevel;
@@ -491,7 +491,7 @@ void outstyle_4(fclaw2d_global_t *glob)
             {
                 fclaw_global_infof("regridding at step %d\n",n);
 
-                fclaw2d_regrid(glob);
+                fclaw_regrid(glob);
             }
         }
         else
@@ -501,9 +501,9 @@ void outstyle_4(fclaw2d_global_t *glob)
 
         if (n % nstep_inner == 0)
         {
-            fclaw2d_diagnostics_gather(glob,init_flag);
+            fclaw_diagnostics_gather(glob,init_flag);
             iframe++;
-            fclaw2d_output_frame(glob,iframe);
+            fclaw_output_frame(glob,iframe);
         }
     }
 }
@@ -513,10 +513,10 @@ void outstyle_4(fclaw2d_global_t *glob)
    Public interface
    ---------------------------------------------------------------- */
 
-void fclaw2d_run(fclaw2d_global_t *glob)
+void fclaw_run(fclaw_global_t *glob)
 {
 
-    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+    const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
 
     switch (fclaw_opt->outstyle)
     {

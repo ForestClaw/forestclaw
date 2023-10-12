@@ -32,6 +32,9 @@ add_library(forestclaw_c OBJECT
   fclaw_timeinterp.c
   fclaw_update_single_step.c
   fclaw_time_sync.c
+	fclaw_finalize.c
+	fclaw_initialize.c
+	fclaw_run.c
   forestclaw.c
   fclaw2d_block.c
   fclaw2d_options.c
@@ -167,6 +170,7 @@ install(FILES
   fclaw_timeinterp.h
   fclaw_update_single_step.h
   fclaw_time_sync.h
+  fclaw_forestclaw.h
 	forestclaw2d.h 
 	fp_exception_glibc_extension.h 
   fclaw2d_include_all.h 

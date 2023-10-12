@@ -23,8 +23,8 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FCLAW2D_FORESTCLAW_H
-#define FCLAW2D_FORESTCLAW_H
+#ifndef FCLAW_FORESTCLAW_H
+#define FCLAW_FORESTCLAW_H
 
 #ifdef __cplusplus
 extern "C"
@@ -34,14 +34,14 @@ extern "C"
 #endif
 #endif
 
-struct fclaw2d_global;
+struct fclaw_global;
 
-void fclaw2d_problem_setup(struct fclaw2d_global *glob);
-void fclaw2d_vtables_initialize(struct fclaw2d_global *glob);
+void fclaw_problem_setup(struct fclaw_global *glob);
+void fclaw_vtables_initialize(struct fclaw_global *glob);
 
-void fclaw2d_initialize (struct fclaw2d_global *glob);
-void fclaw2d_run (struct fclaw2d_global *glob);
-void fclaw2d_finalize(struct fclaw2d_global *glob);
+void fclaw_initialize (struct fclaw_global *glob);
+void fclaw_run (struct fclaw_global *glob);
+void fclaw_finalize(struct fclaw_global *glob);
 
 #ifdef __cplusplus
 #if 0

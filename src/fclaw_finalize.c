@@ -24,13 +24,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include <sc_statistics.h>
-#include <fclaw2d_global.h>
+#include <fclaw_global.h>
 
-#include <fclaw2d_diagnostics.h>
-#include <fclaw2d_options.h>
+#include <fclaw_diagnostics.h>
+#include <fclaw_options.h>
 #include <fclaw2d_map.h>
-#include <fclaw2d_domain.h>
-#include <fclaw2d_forestclaw.h>
+#include <fclaw_domain.h>
+#include <fclaw_forestclaw.h>
 
 /**
  *  This macro defines two utility functions for reading and writing CSV data of a specified type,
@@ -112,11 +112,11 @@ DEFINE_READ_AND_WRITE(long int,long_int,ld)
  * This function is used to output the expected values for regression tests. If there are any
  * discrepancies, it will create a new file with the actual values and terminate the program.
  *
- * @param[in] glob Pointer to the fclaw2d_global_t object containing the global state.
+ * @param[in] glob Pointer to the fclaw_global_t object containing the global state.
  * @param[in] filename Name of the file containing the expected values for the regression tests.
  */
 static void 
-output_expected_values(fclaw2d_global_t* glob, const char* filename)
+output_expected_values(fclaw_global_t* glob, const char* filename)
 {
     if(glob->mpirank == 0)
     {
@@ -167,16 +167,28 @@ output_expected_values(fclaw2d_global_t* glob, const char* filename)
    Public interface
    ---------------------------------------------------------------- */
 
-void fclaw2d_finalize(fclaw2d_global_t* glob)
+void fclaw_finalize(fclaw_global_t* glob)
 {
-    const fclaw_options_t *gparms = fclaw2d_get_options(glob);
+    const fclaw_options_t *gparms = fclaw_get_options(glob);
 
     fclaw_global_essentialf("Finalizing run\n");
-    fclaw2d_diagnostics_finalize(glob);
-    if (glob->cont != NULL) {
-        fclaw2d_map_destroy(glob->cont);
+    fclaw_diagnostics_finalize(glob);
+    if(glob->domain->refine_dim == 2)
+    {
+        fclaw2d_map_context_t* map = fclaw2d_map_get(glob);
+        if (map != NULL) {
+            fclaw2d_map_destroy(map);
+        }
     }
-    fclaw2d_domain_barrier (glob->domain);
+    else
+    {
+        //fclaw3d_map_context_t* map = fclaw2d_map_get(glob);
+        //if (map != NULL) {
+        //    //TODO
+        //    //fclaw3d_map_destroy(map);
+        //}
+    }
+    fclaw_domain_barrier (glob->domain);
 
     if (gparms->report_timing)
     {
@@ -184,7 +196,7 @@ void fclaw2d_finalize(fclaw2d_global_t* glob)
         {
             /* Only call this if we have taken time steps.  For time-independent problems, we
                probably need a different report (no "amr_advance_steps") */
-            fclaw2d_timer_report(glob);
+            fclaw_timer_report(glob);
         }
         else
         {
@@ -197,5 +209,5 @@ void fclaw2d_finalize(fclaw2d_global_t* glob)
         output_expected_values(glob, gparms->regression_check);
         fclaw_global_essentialf("Regression check passed.\n");
     }
-    fclaw2d_domain_reset(glob);
+    fclaw_domain_reset(glob);
 }
