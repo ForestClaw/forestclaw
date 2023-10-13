@@ -199,6 +199,9 @@ if(BUILD_TESTING)
       fclaw_gauges.h.TEST.cpp
       fclaw_packing.h.TEST.cpp
       fclaw_pointer_map.h.TEST.cpp
+      fclaw_global.h.TEST.cpp
+      fclaw_options.h.TEST.cpp
+      fclaw_patch.h.TEST.cpp
       fclaw2d_elliptic_solver.h.TEST.cpp
       fclaw2d_diagnostics.h.TEST.cpp
       fclaw2d_global.h.TEST.cpp
