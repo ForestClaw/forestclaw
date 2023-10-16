@@ -326,11 +326,11 @@ get_edge_neighbors(fclaw_global_t *glob,
 
 
 
-void cb_edge_fill(fclaw_domain_t *domain,
-                  fclaw_patch_t *this_patch,
-                  int this_blockno,
-                  int this_patchno,
-                  void *user)
+void fclaw_edge_fill_cb(fclaw_domain_t *domain,
+                        fclaw_patch_t *this_patch,
+                        int this_blockno,
+                        int this_patchno,
+                        void *user)
 {
     const int num_faces = fclaw_domain_num_faces(domain);
     const int num_edges = fclaw_domain_num_edges(domain);
