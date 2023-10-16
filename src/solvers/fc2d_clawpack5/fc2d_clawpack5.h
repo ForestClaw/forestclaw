@@ -36,22 +36,22 @@ extern "C"
 #endif
 #endif
 
-struct fclaw2d_global;
-struct fclaw2d_patch;
+struct fclaw_global;
+struct fclaw_patch;
 
 
 /* --------------------------- Clawpack solver functions ------------------------------ */
 
 /* Virtualize clawpack-specific wrapper functions */
-typedef void (*clawpack5_src2_t)(struct fclaw2d_global* glob,
-                                 struct fclaw2d_patch *this_patch,
+typedef void (*clawpack5_src2_t)(struct fclaw_global* glob,
+                                 struct fclaw_patch *this_patch,
                                  int this_block_idx,
                                  int this_patch_idx,
                                  double t,
                                  double dt);
     
-typedef void (*clawpack5_b4step2_t)(struct fclaw2d_global* glob,
-                                    struct fclaw2d_patch *this_patch,
+typedef void (*clawpack5_b4step2_t)(struct fclaw_global* glob,
+                                    struct fclaw_patch *this_patch,
                                     int this_block_idx,
                                     int this_patch_idx,
                                     double t,
@@ -155,12 +155,12 @@ typedef struct fc2d_clawpack5_vtable
  * 
  * fclaw2d_vtables_intialize should be called before this function.
  * 
- * fclaw2d_clawpatch_options, and fc2d_clawpack5_options should be stored in glob.
- * fclaw2d_clawpatch_options will be changed in this call.
+ * fclaw_clawpatch_options, and fc2d_clawpack5_options should be stored in glob.
+ * fclaw_clawpatch_options will be changed in this call.
  * 
  * @param global the global context
  */
-void fc2d_clawpack5_solver_initialize(struct fclaw2d_global* glob);
+void fc2d_clawpack5_solver_initialize(struct fclaw_global* glob);
 
 /**
  * @brief Get the clawpack5 vtable
@@ -168,37 +168,37 @@ void fc2d_clawpack5_solver_initialize(struct fclaw2d_global* glob);
  * @param global the global context
  * @return fc2d_clawpack5_vtable_t* the vtable
  */
-fc2d_clawpack5_vtable_t* fc2d_clawpack5_vt(struct fclaw2d_global* glob);
+fc2d_clawpack5_vtable_t* fc2d_clawpack5_vt(struct fclaw_global* glob);
 
 /* ----------------------------- User access to solver functions --------------------------- */
 
 
-void fc2d_clawpack5_setprob(struct fclaw2d_global* glob);
+void fc2d_clawpack5_setprob(struct fclaw_global* glob);
 
-void fc2d_clawpack5_setaux(struct fclaw2d_global *glob,
-                           struct fclaw2d_patch *this_patch,
+void fc2d_clawpack5_setaux(struct fclaw_global *glob,
+                           struct fclaw_patch *this_patch,
                            int this_block_idx,
                            int this_patch_idx);
 
-void fc2d_clawpack5_set_capacity(struct fclaw2d_global *glob,
-                                 struct fclaw2d_patch *this_patch,
+void fc2d_clawpack5_set_capacity(struct fclaw_global *glob,
+                                 struct fclaw_patch *this_patch,
                                  int this_block_idx,
                                  int this_patch_idx);
 
-void fc2d_clawpack5_qinit(struct fclaw2d_global *glob,
-                          struct fclaw2d_patch *this_patch,
+void fc2d_clawpack5_qinit(struct fclaw_global *glob,
+                          struct fclaw_patch *this_patch,
                           int this_block_idx,
                           int this_patch_idx);
 
-void fc2d_clawpack5_b4step2(struct fclaw2d_global *glob,
-                            struct fclaw2d_patch *this_patch,
+void fc2d_clawpack5_b4step2(struct fclaw_global *glob,
+                            struct fclaw_patch *this_patch,
                             int this_block_idx,
                             int this_patch_idx,
                             double t,
                             double dt);
 
-void fc2d_clawpack5_bc2(struct fclaw2d_global *glob,
-                        struct fclaw2d_patch *this_patch,
+void fc2d_clawpack5_bc2(struct fclaw_global *glob,
+                        struct fclaw_patch *this_patch,
                         int this_block_idx,
                         int this_patch_idx,
                         double t,
@@ -206,8 +206,8 @@ void fc2d_clawpack5_bc2(struct fclaw2d_global *glob,
                         int intersects_bc[],
                         int time_interp);
 
-void fc2d_clawpack5_src2(struct fclaw2d_global *glob,
-                         struct fclaw2d_patch *this_patch,
+void fc2d_clawpack5_src2(struct fclaw_global *glob,
+                         struct fclaw_patch *this_patch,
                          int this_block_idx,
                          int this_patch_idx,
                          double t,
