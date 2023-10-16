@@ -31,39 +31,34 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "swirl/swirl_user.h"
 
-void swirl_create_domain(fclaw2d_global_t *glob)
+void swirl_create_domain(fclaw_global_t *glob)
 {
-    fclaw2d_set_global_context(glob);    
+    fclaw_set_global_context(glob);    
 
-    const fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
+    const fclaw_options_t* fclaw_opt = fclaw_get_options(glob);
 
-    fclaw2d_domain_t *domain = 
-          fclaw2d_domain_new_unitsquare(glob->mpicomm, 
+    fclaw_domain_t *domain = 
+          fclaw_domain_new_unitsquare(glob->mpicomm, 
                                         fclaw_opt->minlevel);
     /* Create "empty" mapping */
     fclaw2d_map_context_t* cont = fclaw2d_map_new_nomap();
 
     /* Store domain in the glob */
-    fclaw2d_global_store_domain(glob, domain);
+    fclaw_global_store_domain(glob, domain);
 
-    fclaw2d_global_store_map (glob, cont);
+    fclaw2d_map_store (glob, cont);
 
-    fclaw2d_clear_global_context(glob);    
+    fclaw_clear_global_context(glob);    
 }
 
-void swirl_initialize(fclaw2d_global_t* glob)
+void swirl_initialize(fclaw_global_t* glob)
 {
-    fclaw2d_set_global_context(glob);
-
-    /* ---------------------------------------------------------------
-       Set domain data.
-       --------------------------------------------------------------- */
-    fclaw2d_domain_data_new(glob->domain);
+    fclaw_set_global_context(glob);
 
     const swirl_options_t *swirl_opt = swirl_get_options(glob);
 
     /* Initialize virtual table for ForestClaw */
-    fclaw2d_vtables_initialize(glob);
+    fclaw_vtables_initialize(glob);
 
     /* Initialize virtual tables for solvers */
     if (swirl_opt->claw_version == 4)
@@ -80,19 +75,19 @@ void swirl_initialize(fclaw2d_global_t* glob)
     /* ---------------------------------------------------------------
        Run
        --------------------------------------------------------------- */
-    fclaw2d_initialize(glob);
+    fclaw_initialize(glob);
 
-    fclaw2d_clear_global_context(glob);
+    fclaw_clear_global_context(glob);
 }
 
 
-void swirl_finalize(fclaw2d_global_t* glob)
+void swirl_finalize(fclaw_global_t* glob)
 {
-    fclaw2d_set_global_context(glob);
+    fclaw_set_global_context(glob);
 
-    fclaw2d_problem_setup(glob);
-    fclaw2d_finalize(glob);
+    fclaw_problem_setup(glob);
+    fclaw_finalize(glob);
 
-    fclaw2d_clear_global_context(glob);
+    fclaw_clear_global_context(glob);
 }
 

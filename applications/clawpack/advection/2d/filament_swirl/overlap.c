@@ -29,10 +29,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_filesystem.h>
 
 // #include <fclaw2d_forestclaw.h>
-#include <fclaw2d_global.h>
-#include <fclaw2d_domain.h>
-#include <fclaw2d_patch.h>    
-#include <fclaw2d_clawpatch.h>
+#include <fclaw_global.h>
+#include <fclaw_domain.h>
+#include <fclaw_patch.h>    
+#include <fclaw_clawpatch.h>
 
 
 void apply_consumer_mapping (overlap_point_t * op)
@@ -49,7 +49,7 @@ void apply_consumer_mapping (overlap_point_t * op)
     op->xy[2] = 0.5;   /* swirl 2D is placed at z=0.5 in producer physical */
 }
 
-void add_cell_centers (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
+void add_cell_centers (fclaw_domain_t * domain, fclaw_patch_t * patch,
                        int blockno, int patchno, void *user)
 {
     overlap_point_t *op;
@@ -63,7 +63,7 @@ void add_cell_centers (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
     FCLAW_ASSERT (c->query_points != NULL);
 
     /* create one query point for every cell in the patch */
-    fclaw2d_clawpatch_grid_data (c->glob, patch, &mx, &my, &mbc,
+    fclaw_clawpatch_2d_grid_data (c->glob, patch, &mx, &my, &mbc,
                                  &xlower, &ylower, &dx, &dy);
     for (i = 0; i < mx; i++)
     {
@@ -103,7 +103,7 @@ void create_query_points (overlap_consumer_t * c)
                                           c->domain->local_num_patches *
                                           c->num_cells_in_patch);
     c->cell_idx = 0;
-    fclaw2d_domain_iterate_patches (c->domain, add_cell_centers, c);
+    fclaw_domain_iterate_patches (c->domain, add_cell_centers, c);
 
     /* verify that we created as many query_points as expected */
     FCLAW_ASSERT (c->cell_idx ==
@@ -160,7 +160,7 @@ int apply_inverse_producer_mapping (overlap_point_t * op, double xy[3],
     return 1;                   /* the point lies in the domain */
 }
 
-int overlap_interpolate (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
+int overlap_interpolate (fclaw_domain_t * domain, fclaw_patch_t * patch,
                          int blockno, int patchno, void *point, void *user)
 {
     overlap_point_t *op;
@@ -194,7 +194,7 @@ int overlap_interpolate (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
     }
 
     /* check, if we are on the consumer or the producer side (boolean) */
-    consumer_side = fclaw2d_domain_is_meta (domain);
+    consumer_side = fclaw_domain_is_meta (domain);
 
     /* set tolerances */
     if (consumer_side)

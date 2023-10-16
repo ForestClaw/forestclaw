@@ -26,13 +26,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef TRANSPORT_USER_H
 #define TRANSPORT_USER_H
 
-#include <fclaw2d_include_all.h>
+#include <fclaw_include_all.h>
 
-#include <fclaw2d_clawpatch_pillow.h>
+#include <fclaw_clawpatch_pillow.h>
 
 /* Headers for both Clawpack 4.6 and  Clawpack 5.0 */
-#include <fclaw2d_clawpatch.h>
-#include <fclaw2d_clawpatch_options.h>
+#include <fclaw_clawpatch.h>
+#include <fclaw_clawpatch_options.h>
 #include <fclaw2d_clawpatch_fort.h>
 
 /* Clawpack 4.6 headers */
@@ -63,18 +63,17 @@ extern "C"
 
 struct fclaw_options;
 struct user_options;
-struct fclaw2d_patch;
-struct fclaw2d_domain;
+struct fclaw_domain;
 
 
-void transport_patch_setup_manifold(fclaw2d_global_t *glob,
-                                    fclaw2d_patch_t *patch,
+void transport_patch_setup_manifold(fclaw_global_t *glob,
+                                    fclaw_patch_t *patch,
                                     int blockno,
                                     int patchno,
                                     int claw_version);
 
-void transport_b4step2_manifold(fclaw2d_global_t *glob,
-                                fclaw2d_patch_t *patch,
+void transport_b4step2_manifold(fclaw_global_t *glob,
+                                fclaw_patch_t *patch,
                                 int blockno,
                                 int patchno,
                                 double t,

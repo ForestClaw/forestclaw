@@ -25,7 +25,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "interface_user.h"
 
-#include <fclaw2d_clawpatch.h>
+#include <fclaw_clawpatch.h>
 #include <fclaw2d_clawpatch46_fort.h>
 #include <fclaw2d_clawpatch5_fort.h>
 
@@ -35,15 +35,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "../rp/acoustics_user_fort.h"
 
 
-void interface_problem_setup(fclaw2d_global_t* glob)
+void interface_problem_setup(fclaw_global_t* glob)
 {
     const user_options_t* user = interface_get_options(glob);
     INTERFACE_SETPROB(&user->rhol,&user->cl,&user->rhor,&user->cr);
 }
 
-void interface_link_solvers(fclaw2d_global_t *glob)
+void interface_link_solvers(fclaw_global_t *glob)
 {
-    fclaw2d_vtable_t *vt = fclaw2d_vt(glob);
+    fclaw_vtable_t *vt = fclaw_vt(glob);
 
     vt->problem_setup = &interface_problem_setup;  /* Version-independent */
 

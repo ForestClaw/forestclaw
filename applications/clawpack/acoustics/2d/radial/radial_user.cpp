@@ -26,7 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "radial_user.h"
 
 static
-void radial_problem_setup(fclaw2d_global_t* glob)
+void radial_problem_setup(fclaw_global_t* glob)
 {
     user_options_t* user = radial_get_options(glob);
 
@@ -39,7 +39,7 @@ void radial_problem_setup(fclaw2d_global_t* glob)
     }
 
     /* We want to make sure node 0 gets here before proceeding */
-    fclaw2d_domain_barrier (glob->domain);  /* redundant?  */
+    fclaw_domain_barrier (glob->domain);  /* redundant?  */
  
     /* rho, bulk are inputs; cc and zz are outputs.  Results are
        stored in a common block */
@@ -47,12 +47,12 @@ void radial_problem_setup(fclaw2d_global_t* glob)
 }
 
 static
-void radial_patch_setup(fclaw2d_global_t *glob,
-                        fclaw2d_patch_t *patch,
+void radial_patch_setup(fclaw_global_t *glob,
+                        fclaw_patch_t *patch,
                         int blockno,
                         int patchno)
 {
-    if (fclaw2d_patch_is_ghost(patch))
+    if (fclaw_patch_is_ghost(patch))
     {
         /* Mapped info is needed only for an update */
         return;
@@ -60,17 +60,17 @@ void radial_patch_setup(fclaw2d_global_t *glob,
 
     int mx,my,mbc;
     double xlower,ylower,dx,dy;
-    fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mbc,
+    fclaw_clawpatch_2d_grid_data(glob,patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
     double *xp,*yp,*zp;
     double *xd,*yd,*zd,*area;
-    fclaw2d_clawpatch_metric_data(glob,patch,&xp,&yp,&zp,
+    fclaw_clawpatch_2d_metric_data(glob,patch,&xp,&yp,&zp,
                                   &xd,&yd,&zd,&area);
 
     double *xnormals,*ynormals,*xtangents,*ytangents;
     double *surfnormals,*edgelengths,*curvature;
-    fclaw2d_clawpatch_metric_data2(glob,patch,
+    fclaw_clawpatch_2d_metric_data2(glob,patch,
                                    &xnormals,&ynormals,
                                    &xtangents,&ytangents,
                                    &surfnormals,&edgelengths,
@@ -78,7 +78,7 @@ void radial_patch_setup(fclaw2d_global_t *glob,
 
     int maux;
     double* aux;
-    fclaw2d_clawpatch_aux_data(glob,patch,&aux,&maux);
+    fclaw_clawpatch_aux_data(glob,patch,&aux,&maux);
 
     const user_options_t* user = radial_get_options(glob);
     
@@ -94,9 +94,9 @@ void radial_patch_setup(fclaw2d_global_t *glob,
 
 }
 
-void radial_link_solvers(fclaw2d_global_t *glob)
+void radial_link_solvers(fclaw_global_t *glob)
 {
-    fclaw2d_vtable_t *vt = fclaw2d_vt(glob);
+    fclaw_vtable_t *vt = fclaw_vt(glob);
 
     vt->problem_setup = &radial_problem_setup;  /* Version-independent */
 
@@ -114,7 +114,7 @@ void radial_link_solvers(fclaw2d_global_t *glob)
         }
         else if (user->example == 1 || user->example == 2)
         {
-            fclaw2d_patch_vtable_t  *patch_vt = fclaw2d_patch_vt(glob);
+            fclaw_patch_vtable_t  *patch_vt = fclaw_patch_vt(glob);
             
             patch_vt->setup = &radial_patch_setup;
 
@@ -135,7 +135,7 @@ void radial_link_solvers(fclaw2d_global_t *glob)
         }
         else if (user->example == 1 || user->example == 2)
         {
-            fclaw2d_patch_vtable_t  *patch_vt = fclaw2d_patch_vt(glob);
+            fclaw_patch_vtable_t  *patch_vt = fclaw_patch_vt(glob);
             
             patch_vt->setup = &radial_patch_setup;
 

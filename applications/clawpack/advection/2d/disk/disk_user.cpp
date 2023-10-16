@@ -26,7 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "disk_user.h"
 
 static
-void disk_problem_setup(fclaw2d_global_t* glob)
+void disk_problem_setup(fclaw_global_t* glob)
 {
     const user_options_t* user = disk_get_options(glob);
     if (glob->mpirank == 0)
@@ -36,13 +36,13 @@ void disk_problem_setup(fclaw2d_global_t* glob)
         fprintf(f,  "%-24.4f   %s",user->alpha,"\% alpha\n");
         fclose(f);
     }
-    fclaw2d_domain_barrier (glob->domain);
+    fclaw_domain_barrier (glob->domain);
     SETPROB();
 }
 
 static
-void disk_patch_setup(fclaw2d_global_t *glob,
-                      fclaw2d_patch_t *patch,
+void disk_patch_setup(fclaw_global_t *glob,
+                      fclaw_patch_t *patch,
                       int blockno,
                       int patchno)
 {
@@ -52,12 +52,12 @@ void disk_patch_setup(fclaw2d_global_t *glob,
 }
 
 
-void disk_link_solvers(fclaw2d_global_t *glob)
+void disk_link_solvers(fclaw_global_t *glob)
 {
-    fclaw2d_vtable_t *fclaw_vt = fclaw2d_vt(glob);
-    fclaw_vt->problem_setup = disk_problem_setup;
+    fclaw_vtable_t *fc_vt = fclaw_vt(glob);
+    fc_vt->problem_setup = disk_problem_setup;
 
-    fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt(glob);    
+    fclaw_patch_vtable_t *patch_vt = fclaw_patch_vt(glob);    
     patch_vt->setup = disk_patch_setup;    
     
     const user_options_t* user = disk_get_options(glob);

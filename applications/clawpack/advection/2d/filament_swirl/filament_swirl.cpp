@@ -36,18 +36,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "overlap.h"
 
-#include <fclaw2d_global.h>
+#include <fclaw_global.h>
 
 static
-void setup_overlap(fclaw2d_global_t *swirl_glob,\
-                   fclaw2d_global_t *filament_glob,
+void setup_overlap(fclaw_global_t *swirl_glob,\
+                   fclaw_global_t *filament_glob,
                    overlap_consumer_t *c)
 {
     /* -------------- setup overlap infomation -------------------*/
     /* compute process-local query points on the consumer side */
 
-    fclaw2d_clawpatch_options_t *swirl_clawpatch_opt = 
-        fclaw2d_clawpatch_get_options(swirl_glob);
+    fclaw_clawpatch_options_t *swirl_clawpatch_opt = 
+        fclaw_clawpatch_get_options(swirl_glob);
 
     //overlap_consumer_t consumer, *c = &consumer;
     c->glob = swirl_glob;
@@ -59,14 +59,14 @@ void setup_overlap(fclaw2d_global_t *swirl_glob,\
 
     /* initialize the filament geometry information that is needed for
      * mapping between the swirl and the filament domain */
-    fclaw_options_t *filament_fclaw_opt = fclaw2d_get_options(filament_glob);
+    fclaw_options_t *filament_fclaw_opt = fclaw_get_options(filament_glob);
     overlap_geometry_t filament_geometry, *geo = &filament_geometry;
 
     geo->fclaw_opt = filament_fclaw_opt;
     geo->blocks = filament_glob->domain->blocks;
 
     /* obtain interpolation data of the points from the producer side */
-    fclaw2d_overlap_exchange (filament_glob->domain, c->query_points,
+    fclaw_overlap_exchange (filament_glob->domain, c->query_points,
                               overlap_interpolate, geo);
 
     /* output the interpolation data for all query points */
@@ -74,11 +74,11 @@ void setup_overlap(fclaw2d_global_t *swirl_glob,\
 }
 
 static
-void run_program(fclaw2d_global_t *swirl_glob,\
-                fclaw2d_global_t *filament_glob)
+void run_program(fclaw_global_t *swirl_glob,\
+                fclaw_global_t *filament_glob)
 {
     /* run */
-    fclaw2d_global_t *globs[2];
+    fclaw_global_t *globs[2];
     globs[0] = filament_glob;
     globs[1] = swirl_glob;
     user_run (globs, 2);
@@ -102,14 +102,14 @@ main (int argc, char **argv)
     /* Filament options */
     filament_options_t          *filament_user_opt;
     fclaw_options_t             *filament_fclaw_opt;
-    fclaw2d_clawpatch_options_t *filament_clawpatch_opt;
+    fclaw_clawpatch_options_t *filament_clawpatch_opt;
     fc2d_clawpack46_options_t   *filament_claw46_opt;
     fc2d_clawpack5_options_t    *filament_claw5_opt;
 
     filament_fclaw_opt = 
                     fclaw_options_register(app, "filament",            "filament_options.ini");
     filament_clawpatch_opt    = 
-        fclaw2d_clawpatch_options_register(app, "filament-clawpatch",  "filament_options.ini");
+        fclaw_clawpatch_2d_options_register(app, "filament-clawpatch",  "filament_options.ini");
     filament_claw46_opt = 
           fc2d_clawpack46_options_register(app, "filament-clawpack46", "filament_options.ini");
     filament_claw5_opt           = 
@@ -120,14 +120,14 @@ main (int argc, char **argv)
     /* Swirl options */
     swirl_options_t             *swirl_user_opt;
     fclaw_options_t             *swirl_fclaw_opt;
-    fclaw2d_clawpatch_options_t *swirl_clawpatch_opt;
+    fclaw_clawpatch_options_t *swirl_clawpatch_opt;
     fc2d_clawpack46_options_t   *swirl_claw46_opt;
     fc2d_clawpack5_options_t    *swirl_claw5_opt;
 
     swirl_fclaw_opt =                   
                     fclaw_options_register(app, "swirl",           "swirl_options.ini");
     swirl_clawpatch_opt =   
-        fclaw2d_clawpatch_options_register(app, "swirl-clawpatch", "swirl_options.ini");
+        fclaw_clawpatch_2d_options_register(app, "swirl-clawpatch", "swirl_options.ini");
     swirl_claw46_opt =        
           fc2d_clawpack46_options_register(app, "swirl-clawpack46","swirl_options.ini");
     swirl_claw5_opt =          
@@ -147,10 +147,10 @@ main (int argc, char **argv)
         sc_MPI_Comm mpicomm = fclaw_app_get_mpi_size_rank (app, &size, &rank);
 
         /* Filament setup */
-        fclaw2d_global_t *filament_glob = fclaw2d_global_new_comm (mpicomm, size, rank);
+        fclaw_global_t *filament_glob = fclaw_global_new_comm (mpicomm, size, rank);
 
-        fclaw2d_options_store            (filament_glob, filament_fclaw_opt);
-        fclaw2d_clawpatch_options_store  (filament_glob, filament_clawpatch_opt);
+        fclaw_options_store            (filament_glob, filament_fclaw_opt);
+        fclaw_clawpatch_options_store  (filament_glob, filament_clawpatch_opt);
         fc2d_clawpack46_options_store    (filament_glob, filament_claw46_opt);
         fc2d_clawpack5_options_store     (filament_glob, filament_claw5_opt);
         filament_options_store           (filament_glob, filament_user_opt);
@@ -158,10 +158,10 @@ main (int argc, char **argv)
         filament_create_domain(filament_glob);
 
         /* Swirl setup */
-        fclaw2d_global_t *swirl_glob = fclaw2d_global_new_comm (mpicomm, size, rank);
+        fclaw_global_t *swirl_glob = fclaw_global_new_comm (mpicomm, size, rank);
             
-        fclaw2d_options_store           (swirl_glob, swirl_fclaw_opt);
-        fclaw2d_clawpatch_options_store (swirl_glob, swirl_clawpatch_opt);
+        fclaw_options_store           (swirl_glob, swirl_fclaw_opt);
+        fclaw_clawpatch_options_store (swirl_glob, swirl_clawpatch_opt);
         fc2d_clawpack46_options_store   (swirl_glob, swirl_claw46_opt);
         fc2d_clawpack5_options_store    (swirl_glob, swirl_claw5_opt);
         swirl_options_store             (swirl_glob, swirl_user_opt);
@@ -183,8 +183,8 @@ main (int argc, char **argv)
         sc_array_destroy (c->query_points);
 
         /* Destroy apps */
-        fclaw2d_global_destroy (filament_glob);
-        fclaw2d_global_destroy (swirl_glob);
+        fclaw_global_destroy (filament_glob);
+        fclaw_global_destroy (swirl_glob);
     }
 
     fclaw_app_destroy (app);

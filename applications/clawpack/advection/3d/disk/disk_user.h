@@ -50,14 +50,14 @@ typedef struct user_options
 user_options_t* disk_options_register (fclaw_app_t * app,
                                        const char *configfile);
 
-void disk_options_store (fclaw2d_global_t* glob, user_options_t* user_opt);
+void disk_options_store (fclaw_global_t* glob, user_options_t* user_opt);
 
-const user_options_t* disk_get_options(fclaw2d_global_t* glob);
+const user_options_t* disk_get_options(fclaw_global_t* glob);
 
-void disk_link_solvers(fclaw2d_global_t *glob);
+void disk_link_solvers(fclaw_global_t *glob);
 
 void disk_global_post_process(fclaw_options_t *fclaw_opt,
-                              fclaw3dx_clawpatch_options_t *clawpatch_opt,
+                              fclaw_clawpatch_options_t *clawpatch_opt,
                               user_options_t *user_opt);
 
 void disk_map_extrude(fclaw2d_map_context_t *cont, 

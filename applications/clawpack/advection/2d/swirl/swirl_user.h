@@ -45,15 +45,15 @@ typedef struct user_options
 
 } user_options_t;
 
-void swirl_link_solvers(fclaw2d_global_t *glob);
+void swirl_link_solvers(fclaw_global_t *glob);
 
 /* ------------------------------------- Options ---------------------------------------*/
 user_options_t* swirl_options_register (fclaw_app_t * app,
                                         const char *configfile);
 
-void swirl_options_store (fclaw2d_global_t* glob, user_options_t* user);
+void swirl_options_store (fclaw_global_t* glob, user_options_t* user);
 
-const user_options_t* swirl_get_options(fclaw2d_global_t* glob);
+const user_options_t* swirl_get_options(fclaw_global_t* glob);
 
 
 /* ------------------------------------- Rays ---------------------------------------*/
@@ -82,8 +82,8 @@ typedef struct swirl_ray
 } swirl_ray_t;
 #endif
 
-int swirl_intersect_ray(fclaw2d_domain_t *domain, 
-                         fclaw2d_patch_t * patch,
+int swirl_intersect_ray(fclaw_domain_t *domain, 
+                         fclaw_patch_t * patch,
                          int blockno, 
                          int patchno, 
                          void *ray, 
@@ -98,7 +98,7 @@ void swirl_define_ray(fclaw2d_global_t *glob,
 void swirl_destroy_ray(fclaw2d_global_t *glob,void* ray);
 #endif
 
-void swirl_initialize_rays(fclaw2d_global_t* glob);
+void swirl_initialize_rays(fclaw_global_t* glob);
 
 
 sc_array_t * swirl_integrals_new(void);

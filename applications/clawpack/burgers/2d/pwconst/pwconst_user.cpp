@@ -25,7 +25,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pwconst_user.h"
 
-#include <fclaw2d_clawpatch.h>
+#include <fclaw_clawpatch.h>
 
 #include <fc2d_clawpack46.h>
 #include <clawpack46_user_fort.h>  /* Headers for user defined fortran files */
@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fc2d_clawpack5.h>
 #include <clawpack5_user_fort.h>
 
-void pwconst_link_solvers(fclaw2d_global_t *glob)
+void pwconst_link_solvers(fclaw_global_t *glob)
 {
     const user_options_t* user = pwconst_get_options(glob);
     

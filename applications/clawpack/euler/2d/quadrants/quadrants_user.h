@@ -26,7 +26,7 @@
 #ifndef QUADRANTS_USER_H
 #define QUADRANTS_USER_H
 
-#include <fclaw2d_include_all.h>
+#include <fclaw_include_all.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -48,11 +48,11 @@ typedef struct user_options
 user_options_t* quadrants_options_register (fclaw_app_t * app,
                                           const char *configfile);
 
-void quadrants_options_store (fclaw2d_global_t* glob, user_options_t* user);
+void quadrants_options_store (fclaw_global_t* glob, user_options_t* user);
 
-user_options_t* quadrants_get_options(fclaw2d_global_t* glob);
+user_options_t* quadrants_get_options(fclaw_global_t* glob);
 
-void quadrants_link_solvers(fclaw2d_global_t *glob);
+void quadrants_link_solvers(fclaw_global_t *glob);
 
 fclaw2d_map_context_t* fclaw2d_map_new_nomap();
 

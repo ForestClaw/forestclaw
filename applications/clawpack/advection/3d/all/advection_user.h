@@ -26,15 +26,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef ADVECTION_USER_3D_H
 #define ADVECTION_USER_3D_H
 
-#include <fclaw2d_include_all.h>
+#include <fclaw_include_all.h>
 
 
-#include <fclaw3dx_clawpatch_pillow.h>
+#include <fclaw_clawpatch_pillow.h>
 
 /* Headers for both Clawpack 4.6 and  Clawpack 5.0 */
-#include <fclaw3dx_clawpatch.h>
-#include <fclaw3dx_clawpatch_options.h>
-#include <fclaw3dx_clawpatch_fort.h>
+#include <fclaw_clawpatch.h>
+#include <fclaw_clawpatch_options.h>
+#include <fclaw3d_clawpatch_fort.h>
 
 
 /* Clawpack 4.6 headers */  
@@ -42,7 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fc3d_clawpack46_options.h>
 #include <fc3d_clawpack46_fort.h>  
 #include <fc3d_clawpack46_user_fort.h>  
-#include <fclaw3dx_clawpatch46_fort.h>
+#include <fclaw3d_clawpatch46_fort.h>
 
 #if 0
 /* Clawpack 5.0 headers */
@@ -66,8 +66,8 @@ extern "C"
 /* Fix syntax */
 #endif
 
-void claw3_advection_patch_setup_manifold(fclaw2d_global_t *glob,
-                                          fclaw2d_patch_t *patch,
+void claw3_advection_patch_setup_manifold(fclaw_global_t *glob,
+                                          fclaw_patch_t *patch,
                                           int block,
                                           int patchno,
                                           int claw_version);

@@ -28,9 +28,9 @@
 #include <fclaw2d_defs.h>
 
 static
-void create_domain(fclaw2d_global_t *glob)
+void create_domain(fclaw_global_t *glob)
 {
-    const fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
+    const fclaw_options_t* fclaw_opt = fclaw_get_options(glob);
 
     /* Mapped, multi-block domain */
     int mi = fclaw_opt->mi;
@@ -38,14 +38,14 @@ void create_domain(fclaw2d_global_t *glob)
     int a = fclaw_opt->periodic_x;
     int b = fclaw_opt->periodic_y;
 
-    fclaw3dx_clawpatch_options_t *clawpatch_opt = 
-                 fclaw3dx_clawpatch_get_options(glob);
+    fclaw_clawpatch_options_t *clawpatch_opt = 
+                 fclaw_clawpatch_get_options(glob);
     int mx = clawpatch_opt->mx;
     int minlevel = fclaw_opt->minlevel;
     int check = mi*mx*pow_int(2,minlevel);
 
     fclaw2d_map_context_t *cont, *brick;
-    fclaw2d_domain_t *domain = NULL;
+    fclaw_domain_t *domain = NULL;
 
     fc3d_clawpack46_options_t *claw3_opt = fc3d_clawpack46_get_options(glob);
     const user_options_t *user = swirl_get_options(glob);
@@ -56,7 +56,7 @@ void create_domain(fclaw2d_global_t *glob)
         FCLAW_ASSERT(fclaw_opt->manifold == 0);
 
         /* Mapped, multi-block domain */
-        domain = fclaw2d_domain_new_unitsquare(glob->mpicomm, 
+        domain = fclaw_domain_new_unitsquare(glob->mpicomm, 
                                       fclaw_opt->minlevel);
 
         /* Size is set by [ax,bx] x [ay, by], set in .ini file */
@@ -71,7 +71,7 @@ void create_domain(fclaw2d_global_t *glob)
 
         /* Cartesian square domain */
         domain =
-            fclaw2d_domain_new_brick (glob->mpicomm, mi, mj, a, b,
+            fclaw_domain_new_2d_brick (glob->mpicomm, mi, mj, a, b,
                                      fclaw_opt->minlevel);
 
         brick = fclaw2d_map_new_brick(domain,mi,mj,a,b);
@@ -95,7 +95,7 @@ void create_domain(fclaw2d_global_t *glob)
         }
         /* Five patch square domain */
         domain =
-            fclaw2d_domain_new_disk(glob->mpicomm, 0,0,
+            fclaw_domain_new_2d_disk(glob->mpicomm, 0,0,
                                     fclaw_opt->minlevel);
 
         cont = fclaw2d_map_new_fivepatch(fclaw_opt->scale,
@@ -112,7 +112,7 @@ void create_domain(fclaw2d_global_t *glob)
         FCLAW_ASSERT(mi == 2 && mj == 2);
 
         domain =
-            fclaw2d_domain_new_brick(glob->mpicomm, mi, mj, a, b,
+            fclaw_domain_new_2d_brick(glob->mpicomm, mi, mj, a, b,
                                      fclaw_opt->minlevel);
 
         brick = fclaw2d_map_new_brick (domain, mi, mj, a, b);
@@ -132,28 +132,23 @@ void create_domain(fclaw2d_global_t *glob)
         swirl_map_extrude(cont,user->maxelev);        
 
     /* Store mapping in the glob */
-    fclaw2d_global_store_map (glob, cont);            
+    fclaw2d_map_store (glob, cont);            
 
     /* Store the domain in the glob */
-    fclaw2d_global_store_domain(glob, domain);
+    fclaw_global_store_domain(glob, domain);
 
     /* print out some info */
-    fclaw2d_domain_list_levels(domain, FCLAW_VERBOSITY_ESSENTIAL);
-    fclaw2d_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);  
+    fclaw_domain_list_levels(domain, FCLAW_VERBOSITY_ESSENTIAL);
+    fclaw_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);  
 }
 
 static
-void run_program(fclaw2d_global_t* glob)
+void run_program(fclaw_global_t* glob)
 {
-    /* ---------------------------------------------------------------
-       Set domain data.
-       --------------------------------------------------------------- */
-    fclaw2d_domain_data_new(glob->domain);
-
     const user_options_t *user_opt = swirl_get_options(glob);
 
     /* Initialize virtual table for ForestClaw */
-    fclaw2d_vtables_initialize(glob);
+    fclaw_vtables_initialize(glob);
 
     if (user_opt->claw_version == 4)
     {
@@ -170,9 +165,9 @@ void run_program(fclaw2d_global_t* glob)
     /* ---------------------------------------------------------------
        Run
        --------------------------------------------------------------- */
-    fclaw2d_initialize(glob);
-    fclaw2d_run(glob);
-    fclaw2d_finalize(glob);
+    fclaw_initialize(glob);
+    fclaw_run(glob);
+    fclaw_finalize(glob);
 }
 
 int
@@ -184,12 +179,12 @@ main (int argc, char **argv)
     /* Options */
     user_options_t               *user_opt;
     fclaw_options_t              *fclaw_opt;
-    fclaw3dx_clawpatch_options_t *clawpatch_opt;
+    fclaw_clawpatch_options_t *clawpatch_opt;
     fc3d_clawpack46_options_t    *claw46_opt;
 
     /* Create new options packages */
     fclaw_opt =                   fclaw_options_register(app,  NULL,       "fclaw_options.ini");
-    clawpatch_opt =  fclaw3dx_clawpatch_options_register(app, "clawpatch", "fclaw_options.ini");
+    clawpatch_opt =  fclaw_clawpatch_3d_options_register(app, "clawpatch", "fclaw_options.ini");
     claw46_opt =        fc3d_clawpack46_options_register(app, "claw3",     "fclaw_options.ini");
     user_opt =                    swirl_options_register(app,              "fclaw_options.ini");  
 
@@ -204,11 +199,11 @@ main (int argc, char **argv)
         /* Options have been checked and are valid */
         int size, rank;
         sc_MPI_Comm mpicomm = fclaw_app_get_mpi_size_rank (app, &size, &rank);
-        fclaw2d_global_t *glob = fclaw2d_global_new_comm (mpicomm, size, rank);
+        fclaw_global_t *glob = fclaw_global_new_comm (mpicomm, size, rank);
 
         /* Store option packages in glob */
-        fclaw2d_options_store           (glob, fclaw_opt);
-        fclaw3dx_clawpatch_options_store(glob, clawpatch_opt);
+        fclaw_options_store           (glob, fclaw_opt);
+        fclaw_clawpatch_options_store(glob, clawpatch_opt);
         fc3d_clawpack46_options_store   (glob, claw46_opt);
         swirl_options_store             (glob, user_opt);
 
@@ -217,7 +212,7 @@ main (int argc, char **argv)
 
         run_program(glob);
 
-        fclaw2d_global_destroy(glob);        
+        fclaw_global_destroy(glob);        
     }
     
     fclaw_app_destroy (app);
