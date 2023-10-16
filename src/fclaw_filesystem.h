@@ -29,8 +29,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * @brief functions for filesystem operations
  * 
  */
-#ifndef FCLAW_FILESYSTEM
-#define FCLAW_FILESYSTEM
+#ifndef FCLAW_FILESYSTEM_H
+#define FCLAW_FILESYSTEM_H
 
 #ifdef __cplusplus
 extern "C"
@@ -53,6 +53,13 @@ char* fclaw_cwd();
  * @param dir the directory to change to. Can be absolute or relative.
  */
 void fclaw_cd(const char* dir);
+
+/**
+ * @brief create a directory, including parents
+ * 
+ * @param dir the directory to create. Can be absolute or relative.
+ */
+void fclaw_mkdir(const char* dir);
 
 #ifdef __cplusplus
 #if 0
