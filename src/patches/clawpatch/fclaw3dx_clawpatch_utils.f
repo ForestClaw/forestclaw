@@ -31,21 +31,21 @@ c     # calls to T.
 
       i1 = 0
       j1 = 0
-      call fclaw3dx_clawpatch_transform_face_half(i1,j1,mi,mj,
+      call fclaw2d_clawpatch_transform_face_half(i1,j1,mi,mj,
      &      transform_ptr)
       f(1) = mi(1)
       f(2) = mj(1)
 
       i1 = 1
       j1 = 0
-      call fclaw3dx_clawpatch_transform_face_half(i1,j1,mi,mj,
+      call fclaw2d_clawpatch_transform_face_half(i1,j1,mi,mj,
      &      transform_ptr)
       a(1,1) = mi(1) - f(1)
       a(2,1) = mj(1) - f(2)
 
       i1 = 0
       j1 = 1
-      call fclaw3dx_clawpatch_transform_face_half(i1,j1,mi,mj,
+      call fclaw2d_clawpatch_transform_face_half(i1,j1,mi,mj,
      &      transform_ptr)
       a(1,2) = mi(1) - f(1)
       a(2,2) = mj(1) - f(2)
@@ -64,21 +64,21 @@ c     # calls to T.
 
       i1 = 0
       j1 = 0
-      call fclaw3dx_clawpatch_transform_face(i1,j1,mi,mj,
+      call fclaw2d_clawpatch_transform_face(i1,j1,mi,mj,
      &      transform_ptr)
       f(1) = mi(1)
       f(2) = mj(1)
 
       i1 = 1
       j1 = 0
-      call fclaw3dx_clawpatch_transform_face(i1,j1,mi,mj,
+      call fclaw2d_clawpatch_transform_face(i1,j1,mi,mj,
      &      transform_ptr)
       a(1,1) = mi(1) - f(1)
       a(2,1) = mj(1) - f(2)
 
       i1 = 0
       j1 = 1
-      call fclaw3dx_clawpatch_transform_face(i1,j1,mi,mj,
+      call fclaw2d_clawpatch_transform_face(i1,j1,mi,mj,
      &      transform_ptr)
       a(1,2) = mi(1) - f(1)
       a(2,2) = mj(1) - f(2)

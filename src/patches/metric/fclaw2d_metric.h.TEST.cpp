@@ -23,49 +23,49 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <fclaw2d_global.h>
+#include <fclaw_global.h>
 #include <fclaw2d_metric.h>
 #include <test.hpp>
 
 TEST_CASE("fclaw2d_metric_vtable_initialize stores two seperate vtables in two seperate globs")
 {
-	fclaw2d_global_t* glob1 = fclaw2d_global_new();
-	fclaw2d_global_t* glob2 = fclaw2d_global_new();
+	fclaw_global_t* glob1 = fclaw_global_new();
+	fclaw_global_t* glob2 = fclaw_global_new();
 
 	fclaw2d_metric_vtable_initialize(glob1);
 	fclaw2d_metric_vtable_initialize(glob2);
 
 	CHECK_NE(fclaw2d_metric_vt(glob1), fclaw2d_metric_vt(glob2));
 
-	fclaw2d_global_destroy(glob1);
-	fclaw2d_global_destroy(glob2);
+	fclaw_global_destroy(glob1);
+	fclaw_global_destroy(glob2);
 }
 
 TEST_CASE("fclaw2d_metric_vtable_initialize sets is_set flag")
 {
-	fclaw2d_global_t* glob = fclaw2d_global_new();
+	fclaw_global_t* glob = fclaw_global_new();
 
 	fclaw2d_metric_vtable_initialize(glob);
 
 	CHECK_UNARY(fclaw2d_metric_vt(glob)->is_set);
 
-	fclaw2d_global_destroy(glob);
+	fclaw_global_destroy(glob);
 }
 
 #ifdef FCLAW_ENABLE_DEBUG
 
 TEST_CASE("fclaw2d_metric_vtable_initialize fails if called twice on a glob")
 {
-	fclaw2d_global_t* glob1 = fclaw2d_global_new();
-	fclaw2d_global_t* glob2 = fclaw2d_global_new();
+	fclaw_global_t* glob1 = fclaw_global_new();
+	fclaw_global_t* glob2 = fclaw_global_new();
 
 	fclaw2d_metric_vtable_initialize(glob1);
 	CHECK_SC_ABORTED(fclaw2d_metric_vtable_initialize(glob1));
 	fclaw2d_metric_vtable_initialize(glob2);
 	CHECK_SC_ABORTED(fclaw2d_metric_vtable_initialize(glob2));
 
-	fclaw2d_global_destroy(glob1);
-	fclaw2d_global_destroy(glob2);
+	fclaw_global_destroy(glob1);
+	fclaw_global_destroy(glob2);
 }
 
 #endif

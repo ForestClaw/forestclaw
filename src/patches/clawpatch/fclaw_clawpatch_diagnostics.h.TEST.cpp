@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -23,56 +23,19 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FCLAW3DX_CLAWPATCH_OUTPUT_ASCII_H
-#define FCLAW3DX_CLAWPATCH_OUTPUT_ASCII_H
+#include <fclaw_diagnostics.h>
+#include <fclaw_global.h>
+#include <fclaw_forestclaw.h>
+#include <fclaw_clawpatch_diagnostics.h>
+#include <test.hpp>
 
-#ifdef __cplusplus
-extern "C"
+#ifdef FCLAW_ENABLE_DEBUG
+
+TEST_CASE("2d fclaw_clawpatch_diagnostics_vtable_initialize fails if fclaw2d_diagnostics_vtable_initialize is not called first")
 {
-#endif
-
-struct fclaw2d_global;
-struct fclaw2d_patch;
-struct fclaw2d_domain;
-
-/** 
- * @file
- * Routines for ascii output 
- */
-
-/**
- * @brief Callback called on each patch
- * 
- * @param domain the domain context
- * @param patch the patch context
- * @param blockno the block number
- * @param patchno the patch number
- * @param user the user data pointer
- */
-void fclaw3dx_clawpatch_output_ascii_cb (struct fclaw2d_domain * domain,
-                                         struct fclaw2d_patch * patch,
-                                         int blockno, int patchno,
-                                         void *user);
-
-/**
- * @brief output ascii data
- * 
- * @param glob the global context
- * @param iframe the frame index
- */
-void fclaw3dx_clawpatch_output_ascii(struct fclaw2d_global* glob,int iframe);
-
-/**
- * @brief output ascii time header
- * 
- * @param glob the global context
- * @param iframe the frame index
- */
-void fclaw3dx_clawpatch_time_header_ascii(struct fclaw2d_global* glob, int iframe);
-
-
-#ifdef __cplusplus
+	fclaw_global_t* glob = fclaw_global_new();
+	CHECK_SC_ABORTED(fclaw_clawpatch_diagnostics_vtable_initialize(glob));
+	fclaw_global_destroy(glob);
 }
-#endif
 
 #endif

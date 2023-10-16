@@ -25,16 +25,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <test.hpp>
 
-#include <fclaw2d_forestclaw.h>
-#include <fclaw2d_global.h>
+#include <fclaw_forestclaw.h>
+#include <fclaw_convenience.h>
+#include <fclaw_global.h>
 
-#include <fclaw2d_clawpatch.h>
-#include <fclaw2d_clawpatch_options.h>
+#include <fclaw_clawpatch.h>
+#include <fclaw_clawpatch_options.h>
 #include <fclaw2d_clawpatch_fort.h>
-
-#include <fclaw3dx_clawpatch.h>
-#include <fclaw3dx_clawpatch_options.h>
-#include <fclaw3dx_clawpatch_fort.h>
+#include <fclaw3d_clawpatch_fort.h>
 
 namespace{
     struct exceeds_test_parameters
@@ -65,12 +63,18 @@ TEST_CASE("FCLAW2D_CLAWPATCH_EXCEEDS_THRESHOLD calls user function")
     global_exceeds_test_parameters = exceeds_test_parameters();
     exceeds_test_parameters& params = global_exceeds_test_parameters;
 
-	fclaw2d_global_t* glob = fclaw2d_global_new();
+    fclaw_domain_t* domain = fclaw_domain_new_unitsquare(sc_MPI_COMM_WORLD, 1);
+	fclaw_global_t* glob = fclaw_global_new();
+    fclaw_global_store_domain(glob, domain);
 
-    fclaw2d_vtables_initialize(glob);
-    fclaw2d_clawpatch_vtable_initialize(glob, 4);
+    fclaw_clawpatch_options_t* clawpatch_opts = fclaw_clawpatch_options_new(2);
+    clawpatch_opts->refinement_criteria = FCLAW_REFINE_CRITERIA_USER;
+    fclaw_clawpatch_options_store(glob, clawpatch_opts);
 
-    fclaw2d_clawpatch_vt(glob)->fort_user_exceeds_threshold = 
+    fclaw_vtables_initialize(glob);
+    fclaw_clawpatch_vtable_initialize(glob, 4);
+
+    fclaw_clawpatch_vt(glob)->d2->fort_user_exceeds_threshold = 
         [](const int *blockno,
            const int* meqn,
            const double *qval, 
@@ -104,11 +108,8 @@ TEST_CASE("FCLAW2D_CLAWPATCH_EXCEEDS_THRESHOLD calls user function")
             return params.return_value;
         };
 
-	fclaw2d_clawpatch_options_t opts;
-    opts.refinement_criteria = FCLAW_REFINE_CRITERIA_USER;
-    fclaw2d_clawpatch_options_store(glob, &opts);
 
-    fclaw2d_global_set_global(glob);
+    fclaw_global_set_static(glob);
     int ret = FCLAW2D_CLAWPATCH_TAG_CRITERIA(params.blockno,
                                                   params.qval,
                                                   params.qmin,
@@ -121,23 +122,32 @@ TEST_CASE("FCLAW2D_CLAWPATCH_EXCEEDS_THRESHOLD calls user function")
                                                   params.tag_threshold,
                                                   params.init_flag,
                                                   params.is_ghost);
-    fclaw2d_global_unset_global();
+    fclaw_global_clear_static();
 
     CHECK_EQ(ret, params.return_value);
 
-    fclaw2d_global_destroy(glob);
+    fclaw_clawpatch_options_destroy(clawpatch_opts);
+    fclaw_domain_destroy(domain);
+    fclaw_global_destroy(glob);
 }
 TEST_CASE("FCLAW3DX_CLAWPATCH_EXCEEDS_THRESHOLD calls user function")
 {
     global_exceeds_test_parameters = exceeds_test_parameters();
     exceeds_test_parameters& params = global_exceeds_test_parameters;
 
-	fclaw2d_global_t* glob = fclaw2d_global_new();
+    fclaw_domain_t* domain = fclaw_domain_new_unitsquare(sc_MPI_COMM_WORLD, 1);
+	fclaw_global_t* glob = fclaw_global_new();
+    fclaw_global_store_domain(glob, domain);
 
-    fclaw2d_vtables_initialize(glob);
-    fclaw3dx_clawpatch_vtable_initialize(glob, 4);
+	fclaw_clawpatch_options_t* opts = fclaw_clawpatch_options_new(3);
+    opts->refinement_criteria = FCLAW_REFINE_CRITERIA_USER;
+    fclaw_clawpatch_options_store(glob, opts);
 
-    fclaw3dx_clawpatch_vt(glob)->fort_user_exceeds_threshold = 
+
+    fclaw_vtables_initialize(glob);
+    fclaw_clawpatch_vtable_initialize(glob, 4);
+
+    fclaw_clawpatch_vt(glob)->d3->fort_user_exceeds_threshold = 
         [](const int *blockno,
            const int* meqn,
            const double *qval, 
@@ -175,28 +185,26 @@ TEST_CASE("FCLAW3DX_CLAWPATCH_EXCEEDS_THRESHOLD calls user function")
             return params.return_value;
         };
 
-	fclaw3dx_clawpatch_options_t opts;
-    opts.refinement_criteria = FCLAW_REFINE_CRITERIA_USER;
-    fclaw3dx_clawpatch_options_store(glob, &opts);
-
-    fclaw2d_global_set_global(glob);
-    int ret = FCLAW3DX_CLAWPATCH_TAG_CRITERIA(params.blockno,
-                                                   params.qval,
-                                                   params.qmin,
-                                                   params.qmax,
-                                                   params.quad,
-                                                   params.dx,
-                                                   params.dy,
-                                                   params.dz,
-                                                   params.xc,
-                                                   params.yc,
-                                                   params.zc,
-                                                   params.tag_threshold,
-                                                   params.init_flag,
-                                                   params.is_ghost);
-    fclaw2d_global_unset_global();
+    fclaw_global_set_static(glob);
+    int ret = FCLAW3D_CLAWPATCH_TAG_CRITERIA(params.blockno,
+                                             params.qval,
+                                             params.qmin,
+                                             params.qmax,
+                                             params.quad,
+                                             params.dx,
+                                             params.dy,
+                                             params.dz,
+                                             params.xc,
+                                             params.yc,
+                                             params.zc,
+                                             params.tag_threshold,
+                                             params.init_flag,
+                                             params.is_ghost);
+    fclaw_global_clear_static();
 
     CHECK_EQ(ret, params.return_value);
 
-    fclaw2d_global_destroy(glob);
+    fclaw_clawpatch_options_destroy(opts);
+    fclaw_domain_destroy(domain);
+    fclaw_global_destroy(glob);
 }

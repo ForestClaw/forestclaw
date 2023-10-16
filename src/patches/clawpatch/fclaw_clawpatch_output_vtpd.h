@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2021 Carsten Burstedde, Donna Calhoun, Scott Aiton
+Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -23,7 +23,40 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#define REFINE_DIM 2
-#define PATCH_DIM 3
+#ifndef FCLAW_CLAWPATCH_OUTPUT_VTPD_H
+#define FCLAW_CLAWPATCH_OUTPUT_VTPD_H
 
-#include <fclaw2d_clawpatch_diagnostics_default.c>
+#ifdef __cplusplus
+extern "C"
+{
+#if 0
+}                               /* need this because indent is dumb */
+#endif
+#endif
+
+struct fclaw_global;
+
+/**
+ * @brief Write a file in VTK format for the whole domain in parallel.
+ * 
+ * @param glob the global context
+ * @param basename the base filename 
+ */
+void fclaw_clawpatch_output_vtpd_to_file (struct fclaw_global * glob, const char* basename);
+
+/**
+ * @brief Write a file in VTK format for the whole domain in parallel.
+ * 
+ * @param glob the global context
+ * @param iframe the frame number
+ */
+void fclaw_clawpatch_output_vtpd (struct fclaw_global * glob, int iframe);
+
+#ifdef __cplusplus
+#if 0
+{                               /* need this because indent is dumb */
+#endif
+}
+#endif
+
+#endif
