@@ -89,6 +89,8 @@ fclaw_1to2 = {
     "fclaw2d_domain_serialization_enter"      : "fclaw_domain_serialization_enter",
     "fclaw2d_domain_serialization_leave"      : "fclaw_domain_serialization_leave",
 
+    "fclaw2d_domain_is_meta"                  : "fclaw_domain_is_meta",
+
     #===== ./src/forestclaw2d_convenience.h =====
     "<fclaw2d_convenience.h>"       : "<fclaw_convenience.h>",
     "fclaw2d_domain_new_unitsquare" : "fclaw_domain_new_unitsquare",
