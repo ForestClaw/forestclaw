@@ -1007,17 +1007,17 @@ fclaw_domain_indirect_neighbors (fclaw_domain_t * domain,
 {
     if(domain->refine_dim == 2)
     {
-        return (fclaw_patch_relation_t) fclaw2d_domain_indirect_neighbors(domain->d2,
-                                                                          (fclaw2d_domain_indirect_t*)indirect,
-                                                                          ghostno,faceno,rproc,rblockno,
-                                                                          rpatchno,rfaceno);
+        return (fclaw_patch_relation_t) fclaw2d_domain_indirect_face_neighbors(domain->d2,
+                                                                               (fclaw2d_domain_indirect_t*)indirect,
+                                                                               ghostno,faceno,rproc,rblockno,
+                                                                               rpatchno,rfaceno);
     }
     else if (domain->refine_dim == 3)
     {
-        return (fclaw_patch_relation_t) fclaw3d_domain_indirect_neighbors(domain->d3,
-                                                                          (fclaw3d_domain_indirect_t*)indirect,
-                                                                          ghostno,faceno,rproc,rblockno,
-                                                                          rpatchno,rfaceno);
+        return (fclaw_patch_relation_t) fclaw3d_domain_indirect_face_neighbors(domain->d3,
+                                                                               (fclaw3d_domain_indirect_t*)indirect,
+                                                                               ghostno,faceno,rproc,rblockno,
+                                                                               rpatchno,rfaceno);
     }
     else
     {
