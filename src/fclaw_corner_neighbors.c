@@ -423,7 +423,7 @@ void get_corner_neighbor(fclaw_global_t *glob,
                 igrid = 0;
             }
 
-            tdata->icorner = icorner;    /* This wasn't being set! */
+            tdata_fine->icorner = icorner;    /* This wasn't being set! */
             tdata->neighbor_patchno = rpatchno[igrid];
             rproc_corner = rproc[igrid];
         }
