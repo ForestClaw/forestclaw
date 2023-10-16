@@ -24,35 +24,35 @@
 */
 
 #include "fc2d_thunderegg_vector.hpp"
-#include <fclaw2d_clawpatch.h>
-#include <fclaw2d_clawpatch_options.h>
-#include <fclaw2d_domain.h>
-#include <fclaw2d_global.h>
-#include <fclaw2d_patch.h>
+#include <fclaw_clawpatch.h>
+#include <fclaw_clawpatch_options.h>
+#include <fclaw_domain.h>
+#include <fclaw_global.h>
+#include <fclaw_patch.h>
 
 #include "fc2d_thunderegg.h"
 #include "fc2d_thunderegg_options.h"
 
 using namespace ThunderEgg;
 
-static void get_data(struct fclaw2d_global* glob, fclaw2d_patch_t* patch, fc2d_thunderegg_data_choice_t data_choice, double** q, int* meqn)
+static void get_data(struct fclaw_global* glob, fclaw_patch_t* patch, fc2d_thunderegg_data_choice_t data_choice, double** q, int* meqn)
 {
     switch(data_choice){
         case RHS:
-          fclaw2d_clawpatch_rhs_data(glob, patch, q, meqn);
+          fclaw_clawpatch_rhs_data(glob, patch, q, meqn);
         break;
         case SOLN:
-          fclaw2d_clawpatch_soln_data(glob, patch, q, meqn);
+          fclaw_clawpatch_soln_data(glob, patch, q, meqn);
         break;
         case STORE_STATE:
-          fclaw2d_clawpatch_soln_data(glob, patch, q, meqn);
+          fclaw_clawpatch_soln_data(glob, patch, q, meqn);
         break;
     }
 }
-ThunderEgg::Vector<2> fc2d_thunderegg_get_vector(struct fclaw2d_global *glob, fc2d_thunderegg_data_choice_t data_choice)
+ThunderEgg::Vector<2> fc2d_thunderegg_get_vector(struct fclaw_global *glob, fc2d_thunderegg_data_choice_t data_choice)
 {
-    fclaw2d_clawpatch_options_t *clawpatch_opt =
-        fclaw2d_clawpatch_get_options(glob);
+    fclaw_clawpatch_options_t *clawpatch_opt =
+        fclaw_clawpatch_get_options(glob);
 
     std::array<int,3> ns;
     ns[0] = clawpatch_opt->mx;
@@ -75,7 +75,7 @@ ThunderEgg::Vector<2> fc2d_thunderegg_get_vector(struct fclaw2d_global *glob, fc
     strides[2] = strides[1]*(ns[1] + 2 * mbc);
     std::vector<double*> starts(glob->domain->local_num_patches);
     for(int blockno = 0; blockno < glob->domain->num_blocks; blockno++){
-        fclaw2d_block_t* block = &glob->domain->blocks[blockno];
+        fclaw_block_t* block = &glob->domain->blocks[blockno];
         for(int patchno = 0; patchno < block->num_patches; patchno++){
             int meqn;
             get_data(glob, &block->patches[patchno], data_choice, &starts[block->num_patches_before+patchno], &meqn);
@@ -84,16 +84,16 @@ ThunderEgg::Vector<2> fc2d_thunderegg_get_vector(struct fclaw2d_global *glob, fc
     Communicator comm(glob->mpicomm);
     return ThunderEgg::Vector<2>(comm,starts,strides,ns,mbc);
 }
-void fc2d_thunderegg_store_vector(struct fclaw2d_global *glob, fc2d_thunderegg_data_choice_t data_choice, const ThunderEgg::Vector<2>& vec)
+void fc2d_thunderegg_store_vector(struct fclaw_global *glob, fc2d_thunderegg_data_choice_t data_choice, const ThunderEgg::Vector<2>& vec)
 {
-    fclaw2d_clawpatch_options_t *clawpatch_opt =
-        fclaw2d_clawpatch_get_options(glob);
+    fclaw_clawpatch_options_t *clawpatch_opt =
+        fclaw_clawpatch_get_options(glob);
 
     int mx = clawpatch_opt->mx;
     int my = clawpatch_opt->my;
     int mbc = clawpatch_opt->mbc;
     for(int blockno = 0; blockno < glob->domain->num_blocks; blockno++){
-        fclaw2d_block_t* block = &glob->domain->blocks[blockno];
+        fclaw_block_t* block = &glob->domain->blocks[blockno];
         for(int patchno = 0; patchno < block->num_patches; patchno++){
             PatchView<const double, 2> view = vec.getPatchView(block->num_patches_before+patchno);
             int meqn;

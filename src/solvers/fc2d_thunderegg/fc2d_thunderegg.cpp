@@ -30,18 +30,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw_pointer_map.h>
 
-#include <fclaw2d_elliptic_solver.h>
+#include <fclaw_elliptic_solver.h>
 
-#include <fclaw2d_clawpatch.h>
-#include <fclaw2d_clawpatch_output_ascii.h> 
-#include <fclaw2d_clawpatch_output_vtk.h>
+#include <fclaw_clawpatch.h>
+#include <fclaw_clawpatch_options.h>
+#include <fclaw_clawpatch_output_ascii.h> 
+#include <fclaw_clawpatch_output_vtk.h>
 
-#include <fclaw2d_patch.h>
-#include <fclaw2d_global.h>
-#include <fclaw2d_vtable.h>
-#include <fclaw2d_output.h>
+#include <fclaw_patch.h>
+#include <fclaw_global.h>
+#include <fclaw_vtable.h>
+#include <fclaw_output.h>
 
-#include <fclaw2d_domain.h>
+#include <fclaw_domain.h>
 
 #include "operators/fc2d_thunderegg_fivepoint.h"
 #include "operators/fc2d_thunderegg_heat.h"
@@ -53,15 +54,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /* --------------------- ThunderEgg solver (required) ------------------------- */
 
 static
-void thunderegg_setup_solver(fclaw2d_global_t *glob)
+void thunderegg_setup_solver(fclaw_global_t *glob)
 {
 	//fc2d_thunderegg_vtable_t*  mg_vt = fc2d_thunderegg_vt(glob);
 }
 
 
 static
-void thunderegg_rhs(fclaw2d_global_t *glob,
-                   fclaw2d_patch_t *patch,
+void thunderegg_rhs(fclaw_global_t *glob,
+                   fclaw_patch_t *patch,
                    int blockno,
                    int patchno)
 {
@@ -71,12 +72,12 @@ void thunderegg_rhs(fclaw2d_global_t *glob,
 
     int mx,my,mbc;
     double dx,dy,xlower,ylower;
-	fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mbc,
+	fclaw_clawpatch_2d_grid_data(glob,patch,&mx,&my,&mbc,
 								&xlower,&ylower,&dx,&dy);
 
     int mfields;
     double *rhs;
-	fclaw2d_clawpatch_rhs_data(glob,patch,&rhs,&mfields);
+	fclaw_clawpatch_rhs_data(glob,patch,&rhs,&mfields);
 	FCLAW_ASSERT(mfields == 1);
 
 	/* Compute right hand side */
@@ -85,7 +86,7 @@ void thunderegg_rhs(fclaw2d_global_t *glob,
 }
 
 static
-void thunderegg_solve(fclaw2d_global_t* glob)
+void thunderegg_solve(fclaw_global_t* glob)
 {
     // Apply non-homogeneous boundary conditions 
     fc2d_thunderegg_physical_bc(glob);
@@ -129,19 +130,19 @@ void thunderegg_solve(fclaw2d_global_t* glob)
 /* ---------------------------------- Output functions -------------------------------- */
 
 static
-void thunderegg_output(fclaw2d_global_t *glob, int iframe)
+void thunderegg_output(fclaw_global_t *glob, int iframe)
 {
 	const fc2d_thunderegg_options_t* mg_options;
 	mg_options = fc2d_thunderegg_get_options(glob);
 
 	if (mg_options->ascii_out != 0)
 	{
-		fclaw2d_clawpatch_output_ascii(glob,iframe);
+		fclaw_clawpatch_output_ascii(glob,iframe);
 	}
 
 	if (mg_options->vtk_out != 0)
 	{
-		fclaw2d_clawpatch_output_vtk(glob,iframe);
+		fclaw_clawpatch_output_vtk(glob,iframe);
 	}
 }
 
@@ -161,24 +162,35 @@ void thunderegg_vt_destroy(void* vt)
     FCLAW_FREE (vt);
 }
 
-void fc2d_thunderegg_solver_initialize(fclaw2d_global_t* glob)
+void fc2d_thunderegg_solver_initialize(fclaw_global_t* glob)
 {
+	if(glob->domain->refine_dim != 2)
+    {
+		fclaw_abortf("Domain set to 3d. fc2d_thunderegg is only for 2d");
+    }
+
+    fclaw_clawpatch_options_t* clawpatch_opts = fclaw_clawpatch_get_options(glob);
+	if(clawpatch_opts->patch_dim != 2)
+    {
+		fclaw_abortf("Clawpatch dimension set to 3d. fc2d_thunderegg is only for 2d");
+    }
+
 	int claw_version = 4; /* solution data is organized as (i,j,m) */
-	fclaw2d_clawpatch_vtable_initialize(glob, claw_version);
+	fclaw_clawpatch_vtable_initialize(glob, claw_version);
 
 
-    //fclaw2d_clawpatch_vtable_t*      clawpatch_vt = fclaw2d_clawpatch_vt(glob);
+    //fclaw_clawpatch_vtable_t*      clawpatch_vt = fclaw_clawpatch_vt(glob);
 
 	/* ForestClaw vtable items */
-	fclaw2d_vtable_t*   fclaw_vt = fclaw2d_vt(glob);
-	fclaw_vt->output_frame      = thunderegg_output;
+	fclaw_vtable_t*   fc_vt = fclaw_vt(glob);
+	fc_vt->output_frame      = thunderegg_output;
 
 	/* These could be over-written by user specific settings */
-	fclaw2d_patch_vtable_t*   patch_vt = fclaw2d_patch_vt(glob);  
+	fclaw_patch_vtable_t*   patch_vt = fclaw_patch_vt(glob);  
 	patch_vt->rhs            = thunderegg_rhs;  /* Calls FORTRAN routine */
 	patch_vt->setup          = NULL;
     
-    fclaw2d_elliptic_vtable_t *elliptic_vt = fclaw2d_elliptic_vt(glob);
+    fclaw_elliptic_vtable_t *elliptic_vt = fclaw_elliptic_vt(glob);
     elliptic_vt->setup = thunderegg_setup_solver;
     elliptic_vt->solve = thunderegg_solve;    
     elliptic_vt->apply_bc = fc2d_thunderegg_physical_bc;
@@ -201,7 +213,7 @@ void fc2d_thunderegg_solver_initialize(fclaw2d_global_t* glob)
 
 /* ----------------------------- User access to solver functions --------------------------- */
 
-fc2d_thunderegg_vtable_t* fc2d_thunderegg_vt(fclaw2d_global_t* glob)
+fc2d_thunderegg_vtable_t* fc2d_thunderegg_vt(fclaw_global_t* glob)
 {
 	fc2d_thunderegg_vtable_t* thunderegg_vt = (fc2d_thunderegg_vtable_t*) 
 	   							fclaw_pointer_map_get(glob->vtables, "fc2d_thunderegg");
