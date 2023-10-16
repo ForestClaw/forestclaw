@@ -23,8 +23,8 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FCLAW2D_CLAWPACK46_OPTIONS_H
-#define FCLAW2D_CLAWPACK46_OPTIONS_H
+#ifndef FC2D_CLAWPACK46_OPTIONS_H
+#define FC2D_CLAWPACK46_OPTIONS_H
 
 #include <fclaw_base.h>
 
@@ -36,7 +36,7 @@ extern "C"
 #endif
 #endif
 
-struct fclaw2d_global;
+struct fclaw_global;
 typedef struct fc2d_clawpack46_options fc2d_clawpack46_options_t;
 
 struct fc2d_clawpack46_options
@@ -87,11 +87,11 @@ fc2d_clawpack46_options_t*  fc2d_clawpack46_options_register (fclaw_app_t * app,
 void fc2d_clawpack46_package_register(fclaw_app_t* app,
                                       fc2d_clawpack46_options_t* clawopt);
 
-fc2d_clawpack46_options_t* fc2d_clawpack46_get_options(struct fclaw2d_global *glob);
+fc2d_clawpack46_options_t* fc2d_clawpack46_get_options(struct fclaw_global *glob);
 
-void fc2d_clawpack46_options_store (struct fclaw2d_global* glob, fc2d_clawpack46_options_t* clawopt);
+void fc2d_clawpack46_options_store (struct fclaw_global* glob, fc2d_clawpack46_options_t* clawopt);
 
-void fc2d_clawpack46_output(struct fclaw2d_global *glob, int iframe);
+void fc2d_clawpack46_output(struct fclaw_global *glob, int iframe);
 
 /**
  * @brief Get the packing vtable for fc2d_clawpack46_options_t

@@ -23,8 +23,8 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FC2D_CLAWPACK_FORT_H
-#define FC2D_CLAWPACK_FORT_H
+#ifndef FC2D_CLAWPACK46_FORT_H
+#define FC2D_CLAWPACK46_FORT_H
 
 #ifdef __cplusplus
 extern "C"
@@ -136,7 +136,7 @@ void  CLAWPACK46_FORT_TIME_SYNC_F2C(const int* mx,const int* my,
 									double eff0[], double eff1[],
 									double eff2[], double eff3[],
 									double qfine_dummy[],
-									struct fclaw2d_patch_transform_data** 
+									struct fclaw_patch_transform_data** 
 									transform_cptr);
 
 
@@ -160,7 +160,7 @@ void  CLAWPACK46_FORT_TIME_SYNC_SAMESIZE(const int* mx,const int* my,
                                          double eff0[], double eff1[],
                                          double eff2[], double eff3[],
                                          double qfine_dummy[],
-                                         struct fclaw2d_patch_transform_data** 
+                                         struct fclaw_patch_transform_data** 
                                          transform_cptr);
 
 /* ------------------------------- Time stepping functions ---------------------------- */
