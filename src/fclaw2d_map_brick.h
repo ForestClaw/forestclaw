@@ -27,7 +27,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define FCLAW2D_MAP_BRICK_H
 
 #include <fclaw_base.h>
-#include <fclaw2d_domain.h>
+#include <fclaw_domain.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -67,7 +67,7 @@ typedef struct fclaw2d_block_ll
 fclaw2d_block_ll_t;
 
 struct fclaw2d_map_context*
-fclaw2d_map_new_brick (fclaw2d_domain_t *domain,
+fclaw2d_map_new_brick (fclaw_domain_t *domain,
                        int mi, int mj, int periodic_i, int periodic_j);
 
 void fclaw2d_map_destroy_brick (struct fclaw2d_map_context *cont);

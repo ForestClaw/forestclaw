@@ -134,7 +134,7 @@ fclaw2d_map_context_t* fclaw2d_map_new_brick_conn
 }
 
 fclaw2d_map_context_t*
-fclaw2d_map_new_brick (fclaw2d_domain_t *domain,
+fclaw2d_map_new_brick (fclaw_domain_t *domain,
                        int mi, int mj, int periodic_i, int periodic_j)
 {
     fclaw2d_map_context_t *cont;
@@ -160,7 +160,7 @@ fclaw2d_map_new_brick (fclaw2d_domain_t *domain,
 
     for (i = 0; i < nb; i++)
     {
-        fclaw2d_block_t *block = &domain->blocks[i];
+        fclaw_block_t *block = &domain->blocks[i];
 
         /* (x,y) reference coordinates of lower-left block corner */
         bv->xv[i] = block->vertices[0];
