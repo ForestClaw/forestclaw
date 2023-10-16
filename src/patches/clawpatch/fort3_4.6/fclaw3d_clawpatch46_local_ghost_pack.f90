@@ -1,4 +1,4 @@
-subroutine fclaw3dx_clawpatch46_fort_local_ghost_pack (mx,my,mz, mbc, & 
+subroutine fclaw3d_clawpatch46_fort_local_ghost_pack (mx,my,mz, mbc, & 
     meqn, mint,qdata,volume,qpack,psize, packmode,ierror)
 
     implicit none
@@ -11,7 +11,7 @@ subroutine fclaw3dx_clawpatch46_fort_local_ghost_pack (mx,my,mz, mbc, &
     integer :: packq, unpackq, packarea, unpackarea
     parameter(packq = 0, unpackq = 1, packarea = 2, unpackarea = 3)
 
-    integer :: i,j,k,mq,ibc,jbc, count, count_final
+    integer :: i,j,k,mq,ibc,jbc,kbc, count, count_final
     integer :: nghost
     logical :: packdata
 
@@ -26,10 +26,10 @@ subroutine fclaw3dx_clawpatch46_fort_local_ghost_pack (mx,my,mz, mbc, &
 
     nghost = mbc
     count = 1
-    !! # Face 0
     meqn_loop : do mq = 1,meqn
-        k1_loop : do k = 1-mbc,mz+mbc
-            do j = 1-nghost,my-mint
+        !! # Face 0
+        do k = 1-nghost,mz+nghost
+            do j = 1-nghost,my+nghost
                 do ibc = 1-nghost,mint
                     if (packdata) then
                         qpack(count) = qdata(ibc,j,k,mq)
@@ -39,21 +39,11 @@ subroutine fclaw3dx_clawpatch46_fort_local_ghost_pack (mx,my,mz, mbc, &
                     count = count + 1
                 end do
             end do
+        end do
 
-            !! # Face 2
-            do jbc = 1-nghost,mint
-                do i = mint+1,mx+nghost
-                    if (packdata) then
-                        qpack(count) = qdata(i,jbc,k,mq)
-                    else
-                        qdata(i,jbc,k,mq) = qpack(count)
-                    endif
-                    count = count + 1
-                enddo
-            end do
-
-            !! # Face 1
-            do j = mint+1,my+nghost
+        !! # Face 1
+        do k = 1-nghost,mz+nghost
+            do j = 1-nghost,my+nghost
                 do ibc = mx-mint+1,mx+nghost
                     if (packdata) then
                         qpack(count) = qdata(ibc,j,k,mq)
@@ -63,10 +53,12 @@ subroutine fclaw3dx_clawpatch46_fort_local_ghost_pack (mx,my,mz, mbc, &
                     count = count + 1
                 end do
             end do
+        end do
 
-            !! # Face 3
-            do jbc = my-mint+1,my+nghost
-                do i = 1-nghost,mx-mint
+        !! # Face 2
+        do k = 1-nghost,mz+nghost
+            do jbc = 1-nghost,mint
+                do i = mint+1,mx-mint
                     if (packdata) then
                         qpack(count) = qdata(i,jbc,k,mq)
                     else
@@ -75,7 +67,50 @@ subroutine fclaw3dx_clawpatch46_fort_local_ghost_pack (mx,my,mz, mbc, &
                     count = count + 1
                 end do
             end do
-        end do k1_loop
+        end do
+
+        !! # Face 3
+        do k = 1-nghost,mz+nghost
+            do jbc = my-mint+1,my+nghost
+                do i = mint+1,mx-mint
+                    if (packdata) then
+                        qpack(count) = qdata(i,jbc,k,mq)
+                    else
+                        qdata(i,jbc,k,mq) = qpack(count)
+                    endif
+                    count = count + 1
+                end do
+            end do
+        end do
+
+        !! # Face 4
+        do kbc = 1-nghost,mint
+            do j = mint+1,my-mint
+                do i = mint+1,mx-mint
+                    if (packdata) then
+                        qpack(count) = qdata(i,j,kbc,mq)
+                    else
+                        qdata(i,j,kbc,mq) = qpack(count)
+                    endif
+                    count = count + 1
+                end do
+            end do
+        end do
+
+        !! # Face 5
+        do kbc = mz-mint+1,mz+nghost
+            do j = mint+1,my-mint
+                do i = mint+1,mx-mint
+                    if (packdata) then
+                        qpack(count) = qdata(i,j,kbc,mq)
+                    else
+                        qdata(i,j,kbc,mq) = qpack(count)
+                    endif
+                    count = count + 1
+                end do
+            end do
+        end do
+
     end do meqn_loop
 
     count_final = count - 1
@@ -89,10 +124,9 @@ subroutine fclaw3dx_clawpatch46_fort_local_ghost_pack (mx,my,mz, mbc, &
         return
     endif
 
-
     !! # Face 0
-    k2_loop : do k = 1-mbc,mz+mbc
-        do j = 1-nghost,my-mint
+    do k = 1-nghost,mz+nghost
+        do j = 1-nghost,my+nghost
             do ibc = 1-nghost,mint
                 if (packdata) then
                     qpack(count) = volume(ibc,j,k)
@@ -102,21 +136,11 @@ subroutine fclaw3dx_clawpatch46_fort_local_ghost_pack (mx,my,mz, mbc, &
                 count = count + 1
             end do
         end do
+    end do
 
-        !! # Face 2
-        do jbc = 1-nghost,mint
-            do i = mint+1,mx+nghost
-                if (packdata) then
-                    qpack(count) = volume(i,jbc,k)
-                else
-                    volume(i,jbc,k) = qpack(count)
-                endif
-                count = count + 1
-            end do
-        end do
-
-        !! # Face 1
-        do j = mint+1,my+nghost
+    !! # Face 1
+    do k = 1-nghost,mz+nghost
+        do j = 1-nghost,my+nghost
             do ibc = mx-mint+1,mx+nghost
                 if (packdata) then
                     qpack(count) = volume(ibc,j,k)
@@ -126,10 +150,12 @@ subroutine fclaw3dx_clawpatch46_fort_local_ghost_pack (mx,my,mz, mbc, &
                 count = count + 1
             end do
         end do
+    end do
 
-        !! # Face 3
-        do jbc = my-mint+1,my+nghost
-            do i = 1-nghost,mx-mint
+    !! # Face 2
+    do k = 1-nghost,mz+nghost
+        do jbc = 1-nghost,mint
+            do i = mint+1,mx-mint
                 if (packdata) then
                     qpack(count) = volume(i,jbc,k)
                 else
@@ -138,7 +164,49 @@ subroutine fclaw3dx_clawpatch46_fort_local_ghost_pack (mx,my,mz, mbc, &
                 count = count + 1
             end do
         end do
-    end do k2_loop
+    end do
+
+    !! # Face 3
+    do k = 1-nghost,mz+nghost
+        do jbc = my-mint+1,my+nghost
+            do i = mint+1,mx-mint
+                if (packdata) then
+                    qpack(count) = volume(i,jbc,k)
+                else
+                    volume(i,jbc,k) = qpack(count)
+                endif
+                count = count + 1
+            end do
+        end do
+    end do
+
+    !! # Face 4
+    do kbc = 1-nghost,mint
+        do j = mint+1,my-mint
+            do i = mint+1,mx-mint
+                if (packdata) then
+                    qpack(count) = volume(i,j,kbc)
+                else
+                    volume(i,j,kbc) = qpack(count)
+                endif
+                count = count + 1
+            end do
+        end do
+    end do
+
+    !! # Face 5
+    do kbc = mz-mint+1,mz+nghost
+        do j = mint+1,my-mint
+            do i = mint+1,mx-mint
+                if (packdata) then
+                    qpack(count) = volume(i,j,kbc)
+                else
+                    volume(i,j,kbc) = qpack(count)
+                endif
+                count = count + 1
+            end do
+        end do
+    end do
 
     count_final = count-1
     if (count_final .ne. psize) then
@@ -148,7 +216,7 @@ subroutine fclaw3dx_clawpatch46_fort_local_ghost_pack (mx,my,mz, mbc, &
        ierror = 2
    endif
 
-end subroutine fclaw3dx_clawpatch46_fort_local_ghost_pack
+end subroutine fclaw3d_clawpatch46_fort_local_ghost_pack
 
 
 

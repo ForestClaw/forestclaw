@@ -24,191 +24,174 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-#ifndef REFINE_DIM
-#define REFINE_DIM 2
-#endif
+#include <fclaw_global.h>
+#include <fclaw_patch.h>
 
-#ifndef PATCH_DIM
-#define PATCH_DIM 2
-#endif
+#include <fclaw_clawpatch_pillow.h>
 
-#include <fclaw2d_global.h>
-#include <fclaw2d_patch.h>
-
-#if REFINE_DIM == 2 && PATCH_DIM == 2
-
-#define PILLOW_VTABLE_NAME "fclaw2d_clawpatch_pillow"
-
-#include <fclaw2d_clawpatch_pillow.h>
-
-#include <fclaw2d_clawpatch.h>
+#include <fclaw_clawpatch.h>
+#include <fclaw_clawpatch_options.h>
 #include <fclaw2d_clawpatch46_fort.h>
 #include <fclaw2d_clawpatch5_fort.h>
+#include <fclaw3d_clawpatch46_fort.h>
 
-#elif REFINE_DIM == 2 && PATCH_DIM == 3
-
-#define PILLOW_VTABLE_NAME "fclaw3dx_clawpatch_pillow"
-
-
-#include <fclaw3dx_clawpatch_pillow.h>
-
-#include <fclaw3dx_clawpatch.h>
-#include <fclaw3dx_clawpatch46_fort.h>
 
 #include <fclaw3d_metric.h>
 
-#include <_fclaw2d_to_fclaw3dx.h>
-#include <_fclaw2d_to_fclaw3d.h>
-
-#endif
-
 #include <fclaw_pointer_map.h>
 
-//static fclaw2d_clawpatch_pillow_vtable_t s_clawpatch_pillow_vt;
-
-struct fclaw2d_patch_transform_data;  /* Not used here, so we leave it incomplete */
+struct fclaw_patch_transform_data;  /* Not used here, so we leave it incomplete */
 
 static
-void pillow_copy_block_corner(fclaw2d_global_t* glob,
-                              fclaw2d_patch_t* patch, 
-                              fclaw2d_patch_t *corner_patch,
+void pillow_copy_block_corner(fclaw_global_t* glob,
+                              fclaw_patch_t* patch, 
+                              fclaw_patch_t *corner_patch,
                               int blockno,
                               int corner_blockno,
                               int icorner,
                               int time_interp,
-                              struct fclaw2d_patch_transform_data *transform_data)
+                              struct fclaw_patch_transform_data *transform_data)
 {
     int meqn;
     double *qthis;    
-    fclaw2d_clawpatch_timesync_data(glob,patch,time_interp,&qthis,&meqn);
+    fclaw_clawpatch_timesync_data(glob,patch,time_interp,&qthis,&meqn);
 
-    double *qcorner = fclaw2d_clawpatch_get_q(glob,corner_patch);
+    double *qcorner = fclaw_clawpatch_get_q(glob,corner_patch);
 
-    fclaw2d_clawpatch_pillow_vtable_t* pillow_vt = fclaw2d_clawpatch_pillow_vt(glob);
+    fclaw_clawpatch_pillow_vtable_t* pillow_vt = fclaw_clawpatch_pillow_vt(glob);
     FCLAW_ASSERT(pillow_vt != NULL);
 
-    int mx,my,mbc;
-    double xlower,ylower,dx,dy;
-#if PATCH_DIM == 2
+    if(pillow_vt->dim == 2)
+    {
+        int mx,my,mbc;
+        double xlower,ylower,dx,dy;
+        fclaw_clawpatch_2d_grid_data(glob,patch,&mx,&my,&mbc,
+                                    &xlower,&ylower,&dx,&dy);
 
-    fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mbc,
-                                &xlower,&ylower,&dx,&dy);
+        pillow_vt->d2->fort_copy_block_corner(&mx, &my, &mbc, &meqn, 
+                                              qthis, qcorner,
+                                              &icorner, &blockno);
+    }
+    else 
+    {
+        int mx,my,mz,mbc;
+        double xlower,ylower,zlower,dx,dy,dz;
+        fclaw_clawpatch_3d_grid_data(glob,patch,&mx,&my,&mz,&mbc,
+                                    &xlower,&ylower,&zlower, &dx, &dy, &dz);
+        FCLAW_ASSERT(pillow_vt->d3->fort_copy_block_corner != NULL);
 
-    pillow_vt->fort_copy_block_corner(&mx, &my, &mbc, &meqn, 
-                                      qthis, qcorner,
-                                      &icorner, &blockno);
-#elif PATCH_DIM == 3    
-    int mz;
-    double zlower, dz;
-    fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mz,&mbc,
-                                &xlower,&ylower,&zlower, &dx, &dy, &dz);
-    FCLAW_ASSERT(pillow_vt->fort_copy_block_corner != NULL);
-
-    pillow_vt->fort_copy_block_corner(&mx, &my, &mz, &mbc, &meqn, 
-                                      qthis, qcorner,
-                                      &icorner, &blockno);
-#endif
+        pillow_vt->d3->fort_copy_block_corner(&mx, &my, &mz, &mbc, &meqn, 
+                                              qthis, qcorner,
+                                              &icorner, &blockno);
+    }
 
 }
 
 static
-void pillow_average_block_corner(fclaw2d_global_t *glob,
-                                 fclaw2d_patch_t* coarse_patch,
-                                 fclaw2d_patch_t *fine_patch,
+void pillow_average_block_corner(fclaw_global_t *glob,
+                                 fclaw_patch_t* coarse_patch,
+                                 fclaw_patch_t *fine_patch,
                                  int coarse_blockno,
                                  int fine_blockno,
                                  int icorner_coarse,
                                  int time_interp,
-                                 struct fclaw2d_patch_transform_data* transform_data)
+                                 struct fclaw_patch_transform_data* transform_data)
 {
 
     int refratio = 2;
 
     int meqn;
     double *qcoarse;
-    fclaw2d_clawpatch_timesync_data(glob,coarse_patch,time_interp,
+    fclaw_clawpatch_timesync_data(glob,coarse_patch,time_interp,
                                     &qcoarse,&meqn);
-    double* qfine = fclaw2d_clawpatch_get_q(glob,fine_patch);
+    double* qfine = fclaw_clawpatch_get_q(glob,fine_patch);
 
-    double *areacoarse = fclaw2d_clawpatch_get_area(glob,coarse_patch);
-    double *areafine = fclaw2d_clawpatch_get_area(glob,fine_patch);
+    double *areacoarse = fclaw_clawpatch_get_2d_area(glob,coarse_patch);
+    double *areafine = fclaw_clawpatch_get_2d_area(glob,fine_patch);
 
-    fclaw2d_clawpatch_pillow_vtable_t* pillow_vt = fclaw2d_clawpatch_pillow_vt(glob);
-    int mx,my,mbc;
-    double xlower,ylower,dx,dy;
-#if PATCH_DIM == 2
-    fclaw2d_clawpatch_grid_data(glob,coarse_patch,&mx,&my,&mbc,
-                                &xlower,&ylower,&dx,&dy);
+    fclaw_clawpatch_pillow_vtable_t* pillow_vt = fclaw_clawpatch_pillow_vt(glob);
+
+    if(pillow_vt->dim == 2)
+    {
+        int mx,my,mbc;
+        double xlower,ylower,dx,dy;
+
+        fclaw_clawpatch_2d_grid_data(glob,coarse_patch,&mx,&my,&mbc,
+                                    &xlower,&ylower,&dx,&dy);
 
 
-    pillow_vt->fort_average_block_corner(&mx,&my,&mbc,&meqn,
-                                         &refratio,qcoarse,qfine,
-                                         areacoarse,areafine,
-                                         &icorner_coarse,&coarse_blockno);
-#elif PATCH_DIM == 3
-    int mz;
-    double  zlower, dz;
-    fclaw2d_clawpatch_grid_data(glob,coarse_patch,&mx,&my,&mz, &mbc,
-                                &xlower,&ylower, &zlower, &dx,&dy, &dz);
+        pillow_vt->d2->fort_average_block_corner(&mx,&my,&mbc,&meqn,
+                                                 &refratio,qcoarse,qfine,
+                                                 areacoarse,areafine,
+                                                 &icorner_coarse,&coarse_blockno);
+    }
+    else
+    {
+        int mx,my,mz,mbc;
+        double xlower,ylower,zlower,dx,dy,dz;
+        fclaw_clawpatch_3d_grid_data(glob,coarse_patch,&mx,&my,&mz, &mbc,
+                                    &xlower,&ylower, &zlower, &dx,&dy, &dz);
 
-    pillow_vt->fort_average_block_corner(&mx,&my,&mz, &dz, &mbc,&meqn,
-                                         &refratio,qcoarse,qfine,
-                                         areacoarse,areafine,
-                                         &icorner_coarse,&coarse_blockno);
-#endif
+        pillow_vt->d3->fort_average_block_corner(&mx,&my,&mz, &dz, &mbc,&meqn,
+                                                 &refratio,qcoarse,qfine,
+                                                 areacoarse,areafine,
+                                                 &icorner_coarse,&coarse_blockno);
+    }
 }
 
 static
-void pillow_interpolate_block_corner(fclaw2d_global_t* glob,
-                                     fclaw2d_patch_t* coarse_patch,
-                                     fclaw2d_patch_t *fine_patch,
+void pillow_interpolate_block_corner(fclaw_global_t* glob,
+                                     fclaw_patch_t* coarse_patch,
+                                     fclaw_patch_t *fine_patch,
                                      int coarse_blockno,
                                      int fine_blockno,
                                      int icoarse_corner,
                                      int time_interp,
-                                     struct fclaw2d_patch_transform_data* transform_data)
+                                     struct fclaw_patch_transform_data* transform_data)
 
 {
     int meqn;
     double *qcoarse;
-    fclaw2d_clawpatch_timesync_data(glob,coarse_patch,time_interp,
+    fclaw_clawpatch_timesync_data(glob,coarse_patch,time_interp,
                                     &qcoarse,&meqn);
 
-    double* qfine = fclaw2d_clawpatch_get_q(glob,fine_patch);
+    double* qfine = fclaw_clawpatch_get_q(glob,fine_patch);
 
-    fclaw2d_clawpatch_pillow_vtable_t* pillow_vt = fclaw2d_clawpatch_pillow_vt(glob);
+    fclaw_clawpatch_pillow_vtable_t* pillow_vt = fclaw_clawpatch_pillow_vt(glob);
     int refratio = 2;
-    int mx,my,mbc;
-    double xlower,ylower,dx,dy;
-#if PATCH_DIM == 2
-    fclaw2d_clawpatch_grid_data(glob,coarse_patch,&mx,&my,&mbc,
-                                &xlower,&ylower,&dx,&dy);
+    if(pillow_vt->dim == 2)
+    {
+        int mx,my,mbc;
+        double xlower,ylower,dx,dy;
+        fclaw_clawpatch_2d_grid_data(glob,coarse_patch,&mx,&my,&mbc,
+                                    &xlower,&ylower,&dx,&dy);
 
-    pillow_vt->fort_interpolate_block_corner(&mx, &my, &mbc, &meqn,
-                                             &refratio, qcoarse, qfine,
-                                             &icoarse_corner, &coarse_blockno);
-#elif PATCH_DIM == 3
-    int mz;
-    double zlower, dz;
-    fclaw2d_clawpatch_grid_data(glob,coarse_patch,&mx,&my,&mz, &mbc,
-                                &xlower,&ylower,&zlower, &dx,&dy, &dz);
+        pillow_vt->d2->fort_interpolate_block_corner(&mx, &my, &mbc, &meqn,
+                                                 &refratio, qcoarse, qfine,
+                                                 &icoarse_corner, &coarse_blockno);
+    }
+    else 
+    {
+        int mx,my,mz,mbc;
+        double xlower,ylower,zlower,dx,dy,dz;
+        fclaw_clawpatch_3d_grid_data(glob,coarse_patch,&mx,&my,&mz, &mbc,
+                                    &xlower,&ylower,&zlower, &dx,&dy, &dz);
 
-    pillow_vt->fort_interpolate_block_corner(&mx, &my, &mz, &mbc, &meqn,
-                                             &refratio, qcoarse, qfine,
-                                             &icoarse_corner, &coarse_blockno);
-
-#endif
+        pillow_vt->d3->fort_interpolate_block_corner(&mx, &my, &mz, &mbc, &meqn,
+                                                     &refratio, qcoarse, qfine,
+                                                     &icoarse_corner, &coarse_blockno);
+    }
 }
 
 /* ----------------------------- Use pillow sphere ------------------------------------ */
 
-void fclaw2d_clawpatch_use_pillowsphere(fclaw2d_global_t* glob)
+void fclaw_clawpatch_use_pillowsphere(fclaw_global_t* glob)
 {
-    fclaw2d_patch_vtable_t* patch_vt = fclaw2d_patch_vt(glob);
+    fclaw_patch_vtable_t* patch_vt = fclaw_patch_vt(glob);
 
-    patch_vt->copy_block_corner          = pillow_copy_block_corner;
-    patch_vt->average_block_corner       = pillow_average_block_corner;
-    patch_vt->interpolate_block_corner   = pillow_interpolate_block_corner;
+    patch_vt->d2->copy_block_corner          = pillow_copy_block_corner;
+    patch_vt->d2->average_block_corner       = pillow_average_block_corner;
+    patch_vt->d2->interpolate_block_corner   = pillow_interpolate_block_corner;
 
 }
 
@@ -216,83 +199,86 @@ void fclaw2d_clawpatch_use_pillowsphere(fclaw2d_global_t* glob)
 /* -------------------------------- Virtual table ------------------------------------- */
 
 static
-fclaw2d_clawpatch_pillow_vtable_t* pillow_vt_new()
+fclaw_clawpatch_pillow_vtable_t* pillow_vt_new(int dim)
 {
-    return (fclaw2d_clawpatch_pillow_vtable_t*) 
-           FCLAW_ALLOC_ZERO (fclaw2d_clawpatch_pillow_vtable_t, 1);
+    fclaw_clawpatch_pillow_vtable_t* pillow_vt =
+           FCLAW_ALLOC_ZERO (fclaw_clawpatch_pillow_vtable_t, 1);
+    pillow_vt->dim = dim;
+    if(dim == 2)
+    {
+        pillow_vt->d2 = FCLAW_ALLOC_ZERO(struct fclaw_clawpatch_pillow_vtable_d2,1);
+    }
+    else 
+    {
+        pillow_vt->d3 = FCLAW_ALLOC_ZERO(struct fclaw_clawpatch_pillow_vtable_d3,1);
+    }
+    return pillow_vt;
 }
 
 static
 void pillow_vt_destroy(void* vt)
 {
-    FCLAW_FREE (vt);
+    fclaw_clawpatch_pillow_vtable_t *pillow_vt = (fclaw_clawpatch_pillow_vtable_t*) vt;
+    if (pillow_vt->dim == 2)
+    {
+        FCLAW_FREE (pillow_vt->d2);
+    }
+    else
+    {
+        FCLAW_FREE (pillow_vt->d3);
+    }
+    FCLAW_FREE (pillow_vt);
 }
 
-#if 0
-static
-fclaw2d_clawpatch_pillow_vtable_t* pillow_vt_init()
+void fclaw_clawpatch_pillow_vtable_initialize(fclaw_global_t* glob,
+                                              int claw_version)
 {
-    //FCLAW_ASSERT(s_clawpatch_pillow_vt.is_set == 0);
-    return &s_clawpatch_pillow_vt;
-}
-#endif
+    fclaw_clawpatch_options_t* clawpatch_opt = fclaw_clawpatch_get_options(glob);
+    fclaw_clawpatch_pillow_vtable_t *pillow_vt = pillow_vt_new(clawpatch_opt->patch_dim);
 
-void fclaw2d_clawpatch_pillow_vtable_initialize(fclaw2d_global_t* glob,
-                                                int claw_version)
-{
-    fclaw2d_clawpatch_pillow_vtable_t *pillow_vt = pillow_vt_new();
-
-#if PATCH_DIM == 2
-    if (claw_version == 4)
+    if(clawpatch_opt->patch_dim == 2)
     {
-        pillow_vt->fort_copy_block_corner        = FCLAW2D_PILLOW46_COPY_BLOCK_CORNER;
-        pillow_vt->fort_average_block_corner     = FCLAW2D_PILLOW46_AVERAGE_BLOCK_CORNER;
-        pillow_vt->fort_interpolate_block_corner = FCLAW2D_PILLOW46_INTERPOLATE_BLOCK_CORNER;
+        if (claw_version == 4)
+        {
+            pillow_vt->d2->fort_copy_block_corner        = FCLAW2D_PILLOW46_COPY_BLOCK_CORNER;
+            pillow_vt->d2->fort_average_block_corner     = FCLAW2D_PILLOW46_AVERAGE_BLOCK_CORNER;
+            pillow_vt->d2->fort_interpolate_block_corner = FCLAW2D_PILLOW46_INTERPOLATE_BLOCK_CORNER;
+        }
+        else if (claw_version == 5)
+        {
+            pillow_vt->d2->fort_copy_block_corner        = FCLAW2D_PILLOW5_COPY_BLOCK_CORNER;
+            pillow_vt->d2->fort_average_block_corner     = FCLAW2D_PILLOW5_AVERAGE_BLOCK_CORNER;
+            pillow_vt->d2->fort_interpolate_block_corner = FCLAW2D_PILLOW5_INTERPOLATE_BLOCK_CORNER;
+        }
     }
-    else if (claw_version == 5)
+    else
     {
-        pillow_vt->fort_copy_block_corner        = FCLAW2D_PILLOW5_COPY_BLOCK_CORNER;
-        pillow_vt->fort_average_block_corner     = FCLAW2D_PILLOW5_AVERAGE_BLOCK_CORNER;
-        pillow_vt->fort_interpolate_block_corner = FCLAW2D_PILLOW5_INTERPOLATE_BLOCK_CORNER;
+        if (claw_version == 4)
+        {
+            pillow_vt->d3->fort_copy_block_corner        = FCLAW3DX_PILLOW46_COPY_BLOCK_CORNER;
+            pillow_vt->d3->fort_average_block_corner     = FCLAW3DX_PILLOW46_AVERAGE_BLOCK_CORNER;
+            pillow_vt->d3->fort_interpolate_block_corner = FCLAW3DX_PILLOW46_INTERPOLATE_BLOCK_CORNER;
+        }
     }
-#elif PATCH_DIM == 3
-    if (claw_version == 4)
-    {
-        pillow_vt->fort_copy_block_corner        = FCLAW3DX_PILLOW46_COPY_BLOCK_CORNER;
-        pillow_vt->fort_average_block_corner     = FCLAW3DX_PILLOW46_AVERAGE_BLOCK_CORNER;
-        pillow_vt->fort_interpolate_block_corner = FCLAW3DX_PILLOW46_INTERPOLATE_BLOCK_CORNER;
-    }
-#endif
 
     pillow_vt->is_set = 1;
 
-    FCLAW_ASSERT(fclaw_pointer_map_get(glob->vtables, PILLOW_VTABLE_NAME) == NULL);
-    fclaw_pointer_map_insert(glob->vtables, PILLOW_VTABLE_NAME, pillow_vt, pillow_vt_destroy);
+    FCLAW_ASSERT(fclaw_pointer_map_get(glob->vtables, "fclaw_clawpatch_pillow_vtable") == NULL);
+    fclaw_pointer_map_insert(glob->vtables, "fclaw_clawpatch_pillow_vtable", pillow_vt, pillow_vt_destroy);
 
 }
-
 
 /* ------------------------------- Public access functions ---------------------------- */
 
 
-fclaw2d_clawpatch_pillow_vtable_t* fclaw2d_clawpatch_pillow_vt(fclaw2d_global_t* glob)
+fclaw_clawpatch_pillow_vtable_t* fclaw_clawpatch_pillow_vt(fclaw_global_t* glob)
 {
 
-    fclaw2d_clawpatch_pillow_vtable_t* pillow_vt = (fclaw2d_clawpatch_pillow_vtable_t*) 
+    fclaw_clawpatch_pillow_vtable_t* pillow_vt = (fclaw_clawpatch_pillow_vtable_t*) 
         fclaw_pointer_map_get(glob->vtables, 
-                              PILLOW_VTABLE_NAME);
+                              "fclaw_clawpatch_pillow_vtable");
 
     FCLAW_ASSERT(pillow_vt != NULL);
     FCLAW_ASSERT(pillow_vt->is_set != 0);
     return pillow_vt;
 }
-
-#if 0
-fclaw2d_clawpatch_pillow_vtable_t* fclaw2d_clawpatch_pillow_vt(fclaw2d_global_t* glob)
-{
-    FCLAW_ASSERT(s_clawpatch_pillow_vt.is_set != 0);
-    return &s_clawpatch_pillow_vt;
-}
-#endif
-
-

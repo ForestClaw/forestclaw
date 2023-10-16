@@ -23,49 +23,21 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef REFINE_DIM
-#define REFINE_DIM 2
-#endif
+#include <fclaw_clawpatch_output_vtk.h>
 
-#ifndef PATCH_DIM
-#define PATCH_DIM 2
-#endif
+#include <fclaw_clawpatch.h>
+#include <fclaw_clawpatch_options.h>
 
-#if REFINE_DIM == 2 && PATCH_DIM == 2
+#include <fclaw_global.h>
 
-#include <fclaw2d_clawpatch_output_vtk.h>
-
-#include <fclaw2d_clawpatch.h>
-#include <fclaw2d_clawpatch_options.h>
-
-#define PATCH_CHILDREN 4
-
-#elif REFINE_DIM == 2 && PATCH_DIM == 3
-
-#include <fclaw3dx_clawpatch_output_vtk.h>
-
-#include <fclaw3dx_clawpatch.h>
-#include <fclaw3dx_clawpatch_options.h>
-
-#include <_fclaw2d_to_fclaw3dx.h>
-
-#define PATCH_CHILDREN 8
-
-#else
-#error "This combination of REFINE_DIM and PATCH_DIM is unsupported"
-#endif
-
-#include <fclaw2d_global.h>
-
-#include <fclaw2d_options.h>
+#include <fclaw_options.h>
 #include <fclaw2d_map.h>
 
 typedef struct fclaw2d_vtk_state
 {
-    int mx, my;
-#if PATCH_DIM == 3
-    int mz;
-#endif
+    int dim;
+    int patch_children;
+    int mx, my, mz;
     int meqn;
     int points_per_patch, cells_per_patch;
     int intsize, ndsize;
@@ -83,8 +55,8 @@ typedef struct fclaw2d_vtk_state
     int64_t offset_meqn, psize_meqn;
     int64_t offset_end;
     const char *inttype;
-    fclaw2d_vtk_patch_data_t coordinate_cb;
-    fclaw2d_vtk_patch_data_t value_cb;
+    fclaw_vtk_patch_data_t coordinate_cb;
+    fclaw_vtk_patch_data_t value_cb;
     FILE *file;
 #ifdef P4EST_ENABLE_MPIIO
     MPI_File mpifile;
@@ -95,7 +67,7 @@ typedef struct fclaw2d_vtk_state
 fclaw2d_vtk_state_t;
 
 static int
-fclaw2d_vtk_write_header (fclaw2d_domain_t * domain, fclaw2d_vtk_state_t * s)
+fclaw2d_vtk_write_header (fclaw_domain_t * domain, fclaw2d_vtk_state_t * s)
 {
     int retval;
     FILE *file;
@@ -219,10 +191,10 @@ write_buffer (fclaw2d_vtk_state_t * s, int64_t psize_field)
 }
 
 static void
-write_position_cb (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
+write_position_cb (fclaw_domain_t * domain, fclaw_patch_t * patch,
                    int blockno, int patchno, void *user)
 {
-    fclaw2d_global_iterate_t *g = (fclaw2d_global_iterate_t*) user;
+    fclaw_global_iterate_t *g = (fclaw_global_iterate_t*) user;
     fclaw2d_vtk_state_t *s = (fclaw2d_vtk_state_t *) g->user;
 
     s->coordinate_cb (g->glob, patch, blockno, patchno, s->buf);
@@ -230,10 +202,10 @@ write_position_cb (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
 }
 
 static void
-write_connectivity_cb (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
+write_2d_connectivity_cb (fclaw_domain_t * domain, fclaw_patch_t * patch,
                        int blockno, int patchno, void *user)
 {
-    fclaw2d_global_iterate_t *g = (fclaw2d_global_iterate_t*) user;
+    fclaw_global_iterate_t *g = (fclaw_global_iterate_t*) user;
     fclaw2d_vtk_state_t *s = (fclaw2d_vtk_state_t *) g->user;
     int i, j;
     const int64_t pbefore = s->points_per_patch *
@@ -245,91 +217,105 @@ write_connectivity_cb (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
         int32_t *idata = (int32_t *) s->buf;
         int32_t l;
 
-#if PATCH_DIM == 3
-        int k;
-        for (k = 0; k < s->mz; ++k)
-        {
-#if 0
-        }
-#endif
-#endif
         for (j = 0; j < s->my; ++j)
         {
             for (i = 0; i < s->mx; ++i)
             {
-                l = (int32_t) pbefore + i + j * (s->mx + 1)
-#if PATCH_DIM == 3
-                     + k * (s->my + 1) * (s->mx + 1)
-#endif
-                     + 0;
+                l = (int32_t) pbefore + i + j * (s->mx + 1);
                 *idata++ = l;
                 *idata++ = l + 1;
                 *idata++ = l + (s->mx + 2);
                 *idata++ = l + (s->mx + 1);
-#if PATCH_DIM == 3
-                *idata++ = l + (s->mx + 1) * (s->my + 1);
-                *idata++ = l + (s->mx + 1) * (s->my + 1) + 1;
-                *idata++ = l + (s->mx + 1) * (s->my + 1) + (s->mx + 2);
-                *idata++ = l + (s->mx + 1) * (s->my + 1) + (s->mx + 1);
-#endif
             }
         }
-#if PATCH_DIM == 3
-#if 0
+    }
+    else
+    {
+        int64_t *idata = (int64_t *) s->buf;
+        int64_t l;
+        for (j = 0; j < s->my; ++j)
         {
-#endif
+            for (i = 0; i < s->mx; ++i)
+            {
+                l = pbefore + i + j * (s->mx + 1);
+                *idata++ = l;
+                *idata++ = l + 1;
+                *idata++ = l + (s->mx + 2);
+                *idata++ = l + (s->mx + 1);
+            }
         }
-#endif
+    }
+    write_buffer (s, s->psize_connectivity);
+}
+static void
+write_3d_connectivity_cb (fclaw_domain_t * domain, fclaw_patch_t * patch,
+                          int blockno, int patchno, void *user)
+{
+    fclaw_global_iterate_t *g = (fclaw_global_iterate_t*) user;
+    fclaw2d_vtk_state_t *s = (fclaw2d_vtk_state_t *) g->user;
+    int i, j, k;
+    const int64_t pbefore = s->points_per_patch *
+        (domain->global_num_patches_before +
+         domain->blocks[blockno].num_patches_before + patchno);
+
+    if (s->fits32)
+    {
+        int32_t *idata = (int32_t *) s->buf;
+        int32_t l;
+
+        for (k = 0; k < s->mz; ++k)
+        {
+            for (j = 0; j < s->my; ++j)
+            {
+                for (i = 0; i < s->mx; ++i)
+                {
+                    l = (int32_t) pbefore + i + j * (s->mx + 1)
+                         + k * (s->my + 1) * (s->mx + 1);
+                    *idata++ = l;
+                    *idata++ = l + 1;
+                    *idata++ = l + (s->mx + 2);
+                    *idata++ = l + (s->mx + 1);
+                    *idata++ = l + (s->mx + 1) * (s->my + 1);
+                    *idata++ = l + (s->mx + 1) * (s->my + 1) + 1;
+                    *idata++ = l + (s->mx + 1) * (s->my + 1) + (s->mx + 2);
+                    *idata++ = l + (s->mx + 1) * (s->my + 1) + (s->mx + 1);
+                }
+            }
+        }
     }
     else
     {
         int64_t *idata = (int64_t *) s->buf;
         int64_t l;
 
-#if PATCH_DIM == 3
-        int k;
         for (k = 0; k < s->mz; ++k)
         {
-#if 0
-        }
-#endif
-#endif
-        for (j = 0; j < s->my; ++j)
-        {
-            for (i = 0; i < s->mx; ++i)
+            for (j = 0; j < s->my; ++j)
             {
-                l = pbefore + i + j * (s->mx + 1)
-#if PATCH_DIM == 3
-                     + k * (s->my + 1) * (s->mx + 1)
-#endif
-                     + 0;
-                *idata++ = l;
-                *idata++ = l + 1;
-                *idata++ = l + (s->mx + 2);
-                *idata++ = l + (s->mx + 1);
-#if PATCH_DIM == 3
-                *idata++ = l + (s->mx + 1) * (s->my + 1);
-                *idata++ = l + (s->mx + 1) * (s->my + 1) + 1;
-                *idata++ = l + (s->mx + 1) * (s->my + 1) + (s->mx + 2);
-                *idata++ = l + (s->mx + 1) * (s->my + 1) + (s->mx + 1);
-#endif
+                for (i = 0; i < s->mx; ++i)
+                {
+                    l = pbefore + i + j * (s->mx + 1)
+                         + k * (s->my + 1) * (s->mx + 1);
+                    *idata++ = l;
+                    *idata++ = l + 1;
+                    *idata++ = l + (s->mx + 2);
+                    *idata++ = l + (s->mx + 1);
+                    *idata++ = l + (s->mx + 1) * (s->my + 1);
+                    *idata++ = l + (s->mx + 1) * (s->my + 1) + 1;
+                    *idata++ = l + (s->mx + 1) * (s->my + 1) + (s->mx + 2);
+                    *idata++ = l + (s->mx + 1) * (s->my + 1) + (s->mx + 1);
+                }
             }
         }
-#if PATCH_DIM == 3
-#if 0
-        {
-#endif
-        }
-#endif
     }
     write_buffer (s, s->psize_connectivity);
 }
 
 static void
-write_offsets_cb (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
+write_offsets_cb (fclaw_domain_t * domain, fclaw_patch_t * patch,
                   int blockno, int patchno, void *user)
 {
-    fclaw2d_global_iterate_t *g = (fclaw2d_global_iterate_t*) user;
+    fclaw_global_iterate_t *g = (fclaw_global_iterate_t*) user;
     fclaw2d_vtk_state_t *s = (fclaw2d_vtk_state_t *) g->user;
     int c;
     const int64_t cbefore = s->cells_per_patch *
@@ -339,8 +325,8 @@ write_offsets_cb (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
     if (s->fits32)
     {
         int32_t *idata = (int32_t *) s->buf;
-        int32_t k = PATCH_CHILDREN * (int32_t) (cbefore + 1);
-        for (c = 0; c < s->cells_per_patch; k += PATCH_CHILDREN, ++c)
+        int32_t k = s->patch_children * (int32_t) (cbefore + 1);
+        for (c = 0; c < s->cells_per_patch; k += s->patch_children, ++c)
         {
             *idata++ = k;
         }
@@ -348,8 +334,8 @@ write_offsets_cb (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
     else
     {
         int64_t *idata = (int64_t *) s->buf;
-        int64_t k = PATCH_CHILDREN * (cbefore + 1);
-        for (c = 0; c < s->cells_per_patch; k += PATCH_CHILDREN, ++c)
+        int64_t k = s->patch_children * (cbefore + 1);
+        for (c = 0; c < s->cells_per_patch; k += s->patch_children, ++c)
         {
             *idata++ = k;
         }
@@ -358,30 +344,36 @@ write_offsets_cb (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
 }
 
 static void
-write_types_cb (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
+write_types_cb (fclaw_domain_t * domain, fclaw_patch_t * patch,
                 int blockno, int patchno, void *user)
 {
-    fclaw2d_global_iterate_t *g = (fclaw2d_global_iterate_t*) user;
+    fclaw_global_iterate_t *g = (fclaw_global_iterate_t*) user;
     fclaw2d_vtk_state_t *s = (fclaw2d_vtk_state_t *) g->user;
     int c;
 
     char *cdata = s->buf;
-    for (c = 0; c < s->cells_per_patch; ++c)
+    if(s->dim == 2)
     {
-#if PATCH_DIM == 2
-        *cdata++ = 9;
-#else
-        *cdata++ = 12;
-#endif
+        for (c = 0; c < s->cells_per_patch; ++c)
+        {
+            *cdata++ = 9;
+        }
+    }
+    else 
+    {
+        for (c = 0; c < s->cells_per_patch; ++c)
+        {
+            *cdata++ = 12;
+        }
     }
     write_buffer (s, s->psize_types);
 }
 
 static void
-write_mpirank_cb (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
+write_mpirank_cb (fclaw_domain_t * domain, fclaw_patch_t * patch,
                   int blockno, int patchno, void *user)
 {
-    fclaw2d_global_iterate_t *g = (fclaw2d_global_iterate_t*) user;
+    fclaw_global_iterate_t *g = (fclaw_global_iterate_t*) user;
     fclaw2d_vtk_state_t *s = (fclaw2d_vtk_state_t *) g->user;
     int c;
 
@@ -394,10 +386,10 @@ write_mpirank_cb (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
 }
 
 static void
-write_blockno_cb (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
+write_blockno_cb (fclaw_domain_t * domain, fclaw_patch_t * patch,
                   int blockno, int patchno, void *user)
 {
-    fclaw2d_global_iterate_t *g = (fclaw2d_global_iterate_t*) user;
+    fclaw_global_iterate_t *g = (fclaw_global_iterate_t*) user;
     fclaw2d_vtk_state_t *s = (fclaw2d_vtk_state_t *) g->user;
     int c;
 
@@ -410,10 +402,10 @@ write_blockno_cb (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
 }
 
 static void
-write_patchno_cb (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
+write_patchno_cb (fclaw_domain_t * domain, fclaw_patch_t * patch,
                   int blockno, int patchno, void *user)
 {
-    fclaw2d_global_iterate_t *g = (fclaw2d_global_iterate_t*) user;
+    fclaw_global_iterate_t *g = (fclaw_global_iterate_t*) user;
     fclaw2d_vtk_state_t *s = (fclaw2d_vtk_state_t *) g->user;
     int c;
     const int64_t gpno =
@@ -441,10 +433,10 @@ write_patchno_cb (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
 }
 
 static void
-write_meqn_cb (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
+write_meqn_cb (fclaw_domain_t * domain, fclaw_patch_t * patch,
                int blockno, int patchno, void *user)
 {
-    fclaw2d_global_iterate_t* g = (fclaw2d_global_iterate_t*) user;
+    fclaw_global_iterate_t* g = (fclaw_global_iterate_t*) user;
 
     fclaw2d_vtk_state_t *s = (fclaw2d_vtk_state_t *) g->user;
 
@@ -453,11 +445,11 @@ write_meqn_cb (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
 }
 
 static void
-fclaw2d_vtk_write_field (fclaw2d_global_t * glob, fclaw2d_vtk_state_t * s,
+fclaw2d_vtk_write_field (fclaw_global_t * glob, fclaw2d_vtk_state_t * s,
                          int64_t offset_field, int64_t psize_field,
-                         fclaw2d_patch_callback_t cb)
+                         fclaw_patch_callback_t cb)
 {
-    fclaw2d_domain_t *domain = glob->domain;
+    fclaw_domain_t *domain = glob->domain;
 
     int64_t bcount;
 #ifndef P4EST_ENABLE_MPIIO
@@ -499,7 +491,7 @@ fclaw2d_vtk_write_field (fclaw2d_global_t * glob, fclaw2d_vtk_state_t * s,
         SC_CHECK_MPI (mpiret);
 #endif
     }
-    fclaw2d_global_iterate_patches (glob, cb, s);
+    fclaw_global_iterate_patches (glob, cb, s);
     P4EST_FREE (s->buf);
 
 #ifdef P4EST_ENABLE_MPIIO
@@ -518,7 +510,7 @@ fclaw2d_vtk_write_field (fclaw2d_global_t * glob, fclaw2d_vtk_state_t * s,
 }
 
 static void
-fclaw2d_vtk_write_data (fclaw2d_global_t * glob, fclaw2d_vtk_state_t * s)
+fclaw2d_vtk_write_data (fclaw_global_t * glob, fclaw2d_vtk_state_t * s)
 {
 #ifdef P4EST_ENABLE_MPIIO
     int mpiret;
@@ -540,7 +532,7 @@ fclaw2d_vtk_write_data (fclaw2d_global_t * glob, fclaw2d_vtk_state_t * s)
     fclaw2d_vtk_write_field (glob, s, s->offset_position, s->psize_position,
                              write_position_cb);
     fclaw2d_vtk_write_field (glob, s, s->offset_connectivity,
-                             s->psize_connectivity, write_connectivity_cb);
+                             s->psize_connectivity, (s->dim == 2) ? write_2d_connectivity_cb : write_3d_connectivity_cb);
     fclaw2d_vtk_write_field (glob, s, s->offset_offsets, s->psize_offsets,
                              write_offsets_cb);
     fclaw2d_vtk_write_field (glob, s, s->offset_types, s->psize_types,
@@ -562,7 +554,7 @@ fclaw2d_vtk_write_data (fclaw2d_global_t * glob, fclaw2d_vtk_state_t * s)
 }
 
 static int
-fclaw2d_vtk_write_footer (fclaw2d_domain_t * domain, fclaw2d_vtk_state_t * s)
+fclaw2d_vtk_write_footer (fclaw_domain_t * domain, fclaw2d_vtk_state_t * s)
 {
     int retval;
     FILE *file;
@@ -590,40 +582,41 @@ fclaw2d_vtk_write_footer (fclaw2d_domain_t * domain, fclaw2d_vtk_state_t * s)
     return retval ? -1 : 0;
 }
 
-int
-fclaw2d_vtk_write_file (fclaw2d_global_t * glob, const char *basename,
-                        int mx, int my,
-#if PATCH_DIM == 3
-                        int mz,
-#endif
-                        int meqn,
-                        double vtkspace, int vtkwrite,
-                        fclaw2d_vtk_patch_data_t coordinate_cb,
-                        fclaw2d_vtk_patch_data_t value_cb)
+static int
+fclaw_vtk_write_file (int dim, fclaw_global_t * glob, const char *basename,
+                      int mx, int my, int mz,
+                      int meqn,
+                      double vtkspace, int vtkwrite,
+                      fclaw_vtk_patch_data_t coordinate_cb,
+                      fclaw_vtk_patch_data_t value_cb)
 {
-    fclaw2d_domain_t *domain = glob->domain;
+    fclaw_domain_t *domain = glob->domain;
 
     int retval, gretval;
     int mpiret;
     fclaw2d_vtk_state_t ps, *s = &ps;
 
     /* set up VTK internal information */
+    s->dim = dim;
+    s->patch_children = (dim == 2) ? 4 : 8;
     s->mx = mx;
     s->my = my;
-#if PATCH_DIM == 3
-    s->mz = mz;
-#endif
+    if(dim == 3)
+    {
+        s->mz = mz;
+    }
     s->meqn = meqn;
     s->points_per_patch = (mx + 1) * (my + 1);
     s->cells_per_patch = mx * my;
-#if PATCH_DIM == 3
-    s->points_per_patch *= (mz + 1);
-    s->cells_per_patch *= mz;
-#endif
+    if(dim == 3)
+    {
+        s->points_per_patch *= (mz + 1);
+        s->cells_per_patch *= mz;
+    }
     snprintf (s->filename, BUFSIZ, "%s.vtu", basename);
     s->global_num_points = s->points_per_patch * domain->global_num_patches;
     s->global_num_cells = s->cells_per_patch * domain->global_num_patches;
-    s->global_num_connectivity = PATCH_CHILDREN * (s->global_num_cells + 1);
+    s->global_num_connectivity = s->patch_children * (s->global_num_cells + 1);
     s->fits32 = s->global_num_points <= INT32_MAX
         && s->global_num_connectivity <= INT32_MAX;
     s->inttype = s->fits32 ? "Int32" : "Int64";
@@ -634,7 +627,7 @@ fclaw2d_vtk_write_file (fclaw2d_global_t * glob, const char *basename,
 
     /* compute data size per patch for the various VTK data arrays */
     s->psize_position = s->points_per_patch * 3 * sizeof (double);
-    s->psize_connectivity = s->cells_per_patch * PATCH_CHILDREN * s->intsize;
+    s->psize_connectivity = s->cells_per_patch * s->patch_children * s->intsize;
     s->psize_offsets = s->cells_per_patch * s->intsize;
     s->psize_types = s->cells_per_patch * 1;
     s->psize_mpirank = s->cells_per_patch * 4;
@@ -696,19 +689,43 @@ fclaw2d_vtk_write_file (fclaw2d_global_t * glob, const char *basename,
     return 0;
 }
 
+int
+fclaw_vtk_write_2d_file (fclaw_global_t * glob, const char *basename,
+                        int mx, int my,
+                        int meqn,
+                        double vtkspace, int vtkwrite,
+                        fclaw_vtk_patch_data_t coordinate_cb,
+                        fclaw_vtk_patch_data_t value_cb)
+{
+    return fclaw_vtk_write_file(2,glob,basename,mx,my,0,meqn,vtkspace,vtkwrite,
+                                coordinate_cb,value_cb);
+}
+
+int
+fclaw_vtk_write_3d_file (fclaw_global_t * glob, const char *basename,
+                        int mx, int my, int mz,
+                        int meqn,
+                        double vtkspace, int vtkwrite,
+                        fclaw_vtk_patch_data_t coordinate_cb,
+                        fclaw_vtk_patch_data_t value_cb)
+{
+    return fclaw_vtk_write_file(3,glob,basename,mx,my,mz,meqn,vtkspace,vtkwrite,
+                                coordinate_cb,value_cb);
+}
+
 static void
-fclaw2d_output_vtk_coordinate_cb (fclaw2d_global_t * glob,
-                                  fclaw2d_patch_t * patch,
+fclaw2d_output_vtk_coordinate_cb (fclaw_global_t * glob,
+                                  fclaw_patch_t * patch,
                                   int blockno, int patchno,
                                   char *a)
 {
     int mx,my,mbc;
     double dx,dy,xlower,ylower;
-#if PATCH_DIM == 2
-    fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mbc,
+    fclaw_clawpatch_2d_grid_data(glob,patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
-    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+    const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
+    fclaw2d_map_context_t* cont = fclaw2d_map_get(glob);
 
     /* Enumerate point coordinates in the patch */
     double *d = (double *) a;
@@ -722,7 +739,6 @@ fclaw2d_output_vtk_coordinate_cb (fclaw2d_global_t * glob,
             const double x = xlower + i * dx;
             if (fclaw_opt->manifold)
             {
-                fclaw2d_map_context_t *cont = glob->cont;
                 FCLAW2D_MAP_C2M(&cont,&blockno,&x,&y,&xpp,&ypp,&zpp);
                 *d++ = xpp;
                 *d++ = ypp;
@@ -736,13 +752,21 @@ fclaw2d_output_vtk_coordinate_cb (fclaw2d_global_t * glob,
             }
         }
     }
-#elif PATCH_DIM == 3
-    int mz;
-    double zlower, dz;
-    fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mz, &mbc,
+}
+
+static void
+fclaw3d_output_vtk_coordinate_cb (fclaw_global_t * glob,
+                                  fclaw_patch_t * patch,
+                                  int blockno, int patchno,
+                                  char *a)
+{
+    int mx,my,mz,mbc;
+    double dx,dy,dz,xlower,ylower,zlower;
+    fclaw_clawpatch_3d_grid_data(glob,patch,&mx,&my,&mz, &mbc,
                                 &xlower,&ylower,&zlower, &dx,&dy, &dz);
 
-    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+    const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
+    fclaw2d_map_context_t* cont = fclaw2d_map_get(glob);
     /* Enumerate point coordinates in the patch */
     double *d = (double *) a;
     int i, j, k;
@@ -758,7 +782,6 @@ fclaw2d_output_vtk_coordinate_cb (fclaw2d_global_t * glob,
                 const double x = xlower + i * dx;
                 if (fclaw_opt->manifold)
                 {
-                    fclaw2d_map_context_t *cont = glob->cont;
                     FCLAW3D_MAP_C2M(&cont,&blockno,&x,&y,&z,&xpp,&ypp,&zpp);
                     *d++ = xpp;
                     *d++ = ypp;
@@ -773,28 +796,23 @@ fclaw2d_output_vtk_coordinate_cb (fclaw2d_global_t * glob,
             }
         }
     }
-#endif
 }
 
 
 static void
-fclaw2d_output_vtk_value_cb (fclaw2d_global_t * glob,
-                             fclaw2d_patch_t * patch,
+fclaw2d_output_vtk_value_cb (fclaw_global_t * glob,
+                             fclaw_patch_t * patch,
                              int blockno, int patchno,
                              char *a)
 {
-
-//    fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt(glob);
-
     int meqn;
     double *q;
-    fclaw2d_clawpatch_soln_data(glob,patch,&q,&meqn);
+    fclaw_clawpatch_soln_data(glob,patch,&q,&meqn);
 
     int mx,my,mbc;
     double xlower,ylower,dx,dy;
-#if PATCH_DIM == 2
 
-    fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mbc,
+    fclaw_clawpatch_2d_grid_data(glob,patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
     const int xlane = mx + 2 * mbc;
@@ -817,11 +835,23 @@ fclaw2d_output_vtk_value_cb (fclaw2d_global_t * glob,
             }
         }
     }
-#elif PATCH_DIM == 3
-    int mz;
-    double zlower, dz;
-    fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mz, &mbc,
-                                &xlower,&ylower,&zlower, &dx,&dy, &dz);
+}
+
+static void
+fclaw3d_output_vtk_value_cb (fclaw_global_t * glob,
+                             fclaw_patch_t * patch,
+                             int blockno, int patchno,
+                             char *a)
+{
+
+    int meqn;
+    double *q;
+    fclaw_clawpatch_soln_data(glob,patch,&q,&meqn);
+
+    int mx,my,mz,mbc;
+    double xlower,ylower,zlower,dx,dy,dz;
+    fclaw_clawpatch_3d_grid_data(glob,patch,&mx,&my,&mz, &mbc,
+                               &xlower,&ylower,&zlower, &dx,&dy, &dz);
 
     const int xlane = mx + 2 * mbc;
     const int ylane = my + 2 * mbc;
@@ -847,7 +877,6 @@ fclaw2d_output_vtk_value_cb (fclaw2d_global_t * glob,
             }
         }
     }
-#endif
 }
 
 /*  --------------------------------------------------------------------------
@@ -855,10 +884,10 @@ fclaw2d_output_vtk_value_cb (fclaw2d_global_t * glob,
     ------------------------------------------------------------------------- */
 #if 0
 static void
-fclaw2d_output_write_vtk_debug (fclaw2d_global_t * glob, const char *basename)
+fclaw2d_output_write_vtk_debug (fclaw_global_t * glob, const char *basename)
 {
-    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
-    const fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
+    const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
+    const fclaw_clawpatch_options_t *clawpatch_opt = fclaw_clawpatch_get_options(glob);
 
     (void) fclaw2d_vtk_write_file (glob, basename,
                                    clawpatch_opt->mx, clawpatch_opt->my,
@@ -877,24 +906,44 @@ fclaw2d_output_write_vtk_debug (fclaw2d_global_t * glob, const char *basename)
     Public interface
     --------------------------------------------------------------------------- */
 
-void fclaw2d_clawpatch_output_vtk (fclaw2d_global_t * glob, int iframe)
+void fclaw_clawpatch_output_vtk_to_file (fclaw_global_t * glob, const char* filename)
 {
-    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
-    const fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
+    const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
+    const fclaw_clawpatch_options_t *clawpatch_opt = fclaw_clawpatch_get_options(glob);
 
+
+    if(clawpatch_opt->patch_dim == 2)
+    {
+        fclaw_vtk_write_2d_file (glob, filename,
+                                clawpatch_opt->mx, 
+                                clawpatch_opt->my,
+                                clawpatch_opt->meqn,
+                                fclaw_opt->vtkspace, 0,
+                                fclaw2d_output_vtk_coordinate_cb,
+                                fclaw2d_output_vtk_value_cb);
+
+    }
+    else 
+    {
+        fclaw_vtk_write_3d_file (glob, filename,
+                                clawpatch_opt->mx, 
+                                clawpatch_opt->my, 
+                                clawpatch_opt->mz,
+                                clawpatch_opt->meqn,
+                                fclaw_opt->vtkspace, 0,
+                                fclaw3d_output_vtk_coordinate_cb,
+                                fclaw3d_output_vtk_value_cb);
+    }
+}
+void fclaw_clawpatch_output_vtk (fclaw_global_t * glob, int iframe)
+{
+    const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
 
     char basename[BUFSIZ];
     snprintf (basename, BUFSIZ, "%s_frame_%04d", fclaw_opt->prefix, iframe);
 
-    (void) fclaw2d_vtk_write_file (glob, basename,
-                                   clawpatch_opt->mx, clawpatch_opt->my,
-#if PATCH_DIM == 3
-                                   clawpatch_opt->mz,
-#endif
-                                   clawpatch_opt->meqn,
-                                   fclaw_opt->vtkspace, 0,
-                                   fclaw2d_output_vtk_coordinate_cb,
-                                   fclaw2d_output_vtk_value_cb);
+    fclaw_clawpatch_output_vtk_to_file(glob,basename);
 }
+
 
 

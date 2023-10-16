@@ -16,7 +16,7 @@
 !! @param[in] is_ghost true if cell is a ghost cell
 !! @return 1 if exceeds threshold, 0 if not, -1 if inconclusive.
 !  --------------------------------------------------------------
-integer function fclaw3dx_clawpatch_value_exceeds_th(blockno, meqn, & 
+integer function fclaw3d_clawpatch_value_exceeds_th(blockno, meqn, & 
                                   qval,qmin,qmax,quad, & 
                                   dx,dy,dz, xc,yc,zc, ivar_threshold, threshold, &
                                   init_flag, is_ghost)
@@ -39,6 +39,6 @@ integer function fclaw3dx_clawpatch_value_exceeds_th(blockno, meqn, &
         refine = 1
     endif
 
-    fclaw3dx_clawpatch_value_exceeds_th = refine
+    fclaw3d_clawpatch_value_exceeds_th = refine
 
-end function fclaw3dx_clawpatch_value_exceeds_th
+end function fclaw3d_clawpatch_value_exceeds_th

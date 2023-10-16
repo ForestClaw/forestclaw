@@ -23,8 +23,8 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef PILLOWSPHERE_H
-#define PILLOWSPHERE_H
+#ifndef FCLAW_CLAWPATCH_PILLOW_H
+#define FCLAW_CLAWPATCH_PILLOW_H
 
 #include <fclaw2d_defs.h>
 
@@ -37,7 +37,7 @@ extern "C"
 #endif
 
 struct fclaw2d_glob;
-struct fclaw2d_patch;
+struct fclaw_patch;
 struct fclaw2d_patch_transform;
 
 /**
@@ -47,7 +47,7 @@ struct fclaw2d_patch_transform;
  */
 
 /** typedef */
-typedef struct fclaw2d_clawpatch_pillow_vtable fclaw2d_clawpatch_pillow_vtable_t;
+typedef struct fclaw_clawpatch_pillow_vtable fclaw_clawpatch_pillow_vtable_t;
 
 
 /* ----------------------------- Fortran typedefs ------------------------------------- */
@@ -112,66 +112,104 @@ typedef void  (*pillow_fort_interpolate_block_corner_t)(int* mx, int* my, int* m
                                                         double qfine[], 
                                                         int* icoarse_corner,
                                                         int* blockno);
-#if 0
-typedef void (*pillow_fort_copy_block_corner_t)(const int* mx, 
-                                                const int* my,
-                                                const int *mz,
-                                                const int* mbc, 
-                                                const int* meqn,
-                                                double qthis[], 
-                                                double qneighbor[], 
-                                                const int* icorner,
-                                                const int* iblock);
 
-typedef void  (*pillow_fort_average_block_corner_t)(const int* mx, 
-                                                    const int* my, 
-                                                    const int* mz, 
-                                                    const double *dz, 
-                                                    const int* mbc,
-                                                    const int* meqn, 
-                                                    const int* refratio, 
-                                                    double qcoarse[],
-                                                    double qfine[], 
-                                                    double areacoarse[], 
-                                                    double areafine[],
-                                                    const int* coarse_corner,
-                                                    const int* blockno);
+/* ----------------------------- Fortran typedefs ------------------------------------- */
 
-typedef void  (*pillow_fort_interpolate_block_corner_t)(const int* mx, 
-                                                        const int* my, 
-                                                        const int* mz,
-                                                        const int* mbc,
-                                                        const int* meqn, 
-                                                        const int* refratio,
-                                                        double qcoarse[],
-                                                        double qfine[], 
-                                                        const int* icoarse_corner,
-                                                        const int* blockno);
+/**
+ * @brief Handles the boundary condition at block corners
+ * 
+ * @param[in] my, my, mz the number of cells in the x, y, and z directions
+ * @param[in] mbc the number of ghost cells
+ * @param[in] meqn the number of equations
+ * @param[in,out] qthis this solution
+ * @param[in,out] qneighbor the neighbor solution
+ * @param[in] icorner the corner that the neighbor is on
+ * @param[in] iblock the block number
+ */
+typedef void (*fclaw3dx_clawpatch_pillow_fort_copy_block_corner_t)(int* mx, 
+                                                                   int* my, 
+                                                                   int* mz,
+                                                                   int* mbc, 
+                                                                   int* meqn,
+                                                                   double qthis[], 
+                                                                   double qneighbor[], 
+                                                                   int* icorner,
+                                                                   int* iblock);
+    
+/**
+ * @brief Handles the boundary condition at block corners with finer neighbors
+ * 
+ * @param[in] my, my, mz the number of cells in the x, y, and z directions
+ * @param[in] dz the spacing in the z direction
+ * @param[in] mbc the number of ghost cells
+ * @param[in] meqn the number of equations
+ * @param[in] refratio the refinement ratio
+ * @param[in,out] qcoarse this solution
+ * @param[in] qfine the neighbor solution
+ * @param[in] areacoarse cell areas
+ * @param[in] areafine neighbor cell areas
+ * @param[in] icorner the corner that the fine neighbor is on
+ * @param[in] blockno the block number
+ */
+typedef void  (*fclaw3dx_clawpatch_pillow_fort_average_block_corner_t)(int* mx, 
+                                                                       int* my, 
+                                                                       int* mz,
+                                                                       double* dz,
+                                                                       int* mbc,
+                                                                       int* meqn, 
+                                                                       int* refratio, 
+                                                                       double qcoarse[],
+                                                                       double qfine[], 
+                                                                       double areacoarse[], 
+                                                                       double areafine[],
+                                                                       int* icorner,
+                                                                       int* blockno);
 
-#endif
-
+/**
+ * @brief Handles the boundary condition at block corners with coarser neighbors
+ * 
+ * @param[in] my, my, mz the number of cells in the x, y, and z directions
+ * @param[in] mbc the number of ghost cells
+ * @param[in] meqn the number of equations
+ * @param[in] refratio the refinement ratio
+ * @param[in] qcoarse this solution
+ * @param[in,out] qfine the neighbor solution
+ * @param[in] icorner_coarse the corner that the fine neighbor is on
+ * @param[in] blockno the block number
+ */
+typedef void  (*fclaw3dx_clawpatch_pillow_fort_interpolate_block_corner_t)(int* mx, 
+                                                                           int* my, 
+                                                                           int* mz,
+                                                                           int* mbc, 
+                                                                           int* meqn, 
+                                                                           int* refratio,
+                                                                           double qcoarse[],
+                                                                           double qfine[], 
+                                                                           int* icoarse_corner,
+                                                                           int* blockno);
+ 
 /* ----------------------------- Use pillow sphere ------------------------------------ */
 
 /**
  * @brief Sets global patch_vtable to use pollow sphere routines
  */
-void fclaw2d_clawpatch_use_pillowsphere(struct fclaw2d_global* glob);
+void fclaw_clawpatch_use_pillowsphere(struct fclaw_global* glob);
 
 /* --------------------------------- Virtual table ------------------------------------ */
 
 /**
- * @brief Initialize the pillow vtable
+ * @brief Initialize the pillow vtable for clawpatch
  * 
  * @param glob the global context
  * @param claw_version the clawaptck verstion 4 for v4.6, 5 for v5
  */
-void fclaw2d_clawpatch_pillow_vtable_initialize(struct fclaw2d_global* glob, 
-                                                int claw_version);
+void fclaw_clawpatch_pillow_vtable_initialize(struct fclaw_global* glob, 
+                                              int claw_version);
 
 /**
  * @brief vtable for handling block corners for pillow sphere
  */
-struct fclaw2d_clawpatch_pillow_vtable
+struct fclaw_clawpatch_pillow_vtable_d2
 {
     /* Block corners */
     /** Handles the boundary condition at block corners */
@@ -180,6 +218,26 @@ struct fclaw2d_clawpatch_pillow_vtable
     pillow_fort_average_block_corner_t        fort_average_block_corner;
     /** Handles the boundary condition at block corners with coarser neighbors */
     pillow_fort_interpolate_block_corner_t    fort_interpolate_block_corner;
+};
+/**
+ * @brief vtable for handling block corners for pillow sphere
+ */
+struct fclaw_clawpatch_pillow_vtable_d3
+{
+    /* Block corners */
+    /** Handles the boundary condition at block corners */
+    fclaw3dx_clawpatch_pillow_fort_copy_block_corner_t           fort_copy_block_corner;
+    /** Handles the boundary condition at block corners with finer neighbors */
+    fclaw3dx_clawpatch_pillow_fort_average_block_corner_t        fort_average_block_corner;
+    /** Handles the boundary condition at block corners with coarser neighbors */
+    fclaw3dx_clawpatch_pillow_fort_interpolate_block_corner_t    fort_interpolate_block_corner;
+};
+
+struct fclaw_clawpatch_pillow_vtable
+{
+    int dim;
+    struct fclaw_clawpatch_pillow_vtable_d2* d2;
+    struct fclaw_clawpatch_pillow_vtable_d3* d3;
 
     /** True if vtable is set */
     int is_set;
@@ -194,7 +252,7 @@ struct fclaw2d_clawpatch_pillow_vtable
  * @param glob the global context
  * @return fclaw2d_clawpatch_pillow_vtable_t* the vtable
  */
-fclaw2d_clawpatch_pillow_vtable_t* fclaw2d_clawpatch_pillow_vt(struct fclaw2d_global* glob);
+fclaw_clawpatch_pillow_vtable_t* fclaw_clawpatch_pillow_vt(struct fclaw_global* glob);
 
 
 #ifdef __cplusplus

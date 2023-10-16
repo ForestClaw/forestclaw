@@ -23,8 +23,8 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FCLAW2D_CLAWPATCH_DIAGNOSTICS_H
-#define FCLAW2D_CLAWPATCH_DIAGNOSTICS_H
+#ifndef FCLAW_CLAWPATCH_DIAGNOSTICS_H
+#define FCLAW_CLAWPATCH_DIAGNOSTICS_H
 
 /** 
  *  @file
@@ -39,8 +39,8 @@ extern "C"
 #endif
 #endif
 
-struct fclaw2d_global;
-struct fclaw2d_patch;
+struct fclaw_global;
+struct fclaw_patch;
 
 /**
  * @brief Data structure for default diagnostic routines
@@ -64,8 +64,8 @@ typedef struct {
  * @param glob the global context
  * @param patch_acc the data structure
  */
-void fclaw2d_clawpatch_diagnostics_initialize(struct fclaw2d_global *glob,
-                                              void** patch_acc);
+void fclaw_clawpatch_diagnostics_initialize(struct fclaw_global *glob,
+                                            void** patch_acc);
 
 /**
  * @brief Iterate over patches and perform computations
@@ -73,8 +73,8 @@ void fclaw2d_clawpatch_diagnostics_initialize(struct fclaw2d_global *glob,
  * @param glob the global context
  * @param patch_acc the user defined data structure
  */
-void fclaw2d_clawpatch_diagnostics_compute(struct fclaw2d_global *glob,
-                                           void* patch_acc);
+void fclaw_clawpatch_diagnostics_compute(struct fclaw_global *glob,
+                                         void* patch_acc);
 
 /**
  * @brief Perform final computations after fclaw2d_clawpatch_diagnostics_computer() has been called
@@ -83,8 +83,8 @@ void fclaw2d_clawpatch_diagnostics_compute(struct fclaw2d_global *glob,
  * @param patch_acc the user defined data structure
  * @param init_flag true if in init stage
  */
-void fclaw2d_clawpatch_diagnostics_gather(struct fclaw2d_global *glob,
-                                          void* patch_acc, int init_flag);
+void fclaw_clawpatch_diagnostics_gather(struct fclaw_global *glob,
+                                        void* patch_acc, int init_flag);
 
 /**
  * @brief reset the user defined data structure
@@ -92,8 +92,8 @@ void fclaw2d_clawpatch_diagnostics_gather(struct fclaw2d_global *glob,
  * @param glob the global context
  * @param patch_acc the user defined data structure
  */
-void fclaw2d_clawpatch_diagnostics_reset(struct fclaw2d_global *glob,
-                                         void* patch_acc);
+void fclaw_clawpatch_diagnostics_reset(struct fclaw_global *glob,
+                                       void* patch_acc);
 
 /**
  * @brief Deallocate the user defined data structure
@@ -101,8 +101,8 @@ void fclaw2d_clawpatch_diagnostics_reset(struct fclaw2d_global *glob,
  * @param glob the global context
  * @param patch_acc the user defined data structure
  */
-void fclaw2d_clawpatch_diagnostics_finalize(struct fclaw2d_global *glob,
-                                            void** patch_acc);
+void fclaw_clawpatch_diagnostics_finalize(struct fclaw_global *glob,
+                                          void** patch_acc);
 
 /**
  * @brief Initialize a global vtable
@@ -111,10 +111,10 @@ void fclaw2d_clawpatch_diagnostics_finalize(struct fclaw2d_global *glob,
  * 
  * @param glob the global context
  */
-void fclaw2d_clawpatch_diagnostics_vtable_initialize(struct fclaw2d_global* glob);
+void fclaw_clawpatch_diagnostics_vtable_initialize(struct fclaw_global* glob);
 
 /**
- * @brief Calls the function in fclaw2d_clawpatch_vtable.fort_conservation_check
+ * @brief Calls the function in fclaw_clawpatch_vtable.fort_conservation_check
  * 
  * @param glob the global context
  * @param patch the patch context
@@ -122,14 +122,14 @@ void fclaw2d_clawpatch_diagnostics_vtable_initialize(struct fclaw2d_global* glob
  * @param patchno the patch number
  * @param error_data user data pointer
  */
-void fclaw2d_clawpatch_diagnostics_cons_default(struct fclaw2d_global *glob,
-                                                struct fclaw2d_patch *patch,
-                                                int blockno,
-                                                int patchno,
-                                                void *error_data);
+void fclaw_clawpatch_diagnostics_cons_default(struct fclaw_global *glob,
+                                              struct fclaw_patch *patch,
+                                              int blockno,
+                                              int patchno,
+                                              void *error_data);
 
 /**
- * @brief Calls the function in fclaw2d_clawpatch_vtable.fort_compute_patch_error
+ * @brief Calls the function in fclaw_clawpatch_vtable.fort_compute_patch_error
  * 
  * @param glob the global context
  * @param patch the patch context
@@ -137,11 +137,11 @@ void fclaw2d_clawpatch_diagnostics_cons_default(struct fclaw2d_global *glob,
  * @param patchno the patch number
  * @param error_data user data pointer
  */
-void fclaw2d_clawpatch_diagnostics_error_default(struct fclaw2d_global *glob,
-                                                 struct fclaw2d_patch *patch,
-                                                 int blockno,
-                                                 int patchno,
-                                                 void *error_data);
+void fclaw_clawpatch_diagnostics_error_default(struct fclaw_global *glob,
+                                               struct fclaw_patch *patch,
+                                               int blockno,
+                                               int patchno,
+                                               void *error_data);
 
 
 #ifdef __cplusplus
