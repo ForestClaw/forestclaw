@@ -25,8 +25,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "fc3d_clawpack46_options.h"
 
-#include <fclaw2d_clawpatch_options.h>
-#include <fclaw2d_global.h>
+#include <fclaw_clawpatch_options.h>
+#include <fclaw_global.h>
 #include <fclaw_options.h>
 
 static void*
@@ -63,7 +63,10 @@ clawpack_register (fc3d_clawpack46_options_t* clawopt, sc_options_t * opt)
                            "Output ASCII formatted data [F]");
 
     sc_options_add_bool (opt, 0, "vtk-out", &clawopt->vtk_out, 0,
-                           "Output VTK formatted data [F]");
+                           "Output VTK (vtu) formatted data [F]");
+
+    sc_options_add_bool (opt, 0, "vtpd-out", &clawopt->vtpd_out, 0,
+                           "Output VTK (vtpd) formatted data [F]");
 
 
     clawopt->is_registered = 1;
@@ -199,12 +202,12 @@ fc3d_clawpack46_options_t*  fc3d_clawpack46_options_register (fclaw_app_t * app,
     return clawopt;
 }
 
-fc3d_clawpack46_options_t* fc3d_clawpack46_get_options(fclaw2d_global_t *glob)
+fc3d_clawpack46_options_t* fc3d_clawpack46_get_options(fclaw_global_t *glob)
 {
-    return (fc3d_clawpack46_options_t*) fclaw2d_global_get_options(glob,"fc3d_clawpack46");
+    return (fc3d_clawpack46_options_t*) fclaw_global_get_options(glob,"fc3d_clawpack46");
 }
 
-void fc3d_clawpack46_options_store (fclaw2d_global_t* glob, fc3d_clawpack46_options_t* clawopt)
+void fc3d_clawpack46_options_store (fclaw_global_t* glob, fc3d_clawpack46_options_t* clawopt)
 {
-    fclaw2d_global_options_store(glob, "fc3d_clawpack46", clawopt);
+    fclaw_global_options_store(glob, "fc3d_clawpack46", clawopt);
 }
