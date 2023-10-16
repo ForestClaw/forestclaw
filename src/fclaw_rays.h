@@ -23,10 +23,10 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FCLAW2D_INTEGRATE_H
-#define FCLAW2D_INTEGRATE_H
+#ifndef FCLAW2D_RAYS_H
+#define FCLAW2D_RAYS_H
 
-#include "fclaw2d_convenience.h"  /* Needed for def. of fclaw2d_integrate_t */
+#include "fclaw_convenience.h"  /* Needed for def. of fclaw2d_integrate_t */
 
 #ifdef __cplusplus
 extern "C"
@@ -37,69 +37,69 @@ extern "C"
 /* fix syntax highlighting */
 #endif    
 
-struct fclaw2d_global;
-struct fclaw2d_domain;
+struct fclaw_global;
+struct fclaw_domain;
 
 
 
-typedef struct fclaw2d_ray_vtable fclaw2d_ray_vtable_t;
+typedef struct fclaw_ray_vtable fclaw_ray_vtable_t;
 
-struct fclaw2d_global;
+struct fclaw_global;
 
 /* This is a polynmorphic type */
-typedef struct fclaw2d_ray
+typedef struct fclaw_ray
 {
     int num;                 /* User defined ID */
     void* ray_data;          /* User defined */
     double integral;         /**< scalar integral value lives here */
     int untrustworthy;       /**< set to nonzero if integration
                                   result may be inaccurate */
-} fclaw2d_ray_t;
+} fclaw_ray_t;
 
 
-typedef void (*fclaw2d_ray_allocate_and_define_t)(struct fclaw2d_global *glob, 
-                                                  fclaw2d_ray_t **rays, 
+typedef void (*fclaw_ray_allocate_and_define_t)(struct fclaw_global *glob, 
+                                                  fclaw_ray_t **rays, 
                                                   int *num);
 
-typedef void (*fclaw2d_ray_deallocate_t)(struct fclaw2d_global *glob, 
-                                         fclaw2d_ray_t **rays, 
+typedef void (*fclaw_ray_deallocate_t)(struct fclaw_global *glob, 
+                                         fclaw_ray_t **rays, 
                                          int *num);
 
 
 
 #if 0
-typedef void (*fclaw2d_ray_create_files_t)(struct fclaw2d_global *glob, 
-                                           struct fclaw2d_ray *rays, 
-                                           int num_rays);
+typedef void (*fclaw_ray_create_files_t)(struct fclaw_global *glob, 
+                                         struct fclaw_ray *rays, 
+                                         int num_rays);
 
-typedef void (*fclaw2d_ray_normalize_t)(struct fclaw2d_global *glob, 
-                                       struct fclaw2d_block *block,
-                                       int blockno, 
-                                       struct fclaw2d_ray *g,
-                                       double *xc, double *yc);
+typedef void (*fclaw_ray_normalize_t)(struct fclaw_global *glob, 
+                                      struct fclaw_block *block,
+                                      int blockno, 
+                                      struct fclaw_ray *g,
+                                      double *xc, double *yc);
 
 
-typedef void (*fclaw2d_ray_update_t)(struct fclaw2d_global* glob, 
-                                     struct fclaw2d_block* block,
-                                     struct fclaw2d_patch* patch, 
-                                     int blockno, int patchno,
-                                     double tcurr, struct fclaw2d_ray *g);
+typedef void (*fclaw_ray_update_t)(struct fclaw_global* glob, 
+                                   struct fclaw_block* block,
+                                   struct fclaw_patch* patch, 
+                                   int blockno, int patchno,
+                                   double tcurr, struct fclaw_ray *g);
 
-typedef void (*fclaw2d_ray_print_t)(struct fclaw2d_global *glob, 
-                                    struct fclaw2d_ray *ray);
+typedef void (*fclaw_ray_print_t)(struct fclaw_global *glob, 
+                                  struct fclaw2d_ray *ray);
 
-typedef void (*fclaw2d_ray_destroy_buffer_data_t)(struct fclaw2d_global *glob, 
-                                                  void* gdata);
+typedef void (*fclaw_ray_destroy_buffer_data_t)(struct fclaw_global *glob, 
+                                                void* gdata);
 
 #endif
 
 
-struct fclaw2d_ray_vtable
+struct fclaw_ray_vtable
 {
-    fclaw2d_ray_allocate_and_define_t   allocate_and_define;
-    fclaw2d_ray_deallocate_t            deallocate;
+    fclaw_ray_allocate_and_define_t   allocate_and_define;
+    fclaw_ray_deallocate_t            deallocate;
 
-    fclaw2d_integrate_ray_t             integrate;   /* Function that does the integration */
+    fclaw_integrate_ray_t             integrate;   /* Function that does the integration */
 #if 0
     fclaw2d_ray_create_files_t  create_ray_files;
     fclaw2d_ray_update_t        update_ray;
@@ -111,28 +111,28 @@ struct fclaw2d_ray_vtable
 };
 
 
-void fclaw2d_ray_allocate_and_define(struct fclaw2d_global* glob, 
-                                     fclaw2d_ray_t **rays, 
-                                     int *num_rays);
+void fclaw_ray_allocate_and_define(struct fclaw_global* glob, 
+                                   fclaw_ray_t **rays, 
+                                   int *num_rays);
 
-void fclaw2d_ray_deallocate(struct fclaw2d_global* glob, 
-                            fclaw2d_ray_t **rays, 
-                            int *num_rays);
+void fclaw_ray_deallocate(struct fclaw_global* glob, 
+                          fclaw_ray_t **rays, 
+                          int *num_rays);
 
-void fclaw2d_ray_set_ray(fclaw2d_ray_t *r, 
-                         int id, 
-                         void* ray_data);
+void fclaw_ray_set_ray(fclaw_ray_t *r, 
+                       int id, 
+                       void* ray_data);
 
-void* fclaw2d_ray_get_ray(fclaw2d_ray_t *r, 
-                          int *id);
+void* fclaw_ray_get_ray(fclaw_ray_t *r, 
+                        int *id);
 
-fclaw2d_ray_vtable_t* fclaw2d_ray_vt(struct fclaw2d_global *glob);
+fclaw_ray_vtable_t* fclaw_ray_vt(struct fclaw_global *glob);
 
-void fclaw2d_ray_vtable_initialize(struct fclaw2d_global *glob);
+void fclaw_ray_vtable_initialize(struct fclaw_global *glob);
 
-fclaw2d_ray_t* fclaw2d_ray_allocate_rays(int num_rays);
+fclaw_ray_t* fclaw_ray_allocate_rays(int num_rays);
 
-int fclaw2d_ray_deallocate_rays(fclaw2d_ray_t **rays);
+int fclaw_ray_deallocate_rays(fclaw_ray_t **rays);
 
 
 #endif
