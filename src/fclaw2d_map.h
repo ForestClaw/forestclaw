@@ -28,7 +28,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw_base.h>
 #include <fclaw2d_map_query_defs.h>
-#include <fclaw_global.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -39,8 +38,9 @@ extern "C"
 /* Fix syntax highlighting */
 #endif
 
+typedef struct fclaw_global fclaw_global_t;
 struct p4est_connectivity;
-struct fclaw2d_global;
+struct fclaw_global;
 
 struct fclaw2d_map_context;
 
@@ -133,8 +133,24 @@ struct fclaw2d_map_context
     void *user_data;
 };
 
-fclaw2d_map_context_t
- * fclaw2d_map_get(fclaw_global_t* glob);
+/**
+ * Store the map in the glob
+ *
+ * @param glob the global context
+ * @param map the map to store
+ */
+void fclaw2d_map_store (fclaw_global_t* glob,
+                        struct fclaw2d_map_context * map);
+
+/**
+ * Get map from the glob
+ *
+ * @param the global context
+ * @return the map
+ */
+fclaw2d_map_context_t* fclaw2d_map_get(fclaw_global_t* glob);
+
+
 
 void set_scale(fclaw2d_map_context_t* cont, const double scale[]);
 void set_shift(fclaw2d_map_context_t* cont, const double shift[]);
@@ -303,7 +319,7 @@ fclaw2d_map_context_t* fclaw2d_map_new_brick_conn
    ---------------------------------------------------------------------------------- */
 
 /* This is called to determine is a map is a pillow sphere or not */
-int fclaw2d_map_pillowsphere(struct fclaw2d_global* glob);
+int fclaw2d_map_pillowsphere(struct fclaw_global* glob);
 
 
 #if 0

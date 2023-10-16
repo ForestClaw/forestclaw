@@ -23,33 +23,36 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef REFINE_DIM
-#define REFINE_DIM 2
-#endif
+#ifndef P4_TO_P8
 
-#ifndef PATCH_DIM
-#define PATCH_DIM 2
-#endif
-
-
-#if PATCH_DIM == 2
-
-#include <fclaw2d_global.h>
+#include <fclaw_global.h>
 #include <fclaw2d_map.h>
 #include <fclaw2d_map_query.h>  /* Needed for pillowsphere query */
 
-#elif PATCH_DIM == 3 && REFINE_DIM == 2
+#define MAP_KEY "map_2d"
 
-#include <fclaw2d_global.h>
-#include <fclaw3dx_map.h>
-//#include <fclaw3d_map_query.h>  /* Needed for pillowsphere query */
-//#include <_fclaw2d_to_fclaw3d.h>
+#else
 
-#else /* this is full 3D */
 #include <fclaw3d_map.h>
+
+#define MAP_KEY "map_3d"
+
 #endif
 
 #ifndef P4_TO_P8
+
+void
+fclaw2d_map_store (fclaw_global_t* glob,
+                          fclaw2d_map_context_t * map)
+{
+    fclaw_global_attribute_store(glob, MAP_KEY, map, NULL);
+}
+
+fclaw2d_map_context_t*
+fclaw2d_map_get(fclaw_global_t* glob)
+{
+    return (fclaw2d_map_context_t*) fclaw_global_get_attribute(glob,MAP_KEY);
+}
 
 /* This function can be called from Fortran inside of ClawPatch. */
 void
@@ -141,7 +144,6 @@ void FCLAW2D_MAP_BRICK2C (fclaw2d_map_context_t ** pcont, int *blockno,
     }
 }
 
-#endif /* !P4_TO_P8 */
 
 /* This function is expected to be called from C or C++. */
 void
@@ -162,6 +164,8 @@ fclaw2d_map_destroy (fclaw2d_map_context_t * cont)
         cont->destroy (cont);
     }
 }
+
+#endif /* !P4_TO_P8 */
 
 #ifndef P4_TO_P8
 
@@ -489,9 +493,9 @@ fclaw2d_options_postprocess_map_data(fclaw2d_map_data_t * map_data)
 }
 #endif
 
-int fclaw2d_map_pillowsphere(fclaw2d_global_t* glob)
+int fclaw2d_map_pillowsphere(fclaw_global_t* glob)
 {
-    fclaw2d_map_context_t *cont = glob->cont;
+    fclaw2d_map_context_t *cont = fclaw2d_map_get(glob);
     return FCLAW2D_MAP_IS_PILLOWSPHERE(&cont) != 0;    
 }
 
