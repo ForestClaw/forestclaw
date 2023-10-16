@@ -39,6 +39,7 @@ libforestclaw_installed_headers = \
   	src/fclaw_update_single_step.h \
   	src/fclaw_time_sync.h \
 	src/fclaw_forestclaw.h \
+	src/fclaw_include_all.h \
 	src/fp_exception_glibc_extension.h \
 	src/fclaw2d_include_all.h \
 	src/fclaw2d_defs.h \

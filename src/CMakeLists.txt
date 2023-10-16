@@ -171,6 +171,7 @@ install(FILES
   fclaw_update_single_step.h
   fclaw_time_sync.h
   fclaw_forestclaw.h
+  fclaw_include_all.h
 	forestclaw2d.h 
 	fp_exception_glibc_extension.h 
   fclaw2d_include_all.h 
