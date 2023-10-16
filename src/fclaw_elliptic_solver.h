@@ -24,8 +24,8 @@
 */
 
 
-#ifndef FCLAW2D_ELLIPTIC_SOLVER_H
-#define FCLAW2D_ELLIPTIC_SOLVER_H
+#ifndef FCLAW_ELLIPTIC_SOLVER_H
+#define FCLAW_ELLIPTIC_SOLVER_H
 
 #ifdef __cplusplus
 extern "C"
@@ -35,34 +35,34 @@ extern "C"
 #endif
 #endif
 
-struct fclaw2d_global;
+struct fclaw_global;
 
-typedef void (*fclaw2d_elliptic_setup_t)(struct fclaw2d_global *glob);
+typedef void (*fclaw_elliptic_setup_t)(struct fclaw_global *glob);
 
-typedef void (*fclaw2d_elliptic_rhs_t)(struct fclaw2d_global *glob);
+typedef void (*fclaw_elliptic_rhs_t)(struct fclaw_global *glob);
 
-typedef void (*fclaw2d_elliptic_solve_t)(struct fclaw2d_global *glob);
+typedef void (*fclaw_elliptic_solve_t)(struct fclaw_global *glob);
 
-typedef void (*fclaw2d_elliptic_physical_bc_t)(struct fclaw2d_global *glob);
+typedef void (*fclaw_elliptic_physical_bc_t)(struct fclaw_global *glob);
 
 
 
-typedef struct fclaw2d_elliptic_vtable
+typedef struct fclaw_elliptic_vtable
 {
-    fclaw2d_elliptic_setup_t       setup;
-    fclaw2d_elliptic_rhs_t         rhs;
-    fclaw2d_elliptic_solve_t       solve;
-    fclaw2d_elliptic_physical_bc_t apply_bc;
+    fclaw_elliptic_setup_t       setup;
+    fclaw_elliptic_rhs_t         rhs;
+    fclaw_elliptic_solve_t       solve;
+    fclaw_elliptic_physical_bc_t apply_bc;
 
     int is_set;
 
-} fclaw2d_elliptic_vtable_t;
+} fclaw_elliptic_vtable_t;
 
-void fclaw2d_elliptic_vtable_initialize(struct fclaw2d_global* glob);
+void fclaw_elliptic_vtable_initialize(struct fclaw_global* glob);
 
-void fclaw2d_elliptic_solve(struct fclaw2d_global *glob);
+void fclaw_elliptic_solve(struct fclaw_global *glob);
 
-fclaw2d_elliptic_vtable_t* fclaw2d_elliptic_vt(struct fclaw2d_global* glob);
+fclaw_elliptic_vtable_t* fclaw_elliptic_vt(struct fclaw_global* glob);
 
 #ifdef __cplusplus
 #if 0
