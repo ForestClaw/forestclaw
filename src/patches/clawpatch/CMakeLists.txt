@@ -9,6 +9,10 @@ add_library(clawpatch_f OBJECT
   fort_user/fclaw2d_clawpatch_value_exceeds_th.f90
   fort_user/fclaw2d_clawpatch_minmax_exceeds_th.f90
   fort_user/fclaw2d_clawpatch_gradient_exceeds_th.f90
+  fort3_user/fclaw3d_clawpatch_difference_exceeds_th.f90
+  fort3_user/fclaw3d_clawpatch_value_exceeds_th.f90
+  fort3_user/fclaw3d_clawpatch_minmax_exceeds_th.f90
+  fort3_user/fclaw3d_clawpatch_gradient_exceeds_th.f90
   fort3_user/fclaw3dx_clawpatch_difference_exceeds_th.f90
   fort3_user/fclaw3dx_clawpatch_value_exceeds_th.f90
   fort3_user/fclaw3dx_clawpatch_minmax_exceeds_th.f90
@@ -33,6 +37,15 @@ add_library(clawpatch_f OBJECT
   fort_5.0/fclaw2d_clawpatch5_tag4refinement.f
   fort_5.0/fclaw2d_clawpatch5_tag4coarsening.f
   fort_5.0/fclaw2d_clawpatch5_timeinterp.f
+  fort3_4.6/fclaw3d_clawpatch46_tag4refinement.f90 
+  fort3_4.6/fclaw3d_clawpatch46_tag4coarsening.f90 
+  fort3_4.6/fclaw3d_clawpatch46_average.f90 
+  fort3_4.6/fclaw3d_clawpatch46_copy.f90 
+  fort3_4.6/fclaw3d_clawpatch46_interpolate.f90 
+  fort3_4.6/fclaw3d_clawpatch46_local_ghost_pack.f90 
+  fort3_4.6/fclaw3d_clawpatch46_output_ascii.f90 
+  fort3_4.6/fclaw3d_clawpatch46_timeinterp.f90  
+  fort3_4.6/fclaw3d_clawpatch46_diagnostics.f90 
   fort3_4.6/fclaw3dx_clawpatch46_tag4refinement.f90 
   fort3_4.6/fclaw3dx_clawpatch46_tag4coarsening.f90 
   fort3_4.6/fclaw3dx_clawpatch46_average.f90 
@@ -61,6 +74,14 @@ target_include_directories(clawpatch_f INTERFACE
 
 add_library(clawpatch
   $<TARGET_OBJECTS:clawpatch_f>
+  fclaw_clawpatch.cpp
+  fclaw_clawpatch_options.c
+  fclaw_clawpatch_diagnostics.c
+  fclaw_clawpatch_diagnostics_default.c
+  fclaw_clawpatch_pillow.c
+  fclaw_clawpatch_output_ascii.c
+  fclaw_clawpatch_output_vtk.c
+
   fclaw2d_clawpatch.cpp
   fclaw2d_clawpatch_options.c
   fclaw2d_clawpatch_diagnostics.c
@@ -82,6 +103,7 @@ add_library(clawpatch
   fclaw3dx_clawpatch_conservation.c
 
   fort_user/fclaw2d_clawpatch_tag_criteria.c
+  fort3_user/fclaw3d_clawpatch_tag_criteria.c
   fort3_user/fclaw3dx_clawpatch_tag_criteria.c
   ${metric}/fclaw2d_metric.cpp
   ${metric}/fclaw2d_metric_default.c
@@ -104,6 +126,17 @@ target_link_libraries(clawpatch PUBLIC forestclaw)
 
 install(FILES
   fclaw_clawpatch_enums.h
+
+  fclaw_clawpatch.h
+	fclaw_clawpatch.hpp
+	fclaw_clawpatch_options.h
+	fclaw_clawpatch_diagnostics.h
+	fclaw_clawpatch_pillow.h
+	fclaw_clawpatch_fort.h
+	fclaw_clawpatch46_fort.h
+	fclaw_clawpatch5_fort.h
+	fclaw_clawpatch_output_ascii.h
+	fclaw_clawpatch_output_vtk.h
 
   fclaw2d_clawpatch.h
 	fclaw2d_clawpatch.hpp
