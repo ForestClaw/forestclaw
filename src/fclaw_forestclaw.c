@@ -23,34 +23,34 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <fclaw2d_forestclaw.h>
+#include <fclaw_forestclaw.h>
 
-#include <fclaw2d_global.h>
-#include <fclaw2d_patch.h>
-#include <fclaw2d_vtable.h>
-#include <fclaw2d_diagnostics.h>
+#include <fclaw_global.h>
+#include <fclaw_patch.h>
+#include <fclaw_vtable.h>
+#include <fclaw_diagnostics.h>
 #include <fclaw_gauges.h>
-#include <fclaw2d_rays.h>
+#include <fclaw_rays.h>
 
-#include <fclaw2d_elliptic_solver.h>
+#include <fclaw_elliptic_solver.h>
 
-void fclaw2d_vtables_initialize(fclaw2d_global_t *glob)
+void fclaw_vtables_initialize(fclaw_global_t *glob)
 {
-    fclaw2d_vtable_initialize(glob);
-    fclaw2d_patch_vtable_initialize(glob);
-    fclaw2d_diagnostics_vtable_initialize(glob);
-    fclaw2d_elliptic_vtable_initialize(glob);
+    fclaw_vtable_initialize(glob);
+    fclaw_patch_vtable_initialize(glob);
+    fclaw_diagnostics_vtable_initialize(glob);
+    fclaw_elliptic_vtable_initialize(glob);
     fclaw_gauges_vtable_initialize(glob);
-    fclaw2d_ray_vtable_initialize(glob);
+    fclaw_ray_vtable_initialize(glob);
 }
 
-void fclaw2d_problem_setup(fclaw2d_global_t *glob)
+void fclaw_problem_setup(fclaw_global_t *glob)
 {
-	fclaw2d_vtable_t *fclaw_vt = fclaw2d_vt(glob);
+	fclaw_vtable_t *fc_vt = fclaw_vt(glob);
 	
     /* User defined problem setup */
-    if (fclaw_vt->problem_setup != NULL)
+    if (fc_vt->problem_setup != NULL)
     {
-        fclaw_vt->problem_setup(glob);
+        fc_vt->problem_setup(glob);
     }
 }
