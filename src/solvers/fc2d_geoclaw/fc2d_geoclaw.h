@@ -40,19 +40,19 @@ extern "C"
 typedef struct fc2d_geoclaw_vtable fc2d_geoclaw_vtable_t;
 
 /* Forward declarations */
-struct fclaw2d_patch_transform_data;
-struct fclaw2d_global;
-struct fclaw2d_patch;
+struct fclaw_patch_transform_data;
+struct fclaw_global;
+struct fclaw_patch;
 struct geoclaw_gauge;
 
 
-void fc2d_geoclaw_run(struct fclaw2d_global *glob);
+void fc2d_geoclaw_run(struct fclaw_global *glob);
 
 /* ------------------------------------- Access functions ---------------------------------- */
 
-void fc2d_geoclaw_module_setup(struct fclaw2d_global *glob);
+void fc2d_geoclaw_module_setup(struct fclaw_global *glob);
 
-void fc2d_geoclaw_output(struct fclaw2d_global *glob, int iframe);
+void fc2d_geoclaw_output(struct fclaw_global *glob, int iframe);
 
 /* ------------------------------------- Virtual table ----------------------------------- */
 
@@ -61,12 +61,12 @@ void fc2d_geoclaw_output(struct fclaw2d_global *glob, int iframe);
  * 
  * fclaw2d_vtables_intialize should be called before this function.
  * 
- * fclaw_options, fclaw2d_clawpatch_options, and fc2d_geoclaw_options should be stored in glob.
+ * fclaw_options, fclaw_clawpatch_options, and fc2d_geoclaw_options should be stored in glob.
  * fclaw_options, and, fc2d_geoclaw_options will be changed in this call.
  * 
  * @param global the global context
  */
-void fc2d_geoclaw_solver_initialize(struct fclaw2d_global *glob);
+void fc2d_geoclaw_solver_initialize(struct fclaw_global *glob);
 
 /**
  * @brief Get the geoclaw vtable
@@ -74,7 +74,7 @@ void fc2d_geoclaw_solver_initialize(struct fclaw2d_global *glob);
  * @param global the global context
  * @return fc2d_geoclaw_vtable_t* the vtable
  */
-fc2d_geoclaw_vtable_t* fc2d_geoclaw_vt(struct fclaw2d_global *glob);
+fc2d_geoclaw_vtable_t* fc2d_geoclaw_vt(struct fclaw_global *glob);
 
 
 struct fc2d_geoclaw_vtable
