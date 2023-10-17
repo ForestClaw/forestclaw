@@ -40,8 +40,7 @@ void fclaw_vtables_initialize(fclaw_global_t *glob)
     fclaw_patch_vtable_initialize(glob);
     fclaw_diagnostics_vtable_initialize(glob);
     fclaw_elliptic_vtable_initialize(glob);
-    //TODO gauges
-    //fclaw_gauges_vtable_initialize(glob);
+    fclaw_gauges_vtable_initialize(glob);
     fclaw_ray_vtable_initialize(glob);
 }
 

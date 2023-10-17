@@ -239,8 +239,7 @@ void fclaw_initialize(fclaw_global_t *glob)
     }
 
     fclaw_diagnostics_initialize(glob);
-    //TODO dimension independent gauges
-    //fclaw_locate_gauges(glob);
+    fclaw_locate_gauges(glob);
 
     fclaw_after_regrid(glob);
 

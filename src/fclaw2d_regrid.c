@@ -324,7 +324,7 @@ void fclaw2d_regrid(fclaw2d_global_t *glob)
     fclaw2d_after_regrid(glob);
 
     /* Only if gauges count > 0 */
-    fclaw_locate_gauges(glob);
+    //fclaw_locate_gauges(glob);
 
     /* Stop timer.  Be sure to use timers from new grid, if one was
        created */

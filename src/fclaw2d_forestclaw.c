@@ -40,7 +40,7 @@ void fclaw2d_vtables_initialize(fclaw2d_global_t *glob)
     fclaw2d_patch_vtable_initialize(glob);
     fclaw2d_diagnostics_vtable_initialize(glob);
     fclaw2d_elliptic_vtable_initialize(glob);
-    fclaw_gauges_vtable_initialize(glob);
+    //fclaw_gauges_vtable_initialize(glob);
     fclaw2d_ray_vtable_initialize(glob);
 }
 

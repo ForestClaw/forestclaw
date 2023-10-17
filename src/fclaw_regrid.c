@@ -322,8 +322,7 @@ void fclaw_regrid(fclaw_global_t *glob)
     fclaw_after_regrid(glob);
 
     /* Only if gauges count > 0 */
-    // TODO dimension independent gauges
-    //fclaw_locate_gauges(glob);
+    fclaw_locate_gauges(glob);
 
     /* Stop timer.  Be sure to use timers from new grid, if one was
        created */

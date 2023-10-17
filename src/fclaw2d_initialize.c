@@ -235,7 +235,7 @@ void fclaw2d_initialize(fclaw2d_global_t *glob)
     }
 
     fclaw2d_diagnostics_initialize(glob);
-    fclaw_locate_gauges(glob);
+    //fclaw_locate_gauges(glob);
 
     fclaw2d_after_regrid(glob);
 
