@@ -26,7 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef HEAT_USER_H
 #define HEAT_USER_H
 
-#include <fclaw2d_include_all.h>
+#include <fclaw_include_all.h>
 
 #include <fc2d_thunderegg.h>
 
@@ -44,9 +44,9 @@ extern "C"
 
 /* --------------------------- Problem dependent functions -----------------------------*/
 
-void heat_link_solvers(fclaw2d_global_t *glob);
+void heat_link_solvers(fclaw_global_t *glob);
 
-void heat_run(fclaw2d_global_t *glob);
+void heat_run(fclaw_global_t *glob);
 
 
 /* --------------------------- Fortran functions ---------------------------------------*/
@@ -177,9 +177,9 @@ void HEAT_FORT_BC2(const int* meqn, const int* mbc,
                    double q[], double* t, double *dt, 
                    int intersects_bc[]);
 
-void heat_create_domain(fclaw2d_global_t* glob);
+void heat_create_domain(fclaw_global_t* glob);
 
-void heat_run_program(fclaw2d_global_t* glob);
+void heat_run_program(fclaw_global_t* glob);
 
 #ifdef __cplusplus
 #if 0

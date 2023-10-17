@@ -11,7 +11,7 @@ double phasefield::getLambda(){
     return lambda;
 }
 
-phasefield::phasefield(fclaw2d_global_t *glob,
+phasefield::phasefield(fclaw_global_t *glob,
                        const Vector<2>& phi_n,
                        const Domain<2>& domain,
                        const GhostFiller<2>& ghost_filler) 
