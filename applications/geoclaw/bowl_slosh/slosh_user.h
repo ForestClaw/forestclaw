@@ -26,10 +26,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef SLOSH_USER_H
 #define SLOSH_USER_H
 
-#include <fclaw2d_include_all.h>
+#include <fclaw_include_all.h>
 
-#include <fclaw2d_clawpatch.h>
-#include <fclaw2d_clawpatch_options.h>
+#include <fclaw_clawpatch.h>
+#include <fclaw_clawpatch_options.h>
 
 #include <fc2d_geoclaw.h>
 #include <fc2d_geoclaw_options.h>
@@ -52,14 +52,14 @@ typedef struct user_options
 
 } user_options_t;
 
-void slosh_link_solvers(fclaw2d_global_t *glob);
+void slosh_link_solvers(fclaw_global_t *glob);
 
 user_options_t* slosh_options_register (fclaw_app_t * app,
                                        const char *configfile);
 
-void slosh_options_store (fclaw2d_global_t* glob, user_options_t* user);
+void slosh_options_store (fclaw_global_t* glob, user_options_t* user);
 
-user_options_t* slosh_get_options(fclaw2d_global_t* glob);
+user_options_t* slosh_get_options(fclaw_global_t* glob);
 
 
 
