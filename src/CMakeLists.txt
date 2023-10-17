@@ -35,6 +35,10 @@ add_library(forestclaw_c OBJECT
 	fclaw_finalize.c
 	fclaw_initialize.c
 	fclaw_run.c
+  fclaw_rays.c
+  fclaw_forestclaw.c
+  fclaw_elliptic_solver.c
+  fclaw_output.c
   forestclaw.c
   fclaw2d_block.c
   fclaw2d_options.c
@@ -172,6 +176,8 @@ install(FILES
   fclaw_time_sync.h
   fclaw_forestclaw.h
   fclaw_include_all.h
+  fclaw_rays.h
+  fclaw_elliptic_solver.h
 	forestclaw2d.h 
 	fp_exception_glibc_extension.h 
   fclaw2d_include_all.h 

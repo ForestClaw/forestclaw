@@ -40,6 +40,8 @@ libforestclaw_installed_headers = \
   	src/fclaw_time_sync.h \
 	src/fclaw_forestclaw.h \
 	src/fclaw_include_all.h \
+  	src/fclaw_rays.h \
+  	src/fclaw_elliptic_solver.h \
 	src/fp_exception_glibc_extension.h \
 	src/fclaw2d_include_all.h \
 	src/fclaw2d_defs.h \
@@ -125,6 +127,9 @@ libforestclaw_compiled_sources = \
   	src/fclaw_time_sync.c \
 	src/fclaw_finalize.c \
 	src/fclaw_initialize.c \
+  	src/fclaw_rays.c \
+    src/fclaw_forestclaw.c \
+  	fclaw_elliptic_solver.c \
 	src/fclaw_run.c \
 	src/forestclaw.c \
 	src/fclaw2d_block.c \
