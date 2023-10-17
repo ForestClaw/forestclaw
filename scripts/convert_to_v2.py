@@ -7,9 +7,9 @@ fclaw_1to2 = {
     "fclaw2d_domain_t" : "fclaw_domain_t",
     "fclaw2d_block_t"  : "fclaw_block_t",
     "fclaw2d_patch_t"  : "fclaw_patch_t",
-    "fclaw2d_patch"    : "fclaw_patch_t",
+    "fclaw2d_patch"  : "fclaw_patch",
 
-    "fclaw2d_block"    : "fclaw_block_t",
+    "fclaw2d_block"    : "fclaw_block",
 
     "fclaw2d_domain_persist"   : "fclaw_domain_persist",
     "fclaw2d_domain_persist_t" : "fclaw_domain_persist_t",
