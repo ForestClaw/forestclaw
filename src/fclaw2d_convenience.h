@@ -28,6 +28,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <forestclaw2d.h>
 #include <fclaw2d_map.h>
+#include <p4est.h>
 #include <p4est_connectivity.h>
 
 #ifdef __cplusplus
@@ -37,6 +38,17 @@ extern "C"
 }                               /* need this because indent is dumb */
 #endif
 #endif
+
+/** Construct a domain from a given p4est.
+ *
+ * This function takes ownership of the passed p4est and its connectivity.
+ *
+ * \param [in]    p4est       The p4est that is used to create the domain.
+ * \return                    A domain that is constructed based on the given
+ *                            p4est and in particular with a pp based on the
+ *                            given p4est.
+ */
+fclaw2d_domain_t *fclaw2d_domain_new_p4est (p4est_t *p4est);
 
 fclaw2d_domain_t *fclaw2d_domain_new_unitsquare (sc_MPI_Comm mpicomm,
                                                  int initial_level);

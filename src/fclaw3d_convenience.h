@@ -27,6 +27,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define FCLAW3D_CONVENIENCE_H
 
 #include <forestclaw3d.h>
+#include <p8est.h>
 #include <p8est_connectivity.h>
 
 #ifdef __cplusplus
@@ -36,6 +37,17 @@ extern "C"
 }                               /* need this because indent is dumb */
 #endif
 #endif
+
+/** Construct a domain from a given p8est.
+ *
+ * This function takes ownership of the passed p8est and its connectivity.
+ *
+ * \param [in]    p8est       The p8est that is used to create the domain.
+ * \return                    A domain that is constructed based on the given
+ *                            p8est and in particular with a pp based on the
+ *                            given p8est.
+ */
+fclaw3d_domain_t *fclaw3d_domain_new_p8est (p8est_t *p8est);
 
 fclaw3d_domain_t *fclaw3d_domain_new_unitcube (sc_MPI_Comm mpicomm,
                                                int initial_level);
