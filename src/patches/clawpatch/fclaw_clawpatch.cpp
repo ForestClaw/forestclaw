@@ -1739,23 +1739,23 @@ void initialize_3d_claw46_fort_vt(fclaw_clawpatch_vtable_t* clawpatch_vt)
 }
 
 static
-void initialize_2d_patch_vt(fclaw_patch_vtable_t* patch_vt)
+void initialize_2d_patch_vt(fclaw_patch_vtable_t* patch_vt, int patch_dim)
 {
     /* Ghost filling */
-    patch_vt->d2->copy_face            = clawpatch_copy_face;
-    patch_vt->d2->average_face         = clawpatch_average_face;
-    patch_vt->d2->interpolate_face     = clawpatch_interpolate_face;
+    patch_vt->copy_face            = clawpatch_copy_face;
+    patch_vt->average_face         = clawpatch_average_face;
+    patch_vt->interpolate_face     = clawpatch_interpolate_face;
 
-    patch_vt->d2->copy_corner          = clawpatch_copy_corner;
-    patch_vt->d2->average_corner       = clawpatch_average_corner;
-    patch_vt->d2->interpolate_corner   = clawpatch_interpolate_corner;
+    patch_vt->copy_corner          = clawpatch_copy_corner;
+    patch_vt->average_corner       = clawpatch_average_corner;
+    patch_vt->interpolate_corner   = clawpatch_interpolate_corner;
 
     /* Assume regular block corners;  Change by calling 'fclaw2d_clawpatch_use_pillowsphere' */    
-    patch_vt->d2->copy_block_corner          = clawpatch_copy_corner;
-    patch_vt->d2->average_block_corner       = clawpatch_average_corner;
-    patch_vt->d2->interpolate_block_corner   = clawpatch_interpolate_corner;
+    patch_vt->copy_block_corner          = clawpatch_copy_corner;
+    patch_vt->average_block_corner       = clawpatch_average_corner;
+    patch_vt->interpolate_block_corner   = clawpatch_interpolate_corner;
 
-    if(patch_vt->dim == 2)
+    if(patch_dim == 2)
     {
         /* Timing syncing module for conservation */
         patch_vt->time_sync_f2c       = fclaw2d_clawpatch_time_sync_f2c;
@@ -1773,22 +1773,22 @@ static
 void initialize_3d_patch_vt(fclaw_patch_vtable_t* patch_vt)
 {
     /* Ghost filling */
-    patch_vt->d3->copy_face            = clawpatch_copy_face;
-    patch_vt->d3->average_face         = clawpatch_average_face;
-    patch_vt->d3->interpolate_face     = clawpatch_interpolate_face;
+    patch_vt->copy_face            = clawpatch_copy_face;
+    patch_vt->average_face         = clawpatch_average_face;
+    patch_vt->interpolate_face     = clawpatch_interpolate_face;
 
-    patch_vt->d3->copy_edge            = clawpatch_copy_edge;
-    patch_vt->d3->average_edge         = clawpatch_average_edge;
-    patch_vt->d3->interpolate_edge     = clawpatch_interpolate_edge;
+    patch_vt->copy_edge            = clawpatch_copy_edge;
+    patch_vt->average_edge         = clawpatch_average_edge;
+    patch_vt->interpolate_edge     = clawpatch_interpolate_edge;
 
-    patch_vt->d3->copy_corner          = clawpatch_copy_corner;
-    patch_vt->d3->average_corner       = clawpatch_average_corner;
-    patch_vt->d3->interpolate_corner   = clawpatch_interpolate_corner;
+    patch_vt->copy_corner          = clawpatch_copy_corner;
+    patch_vt->average_corner       = clawpatch_average_corner;
+    patch_vt->interpolate_corner   = clawpatch_interpolate_corner;
 
     /* Assume regular block corners;  Change by calling 'fclaw2d_clawpatch_use_pillowsphere' */    
-    patch_vt->d3->copy_block_corner          = clawpatch_copy_corner;
-    patch_vt->d3->average_block_corner       = clawpatch_average_corner;
-    patch_vt->d3->interpolate_block_corner   = clawpatch_interpolate_corner;
+    patch_vt->copy_block_corner          = clawpatch_copy_corner;
+    patch_vt->average_block_corner       = clawpatch_average_corner;
+    patch_vt->interpolate_block_corner   = clawpatch_interpolate_corner;
 
     patch_vt->transform_init_data  = fclaw3d_clawpatch_transform_init_data;
     patch_vt->transform_face       = fclaw3d_clawpatch_face_transformation;
@@ -1827,9 +1827,9 @@ void fclaw_clawpatch_vtable_initialize(fclaw_global_t* glob,
     patch_vt->save_step             = clawpatch_save_step;
     patch_vt->setup_timeinterp      = clawpatch_setup_timeinterp;
 
-    if(patch_vt->dim == 2)
+    if(domain->refine_dim == 2)
     {
-        initialize_2d_patch_vt(patch_vt);
+        initialize_2d_patch_vt(patch_vt, clawpatch_opt->patch_dim);
     }
     else 
     {

@@ -886,10 +886,10 @@ void fc2d_geoclaw_solver_initialize(fclaw_global_t* glob)
     clawpatch_vt->d2->fort_copy_corner        = FC2D_GEOCLAW_FORT_COPY_CORNER;
 
     /* Geoclaw needs specialized averaging and interpolation routines */
-    patch_vt->d2->average_face                    = geoclaw_average_face;
-    patch_vt->d2->interpolate_face                = geoclaw_interpolate_face;      
-    patch_vt->d2->average_corner                  = geoclaw_average_corner;
-    patch_vt->d2->interpolate_corner              = geoclaw_interpolate_corner;
+    patch_vt->average_face                    = geoclaw_average_face;
+    patch_vt->interpolate_face                = geoclaw_interpolate_face;      
+    patch_vt->average_corner                  = geoclaw_average_corner;
+    patch_vt->interpolate_corner              = geoclaw_interpolate_corner;
 
     patch_vt->remote_ghost_setup              = geoclaw_remote_ghost_setup;
     clawpatch_vt->d2->fort_local_ghost_pack   = FC2D_GEOCLAW_LOCAL_GHOST_PACK;

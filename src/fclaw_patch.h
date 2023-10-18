@@ -1544,103 +1544,9 @@ typedef void* (*fclaw_patch_metric_patch_t)(struct fclaw_patch *patch);
 /* ------------------------------------------------------------------------------------ */
 ///@{
 
-typedef struct fclaw_patch_vtable_d2
-{
-
-    /** @{ @name Face Ghost Filling Functions */
-
-    /** @copybrief ::fclaw2d_patch_copy_face_t */
-    fclaw2d_patch_copy_face_t             copy_face;
-    /** @copybrief ::fclaw2d_patch_average_face_t */
-    fclaw2d_patch_average_face_t          average_face;
-    /** @copybrief ::fclaw2d_patch_interpolate_face_t */
-    fclaw2d_patch_interpolate_face_t      interpolate_face;
-
-    /** @} */
-
-    /** @{ @name Block Face and Interior Corner Ghost Filling Functions */
-
-    /** @copybrief ::fclaw2d_patch_copy_corner_t */
-    fclaw2d_patch_copy_corner_t           copy_corner;
-    /** @copybrief ::fclaw2d_patch_average_corner_t */
-    fclaw2d_patch_average_corner_t        average_corner;
-    /** @copybrief ::fclaw2d_patch_interpolate_corner_t */
-    fclaw2d_patch_interpolate_corner_t    interpolate_corner;
-
-    /** @} */
-
-    /** @{ @name Block Corner Ghost Filling Functions */
-
-    /** @copybrief ::fclaw2d_patch_copy_corner_t */
-    fclaw2d_patch_copy_corner_t           copy_block_corner;
-    /** @copybrief ::fclaw2d_patch_average_corner_t */
-    fclaw2d_patch_average_corner_t        average_block_corner;
-    /** @copybrief ::fclaw2d_patch_interpolate_corner_t */
-    fclaw2d_patch_interpolate_corner_t    interpolate_block_corner;
-
-    /** @} */
-
-} fclaw_patch_vtable_d2_t;
-
-typedef struct fclaw_patch_vtable_d3
-{
-
-    /** @{ @name Face Ghost Filling Functions */
-
-    /** @copybrief ::fclaw2d_patch_copy_face_t */
-    fclaw2d_patch_copy_face_t             copy_face;
-    /** @copybrief ::fclaw2d_patch_average_face_t */
-    fclaw2d_patch_average_face_t          average_face;
-    /** @copybrief ::fclaw2d_patch_interpolate_face_t */
-    fclaw2d_patch_interpolate_face_t      interpolate_face;
-
-
-    /** @{ @name Edge Ghost Filling Functions */
-
-    /** @copybrief ::fclaw2d_patch_copy_edge_t */
-    fclaw2d_patch_copy_edge_t              copy_edge;
-    /** @copybrief ::fclaw2d_patch_average_edge_t */
-    fclaw2d_patch_average_edge_t           average_edge;
-    /** @copybrief ::fclaw2d_patch_average_edge_t */
-    fclaw2d_patch_interpolate_edge_t       interpolate_edge;
-
-    /** @} */
-
-    /** @{ @name Block Face and Interior Corner Ghost Filling Functions */
-
-    /** @copybrief ::fclaw2d_patch_copy_corner_t */
-    fclaw2d_patch_copy_corner_t           copy_corner;
-    /** @copybrief ::fclaw2d_patch_average_corner_t */
-    fclaw2d_patch_average_corner_t        average_corner;
-    /** @copybrief ::fclaw2d_patch_interpolate_corner_t */
-    fclaw2d_patch_interpolate_corner_t    interpolate_corner;
-
-    /** @} */
-
-    /** @{ @name Block Corner Ghost Filling Functions */
-
-    /** @copybrief ::fclaw2d_patch_copy_corner_t */
-    fclaw2d_patch_copy_corner_t           copy_block_corner;
-    /** @copybrief ::fclaw2d_patch_average_corner_t */
-    fclaw2d_patch_average_corner_t        average_block_corner;
-    /** @copybrief ::fclaw2d_patch_interpolate_corner_t */
-    fclaw2d_patch_interpolate_corner_t    interpolate_block_corner;
-
-    /** @} */
-
-} fclaw_patch_vtable_d3_t;
-
-
 /** vtable for patch level routines */
 struct fclaw_patch_vtable
 {
-    /** The dimension of the patches */
-    int dim;
-    /** 2D specific functions */
-    fclaw_patch_vtable_d2_t* d2;
-    /** 3D specific functions */
-    fclaw_patch_vtable_d3_t* d3;
-
     /** @{ @name Creating/Deleting/Building */
 
     /** @copybrief ::fclaw_patch_new_t */
@@ -1758,6 +1664,50 @@ struct fclaw_patch_vtable
     fclaw2d_patch_time_sync_reset_t       time_sync_reset;
 
     /** @} */
+
+    /** @{ @name Face Ghost Filling Functions */
+
+    /** @copybrief ::fclaw2d_patch_copy_face_t */
+    fclaw2d_patch_copy_face_t             copy_face;
+    /** @copybrief ::fclaw2d_patch_average_face_t */
+    fclaw2d_patch_average_face_t          average_face;
+    /** @copybrief ::fclaw2d_patch_interpolate_face_t */
+    fclaw2d_patch_interpolate_face_t      interpolate_face;
+
+
+    /** @{ @name Edge Ghost Filling Functions */
+
+    /** @copybrief ::fclaw2d_patch_copy_edge_t */
+    fclaw2d_patch_copy_edge_t              copy_edge;
+    /** @copybrief ::fclaw2d_patch_average_edge_t */
+    fclaw2d_patch_average_edge_t           average_edge;
+    /** @copybrief ::fclaw2d_patch_average_edge_t */
+    fclaw2d_patch_interpolate_edge_t       interpolate_edge;
+
+    /** @} */
+
+    /** @{ @name Block Face and Interior Corner Ghost Filling Functions */
+
+    /** @copybrief ::fclaw2d_patch_copy_corner_t */
+    fclaw2d_patch_copy_corner_t           copy_corner;
+    /** @copybrief ::fclaw2d_patch_average_corner_t */
+    fclaw2d_patch_average_corner_t        average_corner;
+    /** @copybrief ::fclaw2d_patch_interpolate_corner_t */
+    fclaw2d_patch_interpolate_corner_t    interpolate_corner;
+
+    /** @} */
+
+    /** @{ @name Block Corner Ghost Filling Functions */
+
+    /** @copybrief ::fclaw2d_patch_copy_corner_t */
+    fclaw2d_patch_copy_corner_t           copy_block_corner;
+    /** @copybrief ::fclaw2d_patch_average_corner_t */
+    fclaw2d_patch_average_corner_t        average_block_corner;
+    /** @copybrief ::fclaw2d_patch_interpolate_corner_t */
+    fclaw2d_patch_interpolate_corner_t    interpolate_block_corner;
+
+    /** @} */
+
 
 
     /** @copybrief ::fclaw_patch_metric_patch_t */

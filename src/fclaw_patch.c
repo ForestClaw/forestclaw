@@ -293,18 +293,9 @@ void fclaw_patch_copy_face(fclaw_global_t* glob,
 {
     fclaw_patch_vtable_t *patch_vt = fclaw_patch_vt(glob);
 
-    if(patch_vt->dim == 2)
-    {
-        FCLAW_ASSERT(patch_vt->d2->copy_face != NULL);
-        patch_vt->d2->copy_face(glob,this_patch,neighbor_patch,iface,
-                                time_interp,transform_data);
-    }
-    else 
-    {
-        FCLAW_ASSERT(patch_vt->d3->copy_face != NULL);
-        patch_vt->d3->copy_face(glob,this_patch,neighbor_patch,iface,
-                                time_interp,transform_data);
-    }
+    FCLAW_ASSERT(patch_vt->copy_face != NULL);
+    patch_vt->copy_face(glob,this_patch,neighbor_patch,iface,
+                        time_interp,transform_data);
 }
 
 void fclaw_patch_average_face(fclaw_global_t* glob,
@@ -320,22 +311,11 @@ void fclaw_patch_average_face(fclaw_global_t* glob,
 {
     fclaw_patch_vtable_t *patch_vt = fclaw_patch_vt(glob);
 
-    if(patch_vt->dim == 2)
-    {
-        FCLAW_ASSERT(patch_vt->d2->average_face != NULL);
-        patch_vt->d2->average_face(glob,coarse_patch,fine_patch,idir,
-                                   iface_coarse,RefineFactor,
-                                   refratio,time_interp,igrid,
-                                   transform_data);
-    }
-    else 
-    {
-        FCLAW_ASSERT(patch_vt->d3->average_face != NULL);
-        patch_vt->d3->average_face(glob,coarse_patch,fine_patch,idir,
-                                   iface_coarse,RefineFactor,
-                                   refratio,time_interp,igrid,
-                                   transform_data);
-    }
+    FCLAW_ASSERT(patch_vt->average_face != NULL);
+    patch_vt->average_face(glob,coarse_patch,fine_patch,idir,
+                           iface_coarse,RefineFactor,
+                           refratio,time_interp,igrid,
+                           transform_data);
 }
 
 void fclaw_patch_interpolate_face(fclaw_global_t* glob,
@@ -350,20 +330,10 @@ void fclaw_patch_interpolate_face(fclaw_global_t* glob,
                                     fclaw_patch_transform_data_t* transform_data)
 {
     fclaw_patch_vtable_t *patch_vt = fclaw_patch_vt(glob);
-    if(patch_vt->dim == 2)
-    {
-        FCLAW_ASSERT(patch_vt->d2->interpolate_face != NULL);
-        patch_vt->d2->interpolate_face(glob,coarse_patch,fine_patch,idir,
-                                       iside,RefineFactor,refratio,
-                                       time_interp,igrid,transform_data);
-    }
-    else 
-    {
-        FCLAW_ASSERT(patch_vt->d3->interpolate_face != NULL);
-        patch_vt->d3->interpolate_face(glob,coarse_patch,fine_patch,idir,
-                                       iside,RefineFactor,refratio,
-                                       time_interp,igrid,transform_data);
-    }
+    FCLAW_ASSERT(patch_vt->interpolate_face != NULL);
+    patch_vt->interpolate_face(glob,coarse_patch,fine_patch,idir,
+                               iside,RefineFactor,refratio,
+                               time_interp,igrid,transform_data);
 }
 
 void fclaw_patch_copy_edge(fclaw_global_t* glob,
@@ -376,11 +346,10 @@ void fclaw_patch_copy_edge(fclaw_global_t* glob,
                            fclaw_patch_transform_data_t *transform_data)
 {
     fclaw_patch_vtable_t *patch_vt = fclaw_patch_vt(glob);
-	FCLAW_ASSERT(patch_vt->dim == 3);
-    FCLAW_ASSERT(patch_vt->d3->copy_edge != NULL);        
-    patch_vt->d3->copy_edge(glob,this_patch,edge_patch,
-                            coarse_blockno,fine_blockno,
-                            icorner,time_interp,transform_data);
+	FCLAW_ASSERT(this_patch->refine_dim == 3);
+    patch_vt->copy_edge(glob,this_patch,edge_patch,
+                        coarse_blockno,fine_blockno,
+                        icorner,time_interp,transform_data);
 }
 
 void fclaw_patch_average_edge(fclaw_global_t* glob,
@@ -391,11 +360,11 @@ void fclaw_patch_average_edge(fclaw_global_t* glob,
                               fclaw_patch_transform_data_t* transform_data)
 {
     fclaw_patch_vtable_t *patch_vt = fclaw_patch_vt(glob);
-	FCLAW_ASSERT(patch_vt->dim == 3);
-    FCLAW_ASSERT(patch_vt->d3->copy_edge != NULL);        
-    patch_vt->d3->average_edge(glob,coarse_patch,fine_patch,
-                               iedge_coarse,
-                               time_interp,transform_data);
+	FCLAW_ASSERT(coarse_patch->refine_dim == 3);
+    FCLAW_ASSERT(patch_vt->copy_edge != NULL);        
+    patch_vt->average_edge(glob,coarse_patch,fine_patch,
+                           iedge_coarse,
+                           time_interp,transform_data);
 
 }
 
@@ -408,105 +377,65 @@ void fclaw_patch_interpolate_edge(fclaw_global_t* glob,
                                   *transform_data)
 {
     fclaw_patch_vtable_t *patch_vt = fclaw_patch_vt(glob);
-    FCLAW_ASSERT(patch_vt->dim == 3);
-    FCLAW_ASSERT(patch_vt->d3->interpolate_edge != NULL);
-    patch_vt->d3->interpolate_edge(glob,coarse_patch,fine_patch,
-                                   coarse_edge,time_interp,
-                                   transform_data);        
+    FCLAW_ASSERT(coarse_patch->refine_dim == 3);
+    FCLAW_ASSERT(patch_vt->interpolate_edge != NULL);
+    patch_vt->interpolate_edge(glob,coarse_patch,fine_patch,
+                               coarse_edge,time_interp,
+                               transform_data);        
 }
 
 
 void fclaw_patch_copy_corner(fclaw_global_t* glob,
-                               fclaw_patch_t *this_patch,
-                               fclaw_patch_t *corner_patch,
-                               int coarse_blockno,
-                               int fine_blockno,
-                               int is_block_corner,
-                               int icorner,
-                               int time_interp,
-                               fclaw_patch_transform_data_t *transform_data)
+                             fclaw_patch_t *this_patch,
+                             fclaw_patch_t *corner_patch,
+                             int coarse_blockno,
+                             int fine_blockno,
+                             int is_block_corner,
+                             int icorner,
+                             int time_interp,
+                             fclaw_patch_transform_data_t *transform_data)
 {
     fclaw_patch_vtable_t *patch_vt = fclaw_patch_vt(glob);
-    if(patch_vt->dim == 2)
+    if (!is_block_corner)
     {
-        if (!is_block_corner)
-        {
-            FCLAW_ASSERT(patch_vt->d2->copy_corner != NULL);        
-            patch_vt->d2->copy_corner(glob,this_patch,corner_patch,
-                                      coarse_blockno,fine_blockno,
-                                      icorner,time_interp,transform_data);
-        }
-        else
-        {
-            FCLAW_ASSERT(patch_vt->d2->copy_block_corner != NULL);        
-            patch_vt->d2->copy_block_corner(glob,this_patch,corner_patch,
-                                            coarse_blockno,fine_blockno,
-                                            icorner,time_interp,transform_data);        
-        }
+        FCLAW_ASSERT(patch_vt->copy_corner != NULL);        
+        patch_vt->copy_corner(glob,this_patch,corner_patch,
+                              coarse_blockno,fine_blockno,
+                              icorner,time_interp,transform_data);
     }
-    else 
+    else
     {
-        if (!is_block_corner)
-        {
-            FCLAW_ASSERT(patch_vt->d3->copy_corner != NULL);        
-            patch_vt->d3->copy_corner(glob,this_patch,corner_patch,
-                                      coarse_blockno,fine_blockno,
-                                      icorner,time_interp,transform_data);
-        }
-        else
-        {
-            FCLAW_ASSERT(patch_vt->d3->copy_block_corner != NULL);        
-            patch_vt->d3->copy_block_corner(glob,this_patch,corner_patch,
-                                            coarse_blockno,fine_blockno,
-                                            icorner,time_interp,transform_data);        
-        }
+        FCLAW_ASSERT(patch_vt->copy_block_corner != NULL);        
+        patch_vt->copy_block_corner(glob,this_patch,corner_patch,
+                                    coarse_blockno,fine_blockno,
+                                    icorner,time_interp,transform_data);        
     }
 }
 
 void fclaw_patch_average_corner(fclaw_global_t* glob,
-                                  fclaw_patch_t *coarse_patch,
-                                  fclaw_patch_t *fine_patch,
-                                  int coarse_blockno,
-                                  int fine_blockno,
-                                  int is_block_corner,
-                                  int coarse_corner,
-                                  int time_interp,
-                                  fclaw_patch_transform_data_t* transform_data)
+                                fclaw_patch_t *coarse_patch,
+                                fclaw_patch_t *fine_patch,
+                                int coarse_blockno,
+                                int fine_blockno,
+                                int is_block_corner,
+                                int coarse_corner,
+                                int time_interp,
+                                fclaw_patch_transform_data_t* transform_data)
 {
     fclaw_patch_vtable_t *patch_vt = fclaw_patch_vt(glob);
-    if(patch_vt->dim == 2)
+    if (!is_block_corner)
     {
-        if (!is_block_corner)
-        {
-            FCLAW_ASSERT(patch_vt->d2->copy_corner != NULL);        
-            patch_vt->d2->average_corner(glob,coarse_patch,fine_patch,
-                                      coarse_blockno,fine_blockno,
-                                      coarse_corner,time_interp,transform_data);
-        }
-        else
-        {
-            FCLAW_ASSERT(patch_vt->d2->copy_block_corner != NULL);        
-            patch_vt->d2->average_block_corner(glob,coarse_patch,fine_patch,
-                                               coarse_blockno,fine_blockno,
-                                               coarse_corner,time_interp,transform_data);        
-        }
+        FCLAW_ASSERT(patch_vt->copy_corner != NULL);        
+        patch_vt->average_corner(glob,coarse_patch,fine_patch,
+                                 coarse_blockno,fine_blockno,
+                                 coarse_corner,time_interp,transform_data);
     }
-    else 
+    else
     {
-        if (!is_block_corner)
-        {
-            FCLAW_ASSERT(patch_vt->d3->copy_corner != NULL);        
-            patch_vt->d3->average_corner(glob,coarse_patch,fine_patch,
-                                         coarse_blockno,fine_blockno,
-                                         coarse_corner,time_interp,transform_data);
-        }
-        else
-        {
-            FCLAW_ASSERT(patch_vt->d3->copy_block_corner != NULL);        
-            patch_vt->d3->average_block_corner(glob,coarse_patch,fine_patch,
-                                               coarse_blockno,fine_blockno,
-                                               coarse_corner,time_interp,transform_data);        
-        }
+        FCLAW_ASSERT(patch_vt->copy_block_corner != NULL);        
+        patch_vt->average_block_corner(glob,coarse_patch,fine_patch,
+                                       coarse_blockno,fine_blockno,
+                                       coarse_corner,time_interp,transform_data);        
     }
 }
 
@@ -522,43 +451,21 @@ void fclaw_patch_interpolate_corner(fclaw_global_t* glob,
                                       *transform_data)
 {
     fclaw_patch_vtable_t *patch_vt = fclaw_patch_vt(glob);
-    if(patch_vt->dim == 2)
+    if (!is_block_corner)
     {
-        if (!is_block_corner)
-        {
-            FCLAW_ASSERT(patch_vt->d2->interpolate_corner != NULL);
-            patch_vt->d2->interpolate_corner(glob,coarse_patch,fine_patch,
-                                             coarse_blockno,fine_blockno,
-                                             coarse_corner,time_interp,
-                                             transform_data);        
-        }
-        else
-        {
-            FCLAW_ASSERT(patch_vt->d2->interpolate_block_corner != NULL);
-            patch_vt->d2->interpolate_block_corner(glob,coarse_patch,fine_patch,
-                                                   coarse_blockno,fine_blockno,
-                                                   coarse_corner,time_interp,
-                                                   transform_data);
-        }
+        FCLAW_ASSERT(patch_vt->interpolate_corner != NULL);
+        patch_vt->interpolate_corner(glob,coarse_patch,fine_patch,
+                                     coarse_blockno,fine_blockno,
+                                     coarse_corner,time_interp,
+                                     transform_data);        
     }
     else
     {
-        if (!is_block_corner)
-        {
-            FCLAW_ASSERT(patch_vt->d3->interpolate_corner != NULL);
-            patch_vt->d3->interpolate_corner(glob,coarse_patch,fine_patch,
-                                             coarse_blockno,fine_blockno,
-                                             coarse_corner,time_interp,
-                                             transform_data);        
-        }
-        else
-        {
-            FCLAW_ASSERT(patch_vt->d3->interpolate_block_corner != NULL);
-            patch_vt->d3->interpolate_block_corner(glob,coarse_patch,fine_patch,
-                                                   coarse_blockno,fine_blockno,
-                                                   coarse_corner,time_interp,
-                                                   transform_data);
-        }
+        FCLAW_ASSERT(patch_vt->interpolate_block_corner != NULL);
+        patch_vt->interpolate_block_corner(glob,coarse_patch,fine_patch,
+                                           coarse_blockno,fine_blockno,
+                                           coarse_corner,time_interp,
+                                           transform_data);
     }
 }
 
@@ -866,18 +773,9 @@ void fclaw_patch_time_sync_reset(fclaw_global_t* glob,
 /* ----------------------------------- Virtual table ---------------------------------- */
 
 static
-fclaw_patch_vtable_t* patch_vt_new(int dim)
+fclaw_patch_vtable_t* patch_vt_new()
 {
     fclaw_patch_vtable_t* vt = FCLAW_ALLOC_ZERO (fclaw_patch_vtable_t, 1);
-    vt->dim = dim;
-    if(dim == 2)
-    {
-        vt->d2 = FCLAW_ALLOC_ZERO (fclaw_patch_vtable_d2_t, 1);
-    }
-    else 
-    {
-        vt->d3 = FCLAW_ALLOC_ZERO (fclaw_patch_vtable_d3_t, 1);
-    }
     return vt;
 }
 
@@ -885,25 +783,12 @@ static
 void patch_vt_destroy(void* vt)
 {
     fclaw_patch_vtable_t* patch_vt = (fclaw_patch_vtable_t*) vt;
-    if(patch_vt->dim == 2)
-    {
-        FCLAW_FREE (patch_vt->d2);
-    }
-    else
-    {
-        FCLAW_FREE (patch_vt->d3);
-    }
     FCLAW_FREE (patch_vt);
 }
 
 void fclaw_patch_vtable_initialize(fclaw_global_t* glob)
 {
-    if(glob->domain == NULL)
-    {
-        fclaw_abortf("domain needs to be stored in glob before initializing vtables");
-    }
-
-    fclaw_patch_vtable_t *patch_vt = patch_vt_new(glob->domain->refine_dim);
+    fclaw_patch_vtable_t *patch_vt = patch_vt_new();
 
     patch_vt->is_set = 1;
 
