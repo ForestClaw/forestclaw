@@ -1,4 +1,4 @@
-set(all ${PROJECT_SOURCE_DIR}/clawpack/advection/3d/all)
+set(all ${PROJECT_SOURCE_DIR}/clawpack/advection/3dx/all)
 set(all2d ${PROJECT_SOURCE_DIR}/clawpack/advection/2d/all)
 
 add_library(disk3dx_f OBJECT 

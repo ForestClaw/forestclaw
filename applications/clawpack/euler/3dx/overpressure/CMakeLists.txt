@@ -1,5 +1,5 @@
-set(rp ${PROJECT_SOURCE_DIR}/clawpack/euler/3d/rp)
-set(all ${PROJECT_SOURCE_DIR}/clawpack/euler/3d/all)
+set(rp ${PROJECT_SOURCE_DIR}/clawpack/euler/3dx/rp)
+set(all ${PROJECT_SOURCE_DIR}/clawpack/euler/3dx/all)
 set(all2d ${PROJECT_SOURCE_DIR}/clawpack/advection/2d/all)
 
 add_library(overpressure_f OBJECT 
