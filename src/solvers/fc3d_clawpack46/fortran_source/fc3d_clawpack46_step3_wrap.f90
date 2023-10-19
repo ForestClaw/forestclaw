@@ -39,7 +39,7 @@ subroutine clawpack46_step3_wrap(maxm, meqn, maux, mbc, &
     !! for a Riemann solver.
     double precision :: dtcom, dxcom,dycom,dzcom, tcom
     integer :: icom, jcom, kcom
-    common /comxyt/ dtcom,dxcom,dycom,dzcom, tcom,icom,jcom, kcom
+    common /comxyzt/ dtcom,dxcom,dycom,dzcom, tcom,icom,jcom, kcom
 
     integer jfix, kfix
     double precision kappa
