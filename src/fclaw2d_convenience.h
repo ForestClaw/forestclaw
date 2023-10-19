@@ -27,7 +27,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define FCLAW2D_CONVENIENCE_H
 
 #include <forestclaw2d.h>
-#include <fclaw2d_map.h>
 #include <p4est.h>
 #include <p4est_connectivity.h>
 
@@ -92,18 +91,6 @@ fclaw2d_domain_t *fclaw2d_domain_new_brick (sc_MPI_Comm mpicomm,
 fclaw2d_domain_t *fclaw2d_domain_new_conn (sc_MPI_Comm mpicomm,
                                            int initial_level,
                                            p4est_connectivity_t * conn);
-
-/** Create a domain from a given forest connectivity and matching map.
- * \param [in] mpicomm          We expect sc_MPI_Init to be called earlier.
- * \param [in] initial_level    A non-negative integer <= P4EST_QMAXLEVEL.
- * \param [in] conn             We DO take ownership of the connectivity.
- * \param [in] cont             We do NOT take ownership of the mapping.
- * \return                      A fully initialized domain structure.
- */
-fclaw2d_domain_t *fclaw2d_domain_new_conn_map (sc_MPI_Comm mpicomm,
-                                               int initial_level,
-                                               p4est_connectivity_t * conn,
-                                               fclaw2d_map_context_t * cont);
 
 void fclaw2d_domain_destroy (fclaw2d_domain_t * domain);
 
