@@ -35,8 +35,10 @@ void create_domain(fclaw_global_t *glob)
     /* Mapped, multi-block domain */
     int mi = fclaw_opt->mi;
     int mj = fclaw_opt->mj;
+    int mk = fclaw_opt->mk;
     int a = fclaw_opt->periodic_x;
     int b = fclaw_opt->periodic_y;
+    int c = fclaw_opt->periodic_z;
 
     fclaw_clawpatch_options_t *clawpatch_opt = 
                  fclaw_clawpatch_get_options(glob);
@@ -56,8 +58,8 @@ void create_domain(fclaw_global_t *glob)
         FCLAW_ASSERT(fclaw_opt->manifold == 0);
 
         /* Mapped, multi-block domain */
-        domain = fclaw_domain_new_unitsquare(glob->mpicomm, 
-                                      fclaw_opt->minlevel);
+        domain = fclaw_domain_new_unitcube(glob->mpicomm, 
+                                           fclaw_opt->minlevel);
 
         /* Size is set by [ax,bx] x [ay, by], set in .ini file */
         cont = fclaw2d_map_new_nomap();
@@ -71,18 +73,24 @@ void create_domain(fclaw_global_t *glob)
 
         /* Cartesian square domain */
         domain =
-            fclaw_domain_new_2d_brick (glob->mpicomm, mi, mj, a, b,
-                                     fclaw_opt->minlevel);
+            fclaw_domain_new_3d_brick (glob->mpicomm, 
+                                       mi, mj, mk, a, b, c,
+                                       fclaw_opt->minlevel);
 
-        brick = fclaw2d_map_new_brick(domain,mi,mj,a,b);
+        //TODO 3d brick mapping
+        //brick = fclaw2d_map_new_brick(domain,mi,mj,a,b);
 
         /* Square in [-1,1]x[-1,1], scaled/shifted to [0,1]x[0,1] */
+#if 0
         cont = fclaw2d_map_new_cart(brick,
                                     fclaw_opt->scale,
                                     fclaw_opt->shift);
+#endif
+        cont = NULL; //set 3d brick mapping to NULL until implemented
 
         break;
     case 2:
+        fclaw_abortf("Not implemented\n");
         FCLAW_ASSERT(fclaw_opt->manifold != 0);
         FCLAW_ASSERT(claw3_opt->mcapa != 0);
         FCLAW_ASSERT(clawpatch_opt->maux == 4);
@@ -105,6 +113,7 @@ void create_domain(fclaw_global_t *glob)
         break;
 
     case 3:
+        fclaw_abortf("Not implemented\n");
         /* bilinear square domain : maps to [-1,1]x[-1,1] */
         FCLAW_ASSERT(fclaw_opt->manifold != 0);
         FCLAW_ASSERT(claw3_opt->mcapa != 0);
@@ -112,8 +121,9 @@ void create_domain(fclaw_global_t *glob)
         FCLAW_ASSERT(mi == 2 && mj == 2);
 
         domain =
-            fclaw_domain_new_2d_brick(glob->mpicomm, mi, mj, a, b,
-                                     fclaw_opt->minlevel);
+            fclaw_domain_new_3d_brick(glob->mpicomm, 
+                                      mi, mj, mk, a, b, c,
+                                      fclaw_opt->minlevel);
 
         brick = fclaw2d_map_new_brick (domain, mi, mj, a, b);
 
