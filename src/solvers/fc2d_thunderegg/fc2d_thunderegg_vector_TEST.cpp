@@ -52,7 +52,10 @@ struct QuadDomain {
     fclaw_clawpatch_options_t* opts;
 
     QuadDomain(){
-        glob = fclaw_global_new();
+        int size, rank;
+        sc_MPI_Comm_size(sc_MPI_COMM_WORLD, &size);
+        sc_MPI_Comm_rank(sc_MPI_COMM_WORLD, &rank);
+        glob = fclaw_global_new_comm(sc_MPI_COMM_WORLD, size, rank);
         opts = fclaw_clawpatch_options_new(2);
     
         memset(&fopts, 0, sizeof(fopts));
@@ -113,7 +116,10 @@ struct QuadDomainBrick {
     fclaw_clawpatch_options_t* opts;
 
     QuadDomainBrick(){
-        glob = fclaw_global_new();
+        int size, rank;
+        sc_MPI_Comm_size(sc_MPI_COMM_WORLD, &size);
+        sc_MPI_Comm_rank(sc_MPI_COMM_WORLD, &rank);
+        glob = fclaw_global_new_comm(sc_MPI_COMM_WORLD, size, rank);
         opts = fclaw_clawpatch_options_new(2);
 
         memset(&fopts, 0, sizeof(fopts));
