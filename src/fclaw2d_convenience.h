@@ -28,7 +28,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <forestclaw2d.h>
 #include <p4est.h>
-#include <p4est_connectivity.h>
 
 #ifdef __cplusplus
 extern "C"
