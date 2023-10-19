@@ -42,7 +42,9 @@ extern "C"
  *
  * This function takes ownership of the passed p8est and its connectivity.
  *
- * \param [in]    p8est       The p8est that is used to create the domain.
+ * \param [in,out]    p8est   The p8est that is used to create the domain.
+ *                            p8est->user_pointer must be NULL and will be
+ *                            changed.
  * \return                    A domain that is constructed based on the given
  *                            p8est and in particular with a pp based on the
  *                            given p8est.

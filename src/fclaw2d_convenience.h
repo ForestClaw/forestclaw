@@ -42,7 +42,9 @@ extern "C"
  *
  * This function takes ownership of the passed p4est and its connectivity.
  *
- * \param [in]    p4est       The p4est that is used to create the domain.
+ * \param [in,out]    p4est   The p4est that is used to create the domain.
+ *                            p4est->user_pointer must be NULL and will be
+ *                            changed.
  * \return                    A domain that is constructed based on the given
  *                            p4est and in particular with a pp based on the
  *                            given p4est.

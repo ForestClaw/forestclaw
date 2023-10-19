@@ -314,6 +314,7 @@ fclaw2d_domain_t *
 fclaw2d_domain_new_p4est (p4est_t *p4est)
 {
     FCLAW_ASSERT (p4est != NULL);
+    FCLAW_ASSERT (p4est->user_pointer == NULL);
 
     p4est_wrap_t *wrap;
 
