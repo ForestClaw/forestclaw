@@ -27,17 +27,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef OVERLAP_H
 #define OVERLAP_H
 
+#include <fclaw2d_options.h>
+
+#include <fclaw2d_domain.h>
+#include <fclaw2d_patch.h>
+#include <fclaw2d_global.h>
+
 #ifdef __cplusplus
 extern "C"
 {
 #endif
-
-#include <fclaw2d_options.h>
-
-#include <fclaw2d_domain.h>
-#include <fclaw2d_patch.h>    
-#include <fclaw2d_global.h>
-
 
 typedef struct overlap_prodata
 {
