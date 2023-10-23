@@ -43,7 +43,8 @@ extern "C"
  *
  * \param [in,out]    p8est   The p8est that is used to create the domain.
  *                            p8est->user_pointer must be NULL and will be
- *                            changed.
+ *                            changed. The data size will be set to 0 and the
+ *                            quadrant data will be freed.
  * \return                    A domain that is constructed based on the given
  *                            p8est and in particular with a pp based on the
  *                            given p8est.
