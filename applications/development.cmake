@@ -25,7 +25,7 @@
 #add_subdirectory(clawpack/advection/2d/periodic)
 
 ## bump (original)
-add_subdirectory(clawpack/shallow/2d/bump)
+#add_subdirectory(clawpack/shallow/2d/bump)
 
 ## Conservative advection (transport) on a square
 #add_subdirectory(clawpack/transport/2d/square)

@@ -22,7 +22,7 @@
 #include applications/clawpack/advection/2d/torus/Makefile.am
 
 ## bump (original)
-include applications/clawpack/shallow/2d/bump/Makefile.am
+#include applications/clawpack/shallow/2d/bump/Makefile.am
 
 ## Conservative advection (transport) on a square
 #include applications/clawpack/transport/2d/square/Makefile.am
