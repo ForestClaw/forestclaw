@@ -32,7 +32,7 @@ subroutine cudaclaw_qinit(maxmx,maxmy,meqn,mbc, &
     integer :: blockno, fc2d_cudaclaw_get_block
 
     blockno = fc2d_cudaclaw_get_block()
-
+    
     if (idisc .ne. 2) then
         write(6,*) 'qinit.f : idisc must be 2 for this example.'
         stop

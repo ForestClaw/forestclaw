@@ -71,7 +71,7 @@ user_options_t* shockbubble_get_options(fclaw2d_global_t* glob);
 
 /* ------------------------------- Fortran code --------------------------------------- */
 
-#if 0
+#if 1
 #define SETPROB FCLAW_F77_FUNC(setprob, SETPROB)
 void SETPROB();
 // void SETPROB(const double *gamma, const double* x0, const double* y0,

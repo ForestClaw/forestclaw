@@ -17,7 +17,7 @@ subroutine setprob()
     double precision :: rhoin, rhoout, pout, pin, pinf
 
     open(10,file='setprob.data')
-
+       
     !! # These should be read in as options
     read(10,*) gamma
     gamma1 = gamma - 1.d0
