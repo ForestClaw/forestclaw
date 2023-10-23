@@ -413,25 +413,6 @@ fclaw2d_domain_new_conn (sc_MPI_Comm mpicomm, int initial_level,
     return domain;
 }
 
-#ifndef P4_TO_P8
-
-/* function to be removed once no longer called by applications */
-
-fclaw2d_domain_t *
-fclaw2d_domain_new_conn_map (sc_MPI_Comm mpicomm, int initial_level,
-                             p4est_connectivity_t * conn,
-                             fclaw2d_map_context_t * cont)
-{
-    fclaw2d_domain_t *domain =
-      fclaw2d_domain_new_conn (mpicomm, initial_level, conn);
-
-    fclaw2d_domain_attribute_add (domain, "fclaw_map_context", cont);
-
-    return domain;
-}
-
-#endif
-
 void
 fclaw2d_domain_destroy (fclaw2d_domain_t * domain)
 {

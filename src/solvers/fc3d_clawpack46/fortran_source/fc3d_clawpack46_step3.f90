@@ -85,6 +85,7 @@ subroutine clawpack46_step3(maxm,meqn,maux,mbc,mx,my,mz, &
     !!  # passed in...
     dxcom = dx
     dycom = dy
+    dzcom = dz
     dtcom = dt
 
     !!  # partition work array into pieces needed for local storage in
