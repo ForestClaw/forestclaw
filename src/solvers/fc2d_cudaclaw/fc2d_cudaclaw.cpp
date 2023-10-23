@@ -316,19 +316,34 @@ double cudaclaw_update(fclaw2d_global_t *glob,
     /* Be sure to save current step! */
     fclaw2d_clawpatch_save_current_step(glob, this_patch);
 
-
+    cudaclaw_patch_data_t* patch_data = (cudaclaw_patch_data_t*) buffer_data->user;
     maxcfl = 0;
     if (iter == 0)
     {
         /* Create array to store pointers to patch data */
+        patch_data = (cudaclaw_patch_data_t*) FCLAW_ALLOC(cudaclaw_patch_data_t,1);
         size = (total < patch_buffer_len) ? total : patch_buffer_len;
         bytes = size*sizeof(cudaclaw_fluxes_t);
-        buffer_data->user = FCLAW_ALLOC(cudaclaw_fluxes_t,bytes);
+        
+        if (cuclaw_opt->src_term > 0)
+        {
+            patch_data->patch_array = FCLAW_ALLOC(fclaw2d_patch_t*,size);
+            patch_data->patchno_array = FCLAW_ALLOC(int,size);
+            patch_data->blockno_array = FCLAW_ALLOC(int,size);
+        }
+
+        
+        patch_data->flux_array = FCLAW_ALLOC(cudaclaw_fluxes_t,size); // Is it bytes or size?
+        // buffer_data->user = FCLAW_ALLOC(cudaclaw_fluxes_t,bytes);
+        buffer_data->user = patch_data;
     } 
 
     /* Buffer pointer to fluxes */
-    cudaclaw_store_buffer(glob,this_patch,this_patch_idx,total,
-                          iter, (cudaclaw_fluxes_t*) buffer_data->user);
+    cudaclaw_store_buffer(glob,this_patch,this_patch_idx,this_block_idx,total,iter,
+                            patch_data->flux_array,
+                            patch_data->patch_array,
+                            patch_data->patchno_array,
+                            patch_data->blockno_array);
 
     /* Update all patches in buffer if :
           (1) we have filled the buffer, or 
@@ -337,33 +352,48 @@ double cudaclaw_update(fclaw2d_global_t *glob,
     if ((iter+1) % patch_buffer_len == 0)
     {
         /* (1) We have filled the buffer */
-        maxcfl = cudaclaw_step2_batch(glob,(cudaclaw_fluxes_t*) buffer_data->user,
+        maxcfl = cudaclaw_step2_batch(glob,(cudaclaw_fluxes_t*) patch_data->flux_array,
                                       patch_buffer_len,t,dt);
     }
     else if ((iter+1) == total)
     {        
         /* (2) We have a partially filled buffer, but are done with all the patches 
             that need to be updated.  */
-        maxcfl = cudaclaw_step2_batch(glob,(cudaclaw_fluxes_t*) buffer_data->user,
+        maxcfl = cudaclaw_step2_batch(glob,(cudaclaw_fluxes_t*) patch_data->flux_array,
                                       total%patch_buffer_len,t,dt); 
+    }  
+
+    
+    /* -------------------------------- Source term ----------------------------------- */
+    // Check if we have stored all the patches in the buffer
+    if (((iter+1) % patch_buffer_len == 0) || ((iter+1) == total))
+    {
+        if (cuclaw_opt->src_term > 0)
+        {   
+            FCLAW_ASSERT(cudaclaw_vt->src2 != NULL);
+            // iterate over patches in buffer and call src2 to update them
+            for (int i = 0; i < total; i++)
+            {
+                cudaclaw_vt->src2(glob,
+                                  patch_data->patch_array[i],
+                                  patch_data->blockno_array[i],
+                                  patch_data->patchno_array[i],
+                                  t,dt);
+            }
+            FCLAW_FREE(patch_data->patch_array);
+            FCLAW_FREE(patch_data->patchno_array);
+            FCLAW_FREE(patch_data->blockno_array);
+        }
     }
 
     if (iter == total-1)
     {
-        FCLAW_FREE(buffer_data->user);                                      
+        // FCLAW_FREE(patch_data->patch_array);
+        FCLAW_FREE(patch_data->flux_array);                                      
     }
 
     fclaw2d_timer_stop_threadsafe (&glob->timers[FCLAW2D_TIMER_ADVANCE_STEP2]);       
 
-    /* -------------------------------- Source term ----------------------------------- */
-    if (cuclaw_opt->src_term > 0)
-    {
-        FCLAW_ASSERT(cudaclaw_vt->src2 != NULL);
-        cudaclaw_vt->src2(glob,
-                        this_patch,
-                        this_block_idx,
-                        this_patch_idx,t,dt);
-    }
     return maxcfl;
 }
 

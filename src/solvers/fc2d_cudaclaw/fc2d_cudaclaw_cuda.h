@@ -88,9 +88,13 @@ double cudaclaw_step2_batch(struct fclaw2d_global* glob,
 
 void cudaclaw_store_buffer(struct fclaw2d_global* glob,
                            struct fclaw2d_patch *this_patch,
-                           int this_atch_idx,
-                           int count, int iter, 
-                           struct cudaclaw_fluxes* flux_array);
+                           int patchno, int blockno,
+                           int total, int iter,
+                           struct cudaclaw_fluxes* flux_array,
+                           struct fclaw2d_patch** patch_array,
+                           int* patchno_array,
+                           int* blockno_array);
+                          
 
 double *cudaclaw_get_cpu_membuffer();
 
