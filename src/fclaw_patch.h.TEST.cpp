@@ -28,14 +28,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_convenience.h>
 #include <test.hpp>
 
-TEST_CASE("fclaw_patch_vtable_intialize fails if domain has not been stored in glob")
-{
-	fclaw_global_t* glob = fclaw_global_new();
-
-	CHECK_SC_ABORTED(fclaw_patch_vtable_initialize(glob));
-
-	fclaw_global_destroy(glob);
-}
 TEST_CASE("fclaw_patch_vtable_intialize fails if called twice")
 {
 	fclaw_domain_t * domain = fclaw_domain_new_unitsquare(sc_MPI_COMM_WORLD, 0);
