@@ -87,7 +87,7 @@ libforestclaw_installed_headers = \
 	src/fclaw3d_convenience.h \
 	src/fclaw3d_map.h \
 	src/fclaw3d_file.h \
-	src/fclaw3d_wrap.h \
+	src/fclaw3d_wrap.h 
 
 libforestclaw_internal_headers =
 
