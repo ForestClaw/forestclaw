@@ -372,7 +372,7 @@ double cudaclaw_update(fclaw2d_global_t *glob,
         {   
             FCLAW_ASSERT(cudaclaw_vt->src2 != NULL);
             // iterate over patches in buffer and call src2 to update them
-            for (int i = 0; i < total; i++)
+            for (int i = 0; i < (iter+1); i++)
             {
                 cudaclaw_vt->src2(glob,
                                   patch_data->patch_array[i],
@@ -384,15 +384,16 @@ double cudaclaw_update(fclaw2d_global_t *glob,
             FCLAW_FREE(patch_data->patchno_array);
             FCLAW_FREE(patch_data->blockno_array);
         }
-    }
+    }   
 
     if (iter == total-1)
     {
         // FCLAW_FREE(patch_data->patch_array);
-        FCLAW_FREE(patch_data->flux_array);                                      
+        FCLAW_FREE(patch_data->flux_array);   
+        FCLAW_FREE(buffer_data->user);                                   
     }
 
-    fclaw2d_timer_stop_threadsafe (&glob->timers[FCLAW2D_TIMER_ADVANCE_STEP2]);       
+    fclaw2d_timer_stop_threadsafe (&glob->timers[FCLAW2D_TIMER_ADVANCE_STEP2]);    
 
     return maxcfl;
 }

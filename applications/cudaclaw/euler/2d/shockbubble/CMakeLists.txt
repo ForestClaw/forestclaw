@@ -9,8 +9,8 @@ add_library(shockbubble_cpu_f OBJECT
   # fclaw2d_clawpatch46_output_ascii.f
   ${rpclaw}/clawpack46_rpn2_euler4.f 
   ${rpclaw}/clawpack46_rpt2_euler4.f 
-  ${rpclaw}/clawpack46_rpn2_euler5.f 
-  ${rpclaw}/clawpack46_rpt2_euler5.f 
+  ${rpclaw}/clawpack46_rpn2_euler3.f 
+  ${rpclaw}/clawpack46_rpt2_euler3.f 
 )
 
 add_library(shockbubble_cuda_f OBJECT 

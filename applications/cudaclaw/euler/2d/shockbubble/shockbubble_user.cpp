@@ -108,26 +108,27 @@ void shockbubble_link_solvers(fclaw2d_global_t *glob)
         // claw46_vt->fort_setaux = &CLAWPACK46_SETAUX;
         // claw46_vt->fort_bc2    = &CLAWPACK46_BC2;   /* Special  BCs at left edge */
         // claw46_vt->fort_src2   = &CLAWPACK46_SRC2;  /* To simulate axis-symmetric */
+        
         claw46_vt->fort_qinit  = &CUDACLAW_QINIT;
         claw46_vt->fort_setaux = &CLAWPACK46_SETAUX;
         claw46_vt->fort_bc2    = &CUDACLAW_BC2;   /* Special  BCs at left edge */
         claw46_vt->fort_src2   = &CUDACLAW_SRC2;  /* To simulate axis-symmetric */
 
-        // switch (clawopt->mwaves)
-        // {
-        // case 4:
-        //     /* Requires meqn=4 */
-        claw46_vt->fort_rpn2   = &CLAWPACK46_RPN2_EULER4;  /* No tracer */
-        claw46_vt->fort_rpt2   = &CLAWPACK46_RPT2_EULER4;
-        //     break;
-        // case 5:
-        //     /* Requires meqn=5 */
-        //     claw46_vt->fort_rpn2   = &CLAWPACK46_RPN2_EULER5;  /* Includes a tracer */
-        //     claw46_vt->fort_rpt2   = &CLAWPACK46_RPT2_EULER5;
-        //     break;
-        // default:
-            // SC_ABORT_NOT_REACHED ();
-        // }
+        switch (clawopt->mwaves)
+        {
+        case 3:
+            /* Requires meqn=3 */
+            claw46_vt->fort_rpn2   = &CLAWPACK46_RPN2_EULER3; 
+            claw46_vt->fort_rpt2   = &CLAWPACK46_RPT2_EULER3;
+            break;
+        case 4:
+            /* Requires meqn=4 */
+            claw46_vt->fort_rpn2   = &CLAWPACK46_RPN2_EULER4;  
+            claw46_vt->fort_rpt2   = &CLAWPACK46_RPT2_EULER4;
+            break;
+        default:
+            SC_ABORT_NOT_REACHED ();
+        }
     }
     else
     {
@@ -136,7 +137,7 @@ void shockbubble_link_solvers(fclaw2d_global_t *glob)
         fc2d_cudaclaw_vtable_t *cuclaw_vt   = fc2d_cudaclaw_vt(glob);
         cuclaw_vt->fort_qinit  = &CUDACLAW_QINIT;
         cuclaw_vt->fort_bc2    = &CUDACLAW_BC2;   /* Special  BCs at left edge */
-        cuclaw_vt->fort_setaux = &CLAWPACK46_SETAUX;
+        // cuclaw_vt->fort_setaux = &CLAWPACK46_SETAUX;
         cuclaw_vt->fort_src2   = &CUDACLAW_SRC2;  /* To simulate axis-symmetric */
 
 
