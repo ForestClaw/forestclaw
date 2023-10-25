@@ -178,6 +178,7 @@ install(FILES
   fclaw_include_all.h
   fclaw_rays.h
   fclaw_elliptic_solver.h
+	forestclaw.h 
 	forestclaw2d.h 
 	fp_exception_glibc_extension.h 
   fclaw2d_include_all.h 
