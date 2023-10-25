@@ -37,5 +37,5 @@ target_link_libraries(latlong_3dx PRIVATE
  FORESTCLAW::CLAWPACK5
 )
 
-add_test(NAME clawpack_advection_3d_latlong COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/regressions.sh WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-set_tests_properties(clawpack_advection_3d_latlong PROPERTIES ENVIRONMENT "${FCLAW_TEST_ENVIRONMENT}")
+add_test(NAME clawpack_advection_3dx_latlong COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/regressions.sh WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+set_tests_properties(clawpack_advection_3dx_latlong PROPERTIES ENVIRONMENT "${FCLAW_TEST_ENVIRONMENT}")
