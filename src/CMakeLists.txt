@@ -212,6 +212,7 @@ install(FILES
 	fclaw2d_map_query_defs.h
 	fclaw2d_diagnostics.h
   fclaw2d_file.h
+  fclaw2d_wrap.h
   fclaw2d_to_3d.h
   forestclaw3d.h
   fclaw3d_convenience.h
@@ -224,6 +225,7 @@ install(FILES
   fclaw3d_options.h
   fclaw3d_include_all.h 
   fclaw3d_file.h
+  fclaw3d_wrap.h
   DESTINATION include
 )
 
