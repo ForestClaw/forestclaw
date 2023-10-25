@@ -4,7 +4,7 @@ bin_PROGRAMS += applications/clawpack/euler/3dx/overpressure/overpressure
 
 TESTS += applications/clawpack/euler/3dx/overpressure/regressions.sh
 
-applications_clawpack_euler_3d_overpressure_overpressure_SOURCES = \
+applications_clawpack_euler_3dx_overpressure_overpressure_SOURCES = \
 	applications/clawpack/euler/3dx/overpressure/overpressure.cpp \
 	applications/clawpack/euler/3dx/overpressure/overpressure_options.c \
 	applications/clawpack/euler/3dx/overpressure/overpressure_user.cpp \
@@ -38,13 +38,13 @@ EXTRA_DIST += \
 	applications/clawpack/euler/3dx/overpressure/read_vars.m \
 	applications/clawpack/euler/3dx/overpressure/setplot3.m
 
-applications_clawpack_euler_3d_overpressure_overpressure_CPPFLAGS = \
+applications_clawpack_euler_3dx_overpressure_overpressure_CPPFLAGS = \
         $(AM_CPPFLAGS) \
         $(FCLAW_CLAWPACK46_CPPFLAGS) \
         $(FCLAW_CLAWPACK5_CPPFLAGS) \
         $(FCLAW_CLAWPATCH_CPPFLAGS)
 
-applications_clawpack_euler_3d_overpressure_overpressure_LDADD = \
+applications_clawpack_euler_3dx_overpressure_overpressure_LDADD = \
         $(LDADD) \
         $(FCLAW_CLAWPACK46_LDADD) \
         $(FCLAW_CLAWPACK5_LDADD) \

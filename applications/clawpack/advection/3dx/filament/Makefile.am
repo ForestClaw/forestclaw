@@ -4,7 +4,7 @@ bin_PROGRAMS += applications/clawpack/advection/3dx/filament/filament
 
 TESTS += applications/clawpack/advection/3dx/filament/regressions.sh
 
-applications_clawpack_advection_3d_filament_filament_SOURCES = \
+applications_clawpack_advection_3dx_filament_filament_SOURCES = \
 	applications/clawpack/advection/3dx/filament/filament.cpp \
 	applications/clawpack/advection/3dx/filament/filament_options.c \
 	applications/clawpack/advection/3dx/filament/filament_user.cpp \
@@ -34,16 +34,16 @@ EXTRA_DIST += \
 	applications/clawpack/advection/3dx/filament/mapc2p.m \
 	applications/clawpack/advection/3dx/filament/read_vars.m
 
-applications_clawpack_advection_3d_filament_filament_CPPFLAGS = \
+applications_clawpack_advection_3dx_filament_filament_CPPFLAGS = \
         $(AM_CPPFLAGS) \
         $(FCLAW_CLAWPACK3_CPPFLAGS) \
         $(FCLAW_CLAWPATCH_CPPFLAGS)
 	    
 
-# applications_clawpack_advection_3d_filament_filament_CPPFLAGS += -D MPI_DEBUG
+# applications_clawpack_advection_3dx_filament_filament_CPPFLAGS += -D MPI_DEBUG
 
 
-applications_clawpack_advection_3d_filament_filament_LDADD = \
+applications_clawpack_advection_3dx_filament_filament_LDADD = \
         $(LDADD) \
         $(FCLAW_CLAWPACK3_LDADD) \
         $(FCLAW_CLAWPATCH_LDADD) \

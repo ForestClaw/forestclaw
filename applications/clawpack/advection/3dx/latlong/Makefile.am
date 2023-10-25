@@ -2,7 +2,7 @@ bin_PROGRAMS += applications/clawpack/advection/3dx/latlong/latlong
 
 TESTS += applications/clawpack/advection/3dx/latlong/regressions.sh
 
-applications_clawpack_advection_3d_latlong_latlong_SOURCES = \
+applications_clawpack_advection_3dx_latlong_latlong_SOURCES = \
 	applications/clawpack/advection/3dx/latlong/latlong.cpp \
 	applications/clawpack/advection/3dx/latlong/latlong_options.c \
 	applications/clawpack/advection/3dx/latlong/latlong_user.h \
@@ -26,13 +26,13 @@ EXTRA_DIST += \
 	applications/clawpack/advection/3dx/latlong/setplot2.m \
 	applications/clawpack/advection/3dx/latlong/mapc2m.m
 
-applications_clawpack_advection_3d_latlong_latlong_CPPFLAGS = \
+applications_clawpack_advection_3dx_latlong_latlong_CPPFLAGS = \
 	$(AM_CPPFLAGS) \
 	$(FCLAW_CLAWPACK46_CPPFLAGS) \
 	$(FCLAW_CLAWPATCH_CPPFLAGS)
 
 
-applications_clawpack_advection_3d_latlong_latlong_LDADD = \
+applications_clawpack_advection_3dx_latlong_latlong_LDADD = \
         $(LDADD) \
         $(FCLAW_CLAWPACK46_LDADD) \
         $(FCLAW_CLAWPATCH_LDADD)  \

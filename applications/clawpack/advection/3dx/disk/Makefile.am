@@ -3,7 +3,7 @@
 bin_PROGRAMS += applications/clawpack/advection/3dx/disk/disk
 
 
-applications_clawpack_advection_3d_disk_disk_SOURCES = \
+applications_clawpack_advection_3dx_disk_disk_SOURCES = \
 	applications/clawpack/advection/3dx/disk/disk.cpp \
 	applications/clawpack/advection/3dx/disk/disk_options.c \
 	applications/clawpack/advection/3dx/disk/disk_user.cpp \
@@ -29,12 +29,12 @@ EXTRA_DIST += \
 	applications/clawpack/advection/3dx/disk/mapc2p.m \
 	applications/clawpack/advection/3dx/disk/filament_soln.m
 
-applications_clawpack_advection_3d_disk_disk_CPPFLAGS = -I../all/ \
+applications_clawpack_advection_3dx_disk_disk_CPPFLAGS = -I../all/ \
         $(AM_CPPFLAGS) \
         $(FCLAW_CLAWPACK3_46_CPPFLAGS) \
         $(FCLAW_CLAWPATCH_CPPFLAGS)
 
-applications_clawpack_advection_3d_disk_disk_LDADD = \
+applications_clawpack_advection_3dx_disk_disk_LDADD = \
         $(LDADD) \
         $(FCLAW_CLAWPACK3_46_LDADD)  \
         $(FCLAW_CLAWPATCH_LDADD) \
