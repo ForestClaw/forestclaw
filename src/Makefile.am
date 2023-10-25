@@ -112,6 +112,7 @@ libforestclaw_compiled_sources = \
     src/fclaw_diagnostics.c \
 	src/fclaw_convenience.c \
 	src/fclaw_ghost_fill.c \
+	src/fclaw_global.c \
     src/fclaw_corner_neighbors.c \
     src/fclaw_edge_neighbors.c \
     src/fclaw_face_neighbors.c \
@@ -129,7 +130,7 @@ libforestclaw_compiled_sources = \
 	src/fclaw_initialize.c \
   	src/fclaw_rays.c \
     src/fclaw_forestclaw.c \
-  	fclaw_elliptic_solver.c \
+  	src/fclaw_elliptic_solver.c \
 	src/fclaw_run.c \
 	src/forestclaw.c \
 	src/fclaw2d_block.c \
@@ -164,7 +165,6 @@ libforestclaw_compiled_sources = \
 	src/fclaw2d_farraybox.cpp \
 	src/fclaw2d_output_tikz.c \
 	src/fclaw2d_file.c \
-	src/fclaw2d_wrap.c \
 	src/fclaw2d_wrap.c \
 	src/forestclaw2d.c \
 	src/forestclaw3d.c \
