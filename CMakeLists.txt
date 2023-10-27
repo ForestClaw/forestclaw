@@ -1,4 +1,10 @@
-cmake_minimum_required(VERSION 3.14...3.28)
+cmake_minimum_required(VERSION 3.19...3.28)
+
+if(CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
+  message(FATAL_ERROR "please use out-of-source build
+  cmake -Bbuild
+  ")
+endif()
 
 include(cmake/GitVersionGen.cmake)
 
@@ -18,7 +24,7 @@ set(CMAKE_CXX_STANDARD 17)
 # --- user options
 
 include(cmake/options.cmake)
-message(STATUS "${PROJECT_NAME} ${PROJECT_VERSION}  install prefix: ${CMAKE_INSTALL_PREFIX}")
+message(STATUS "${PROJECT_NAME} ${PROJECT_VERSION}  install prefix: ${CMAKE_INSTALL_PREFIX}  CMake ${CMAKE_VERSION}  Toolchain ${CMAKE_TOOLCHAIN_FILE}")
 
 # --- external libs
 
@@ -38,33 +44,12 @@ find_package(ZLIB)
 
 # --- p4est, sc
 
-set(CMAKE_FIND_PACKAGE_PREFER_CONFIG true)
-
-if(NOT sc_external)
-  find_package(SC HINTS ${THUNDEREGG_ROOT} ${P4EST_ROOT})
-endif()
-if(NOT TARGET SC::SC)
-  include(cmake/sc.cmake)
-endif()
-
-
-if(NOT p4est_external)
-  find_package(P4EST HINTS ${THUNDEREGG_ROOT})
-endif()
-if(NOT TARGET P4EST::P4EST)
-  include(cmake/p4est.cmake)
-endif()
-
-
+include(cmake/sc.cmake)
+include(cmake/p4est.cmake)
 
 # --- ThunderEgg
 if(thunderegg)
-  if(NOT thunderegg_external)
-    find_package(ThunderEgg HINTS ${THUNDEREGG_ROOT})
-  endif()
-  if(NOT TARGET ThunderEgg::ThunderEgg)
-    include(cmake/ThunderEgg.cmake)
-  endif()
+  include(cmake/ThunderEgg.cmake)
 endif(thunderegg)
 
 
@@ -84,8 +69,6 @@ endif(BUILD_TESTING)
 
 # --- ForestClaw
 add_subdirectory(src)
-
-
 
 # --- Clawpatch
 if(clawpatch)

@@ -9,10 +9,8 @@ option(cudaclaw "build CudaClaw")
 option(thunderegg "build ThunderEgg")
 
 option(thunderegg_external "force build of ThunderEgg")
-option(p4est_external "force build of p4est")
-option(sc_external "force build of libsc")
 
-option(CMAKE_TLS_VERIFY "verify HTTPS certs" on)
+option(CMAKE_TLS_VERIFY "verify TLS cert" on)
 
 # --- default install directory under build/local
 # users can specify like "cmake -B build -DCMAKE_INSTALL_PREFIX=~/mydir"

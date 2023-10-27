@@ -167,12 +167,13 @@ install(FILES
   fclaw3d_options.h
   fclaw3d_include_all.h
   fclaw3d_file.h
-  fclaw3d_wrap.h
-  DESTINATION include
+  fclaw_patch.h
+  fclaw_domain.h
+  fclaw_global.h
+  TYPE INCLUDE
 )
 
-install(TARGETS forestclaw
-  EXPORT ${PROJECT_NAME}-targets)
+install(TARGETS forestclaw EXPORT ${PROJECT_NAME}-targets)
 
 if(BUILD_TESTING)
   add_executable(forestclaw.TEST

@@ -54,8 +54,7 @@ install(FILES
 	TYPE INCLUDE
 )
 
-install(TARGETS cudaclaw5
-  EXPORT ${PROJECT_NAME}-targets)
+install(TARGETS cudaclaw5 EXPORT ${PROJECT_NAME}-targets)
 
 # imported target, for use from FetchContent
 add_library(FORESTCLAW::CUDACLAW5 INTERFACE IMPORTED GLOBAL)

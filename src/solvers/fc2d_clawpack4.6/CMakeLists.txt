@@ -41,8 +41,7 @@ install(FILES
   TYPE INCLUDE
 )
 
-install(TARGETS clawpack4.6
-  EXPORT ${PROJECT_NAME}-targets)
+install(TARGETS clawpack4.6 EXPORT ${PROJECT_NAME}-targets)
 
 
 # -- imported target, for use from FetchContent

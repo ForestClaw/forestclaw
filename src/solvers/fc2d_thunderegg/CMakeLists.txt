@@ -48,8 +48,7 @@ install(FILES
   TYPE INCLUDE
 )
 
-install(TARGETS fc2d_thunderegg
-  EXPORT ${PROJECT_NAME}-targets)
+install(TARGETS fc2d_thunderegg EXPORT ${PROJECT_NAME}-targets)
 
 
 # imported target, for use from FetchContent

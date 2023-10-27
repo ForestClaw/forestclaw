@@ -41,8 +41,7 @@ install(FILES
   TYPE INCLUDE
 )
 
-install(TARGETS clawpack5
-  EXPORT ${PROJECT_NAME}-targets)
+install(TARGETS clawpack5 EXPORT ${PROJECT_NAME}-targets)
 
 # imported target, for use from FetchContent
 add_library(FORESTCLAW::CLAWPACK5 INTERFACE IMPORTED GLOBAL)
