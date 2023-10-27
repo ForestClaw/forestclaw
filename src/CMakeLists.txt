@@ -1,11 +1,9 @@
 # we use auxiliary objects for each code language to avoid compiler option mingling
 
 # -- c library
-add_library(forestclaw_c OBJECT 
-  forestclaw.c
-  fclaw_convenience.c
-  fclaw_base.c 
-  fclaw_options.c 
+add_library(forestclaw_c OBJECT
+  fclaw_base.c
+  fclaw_options.c
   fclaw_filesystem.cpp
   fclaw_gauges.c
   fclaw_package.c
@@ -57,10 +55,12 @@ add_library(forestclaw_c OBJECT
   mappings/fclaw_map_nomap_brick.c
 )
 target_include_directories(forestclaw_c PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${PROJECT_BINARY_DIR}/include patches/clawpatch)
-target_link_libraries(forestclaw_c PRIVATE P4EST::P4EST SC::SC)
-if(mpi)
-  target_link_libraries(forestclaw_c PRIVATE MPI::MPI_C)
-endif(mpi)
+target_link_libraries(forestclaw_c PRIVATE P4EST::P4EST SC::SC
+$<$<BOOL:${mpi}>:MPI::MPI_C>
+)
+# FIXME: this is a temporary workaround until we use FetchContent to have these definitions in the same namespace
+target_compile_definitions(forestclaw_c PRIVATE $<$<BOOL:${mpi}>:SC_ENABLE_MPI>)
+
 
 # -- fortran library
 add_library(forestclaw_f OBJECT
@@ -111,57 +111,61 @@ add_library(FORESTCLAW::FORESTCLAW INTERFACE IMPORTED GLOBAL)
 target_link_libraries(FORESTCLAW::FORESTCLAW INTERFACE forestclaw)
 
 install(FILES
-  forestclaw.h
-  fclaw_convenience.h
-  fclaw_base.h 
-	fclaw_timer.h 
-	fclaw_package.h 
+  fclaw_base.h
+	fclaw_timer.h
+	fclaw_package.h
   fclaw_packing.h
-	fclaw_pointer_map.h 
-	fclaw_filesystem.h 
-	fclaw_options.h 
-	fclaw_gauges.h 
-	fclaw_mpi.h 
-	fclaw_math.h 
-  fclaw_wrap.h
-  fclaw_include_all.h 
-	fclaw_advance.h 
-	fclaw_elliptic_solver.h 
-	fclaw_farraybox.hpp 
-	fclaw_global.h
-	fclaw_forestclaw.h
-	fclaw_domain.h
-	fclaw_block.h
-	fclaw_patch.h
-	fclaw_vtable.h
-	fclaw_output.h
-	fclaw_time_sync.h
-	fclaw_update_single_step.h
-	fclaw_physical_bc.h
-	fclaw_rays.h
-	fclaw_ghost_fill.h
-	fclaw_corner_neighbors.h
-	fclaw_edge_neighbors.h
-	fclaw_face_neighbors.h
-	fclaw_map.h
-	fclaw_timeinterp.h
-	fclaw_regrid.h
-	fclaw_map_brick.h
-	fclaw_partition.h
-	fclaw_exchange.h
-	fclaw_map_query.h
-	fclaw_map_query_defs.h
-	fclaw_diagnostics.h
-	forestclaw2d.h 
-	fp_exception_glibc_extension.h 
-  fclaw2d_convenience.h
-	fclaw2d_defs.h 
+	fclaw_pointer_map.h
+	fclaw_filesystem.h
+	fclaw_options.h
+	fclaw_gauges.h
+	fclaw_mpi.h
+	fclaw_math.h
+	forestclaw2d.h
+	fp_exception_glibc_extension.h
+  fclaw2d_include_all.h
+	fclaw2d_defs.h
+	fclaw2d_options.h
+	fclaw2d_advance.h
+	fclaw2d_elliptic_solver.h
+	fclaw2d_farraybox.hpp
+	fclaw2d_global.h
+	fclaw2d_forestclaw.h
+	fclaw2d_domain.h
+	fclaw2d_block.h
+	fclaw2d_patch.h
+	fclaw2d_vtable.h
+	fclaw2d_output.h
+	fclaw2d_time_sync.h
+	fclaw2d_update_single_step.h
+	fclaw2d_physical_bc.h
+	fclaw2d_rays.h
+	fclaw2d_ghost_fill.h
+	fclaw2d_corner_neighbors.h
+	fclaw2d_face_neighbors.h
+	fclaw2d_map.h
+	fclaw2d_timeinterp.h
+	fclaw2d_regrid.h
+	fclaw2d_map_brick.h
+	fclaw2d_partition.h
+	fclaw2d_exchange.h
+	fclaw2d_convenience.h
+	fclaw2d_map_query.h
+	fclaw2d_map_query_defs.h
+	fclaw2d_diagnostics.h
   fclaw2d_file.h
   fclaw2d_wrap.h
   fclaw2d_to_3d.h
   forestclaw3d.h
   fclaw3d_convenience.h
   fclaw3d_defs.h
+  fclaw3d_domain.h
+  fclaw3d_global.h
+  fclaw3d_map.h
+  fclaw3d_patch.h
+  fclaw3d_exchange.h
+  fclaw3d_options.h
+  fclaw3d_include_all.h
   fclaw3d_file.h
   fclaw3d_wrap.h
   DESTINATION include
