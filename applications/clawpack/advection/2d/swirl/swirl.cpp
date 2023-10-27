@@ -28,7 +28,7 @@
 
 #include "../all/advection_user.h"
 
-#define FCLAW_SWIRL_IO_DEMO 1
+#define FCLAW_SWIRL_IO_DEMO 0
 
 static
 void create_domain(fclaw2d_global_t *glob)
