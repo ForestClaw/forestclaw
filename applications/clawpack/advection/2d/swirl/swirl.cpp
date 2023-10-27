@@ -107,6 +107,7 @@ void run_program(fclaw2d_global_t* glob)
     fc = fclaw2d_file_open_read ("swirl_io_test", read_user_string,
                                  glob->domain->mpicomm, 0, &read_domain,
                                  &errcode);
+    fclaw2d_domain_destroy (read_domain);
 
     fclaw2d_file_close (fc, &errcode);
 #endif
