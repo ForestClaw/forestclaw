@@ -3144,10 +3144,21 @@ fclaw2d_file_write_block (fclaw2d_file_context_t *
     FCLAW_ASSERT (block_data != NULL);
     FCLAW_ASSERT (errcode != NULL);
 
-    /* The functionality must be still implemented. */
-    *errcode = FCLAW2D_FILE_ERR_NOT_IMPLEMENTED;
+    int errcode_internal;
 
-    return NULL;
+    fc->fc = fclaw2d_file_write_block_v1 (fc->fc, block_size, block_data, user_string,
+                                          &errcode_internal);
+    fclaw2d_file_translate_error_code_v1 (errcode_internal, errcode);
+    if (*errcode != FCLAW2D_FILE_ERR_SUCCESS)
+    {
+        FCLAW_ASSERT (fc->fc == NULL);
+        /* The p4est file context was closed and deallocated. */
+        /* deallocate fclaw2d file context */
+        FCLAW_FREE (fc);
+        return NULL;
+    }
+
+    return fc;
 }
 
 fclaw2d_file_context_t *
@@ -3248,8 +3259,21 @@ fclaw2d_file_read_block (fclaw2d_file_context_t *
     FCLAW_ASSERT (block_data != NULL);
     FCLAW_ASSERT (errcode != NULL);
 
-    /* The functionality must be still implemented. */
-    *errcode = FCLAW2D_FILE_ERR_NOT_IMPLEMENTED;
+    int errcode_internal;
+
+    fc->fc = fclaw2d_file_read_block_v1 (fc->fc, block_size, block_data, user_string,
+                                          &errcode_internal);
+    fclaw2d_file_translate_error_code_v1 (errcode_internal, errcode);
+    if (*errcode != FCLAW2D_FILE_ERR_SUCCESS)
+    {
+        FCLAW_ASSERT (fc->fc == NULL);
+        /* The p4est file context was closed and deallocated. */
+        /* deallocate fclaw2d file context */
+        FCLAW_FREE (fc);
+        return NULL;
+    }
+
+    return fc;
 
     return NULL;
 }

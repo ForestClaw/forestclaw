@@ -60,6 +60,8 @@ void run_program(fclaw2d_global_t* glob)
     int errcode;
     fclaw2d_file_context_t *fc;
     char read_user_string[FCLAW2D_FILE_USER_STRING_BYTES + 1];
+    sc_array_t block_arr;
+    int64_t test_int = 12;
     fclaw2d_domain_t *read_domain;
 #endif
 
@@ -102,11 +104,23 @@ void run_program(fclaw2d_global_t* glob)
     fc = fclaw2d_file_open_write ("swirl_io_test", "ForestClaw data file", 0,
                                   glob->domain, &errcode);
 
+    /* write a block to the file */
+    sc_array_init_data (&block_arr, &test_int, sizeof (int64_t), 1);
+    fc = fclaw2d_file_write_block (fc, "Test block", block_arr.elem_size,
+                                   &block_arr, &errcode);
+
     fclaw2d_file_close (fc, &errcode);
 
     fc = fclaw2d_file_open_read ("swirl_io_test", read_user_string,
                                  glob->domain->mpicomm, 0, &read_domain,
                                  &errcode);
+
+    /* read a block from the file */
+    test_int = -1;
+    fc = fclaw2d_file_read_block (fc, read_user_string, sizeof (int64_t), &block_arr,
+                                  &errcode);
+    FCLAW_ASSERT (test_int == 12);
+
     fclaw2d_domain_destroy (read_domain);
 
     fclaw2d_file_close (fc, &errcode);
