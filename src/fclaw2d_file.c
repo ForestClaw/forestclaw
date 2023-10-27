@@ -2400,7 +2400,7 @@ fclaw2d_file_error_string_v1 (int errclass, char *string, int *resultlen)
  *                            In case of error the file is tried to close
  *                            and fc is freed.
  */
-fclaw2d_file_context_p4est_v1_t *
+static fclaw2d_file_context_p4est_v1_t *
 fclaw2d_file_write_p4est_v1 (fclaw2d_file_context_p4est_v1_t * fc,
                              p4est_t * p4est, const char *quad_string,
                              const char *quad_data_string, int save_data,
