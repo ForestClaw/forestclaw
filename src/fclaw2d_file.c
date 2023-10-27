@@ -2464,7 +2464,9 @@ fclaw2d_file_write_p4est_v1 (fclaw2d_file_context_p4est_v1_t * fc,
         FCLAW_ASSERT (fc == NULL);
         /* first write call failed */
         sc_array_destroy (quads);
-        sc_array_destroy (quad_data);
+        if (write_data) {
+            sc_array_destroy (quad_data);
+        }
         return NULL;
     }
 
@@ -2481,7 +2483,9 @@ fclaw2d_file_write_p4est_v1 (fclaw2d_file_context_p4est_v1_t * fc,
         FCLAW_ASSERT (fc == NULL);
         /* first write call failed */
         sc_array_destroy (quads);
-        sc_array_destroy (quad_data);
+        if (write_data) {
+            sc_array_destroy (quad_data);
+        }
         return NULL;
     }
 
