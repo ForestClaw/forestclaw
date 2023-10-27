@@ -159,8 +159,3 @@ if(applications)
 endif(applications)
 
 include(cmake/documentation.cmake)
-
-# --- auto-ignore build directory
-if(NOT CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
-  file(GENERATE OUTPUT .gitignore CONTENT "*")
-endif()
