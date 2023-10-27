@@ -1710,7 +1710,6 @@ fclaw2d_file_read_field_ext_v1 (fclaw2d_file_context_p4est_v1_t * fc,
     return fc;
 }
 
-#if 0
 /** Read one (more) per-quadrant data set from a parallel input file.
  * This function requires an opened file context.
  * This function requires the appropriate number of readable bytes.
@@ -1826,7 +1825,6 @@ fclaw2d_file_read_field_v1 (fclaw2d_file_context_p4est_v1_t * fc,
     fclaw2d_file_error_code_v1 (*errcode, errcode);
     return retfc;
 }
-#endif
 
 /** A data type that encodes the metadata of one data block in a fclaw2d data file.
  */
@@ -3172,10 +3170,21 @@ fclaw2d_file_write_array (fclaw2d_file_context_t *
     FCLAW_ASSERT (patch_data != NULL);
     FCLAW_ASSERT (errcode != NULL);
 
-    /* The functionality must be still implemented. */
-    *errcode = FCLAW2D_FILE_ERR_NOT_IMPLEMENTED;
+    int errcode_internal;
 
-    return NULL;
+    /* we use the partiton of the underlying p4est */
+    fc->fc = fclaw2d_file_write_field_v1 (fc->fc, patch_size, patch_data,
+                                          user_string, &errcode_internal);
+    fclaw2d_file_translate_error_code_v1 (errcode_internal, errcode);
+    if (*errcode != FCLAW2D_FILE_ERR_SUCCESS) {
+        FCLAW_ASSERT (fc->fc == NULL);
+        /* The p4est file context was closed and deallocated. */
+        /* deallocate fclaw2d file context */
+        FCLAW_FREE (fc);
+        return NULL;
+    }
+
+    return fc;
 }
 
 fclaw2d_file_context_t *
@@ -3289,10 +3298,21 @@ fclaw2d_file_read_array (fclaw2d_file_context_t *
     FCLAW_ASSERT (patch_data != NULL);
     FCLAW_ASSERT (errcode != NULL);
 
-    /* The functionality must be still implemented. */
-    *errcode = FCLAW2D_FILE_ERR_NOT_IMPLEMENTED;
+    int errcode_internal;
 
-    return NULL;
+    /* we use the partition of the underlying p4est */
+    fc->fc = fclaw2d_file_read_field_v1 (fc->fc, patch_size, patch_data,
+                                          user_string, &errcode_internal);
+    fclaw2d_file_translate_error_code_v1 (errcode_internal, errcode);
+    if (*errcode != FCLAW2D_FILE_ERR_SUCCESS) {
+        FCLAW_ASSERT (fc->fc == NULL);
+        /* The p4est file context was closed and deallocated. */
+        /* deallocate fclaw2d file context */
+        FCLAW_FREE (fc);
+        return NULL;
+    }
+
+    return fc;
 }
 
 int
