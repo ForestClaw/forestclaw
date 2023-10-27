@@ -2548,7 +2548,6 @@ fclaw2d_file_data_to_p4est (sc_MPI_Comm mpicomm, int mpisize,
     FCLAW_ASSERT (gfq != NULL);
     FCLAW_ASSERT (quads != NULL &&
                   quads->elem_size == FCLAW2D_FILE_COMPRESSED_QUAD_SIZE_V1);
-    FCLAW_ASSERT (quad_data != NULL);
     FCLAW_ASSERT (errcode != NULL);
     *errcode = FCLAW2D_FILE_ERR_P4EST_V1;
 
@@ -2626,7 +2625,8 @@ fclaw2d_file_read_p4est_v1 (fclaw2d_file_context_p4est_v1_t * fc,
     sc_array_init_size (&pertree_arr,
                         (conn->num_trees + 1) * sizeof (p4est_gloidx_t), 1);
     sc_array_init (&quadrants, FCLAW2D_FILE_COMPRESSED_QUAD_SIZE_V1);
-    sc_array_init (&quad_data, data_size);
+    /* dummy intialization */
+    sc_array_init (&quad_data, 1);
 
     /* temporary information */
     mpiret = sc_MPI_Comm_size (fc->mpicomm, &mpisize);
@@ -2744,6 +2744,7 @@ fclaw2d_file_read_p4est_v1 (fclaw2d_file_context_p4est_v1_t * fc,
 
     if (written_data)
     {
+        sc_array_init (&quad_data, data_size);
         /* read the quadrant data */
         fc = fclaw2d_file_read_field_ext_v1 (fc, gfq, quad_data.elem_size,
                                              &quad_data, quad_data_string,
@@ -2755,12 +2756,16 @@ fclaw2d_file_read_p4est_v1 (fclaw2d_file_context_p4est_v1_t * fc,
             goto p4est_read_file_p4est_end;
         }
     }
+    else {
+        FCLAW_ASSERT (data_size == 0);
+    }
 
     /* create the p4est from the read data */
     *p4est =
         fclaw2d_file_data_to_p4est (fc->mpicomm, mpisize, conn, gfq,
                                     (p4est_gloidx_t *) pertree_arr.array,
-                                    &quadrants, &quad_data, errcode);
+                                    &quadrants, written_data ? &quad_data : NULL,
+                                    errcode);
     FCLAW_ASSERT ((p4est == NULL) ==
                   (*errcode != FCLAW2D_FILE_ERR_SUCCESS_V1));
     if (*errcode != FCLAW2D_FILE_ERR_SUCCESS_V1)
