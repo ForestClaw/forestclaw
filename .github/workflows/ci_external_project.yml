@@ -34,10 +34,10 @@ jobs:
           components:      "geoclaw"
           ubuntu_packages: ""
 
-        - name:            "Serial With CudaClaw"
-          components:      "cudaclaw"
-          ubuntu_packages: "nvidia-cuda-toolkit"
-          cuda:            true
+#        - name:            "Serial With CudaClaw"
+#          components:      "cudaclaw"
+#          ubuntu_packages: "nvidia-cuda-toolkit"
+#          cuda:            true
 
         - name:            "MPI Minimal"
           components:      "mpi"

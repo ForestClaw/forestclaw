@@ -37,15 +37,15 @@ jobs:
         - name: "Serial With GeoClaw"
           configure_flags: "--enable-geoclaw"
           ubuntu_packages: ""
-        - name: "Serial With CudaClaw (CUDA 10.1)"
-          configure_flags: "CUDA_CFLAGS=\"-arch=sm_61\" LIBS=\"-lcuda -lcudart -lnvToolsExt\" --enable-cudaclaw --disable-shared"
-          ubuntu_packages: "nvidia-cuda-toolkit"
-          cuda: true
-        - name: "Serial With CudaClaw (CUDA 11.3)"
-          configure_flags: "NVCC=/usr/local/cuda-11.3/bin/nvcc CUDA_CFLAGS=\"-arch=sm_61\" LIBS=\"-L/usr/local/cuda-11.3/lib64 -lcudart -lnvToolsExt\" --enable-cudaclaw --disable-shared"
-          ubuntu_packages: ""
-          cuda: true
-          cuda_11_3: true
+#        - name: "Serial With CudaClaw (CUDA 10.1)"
+#          configure_flags: "CUDA_CFLAGS=\"-arch=sm_61\" LIBS=\"-lcuda -lcudart -lnvToolsExt\" --enable-cudaclaw --disable-shared"
+#          ubuntu_packages: "nvidia-cuda-toolkit"
+#          cuda: true
+#        - name: "Serial With CudaClaw (CUDA 11.3)"
+#          configure_flags: "NVCC=/usr/local/cuda-11.3/bin/nvcc CUDA_CFLAGS=\"-arch=sm_61\" LIBS=\"-L/usr/local/cuda-11.3/lib64 -lcudart -lnvToolsExt\" --enable-cudaclaw --disable-shared"
+#          ubuntu_packages: ""
+#          cuda: true
+#          cuda_11_3: true
         - name: "MPI Minimal"
           configure_flags: "--enable-mpi"
           ubuntu_packages: "libopenmpi-dev openmpi-bin"

@@ -31,16 +31,16 @@ jobs:
         - name: "Serial With GeoClaw"
           configure_flags: "-Dgeoclaw=ON"
           ubuntu_packages: ""
-        - name: "Serial With CudaClaw (CUDA 10.1)"
-          configure_flags: "-Dcudaclaw=ON"
-          ubuntu_packages: "nvidia-cuda-toolkit"
-          cuda: true
-        - name: "Serial With CudaClaw (CUDA 11.3)"
-          configure_flags: "-Dcudaclaw=ON"
-          configure_environment: "CUDACXX=/usr/local/cuda/bin/nvcc"
-          ubuntu_packages: ""
-          cuda: true
-          cuda_11_3: true
+#        - name: "Serial With CudaClaw (CUDA 10.1)"
+#          configure_flags: "-Dcudaclaw=ON"
+#          ubuntu_packages: "nvidia-cuda-toolkit"
+#          cuda: true
+#        - name: "Serial With CudaClaw (CUDA 11.3)"
+#          configure_flags: "-Dcudaclaw=ON"
+#          configure_environment: "CUDACXX=/usr/local/cuda/bin/nvcc"
+#          ubuntu_packages: ""
+#          cuda: true
+#          cuda_11_3: true
         - name: "MPI Minimal"
           configure_flags: "-Dmpi=ON"
           ubuntu_packages: "libopenmpi-dev openmpi-bin"

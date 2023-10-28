@@ -57,8 +57,6 @@ static
 void run_program(fclaw_global_t* glob)
 {
 #if FCLAW_SWIRL_IO_DEMO
-    int errcode;
-    fclaw2d_file_context_t *fc;
 #endif
 
     /* Initialize virtual table for ForestClaw */
@@ -92,6 +90,8 @@ void run_program(fclaw_global_t* glob)
     /** WARNING: This is work in progress and currently not a valid example
      * workflow.
     */
+    int errcode;
+    fclaw2d_file_context_t *fc;
     fc = fclaw2d_file_open_write ("swirl_io_test", "ForestClaw data file", 0,
                                   glob->domain, &errcode);
 
