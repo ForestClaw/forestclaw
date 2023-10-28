@@ -3168,13 +3168,28 @@ fclaw2d_file_write_array (fclaw2d_file_context_t *
     FCLAW_ASSERT (fc != NULL);
     FCLAW_ASSERT (user_string != NULL);
     FCLAW_ASSERT (patch_data != NULL);
+    FCLAW_ASSERT (patch_data->elem_size == sizeof (sc_array_t));
     FCLAW_ASSERT (errcode != NULL);
 
     int errcode_internal;
+    char *data_dest, *data_src;
+    size_t si;
+    sc_array_t contig_arr, *patch_arr;
+
+    /* copy the data to a contigous array  */
+    sc_array_init_size (&contig_arr, patch_size, patch_data->elem_count);
+    for (si = 0; si < patch_data->elem_count; ++si) {
+        patch_arr = (sc_array_t *) sc_array_index (patch_data, si);
+        data_src = (char *) sc_array_index (patch_arr, 0);
+        data_dest = (char *) sc_array_index (&contig_arr, si);
+
+        memcpy (data_dest, data_src, patch_size);
+    }
 
     /* we use the partiton of the underlying p4est */
-    fc->fc = fclaw2d_file_write_field_v1 (fc->fc, patch_size, patch_data,
+    fc->fc = fclaw2d_file_write_field_v1 (fc->fc, patch_size, &contig_arr,
                                           user_string, &errcode_internal);
+    sc_array_reset (&contig_arr);
     fclaw2d_file_translate_error_code_v1 (errcode_internal, errcode);
     if (*errcode != FCLAW2D_FILE_ERR_SUCCESS) {
         FCLAW_ASSERT (fc->fc == NULL);

@@ -60,12 +60,13 @@ void run_program(fclaw2d_global_t* glob)
 {
 #if FCLAW_SWIRL_IO_DEMO
     int i;
+    size_t si;
     int errcode;
     fclaw2d_file_context_t *fc;
     char read_user_string[FCLAW2D_FILE_USER_STRING_BYTES + 1];
-    sc_array_t block_arr, field_arr, read_arr;
+    sc_array_t block_arr, field_arr, read_arr, *current_arr;
     int64_t test_int = 12;
-    char *local_arr_data;
+    char *data, *local_arr_data;
     fclaw2d_domain_t *read_domain;
 #endif
 
@@ -114,30 +115,26 @@ void run_program(fclaw2d_global_t* glob)
                                    &block_arr, &errcode);
 
     /* write an array associated to the domain to the file */
-    local_arr_data = FCLAW_ALLOC (char, 3 * glob->domain->local_num_patches);
-    for (i = 0; i < 3 * glob->domain->local_num_patches; ++i) {
-        switch (i % 3)
-        {
-        case 0:
-            local_arr_data[i] = 'a';
-            break;
-        case 1:
-            local_arr_data[i] = 'b';
-            break;
-        case 2:
-            local_arr_data[i] = 'c';
-            break;  
-        }
-    }
-    sc_array_init_data (&field_arr, local_arr_data, 3 * sizeof (char),
-                        glob->domain->local_num_patches);
-    fc = fclaw2d_file_write_array (fc, "Test array", 3 * sizeof (char),
-                                   &field_arr, &errcode);
-    /* reset the local array data */
-    for (i = 0; i < 3 * glob->domain->local_num_patches; ++i) {
-        local_arr_data[i] = 'd';
+    /* we write non-contiguous data to demonstrate how to assemble the array */
+    sc_array_init_size (&field_arr, sizeof (sc_array_t), glob->domain->local_num_patches);
+
+    for (si = 0; si < glob->domain->local_num_patches; ++si) {
+        current_arr = (sc_array_t *) sc_array_index (&field_arr, si);
+        sc_array_init_size (current_arr, 3 * sizeof (char), 1);
+        data = (char *) sc_array_index (current_arr, 0);
+        data[0] = 'a';
+        data[1] = 'b';
+        data[2] = 'c';
     }
 
+    fc = fclaw2d_file_write_array (fc, "Test array", 3 * sizeof (char),
+                                   &field_arr, &errcode);
+    /* free the local array data */
+    for (si = 0; si < glob->domain->local_num_patches; ++si) {
+        current_arr = (sc_array_t *) sc_array_index (&field_arr, si);
+        sc_array_reset (current_arr);
+    }
+    sc_array_reset (&field_arr);
     fclaw2d_file_close (fc, &errcode);
 
     fc = fclaw2d_file_open_read ("swirl_io_test", read_user_string,
@@ -155,28 +152,19 @@ void run_program(fclaw2d_global_t* glob)
     fc = fclaw2d_file_read_array (fc, read_user_string, read_arr.elem_size,
                                   &read_arr, &errcode);
     /* check read array */
-    for (i = 0; i < 3 * glob->domain->local_num_patches; ++i) {
-        switch (i % 3)
-        {
-        case 0:
-            printf ("%c\n", read_arr.array[i]);
-            FCLAW_ASSERT (read_arr.array[i] == 'a');
-            break;
-        case 1:
-            FCLAW_ASSERT (read_arr.array[i] == 'b');
-            break;
-        case 2:
-            FCLAW_ASSERT (read_arr.array[i] == 'c');
-            break;  
-        }
+    for (i = 0; i < read_domain->local_num_patches; ++i) {
+        local_arr_data = (char *) sc_array_index_int (&read_arr, i);
+        FCLAW_ASSERT (local_arr_data[0] == 'a');
+        FCLAW_ASSERT (local_arr_data[1] == 'b');
+        FCLAW_ASSERT (local_arr_data[2] == 'c');
     }
 
     /* sanity check of read domain */
-    /*FCLAW_ASSERT (p4est_is_equal (((p4est_wrap_t *) read_domain->pp)->p4est,
-                    ((p4est_wrap_t *) glob->domain->pp)->p4est, 0));*/
+    FCLAW_ASSERT (p4est_checksum (((p4est_wrap_t *) read_domain->pp)->p4est) ==
+                    p4est_checksum (((p4est_wrap_t *) glob->domain->pp)->p4est));
 
     fclaw2d_domain_destroy (read_domain);
-    FCLAW_FREE (local_arr_data);
+    sc_array_reset (&read_arr);
 
     fclaw2d_file_close (fc, &errcode);
 #endif
