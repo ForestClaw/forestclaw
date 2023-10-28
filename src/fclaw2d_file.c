@@ -2981,7 +2981,7 @@ fclaw2d_file_context_t;
  *
  * \param [in]  errcode_v1     A fclaw2d_file_v1 error code; see \ref
  *                             fclaw2d_file_error_v1
- * \param [in]  errcode        On output a fclaw2d_file errorcode; see \ref
+ * \param [out]  errcode       On output a fclaw2d_file errorcode; see \ref
  *                             fclaw2d_file_error.
  * \return                     0 in case of success and -1 otherwise.
  */
@@ -3057,6 +3057,96 @@ fclaw2d_file_translate_error_code_v1 (int errcode_v1, int *errcode)
         return 0;
     default:
         *errcode = FCLAW2D_FILE_ERR_UNKNOWN;
+        return 0;
+    }
+    return 0;
+}
+
+/**
+ * This function translates the fclaw2d_file error codes to fclaw_file_v1
+ * error classes.
+ *
+ * \param [in]  errcode         A fclaw2d_file error code; see \ref
+ *                              fclaw2d_file_error
+ * \param [out]  errcode_v1     On output a fclaw2d_file_v1 errorcode; see \ref
+ *                              fclaw2d_file_error_v1.
+ * \return                      0 in case of success and -1 otherwise.
+ */
+static int
+fclaw2d_file_translate_error_code_to_v1 (int errcode, int *errcode_v1)
+{
+    FCLAW_ASSERT (errcode_v1 != NULL);
+
+    switch (errcode)
+    {
+    case FCLAW2D_FILE_ERR_SUCCESS:
+        *errcode_v1 = FCLAW2D_FILE_ERR_SUCCESS_V1;
+        return 0;
+    case FCLAW2D_FILE_ERR_FILE:
+        *errcode_v1 = FCLAW2D_FILE_ERR_FILE_V1;
+        return 0;
+    case FCLAW2D_FILE_ERR_NOT_SAME:
+        *errcode_v1 = FCLAW2D_FILE_ERR_NOT_SAME_V1;
+        return 0;
+    case FCLAW2D_FILE_ERR_AMODE:
+        *errcode_v1 = FCLAW2D_FILE_ERR_AMODE;
+        return 0;
+    case FCLAW2D_FILE_ERR_NO_SUCH_FILE:
+        *errcode_v1 = FCLAW2D_FILE_ERR_NO_SUCH_FILE_V1;
+        return 0;
+    case FCLAW2D_FILE_ERR_FILE_EXIST:
+        *errcode_v1 = FCLAW2D_FILE_ERR_FILE_EXIST_V1;
+        return 0;
+    case FCLAW2D_FILE_ERR_BAD_FILE:
+        *errcode_v1 = FCLAW2D_FILE_ERR_BAD_FILE_V1;
+        return 0;
+    case FCLAW2D_FILE_ERR_ACCESS:
+        *errcode_v1 = FCLAW2D_FILE_ERR_ACCESS_V1;
+        return 0;
+    case FCLAW2D_FILE_ERR_NO_SPACE:
+        *errcode_v1 = FCLAW2D_FILE_ERR_NO_SPACE_V1;
+        return 0;
+    case FCLAW2D_FILE_ERR_QUOTA:
+        *errcode_v1 = FCLAW2D_FILE_ERR_QUOTA_V1;
+        return 0;
+    case FCLAW2D_FILE_ERR_READ_ONLY:
+        *errcode_v1 = FCLAW2D_FILE_ERR_READ_ONLY_V1;
+        return 0;
+    case FCLAW2D_FILE_ERR_IN_USE:
+        *errcode_v1 = FCLAW2D_FILE_ERR_IN_USE_V1;
+        return 0;
+    case FCLAW2D_FILE_ERR_IO:
+        *errcode_v1 = FCLAW2D_FILE_ERR_IO_V1;
+        return 0;
+    case FCLAW2D_FILE_ERR_FORMAT:
+        *errcode_v1 = FCLAW2D_FILE_ERR_FORMAT_V1;
+        return 0;
+    case FCLAW2D_FILE_ERR_SECTION_TYPE:
+        *errcode_v1 = FCLAW2D_FILE_ERR_SECTION_TYPE_V1;
+        return 0;
+    case FCLAW2D_FILE_ERR_CONN:
+        *errcode_v1 = FCLAW2D_FILE_ERR_CONN_V1;
+        return 0;
+    case FCLAW2D_FILE_ERR_P4EST:
+        *errcode_v1 = FCLAW2D_FILE_ERR_P4EST_V1;
+        return 0;
+    case FCLAW2D_FILE_ERR_IN_DATA:
+        *errcode_v1 = FCLAW2D_FILE_ERR_IN_DATA_V1;
+        return 0;
+    case FCLAW2D_FILE_ERR_COUNT:
+        *errcode_v1 = FCLAW2D_FILE_ERR_COUNT_V1;
+        return 0;
+    case FCLAW2D_FILE_ERR_WRONG_DIM:
+        *errcode_v1 = FCLAW2D_FILE_ERR_WRONG_DIM_V1;
+        return 0;
+    case FCLAW2D_FILE_ERR_UNKNOWN:
+        *errcode_v1 = FCLAW2D_FILE_ERR_UNKNOWN_V1;
+        return 0;
+    case FCLAW2D_FILE_ERR_LASTCODE:
+        *errcode_v1 = FCLAW2D_FILE_ERR_LASTCODE_V1;
+        return 0;
+    default:
+        *errcode_v1 = FCLAW2D_FILE_ERR_UNKNOWN_V1;
         return 0;
     }
     return 0;
@@ -3374,28 +3464,42 @@ fclaw2d_file_error_string (int errcode, char *string, int *resultlen)
 {
     FCLAW_ASSERT (string != NULL);
     FCLAW_ASSERT (resultlen != NULL);
+    FCLAW_ASSERT (FCLAW2D_FILE_ERR_SUCCESS <= errcode
+                  && errcode < FCLAW2D_FILE_ERR_LASTCODE);
 
     int ret;
+    int errcode_v1;
+    const char *tstr = NULL;
 
-    if (errcode == FCLAW2D_FILE_ERR_NOT_IMPLEMENTED)
+    /* The version 1 originated error codes come first, FCLAW2D_FILE_ERR_UNKNOWN
+     * is the last error code that orgrinates from the first version of the
+     * file format.
+     */
+    if (FCLAW2D_FILE_ERR_SUCCESS <= errcode && errcode <= FCLAW2D_FILE_ERR_UNKNOWN) {
+        /* use error string as in file format version 1 implementation */
+        fclaw2d_file_translate_error_code_to_v1 (errcode, &errcode_v1);
+        return fclaw2d_file_error_string_v1 (errcode_v1, string, resultlen);
+    }
+
+    /* handle remaining error codes */
+    switch (errcode)
     {
-        if ((ret = snprintf (string, sc_MPI_MAX_ERROR_STRING, "%s",
-                             "The functionality must be still implemented.\n"))
-            < 0)
-        {
-            return sc_MPI_ERR_NO_MEM;
-        }
-        if (ret >= sc_MPI_MAX_ERROR_STRING)
-        {
+    case FCLAW2D_FILE_ERR_NOT_IMPLEMENTED:
+        tstr = "The functionality must be still implemented";
+        break;
+
+    default:
+        /* no valid fclaw2d file error code */
+        SC_ABORT_NOT_REACHED ();
+    }
+
+    if ((ret = snprintf (string, sc_MPI_MAX_ERROR_STRING, "%s", tstr)) < 0) {
+           return sc_MPI_ERR_NO_MEM;
+    }
+    if (ret >= sc_MPI_MAX_ERROR_STRING) {
             ret = sc_MPI_MAX_ERROR_STRING - 1;
-        }
-        *resultlen = ret;
     }
-    else
-    {
-        /* Other error codes must be still implemented. */
-        return -1;
-    }
+    *resultlen = ret;
 
-    return 0;
+    return sc_MPI_SUCCESS;
 }
