@@ -2611,7 +2611,7 @@ fclaw2d_file_read_p4est_v1 (fclaw2d_file_context_p4est_v1_t * fc,
     sc_array_init_size (&pertree_arr,
                         (conn->num_trees + 1) * sizeof (p4est_gloidx_t), 1);
     sc_array_init (&quadrants, FCLAW2D_FILE_COMPRESSED_QUAD_SIZE_V1);
-    /* dummy intialization */
+    /* dummy initialization */
     sc_array_init (&quad_data, 1);
 
     /* temporary information */

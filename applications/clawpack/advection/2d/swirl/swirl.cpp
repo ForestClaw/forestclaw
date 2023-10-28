@@ -27,7 +27,6 @@
 #include <fclaw2d_file.h>
 
 #include "../all/advection_user.h"
-#include <p4est_algorithms.h> /* just temporary for testing */
 #include <p4est_wrap.h> /* just temporary for testing */
 
 #define FCLAW_SWIRL_IO_DEMO 1
