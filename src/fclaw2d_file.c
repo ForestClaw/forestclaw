@@ -3311,12 +3311,17 @@ fclaw2d_file_read_array (fclaw2d_file_context_t *
     FCLAW_ASSERT (fc != NULL);
     FCLAW_ASSERT (user_string != NULL);
     FCLAW_ASSERT (patch_data != NULL);
+    FCLAW_ASSERT (patch_data->elem_size == sizeof (sc_array_t));
     FCLAW_ASSERT (errcode != NULL);
 
+    size_t si;
     int errcode_internal;
+    char *data_src, *data_dest;
+    sc_array_t contig_arr, *current_arr;
 
+    sc_array_init (&contig_arr, patch_size);
     /* we use the partition of the underlying p4est */
-    fc->fc = fclaw2d_file_read_field_v1 (fc->fc, patch_size, patch_data,
+    fc->fc = fclaw2d_file_read_field_v1 (fc->fc, patch_size, &contig_arr,
                                           user_string, &errcode_internal);
     fclaw2d_file_translate_error_code_v1 (errcode_internal, errcode);
     if (*errcode != FCLAW2D_FILE_ERR_SUCCESS) {
@@ -3326,6 +3331,19 @@ fclaw2d_file_read_array (fclaw2d_file_context_t *
         FCLAW_FREE (fc);
         return NULL;
     }
+
+    /* copy data to discontigous array */
+    sc_array_resize (patch_data, contig_arr.elem_count);
+    for (si = 0; si < contig_arr.elem_count; ++si) {
+        data_src = (char *) sc_array_index (&contig_arr, si);
+
+        current_arr = (sc_array_t *) sc_array_index (patch_data, si);
+        sc_array_init_size (current_arr, patch_size, 1);
+        data_dest = (char *) sc_array_index (current_arr, 0);
+
+        memcpy (data_dest, data_src, patch_size);
+    }
+    sc_array_reset (&contig_arr);
 
     return fc;
 }
