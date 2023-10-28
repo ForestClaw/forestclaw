@@ -130,6 +130,9 @@ void run_program(fclaw2d_global_t* glob)
          * associated to the i-th local patch below.
          */
         current_arr = (sc_array_t *) sc_array_index (&field_arr, i);
+        /* To not allocate data but point to already allocated data
+         * use \ref sc_array_init_data.
+         */
         sc_array_init_size (current_arr, 3 * sizeof (char), 1);
         data = (char *) sc_array_index (current_arr, 0);
         data[0] = 'a';
