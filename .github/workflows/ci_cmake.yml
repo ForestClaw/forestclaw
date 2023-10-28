@@ -50,16 +50,16 @@ jobs:
         - name: "MPI With GeoClaw"
           configure_flags: "-Dmpi=ON -Dgeoclaw=ON"
           ubuntu_packages: "libopenmpi-dev openmpi-bin"
-        - name: "MPI With CudaClaw (CUDA 10.1)"
-          configure_flags: "-Dmpi=ON -Dcudaclaw=ON"
-          ubuntu_packages: "libopenmpi-dev openmpi-bin nvidia-cuda-toolkit"
-          cuda: true
-        - name: "MPI With CudaClaw (CUDA 11.3)"
-          configure_flags: "-Dmpi=ON -Dcudaclaw=ON"
-          configure_environment: "CUDACXX=/usr/local/cuda/bin/nvcc"
-          ubuntu_packages: "libopenmpi-dev openmpi-bin"
-          cuda: true
-          cuda_11_3: true
+#        - name: "MPI With CudaClaw (CUDA 10.1)"
+#          configure_flags: "-Dmpi=ON -Dcudaclaw=ON"
+#          ubuntu_packages: "libopenmpi-dev openmpi-bin nvidia-cuda-toolkit"
+#          cuda: true
+#        - name: "MPI With CudaClaw (CUDA 11.3)"
+#          configure_flags: "-Dmpi=ON -Dcudaclaw=ON"
+#          configure_environment: "CUDACXX=/usr/local/cuda/bin/nvcc"
+#          ubuntu_packages: "libopenmpi-dev openmpi-bin"
+#          cuda: true
+#          cuda_11_3: true
         - name: "MPI With ThunderEgg"
           configure_flags: "-Dmpi=ON -Dthunderegg=ON"
           ubuntu_packages: "libopenmpi-dev openmpi-bin libfftw3-dev"

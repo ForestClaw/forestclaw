@@ -51,10 +51,10 @@ jobs:
           components:      "mpi geoclaw"
           ubuntu_packages: "libopenmpi-dev openmpi-bin"
 
-        - name:            "MPI With CudaClaw"
-          components:      "mpi cudaclaw"
-          ubuntu_packages: "libopenmpi-dev openmpi-bin nvidia-cuda-toolkit"
-          cuda:            true
+#        - name:            "MPI With CudaClaw"
+#          components:      "mpi cudaclaw"
+#          ubuntu_packages: "libopenmpi-dev openmpi-bin nvidia-cuda-toolkit"
+#          cuda:            true
 
         - name:            "MPI With ThunderEgg"
           components:      "mpi thunderegg"

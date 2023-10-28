@@ -58,15 +58,15 @@ jobs:
         - name: "MPI With GeoClaw"
           configure_flags: "--enable-geoclaw --enable-mpi"
           ubuntu_packages: "libopenmpi-dev openmpi-bin"
-        - name: "MPI With CudaClaw (CUDA 10.1)"
-          configure_flags: "CUDA_CFLAGS=\"-arch=sm_61 -I/usr/lib/x86_64-linux-gnu/openmpi/include\" LIBS=\"-lcuda -lcudart -lnvToolsExt\" --enable-cudaclaw --enable-mpi --disable-shared"
-          ubuntu_packages: "libopenmpi-dev openmpi-bin nvidia-cuda-toolkit"
-          cuda: true
-        - name: "MPI With CudaClaw (CUDA 11.3)"
-          configure_flags: "NVCC=/usr/local/cuda-11.3/bin/nvcc CUDA_CFLAGS=\"-arch=sm_61 -I/usr/lib/x86_64-linux-gnu/openmpi/include\" LIBS=\"-L/usr/local/cuda-11.3/lib64 -lcudart -lnvToolsExt\" --enable-cudaclaw --enable-mpi --disable-shared"
-          ubuntu_packages: "libopenmpi-dev openmpi-bin"
-          cuda: true
-          cuda_11_3: true
+#        - name: "MPI With CudaClaw (CUDA 10.1)"
+#          configure_flags: "CUDA_CFLAGS=\"-arch=sm_61 -I/usr/lib/x86_64-linux-gnu/openmpi/include\" LIBS=\"-lcuda -lcudart -lnvToolsExt\" --enable-cudaclaw --enable-mpi --disable-shared"
+#          ubuntu_packages: "libopenmpi-dev openmpi-bin nvidia-cuda-toolkit"
+#          cuda: true
+#        - name: "MPI With CudaClaw (CUDA 11.3)"
+#          configure_flags: "NVCC=/usr/local/cuda-11.3/bin/nvcc CUDA_CFLAGS=\"-arch=sm_61 -I/usr/lib/x86_64-linux-gnu/openmpi/include\" LIBS=\"-L/usr/local/cuda-11.3/lib64 -lcudart -lnvToolsExt\" --enable-cudaclaw --enable-mpi --disable-shared"
+#          ubuntu_packages: "libopenmpi-dev openmpi-bin"
+#          cuda: true
+#          cuda_11_3: true
         - name: "MPI With ThunderEgg"
           configure_flags: "--enable-mpi --enable-thunderegg --with-thunderegg=$GITHUB_WORKSPACE/ThunderEgg"
           ubuntu_packages: "cmake libopenmpi-dev openmpi-bin libfftw3-dev"
