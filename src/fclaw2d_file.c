@@ -3464,7 +3464,7 @@ fclaw2d_file_close (fclaw2d_file_context_t * fc, int *errcode)
     fclaw2d_file_translate_error_code_v1 (errcode_internal, errcode);
     if (*errcode != FCLAW2D_FILE_ERR_SUCCESS)
     {
-        FCLAW_ASSERT (retval != 0);
+        FCLAW_EXECUTE_ASSERT_TRUE (retval != 0);
         return -1;
     }
 
