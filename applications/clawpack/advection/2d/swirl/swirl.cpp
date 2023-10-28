@@ -27,7 +27,7 @@
 #include <fclaw2d_file.h>
 
 #include "../all/advection_user.h"
-#include <p4est_wrap.h> /* just temporary for testing */
+#include <p4est_wrap.h>         /* just temporary for testing */
 
 #define FCLAW_SWIRL_IO_DEMO 1
 
@@ -108,15 +108,27 @@ void run_program(fclaw2d_global_t* glob)
                                   glob->domain, &errcode);
 
     /* write a block to the file */
+    /* Initialize a sc_array with one element and the element size equals
+     * to the number of bytes of the block section.  */
     sc_array_init_data (&block_arr, &test_int, sizeof (int64_t), 1);
     fc = fclaw2d_file_write_block (fc, "Test block", block_arr.elem_size,
                                    &block_arr, &errcode);
 
     /* write an array associated to the domain to the file */
     /* we write non-contiguous data to demonstrate how to assemble the array */
-    sc_array_init_size (&field_arr, sizeof (sc_array_t), glob->domain->local_num_patches);
+    /* To this end, we initialize a sc_array with the number of local patches
+     * of the domain passed to \ref fclaw2d_file_open_write and sizeof (sc_array_t)
+     * as element size.
+     */
+    sc_array_init_size (&field_arr, sizeof (sc_array_t),
+                        glob->domain->local_num_patches);
 
-    for (i = 0; i < glob->domain->local_num_patches; ++i) {
+    for (i = 0; i < glob->domain->local_num_patches; ++i)
+    {
+        /* Each sc_array in field_array represents one data entity
+         * associated to a patch. That means we write the data
+         * associated to the i-th local patch below.
+         */
         current_arr = (sc_array_t *) sc_array_index (&field_arr, i);
         sc_array_init_size (current_arr, 3 * sizeof (char), 1);
         data = (char *) sc_array_index (current_arr, 0);
@@ -128,7 +140,8 @@ void run_program(fclaw2d_global_t* glob)
     fc = fclaw2d_file_write_array (fc, "Test array", 3 * sizeof (char),
                                    &field_arr, &errcode);
     /* free the local array data */
-    for (i = 0; i < glob->domain->local_num_patches; ++i) {
+    for (i = 0; i < glob->domain->local_num_patches; ++i)
+    {
         current_arr = (sc_array_t *) sc_array_index (&field_arr, i);
         sc_array_reset (current_arr);
     }
@@ -141,31 +154,45 @@ void run_program(fclaw2d_global_t* glob)
 
     /* read a block from the file */
     test_int = -1;
-    fc = fclaw2d_file_read_block (fc, read_user_string, sizeof (int64_t), &block_arr,
-                                  &errcode);
+    fc = fclaw2d_file_read_block (fc, read_user_string, sizeof (int64_t),
+                                  &block_arr, &errcode);
     FCLAW_ASSERT (test_int == 12);
 
     /* read an array from the file */
+    /* For reading array data we need to pass a sc_array with element
+     * equals to sizeof (sc_array_t). The sc_array will be resized by
+     * \ref fclaw2d_file_read_array. Each entry of the output sc_array
+     * is an sc_array with one element and element size equals to the
+     * patch size.
+     */
     sc_array_init (&read_arr, sizeof (sc_array_t));
     fc = fclaw2d_file_read_array (fc, read_user_string, 3 * sizeof (char),
                                   &read_arr, &errcode);
     /* check read array */
-    for (i = 0; i < read_domain->local_num_patches; ++i) {
+    for (i = 0; i < read_domain->local_num_patches; ++i)
+    {
         current_arr = (sc_array_t *) sc_array_index_int (&read_arr, i);
+        /* local_arr_data is the pointer to the actual data of the
+         * i-th array entry
+         */
         local_arr_data = (char *) sc_array_index (current_arr, 0);
+        /* check array entry */
         FCLAW_ASSERT (local_arr_data[0] == 'a');
         FCLAW_ASSERT (local_arr_data[1] == 'b');
         FCLAW_ASSERT (local_arr_data[2] == 'c');
     }
-    for (i = 0; i < read_domain->local_num_patches; ++i) {
+    for (i = 0; i < read_domain->local_num_patches; ++i)
+    {
         current_arr = (sc_array_t *) sc_array_index (&read_arr, i);
         sc_array_reset (current_arr);
     }
     sc_array_reset (&read_arr);
 
     /* sanity check of read domain */
-    FCLAW_ASSERT (p4est_checksum (((p4est_wrap_t *) read_domain->pp)->p4est) ==
-                    p4est_checksum (((p4est_wrap_t *) glob->domain->pp)->p4est));
+    FCLAW_ASSERT (p4est_checksum (((p4est_wrap_t *) read_domain->pp)->p4est)
+                  ==
+                  p4est_checksum (((p4est_wrap_t *) glob->domain->pp)->
+                                  p4est));
 
     fclaw2d_domain_destroy (read_domain);
 
