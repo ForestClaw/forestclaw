@@ -156,6 +156,7 @@ typedef enum fclaw2d_file_error_v1
     FCLAW2D_FILE_ERR_IN_DATA_V1, /**< input data of file function is invalid */
     FCLAW2D_FILE_ERR_COUNT_V1, /**< read or write count error that was not
                                  classified as a format error */
+    FCLAW2D_FILE_ERR_WRONG_DIM_V1, /**< file has wrong dimension */
     FCLAW2D_FILE_ERR_UNKNOWN_V1, /**< unknown error */
     FCLAW2D_FILE_ERR_LASTCODE_V1 /**< to define own error codes for
                                   a higher level application
@@ -415,6 +416,13 @@ fclaw2d_file_check_file_metadata_v1 (sc_MPI_Comm mpicomm,
     metadata[FCLAW2D_FILE_MAGIC_BYTES_V1 - 1] = '\0';
     if (strcmp (metadata, FCLAW2D_FILE_MAGIC_NUMBER_V1))
     {
+        /* This check breaks if we change the magic string but this code is
+         * only dedicated to implement version 1 so there should be no
+         * version bump in \ref FCLAW2D_FILE_MAGIC_NUMBER_V1. */
+        if (!strcmp (metadata, "p8data0") || !strcmp (metadata, "p4data0")) {
+            /* check if it is just a dimension mismatch */
+            return FCLAW2D_FILE_ERR_WRONG_DIM_V1;
+        }
         /* TODO: check for wrong endianness */
         fclaw_errorf
             ("Error reading <%s>. Wrong magic number (in file = %s, magic number = %s).\n",
@@ -2274,7 +2282,7 @@ fclaw2d_file_error_string_v1 (int errclass, char *string, int *resultlen)
     switch (errclass)
     {
     case FCLAW2D_FILE_ERR_SUCCESS_V1:
-        tstr = "No fclaw2d file error";
+        tstr = "No file error";
         break;
     case FCLAW2D_FILE_ERR_FORMAT_V1:
         tstr = "Wrong file format";
@@ -2294,6 +2302,9 @@ fclaw2d_file_error_string_v1 (int errclass, char *string, int *resultlen)
     case FCLAW2D_FILE_ERR_COUNT_V1:
         tstr =
             "Read or write count error that is not classified as an other error";
+        break;
+    case FCLAW2D_FILE_ERR_WRONG_DIM_V1:
+        tstr = "The file has the wrong dimension";
         break;
 
         /* handle error codes as defined in libsc */
@@ -3048,6 +3059,9 @@ fclaw2d_file_translate_error_code_v1 (int errcode_v1, int *errcode)
         return 0;
     case FCLAW2D_FILE_ERR_COUNT_V1:
         *errcode = FCLAW2D_FILE_ERR_COUNT;
+        return 0;
+    case FCLAW2D_FILE_ERR_WRONG_DIM_V1:
+        *errcode = FCLAW2D_FILE_ERR_WRONG_DIM;
         return 0;
     case FCLAW2D_FILE_ERR_UNKNOWN_V1:
         *errcode = FCLAW2D_FILE_ERR_UNKNOWN;
