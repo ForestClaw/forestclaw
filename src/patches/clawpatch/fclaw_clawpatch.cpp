@@ -1804,6 +1804,12 @@ void fclaw_clawpatch_vtable_initialize(fclaw_global_t* glob,
                              fclaw_clawpatch_get_options(glob);
     fclaw_patch_vtable_t *patch_vt = fclaw_patch_vt(glob);
 
+    if(clawpatch_opt->patch_dim == 2 && domain->refine_dim == 3)
+    {
+        fclaw_abortf("fclaw_clawpatch_vtable_initialize : " \
+                    "2d patches not supported with 3d oct-tree refinement\n");
+    }
+
     if(clawpatch_opt->patch_dim == 2)
     {
         fclaw2d_metric_vtable_initialize(glob);
