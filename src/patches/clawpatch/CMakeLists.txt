@@ -79,6 +79,7 @@ add_library(clawpatch
   fclaw_clawpatch_diagnostics_default.c
   fclaw_clawpatch_options.c
   fclaw_clawpatch_output_ascii.c
+  fclaw_clawpatch_output_hdf5.c
   fclaw_clawpatch_output_vtk.c
   fclaw_clawpatch_pillow.c
 
@@ -105,6 +106,7 @@ target_include_directories(clawpatch
 )
 
 target_link_libraries(clawpatch PUBLIC forestclaw)
+target_link_libraries(clawpatch PRIVATE hdf5::hdf5 hdf5::hdf5_hl)
 
 # -- install
 
