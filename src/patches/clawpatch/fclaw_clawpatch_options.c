@@ -45,6 +45,11 @@ static void *
 clawpatch_register(fclaw_clawpatch_options_t *clawpatch_options,
                    sc_options_t * opt)
 {
+    if(clawpatch_options->patch_dim == 0)
+    {
+        sc_options_add_int (opt, 0, "dim", &clawpatch_options->patch_dim, 2,
+                            "Dimension of the patch (2 or 3) [2]");
+    }
     sc_options_add_int (opt, 0, "mx", &clawpatch_options->mx, 8,
                         "Number of grid cells per patch in x [8]");
 
@@ -112,6 +117,12 @@ clawpatch_postprocess(fclaw_clawpatch_options_t *clawpatch_opt)
 static fclaw_exit_type_t
 clawpatch_check(fclaw_clawpatch_options_t *clawpatch_opt)
 {
+    if (clawpatch_opt->patch_dim != 2 && clawpatch_opt->patch_dim != 3)
+    {
+        fclaw_global_essentialf("Clawpatch error : patch_dim must be 2 or 3\n");
+        return FCLAW_EXIT_ERROR;
+    }
+
     if (2*clawpatch_opt->mbc > clawpatch_opt->mx)
     {
         fclaw_global_essentialf("Clawpatch error : 2*mbc > mx or 2*mbc > my\n");
@@ -322,6 +333,12 @@ fclaw_clawpatch_options_t *
 fclaw_clawpatch_3d_options_register(fclaw_app_t* app, const char* name, const char* configfile)
 {
     return fclaw_clawpatch_options_register(3,app,name,configfile);
+}
+
+fclaw_clawpatch_options_t *
+fclaw_clawpatch_dim_ind_options_register(fclaw_app_t* app, const char* name, const char* configfile)
+{
+    return fclaw_clawpatch_options_register(0,app,name,configfile);
 }
 
 void 

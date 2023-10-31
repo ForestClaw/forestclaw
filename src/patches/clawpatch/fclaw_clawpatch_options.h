@@ -135,6 +135,19 @@ fclaw_clawpatch_2d_options_register(fclaw_app_t* app, const char* name, const ch
 fclaw_clawpatch_options_t *
 fclaw_clawpatch_3d_options_register(fclaw_app_t* app, const char* name, const char* configfile);
 
+/**
+ * @brief Register dimension independent options. 
+ *        This will expose a dim option in the clawpatch options.
+ * 
+ * @param app the app context
+ * @param name the name of the options group
+ * @param configfile the config file
+ * @return fclaw_clawpatch_options_t* a newly allocated options struct
+ */
+fclaw_clawpatch_options_t *
+fclaw_clawpatch_dim_ind_options_register(fclaw_app_t* app, const char* name, const char* configfile);
+
+
 
 /**
  * @brief Store the options in the global context
