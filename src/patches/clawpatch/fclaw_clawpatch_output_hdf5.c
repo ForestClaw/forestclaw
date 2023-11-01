@@ -636,6 +636,121 @@ write_patch_points (fclaw_global_t * glob,
     write_3d_patch_points(glob, patch, blockno, patchno, points);
 }
 
+static void
+write_3d_patch_connectivity (fclaw_global_t * glob,
+                             fclaw_patch_t * patch,
+                             int blockno,
+                             int patchno,
+                             long num_points_before,
+                             long * conn)
+{
+    int mx,my,mz,mbc;
+    double dx,dy,dz,xlower,ylower,zlower;
+    fclaw_clawpatch_3d_grid_data(glob,patch,&mx,&my,&mz, &mbc,
+                                &xlower,&ylower,&zlower, &dx,&dy, &dz);
+    for (int k = 0; k < mz; ++k)
+    {
+        for (int j = 0; j < my; ++j)
+        {
+            for (int i = 0; i < mx; ++i)
+            {
+                long l = num_points_before + i + j * (mx + 1)
+                     + k * (my + 1) * (mx + 1);
+                *conn++ = l;
+                *conn++ = l + 1;
+                *conn++ = l + (mx + 2);
+                *conn++ = l + (mx + 1);
+                *conn++ = l + (mx + 1) * (my + 1);
+                *conn++ = l + (mx + 1) * (my + 1) + 1;
+                *conn++ = l + (mx + 1) * (my + 1) + (mx + 2);
+                *conn++ = l + (mx + 1) * (my + 1) + (mx + 1);
+            }
+        }
+    }
+}
+static void
+write_patch_connectivity (fclaw_global_t * glob,
+                          fclaw_patch_t * patch,
+                          int blockno,
+                          int patchno,
+                          long num_points_before,
+                          long * connectivity)
+{
+    write_3d_patch_connectivity(glob, patch, blockno, patchno, num_points_before, connectivity);
+}
+//this is copied form hdf5lt needed to change to NULLPAD for VTK
+herr_t
+set_attribute_string(hid_t loc_id, const char *obj_name, const char *attr_name, const char *attr_data)
+{
+    hid_t  attr_type;
+    hid_t  attr_space_id;
+    hid_t  attr_id;
+    hid_t  obj_id;
+    htri_t has_attr;
+    size_t attr_size;
+
+    /* check the arguments */
+    if (obj_name == NULL)
+        return -1;
+    if (attr_name == NULL)
+        return -1;
+    if (attr_data == NULL)
+        return -1;
+
+    /* Open the object */
+    if ((obj_id = H5Oopen(loc_id, obj_name, H5P_DEFAULT)) < 0)
+        return -1;
+
+    /* Create the attribute */
+    if ((attr_type = H5Tcopy(H5T_C_S1)) < 0)
+        goto out;
+
+    attr_size = strlen(attr_data);
+
+    if (H5Tset_size(attr_type, (size_t)attr_size) < 0)
+        goto out;
+
+    if (H5Tset_strpad(attr_type, H5T_STR_NULLPAD) < 0)
+        goto out;
+
+    if ((attr_space_id = H5Screate(H5S_SCALAR)) < 0)
+        goto out;
+
+    /* Delete the attribute if it already exists */
+    if ((has_attr = H5Aexists(obj_id, attr_name)) < 0)
+        goto out;
+    if (has_attr > 0)
+        if (H5Adelete(obj_id, attr_name) < 0)
+            goto out;
+
+    /* Create and write the attribute */
+
+    if ((attr_id = H5Acreate2(obj_id, attr_name, attr_type, attr_space_id, H5P_DEFAULT, H5P_DEFAULT)) < 0)
+        goto out;
+
+    if (H5Awrite(attr_id, attr_type, attr_data) < 0)
+        goto out;
+
+    if (H5Aclose(attr_id) < 0)
+        goto out;
+
+    if (H5Sclose(attr_space_id) < 0)
+        goto out;
+
+    if (H5Tclose(attr_type) < 0)
+        goto out;
+
+    /* Close the object */
+    if (H5Oclose(obj_id) < 0)
+        return -1;
+
+    return 0;
+
+out:
+
+    H5Oclose(obj_id);
+    return -1;
+}
 static int
 fclaw_hdf5_write_file (int dim, fclaw_global_t * glob, const char *basename,
                       int mx, int my, int mz,
@@ -648,7 +763,7 @@ fclaw_hdf5_write_file (int dim, fclaw_global_t * glob, const char *basename,
     int ierr;
 
     char vtkhdf[8] = "/VTKHDF";
-    char pointdata[18] = "/VTKHDF/PointData";
+    char celldata[18] = "/VTKHDF/CellData";
     
     /* create HDF5 file */
     hid_t fid = H5Fcreate(basename, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
@@ -676,59 +791,69 @@ fclaw_hdf5_write_file (int dim, fclaw_global_t * glob, const char *basename,
 
     int vtk_version[2] = {1, 0};
     H5LTset_attribute_int(fid, vtkhdf, "Version", vtk_version, 2);
+    //hid_t attr_id = H5Acreate (gid1, "Units", H5T_STD_I32BE, dataspace_id, H5P_DEFAULT, H5P_DEFAULT);
+    //H5Aclose (attr_id);
+    set_attribute_string(fid, vtkhdf, "Type", "UnstructuredGrid");
+    //const char* type = "UnstructuredGrid";
+    //H5LTset_attribute(fid, vtkhdf, "Type", type);
     
     // The idea here is to write a paritioned vtu, where each partition is a patch
     // this will make processing easier in matlab
 
-    int number_of_cells[global_num_patches];
+    long number_of_cells[global_num_patches];
     for(int i = 0; i < global_num_patches; i++){
         number_of_cells[i] = num_cells_per_patch;
     }
 
     hsize_t dims[3] = {0,0,0};
     dims[0] = global_num_patches;
-    H5LTmake_dataset_int(gid1, "NumberOfCells", 1, dims, number_of_cells);
+    H5LTmake_dataset_long(gid1, "NumberOfCells", 1, dims, number_of_cells);
 
-    int number_of_points[global_num_patches];
+    long number_of_points[global_num_patches];
     for(int i = 0; i < global_num_patches; i++){
         number_of_points[i] = num_points_per_patch;
     }
 
     dims[0] = global_num_patches;
-    H5LTmake_dataset_int(gid1, "NumberOfPoints", 1, dims, number_of_points);
+    H5LTmake_dataset_long(gid1, "NumberOfPoints", 1, dims, number_of_points);
 
 
-    int number_of_connectivity_ids[global_num_patches];
+    long number_of_connectivity_ids[global_num_patches];
     for(int i = 0; i < global_num_patches; i++){
         number_of_connectivity_ids[i] = num_cells_per_patch * num_points_per_cell;
     }
 
     dims[0] = global_num_patches;
-    H5LTmake_dataset_int(gid1, "NumberOfConnectivityIds", 1, dims, number_of_connectivity_ids);
+    H5LTmake_dataset_long(gid1, "NumberOfConnectivityIds", 1, dims, number_of_connectivity_ids);
 
 
-    char types[global_num_patches * num_cells_per_patch]; 
+    uint8_t types[global_num_patches * num_cells_per_patch]; 
     for(int i = 0; i < global_num_patches * num_cells_per_patch; i++){
         types[i] = cell_type;
     }
 
     dims[0] = global_num_patches * num_cells_per_patch;
-    H5LTmake_dataset_char(gid1, "Types", 1, dims, types);
+    H5LTmake_dataset(gid1, "Types", 1, dims, H5T_NATIVE_UINT8, types);
 
 
-    int offsets[global_num_patches * num_cells_per_patch + 1];
-    int curr_offset = 0;
-    for(int i = 0; i < global_num_patches * num_cells_per_patch + 1; i++){
-        offsets[i] = curr_offset;
-        curr_offset += num_points_per_cell;
+    long *offsets = FCLAW_ALLOC(long,global_num_patches * (num_cells_per_patch + 1));
+    for(int patchno = 0; patchno < global_num_patches; patchno++)
+    {
+        long curr_offset = 0;// patchno * num_cells_per_patch * num_points_per_cell;
+        int offset_start = patchno * (num_cells_per_patch + 1);
+        for(int i = 0; i < num_cells_per_patch+1; i++){
+            offsets[offset_start + i] = curr_offset;
+            curr_offset += num_points_per_cell;
+        }
     }
 
-    dims[0] = global_num_patches * num_cells_per_patch + 1;
-    H5LTmake_dataset_int(gid1, "Offsets", 1, dims, offsets);
+    dims[0] = global_num_patches * (num_cells_per_patch + 1);
+    H5LTmake_dataset_long(gid1, "Offsets", 1, dims, offsets);
+    FCLAW_FREE(offsets);
 
 
     double* points = FCLAW_ALLOC(double, global_num_patches * num_points_per_patch * 3);
-    hsize_t points_dim[3] = {global_num_patches, num_points_per_patch, 3};
+    hsize_t points_dim[2] = {global_num_patches * num_points_per_patch, 3};
     for(int blockno = 0; blockno < glob->domain->num_blocks; blockno++)
     {
         fclaw_block_t* block = &glob->domain->blocks[blockno];
@@ -740,8 +865,26 @@ fclaw_hdf5_write_file (int dim, fclaw_global_t * glob, const char *basename,
         }
     }
 
-    H5LTmake_dataset_double(gid1, "Points", 3, points_dim, points);
+    H5LTmake_dataset_double(gid1, "Points", 2, points_dim, points);
     FCLAW_FREE(points);
+
+    long* connectivity = FCLAW_ALLOC(long, global_num_patches * num_cells_per_patch * num_points_per_cell);
+
+    for(int blockno = 0; blockno < glob->domain->num_blocks; blockno++)
+    {
+        fclaw_block_t* block = &glob->domain->blocks[blockno];
+        for(int patchno = 0; patchno < block->num_patches; patchno++)
+        {
+            fclaw_patch_t* patch = &block->patches[patchno];
+            long num_points_before = 0;//(block->num_patches_before + patchno) * num_points_per_patch;
+            long *patch_connectivity = &connectivity[(block->num_patches_before + patchno) * num_cells_per_patch * num_points_per_cell];
+            write_patch_connectivity(glob, patch, blockno, patchno, num_points_before, patch_connectivity);
+        }
+    }
+
+    dims[0] = global_num_patches * num_cells_per_patch * num_points_per_cell;
+    H5LTmake_dataset_long(gid1, "Connectivity", 1, dims, connectivity);
+    FCLAW_FREE(connectivity);
 
     /* avoid resource leaks by closing */
     H5Gclose(gid1);
@@ -749,19 +892,12 @@ fclaw_hdf5_write_file (int dim, fclaw_global_t * glob, const char *basename,
 
 
 
-    //H5LTset_attribute_int(fid, vtkhdf, "NumberOfConnectivityIds", number_of_points, global_num_patches);
-
-    //float spacing[3] = {0.131579, 0.125, 0.0952381};
-    //H5LTset_attribute_float(fid, vtkhdf, "Spacing", spacing, 3);
+    //gid1 = H5Gcreate2(fid, celldata, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
     
-    //int whole_extent[6] = {0, 19, 0, 20, 0, 21};
-    //H5LTset_attribute_int(fid, vtkhdf, "WholeExtent", whole_extent, 6);
-    
-    //H5LTset_attribute_string(fid, vtkhdf, "Type", "UnstructuredGrid");
-    
-    
-    //gid1 = H5Gcreate2(fid, pointdata, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-    
+    //double * q = FCLAW_ALLOC(double, global_num_patches * num_cells_per_patch * meqn);
+    //dims[0] = global_num_patches * num_cells_per_patch;
+    //dims[1] = meqn;
+    //H5LTmake_dataset_double(gid1, "meqn", 1, dims, q);
     //H5LTset_attribute_string(fid, pointdata, "Scalars", "Iterations");
     
     ///* declare 3D array of test data */
@@ -1035,7 +1171,7 @@ void fclaw_clawpatch_output_hdf5 (fclaw_global_t * glob, int iframe)
     const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
 
     char basename[BUFSIZ];
-    snprintf (basename, BUFSIZ, "%s_frame_%04d.hdf5", fclaw_opt->prefix, iframe);
+    snprintf (basename, BUFSIZ, "%s_frame_%04d.hdf", fclaw_opt->prefix, iframe);
 
     fclaw_clawpatch_output_hdf5_to_file(glob,basename);
 }
