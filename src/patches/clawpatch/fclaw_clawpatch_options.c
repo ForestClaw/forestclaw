@@ -45,6 +45,7 @@ static void *
 clawpatch_register(fclaw_clawpatch_options_t *clawpatch_options,
                    sc_options_t * opt)
 {
+    int original_patch_dim = clawpatch_options->patch_dim;
     if(clawpatch_options->patch_dim == 0)
     {
         sc_options_add_int (opt, 0, "patch-dim", &clawpatch_options->patch_dim, 2,
@@ -56,7 +57,7 @@ clawpatch_register(fclaw_clawpatch_options_t *clawpatch_options,
     sc_options_add_int (opt, 0, "my", &clawpatch_options->my, 8,
                         "Number of grid cells per patch in y [8]");
 
-    if(clawpatch_options->patch_dim == 2)
+    if(original_patch_dim == 2)
     {
         clawpatch_options->mz = 1;
     }
