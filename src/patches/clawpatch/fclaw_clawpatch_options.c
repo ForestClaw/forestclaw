@@ -47,7 +47,7 @@ clawpatch_register(fclaw_clawpatch_options_t *clawpatch_options,
 {
     if(clawpatch_options->patch_dim == 0)
     {
-        sc_options_add_int (opt, 0, "dim", &clawpatch_options->patch_dim, 2,
+        sc_options_add_int (opt, 0, "patch-dim", &clawpatch_options->patch_dim, 2,
                             "Dimension of the patch (2 or 3) [2]");
     }
     sc_options_add_int (opt, 0, "mx", &clawpatch_options->mx, 8,
