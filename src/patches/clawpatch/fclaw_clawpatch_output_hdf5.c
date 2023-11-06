@@ -535,6 +535,10 @@ make_dataset_numerical(hid_t loc_id, const char *dset_name, int rank, const hsiz
     if(H5Pset_chunk(prop_id, rank, chunk_dims) < 0)
         return -1;
 
+    if(H5Pset_deflate(prop_id, 5) < 0)
+        return -1;
+
+
     /* Create the data space for the dataset. */
     if ((sid = H5Screate_simple(rank, dims, NULL)) < 0)
         return -1;
@@ -806,19 +810,9 @@ fclaw_hdf5_write_file (int dim, fclaw_global_t * glob, const char *basename,
     chunk_dims[0] = num_cells_per_patch;
     chunk_dims[1] = meqn;
     make_dataset_numerical(gid1, "meqn", 1, dims, chunk_dims, H5T_NATIVE_DOUBLE, q);
-    //H5LTset_attribute_string(fid, pointdata, "Scalars", "Iterations");
-    
-    ///* declare 3D array of test data */
-    //hsize_t dims[3] = {20, 21, 22};
-    ///* malloc array */
-    //float* Iterations = (float*) malloc(dims[0] * dims[1] * dims[2] * sizeof(float));
-    
-    ///* arbitrary array values */
-    //for(int i = 0; i < dims[0] * dims[1] * dims[2]; i++){
-    //  Iterations[i] = (float) rand() / (float) RAND_MAX;
-    //}
-    
-    //H5LTmake_dataset_float(gid1, "Iterations", 3, dims, Iterations);
+    FCLAW_FREE(q);
+
+    // write blockno
     
     H5Gclose(gid1);
     
