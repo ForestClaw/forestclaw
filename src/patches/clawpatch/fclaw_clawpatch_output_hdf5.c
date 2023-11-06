@@ -421,6 +421,38 @@ write_3d_patch_connectivity (fclaw_global_t * glob,
     }
 }
 static void
+write_patch_q (fclaw_global_t * glob,
+               fclaw_patch_t * patch,
+               int blockno,
+               int patchno,
+               double * q_out)
+{
+    int mx,my,mz,mbc;
+    double dx,dy,dz,xlower,ylower,zlower;
+    fclaw_clawpatch_3d_grid_data(glob,patch,&mx,&my,&mz, &mbc,
+                                &xlower,&ylower,&zlower, &dx,&dy, &dz);
+
+    int meqn;
+    double* q;
+    fclaw_clawpatch_soln_data(glob,patch,&q,&meqn);
+
+    for (int k = 0; k < mz; ++k)
+    {
+        for (int j = 0; j < my; ++j)
+        {
+            for (int i = 0; i < mx; ++i)
+            {
+                for (int m = 0; m < meqn; m++)
+                {
+                    size_t out_idx = k*mx*my*meqn + j*mx*meqn + i*meqn + m;
+                    size_t in_idx = m*(mx+2*mbc)*(my+2*mbc)*(mz+2*mbc) + (k+mbc)*(mx+2*mbc)*(my+2*mbc) + (j+mbc)*(mx+2*mbc) + (i+mbc);
+                    q_out[out_idx] = q[in_idx];
+                }
+            }
+        }
+    }
+}
+static void
 write_patch_connectivity (fclaw_global_t * glob,
                           fclaw_patch_t * patch,
                           int blockno,
@@ -746,12 +778,23 @@ fclaw_hdf5_write_file (int dim, fclaw_global_t * glob, const char *basename,
 
 
 
-    //gid1 = H5Gcreate2(fid, celldata, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+    gid1 = H5Gcreate2(file_id, celldata, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
     
-    //double * q = FCLAW_ALLOC(double, global_num_patches * num_cells_per_patch * meqn);
-    //dims[0] = global_num_patches * num_cells_per_patch;
-    //dims[1] = meqn;
-    //H5LTmake_dataset_double(gid1, "meqn", 1, dims, q);
+    //create contiguous array for q
+    double * q = FCLAW_ALLOC(double, global_num_patches * num_cells_per_patch * meqn);
+    for(int blockno = 0; blockno < glob->domain->num_blocks; blockno++)
+    {
+        fclaw_block_t* block = &glob->domain->blocks[blockno];
+        for(int patchno = 0; patchno < block->num_patches; patchno++)
+        {
+            fclaw_patch_t* patch = &block->patches[patchno];
+            double *patch_q = &q[(block->num_patches_before + patchno) * num_cells_per_patch * meqn];
+            write_patch_q(glob, patch, blockno, patchno, patch_q);
+        }
+    }
+    dims[0] = num_cells_per_patch*global_num_patches;
+    dims[1] = meqn;
+    make_dataset_numerical(gid1, "meqn", 1, dims, H5T_NATIVE_DOUBLE, q);
     //H5LTset_attribute_string(fid, pointdata, "Scalars", "Iterations");
     
     ///* declare 3D array of test data */
@@ -766,7 +809,7 @@ fclaw_hdf5_write_file (int dim, fclaw_global_t * glob, const char *basename,
     
     //H5LTmake_dataset_float(gid1, "Iterations", 3, dims, Iterations);
     
-    //H5Gclose(gid1);
+    H5Gclose(gid1);
     
 
     H5Fclose(file_id);
