@@ -813,6 +813,56 @@ fclaw_hdf5_write_file (int dim, fclaw_global_t * glob, const char *basename,
     FCLAW_FREE(q);
 
     // write blockno
+    int *blockno_array = FCLAW_ALLOC(int, global_num_patches * num_cells_per_patch);
+    for(int blockno = 0; blockno < glob->domain->num_blocks; blockno++)
+    {
+        fclaw_block_t* block = &glob->domain->blocks[blockno];
+        for(int patchno = 0; patchno < block->num_patches; patchno++)
+        {
+            int *patch_blockno = &blockno_array[(block->num_patches_before + patchno) * num_cells_per_patch];
+            for(int i = 0; i < num_cells_per_patch; i++){
+                patch_blockno[i] = blockno;
+            }
+        }
+    }
+    dims[0] = global_num_patches * num_cells_per_patch;
+    chunk_dims[0] = num_cells_per_patch;
+    make_dataset_numerical(gid1, "blockno", 1, dims, chunk_dims, H5T_NATIVE_INT, blockno_array);
+    FCLAW_FREE(blockno_array);
+
+    //write patchno
+    int *patchno_array = FCLAW_ALLOC(int, global_num_patches * num_cells_per_patch);
+    for(int blockno = 0; blockno < glob->domain->num_blocks; blockno++)
+    {
+        fclaw_block_t* block = &glob->domain->blocks[blockno];
+        for(int patchno = 0; patchno < block->num_patches; patchno++)
+        {
+            int *patch_patchno = &patchno_array[(block->num_patches_before + patchno) * num_cells_per_patch];
+            for(int i = 0; i < num_cells_per_patch; i++){
+                patch_patchno[i] = patchno;
+            }
+        }
+    }
+    dims[0] = global_num_patches * num_cells_per_patch;
+    chunk_dims[0] = num_cells_per_patch;
+    make_dataset_numerical(gid1, "patchno", 1, dims, chunk_dims, H5T_NATIVE_INT, patchno_array);
+
+    //write mpirank
+    int *mpirank_array = FCLAW_ALLOC(int, global_num_patches * num_cells_per_patch);
+    for(int blockno = 0; blockno < glob->domain->num_blocks; blockno++)
+    {
+        fclaw_block_t* block = &glob->domain->blocks[blockno];
+        for(int patchno = 0; patchno < block->num_patches; patchno++)
+        {
+            int *patch_mpirank = &mpirank_array[(block->num_patches_before + patchno) * num_cells_per_patch];
+            for(int i = 0; i < num_cells_per_patch; i++){
+                patch_mpirank[i] = glob->mpirank;
+            }
+        }
+    }
+    dims[0] = global_num_patches * num_cells_per_patch;
+    chunk_dims[0] = num_cells_per_patch;
+    make_dataset_numerical(gid1, "mpirank", 1, dims, chunk_dims, H5T_NATIVE_INT, mpirank_array);
     
     H5Gclose(gid1);
     
