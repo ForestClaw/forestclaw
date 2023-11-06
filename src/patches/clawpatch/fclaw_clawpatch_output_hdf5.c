@@ -521,7 +521,14 @@ out:
     return -1;
 }
 static herr_t
-make_dataset_numerical(hid_t loc_id, const char *dset_name, int rank, const hsize_t *dims, const hsize_t *chunk_dims, hid_t tid,
+make_dataset_numerical(hid_t loc_id, 
+                       const char *dset_name, 
+                       int rank, 
+                       const hsize_t *dims, 
+                       const hsize_t *chunk_dims,
+                       //const hsize_t* local_start, 
+                       //const hsize_t* local_dims, 
+                       hid_t tid,
                        const void *data)
 {
     hid_t did = -1, sid = -1, prop_id = -1;
@@ -532,11 +539,17 @@ make_dataset_numerical(hid_t loc_id, const char *dset_name, int rank, const hsiz
     if((prop_id = H5Pcreate(H5P_DATASET_CREATE)) < 0)
         return -1;
     
-    if(H5Pset_chunk(prop_id, rank, chunk_dims) < 0)
-        return -1;
+    if(chunk_dims != NULL)
+    {
+        if(H5Pset_chunk(prop_id, rank, chunk_dims) < 0)
+            return -1;
+        if(H5Pset_deflate(prop_id, 5) < 0)
+            return -1;
+    }
 
-    if(H5Pset_deflate(prop_id, 5) < 0)
-        return -1;
+    
+    //f(H5Pset_dxpl_mpio(prop_id, H5FD_MPIO_COLLECTIVE) < 0)
+       // return -1;
 
 
     /* Create the data space for the dataset. */
@@ -660,12 +673,12 @@ fclaw_hdf5_write_file (int dim, fclaw_global_t * glob, const char *basename,
     char celldata[18] = "/VTKHDF/CellData";
     
     // Set up file access property list with parallel I/O access
-    //hid_t plist_id = H5Pcreate(H5P_FILE_ACCESS);
-    //H5Pset_fapl_mpio(plist_id, MPI_COMM_WORLD, MPI_INFO_NULL);
+    hid_t plist_id = H5Pcreate(H5P_FILE_ACCESS);
+    //H5Pset_fapl_mpio(plist_id, glob->mpicomm, MPI_INFO_NULL);
 
     // Create a new file collectively and release property list identifier.
-    hid_t file_id = H5Fcreate(basename, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
-    //H5Pclose(plist_id);
+    hid_t file_id = H5Fcreate(basename, H5F_ACC_TRUNC, H5P_DEFAULT, plist_id);
+    H5Pclose(plist_id);
 
     hid_t gid1 = H5Gcreate2(file_id, vtkhdf, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
     
@@ -700,24 +713,24 @@ fclaw_hdf5_write_file (int dim, fclaw_global_t * glob, const char *basename,
     // this will make processing easier in matlab
 
     hsize_t dims[3] = {0,0,0};
-    hsize_t chunk_dims[3] = {0,0,0};
+
+    // write single value datasets for vtk
 
     long number_of_cells = global_num_patches * num_cells_per_patch;
     dims[0] = 1;
-    chunk_dims[0] = 1;
-    make_dataset_numerical(gid1, "NumberOfCells", 1, dims, chunk_dims, H5T_NATIVE_LONG, &number_of_cells);
+    make_dataset_numerical(gid1, "NumberOfCells", 1, dims, NULL, H5T_NATIVE_LONG, &number_of_cells);
 
     long number_of_points = global_num_patches * num_points_per_patch;
     dims[0] = 1;
-    chunk_dims[0] = 1;
-    make_dataset_numerical(gid1, "NumberOfPoints", 1, dims, chunk_dims, H5T_NATIVE_LONG, &number_of_points);
+    make_dataset_numerical(gid1, "NumberOfPoints", 1, dims, NULL, H5T_NATIVE_LONG, &number_of_points);
 
 
     long number_of_connectivity_ids = global_num_patches * num_cells_per_patch * num_points_per_cell;
     dims[0] = 1;
-    chunk_dims[0] = 1;
-    make_dataset_numerical(gid1, "NumberOfConnectivityIds", 1, dims, chunk_dims, H5T_NATIVE_LONG, &number_of_connectivity_ids);
+    make_dataset_numerical(gid1, "NumberOfConnectivityIds", 1, dims, NULL, H5T_NATIVE_LONG, &number_of_connectivity_ids);
 
+
+    hsize_t chunk_dims[3] = {0,0,0};
 
     uint8_t types[global_num_patches * num_cells_per_patch]; 
     for(int i = 0; i < global_num_patches * num_cells_per_patch; i++){
