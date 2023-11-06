@@ -60,54 +60,6 @@ typedef void (*fclaw_hdf5_patch_data_t) (struct fclaw_global * glob,
                                         int this_block_idx, int this_patch_idx,
                                         char *a);
 	
-/** 
- * Write a file in VTK format for the whole domain in parallel.
- * @param[in] glob the global context
- * @param[in] basename the base filename
- * @param[in] mx, my th enumber of cells in the x and y directions
- * @param[in] meqn th enumber of equations
- * @param[in] hdf5space     Relative width of visual separation of patches.
- *                         Between 0. (none) and 1. (patch width becomes 0).
- * @param[in] hdf5write     Mode of writing:  (unused; uses 1 by default)
- *                         0 for MPI_File_write_all (faster),
- *                         1 for MPI_File_write (less memory usage).
- * @param[in] coordniate_cb the callback to write a patch's coordinate binary data
- * @param[in] value_cb the callback to write a patch's value binary data
- * @return          0 if successful, negative otherwise.
- *                  Collective with identical value on all ranks.
- */
-int
-fclaw_hdf5_write_2d_file (struct fclaw_global * glob, const char *basename,
-                         int mx, int my,
-                         int meqn,
-                         double hdf5space, int hdf5write,
-                         fclaw_hdf5_patch_data_t coordinate_cb,
-                         fclaw_hdf5_patch_data_t value_cb);
-
-/** 
- * Write a file in VTK format for the whole domain in parallel.
- * @param[in] glob the global context
- * @param[in] basename the base filename
- * @param[in] mx, my, mz th enumber of cells in the x, y, and z directions
- * @param[in] meqn th enumber of equations
- * @param[in] hdf5space     Relative width of visual separation of patches.
- *                         Between 0. (none) and 1. (patch width becomes 0).
- * @param[in] hdf5write     Mode of writing:  (unused; uses 1 by default)
- *                         0 for MPI_File_write_all (faster),
- *                         1 for MPI_File_write (less memory usage).
- * @param[in] coordniate_cb the callback to write a patch's coordinate binary data
- * @param[in] value_cb the callback to write a patch's value binary data
- * @return          0 if successful, negative otherwise.
- *                  Collective with identical value on all ranks.
- */
-int
-fclaw_hdf5_write_3d_file (struct fclaw_global * glob, const char *basename,
-                         int mx, int my, int mz,
-                         int meqn,
-                         double hdf5space, int hdf5write,
-                         fclaw_hdf5_patch_data_t coordinate_cb,
-                         fclaw_hdf5_patch_data_t value_cb);
-
 /**
  * @brief Output vtu file
  * 
