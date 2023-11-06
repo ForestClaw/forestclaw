@@ -521,13 +521,18 @@ out:
     return -1;
 }
 static herr_t
-make_dataset_numerical(hid_t loc_id, const char *dset_name, int rank, const hsize_t *dims, hid_t tid,
+make_dataset_numerical(hid_t loc_id, const char *dset_name, int rank, const hsize_t *dims, const hsize_t *chunk_dims, hid_t tid,
                        const void *data)
 {
-    hid_t did = -1, sid = -1;
+    hid_t did = -1, sid = -1, prop_id = -1;
 
     /* check the arguments */
     if (dset_name == NULL)
+        return -1;
+    if((prop_id = H5Pcreate(H5P_DATASET_CREATE)) < 0)
+        return -1;
+    
+    if(H5Pset_chunk(prop_id, rank, chunk_dims) < 0)
         return -1;
 
     /* Create the data space for the dataset. */
@@ -535,7 +540,7 @@ make_dataset_numerical(hid_t loc_id, const char *dset_name, int rank, const hsiz
         return -1;
 
     /* Create the dataset. */
-    if ((did = H5Dcreate2(loc_id, dset_name, tid, sid, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) < 0)
+    if ((did = H5Dcreate2(loc_id, dset_name, tid, sid, H5P_DEFAULT, prop_id, H5P_DEFAULT)) < 0)
         goto out;
 
     /* Write the dataset only if there is data to write */
@@ -551,6 +556,9 @@ make_dataset_numerical(hid_t loc_id, const char *dset_name, int rank, const hsiz
     if (H5Sclose(sid) < 0)
         return -1;
 
+    if (H5Pclose(prop_id) < 0)
+        return -1;
+
     return 0;
 
 out:
@@ -558,6 +566,7 @@ out:
     {
         H5Dclose(did);
         H5Sclose(sid);
+        H5Sclose(prop_id);
     }
     H5E_END_TRY
     return -1;
@@ -676,7 +685,6 @@ fclaw_hdf5_write_file (int dim, fclaw_global_t * glob, const char *basename,
     }
 
     int vtk_version[2] = {1, 0};
-    hsize_t dims[3] = {0,0,0};
     set_attribute_numerical(file_id, vtkhdf, "Version", 2, H5T_NATIVE_INT, vtk_version);
     //hid_t attr_id = H5Acreate (gid1, "Units", H5T_STD_I32BE, dataspace_id, H5P_DEFAULT, H5P_DEFAULT);
     //H5Aclose (attr_id);
@@ -687,30 +695,24 @@ fclaw_hdf5_write_file (int dim, fclaw_global_t * glob, const char *basename,
     // The idea here is to write a paritioned vtu, where each partition is a patch
     // this will make processing easier in matlab
 
-    long number_of_cells[global_num_patches];
-    for(int i = 0; i < global_num_patches; i++){
-        number_of_cells[i] = num_cells_per_patch;
-    }
+    hsize_t dims[3] = {0,0,0};
+    hsize_t chunk_dims[3] = {0,0,0};
 
-    dims[0] = global_num_patches;
-    make_dataset_numerical(gid1, "NumberOfCells", 1, dims, H5T_NATIVE_LONG, number_of_cells);
+    long number_of_cells = global_num_patches * num_cells_per_patch;
+    dims[0] = 1;
+    chunk_dims[0] = 1;
+    make_dataset_numerical(gid1, "NumberOfCells", 1, dims, chunk_dims, H5T_NATIVE_LONG, &number_of_cells);
 
-    long number_of_points[global_num_patches];
-    for(int i = 0; i < global_num_patches; i++){
-        number_of_points[i] = num_points_per_patch;
-    }
-
-    dims[0] = global_num_patches;
-    make_dataset_numerical(gid1, "NumberOfPoints", 1, dims, H5T_NATIVE_LONG, number_of_points);
+    long number_of_points = global_num_patches * num_points_per_patch;
+    dims[0] = 1;
+    chunk_dims[0] = 1;
+    make_dataset_numerical(gid1, "NumberOfPoints", 1, dims, chunk_dims, H5T_NATIVE_LONG, &number_of_points);
 
 
-    long number_of_connectivity_ids[global_num_patches];
-    for(int i = 0; i < global_num_patches; i++){
-        number_of_connectivity_ids[i] = num_cells_per_patch * num_points_per_cell;
-    }
-
-    dims[0] = global_num_patches;
-    make_dataset_numerical(gid1, "NumberOfConnectivityIds", 1, dims, H5T_NATIVE_LONG, number_of_connectivity_ids);
+    long number_of_connectivity_ids = global_num_patches * num_cells_per_patch * num_points_per_cell;
+    dims[0] = 1;
+    chunk_dims[0] = 1;
+    make_dataset_numerical(gid1, "NumberOfConnectivityIds", 1, dims, chunk_dims, H5T_NATIVE_LONG, &number_of_connectivity_ids);
 
 
     uint8_t types[global_num_patches * num_cells_per_patch]; 
@@ -719,27 +721,33 @@ fclaw_hdf5_write_file (int dim, fclaw_global_t * glob, const char *basename,
     }
 
     dims[0] = global_num_patches * num_cells_per_patch;
-    make_dataset_numerical(gid1, "Types", 1, dims, H5T_NATIVE_UINT8, types);
+    chunk_dims[0] = num_cells_per_patch;
+    make_dataset_numerical(gid1, "Types", 1, dims, chunk_dims, H5T_NATIVE_UINT8, types);
 
 
-    long *offsets = FCLAW_ALLOC(long,global_num_patches * (num_cells_per_patch + 1));
+    long *offsets = FCLAW_ALLOC(long,global_num_patches * num_cells_per_patch + 1);
     for(int patchno = 0; patchno < global_num_patches; patchno++)
     {
-        long curr_offset = 0;// patchno * num_cells_per_patch * num_points_per_cell;
-        int offset_start = patchno * (num_cells_per_patch + 1);
-        for(int i = 0; i < num_cells_per_patch+1; i++){
+        long curr_offset = patchno * num_cells_per_patch * num_points_per_cell;
+        int offset_start = patchno * num_cells_per_patch;
+        for(int i = 0; i < num_cells_per_patch; i++){
             offsets[offset_start + i] = curr_offset;
             curr_offset += num_points_per_cell;
         }
     }
+    offsets[global_num_patches * num_cells_per_patch] = global_num_patches * num_cells_per_patch * num_points_per_cell;
 
-    dims[0] = global_num_patches * (num_cells_per_patch + 1);
-    make_dataset_numerical(gid1, "Offsets", 1, dims, H5T_NATIVE_LONG, offsets);
+    dims[0] = global_num_patches * num_cells_per_patch + 1;
+    chunk_dims[0] = num_cells_per_patch;
+    make_dataset_numerical(gid1, "Offsets", 1, dims, chunk_dims, H5T_NATIVE_LONG, offsets);
     FCLAW_FREE(offsets);
 
 
     double* points = FCLAW_ALLOC(double, global_num_patches * num_points_per_patch * 3);
-    hsize_t points_dim[2] = {global_num_patches * num_points_per_patch, 3};
+    dims[0] = global_num_patches * num_points_per_patch;
+    dims[1] = 3;
+    chunk_dims[0] = num_points_per_patch;
+    chunk_dims[1] = 3;
     for(int blockno = 0; blockno < glob->domain->num_blocks; blockno++)
     {
         fclaw_block_t* block = &glob->domain->blocks[blockno];
@@ -751,7 +759,7 @@ fclaw_hdf5_write_file (int dim, fclaw_global_t * glob, const char *basename,
         }
     }
 
-    make_dataset_numerical(gid1, "Points", 2, points_dim, H5T_NATIVE_DOUBLE, points);
+    make_dataset_numerical(gid1, "Points", 2, dims, chunk_dims, H5T_NATIVE_DOUBLE, points);
     FCLAW_FREE(points);
 
     long* connectivity = FCLAW_ALLOC(long, global_num_patches * num_cells_per_patch * num_points_per_cell);
@@ -762,14 +770,15 @@ fclaw_hdf5_write_file (int dim, fclaw_global_t * glob, const char *basename,
         for(int patchno = 0; patchno < block->num_patches; patchno++)
         {
             fclaw_patch_t* patch = &block->patches[patchno];
-            long num_points_before = 0;//(block->num_patches_before + patchno) * num_points_per_patch;
+            long num_points_before = (block->num_patches_before + patchno) * num_points_per_patch;
             long *patch_connectivity = &connectivity[(block->num_patches_before + patchno) * num_cells_per_patch * num_points_per_cell];
             write_patch_connectivity(glob, patch, blockno, patchno, num_points_before, patch_connectivity);
         }
     }
 
     dims[0] = global_num_patches * num_cells_per_patch * num_points_per_cell;
-    make_dataset_numerical(gid1, "Connectivity", 1, dims, H5T_NATIVE_LONG, connectivity);
+    chunk_dims[0] = num_cells_per_patch * num_points_per_cell;
+    make_dataset_numerical(gid1, "Connectivity", 1, dims, chunk_dims, H5T_NATIVE_LONG, connectivity);
     FCLAW_FREE(connectivity);
 
     /* avoid resource leaks by closing */
@@ -794,7 +803,9 @@ fclaw_hdf5_write_file (int dim, fclaw_global_t * glob, const char *basename,
     }
     dims[0] = num_cells_per_patch*global_num_patches;
     dims[1] = meqn;
-    make_dataset_numerical(gid1, "meqn", 1, dims, H5T_NATIVE_DOUBLE, q);
+    chunk_dims[0] = num_cells_per_patch;
+    chunk_dims[1] = meqn;
+    make_dataset_numerical(gid1, "meqn", 1, dims, chunk_dims, H5T_NATIVE_DOUBLE, q);
     //H5LTset_attribute_string(fid, pointdata, "Scalars", "Iterations");
     
     ///* declare 3D array of test data */
