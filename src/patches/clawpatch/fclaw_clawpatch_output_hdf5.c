@@ -203,18 +203,32 @@ write_3d_connectivity_cb (fclaw_domain_t * domain, fclaw_patch_t * patch,
 }
 
 static void
-write_3d_patch_points (fclaw_global_t * glob,
-                       fclaw_patch_t * patch,
-                       int blockno,
-                       int patchno,
-                       double * points)
+write_patch_points (fclaw_global_t * glob,
+                    fclaw_patch_t * patch,
+                    int blockno,
+                    int patchno,
+                    double * points)
 {
+    const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
+    const fclaw_clawpatch_options_t* clawpatch_opt = fclaw_clawpatch_get_options(glob);
+
     int mx,my,mz,mbc;
     double dx,dy,dz,xlower,ylower,zlower;
-    fclaw_clawpatch_3d_grid_data(glob,patch,&mx,&my,&mz, &mbc,
-                                &xlower,&ylower,&zlower, &dx,&dy, &dz);
 
-    const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
+    if(clawpatch_opt->patch_dim == 2)
+    {
+        fclaw_clawpatch_2d_grid_data(glob,patch,&mx,&my,&mbc,
+                                    &xlower,&ylower,&dx,&dy);
+        mz = 0;
+        dz = 0;
+        zlower = 0;
+    }
+    else 
+    {
+        fclaw_clawpatch_3d_grid_data(glob,patch,&mx,&my,&mz, &mbc,
+                                    &xlower,&ylower,&zlower, &dx,&dy, &dz);
+    }
+
     fclaw2d_map_context_t* cont = fclaw2d_map_get(glob);
     /* Enumerate point coordinates in the patch */
     int i, j, k;
@@ -228,7 +242,14 @@ write_3d_patch_points (fclaw_global_t * glob,
             for (i = 0; i <= mx; ++i)
             {
                 const double x = xlower + i * dx;
-                if (fclaw_opt->manifold)
+                if (clawpatch_opt->patch_dim == 2 && fclaw_opt->manifold)
+                {
+                    FCLAW2D_MAP_C2M(&cont,&blockno,&x,&y,&xpp,&ypp,&zpp);
+                    *points++ = xpp;
+                    *points++ = ypp;
+                    *points++ = zpp;
+                }
+                else if (clawpatch_opt->patch_dim == 3 && fclaw_opt->manifold)
                 {
                     FCLAW3D_MAP_C2M(&cont,&blockno,&x,&y,&z,&xpp,&ypp,&zpp);
                     *points++ = xpp;
@@ -244,16 +265,6 @@ write_3d_patch_points (fclaw_global_t * glob,
             }
         }
     }
-}
-
-static void
-write_patch_points (fclaw_global_t * glob,
-                    fclaw_patch_t * patch,
-                    int blockno,
-                    int patchno,
-                    double * points)
-{
-    write_3d_patch_points(glob, patch, blockno, patchno, points);
 }
 
 static void
