@@ -71,7 +71,7 @@ typedef enum fclaw2d_file_error
     FCLAW2D_FILE_ERR_IN_DATA, /**< input data of file function is invalid */
     FCLAW2D_FILE_ERR_COUNT, /**< read or write count error that was not
                                  classified as a format error */
-    FCLAW2D_FILE_ERR_WRONG_DIM, /**< file has wrong dimension */
+    FCLAW2D_FILE_ERR_DIM, /**< file has wrong dimension */
     FCLAW2D_FILE_ERR_UNKNOWN, /**< unknown error */
     FCLAW2D_FILE_ERR_NOT_IMPLEMENTED, /**< functionality is not implemented */
     FCLAW2D_FILE_ERR_LASTCODE /**< to define own error codes for
