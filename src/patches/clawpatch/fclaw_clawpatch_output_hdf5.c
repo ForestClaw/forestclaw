@@ -723,12 +723,16 @@ out:
     return -1;
 }
 static int
-fclaw_hdf5_write_file (int dim, fclaw_global_t * glob, const char *basename,
-                      int mx, int my, int mz,
-                      int meqn)
+fclaw_hdf5_write_file (fclaw_global_t * glob, const char *filename)
 {
     const fclaw_clawpatch_options_t* clawpatch_opt = fclaw_clawpatch_get_options(glob);
     int ierr;
+
+    //get mx, my, mz, meqn from clawpatch options
+    int mx   = clawpatch_opt->mx;
+    int my   = clawpatch_opt->my;
+    int mz   = clawpatch_opt->mz;
+    int meqn = clawpatch_opt->meqn;
 
     char vtkhdf[8] = "/VTKHDF";
     char celldata[18] = "/VTKHDF/CellData";
@@ -739,7 +743,7 @@ fclaw_hdf5_write_file (int dim, fclaw_global_t * glob, const char *basename,
         return -1;
 
     // Create a new file collectively and release property list identifier.
-    hid_t file_id = H5Fcreate(basename, H5F_ACC_TRUNC, H5P_DEFAULT, plist_id);
+    hid_t file_id = H5Fcreate(filename, H5F_ACC_TRUNC, H5P_DEFAULT, plist_id);
 
     if(file_id < 0)
         return -1;
@@ -975,48 +979,13 @@ fclaw_hdf5_write_file (int dim, fclaw_global_t * glob, const char *basename,
     return EXIT_SUCCESS;
 }
 
-int
-fclaw_hdf5_write_2d_file (fclaw_global_t * glob, const char *basename,
-                        int mx, int my,
-                        int meqn)
-{
-    return fclaw_hdf5_write_file(2,glob,basename,mx,my,0,meqn);
-}
-
-int
-fclaw_hdf5_write_3d_file (fclaw_global_t * glob, const char *basename,
-                        int mx, int my, int mz,
-                        int meqn)
-{
-    return fclaw_hdf5_write_file(3,glob,basename,mx,my,mz,meqn);
-}
-
 /*  ---------------------------------------------------------------------------
     Public interface
     --------------------------------------------------------------------------- */
 
 void fclaw_clawpatch_output_hdf5_to_file (fclaw_global_t * glob, const char* filename)
 {
-    const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
-    const fclaw_clawpatch_options_t *clawpatch_opt = fclaw_clawpatch_get_options(glob);
-
-
-    if(clawpatch_opt->patch_dim == 2)
-    {
-        fclaw_hdf5_write_2d_file (glob, filename,
-                                clawpatch_opt->mx, 
-                                clawpatch_opt->my,
-                                clawpatch_opt->meqn);
-
-    }
-    else 
-    {
-        fclaw_hdf5_write_3d_file (glob, filename,
-                                clawpatch_opt->mx, 
-                                clawpatch_opt->my, 
-                                clawpatch_opt->mz,
-                                clawpatch_opt->meqn);
-    }
+    fclaw_hdf5_write_file (glob, filename);
 }
 void fclaw_clawpatch_output_hdf5 (fclaw_global_t * glob, int iframe)
 {
