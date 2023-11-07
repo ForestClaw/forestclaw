@@ -945,6 +945,7 @@ fclaw_hdf5_write_file (int dim, fclaw_global_t * glob, const char *basename,
     slab_start[0] = glob->domain->global_num_patches_before * num_cells_per_patch;
     slab_dims[0] = local_num_patches * num_cells_per_patch;
     make_dataset_numerical(gid1, "patchno", 1, dims, chunk_dims, slab_start, slab_dims, H5T_NATIVE_INT, patchno_array);
+    FCLAW_FREE(patchno_array);
 
     //write mpirank
     int *mpirank_array = FCLAW_ALLOC(int, local_num_patches * num_cells_per_patch);
@@ -964,6 +965,7 @@ fclaw_hdf5_write_file (int dim, fclaw_global_t * glob, const char *basename,
     slab_start[0] = glob->domain->global_num_patches_before * num_cells_per_patch;
     slab_dims[0] = local_num_patches * num_cells_per_patch;
     make_dataset_numerical(gid1, "mpirank", 1, dims, chunk_dims, slab_start, slab_dims, H5T_NATIVE_INT, mpirank_array);
+    FCLAW_FREE(mpirank_array);
     
     H5Gclose(gid1);
 
