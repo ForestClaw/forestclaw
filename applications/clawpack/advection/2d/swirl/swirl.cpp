@@ -79,7 +79,7 @@ void run_program(fclaw2d_global_t* glob)
 {
 #if FCLAW_SWIRL_IO_DEMO
     int i;
-    int errcode;
+    int errcode, retval;
     fclaw2d_file_context_t *fc;
     char read_user_string[FCLAW2D_FILE_USER_STRING_BYTES + 1];
     sc_array_t block_arr, field_arr, read_arr, *current_arr;
@@ -134,6 +134,7 @@ void run_program(fclaw2d_global_t* glob)
     sc_array_init_data (&block_arr, &test_int, sizeof (int64_t), 1);
     fc = fclaw2d_file_write_block (fc, "Test block", block_arr.elem_size,
                                    &block_arr, &errcode);
+    check_fclaw2d_file_error_code (errcode, "file write block");
 
     /* write an array associated to the domain to the file */
     /* we write non-contiguous data to demonstrate how to assemble the array */
@@ -163,6 +164,7 @@ void run_program(fclaw2d_global_t* glob)
 
     fc = fclaw2d_file_write_array (fc, "Test array", 3 * sizeof (char),
                                    &field_arr, &errcode);
+    check_fclaw2d_file_error_code (errcode, "file write array");
     /* free the local array data */
     for (i = 0; i < glob->domain->local_num_patches; ++i)
     {
@@ -170,16 +172,20 @@ void run_program(fclaw2d_global_t* glob)
         sc_array_reset (current_arr);
     }
     sc_array_reset (&field_arr);
-    fclaw2d_file_close (fc, &errcode);
+    retval = fclaw2d_file_close (fc, &errcode);
+    check_fclaw2d_file_error_code (errcode, "file close 1");
+    FCLAW_EXECUTE_ASSERT_FALSE (retval);
 
     fc = fclaw2d_file_open_read ("swirl_io_test", read_user_string,
                                  glob->domain->mpicomm, 0, &read_domain,
                                  &errcode);
+    check_fclaw2d_file_error_code (errcode, "file open read");
 
     /* read a block from the file */
     test_int = -1;
     fc = fclaw2d_file_read_block (fc, read_user_string, sizeof (int64_t),
                                   &block_arr, &errcode);
+    check_fclaw2d_file_error_code (errcode, "file read block");
     FCLAW_ASSERT (test_int == 12);
 
     /* read an array from the file */
@@ -192,6 +198,7 @@ void run_program(fclaw2d_global_t* glob)
     sc_array_init (&read_arr, sizeof (sc_array_t));
     fc = fclaw2d_file_read_array (fc, read_user_string, 3 * sizeof (char),
                                   &read_arr, &errcode);
+    check_fclaw2d_file_error_code (errcode, "file write array");
     /* check read array */
     for (i = 0; i < read_domain->local_num_patches; ++i)
     {
@@ -220,7 +227,9 @@ void run_program(fclaw2d_global_t* glob)
 
     fclaw2d_domain_destroy (read_domain);
 
-    fclaw2d_file_close (fc, &errcode);
+    retval = fclaw2d_file_close (fc, &errcode);
+    check_fclaw2d_file_error_code (errcode, "file close 2");
+    FCLAW_EXECUTE_ASSERT_FALSE (retval);
 #endif
 
     fclaw2d_finalize(glob);
