@@ -156,7 +156,36 @@ write_3d_patch_connectivity (fclaw_global_t * glob,
     }
 }
 static void
-write_patch_q (fclaw_global_t * glob,
+write_2d_patch_q (fclaw_global_t * glob,
+                  fclaw_patch_t * patch,
+                  int blockno,
+                  int patchno,
+                  double * q_out)
+{
+    int mx,my,mbc;
+    double dx,dy,xlower,ylower;
+    fclaw_clawpatch_2d_grid_data(glob,patch,&mx,&my, &mbc,
+                                &xlower,&ylower, &dx,&dy);
+
+    int meqn;
+    double* q;
+    fclaw_clawpatch_soln_data(glob,patch,&q,&meqn);
+
+    for (int j = 0; j < my; ++j)
+    {
+        for (int i = 0; i < mx; ++i)
+        {
+            for (int m = 0; m < meqn; m++)
+            {
+                size_t out_idx = j*mx*meqn + i*meqn + m;
+                size_t in_idx = m*(mx+2*mbc)*(my+2*mbc) + (j+mbc)*(mx+2*mbc) + (i+mbc);
+                q_out[out_idx] = q[in_idx];
+            }
+        }
+    }
+}
+static void
+write_3d_patch_q (fclaw_global_t * glob,
                fclaw_patch_t * patch,
                int blockno,
                int patchno,
@@ -185,6 +214,23 @@ write_patch_q (fclaw_global_t * glob,
                 }
             }
         }
+    }
+}
+static void
+write_patch_q (fclaw_global_t * glob,
+               fclaw_patch_t * patch,
+               int blockno,
+               int patchno,
+               int patch_dim,
+               double * q_out)
+{
+    if (patch_dim == 2)
+    {
+        write_2d_patch_q(glob, patch, blockno, patchno, q_out);
+    }
+    else
+    {
+        write_3d_patch_q(glob, patch, blockno, patchno, q_out);
     }
 }
 static void
@@ -469,13 +515,34 @@ static int
 fclaw_hdf5_write_file (fclaw_global_t * glob, const char *filename)
 {
     const fclaw_clawpatch_options_t* clawpatch_opt = fclaw_clawpatch_get_options(glob);
-    int ierr;
-
     //get mx, my, mz, meqn from clawpatch options
+    int patch_dim = clawpatch_opt->patch_dim;
     int mx   = clawpatch_opt->mx;
     int my   = clawpatch_opt->my;
     int mz   = clawpatch_opt->mz;
     int meqn = clawpatch_opt->meqn;
+
+    int local_num_patches = glob->domain->local_num_patches;
+    int global_num_patches = glob->domain->global_num_patches;
+
+    int num_cells_per_patch;
+    int num_points_per_patch;
+    int num_points_per_cell;
+    uint8_t cell_type;
+    if(clawpatch_opt->patch_dim == 2)
+    {
+        num_cells_per_patch = mx * my;
+        num_points_per_patch = (mx + 1) * (my + 1);
+        num_points_per_cell = 4;
+        cell_type = 9;
+    }
+    else 
+    {
+        num_cells_per_patch = mx * my * mz;
+        num_points_per_patch = (mx + 1) * (my + 1) * (mz + 1);
+        num_points_per_cell = 8;
+        cell_type = 12; 
+    }
 
     char vtkhdf[8] = "/VTKHDF";
     char celldata[18] = "/VTKHDF/CellData";
@@ -495,25 +562,6 @@ fclaw_hdf5_write_file (fclaw_global_t * glob, const char *filename)
 
     hid_t gid1 = H5Gcreate2(file_id, vtkhdf, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
     
-    int num_cells_per_patch = mx * my * mz;
-    int num_points_per_patch = (mx + 1) * (my + 1) * (mz + 1);
-    int local_num_patches = glob->domain->local_num_patches;
-    int global_num_patches = glob->domain->global_num_patches;
-
-    
-    int num_points_per_cell;
-    uint8_t cell_type;
-    if(clawpatch_opt->patch_dim == 2)
-    {
-        num_points_per_cell = 4;
-        cell_type = 9;
-    }
-    else
-    {
-        num_points_per_cell = 8;
-        cell_type = 12; 
-    }
-
     int vtk_version[2] = {1, 0};
     set_attribute_numerical(file_id, vtkhdf, "Version", 2, H5T_NATIVE_INT, vtk_version);
     //hid_t attr_id = H5Acreate (gid1, "Units", H5T_STD_I32BE, dataspace_id, H5P_DEFAULT, H5P_DEFAULT);
@@ -612,7 +660,7 @@ fclaw_hdf5_write_file (fclaw_global_t * glob, const char *filename)
             fclaw_patch_t* patch = &block->patches[patchno];
             long num_points_before = (glob->domain->global_num_patches_before + block->num_patches_before + patchno) * num_points_per_patch;
             long *patch_connectivity = &connectivity[(block->num_patches_before + patchno) * num_cells_per_patch * num_points_per_cell];
-            write_patch_connectivity(glob, patch, blockno, patchno, clawpatch_opt->patch_dim, num_points_before, patch_connectivity);
+            write_patch_connectivity(glob, patch, blockno, patchno, patch_dim, num_points_before, patch_connectivity);
         }
     }
 
@@ -640,7 +688,7 @@ fclaw_hdf5_write_file (fclaw_global_t * glob, const char *filename)
         {
             fclaw_patch_t* patch = &block->patches[patchno];
             double *patch_q = &q[(block->num_patches_before + patchno) * num_cells_per_patch * meqn];
-            write_patch_q(glob, patch, blockno, patchno, patch_q);
+            write_patch_q(glob, patch, blockno, patchno, patch_dim, patch_q);
         }
     }
     dims[0] = num_cells_per_patch*global_num_patches;
