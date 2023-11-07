@@ -813,7 +813,6 @@ fclaw_hdf5_write_file (int dim, fclaw_global_t * glob, const char *basename,
     make_dataset_numerical(gid1, "Types", 1, dims, chunk_dims, slab_start, slab_dims, H5T_NATIVE_UINT8, types);
 
 
-#if 0
 
     // write offsets
     // calculate additional end lenth for rank == size -1
@@ -833,11 +832,7 @@ fclaw_hdf5_write_file (int dim, fclaw_global_t * glob, const char *basename,
     FCLAW_FREE(offsets);
 
 
-    double* points = FCLAW_ALLOC(double, global_num_patches * num_points_per_patch * 3);
-    dims[0] = global_num_patches * num_points_per_patch;
-    dims[1] = 3;
-    chunk_dims[0] = num_points_per_patch;
-    chunk_dims[1] = 3;
+    double* points = FCLAW_ALLOC(double, local_num_patches * num_points_per_patch * 3);
     for(int blockno = 0; blockno < glob->domain->num_blocks; blockno++)
     {
         fclaw_block_t* block = &glob->domain->blocks[blockno];
@@ -849,10 +844,18 @@ fclaw_hdf5_write_file (int dim, fclaw_global_t * glob, const char *basename,
         }
     }
 
-    make_dataset_numerical(gid1, "Points", 2, dims, chunk_dims, H5T_NATIVE_DOUBLE, points);
+    dims[0] = global_num_patches * num_points_per_patch;
+    dims[1] = 3;
+    chunk_dims[0] = num_points_per_patch;
+    chunk_dims[1] = 3;
+    slab_start[0] = glob->domain->global_num_patches_before * num_points_per_patch;
+    slab_start[1] = 0;
+    slab_dims[0] = local_num_patches * num_points_per_patch;
+    slab_dims[1] = 3;
+    make_dataset_numerical(gid1, "Points", 2, dims, chunk_dims, slab_start, slab_dims, H5T_NATIVE_DOUBLE, points);
     FCLAW_FREE(points);
 
-    long* connectivity = FCLAW_ALLOC(long, global_num_patches * num_cells_per_patch * num_points_per_cell);
+    long* connectivity = FCLAW_ALLOC(long, local_num_patches * num_cells_per_patch * num_points_per_cell);
 
     for(int blockno = 0; blockno < glob->domain->num_blocks; blockno++)
     {
@@ -860,7 +863,7 @@ fclaw_hdf5_write_file (int dim, fclaw_global_t * glob, const char *basename,
         for(int patchno = 0; patchno < block->num_patches; patchno++)
         {
             fclaw_patch_t* patch = &block->patches[patchno];
-            long num_points_before = (block->num_patches_before + patchno) * num_points_per_patch;
+            long num_points_before = (glob->domain->global_num_patches_before + block->num_patches_before + patchno) * num_points_per_patch;
             long *patch_connectivity = &connectivity[(block->num_patches_before + patchno) * num_cells_per_patch * num_points_per_cell];
             write_patch_connectivity(glob, patch, blockno, patchno, num_points_before, patch_connectivity);
         }
@@ -868,7 +871,9 @@ fclaw_hdf5_write_file (int dim, fclaw_global_t * glob, const char *basename,
 
     dims[0] = global_num_patches * num_cells_per_patch * num_points_per_cell;
     chunk_dims[0] = num_cells_per_patch * num_points_per_cell;
-    make_dataset_numerical(gid1, "Connectivity", 1, dims, chunk_dims, H5T_NATIVE_LONG, connectivity);
+    slab_start[0] = glob->domain->global_num_patches_before * num_cells_per_patch * num_points_per_cell;
+    slab_dims[0] = local_num_patches * num_cells_per_patch * num_points_per_cell;
+    make_dataset_numerical(gid1, "Connectivity", 1, dims, chunk_dims, slab_start, slab_dims, H5T_NATIVE_LONG, connectivity);
     FCLAW_FREE(connectivity);
 
     /* avoid resource leaks by closing */
@@ -880,7 +885,7 @@ fclaw_hdf5_write_file (int dim, fclaw_global_t * glob, const char *basename,
     gid1 = H5Gcreate2(file_id, celldata, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
     
     //create contiguous array for q
-    double * q = FCLAW_ALLOC(double, global_num_patches * num_cells_per_patch * meqn);
+    double * q = FCLAW_ALLOC(double, local_num_patches * num_cells_per_patch * meqn);
     for(int blockno = 0; blockno < glob->domain->num_blocks; blockno++)
     {
         fclaw_block_t* block = &glob->domain->blocks[blockno];
@@ -895,11 +900,15 @@ fclaw_hdf5_write_file (int dim, fclaw_global_t * glob, const char *basename,
     dims[1] = meqn;
     chunk_dims[0] = num_cells_per_patch;
     chunk_dims[1] = meqn;
-    make_dataset_numerical(gid1, "meqn", 1, dims, chunk_dims, H5T_NATIVE_DOUBLE, q);
+    slab_start[0] = glob->domain->global_num_patches_before * num_cells_per_patch;
+    slab_start[1] = 0;
+    slab_dims[0] = local_num_patches * num_cells_per_patch;
+    slab_dims[1] = meqn;
+    make_dataset_numerical(gid1, "meqn", 1, dims, chunk_dims, slab_start, slab_dims, H5T_NATIVE_DOUBLE, q);
     FCLAW_FREE(q);
 
     // write blockno
-    int *blockno_array = FCLAW_ALLOC(int, global_num_patches * num_cells_per_patch);
+    int *blockno_array = FCLAW_ALLOC(int, local_num_patches * num_cells_per_patch);
     for(int blockno = 0; blockno < glob->domain->num_blocks; blockno++)
     {
         fclaw_block_t* block = &glob->domain->blocks[blockno];
@@ -913,11 +922,13 @@ fclaw_hdf5_write_file (int dim, fclaw_global_t * glob, const char *basename,
     }
     dims[0] = global_num_patches * num_cells_per_patch;
     chunk_dims[0] = num_cells_per_patch;
-    make_dataset_numerical(gid1, "blockno", 1, dims, chunk_dims, H5T_NATIVE_INT, blockno_array);
+    slab_start[0] = glob->domain->global_num_patches_before * num_cells_per_patch;
+    slab_dims[0] = local_num_patches * num_cells_per_patch;
+    make_dataset_numerical(gid1, "blockno", 1, dims, chunk_dims, slab_start, slab_dims, H5T_NATIVE_INT, blockno_array);
     FCLAW_FREE(blockno_array);
 
     //write patchno
-    int *patchno_array = FCLAW_ALLOC(int, global_num_patches * num_cells_per_patch);
+    int *patchno_array = FCLAW_ALLOC(int, local_num_patches * num_cells_per_patch);
     for(int blockno = 0; blockno < glob->domain->num_blocks; blockno++)
     {
         fclaw_block_t* block = &glob->domain->blocks[blockno];
@@ -931,10 +942,12 @@ fclaw_hdf5_write_file (int dim, fclaw_global_t * glob, const char *basename,
     }
     dims[0] = global_num_patches * num_cells_per_patch;
     chunk_dims[0] = num_cells_per_patch;
-    make_dataset_numerical(gid1, "patchno", 1, dims, chunk_dims, H5T_NATIVE_INT, patchno_array);
+    slab_start[0] = glob->domain->global_num_patches_before * num_cells_per_patch;
+    slab_dims[0] = local_num_patches * num_cells_per_patch;
+    make_dataset_numerical(gid1, "patchno", 1, dims, chunk_dims, slab_start, slab_dims, H5T_NATIVE_INT, patchno_array);
 
     //write mpirank
-    int *mpirank_array = FCLAW_ALLOC(int, global_num_patches * num_cells_per_patch);
+    int *mpirank_array = FCLAW_ALLOC(int, local_num_patches * num_cells_per_patch);
     for(int blockno = 0; blockno < glob->domain->num_blocks; blockno++)
     {
         fclaw_block_t* block = &glob->domain->blocks[blockno];
@@ -948,9 +961,10 @@ fclaw_hdf5_write_file (int dim, fclaw_global_t * glob, const char *basename,
     }
     dims[0] = global_num_patches * num_cells_per_patch;
     chunk_dims[0] = num_cells_per_patch;
-    make_dataset_numerical(gid1, "mpirank", 1, dims, chunk_dims, H5T_NATIVE_INT, mpirank_array);
+    slab_start[0] = glob->domain->global_num_patches_before * num_cells_per_patch;
+    slab_dims[0] = local_num_patches * num_cells_per_patch;
+    make_dataset_numerical(gid1, "mpirank", 1, dims, chunk_dims, slab_start, slab_dims, H5T_NATIVE_INT, mpirank_array);
     
-#endif
     H5Gclose(gid1);
 
     H5Fclose(file_id);
