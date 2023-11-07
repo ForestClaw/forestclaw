@@ -35,173 +35,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <hdf5_hl.h>
 #include <hdf5.h>
 
-typedef struct fclaw2d_hdf5_state
-{
-    int dim;
-    int patch_children;
-    int mx, my, mz;
-    int meqn;
-    int points_per_patch, cells_per_patch;
-    int intsize, ndsize;
-    int fits32;
-    char filename[BUFSIZ];
-    int64_t global_num_points, global_num_cells;
-    int64_t global_num_connectivity;
-    int64_t offset_position, psize_position;
-    int64_t offset_connectivity, psize_connectivity;
-    int64_t offset_offsets, psize_offsets;
-    int64_t offset_types, psize_types;
-    int64_t offset_mpirank, psize_mpirank;
-    int64_t offset_blockno, psize_blockno;
-    int64_t offset_patchno, psize_patchno;
-    int64_t offset_meqn, psize_meqn;
-    int64_t offset_end;
-    const char *inttype;
-    fclaw_hdf5_patch_data_t coordinate_cb;
-    fclaw_hdf5_patch_data_t value_cb;
-    FILE *file;
-#ifdef P4EST_ENABLE_MPIIO
-    MPI_File mpifile;
-    MPI_Offset mpibegin;
-#endif
-    char *buf;
-}
-fclaw2d_hdf5_state_t;
-
-/**
- * @brief Write the buffer to file
- *
- * @param s the hdf5 state
- * @param psize_field the size of the buffer
- */
-static void
-write_buffer (fclaw2d_hdf5_state_t * s, int64_t psize_field)
-{
-#ifndef P4EST_ENABLE_MPIIO
-    size_t retvalz;
-
-    retvalz = fwrite (s->buf, psize_field, 1, s->file);
-    SC_CHECK_ABORT (retvalz == 1, "VTK file write failed");
-#else
-    int mpiret;
-    MPI_Status mpistatus;
-
-    mpiret = MPI_File_write (s->mpifile, s->buf, psize_field, MPI_BYTE,
-                             &mpistatus);
-    SC_CHECK_MPI (mpiret);
-#endif
-}
-
-static void
-write_2d_connectivity_cb (fclaw_domain_t * domain, fclaw_patch_t * patch,
-                       int blockno, int patchno, void *user)
-{
-    fclaw_global_iterate_t *g = (fclaw_global_iterate_t*) user;
-    fclaw2d_hdf5_state_t *s = (fclaw2d_hdf5_state_t *) g->user;
-    int i, j;
-    const int64_t pbefore = s->points_per_patch *
-        (domain->global_num_patches_before +
-         domain->blocks[blockno].num_patches_before + patchno);
-
-    if (s->fits32)
-    {
-        int32_t *idata = (int32_t *) s->buf;
-        int32_t l;
-
-        for (j = 0; j < s->my; ++j)
-        {
-            for (i = 0; i < s->mx; ++i)
-            {
-                l = (int32_t) pbefore + i + j * (s->mx + 1);
-                *idata++ = l;
-                *idata++ = l + 1;
-                *idata++ = l + (s->mx + 2);
-                *idata++ = l + (s->mx + 1);
-            }
-        }
-    }
-    else
-    {
-        int64_t *idata = (int64_t *) s->buf;
-        int64_t l;
-        for (j = 0; j < s->my; ++j)
-        {
-            for (i = 0; i < s->mx; ++i)
-            {
-                l = pbefore + i + j * (s->mx + 1);
-                *idata++ = l;
-                *idata++ = l + 1;
-                *idata++ = l + (s->mx + 2);
-                *idata++ = l + (s->mx + 1);
-            }
-        }
-    }
-    write_buffer (s, s->psize_connectivity);
-}
-static void
-write_3d_connectivity_cb (fclaw_domain_t * domain, fclaw_patch_t * patch,
-                          int blockno, int patchno, void *user)
-{
-    fclaw_global_iterate_t *g = (fclaw_global_iterate_t*) user;
-    fclaw2d_hdf5_state_t *s = (fclaw2d_hdf5_state_t *) g->user;
-    int i, j, k;
-    const int64_t pbefore = s->points_per_patch *
-        (domain->global_num_patches_before +
-         domain->blocks[blockno].num_patches_before + patchno);
-
-    if (s->fits32)
-    {
-        int32_t *idata = (int32_t *) s->buf;
-        int32_t l;
-
-        for (k = 0; k < s->mz; ++k)
-        {
-            for (j = 0; j < s->my; ++j)
-            {
-                for (i = 0; i < s->mx; ++i)
-                {
-                    l = (int32_t) pbefore + i + j * (s->mx + 1)
-                         + k * (s->my + 1) * (s->mx + 1);
-                    *idata++ = l;
-                    *idata++ = l + 1;
-                    *idata++ = l + (s->mx + 2);
-                    *idata++ = l + (s->mx + 1);
-                    *idata++ = l + (s->mx + 1) * (s->my + 1);
-                    *idata++ = l + (s->mx + 1) * (s->my + 1) + 1;
-                    *idata++ = l + (s->mx + 1) * (s->my + 1) + (s->mx + 2);
-                    *idata++ = l + (s->mx + 1) * (s->my + 1) + (s->mx + 1);
-                }
-            }
-        }
-    }
-    else
-    {
-        int64_t *idata = (int64_t *) s->buf;
-        int64_t l;
-
-        for (k = 0; k < s->mz; ++k)
-        {
-            for (j = 0; j < s->my; ++j)
-            {
-                for (i = 0; i < s->mx; ++i)
-                {
-                    l = pbefore + i + j * (s->mx + 1)
-                         + k * (s->my + 1) * (s->mx + 1);
-                    *idata++ = l;
-                    *idata++ = l + 1;
-                    *idata++ = l + (s->mx + 2);
-                    *idata++ = l + (s->mx + 1);
-                    *idata++ = l + (s->mx + 1) * (s->my + 1);
-                    *idata++ = l + (s->mx + 1) * (s->my + 1) + 1;
-                    *idata++ = l + (s->mx + 1) * (s->my + 1) + (s->mx + 2);
-                    *idata++ = l + (s->mx + 1) * (s->my + 1) + (s->mx + 1);
-                }
-            }
-        }
-    }
-    write_buffer (s, s->psize_connectivity);
-}
-
 static void
 write_patch_points (fclaw_global_t * glob,
                     fclaw_patch_t * patch,
@@ -266,7 +99,30 @@ write_patch_points (fclaw_global_t * glob,
         }
     }
 }
-
+static void
+write_2d_patch_connectivity (fclaw_global_t * glob,
+                             fclaw_patch_t * patch,
+                             int blockno,
+                             int patchno,
+                             long num_points_before,
+                             long * conn)
+{
+    int mx,my,mbc;
+    double dx,dy, xlower,ylower;
+    fclaw_clawpatch_2d_grid_data(glob,patch,&mx,&my,&mbc,
+                                &xlower,&ylower, &dx,&dy);
+    for (int j = 0; j < my; ++j)
+    {
+        for (int i = 0; i < mx; ++i)
+        {
+            long l = num_points_before + i + j * (mx + 1);
+            *conn++ = l;
+            *conn++ = l + 1;
+            *conn++ = l + (mx + 2);
+            *conn++ = l + (mx + 1);
+        }
+    }
+}
 static void
 write_3d_patch_connectivity (fclaw_global_t * glob,
                              fclaw_patch_t * patch,
@@ -336,10 +192,18 @@ write_patch_connectivity (fclaw_global_t * glob,
                           fclaw_patch_t * patch,
                           int blockno,
                           int patchno,
+                          int patch_dim,
                           long num_points_before,
                           long * connectivity)
 {
-    write_3d_patch_connectivity(glob, patch, blockno, patchno, num_points_before, connectivity);
+    if(patch_dim == 2)
+    {
+        write_2d_patch_connectivity(glob, patch, blockno, patchno, num_points_before, connectivity);
+    }
+    else
+    {
+        write_3d_patch_connectivity(glob, patch, blockno, patchno, num_points_before, connectivity);
+    }
 }
 
 static
@@ -748,7 +612,7 @@ fclaw_hdf5_write_file (fclaw_global_t * glob, const char *filename)
             fclaw_patch_t* patch = &block->patches[patchno];
             long num_points_before = (glob->domain->global_num_patches_before + block->num_patches_before + patchno) * num_points_per_patch;
             long *patch_connectivity = &connectivity[(block->num_patches_before + patchno) * num_cells_per_patch * num_points_per_cell];
-            write_patch_connectivity(glob, patch, blockno, patchno, num_points_before, patch_connectivity);
+            write_patch_connectivity(glob, patch, blockno, patchno, clawpatch_opt->patch_dim, num_points_before, patch_connectivity);
         }
     }
 
