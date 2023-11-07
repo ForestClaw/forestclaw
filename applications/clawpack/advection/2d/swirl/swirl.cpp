@@ -54,16 +54,34 @@ void create_domain(fclaw2d_global_t *glob)
     fclaw2d_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);
 }
 
+static void
+check_fclaw2d_file_error_code (int errcode, const char *str)
+{
+    int reslen, retval;
+    char err_str[sc_MPI_MAX_ERROR_STRING];
+
+    if (errcode != FCLAW2D_FILE_ERR_SUCCESS)
+    {
+        /* In case of a not successful fclaw2d_file function call we always
+         * close the file if applicable and deallocate the file context.  
+         */
+        /* examine the error code */
+        retval = fclaw2d_file_error_string (errcode, err_str, &reslen);
+        /* check for error in the error sting function */
+        SC_CHECK_ABORTF (!retval, "%s: error string function not successful",
+                         str);
+        SC_ABORTF ("%s: %*.*s", str, reslen, reslen, err_str);
+    }
+}
+
 static
 void run_program(fclaw2d_global_t* glob)
 {
 #if FCLAW_SWIRL_IO_DEMO
     int i;
     int errcode;
-    int reslen;
     fclaw2d_file_context_t *fc;
     char read_user_string[FCLAW2D_FILE_USER_STRING_BYTES + 1];
-    char err_str[sc_MPI_MAX_ERROR_STRING];
     sc_array_t block_arr, field_arr, read_arr, *current_arr;
     int64_t test_int = 12;
     char *data, *local_arr_data;
@@ -108,8 +126,7 @@ void run_program(fclaw2d_global_t* glob)
     */
     fc = fclaw2d_file_open_write ("swirl_io_test", "ForestClaw data file", 0,
                                   glob->domain, &errcode);
-    fclaw2d_file_error_string (errcode, err_str, &reslen);
-    fclaw_global_errorf ("file open write: %*.*s.\n", reslen, reslen, err_str);
+    check_fclaw2d_file_error_code (errcode, "file open write");
 
     /* write a block to the file */
     /* Initialize a sc_array with one element and the element size equals
@@ -198,8 +215,8 @@ void run_program(fclaw2d_global_t* glob)
     /* sanity check of read domain */
     FCLAW_ASSERT (p4est_checksum (((p4est_wrap_t *) read_domain->pp)->p4est)
                   ==
-                  p4est_checksum (((p4est_wrap_t *) glob->domain->pp)->
-                                  p4est));
+                  p4est_checksum (((p4est_wrap_t *) glob->domain->
+                                   pp)->p4est));
 
     fclaw2d_domain_destroy (read_domain);
 
