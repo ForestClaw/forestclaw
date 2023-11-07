@@ -521,17 +521,64 @@ out:
     return -1;
 }
 static herr_t
+make_single_value_dataset_numerical(int mpirank,
+                                    hid_t loc_id, 
+                                    const char *dset_name, 
+                                    int rank, 
+                                    const hsize_t *dims, 
+                                    hid_t tid,
+                                    const void *data)
+{
+    hid_t did = -1, sid = -1;
+
+    /* check the arguments */
+    if (dset_name == NULL)
+        return -1;
+
+    /* Create the data space for the dataset. */
+    if ((sid = H5Screate_simple(rank, dims, NULL)) < 0)
+        return -1;
+
+    /* Create the dataset. */
+    if ((did = H5Dcreate2(loc_id, dset_name, tid, sid, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) < 0)
+        goto out;
+
+    /* Write the dataset only if there is data to write */
+    if (data && mpirank == 0)
+        if (H5Dwrite(did, tid, H5S_ALL, H5S_ALL, H5P_DEFAULT, data) < 0)
+            goto out;
+
+    /* End access to the dataset and release resources used by it. */
+    if (H5Dclose(did) < 0)
+        return -1;
+
+    /* Terminate access to the data space. */
+    if (H5Sclose(sid) < 0)
+        return -1;
+
+    return 0;
+
+out:
+    H5E_BEGIN_TRY
+    {
+        H5Dclose(did);
+        H5Sclose(sid);
+    }
+    H5E_END_TRY
+    return -1;
+}
+static herr_t
 make_dataset_numerical(hid_t loc_id, 
                        const char *dset_name, 
                        int rank, 
                        const hsize_t *dims, 
                        const hsize_t *chunk_dims,
-                       //const hsize_t* local_start, 
-                       //const hsize_t* local_dims, 
+                       const hsize_t* slab_start, 
+                       const hsize_t* slab_dims, 
                        hid_t tid,
                        const void *data)
 {
-    hid_t did = -1, sid = -1, prop_id = -1;
+    hid_t did = -1, sid = -1, prop_id = -1, plist_id = -1;
 
     /* check the arguments */
     if (dset_name == NULL)
@@ -548,21 +595,35 @@ make_dataset_numerical(hid_t loc_id,
     }
 
     
-    //f(H5Pset_dxpl_mpio(prop_id, H5FD_MPIO_COLLECTIVE) < 0)
-       // return -1;
-
-
     /* Create the data space for the dataset. */
     if ((sid = H5Screate_simple(rank, dims, NULL)) < 0)
         return -1;
+
 
     /* Create the dataset. */
     if ((did = H5Dcreate2(loc_id, dset_name, tid, sid, H5P_DEFAULT, prop_id, H5P_DEFAULT)) < 0)
         goto out;
 
+    hid_t memspace = H5Screate_simple(rank, slab_dims, NULL);
+    if(memspace < 0)
+        return -1;
+
+    hid_t filespace = H5Dget_space(did);
+    if(filespace < 0)
+        return -1;
+
+    if (H5Sselect_hyperslab(filespace, H5S_SELECT_SET, slab_start, NULL, slab_dims, NULL) < 0)
+        return -1;
+
+    if((plist_id = H5Pcreate(H5P_DATASET_XFER)) < 0)
+        return -1;
+
+    if(H5Pset_dxpl_mpio(plist_id, H5FD_MPIO_COLLECTIVE) < 0)
+       return -1;
+
     /* Write the dataset only if there is data to write */
     if (data)
-        if (H5Dwrite(did, tid, H5S_ALL, H5S_ALL, H5P_DEFAULT, data) < 0)
+        if (H5Dwrite(did, tid, memspace, filespace, plist_id, data) < 0)
             goto out;
 
     /* End access to the dataset and release resources used by it. */
@@ -674,10 +735,15 @@ fclaw_hdf5_write_file (int dim, fclaw_global_t * glob, const char *basename,
     
     // Set up file access property list with parallel I/O access
     hid_t plist_id = H5Pcreate(H5P_FILE_ACCESS);
-    //H5Pset_fapl_mpio(plist_id, glob->mpicomm, MPI_INFO_NULL);
+    if(H5Pset_fapl_mpio(plist_id, glob->mpicomm, MPI_INFO_NULL) < 0)
+        return -1;
 
     // Create a new file collectively and release property list identifier.
     hid_t file_id = H5Fcreate(basename, H5F_ACC_TRUNC, H5P_DEFAULT, plist_id);
+
+    if(file_id < 0)
+        return -1;
+
     H5Pclose(plist_id);
 
     hid_t gid1 = H5Gcreate2(file_id, vtkhdf, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
@@ -718,45 +784,52 @@ fclaw_hdf5_write_file (int dim, fclaw_global_t * glob, const char *basename,
 
     long number_of_cells = global_num_patches * num_cells_per_patch;
     dims[0] = 1;
-    make_dataset_numerical(gid1, "NumberOfCells", 1, dims, NULL, H5T_NATIVE_LONG, &number_of_cells);
+    make_single_value_dataset_numerical(glob->mpirank, gid1, "NumberOfCells", 1, dims, H5T_NATIVE_LONG, &number_of_cells);
 
     long number_of_points = global_num_patches * num_points_per_patch;
     dims[0] = 1;
-    make_dataset_numerical(gid1, "NumberOfPoints", 1, dims, NULL, H5T_NATIVE_LONG, &number_of_points);
+    make_single_value_dataset_numerical(glob->mpirank, gid1, "NumberOfPoints", 1, dims, H5T_NATIVE_LONG, &number_of_points);
 
 
     long number_of_connectivity_ids = global_num_patches * num_cells_per_patch * num_points_per_cell;
     dims[0] = 1;
-    make_dataset_numerical(gid1, "NumberOfConnectivityIds", 1, dims, NULL, H5T_NATIVE_LONG, &number_of_connectivity_ids);
+    make_single_value_dataset_numerical(glob->mpirank, gid1, "NumberOfConnectivityIds", 1, dims, H5T_NATIVE_LONG, &number_of_connectivity_ids);
+
 
 
     hsize_t chunk_dims[3] = {0,0,0};
+    hsize_t slab_dims[3] = {0,0,0};
+    hsize_t slab_start[3] = {0,0,0};
 
-    uint8_t types[global_num_patches * num_cells_per_patch]; 
-    for(int i = 0; i < global_num_patches * num_cells_per_patch; i++){
+    uint8_t types[local_num_patches * num_cells_per_patch]; 
+    for(int i = 0; i < local_num_patches * num_cells_per_patch; i++){
         types[i] = cell_type;
     }
 
     dims[0] = global_num_patches * num_cells_per_patch;
     chunk_dims[0] = num_cells_per_patch;
-    make_dataset_numerical(gid1, "Types", 1, dims, chunk_dims, H5T_NATIVE_UINT8, types);
+    slab_start[0] = glob->domain->global_num_patches_before * num_cells_per_patch;
+    slab_dims[0] = local_num_patches * num_cells_per_patch;
+    make_dataset_numerical(gid1, "Types", 1, dims, chunk_dims, slab_start, slab_dims, H5T_NATIVE_UINT8, types);
 
 
-    long *offsets = FCLAW_ALLOC(long,global_num_patches * num_cells_per_patch + 1);
-    for(int patchno = 0; patchno < global_num_patches; patchno++)
-    {
-        long curr_offset = patchno * num_cells_per_patch * num_points_per_cell;
-        int offset_start = patchno * num_cells_per_patch;
-        for(int i = 0; i < num_cells_per_patch; i++){
-            offsets[offset_start + i] = curr_offset;
-            curr_offset += num_points_per_cell;
-        }
+#if 0
+
+    // write offsets
+    // calculate additional end lenth for rank == size -1
+    int end = (glob->mpirank == glob->mpisize - 1) ? 1 : 0;
+    long *offsets = FCLAW_ALLOC(long,local_num_patches * num_cells_per_patch + end);
+    int curr_offset = glob->domain->global_num_patches_before * num_cells_per_patch * num_points_per_cell;
+    for(int i=0; i < local_num_patches * num_cells_per_patch + end; i++){
+        offsets[i] = curr_offset;
+        curr_offset += num_points_per_cell;
     }
-    offsets[global_num_patches * num_cells_per_patch] = global_num_patches * num_cells_per_patch * num_points_per_cell;
 
     dims[0] = global_num_patches * num_cells_per_patch + 1;
     chunk_dims[0] = num_cells_per_patch;
-    make_dataset_numerical(gid1, "Offsets", 1, dims, chunk_dims, H5T_NATIVE_LONG, offsets);
+    slab_start[0] = glob->domain->global_num_patches_before * num_cells_per_patch;
+    slab_dims[0] = local_num_patches * num_cells_per_patch + end;
+    make_dataset_numerical(gid1, "Offsets", 1, dims, chunk_dims, slab_start, slab_dims, H5T_NATIVE_LONG, offsets);
     FCLAW_FREE(offsets);
 
 
@@ -877,8 +950,8 @@ fclaw_hdf5_write_file (int dim, fclaw_global_t * glob, const char *basename,
     chunk_dims[0] = num_cells_per_patch;
     make_dataset_numerical(gid1, "mpirank", 1, dims, chunk_dims, H5T_NATIVE_INT, mpirank_array);
     
+#endif
     H5Gclose(gid1);
-    
 
     H5Fclose(file_id);
     
