@@ -971,6 +971,7 @@ fclaw_hdf5_write_file (int dim, fclaw_global_t * glob, const char *basename,
 
     H5Fclose(file_id);
     
+    FCLAW_ASSERT(H5Fget_obj_count(H5F_OBJ_ALL, H5F_OBJ_ALL) == 0);
     return EXIT_SUCCESS;
 }
 
