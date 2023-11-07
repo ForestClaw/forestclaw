@@ -48,6 +48,9 @@ extern "C"
 #define FCLAW3D_FILE_MAX_FIELD_ENTRY_SIZE ((1000 * 1000 * 1000 * 1000 * 10) - 1) /**< maximal data size per field entry*/
 
 /** Error values for fclaw2d_file functions.
+ * In the future we may add further error codes. Therefore, the error codes
+ * should only be used by the enum but not by the explicit numeric values since
+ * these explicit numeric values may change.  
  */
 typedef enum fclaw3d_file_error
 {
