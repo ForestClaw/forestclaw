@@ -3402,8 +3402,6 @@ fclaw2d_file_read_block (fclaw2d_file_context_t *
     }
 
     return fc;
-
-    return NULL;
 }
 
 fclaw2d_file_context_t *
