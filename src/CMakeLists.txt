@@ -50,7 +50,6 @@ add_library(forestclaw_c OBJECT
   fclaw2d_convenience.c
   fclaw2d_exchange.c
   fclaw2d_physical_bc.c
-  fclaw2d_ghost_fill.c
   fclaw2d_output.c
   fclaw2d_diagnostics.c
   fclaw2d_domain.c
@@ -179,7 +178,6 @@ install(FILES
 	fclaw2d_vtable.h
 	fclaw2d_output.h
 	fclaw2d_physical_bc.h
-	fclaw2d_ghost_fill.h
 	fclaw2d_map.h
 	fclaw2d_regrid.h
 	fclaw2d_map_brick.h
