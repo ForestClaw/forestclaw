@@ -52,7 +52,6 @@ libforestclaw_installed_headers = \
 	src/fclaw2d_patch.h \
 	src/fclaw2d_vtable.h \
 	src/fclaw2d_output.h \
-	src/fclaw2d_physical_bc.h \
 	src/fclaw2d_map.h \
 	src/fclaw2d_regrid.h \
 	src/fclaw2d_map_brick.h \
@@ -131,7 +130,6 @@ libforestclaw_compiled_sources = \
 	src/fclaw2d_map_brick.c \
 	src/fclaw2d_convenience.c \
 	src/fclaw2d_exchange.c \
-	src/fclaw2d_physical_bc.c \
 	src/fclaw2d_output.c \
 	src/fclaw2d_diagnostics.c \
 	src/fclaw2d_domain.c \
