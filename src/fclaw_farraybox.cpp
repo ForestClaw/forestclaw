@@ -64,7 +64,7 @@ void set_big_number(double& f)
 }
 
 
-void fclaw2d_farraybox_set_to_nan(double& f)
+void fclaw_farraybox_set_to_nan(double& f)
 {
     set_snan(f);
 }

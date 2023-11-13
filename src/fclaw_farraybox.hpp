@@ -29,7 +29,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_defs.h>
 #include <vector>
 
-void fclaw2d_farraybox_set_to_nan(double& f);
+void fclaw_farraybox_set_to_nan(double& f);
 
 class Box
 {
