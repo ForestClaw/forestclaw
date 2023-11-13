@@ -10,7 +10,6 @@
 # Swirl : Scalar advection
 include applications/clawpack/advection/3dx/swirl/Makefile.am
 include applications/clawpack/advection/3d/swirl/Makefile.am
-include applications/clawpack/advection/p8/swirl/Makefile.am
 
 # Filament : sphere in rotating flow field
 include applications/clawpack/advection/3dx/filament/Makefile.am
