@@ -197,13 +197,13 @@ void FCLAW_MAP_2D_C2M (fclaw_map_context_t ** cont, int *blockno,
                        double *xp, double *yp, double *zp);
 
 
-#define FCLAW2D_MAP_C2M_BASIS FCLAW_F77_FUNC_(fclaw2d_map_c2m_basis, \
-                                              FCLAW2D_MAP_C2M_BASIS)
+#define FCLAW_MAP_2D_C2M_BASIS FCLAW_F77_FUNC_(fclaw_map_2d_c2m_basis, \
+                                               FCLAW_MAP_2D_C2M_BASIS)
 
-void FCLAW2D_MAP_C2M_BASIS (fclaw_map_context_t ** cont, 
-                            const double *xc, const double *yc,
-                            double *t, double *tinv, double *tderivs,
-                            int * flag);
+void FCLAW_MAP_2D_C2M_BASIS (fclaw_map_context_t ** cont, 
+                             const double *xc, const double *yc,
+                             double *t, double *tinv, double *tderivs,
+                             int * flag);
 
 
 #define FCLAW3D_MAP_C2M FCLAW_F77_FUNC_(fclaw3d_map_c2m,FCLAW3D_MAP_C2M)

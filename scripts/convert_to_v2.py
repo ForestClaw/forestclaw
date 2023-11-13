@@ -732,7 +732,9 @@ fclaw_1to2 = {
     "FCLAW2D_MAP_QUERY"                            : "FCLAW_MAP_QUERY",
     "fclaw2d_map_query"                            : "fclaw_map_query",
     "FCLAW2D_MAP_C2M"                              : "FCLAW_MAP_2D_C2M",
-    "fclaw2d_map_c2m"                              : "fclaw_map_2d_c2m"
+    "fclaw2d_map_c2m"                              : "fclaw_map_2d_c2m",
+    "FCLAW2D_MAP_C2M_BASIS"                        : "FCLAW_MAP_2D_C2M_BASIS",
+    "fclaw2d_map_c2m_basis"                        : "fclaw_map_2d_c2m_basis"
 }
 
 import glob
