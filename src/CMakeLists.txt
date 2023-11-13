@@ -52,7 +52,6 @@ add_library(forestclaw_c OBJECT
   fclaw2d_output.c
   fclaw2d_diagnostics.c
   fclaw2d_domain.c
-  fclaw2d_regrid.c
   fclaw2d_patch.c
   fclaw2d_partition.c
   fclaw2d_output_tikz.c
@@ -177,7 +176,6 @@ install(FILES
 	fclaw2d_vtable.h
 	fclaw2d_output.h
 	fclaw2d_map.h
-	fclaw2d_regrid.h
 	fclaw2d_map_brick.h
 	fclaw2d_partition.h
 	fclaw2d_exchange.h
