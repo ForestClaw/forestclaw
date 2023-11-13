@@ -51,14 +51,11 @@ install(FILES
 	fc2d_cudaclaw5_fort.h
 	cuda_source/cudaclaw5_update_q.h
 	cuda_source/cudaclaw5_allocate.h
-	DESTINATION include
+	TYPE INCLUDE
 )
 
 install(TARGETS cudaclaw5
-  EXPORT ${PROJECT_NAME}-targets
-  ARCHIVE DESTINATION lib
-  LIBRARY DESTINATION lib
-	RUNTIME DESTINATION bin)
+  EXPORT ${PROJECT_NAME}-targets)
 
 # imported target, for use from FetchContent
 add_library(FORESTCLAW::CUDACLAW5 INTERFACE IMPORTED GLOBAL)

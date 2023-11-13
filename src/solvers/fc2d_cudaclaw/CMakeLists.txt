@@ -56,14 +56,11 @@ install(FILES
 	fc2d_cudaclaw_options.h
 	cudaclaw_user_fort.h
 	fc2d_cudaclaw_fort.h
-  DESTINATION include
+  TYPE INCLUDE
 )
 
 install(TARGETS cudaclaw
-  EXPORT ${PROJECT_NAME}-targets
-  ARCHIVE DESTINATION lib
-  LIBRARY DESTINATION lib
-	RUNTIME DESTINATION bin)
+  EXPORT ${PROJECT_NAME}-targets)
 
 # imported target, for use from FetchContent
 add_library(FORESTCLAW::CUDACLAW INTERFACE IMPORTED GLOBAL)

@@ -37,23 +37,23 @@ add_library(clawpatch_f OBJECT
   fort_5.0/fclaw2d_clawpatch5_tag4refinement.f
   fort_5.0/fclaw2d_clawpatch5_tag4coarsening.f
   fort_5.0/fclaw2d_clawpatch5_timeinterp.f
-  
-  fort3_4.6/fclaw3d_clawpatch46_diagnostics.f90 
-  fort3_4.6/fclaw3d_clawpatch46_local_ghost_pack.f90 
-  fort3_4.6/fclaw3d_clawpatch46_output_ascii.f90 
-  fort3_4.6/fclaw3d_clawpatch46_tag4coarsening.f90 
-  fort3_4.6/fclaw3d_clawpatch46_tag4refinement.f90 
-  fort3_4.6/fclaw3d_clawpatch46_timeinterp.f90  
 
-  fort3_4.6/fclaw3d_clawpatch46_average.f90 
-  fort3_4.6/fclaw3d_clawpatch46_copy.f90 
-  fort3_4.6/fclaw3d_clawpatch46_interpolate.f90 
+  fort3_4.6/fclaw3d_clawpatch46_diagnostics.f90
+  fort3_4.6/fclaw3d_clawpatch46_local_ghost_pack.f90
+  fort3_4.6/fclaw3d_clawpatch46_output_ascii.f90
+  fort3_4.6/fclaw3d_clawpatch46_tag4coarsening.f90
+  fort3_4.6/fclaw3d_clawpatch46_tag4refinement.f90
+  fort3_4.6/fclaw3d_clawpatch46_timeinterp.f90
 
-  fort3_4.6/fclaw3dx_clawpatch46_average.f90 
-  fort3_4.6/fclaw3dx_clawpatch46_copy.f90 
-  fort3_4.6/fclaw3dx_clawpatch46_interpolate.f90 
-  fort3_4.6/fclaw3dx_clawpatch46_local_ghost_pack.f90 
-  fort3_4.6/fclaw3dx_clawpatch46_pillowsphere.f90 
+  fort3_4.6/fclaw3d_clawpatch46_average.f90
+  fort3_4.6/fclaw3d_clawpatch46_copy.f90
+  fort3_4.6/fclaw3d_clawpatch46_interpolate.f90
+
+  fort3_4.6/fclaw3dx_clawpatch46_average.f90
+  fort3_4.6/fclaw3dx_clawpatch46_copy.f90
+  fort3_4.6/fclaw3dx_clawpatch46_interpolate.f90
+  fort3_4.6/fclaw3dx_clawpatch46_local_ghost_pack.f90
+  fort3_4.6/fclaw3dx_clawpatch46_pillowsphere.f90
 
   ${metric}/fortran_source2d/fclaw2d_metric_default_fort.f90
   ${metric}/fortran_source3d/fclaw3d_metric_default_fort.f90
@@ -92,7 +92,7 @@ add_library(clawpatch
   fort3_user/fclaw3d_clawpatch_tag_criteria.c
   ${metric}/fclaw2d_metric.cpp
   ${metric}/fclaw2d_metric_default.c
-  ${metric}/fclaw3d_metric.cpp 
+  ${metric}/fclaw3d_metric.cpp
   ${metric}/fclaw3d_metric_default.c
 )
 
@@ -132,19 +132,16 @@ install(FILES
 	${metric}/fclaw2d_metric.h
 	${metric}/fclaw2d_metric.hpp
 	${metric}/fclaw2d_metric_default_fort.h
-	${metric}/fortran_source2d/fclaw2d_metric_terms.i 
+	${metric}/fortran_source2d/fclaw2d_metric_terms.i
 
   ${metric}/fclaw3d_metric.h
   ${metric}/fclaw3d_metric.hpp
   ${metric}/fclaw3d_metric_default_fort.h
-  DESTINATION include
+  TYPE INCLUDE
 )
 
 install(TARGETS clawpatch
-  EXPORT ${PROJECT_NAME}-targets
-  ARCHIVE DESTINATION lib
-  LIBRARY DESTINATION lib
-  RUNTIME DESTINATION bin)
+  EXPORT ${PROJECT_NAME}-targets)
 
 # -- export name
 set_target_properties(clawpatch PROPERTIES EXPORT_NAME CLAWPATCH)

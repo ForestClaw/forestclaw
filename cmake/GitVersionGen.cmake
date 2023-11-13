@@ -9,24 +9,24 @@
 # This script is intended for use with CMake and shallow copies of repositories.
 
 # Check if the .tarball-version file exists
-if(EXISTS "${CMAKE_SOURCE_DIR}/.tarball-version")
+if(EXISTS "${CMAKE_CURRENT_LIST_DIR}/.tarball-version")
   # If .tarball-version exists, read the version from it and remove the leading character
-  file(READ "${CMAKE_SOURCE_DIR}/.tarball-version" FORESTCLAW_FULL_VERSION)
+  file(READ "${CMAKE_CURRENT_LIST_DIR}/.tarball-version" FORESTCLAW_FULL_VERSION)
   string(STRIP "${FORESTCLAW_FULL_VERSION}" FORESTCLAW_FULL_VERSION)
-else()
+elseif(EXISTS "${CMAKE_CURRENT_LIST_DIR}/.repository-version")
   # If .tarball-version does not exist, read the version number from the .repository-version file and remove the leading character
-  file(READ "${CMAKE_SOURCE_DIR}/.repository-version" FORESTCLAW_FULL_VERSION)
+  file(READ "${CMAKE_CURRENT_LIST_DIR}/.repository-version" FORESTCLAW_FULL_VERSION)
   string(STRIP "${FORESTCLAW_FULL_VERSION}" FORESTCLAW_FULL_VERSION)
 
   # Get the current commit hash (short version) and check if the current commit is tagged with the version number
   find_package(Git)
   if(GIT_FOUND)
-    execute_process(COMMAND ${GIT_EXECUTABLE} rev-parse --short HEAD 
-                    OUTPUT_VARIABLE current_commit 
+    execute_process(COMMAND ${GIT_EXECUTABLE} rev-parse --short HEAD
+                    OUTPUT_VARIABLE current_commit
                     ERROR_QUIET
                     OUTPUT_STRIP_TRAILING_WHITESPACE)
-    execute_process(COMMAND ${GIT_EXECUTABLE} rev-list --abbrev-commit -n 1 "refs/tags/${FORESTCLAW_FULL_VERSION}" 
-                    OUTPUT_VARIABLE tagged_commit 
+    execute_process(COMMAND ${GIT_EXECUTABLE} rev-list --abbrev-commit -n 1 "refs/tags/${FORESTCLAW_FULL_VERSION}"
+                    OUTPUT_VARIABLE tagged_commit
                     ERROR_QUIET
                     OUTPUT_STRIP_TRAILING_WHITESPACE)
 
@@ -36,7 +36,7 @@ else()
     endif()
 
     # Check if the repository is dirty
-    execute_process(COMMAND ${GIT_EXECUTABLE} status --porcelain -uno -z 
+    execute_process(COMMAND ${GIT_EXECUTABLE} status --porcelain -uno -z
                     OUTPUT_VARIABLE git_status
                     ERROR_QUIET)
 
@@ -65,4 +65,4 @@ list(GET FORESTCLAW_VERSION_PARTS 2 FORESTCLAW_VERSION_PATCH)
 
 set(FORESTCLAW_VERSION "${FORESTCLAW_VERSION_MAJOR}.${FORESTCLAW_VERSION_MINOR}.${FORESTCLAW_VERSION_PATCH}")
 
-message (STATUS "ForestClaw version: ${FORESTCLAW_FULL_VERSION}")
+message(STATUS "ForestClaw version: ${FORESTCLAW_FULL_VERSION}")

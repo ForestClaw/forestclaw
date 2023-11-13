@@ -45,14 +45,11 @@ install(FILES
 	operators/fc2d_thunderegg_fivepoint.h
 	operators/fc2d_thunderegg_varpoisson.h
 	operators/fc2d_thunderegg_heat.h
-  DESTINATION include
+  TYPE INCLUDE
 )
 
 install(TARGETS fc2d_thunderegg
-  EXPORT ${PROJECT_NAME}-targets
-  ARCHIVE DESTINATION lib
-  LIBRARY DESTINATION lib
-  RUNTIME DESTINATION bin)
+  EXPORT ${PROJECT_NAME}-targets)
 
 
 # imported target, for use from FetchContent

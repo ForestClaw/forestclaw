@@ -1,12 +1,12 @@
 # we use auxiliary objects for each code language to avoid compiler option mingling
 
 # -- c library
-add_library(forestclaw_c OBJECT 
-  fclaw_base.c 
-  fclaw_options.c 
+add_library(forestclaw_c OBJECT
+  fclaw_base.c
+  fclaw_options.c
   fclaw_filesystem.cpp
-  fclaw_gauges.c 
-  fclaw_package.c 
+  fclaw_gauges.c
+  fclaw_package.c
   fclaw_packing.c
   fclaw_pointer_map.c
   fclaw_math.c
@@ -143,17 +143,17 @@ add_library(FORESTCLAW::FORESTCLAW INTERFACE IMPORTED GLOBAL)
 target_link_libraries(FORESTCLAW::FORESTCLAW INTERFACE forestclaw)
 
 install(FILES
-  fclaw_base.h 
-	fclaw_timer.h 
-	fclaw_package.h 
+  fclaw_base.h
+	fclaw_timer.h
+	fclaw_package.h
   fclaw_packing.h
-	fclaw_pointer_map.h 
-	fclaw_filesystem.h 
-	fclaw_options.h 
-	fclaw_gauges.h 
-	fclaw_mpi.h 
-	fclaw_math.h 
-	fclaw_wrap.h 
+	fclaw_pointer_map.h
+	fclaw_filesystem.h
+	fclaw_options.h
+	fclaw_gauges.h
+	fclaw_mpi.h
+	fclaw_math.h
+	fclaw_wrap.h
 	fclaw_global.h
   fclaw_convenience.h
   fclaw_diagnostics.h
@@ -180,15 +180,15 @@ install(FILES
   fclaw_elliptic_solver.h
   fclaw_output.h
   fclaw_farraybox.hpp
-	forestclaw.h 
-	forestclaw2d.h 
-	fp_exception_glibc_extension.h 
-  fclaw2d_include_all.h 
-	fclaw2d_defs.h 
-	fclaw2d_options.h 
-	fclaw2d_advance.h 
-	fclaw2d_elliptic_solver.h 
-	fclaw2d_farraybox.hpp 
+	forestclaw.h
+	forestclaw2d.h
+	fp_exception_glibc_extension.h
+  fclaw2d_include_all.h
+	fclaw2d_defs.h
+	fclaw2d_options.h
+	fclaw2d_advance.h
+	fclaw2d_elliptic_solver.h
+	fclaw2d_farraybox.hpp
 	fclaw2d_global.h
 	fclaw2d_forestclaw.h
 	fclaw2d_domain.h
@@ -225,17 +225,14 @@ install(FILES
   fclaw3d_patch.h
   fclaw3d_exchange.h
   fclaw3d_options.h
-  fclaw3d_include_all.h 
+  fclaw3d_include_all.h
   fclaw3d_file.h
   fclaw3d_wrap.h
-  DESTINATION include
+  TYPE INCLUDE
 )
 
 install(TARGETS forestclaw
-  EXPORT ${PROJECT_NAME}-targets
-  ARCHIVE DESTINATION lib
-  LIBRARY DESTINATION lib
-  RUNTIME DESTINATION bin)
+  EXPORT ${PROJECT_NAME}-targets)
 
 if(BUILD_TESTING)
   add_executable(forestclaw.TEST
