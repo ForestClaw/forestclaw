@@ -253,91 +253,12 @@ void fclaw_map_2d_c2m_nomap_brick(fclaw_map_context_t * cont, int blockno,
 
 
 /* ----------------------------------------------------------------------------------
-   New maps (torus, cubedsphere, disk) and a utility function for calling maps
-   defined in fortran.
-   ---------------------------------------------------------------------------------- */
-
-#if 0
-
-/* The torus is now defined in its own file in an example directory */
-/** Create a torus mapping for one block with [0, 1]^2 (for now).
- * \param [in] R1       Large radius of the torus.
- * \param [in] R2       Small radius of the torus.
- * \return              Mapping context.
- */
-fclaw_map_context_t *fclaw2d_map_new_torus (double R1, double R2);
-
-/** Create a cubed sphere mapping from six trees.
- * \param [in] R        Radius of the cubed sphere surface.
- * \return              Mapping context.
- */
-
-
-fclaw_map_context_t *fclaw2d_map_new_csphere (double R);
-
-/** Create a planar spherical disk mapping from five trees.
- * It is composed of a center square and one deformed patch on either side.
- * \param [in] R1       Outer radius of the disk.
- * \param [in] R2       Radius at any corner of the inside square.
- * \return              Mapping context.
- */
-fclaw_map_context_t *fclaw2d_map_new_disk (double R1, double R2);
-
-/** Create a mapping context for any number of blocks using a Fortran mapc2m.
- * \param [in] mapc2m   Address of the Fortran mapping function.
- *                      It expects the block number in a Clawpatch COMMON.
- * \param [in] query_results    Results for the queries defined above.
- *                      Be sure to assign them by the symbolic constants
- *                      defined above since these may change in the future.
- * \return              Mapping context.
- */
-fclaw_map_context_t *fclaw2d_map_new_fortran (fclaw2d_map_c2m_fortran_t
-                                                mapc2m,
-                                                const int
-                                                query_results
-                                                [FCLAW2D_MAP_QUERY_LAST]);
-
-#endif
-
-/* ----------------------------------------------------------------------------------
    Pillowsphere utility
    ---------------------------------------------------------------------------------- */
 
 /* This is called to determine is a map is a pillow sphere or not */
 int fclaw_map_pillowsphere(struct fclaw_global* glob);
 
-
-#if 0
-/* ----------------------------------------------------------------------------------
-   No map
-   ---------------------------------------------------------------------------------- */
-
-
-fclaw_map_context_t* fclaw2d_map_new_nomap(void);
-
-#endif
-
-
-
-#if 0
-#define SET_SCALE FCLAW_F77_FUNC_(set_scale, SET_SCALE)
-void SET_SCALE(fclaw_map_context_t* cont, const double scale[]);
-
-#define SET_ROTATION FCLAW_F77_FUNC_(set_rotation, SET_ROTATION)
-void SET_ROTATE(fclaw_map_context_t* cont,const double rot_angle[]);
-
-#define SET_SHIFT FCLAW_F77_FUNC_(set_shift, SET_SHIFT)
-void SET_SHIFT(fclaw_map_context_t* cont,const double shift[]);
-
-#define SCALE_MAP FCLAW_F77_FUNC (scale_map,SCALE_MAP)
-void SCALE_MAP (double *xp, double *yp, double *zp);
-
-#define ROTATE_MAP FCLAW_F77_FUNC (rotate_map,ROTATE_MAP)
-void ROTATE_MAP (double *xp, double *yp, double *zp);
-
-#define SHIFT_MAP FCLAW_F77_FUNC (shift_map,SHIFT_MAP)
-void SHIFT_MAP (double *xp, double *yp, double *zp);
-#endif
 
 /* ----------------------------------------------------------------------------------
    Some mapping utility functions
@@ -360,16 +281,6 @@ void FCLAW_MAP_SET_CONTEXT (fclaw_map_context_t** a_context);
 /* -------------------------------------- No map -------------------------------------- */
 
 fclaw_map_context_t* fclaw_map_new_nomap();
-
-
-/* -------------------------------- Brick mapping ----------------------------------- */
-
-#if 0
-fclaw_map_context_t* fclaw2d_map_new_brick(struct p4est_connectivity* conn,
-                                             int mi,
-                                             int mj);
-#endif                                             
-
 
 
 /* --------------------------------- Square mappings ---------------------------------- */
