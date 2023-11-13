@@ -308,33 +308,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define fclaw2d_map_new_nomap           fclaw3d_map_new_nomap
 
 /* translations for the global data structure */
-#define fclaw2d_iterate_patch_cb        fclaw3d_iterate_patch_cb
-#define fclaw2d_iterate_family_cb       fclaw3d_iterate_family_cb
 #define fclaw2d_domain_integrate_rays   fclaw3d_domain_integrate_rays
 #define fclaw2d_overlap_exchange        fclaw3d_overlap_exchange
-#define fclaw2d_global_t                fclaw3d_global_t
-#define fclaw2d_global_iterate_t        fclaw3d_global_iterate_t
-#define fclaw2d_global_new              fclaw3d_global_new
-#define fclaw2d_global_new_comm         fclaw3d_global_new_comm
-#define fclaw2d_global_destroy          fclaw3d_global_destroy
-#define fclaw2d_global_store_domain     fclaw3d_global_store_domain
-#define fclaw2d_global_store_map        fclaw3d_global_store_map
-#define fclaw2d_global_unpack           fclaw3d_global_unpack
-#define fclaw2d_global_pack             fclaw3d_global_pack
-#define fclaw2d_global_packsize         fclaw3d_global_packsize
-#define fclaw2d_global_iterate_level    fclaw3d_global_iterate_level
-#define fclaw2d_global_iterate_patches  fclaw3d_global_iterate_patches
-#define fclaw2d_global_iterate_families fclaw3d_global_iterate_families
-#define fclaw2d_global_iterate_adapted  fclaw3d_global_iterate_adapted
-#define fclaw2d_global_iterate_level_mthread fclaw3d_global_iterate_level_mthread
-#define fclaw2d_global_iterate_partitioned fclaw3d_global_iterate_partitioned
-#define fclaw2d_global_options_store    fclaw3d_global_options_store
-#define fclaw2d_global_get_options      fclaw3d_global_get_options
-#define fclaw2d_global_set_global       fclaw3d_global_set_global
-#define fclaw2d_global_unset_global     fclaw3d_global_unset_global
-#define fclaw2d_global_get_global       fclaw3d_global_get_global
-#define fclaw2d_set_global_context      fclaw3d_set_global_context
-#define fclaw2d_clear_global_context    fclaw3d_clear_global_context
 
 /* translations for the options */
 #define fclaw2d_options_store           fclaw3d_options_store
