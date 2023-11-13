@@ -301,12 +301,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define fclaw2d_domain_list_adapted     fclaw3d_domain_list_adapted
 #define fclaw2d_domain_search_points    fclaw3d_domain_search_points
 
-/* translations for maps */
-#define fclaw2d_map_context_t           fclaw3d_map_context_t
-#define fclaw2d_map_destroy_t           fclaw3d_map_destroy_t
-#define fclaw2d_map_destroy             fclaw3d_map_destroy
-#define fclaw2d_map_new_nomap           fclaw3d_map_new_nomap
-
 /* translations for the global data structure */
 #define fclaw2d_domain_integrate_rays   fclaw3d_domain_integrate_rays
 #define fclaw2d_overlap_exchange        fclaw3d_overlap_exchange
