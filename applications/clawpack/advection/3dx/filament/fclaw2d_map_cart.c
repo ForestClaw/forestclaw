@@ -11,7 +11,7 @@ extern "C"
 #endif
 
 static int
-fclaw2d_map_query_cart (fclaw2d_map_context_t * cont, int query_identifier)
+fclaw2d_map_query_cart (fclaw_map_context_t * cont, int query_identifier)
 {
     switch (query_identifier)
     {
@@ -60,7 +60,7 @@ fclaw2d_map_query_cart (fclaw2d_map_context_t * cont, int query_identifier)
 
 
 static void
-fclaw2d_map_c2m_cart(fclaw2d_map_context_t * cont, int blockno,
+fclaw2d_map_c2m_cart(fclaw_map_context_t * cont, int blockno,
                      double xc, double yc,
                      double *xp, double *yp, double *zp)
 {
@@ -77,7 +77,7 @@ fclaw2d_map_c2m_cart(fclaw2d_map_context_t * cont, int blockno,
 }
 
 static void
-fclaw3dx_map_c2m_cart(fclaw2d_map_context_t * cont, int blockno,
+fclaw3dx_map_c2m_cart(fclaw_map_context_t * cont, int blockno,
                      double xc,  double yc,  double zc,
                      double *xp, double *yp, double *zp)
 {
@@ -99,13 +99,13 @@ fclaw3dx_map_c2m_cart(fclaw2d_map_context_t * cont, int blockno,
 }
 
 
-fclaw2d_map_context_t* fclaw2d_map_new_cart(fclaw2d_map_context_t *brick,
+fclaw_map_context_t* fclaw2d_map_new_cart(fclaw_map_context_t *brick,
                                             const double scale[],
                                             const double shift[])
 {
-    fclaw2d_map_context_t *cont;
+    fclaw_map_context_t *cont;
 
-    cont = FCLAW_ALLOC_ZERO (fclaw2d_map_context_t, 1);
+    cont = FCLAW_ALLOC_ZERO (fclaw_map_context_t, 1);
     cont->query = fclaw2d_map_query_cart;
     cont->mapc2m = fclaw2d_map_c2m_cart;
     cont->mapc2m_3dx = fclaw2d_map_c2m_cart_3dx;

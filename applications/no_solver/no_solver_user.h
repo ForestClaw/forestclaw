@@ -72,22 +72,22 @@ void no_solver_link_solvers(fclaw2d_global_t* global);
 
 
 /* ------- Mapping functions ------- */
-fclaw2d_map_context_t* fclaw2d_map_new_nomap();
+fclaw_map_context_t* fclaw2d_map_new_nomap();
 
-fclaw2d_map_context_t* fclaw2d_map_new_cart(const double scale[],
+fclaw_map_context_t* fclaw2d_map_new_cart(const double scale[],
                                             const double shift[],
                                             const double rotate[]);
 
-fclaw2d_map_context_t* fclaw2d_map_new_fivepatch(const double scale[],
+fclaw_map_context_t* fclaw2d_map_new_fivepatch(const double scale[],
                                                  const double shift[],
                                                  const double rotate[],
                                                  const double alpha);
 
-fclaw2d_map_context_t* fclaw2d_map_new_pillowdisk(const double scale[],
+fclaw_map_context_t* fclaw2d_map_new_pillowdisk(const double scale[],
                                                   const double shift[],
                                                   const double rotate[]);
 
-fclaw2d_map_context_t* fclaw2d_map_new_pillowdisk5(const double scale[],
+fclaw_map_context_t* fclaw2d_map_new_pillowdisk5(const double scale[],
                                                        const double shift[],
                                                        const double rotate[],
                                                        const double alpha);

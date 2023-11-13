@@ -6,7 +6,7 @@
 #include <fclaw2d_convenience.h>
 
 static int
-fclaw2d_map_query_brick (fclaw2d_map_context_t * cont, int query_identifier)
+fclaw2d_map_query_brick (fclaw_map_context_t * cont, int query_identifier)
 {
     switch (query_identifier)
     {
@@ -56,7 +56,7 @@ fclaw2d_map_query_brick (fclaw2d_map_context_t * cont, int query_identifier)
 }
 
 void
-FCLAW2D_MAP_BRICK_GET_DIM(fclaw2d_map_context_t **cont,
+FCLAW2D_MAP_BRICK_GET_DIM(fclaw_map_context_t **cont,
                           int *mi, int* mj)
 {
     fclaw2d_block_ll_t *bv = (fclaw2d_block_ll_t *) (*cont)->brick->user_data;
@@ -66,7 +66,7 @@ FCLAW2D_MAP_BRICK_GET_DIM(fclaw2d_map_context_t **cont,
 
 
 static void
-fclaw2d_map_c2m_brick(fclaw2d_map_context_t * cont, int blockno,
+fclaw2d_map_c2m_brick(fclaw_map_context_t * cont, int blockno,
                      double xc, double yc,
                      double *xp, double *yp, double *zp)
 {
@@ -77,7 +77,7 @@ fclaw2d_map_c2m_brick(fclaw2d_map_context_t * cont, int blockno,
     *zp = 0;
 }
 
-void fclaw2d_map_destroy_brick(fclaw2d_map_context_t *cont)
+void fclaw2d_map_destroy_brick(fclaw_map_context_t *cont)
 {
     fclaw2d_block_ll_t *bv = (fclaw2d_block_ll_t *) cont->user_data;
     FCLAW_FREE(bv->xv);
@@ -88,14 +88,14 @@ void fclaw2d_map_destroy_brick(fclaw2d_map_context_t *cont)
 }
 
 
-fclaw2d_map_context_t* fclaw2d_map_new_brick_conn
+fclaw_map_context_t* fclaw2d_map_new_brick_conn
   (p4est_connectivity_t *conn, int mi, int mj)
 {
-    fclaw2d_map_context_t *cont;
+    fclaw_map_context_t *cont;
     fclaw2d_block_ll_t *bv;
     int i,nb,vnum;
 
-    cont = FCLAW_ALLOC_ZERO (fclaw2d_map_context_t, 1);
+    cont = FCLAW_ALLOC_ZERO (fclaw_map_context_t, 1);
     cont->query = fclaw2d_map_query_brick;
     cont->mapc2m = fclaw2d_map_c2m_brick;
     cont->destroy = fclaw2d_map_destroy_brick;
@@ -133,15 +133,15 @@ fclaw2d_map_context_t* fclaw2d_map_new_brick_conn
     return cont;
 }
 
-fclaw2d_map_context_t*
+fclaw_map_context_t*
 fclaw2d_map_new_brick (fclaw_domain_t *domain,
                        int mi, int mj, int periodic_i, int periodic_j)
 {
-    fclaw2d_map_context_t *cont;
+    fclaw_map_context_t *cont;
     fclaw2d_block_ll_t *bv;
     int i,nb;
 
-    cont = FCLAW_ALLOC_ZERO (fclaw2d_map_context_t, 1);
+    cont = FCLAW_ALLOC_ZERO (fclaw_map_context_t, 1);
     cont->query = fclaw2d_map_query_brick;
     cont->mapc2m = fclaw2d_map_c2m_brick;
     cont->destroy = fclaw2d_map_destroy_brick;

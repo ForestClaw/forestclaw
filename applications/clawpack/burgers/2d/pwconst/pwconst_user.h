@@ -52,7 +52,7 @@ const user_options_t* pwconst_get_options(fclaw_global_t* glob);
 
 void pwconst_link_solvers(fclaw_global_t *glob);
 
-fclaw2d_map_context_t* fclaw2d_map_new_nomap();
+fclaw_map_context_t* fclaw2d_map_new_nomap();
 
 #ifdef __cplusplus
 #if 0

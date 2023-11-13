@@ -244,7 +244,7 @@ void clawpatch_define(fclaw_global_t* glob,
         fclaw_patch_set_block_corner_count(glob,patch,icorner,0);
     }
 
-    fclaw2d_map_context_t* cont = fclaw2d_map_get(glob);
+    fclaw_map_context_t* cont = fclaw_map_get(glob);
 
     int is_brick;
     if(glob->domain->refine_dim == 2)

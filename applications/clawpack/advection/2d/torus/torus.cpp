@@ -53,10 +53,10 @@ void create_domain(fclaw_global_t *glob)
     /* Create a mapping context (torus based on a brick) */
     const user_options_t *user = (user_options_t*) torus_get_options(glob);
 
-    fclaw2d_map_context_t *brick =
+    fclaw_map_context_t *brick =
               fclaw2d_map_new_brick(domain, mi, mj, a, b);
 
-    fclaw2d_map_context_t *cont  = 
+    fclaw_map_context_t *cont  = 
         fclaw2d_map_new_torus(brick,
                               fclaw_opt->scale,
                               rotate,
@@ -64,7 +64,7 @@ void create_domain(fclaw_global_t *glob)
                               user->beta);
 
     /* Store mapping in the glob */
-    fclaw2d_map_store (glob, cont);            
+    fclaw_map_store (glob, cont);            
 
     /* Store the domain in the glob */
     fclaw_global_store_domain(glob, domain);

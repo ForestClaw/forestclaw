@@ -47,11 +47,11 @@ void filament_create_domain(fclaw_global_t *glob)
     fclaw_domain_t *domain =
         fclaw_domain_new_2d_brick (glob->mpicomm, mi, mj, a, b,
                                       fclaw_opt->minlevel);
-    fclaw2d_map_context_t* brick = 
+    fclaw_map_context_t* brick = 
         fclaw2d_map_new_brick (domain, mi, mj, a, b);
         
     /* Square in [-1,1]x[-1,1], shifted by (1,1,0) */
-    fclaw2d_map_context_t *cont  = 
+    fclaw_map_context_t *cont  = 
         fclaw2d_map_new_cart(brick,
                              fclaw_opt->scale,
                              fclaw_opt->shift);
@@ -59,7 +59,7 @@ void filament_create_domain(fclaw_global_t *glob)
     /* Store domain in the glob */
     fclaw_global_store_domain(glob, domain);
 
-    fclaw2d_map_store (glob, cont);
+    fclaw_map_store (glob, cont);
 
     fclaw_clear_global_context(glob);    
 }

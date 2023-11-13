@@ -109,12 +109,12 @@ void CLAWPACK5_SETAUX_MANIFOLD(const int* mbc,
 
 /* -------------------------------- Mappings ------------------------------------- */
 
-fclaw2d_map_context_t* fclaw2d_map_new_pillowdisk5(const double scale[],
+fclaw_map_context_t* fclaw2d_map_new_pillowdisk5(const double scale[],
                                                    const double shift[],
                                                    const double rotate[],
                                                    const double alpha);
 
-fclaw2d_map_context_t* fclaw2d_map_new_pillowdisk(const double scale[],
+fclaw_map_context_t* fclaw2d_map_new_pillowdisk(const double scale[],
                                                   const double shift[],
                                                   const double rotate[]);
 

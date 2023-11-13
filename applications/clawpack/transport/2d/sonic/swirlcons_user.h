@@ -76,17 +76,17 @@ user_options_t* swirlcons_options_register (fclaw_app_t * app,
                                        const char *configfile);
 
 /* --------------------------------- Mappings ----------------------------------------- */
-fclaw2d_map_context_t* fclaw2d_map_new_fivepatch(const double scale[],
+fclaw_map_context_t* fclaw2d_map_new_fivepatch(const double scale[],
                                                  const double shift[],
                                                  const double rotate[],
                                                  const double alpha);
 
-fclaw2d_map_context_t* fclaw2d_map_new_cart (fclaw2d_map_context_t* brick,
+fclaw_map_context_t* fclaw2d_map_new_cart (fclaw_map_context_t* brick,
                                              const double scale[],
                                              const double shift[],
                                              const double rotate[]);
 
-fclaw2d_map_context_t* fclaw2d_map_new_bilinear(fclaw2d_map_context_t *brick,
+fclaw_map_context_t* fclaw2d_map_new_bilinear(fclaw_map_context_t *brick,
                                                 const double scale[],
                                                 const double shift[],
                                                 const double rotate[],

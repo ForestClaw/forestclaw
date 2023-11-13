@@ -59,14 +59,14 @@ double sphere_patch_update(fclaw2d_domain_t *domain,
                             double t,
                             double dt);
 
-fclaw2d_map_context_t *
-    fclaw2d_map_new_latlong (fclaw2d_map_context_t* brick,
+fclaw_map_context_t *
+    fclaw2d_map_new_latlong (fclaw_map_context_t* brick,
                              const double scale[],
                              const double lat[],
                              const double longitude[],
                              const int a, const int b);
 
-fclaw2d_map_context_t * fclaw2d_map_new_cubedsphere (const double scale[],
+fclaw_map_context_t * fclaw2d_map_new_cubedsphere (const double scale[],
                                                      const double shift[],
                                                      const double rotate[]);
 

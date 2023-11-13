@@ -42,7 +42,7 @@ create_domain(fclaw_global_t * glob)
 
     /* Mapped, multi-block domain */
     fclaw_domain_t *domain;
-    fclaw2d_map_context_t *cont = NULL;
+    fclaw_map_context_t *cont = NULL;
 
     const user_options_t *user = radial_get_options(glob);
     switch (user->example)
@@ -78,7 +78,7 @@ create_domain(fclaw_global_t * glob)
     }
 
     fclaw_global_store_domain (glob, domain);
-    fclaw2d_map_store (glob, cont);
+    fclaw_map_store (glob, cont);
 
     fclaw_domain_list_levels (domain, FCLAW_VERBOSITY_ESSENTIAL);
     fclaw_domain_list_neighbors (domain, FCLAW_VERBOSITY_DEBUG);

@@ -62,7 +62,7 @@ void interface_problem_setup(fclaw_global_t* glob);
 
 void interface_link_solvers(fclaw_global_t *glob);
 
-fclaw2d_map_context_t* fclaw2d_map_new_nomap();
+fclaw_map_context_t* fclaw2d_map_new_nomap();
 
 /* ----------------------------- Fortran code ----------------------------------------- */
 

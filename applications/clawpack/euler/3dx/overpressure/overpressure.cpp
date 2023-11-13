@@ -47,7 +47,7 @@ void create_domain(fclaw_global_t *glob)
 
     /* Mapped, multi-block domain */
     fclaw_domain_t         *domain;
-    fclaw2d_map_context_t    *cont = NULL, *brick = NULL;
+    fclaw_map_context_t    *cont = NULL, *brick = NULL;
 
     fclaw_clawpatch_options_t *clawpatch_opt = fclaw_clawpatch_get_options(glob);
     fc3d_clawpack46_options_t *claw3_opt = fc3d_clawpack46_get_options(glob);
@@ -131,7 +131,7 @@ void create_domain(fclaw_global_t *glob)
 
 
     /* Store mapping in the glob */
-    fclaw2d_map_store (glob, cont);            
+    fclaw_map_store (glob, cont);            
 
     /* Store the domain in the glob */
     fclaw_global_store_domain(glob, domain);

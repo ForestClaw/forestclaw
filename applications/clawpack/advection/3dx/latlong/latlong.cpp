@@ -57,12 +57,12 @@ void create_domain(fclaw_global_t *glob)
                                  fclaw_opt->minlevel);
 
     /* Create brick mapping */
-    fclaw2d_map_context_t *brick =
+    fclaw_map_context_t *brick =
         fclaw2d_map_new_brick(domain, mi, mj, a, b);
 
     /* Create latlong mapping based on brick */
     const user_options_t  *user = latlong_get_options(glob);
-    fclaw2d_map_context_t *cont =
+    fclaw_map_context_t *cont =
         fclaw2d_map_new_latlong(brick,fclaw_opt->scale,
                                 rotate,
                                 user->latitude, 
@@ -72,7 +72,7 @@ void create_domain(fclaw_global_t *glob)
     latlong_map_extrude(cont,user->maxelev);
 
     /* Store mapping in the glob */
-    fclaw2d_map_store (glob, cont);            
+    fclaw_map_store (glob, cont);            
 
     /* Store the domain in the glob */
     fclaw_global_store_domain(glob, domain);

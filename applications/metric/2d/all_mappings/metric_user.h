@@ -100,41 +100,41 @@ void metric_link_patch(fclaw2d_domain_t *domain);
 void metric_diagnostics(fclaw2d_domain_t *domain, const double t);
 
 
-fclaw2d_map_context_t* fclaw2d_map_new_nomap();
+fclaw_map_context_t* fclaw2d_map_new_nomap();
 
-fclaw2d_map_context_t* fclaw2d_map_new_cart(const double scale[],
+fclaw_map_context_t* fclaw2d_map_new_cart(const double scale[],
                                             const double shift[],
                                             const double rotate[]);
 
 
-fclaw2d_map_context_t* fclaw2d_map_new_fivepatch(const double scale[],
+fclaw_map_context_t* fclaw2d_map_new_fivepatch(const double scale[],
                                                  const double shift[],
                                                  const double rotate[],
                                                  const double alpha);
 
-fclaw2d_map_context_t* fclaw2d_map_new_pillowdisk(const double scale[],
+fclaw_map_context_t* fclaw2d_map_new_pillowdisk(const double scale[],
                                                   const double shift[],
                                                   const double rotate[]);
 
-fclaw2d_map_context_t* fclaw2d_map_new_squareddisk(const double scale[],
+fclaw_map_context_t* fclaw2d_map_new_squareddisk(const double scale[],
                                                    const double shift[],
                                                    const double rotate[],
                                                    const double alpha);
 
-fclaw2d_map_context_t* fclaw2d_map_new_pillowsphere(const double scale[],
+fclaw_map_context_t* fclaw2d_map_new_pillowsphere(const double scale[],
                                                     const double shift[],
                                                     const double rotate[]);
 
-fclaw2d_map_context_t* fclaw2d_map_new_cubedsphere(const double scale[],
+fclaw_map_context_t* fclaw2d_map_new_cubedsphere(const double scale[],
                                                    const double shift[],
                                                    const double rotate[]);
 
-fclaw2d_map_context_t* fclaw2d_map_new_pillowdisk5(const double scale[],
+fclaw_map_context_t* fclaw2d_map_new_pillowdisk5(const double scale[],
                                                    const double shift[],
                                                    const double rotate[],
                                                    const double alpha);
 
-fclaw2d_map_context_t* fclaw2d_map_new_torus(const double scale[],
+fclaw_map_context_t* fclaw2d_map_new_torus(const double scale[],
                                              const double shift[],
                                              const double rotate[],
                                              const double alpha);

@@ -47,7 +47,7 @@ namespace{
 struct QuadDomain {
     fclaw_global_t* glob;
     fclaw_options_t fopts;
-    fclaw2d_map_context_t    *map;
+    fclaw_map_context_t    *map;
     fclaw_domain_t  *domain;
     fclaw_clawpatch_options_t* opts;
 
@@ -83,7 +83,7 @@ struct QuadDomain {
         fclaw_global_store_domain(glob, domain);
 
         map = fclaw2d_map_new_nomap();
-        fclaw2d_map_store(glob,map);
+        fclaw_map_store(glob,map);
 
         fclaw_vtables_initialize(glob);
         fclaw_clawpatch_vtable_initialize(glob, 4);
@@ -111,7 +111,7 @@ struct QuadDomain {
 struct QuadDomainBrick {
     fclaw_global_t* glob;
     fclaw_options_t fopts;
-    fclaw2d_map_context_t* map;
+    fclaw_map_context_t* map;
     fclaw_domain_t *domain;
     fclaw_clawpatch_options_t* opts;
 
@@ -148,7 +148,7 @@ struct QuadDomainBrick {
         fclaw_global_store_domain(glob, domain);
 
         map = fclaw2d_map_new_nomap();
-        fclaw2d_map_store(glob, map);
+        fclaw_map_store(glob, map);
 
         fclaw_vtables_initialize(glob);
         fclaw_clawpatch_vtable_initialize(glob, 4);

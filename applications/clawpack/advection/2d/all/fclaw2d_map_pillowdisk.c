@@ -13,7 +13,7 @@ extern "C"
 
 
 static int
-fclaw2d_map_query_pillowdisk (fclaw2d_map_context_t * cont, int query_identifier)
+fclaw2d_map_query_pillowdisk (fclaw_map_context_t * cont, int query_identifier)
 {
 
     switch (query_identifier)
@@ -61,7 +61,7 @@ fclaw2d_map_query_pillowdisk (fclaw2d_map_context_t * cont, int query_identifier
 
 
 static void
-fclaw2d_map_c2m_pillowdisk(fclaw2d_map_context_t * cont, int blockno,
+fclaw2d_map_c2m_pillowdisk(fclaw_map_context_t * cont, int blockno,
                       double xc, double yc,
                       double *xp, double *yp, double *zp)
 {
@@ -76,13 +76,13 @@ fclaw2d_map_c2m_pillowdisk(fclaw2d_map_context_t * cont, int blockno,
     }
 }
 
-fclaw2d_map_context_t* fclaw2d_map_new_pillowdisk(const double scale[],
+fclaw_map_context_t* fclaw2d_map_new_pillowdisk(const double scale[],
                                                   const double shift[],
                                                   const double rotate[])
 {
-    fclaw2d_map_context_t *cont;
+    fclaw_map_context_t *cont;
 
-    cont = FCLAW_ALLOC_ZERO (fclaw2d_map_context_t, 1);
+    cont = FCLAW_ALLOC_ZERO (fclaw_map_context_t, 1);
     cont->query = fclaw2d_map_query_pillowdisk;
     cont->mapc2m = fclaw2d_map_c2m_pillowdisk;
 

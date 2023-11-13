@@ -35,7 +35,7 @@ static unsigned fclaw2d_p4est_magic;
    sc_hash_function_string ("fclaw2d_p4est_magic", NULL)))
 
 static int
-fclaw2d_p4est_map_query (fclaw2d_map_context_t * cont, int query_identifier)
+fclaw2d_p4est_map_query (fclaw_map_context_t * cont, int query_identifier)
 {
     P4EST_ASSERT (cont->magic == FCLAW2D_P4EST_MAGIC);
 
@@ -57,7 +57,7 @@ fclaw2d_p4est_map_query (fclaw2d_map_context_t * cont, int query_identifier)
 }
 
 static void
-fclaw2d_p4est_map_c2m (fclaw2d_map_context_t * cont, int blockno,
+fclaw2d_p4est_map_c2m (fclaw_map_context_t * cont, int blockno,
                        double cx, double cy,
                        double *mx, double *my, double *mz)
 {
@@ -75,14 +75,14 @@ fclaw2d_p4est_map_c2m (fclaw2d_map_context_t * cont, int blockno,
     *mz = xyzp[2];
 }
 
-fclaw2d_map_context_t *
+fclaw_map_context_t *
 fclaw2d_p4est_map_new (const p4est_connectivity_t * conn)
 {
-    fclaw2d_map_context_t *cont;
+    fclaw_map_context_t *cont;
 
     P4EST_ASSERT (conn->vertices != NULL);
 
-    cont = P4EST_ALLOC_ZERO (fclaw2d_map_context_t, 1);
+    cont = P4EST_ALLOC_ZERO (fclaw_map_context_t, 1);
     cont->magic = FCLAW2D_P4EST_MAGIC;
     cont->query = fclaw2d_p4est_map_query;
     cont->mapc2m = fclaw2d_p4est_map_c2m;
@@ -92,7 +92,7 @@ fclaw2d_p4est_map_new (const p4est_connectivity_t * conn)
 }
 
 void
-fclaw2d_p4est_map_destroy (fclaw2d_map_context_t * cont)
+fclaw2d_p4est_map_destroy (fclaw_map_context_t * cont)
 {
     P4EST_ASSERT (cont->magic == FCLAW2D_P4EST_MAGIC);
     P4EST_FREE (cont);

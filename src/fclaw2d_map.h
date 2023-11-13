@@ -52,7 +52,7 @@ typedef void (*fclaw2d_map_c2m_fortran_t) (const double *xc, const double *yc,
 
 #define FCLAW2D_MAP_QUERY FCLAW_F77_FUNC_(fclaw2d_map_query,FCLAW2D_MAP_QUERY)
 
-typedef struct fclaw2d_map_context fclaw2d_map_context_t;
+typedef struct fclaw2d_map_context fclaw_map_context_t;
 typedef struct fclaw2d_map_data fclaw2d_map_data_t;
 
 /** This function is used to query the map for general properties.
@@ -61,7 +61,7 @@ typedef struct fclaw2d_map_data fclaw2d_map_data_t;
  *                      Be sure to use the symbolic constants above.
  * \return              Result of the query.
  */
-typedef int (*fclaw2d_map_query_t) (fclaw2d_map_context_t * cont,
+typedef int (*fclaw2d_map_query_t) (fclaw_map_context_t * cont,
                                     int query_identifier);
 
 /** This function performs the coordinate transformation.
@@ -73,33 +73,33 @@ typedef int (*fclaw2d_map_query_t) (fclaw2d_map_context_t * cont,
  * \param [out] yp      Transformed y-coordinate.
  * \param [out] zp      Transformed z-coordinate.
  */
-typedef void (*fclaw2d_map_c2m_t) (fclaw2d_map_context_t * cont, int blockno,
+typedef void (*fclaw2d_map_c2m_t) (fclaw_map_context_t * cont, int blockno,
                                    double xc, double yc,
                                    double *xp, double *yp, double *zp);
 
 
 
 /* Covariant and contravariant basis vectors needed for exact solution */
-typedef void (*fclaw2d_map_c2m_basis_t)(fclaw2d_map_context_t * cont, 
+typedef void (*fclaw2d_map_c2m_basis_t)(fclaw_map_context_t * cont, 
                                         double xc, double yc, 
                                         double *t, double *tinv, 
                                         double *tderivs, int flag);
 
 /* For extruded mesh mappings */
-typedef void (*fclaw3dx_map_c2m_t) (fclaw2d_map_context_t * cont, int blockno,
+typedef void (*fclaw3dx_map_c2m_t) (fclaw_map_context_t * cont, int blockno,
                                    double xc, double yc,double zc,
                                    double *xp, double *yp, double *zp);
 
 
 /* Covariant and contravariant basis vectors needed for exact solution */
-typedef void (*fclaw3dx_map_c2m_basis_t)(fclaw2d_map_context_t * cont, 
+typedef void (*fclaw3dx_map_c2m_basis_t)(fclaw_map_context_t * cont, 
                                         double xc, double yc, double zc,
                                         double *t, double *tinv, 
                                         double *tderivs, int flag);
 
 /** Destructor for a fclaw2d_map_context.
  */
-typedef void (*fclaw2d_map_destroy_t) (fclaw2d_map_context_t * cont);
+typedef void (*fclaw2d_map_destroy_t) (fclaw_map_context_t * cont);
 
 /** Mapping context that is interpreted by its query and c2m members.
  * The callbacks are free to define the meaning of the user_* fields.
@@ -129,7 +129,7 @@ struct fclaw2d_map_context
     double shift[3];
     double rotate[9];
 
-    fclaw2d_map_context_t *brick;
+    fclaw_map_context_t *brick;
     void *user_data;
 };
 
@@ -139,8 +139,8 @@ struct fclaw2d_map_context
  * @param glob the global context
  * @param map the map to store
  */
-void fclaw2d_map_store (fclaw_global_t* glob,
-                        struct fclaw2d_map_context * map);
+void fclaw_map_store (fclaw_global_t* glob,
+                      struct fclaw2d_map_context * map);
 
 /**
  * Get map from the glob
@@ -148,21 +148,21 @@ void fclaw2d_map_store (fclaw_global_t* glob,
  * @param the global context
  * @return the map
  */
-fclaw2d_map_context_t* fclaw2d_map_get(fclaw_global_t* glob);
+fclaw_map_context_t* fclaw_map_get(fclaw_global_t* glob);
 
 
 
-void set_scale(fclaw2d_map_context_t* cont, const double scale[]);
-void set_shift(fclaw2d_map_context_t* cont, const double shift[]);
-void set_rotate(fclaw2d_map_context_t* cont, const double rotate[]);
+void set_scale(fclaw_map_context_t* cont, const double scale[]);
+void set_shift(fclaw_map_context_t* cont, const double shift[]);
+void set_rotate(fclaw_map_context_t* cont, const double rotate[]);
 void set_default_transform(double scale[],double shift[],double rotate[]);
 
 
-void scale_map(fclaw2d_map_context_t* cont,
+void scale_map(fclaw_map_context_t* cont,
                double *xp, double *yp, double *zp);
-void shift_map(fclaw2d_map_context_t* cont,
+void shift_map(fclaw_map_context_t* cont,
                double *xp, double *yp, double *zp);
-void rotate_map(fclaw2d_map_context_t* cont,
+void rotate_map(fclaw_map_context_t* cont,
                 double *xp, double *yp, double *zp);
 
 #define SET_ROTATION_MATRIX FCLAW_F77_FUNC (set_rotation_matrix,SET_ROTATION_MATRIX)
@@ -178,7 +178,7 @@ void SET_ROTATION_MATRIX (const double rot_angles[],double rrot[]);
  */
 
 
-void FCLAW2D_MAP_QUERY (fclaw2d_map_context_t ** cont,
+void FCLAW2D_MAP_QUERY (fclaw_map_context_t ** cont,
                         const int *query_identifier, int *iresult);
 
 
@@ -194,7 +194,7 @@ void FCLAW2D_MAP_QUERY (fclaw2d_map_context_t ** cont,
  */
 
 #define FCLAW2D_MAP_C2M FCLAW_F77_FUNC_(fclaw2d_map_c2m,FCLAW2D_MAP_C2M)
-void FCLAW2D_MAP_C2M (fclaw2d_map_context_t ** cont, int *blockno,
+void FCLAW2D_MAP_C2M (fclaw_map_context_t ** cont, int *blockno,
                       const double *xc, const double *yc,
                       double *xp, double *yp, double *zp);
 
@@ -202,14 +202,14 @@ void FCLAW2D_MAP_C2M (fclaw2d_map_context_t ** cont, int *blockno,
 #define FCLAW2D_MAP_C2M_BASIS FCLAW_F77_FUNC_(fclaw2d_map_c2m_basis, \
                                               FCLAW2D_MAP_C2M_BASIS)
 
-void FCLAW2D_MAP_C2M_BASIS (fclaw2d_map_context_t ** cont, 
+void FCLAW2D_MAP_C2M_BASIS (fclaw_map_context_t ** cont, 
                             const double *xc, const double *yc,
                             double *t, double *tinv, double *tderivs,
                             int * flag);
 
 
 #define FCLAW3D_MAP_C2M FCLAW_F77_FUNC_(fclaw3d_map_c2m,FCLAW3D_MAP_C2M)
-void FCLAW3D_MAP_C2M (fclaw2d_map_context_t ** cont, int *blockno,
+void FCLAW3D_MAP_C2M (fclaw_map_context_t ** cont, int *blockno,
                       const double *xc, const double *yc, const double *zc,
                       double *xp, double *yp, double *zp);
 
@@ -217,7 +217,7 @@ void FCLAW3D_MAP_C2M (fclaw2d_map_context_t ** cont, int *blockno,
 #define FCLAW3D_MAP_C2M_BASIS FCLAW_F77_FUNC_(fclaw3d_map_c2m_basis, \
                                               FCLAW3D_MAP_C2M_BASIS)
 
-void FCLAW3D_MAP_C2M_BASIS (fclaw2d_map_context_t ** cont, 
+void FCLAW3D_MAP_C2M_BASIS (fclaw_map_context_t ** cont, 
                             const double *xc, const double *yc, const double *zc,
                             double *t, double *tinv, double *tderivs,
                             int * flag);
@@ -235,7 +235,7 @@ void FCLAW3D_MAP_C2M_BASIS (fclaw2d_map_context_t ** cont,
 
 #define FCLAW2D_MAP_BRICK2C FCLAW_F77_FUNC_(fclaw2d_map_brick2c, \
                                             FCLAW2D_MAP_BRICK2C)
-void FCLAW2D_MAP_BRICK2C (fclaw2d_map_context_t ** cont, int *blockno,
+void FCLAW2D_MAP_BRICK2C (fclaw_map_context_t ** cont, int *blockno,
                           const double *xc, const double *yc,
                           double *xp, double *yp, double *zp);
 
@@ -246,10 +246,10 @@ void FCLAW2D_MAP_BRICK2C (fclaw2d_map_context_t ** cont, int *blockno,
  * \param [in] cont     Mapping context where the \a destroy member is either
  *                      NULL or a valid function that is then called.
  */
-void fclaw2d_map_destroy (fclaw2d_map_context_t * cont);
+void fclaw2d_map_destroy (fclaw_map_context_t * cont);
 
-fclaw2d_map_context_t* fclaw2d_map_new_nomap_brick(fclaw2d_map_context_t* brick);
-void fclaw2d_map_c2m_nomap_brick(fclaw2d_map_context_t * cont, int blockno,
+fclaw_map_context_t* fclaw2d_map_new_nomap_brick(fclaw_map_context_t* brick);
+void fclaw2d_map_c2m_nomap_brick(fclaw_map_context_t * cont, int blockno,
                                  double xc, double yc,
                                  double *xp, double* yp, double *zp);
 
@@ -267,7 +267,7 @@ void fclaw2d_map_c2m_nomap_brick(fclaw2d_map_context_t * cont, int blockno,
  * \param [in] R2       Small radius of the torus.
  * \return              Mapping context.
  */
-fclaw2d_map_context_t *fclaw2d_map_new_torus (double R1, double R2);
+fclaw_map_context_t *fclaw2d_map_new_torus (double R1, double R2);
 
 /** Create a cubed sphere mapping from six trees.
  * \param [in] R        Radius of the cubed sphere surface.
@@ -275,7 +275,7 @@ fclaw2d_map_context_t *fclaw2d_map_new_torus (double R1, double R2);
  */
 
 
-fclaw2d_map_context_t *fclaw2d_map_new_csphere (double R);
+fclaw_map_context_t *fclaw2d_map_new_csphere (double R);
 
 /** Create a planar spherical disk mapping from five trees.
  * It is composed of a center square and one deformed patch on either side.
@@ -283,7 +283,7 @@ fclaw2d_map_context_t *fclaw2d_map_new_csphere (double R);
  * \param [in] R2       Radius at any corner of the inside square.
  * \return              Mapping context.
  */
-fclaw2d_map_context_t *fclaw2d_map_new_disk (double R1, double R2);
+fclaw_map_context_t *fclaw2d_map_new_disk (double R1, double R2);
 
 /** Create a mapping context for any number of blocks using a Fortran mapc2m.
  * \param [in] mapc2m   Address of the Fortran mapping function.
@@ -293,7 +293,7 @@ fclaw2d_map_context_t *fclaw2d_map_new_disk (double R1, double R2);
  *                      defined above since these may change in the future.
  * \return              Mapping context.
  */
-fclaw2d_map_context_t *fclaw2d_map_new_fortran (fclaw2d_map_c2m_fortran_t
+fclaw_map_context_t *fclaw2d_map_new_fortran (fclaw2d_map_c2m_fortran_t
                                                 mapc2m,
                                                 const int
                                                 query_results
@@ -310,7 +310,7 @@ fclaw2d_map_context_t *fclaw2d_map_new_fortran (fclaw2d_map_c2m_fortran_t
     We provide an alternative, temporarily called fclaw2d_map_new_brick_domain,
     in the fclaw2d_map_brick files.
  */
-fclaw2d_map_context_t* fclaw2d_map_new_brick_conn
+fclaw_map_context_t* fclaw2d_map_new_brick_conn
    (struct p4est_connectivity* conn, int mi, int mj);
 
 
@@ -328,7 +328,7 @@ int fclaw2d_map_pillowsphere(struct fclaw_global* glob);
    ---------------------------------------------------------------------------------- */
 
 
-fclaw2d_map_context_t* fclaw2d_map_new_nomap(void);
+fclaw_map_context_t* fclaw2d_map_new_nomap(void);
 
 #endif
 
@@ -336,13 +336,13 @@ fclaw2d_map_context_t* fclaw2d_map_new_nomap(void);
 
 #if 0
 #define SET_SCALE FCLAW_F77_FUNC_(set_scale, SET_SCALE)
-void SET_SCALE(fclaw2d_map_context_t* cont, const double scale[]);
+void SET_SCALE(fclaw_map_context_t* cont, const double scale[]);
 
 #define SET_ROTATION FCLAW_F77_FUNC_(set_rotation, SET_ROTATION)
-void SET_ROTATE(fclaw2d_map_context_t* cont,const double rot_angle[]);
+void SET_ROTATE(fclaw_map_context_t* cont,const double rot_angle[]);
 
 #define SET_SHIFT FCLAW_F77_FUNC_(set_shift, SET_SHIFT)
-void SET_SHIFT(fclaw2d_map_context_t* cont,const double shift[]);
+void SET_SHIFT(fclaw_map_context_t* cont,const double shift[]);
 
 #define SCALE_MAP FCLAW_F77_FUNC (scale_map,SCALE_MAP)
 void SCALE_MAP (double *xp, double *yp, double *zp);
@@ -365,7 +365,7 @@ void SET_BLOCK(const int * a_blockno);
 
 #define FCLAW_MAP_SET_CONTEXT FCLAW_F77_FUNC (fclaw_map_set_context, \
                                               FCLAW_MAP_SET_CONTEXT)
-void FCLAW_MAP_SET_CONTEXT (fclaw2d_map_context_t** a_context);
+void FCLAW_MAP_SET_CONTEXT (fclaw_map_context_t** a_context);
 
 
 /* ----------------------------------------------------------------------------------
@@ -374,13 +374,13 @@ void FCLAW_MAP_SET_CONTEXT (fclaw2d_map_context_t** a_context);
 
 /* -------------------------------------- No map -------------------------------------- */
 
-fclaw2d_map_context_t* fclaw2d_map_new_nomap();
+fclaw_map_context_t* fclaw2d_map_new_nomap();
 
 
 /* -------------------------------- Brick mapping ----------------------------------- */
 
 #if 0
-fclaw2d_map_context_t* fclaw2d_map_new_brick(struct p4est_connectivity* conn,
+fclaw_map_context_t* fclaw2d_map_new_brick(struct p4est_connectivity* conn,
                                              int mi,
                                              int mj);
 #endif                                             
@@ -389,39 +389,39 @@ fclaw2d_map_context_t* fclaw2d_map_new_brick(struct p4est_connectivity* conn,
 
 /* --------------------------------- Square mappings ---------------------------------- */
 
-fclaw2d_map_context_t* fclaw2d_map_new_identity(fclaw2d_map_context_t *brick);
+fclaw_map_context_t* fclaw2d_map_new_identity(fclaw_map_context_t *brick);
 
-fclaw2d_map_context_t* fclaw2d_map_new_cart(fclaw2d_map_context_t* brick,
+fclaw_map_context_t* fclaw2d_map_new_cart(fclaw_map_context_t* brick,
                                             const double scale[],
                                             const double shift[]);
   
-fclaw2d_map_context_t* fclaw2d_map_new_fivepatch(const double scale[],
+fclaw_map_context_t* fclaw2d_map_new_fivepatch(const double scale[],
                                                  const double shift[],
                                                  const double alpha);
 
-fclaw2d_map_context_t* fclaw2d_map_new_squareddisk(const double scale[],
+fclaw_map_context_t* fclaw2d_map_new_squareddisk(const double scale[],
                                                    const double shift[],
                                                    const double alpha);
   
-fclaw2d_map_context_t* fclaw2d_map_new_bilinear(fclaw2d_map_context_t *brick,
+fclaw_map_context_t* fclaw2d_map_new_bilinear(fclaw_map_context_t *brick,
                                                 const double scale[],
                                                 const double shift[],
                                                 const double center[]);
 
 /* ---------------------------------- Disk mappings ----------------------------------- */
 
-fclaw2d_map_context_t* fclaw2d_map_new_pillowdisk(const double scale[],
+fclaw_map_context_t* fclaw2d_map_new_pillowdisk(const double scale[],
                                                   const double shift[],
                                                   const double rotate[]);
 
-fclaw2d_map_context_t* fclaw2d_map_new_pillowdisk5(const double scale[],
+fclaw_map_context_t* fclaw2d_map_new_pillowdisk5(const double scale[],
                                                    const double shift[],
                                                    const double rotate[],
                                                    const double alpha);
 
 /* --------------------------------- Annulus mapping ---------------------------------- */
-fclaw2d_map_context_t *
-    fclaw2d_map_new_annulus (fclaw2d_map_context_t* brick,
+fclaw_map_context_t *
+    fclaw2d_map_new_annulus (fclaw_map_context_t* brick,
                              const double scale[],
                              const double rotate[],
                              const double alpha,
@@ -429,8 +429,8 @@ fclaw2d_map_context_t *
 
 
 /* --------------------------------- Latlong mapping ---------------------------------- */
-fclaw2d_map_context_t *
-    fclaw2d_map_new_latlong (fclaw2d_map_context_t* brick,
+fclaw_map_context_t *
+    fclaw2d_map_new_latlong (fclaw_map_context_t* brick,
                              const double scale[],
                              const double rotate[],
                              const double lat[],
@@ -439,21 +439,21 @@ fclaw2d_map_context_t *
 
 /* --------------------------------- Hemisphere mappings ------------------------------ */
 
-fclaw2d_map_context_t* fclaw2d_map_new_pillowsphere5(const double scale[],
+fclaw_map_context_t* fclaw2d_map_new_pillowsphere5(const double scale[],
                                                      const double rotate[],
                                                      const double alpha);
 
 /* --------------------------------- Sphere mappings ---------------------------------- */
 
-fclaw2d_map_context_t* fclaw2d_map_new_pillowsphere(const double scale[],
+fclaw_map_context_t* fclaw2d_map_new_pillowsphere(const double scale[],
                                                     const double rotate[]);
 
-fclaw2d_map_context_t * fclaw2d_map_new_cubedsphere (const double scale[],
+fclaw_map_context_t * fclaw2d_map_new_cubedsphere (const double scale[],
                                                      const double rotate[]);
 
 /* --------------------------------- Torus mappings ---------------------------------- */
-fclaw2d_map_context_t *
-    fclaw2d_map_new_torus (fclaw2d_map_context_t* brick,
+fclaw_map_context_t *
+    fclaw2d_map_new_torus (fclaw_map_context_t* brick,
                            const double scale[],
                            const double rotate[],
                            const double alpha,

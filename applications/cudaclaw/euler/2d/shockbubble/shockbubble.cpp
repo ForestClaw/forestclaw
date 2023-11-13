@@ -43,7 +43,7 @@ void create_domain(fclaw2d_global_t* glob)
         fclaw2d_domain_new_brick(glob->mpicomm, mi, mj, a, b, fclaw_opt->minlevel);
 
     /* Use [ax,bx]x[ay,by] */
-    fclaw2d_map_context_t    *cont = NULL, *brick = NULL;
+    fclaw_map_context_t    *cont = NULL, *brick = NULL;
     brick = fclaw2d_map_new_brick (domain, mi, mj, a, b);
     cont = fclaw2d_map_new_nomap_brick(brick);
 

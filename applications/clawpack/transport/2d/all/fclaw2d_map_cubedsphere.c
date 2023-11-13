@@ -25,7 +25,7 @@ void MAP2COMP(double* xp, double* yp, double* zp, double* xc1, double* yc1);
 
 
 static int
-fclaw2d_map_query_cubedsphere (fclaw2d_map_context_t * cont, int query_identifier)
+fclaw2d_map_query_cubedsphere (fclaw_map_context_t * cont, int query_identifier)
 {
     switch (query_identifier)
     {
@@ -75,7 +75,7 @@ fclaw2d_map_query_cubedsphere (fclaw2d_map_context_t * cont, int query_identifie
 
 
 static void
-fclaw2d_map_c2m_basis_cubedsphere(fclaw2d_map_context_t * cont,
+fclaw2d_map_c2m_basis_cubedsphere(fclaw_map_context_t * cont,
                                   double xc, double yc, 
                                   double *t, double *tinv, 
                                   double *tderivs, int flag)
@@ -88,7 +88,7 @@ fclaw2d_map_c2m_basis_cubedsphere(fclaw2d_map_context_t * cont,
 
 
 static void
-fclaw2d_map_c2m_cubedsphere (fclaw2d_map_context_t * cont, int blockno,
+fclaw2d_map_c2m_cubedsphere (fclaw_map_context_t * cont, int blockno,
                          double xc, double yc,
                          double *xp, double *yp, double *zp)
 {
@@ -100,12 +100,12 @@ fclaw2d_map_c2m_cubedsphere (fclaw2d_map_context_t * cont, int blockno,
 #endif    
 }
 
-fclaw2d_map_context_t * fclaw2d_map_new_cubedsphere(const double scale[],
+fclaw_map_context_t * fclaw2d_map_new_cubedsphere(const double scale[],
                                                     const double rotate[])
 {
-    fclaw2d_map_context_t *cont;
+    fclaw_map_context_t *cont;
 
-    cont = FCLAW_ALLOC_ZERO (fclaw2d_map_context_t, 1);
+    cont = FCLAW_ALLOC_ZERO (fclaw_map_context_t, 1);
     cont->query = fclaw2d_map_query_cubedsphere;
     cont->mapc2m = fclaw2d_map_c2m_cubedsphere;
     cont->basis = fclaw2d_map_c2m_basis_cubedsphere;

@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /* User defined extruded mesh mapping */
 static void
-latlong_map_3dx(fclaw2d_map_context_t * cont, int blockno,
+latlong_map_3dx(fclaw_map_context_t * cont, int blockno,
                double xc, double yc, double zc,
                double *xp, double *yp, double *zp)
 {
@@ -64,7 +64,7 @@ latlong_map_3dx(fclaw2d_map_context_t * cont, int blockno,
 }
 
 
-void latlong_map_extrude(fclaw2d_map_context_t* cont,
+void latlong_map_extrude(fclaw_map_context_t* cont,
                          const double maxelev)
 
 {

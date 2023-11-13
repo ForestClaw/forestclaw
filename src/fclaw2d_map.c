@@ -42,35 +42,35 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef P4_TO_P8
 
 void
-fclaw2d_map_store (fclaw_global_t* glob,
-                          fclaw2d_map_context_t * map)
+fclaw_map_store (fclaw_global_t* glob,
+                          fclaw_map_context_t * map)
 {
     fclaw_global_attribute_store(glob, MAP_KEY, map, NULL);
 }
 
-fclaw2d_map_context_t*
-fclaw2d_map_get(fclaw_global_t* glob)
+fclaw_map_context_t*
+fclaw_map_get(fclaw_global_t* glob)
 {
-    return (fclaw2d_map_context_t*) fclaw_global_get_attribute(glob,MAP_KEY);
+    return (fclaw_map_context_t*) fclaw_global_get_attribute(glob,MAP_KEY);
 }
 
 /* This function can be called from Fortran inside of ClawPatch. */
 void
-FCLAW2D_MAP_QUERY (fclaw2d_map_context_t ** pcont,
+FCLAW2D_MAP_QUERY (fclaw_map_context_t ** pcont,
                    const int *query_identifier, int *iresult)
 {
-    fclaw2d_map_context_t *cont = *pcont;
+    fclaw_map_context_t *cont = *pcont;
     *iresult = cont->query (cont, *query_identifier);
 }
 
 /* This function can be called from Fortran inside of ClawPatch. */
 
 void
-FCLAW2D_MAP_C2M (fclaw2d_map_context_t ** pcont, int *blockno,
+FCLAW2D_MAP_C2M (fclaw_map_context_t ** pcont, int *blockno,
                  const double *xc, const double *yc,
                  double *xp, double *yp, double *zp)
 {
-    fclaw2d_map_context_t *cont = *pcont;
+    fclaw_map_context_t *cont = *pcont;
     FCLAW_ASSERT(cont->mapc2m != NULL);
     cont->mapc2m (cont, *blockno, *xc, *yc, xp, yp, zp);
 }
@@ -79,12 +79,12 @@ FCLAW2D_MAP_C2M (fclaw2d_map_context_t ** pcont, int *blockno,
 /* This function can be called from Fortran inside of ClawPatch. */
 
 void
-FCLAW2D_MAP_C2M_BASIS (fclaw2d_map_context_t ** pcont,
+FCLAW2D_MAP_C2M_BASIS (fclaw_map_context_t ** pcont,
                        const double *xc, const double *yc,
                        double *t, double *tinv, double *tderivs,
                        int *flag)
 {
-    fclaw2d_map_context_t *cont = *pcont;
+    fclaw_map_context_t *cont = *pcont;
     FCLAW_ASSERT(cont->basis != NULL);
 
     cont->basis (cont, *xc, *yc, t, tinv, tderivs, *flag);
@@ -98,11 +98,11 @@ FCLAW2D_MAP_C2M_BASIS (fclaw2d_map_context_t ** pcont,
 
 //#if PATCH_DIM == 3 && REFINE_DIM == 2
 void
-FCLAW3D_MAP_C2M (fclaw2d_map_context_t ** pcont, int *blockno,
+FCLAW3D_MAP_C2M (fclaw_map_context_t ** pcont, int *blockno,
                  const double *xc, const double *yc, const double *zc,
                  double *xp, double *yp, double *zp)
 {
-    fclaw2d_map_context_t *cont = *pcont;
+    fclaw_map_context_t *cont = *pcont;
     FCLAW_ASSERT(cont->mapc2m_3dx != NULL);
     cont->mapc2m_3dx (cont, *blockno, *xc, *yc, *zc, xp, yp, zp);
 }
@@ -110,12 +110,12 @@ FCLAW3D_MAP_C2M (fclaw2d_map_context_t ** pcont, int *blockno,
 
 
 void
-FCLAW3D_MAP_C2M_BASIS (fclaw2d_map_context_t ** pcont,
+FCLAW3D_MAP_C2M_BASIS (fclaw_map_context_t ** pcont,
                        const double *xc, const double *yc, const double *zc, 
                        double *t, double *tinv, double *tderivs,
                        int *flag)
 {
-    fclaw2d_map_context_t *cont = *pcont;
+    fclaw_map_context_t *cont = *pcont;
     FCLAW_ASSERT(cont->basis_3dx != NULL);
 
     /* DAC : Still need to decide what should go here */
@@ -123,15 +123,15 @@ FCLAW3D_MAP_C2M_BASIS (fclaw2d_map_context_t ** pcont,
 }
 //#endif
 
-void FCLAW2D_MAP_BRICK2C (fclaw2d_map_context_t ** pcont, int *blockno,
+void FCLAW2D_MAP_BRICK2C (fclaw_map_context_t ** pcont, int *blockno,
                           const double *xc, const double *yc,
                           double *xp, double *yp, double *zp)
 {
-    fclaw2d_map_context_t *cont = *pcont;
+    fclaw_map_context_t *cont = *pcont;
 
     if (cont->brick != NULL)
     {
-        fclaw2d_map_context_t *brick = cont->brick;  
+        fclaw_map_context_t *brick = cont->brick;  
         brick->mapc2m (brick, *blockno, *xc, *yc, xp, yp, zp);
     }
     else
@@ -147,7 +147,7 @@ void FCLAW2D_MAP_BRICK2C (fclaw2d_map_context_t ** pcont, int *blockno,
 
 /* This function is expected to be called from C or C++. */
 void
-fclaw2d_map_destroy (fclaw2d_map_context_t * cont)
+fclaw2d_map_destroy (fclaw_map_context_t * cont)
 {
 #ifndef P4_TO_P8
     if (cont->brick != NULL)
@@ -173,7 +173,7 @@ fclaw2d_map_destroy (fclaw2d_map_context_t * cont)
 /* Cubed sphere surface.  Matches p4est_connectivity_new_cubed (). */
 
 static int
-fclaw2d_map_query_csphere (fclaw2d_map_context_t * cont, int query_identifier)
+fclaw2d_map_query_csphere (fclaw_map_context_t * cont, int query_identifier)
 {
     switch (query_identifier)
     {
@@ -236,7 +236,7 @@ fclaw2d_map_c2m_csphere_help (double R, double xi, double eta,
 }
 
 static void
-fclaw2d_map_c2m_csphere (fclaw2d_map_context_t * cont, int blockno,
+fclaw2d_map_c2m_csphere (fclaw_map_context_t * cont, int blockno,
                          double xc, double yc,
                          double *xp, double *yp, double *zp)
 {
@@ -270,14 +270,14 @@ fclaw2d_map_c2m_csphere (fclaw2d_map_context_t * cont, int blockno,
     }
 }
 
-fclaw2d_map_context_t *
+fclaw_map_context_t *
 fclaw2d_map_new_csphere (double R)
 {
-    fclaw2d_map_context_t *cont;
+    fclaw_map_context_t *cont;
 
     FCLAW_ASSERT (0. <= R);
 
-    cont = FCLAW_ALLOC_ZERO (fclaw2d_map_context_t, 1);
+    cont = FCLAW_ALLOC_ZERO (fclaw_map_context_t, 1);
     cont->query = fclaw2d_map_query_csphere;
     cont->mapc2m = fclaw2d_map_c2m_csphere;
     cont->user_double[0] = R;
@@ -288,7 +288,7 @@ fclaw2d_map_new_csphere (double R)
 /* Spherical disk in xy plane.  Matches p4est_connectivity_new_disk (). */
 
 static int
-fclaw2d_map_query_disk (fclaw2d_map_context_t * cont, int query_identifier)
+fclaw2d_map_query_disk (fclaw_map_context_t * cont, int query_identifier)
 {
     switch (query_identifier)
     {
@@ -331,7 +331,7 @@ fclaw2d_map_c2m_disk_help (double R2sqrbyR1, double R1byR2,
 }
 
 static void
-fclaw2d_map_c2m_disk (fclaw2d_map_context_t * cont, int blockno,
+fclaw2d_map_c2m_disk (fclaw_map_context_t * cont, int blockno,
                       double xc, double yc,
                       double *xp, double *yp, double *zp)
 {
@@ -375,14 +375,14 @@ fclaw2d_map_c2m_disk (fclaw2d_map_context_t * cont, int blockno,
     }
 }
 
-fclaw2d_map_context_t *
+fclaw_map_context_t *
 fclaw2d_map_new_disk (double R1, double R2)
 {
-    fclaw2d_map_context_t *cont;
+    fclaw_map_context_t *cont;
 
     FCLAW_ASSERT (0. < R2 && R2 <= R1);
 
-    cont = FCLAW_ALLOC_ZERO (fclaw2d_map_context_t, 1);
+    cont = FCLAW_ALLOC_ZERO (fclaw_map_context_t, 1);
     cont->query = fclaw2d_map_query_disk;
     cont->mapc2m = fclaw2d_map_c2m_disk;
     cont->user_double[0] = R2 * R2 / R1;
@@ -400,14 +400,14 @@ fclaw2d_map_new_disk (double R1, double R2)
  */
 
 static int
-fclaw2d_map_query_fortran (fclaw2d_map_context_t * cont, int query_identifier)
+fclaw2d_map_query_fortran (fclaw_map_context_t * cont, int query_identifier)
 {
     return 0 <= query_identifier && query_identifier <
         FCLAW2D_MAP_QUERY_LAST ? cont->user_int[query_identifier] : 0;
 }
 
 static void
-fclaw2d_map_c2m_fortran (fclaw2d_map_context_t * cont, int blockno,
+fclaw2d_map_c2m_fortran (fclaw_map_context_t * cont, int blockno,
                          double xc, double yc,
                          double *xp, double *yp, double *zp)
 {
@@ -416,13 +416,13 @@ fclaw2d_map_c2m_fortran (fclaw2d_map_context_t * cont, int blockno,
     (*(fclaw2d_map_c2m_fortran_t) cont->user_data) (&xc, &yc, xp, yp, zp);
 }
 
-fclaw2d_map_context_t *
+fclaw_map_context_t *
 fclaw2d_map_new_fortran (fclaw2d_map_c2m_fortran_t mapc2m,
                          const int query_results[FCLAW2D_MAP_QUERY_LAST])
 {
-    fclaw2d_map_context_t *cont;
+    fclaw_map_context_t *cont;
 
-    cont = FCLAW_ALLOC_ZERO (fclaw2d_map_context_t, 1);
+    cont = FCLAW_ALLOC_ZERO (fclaw_map_context_t, 1);
     cont->query = fclaw2d_map_query_fortran;
     cont->mapc2m = fclaw2d_map_c2m_fortran;
     memcpy (cont->user_int, query_results,
@@ -495,16 +495,16 @@ fclaw2d_options_postprocess_map_data(fclaw2d_map_data_t * map_data)
 
 int fclaw2d_map_pillowsphere(fclaw_global_t* glob)
 {
-    fclaw2d_map_context_t *cont = fclaw2d_map_get(glob);
+    fclaw_map_context_t *cont = fclaw_map_get(glob);
     return FCLAW2D_MAP_IS_PILLOWSPHERE(&cont) != 0;    
 }
 
-void set_scale(fclaw2d_map_context_t* cont, const double scale[])
+void set_scale(fclaw_map_context_t* cont, const double scale[])
 {
     memcpy(cont->scale,scale,3*sizeof(double));
 }
 
-void set_shift(fclaw2d_map_context_t* cont, const double shift[])
+void set_shift(fclaw_map_context_t* cont, const double shift[])
 {
     memcpy(cont->shift,shift,3*sizeof(double));
 }
@@ -521,28 +521,28 @@ void set_default_transform(double scale[],double shift[],double rotate[])
   rotate[1] = 0;
 }
 
-void set_rotate(fclaw2d_map_context_t* cont, const double rotate[])
+void set_rotate(fclaw_map_context_t* cont, const double rotate[])
 {
     double rotate_mat[9];
     SET_ROTATION_MATRIX(rotate,rotate_mat);
     memcpy(cont->rotate,rotate_mat,9*sizeof(double));
 }
 
-void scale_map(fclaw2d_map_context_t* cont, double *xp, double *yp, double *zp)
+void scale_map(fclaw_map_context_t* cont, double *xp, double *yp, double *zp)
 {
     *xp *= cont->scale[0];
     *yp *= cont->scale[1];
     *zp *= cont->scale[2];
 }
 
-void shift_map(fclaw2d_map_context_t* cont, double *xp, double *yp, double *zp)
+void shift_map(fclaw_map_context_t* cont, double *xp, double *yp, double *zp)
 {
     *xp += cont->shift[0];
     *yp += cont->shift[1];
     *zp += cont->shift[2];
 }
 
-void rotate_map(fclaw2d_map_context_t* cont, double *xp, double *yp, double *zp)
+void rotate_map(fclaw_map_context_t* cont, double *xp, double *yp, double *zp)
 {
     double v[3], vrot[3];
     int i,j;

@@ -42,119 +42,119 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #endif
 
-int FCLAW2D_MAP_IS_USED(fclaw2d_map_context_t** pcont)
+int FCLAW2D_MAP_IS_USED(fclaw_map_context_t** pcont)
 {
     int iresult;
-    fclaw2d_map_context_t *cont = *pcont;
+    fclaw_map_context_t *cont = *pcont;
     int id = FCLAW2D_MAP_QUERY_IS_USED;
     iresult = cont->query(cont,id);
     return iresult != 0;
 }
 
-int FCLAW2D_MAP_IS_DISK(fclaw2d_map_context_t** pcont)
+int FCLAW2D_MAP_IS_DISK(fclaw_map_context_t** pcont)
 {
     int iresult;
-    fclaw2d_map_context_t *cont = *pcont;
+    fclaw_map_context_t *cont = *pcont;
     int id = FCLAW2D_MAP_QUERY_IS_DISK;
     iresult = cont->query(cont,id);
     return iresult != 0;
 }
 
-int FCLAW2D_MAP_IS_CART(fclaw2d_map_context_t** pcont)
+int FCLAW2D_MAP_IS_CART(fclaw_map_context_t** pcont)
 {
     int iresult;
-    fclaw2d_map_context_t *cont = *pcont;
+    fclaw_map_context_t *cont = *pcont;
     int id = FCLAW2D_MAP_QUERY_IS_CART;
     iresult = cont->query(cont,id);
     return iresult != 0;
 }
 
-int FCLAW2D_MAP_IS_AFFINE(fclaw2d_map_context_t** pcont)
+int FCLAW2D_MAP_IS_AFFINE(fclaw_map_context_t** pcont)
 {
     int iresult;
-    fclaw2d_map_context_t *cont = *pcont;
+    fclaw_map_context_t *cont = *pcont;
     int id = FCLAW2D_MAP_QUERY_IS_AFFINE;
     iresult = cont->query(cont,id);
     return iresult != 0;
 }
 
 
-int FCLAW2D_MAP_IS_PILLOWDISK(fclaw2d_map_context_t** pcont)
+int FCLAW2D_MAP_IS_PILLOWDISK(fclaw_map_context_t** pcont)
 {
     int iresult;
-    fclaw2d_map_context_t *cont = *pcont;
+    fclaw_map_context_t *cont = *pcont;
     int id = FCLAW2D_MAP_QUERY_IS_PILLOWDISK;
     iresult = cont->query(cont,id);
     return iresult != 0;
 }
 
-int FCLAW2D_MAP_IS_SQUAREDDISK(fclaw2d_map_context_t** pcont)
+int FCLAW2D_MAP_IS_SQUAREDDISK(fclaw_map_context_t** pcont)
 {
     int iresult;
-    fclaw2d_map_context_t *cont = *pcont;
+    fclaw_map_context_t *cont = *pcont;
     int id = FCLAW2D_MAP_QUERY_IS_SQUAREDDISK;
     iresult = cont->query(cont,id);
     return iresult != 0;
 }
 
-int  FCLAW2D_MAP_IS_PILLOWSPHERE(fclaw2d_map_context_t** pcont)
+int  FCLAW2D_MAP_IS_PILLOWSPHERE(fclaw_map_context_t** pcont)
 {
     int iresult;
-    fclaw2d_map_context_t *cont = *pcont;
+    fclaw_map_context_t *cont = *pcont;
     int id = FCLAW2D_MAP_QUERY_IS_PILLOWSPHERE;
     iresult = cont->query(cont,id);
     return iresult != 0;
 }
 
-int FCLAW2D_MAP_IS_CUBEDSPHERE(fclaw2d_map_context_t** pcont)
+int FCLAW2D_MAP_IS_CUBEDSPHERE(fclaw_map_context_t** pcont)
 {
     int iresult;
-    fclaw2d_map_context_t *cont = *pcont;
+    fclaw_map_context_t *cont = *pcont;
     int id = FCLAW2D_MAP_QUERY_IS_CUBEDSPHERE;
     iresult = cont->query(cont,id);
     return iresult != 0;
 }
 
-int FCLAW2D_MAP_IS_FLAT(fclaw2d_map_context_t** pcont)
+int FCLAW2D_MAP_IS_FLAT(fclaw_map_context_t** pcont)
 {
     int iresult;
-    fclaw2d_map_context_t *cont = *pcont;
+    fclaw_map_context_t *cont = *pcont;
     int id = FCLAW2D_MAP_QUERY_IS_FLAT;
     iresult = cont->query(cont,id);
     return iresult != 0;
 }
 
-int FCLAW2D_MAP_IS_SPHERE(fclaw2d_map_context_t** pcont)
+int FCLAW2D_MAP_IS_SPHERE(fclaw_map_context_t** pcont)
 {
     int iresult;
-    fclaw2d_map_context_t *cont = *pcont;
+    fclaw_map_context_t *cont = *pcont;
     int id = FCLAW2D_MAP_QUERY_IS_SPHERE;
     iresult = cont->query(cont,id);
     return iresult != 0;
 }
 
-int FCLAW2D_MAP_IS_HEMISPHERE(fclaw2d_map_context_t** pcont)
+int FCLAW2D_MAP_IS_HEMISPHERE(fclaw_map_context_t** pcont)
 {
     int iresult;
-    fclaw2d_map_context_t *cont = *pcont;
+    fclaw_map_context_t *cont = *pcont;
     int id = FCLAW2D_MAP_QUERY_IS_HEMISPHERE;
     iresult = cont->query(cont,id);
     return iresult != 0;
 }
 
-int FCLAW2D_MAP_IS_TORUS(fclaw2d_map_context_t** pcont)
+int FCLAW2D_MAP_IS_TORUS(fclaw_map_context_t** pcont)
 {
     int iresult;
-    fclaw2d_map_context_t *cont = *pcont;
+    fclaw_map_context_t *cont = *pcont;
     int id = FCLAW2D_MAP_QUERY_IS_TORUS;
     iresult = cont->query(cont,id);
     return iresult != 0;
 }
 
-int FCLAW2D_MAP_IS_BRICK(fclaw2d_map_context_t** pcont)
+int FCLAW2D_MAP_IS_BRICK(fclaw_map_context_t** pcont)
 {
-    fclaw2d_map_context_t *cont = *pcont;
-    fclaw2d_map_context_t *brick = cont->brick;
+    fclaw_map_context_t *cont = *pcont;
+    fclaw_map_context_t *brick = cont->brick;
     int iresult;
     int id = FCLAW2D_MAP_QUERY_IS_BRICK;
     if (brick != NULL)

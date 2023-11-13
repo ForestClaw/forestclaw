@@ -83,18 +83,18 @@ void radialdam_global_post_process(fclaw_options_t *fclaw_opt,
 
 /* ------------------------------- Mapping functions ---------------------------------- */
 
-fclaw2d_map_context_t* fclaw2d_map_new_nomap();
+fclaw_map_context_t* fclaw2d_map_new_nomap();
 
-fclaw2d_map_context_t* fclaw2d_map_new_pillowdisk(const double scale[],
+fclaw_map_context_t* fclaw2d_map_new_pillowdisk(const double scale[],
                                                   const double shift[],
                                                   const double rotate[]);
 
-fclaw2d_map_context_t* fclaw2d_map_new_pillowdisk5(const double scale[],
+fclaw_map_context_t* fclaw2d_map_new_pillowdisk5(const double scale[],
                                                    const double shift[],
                                                    const double rotate[],
                                                    const double alpha);
 
-fclaw2d_map_context_t* fclaw2d_map_new_fivepatch(const double scale[],
+fclaw_map_context_t* fclaw2d_map_new_fivepatch(const double scale[],
                                                  const double shift[],
                                                  const double alpha);
 /* ----------------------------- Conservative update ---------------------------------- */

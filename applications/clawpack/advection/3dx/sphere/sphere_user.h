@@ -56,7 +56,7 @@ const user_options_t* sphere_get_options(fclaw_global_t* glob);
 
 void sphere_link_solvers(fclaw_global_t *glob);
 
-void sphere_map_extrude(fclaw2d_map_context_t* cont,
+void sphere_map_extrude(fclaw_map_context_t* cont,
                          const double maxelev);
 
 

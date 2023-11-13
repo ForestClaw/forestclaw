@@ -44,7 +44,7 @@ void create_domain(fclaw_global_t *glob)
     int a = 0; /* non-periodic */
     int b = 0;
     
-    fclaw2d_map_context_t    *cont = NULL, *brick = NULL;
+    fclaw_map_context_t    *cont = NULL, *brick = NULL;
     fclaw_domain_t *domain = NULL;
 
     user_options_t *user = (user_options_t*) filament_get_options(glob);
@@ -94,7 +94,7 @@ void create_domain(fclaw_global_t *glob)
     }
 
     /* Store mapping in the glob */
-    fclaw2d_map_store (glob, cont);            
+    fclaw_map_store (glob, cont);            
     
     /* Store domain in glob */
     fclaw_global_store_domain(glob, domain);

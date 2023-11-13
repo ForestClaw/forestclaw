@@ -39,7 +39,7 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, fclaw_options_t* fclaw_opt,
 {
     /* Mapped, multi-block domain */
     fclaw2d_domain_t         *domain = NULL;
-    fclaw2d_map_context_t    *cont = NULL, *brick = NULL;
+    fclaw_map_context_t    *cont = NULL, *brick = NULL;
 
     int mi = fclaw_opt->mi;
     int mj = fclaw_opt->mj;

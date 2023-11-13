@@ -13,7 +13,7 @@ extern "C"
 
 
 static int
-fclaw2d_map_query_nomap_brick (fclaw2d_map_context_t * cont, int query_identifier)
+fclaw2d_map_query_nomap_brick (fclaw_map_context_t * cont, int query_identifier)
 {
     switch (query_identifier)
     {
@@ -62,7 +62,7 @@ fclaw2d_map_query_nomap_brick (fclaw2d_map_context_t * cont, int query_identifie
 
 
 void
-    fclaw2d_map_c2m_nomap_brick(fclaw2d_map_context_t * cont, int blockno,
+    fclaw2d_map_c2m_nomap_brick(fclaw_map_context_t * cont, int blockno,
                                 double xc, double yc,
                                 double *xp, double *yp, double *zp)
 {
@@ -73,7 +73,7 @@ void
 
 /* This shouldn't be called */
 static void
-fclaw3dx_map_c2m_nomap_brick(fclaw2d_map_context_t * cont, int blockno,
+fclaw3dx_map_c2m_nomap_brick(fclaw_map_context_t * cont, int blockno,
                              double xc, double yc, double zc,
                              double *xp, double *yp, double *zp)
 {
@@ -90,10 +90,10 @@ fclaw3dx_map_c2m_nomap_brick(fclaw2d_map_context_t * cont, int blockno,
 }
 
 
-fclaw2d_map_context_t* fclaw2d_map_new_nomap_brick(fclaw2d_map_context_t* brick)
+fclaw_map_context_t* fclaw2d_map_new_nomap_brick(fclaw_map_context_t* brick)
 {
-    fclaw2d_map_context_t *cont;
-    cont = FCLAW_ALLOC_ZERO (fclaw2d_map_context_t, 1);
+    fclaw_map_context_t *cont;
+    cont = FCLAW_ALLOC_ZERO (fclaw_map_context_t, 1);
     cont->query = fclaw2d_map_query_nomap_brick;
     cont->mapc2m = fclaw2d_map_c2m_nomap_brick;
 

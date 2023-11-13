@@ -239,7 +239,7 @@ void get_corner_neighbor(fclaw_global_t *glob,
     if(domain->refine_dim == 2)
     {
         //TODO 3d
-        fclaw2d_map_context_t* cont = fclaw2d_map_get(glob);
+        fclaw_map_context_t* cont = fclaw_map_get(glob);
         ispillowsphere =  FCLAW2D_MAP_IS_PILLOWSPHERE(&cont);    
     }
 

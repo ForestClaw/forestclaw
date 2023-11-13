@@ -230,7 +230,7 @@ fclaw_1to2 = {
     "fclaw2d_global_new_comm"              : "fclaw_global_new_comm",
     "fclaw2d_global_destroy"               : "fclaw_global_destroy",
     "fclaw2d_global_store_domain"          : "fclaw_global_store_domain",
-    "fclaw2d_global_store_map"             : "fclaw2d_map_store",
+    "fclaw2d_global_store_map"             : "fclaw_map_store",
     "fclaw2d_global_iterate_level"         : "fclaw_global_iterate_level",
     "fclaw2d_global_iterate_patches"       : "fclaw_global_iterate_patches",
     "fclaw2d_global_iterate_families"      : "fclaw_global_iterate_families",
@@ -716,7 +716,12 @@ fclaw_1to2 = {
     "fclaw2d_ray_vt"                               : "fclaw_ray_vt",
     "fclaw2d_ray_vtable_initialize"                : "fclaw_ray_vtable_initialize",
     "fclaw2d_ray_allocate_rays"                    : "fclaw_ray_allocate_rays",
-    "fclaw2d_ray_deallocate_rays"                  : "fclaw_ray_deallocate_rays"
+    "fclaw2d_ray_deallocate_rays"                  : "fclaw_ray_deallocate_rays",
+
+    #===== ./src/fclaw2d_map.c =====
+    "fclaw2d_map_context_t"                        : "fclaw_map_context_t",
+    "fclaw2d_map_store_t"                          : "fclaw_map_store_t",
+    "fclaw2d_get_map"                              : "fclaw_get_map"
 
 }
 

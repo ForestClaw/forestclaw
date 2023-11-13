@@ -82,33 +82,33 @@ void transport_b4step2_manifold(fclaw_global_t *glob,
 
 /* --------------------------------- Square mappings ---------------------------------- */
 
-fclaw2d_map_context_t* fclaw2d_map_new_identity(fclaw2d_map_context_t *brick);
+fclaw_map_context_t* fclaw2d_map_new_identity(fclaw_map_context_t *brick);
 
-fclaw2d_map_context_t* fclaw2d_map_new_cart(fclaw2d_map_context_t* brick,
+fclaw_map_context_t* fclaw2d_map_new_cart(fclaw_map_context_t* brick,
                                             const double scale[],
                                             const double shift[]);
   
-fclaw2d_map_context_t* fclaw2d_map_new_fivepatch(const double scale[],
+fclaw_map_context_t* fclaw2d_map_new_fivepatch(const double scale[],
                                                  const double shift[],
                                                  const double alpha);
   
-fclaw2d_map_context_t* fclaw2d_map_new_bilinear(fclaw2d_map_context_t *brick,
+fclaw_map_context_t* fclaw2d_map_new_bilinear(fclaw_map_context_t *brick,
                                                 const double scale[],
                                                 const double shift[],
                                                 const double center[]);
 
 /* --------------------------------- Sphere mappings ---------------------------------- */
 
-fclaw2d_map_context_t * fclaw2d_map_new_cubedsphere (const double scale[],
+fclaw_map_context_t * fclaw2d_map_new_cubedsphere (const double scale[],
                                                      const double rotate[]);
 
-fclaw2d_map_context_t * fclaw2d_map_new_pillowsphere (const double scale[],
+fclaw_map_context_t * fclaw2d_map_new_pillowsphere (const double scale[],
                                                       const double rotate[]);
 
 
 /* ----------------------------------- Torus mapping ---------------------------------- */
-fclaw2d_map_context_t *
-    fclaw2d_map_new_torus (fclaw2d_map_context_t* brick,
+fclaw_map_context_t *
+    fclaw2d_map_new_torus (fclaw_map_context_t* brick,
                            const double scale[],
                            const double rotate[],
                            const double alpha,

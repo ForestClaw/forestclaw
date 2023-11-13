@@ -46,7 +46,7 @@ void create_domain(fclaw_global_t *glob)
     int minlevel = fclaw_opt->minlevel;
     int check = mi*mx*pow_int(2,minlevel);
 
-    fclaw2d_map_context_t *cont, *brick;
+    fclaw_map_context_t *cont, *brick;
     fclaw_domain_t *domain = NULL;
 
     fc3d_clawpack46_options_t *claw3_opt = fc3d_clawpack46_get_options(glob);
@@ -142,7 +142,7 @@ void create_domain(fclaw_global_t *glob)
         swirl_map_extrude(cont,user->maxelev);        
 
     /* Store mapping in the glob */
-    fclaw2d_map_store (glob, cont);            
+    fclaw_map_store (glob, cont);            
 
     /* Store the domain in the glob */
     fclaw_global_store_domain(glob, domain);

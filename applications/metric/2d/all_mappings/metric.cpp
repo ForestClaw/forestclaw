@@ -101,7 +101,7 @@ void run_program(fclaw_app_t* app)
     /* Mapped, multi-block domain */
     p4est_connectivity_t     *conn = NULL;
     fclaw2d_domain_t	     *domain;
-    fclaw2d_map_context_t    *cont = NULL;
+    fclaw_map_context_t    *cont = NULL;
 
     fclaw_options_t* gparms;
     user_options_t suser_options, *user = &suser_options;

@@ -287,8 +287,8 @@ TEST_CASE("3d fclaw_clawpatch patch_build")
 	    fclaw_domain_t* domain = fclaw_domain_new_unitcube(sc_MPI_COMM_WORLD, 0);
 	    fclaw_global_store_domain(glob, domain);
 
-        fclaw2d_map_context_t* map = fclaw2d_map_new_nomap();
-        fclaw2d_map_store(glob, map);
+        fclaw_map_context_t* map = fclaw2d_map_new_nomap();
+        fclaw_map_store(glob, map);
 
         fclaw_vtables_initialize(glob);
         fclaw_clawpatch_vtable_initialize(glob, 4);

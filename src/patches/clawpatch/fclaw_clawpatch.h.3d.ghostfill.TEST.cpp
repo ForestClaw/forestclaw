@@ -51,7 +51,7 @@ struct TestData {
     fclaw_global_t* glob;
     fclaw_options_t fopts;
     fclaw_domain_t *domain;
-    fclaw2d_map_context_t* map;
+    fclaw_map_context_t* map;
     fclaw_clawpatch_options_t* opts;
     fclaw_patch_vtable_t* patch_vt;
     fclaw_clawpatch_vtable_t * clawpatch_vt;
@@ -89,7 +89,7 @@ struct TestData {
         if(domain->refine_dim == 2)
         {
             map = fclaw2d_map_new_nomap();
-            fclaw2d_map_store(glob, map);
+            fclaw_map_store(glob, map);
         }
         //map = fclaw3d_map_new_nomap();
         //fclaw_global_store_map_3d(glob, map);

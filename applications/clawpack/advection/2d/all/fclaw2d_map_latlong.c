@@ -8,7 +8,7 @@
 
 
 static int
-fclaw2d_map_query_latlong (fclaw2d_map_context_t * cont, int query_identifier)
+fclaw2d_map_query_latlong (fclaw_map_context_t * cont, int query_identifier)
 {
     switch (query_identifier)
     {
@@ -58,14 +58,14 @@ fclaw2d_map_query_latlong (fclaw2d_map_context_t * cont, int query_identifier)
 
 
 static void
-fclaw2d_map_c2m_latlong (fclaw2d_map_context_t * cont, int blockno,
+fclaw2d_map_c2m_latlong (fclaw_map_context_t * cont, int blockno,
                        double xc, double yc,
                        double *xp, double *yp, double *zp)
 {
     double lat[2], longitude[2];
     double xc1,yc1,zc1,xc2,yc2;
 
-    /* fclaw2d_map_context_t *brick_map = (fclaw2d_map_context_t*) cont->user_data; */
+    /* fclaw_map_context_t *brick_map = (fclaw_map_context_t*) cont->user_data; */
 
     /* Scale's brick mapping to [0,1]x[0,1] to create a single "logical" block */
     FCLAW2D_MAP_BRICK2C(&cont,&blockno,&xc,&yc,&xc1,&yc1,&zc1);
@@ -91,17 +91,17 @@ fclaw2d_map_c2m_latlong (fclaw2d_map_context_t * cont, int blockno,
 
 
 
-fclaw2d_map_context_t *
-    fclaw2d_map_new_latlong (fclaw2d_map_context_t* brick,
+fclaw_map_context_t *
+    fclaw2d_map_new_latlong (fclaw_map_context_t* brick,
                              const double scale[],
                              const double rotate[],
                              const double lat[],
                              const double longitude[],
                              const int a, const int b)
 {
-    fclaw2d_map_context_t *cont;
+    fclaw_map_context_t *cont;
 
-    cont = FCLAW_ALLOC_ZERO (fclaw2d_map_context_t, 1);
+    cont = FCLAW_ALLOC_ZERO (fclaw_map_context_t, 1);
     cont->query = fclaw2d_map_query_latlong;
     cont->mapc2m = fclaw2d_map_c2m_latlong;    
 

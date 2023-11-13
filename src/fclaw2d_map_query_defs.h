@@ -65,7 +65,7 @@ extern "C"
 #if 0
 /* Generic query function (kept up to date with list above) */
 static int
-fclaw2d_map_query_generic (fclaw2d_map_context_t * cont, int query_identifier)
+fclaw2d_map_query_generic (fclaw_map_context_t * cont, int query_identifier)
 {
     switch (query_identifier)
     {
