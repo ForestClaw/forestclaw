@@ -286,10 +286,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define fclaw2d_domain_ghost_exchange_end   fclaw3d_domain_ghost_exchange_end
 #define fclaw2d_domain_free_after_exchange  fclaw3d_domain_free_after_exchange
 
-#define fclaw2d_exchange_setup          fclaw3d_exchange_setup
-#define fclaw2d_exchange_delete         fclaw3d_exchange_delete
-#define fclaw2d_exchange_ghost_patches_begin fclaw3d_exchange_ghost_patches_begin
-#define fclaw2d_exchange_ghost_patches_end fclaw3d_exchange_ghost_patches_end
 #define fclaw2d_domain_serialization_enter  fclaw3d_domain_serialization_enter
 #define fclaw2d_domain_serialization_leave  fclaw3d_domain_serialization_leave
 #define fclaw2d_domain_is_meta          fclaw3d_domain_is_meta
