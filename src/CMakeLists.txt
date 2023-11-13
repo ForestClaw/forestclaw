@@ -57,8 +57,6 @@ add_library(forestclaw_c OBJECT
   fclaw2d_regrid.c
   fclaw2d_patch.c
   fclaw2d_partition.c
-  fclaw2d_corner_neighbors.c
-  fclaw2d_face_neighbors.c
   fclaw2d_output_tikz.c
   fclaw2d_file.c
   fclaw2d_wrap.c
@@ -182,8 +180,6 @@ install(FILES
 	fclaw2d_output.h
 	fclaw2d_physical_bc.h
 	fclaw2d_ghost_fill.h
-	fclaw2d_corner_neighbors.h
-	fclaw2d_face_neighbors.h
 	fclaw2d_map.h
 	fclaw2d_regrid.h
 	fclaw2d_map_brick.h
