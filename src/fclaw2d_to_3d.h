@@ -53,7 +53,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define fclaw2d_domain_t                fclaw3d_domain_t
 #define fclaw2d_file_context            fclaw3d_file_context
 #define fclaw2d_file_context_t          fclaw3d_file_context_t
-#define fclaw2d_domain_data_t           fclaw3d_domain_data_t
 #define fclaw2d_domain_persist_t        fclaw3d_domain_persist_t
 #define fclaw2d_timer_names_t           fclaw3d_timer_names_t
 #define fclaw2d_patch_callback_t        fclaw3d_patch_callback_t
@@ -274,11 +273,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define fclaw2d_domain_set_refinement   fclaw3d_domain_set_refinement
 #define fclaw2d_patch_mark_refine       fclaw3d_patch_mark_refine
 #define fclaw2d_patch_mark_coarsen      fclaw3d_patch_mark_coarsen
-#define fclaw2d_domain_data_new         fclaw3d_domain_data_new
-#define fclaw2d_domain_data_delete      fclaw3d_domain_data_delete
-#define fclaw2d_domain_get_data         fclaw3d_domain_get_data
-#define fclaw2d_domain_setup            fclaw3d_domain_setup
-#define fclaw2d_domain_reset            fclaw3d_domain_reset
 #define fclaw2d_domain_iterate_adapted  fclaw3d_domain_iterate_adapted
 #define fclaw2d_domain_assign_for_partition fclaw3d_domain_assign_for_partition
 #define fclaw2d_domain_allocate_before_partition    fclaw3d_domain_allocate_before_partition
@@ -310,10 +304,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define fclaw2d_domain_list_neighbors   fclaw3d_domain_list_neighbors
 #define fclaw2d_domain_list_adapted     fclaw3d_domain_list_adapted
 #define fclaw2d_domain_search_points    fclaw3d_domain_search_points
-#define fclaw2d_domain_iterate_cb       fclaw3d_domain_iterate_cb
-#define fclaw2d_domain_iterate_level_mthread fclaw3d_domain_iterate_level_mthread
-#define fclaw_domain_new2d              fclaw_domain_new3d
-#define fclaw_domain_destroy2d          fclaw_domain_destroy3d
 
 /* translations for maps */
 #define fclaw2d_map_context_t           fclaw3d_map_context_t
