@@ -55,7 +55,6 @@ add_library(forestclaw_c OBJECT
   fclaw2d_ghost_fill.c
   fclaw2d_output.c
   fclaw2d_diagnostics.c
-  fclaw2d_rays.c
   fclaw2d_update_single_step.c
   fclaw2d_domain.c
   fclaw2d_regrid.c
@@ -191,7 +190,6 @@ install(FILES
 	fclaw2d_time_sync.h
 	fclaw2d_update_single_step.h
 	fclaw2d_physical_bc.h
-	fclaw2d_rays.h
 	fclaw2d_ghost_fill.h
 	fclaw2d_corner_neighbors.h
 	fclaw2d_face_neighbors.h
