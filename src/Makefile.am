@@ -50,7 +50,6 @@ libforestclaw_installed_headers = \
 	src/fclaw2d_global.h \
 	src/fclaw2d_domain.h \
 	src/fclaw2d_patch.h \
-	src/fclaw2d_vtable.h \
 	src/fclaw2d_map.h \
 	src/fclaw2d_map_brick.h \
 	src/fclaw2d_exchange.h \
@@ -121,7 +120,6 @@ libforestclaw_compiled_sources = \
 	src/forestclaw.c \
 	src/fclaw2d_options.c \
 	src/fclaw2d_global.c \
-	src/fclaw2d_vtable.c \
 	src/fclaw2d_map.c \
 	src/fclaw2d_map_query.c \
 	src/fclaw2d_map_brick.c \
@@ -215,7 +213,7 @@ src_forestclaw_TEST_SOURCES = \
 	src/fclaw2d_global.h.TEST.cpp \
 	src/fclaw2d_options.h.TEST.cpp \
 	src/fclaw2d_patch.h.TEST.cpp \
-	src/fclaw2d_vtable.h.TEST.cpp 
+	src/fclaw_vtable.h.TEST.cpp 
 
 src_forestclaw_TEST_CPPFLAGS = \
 	$(test_libtestutils_la_CPPFLAGS) \

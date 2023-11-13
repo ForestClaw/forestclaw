@@ -43,7 +43,6 @@ add_library(forestclaw_c OBJECT
   forestclaw.c
   fclaw2d_options.c
   fclaw2d_global.c
-  fclaw2d_vtable.c
   fclaw2d_map.c
   fclaw2d_map_query.c
   fclaw2d_map_brick.c
@@ -171,7 +170,6 @@ install(FILES
 	fclaw2d_global.h
 	fclaw2d_domain.h
 	fclaw2d_patch.h
-	fclaw2d_vtable.h
 	fclaw2d_map.h
 	fclaw2d_map_brick.h
 	fclaw2d_exchange.h
@@ -216,7 +214,7 @@ if(BUILD_TESTING)
       fclaw2d_global.h.TEST.cpp
       fclaw2d_options.h.TEST.cpp
       fclaw2d_patch.h.TEST.cpp
-      fclaw2d_vtable.h.TEST.cpp
+      fclaw_vtable.h.TEST.cpp
   )
 
   target_link_libraries(forestclaw.TEST testutils forestclaw)
