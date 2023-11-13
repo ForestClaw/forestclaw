@@ -90,7 +90,7 @@ fclaw3dx_map_c2m_nomap_brick(fclaw_map_context_t * cont, int blockno,
 }
 
 
-fclaw_map_context_t* fclaw2d_map_new_nomap_brick(fclaw_map_context_t* brick)
+fclaw_map_context_t* fclaw_map_new_nomap_brick(fclaw_map_context_t* brick)
 {
     fclaw_map_context_t *cont;
     cont = FCLAW_ALLOC_ZERO (fclaw_map_context_t, 1);

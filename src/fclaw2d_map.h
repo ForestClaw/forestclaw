@@ -246,7 +246,7 @@ void FCLAW_MAP_2D_BRICK2C (fclaw_map_context_t ** cont, int *blockno,
  */
 void fclaw_map_destroy (fclaw_map_context_t * cont);
 
-fclaw_map_context_t* fclaw2d_map_new_nomap_brick(fclaw_map_context_t* brick);
+fclaw_map_context_t* fclaw_map_new_nomap_brick(fclaw_map_context_t* brick);
 void fclaw2d_map_c2m_nomap_brick(fclaw_map_context_t * cont, int blockno,
                                  double xc, double yc,
                                  double *xp, double* yp, double *zp);

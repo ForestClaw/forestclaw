@@ -53,7 +53,7 @@ void create_domain(fclaw_global_t *glob)
               fclaw2d_map_new_brick(domain, mi, mj, a, b);
 
     fclaw_map_context_t *cont = 
-        fclaw2d_map_new_nomap_brick(brick);
+        fclaw_map_new_nomap_brick(brick);
 
     /* Store mapping in the glob */
     fclaw_map_store (glob, cont);            

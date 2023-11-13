@@ -66,7 +66,7 @@ void create_domain(fclaw_global_t *glob)
 
         /* Size is set by [ax,bx] x [ay, by], set in .ini file */            
         brick = fclaw2d_map_new_brick(domain,mi,mj,a,b);        
-        cont = fclaw2d_map_new_nomap_brick(brick);
+        cont = fclaw_map_new_nomap_brick(brick);
 
         break;
     case 1:

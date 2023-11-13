@@ -741,7 +741,8 @@ fclaw_1to2 = {
     "fclaw3d_map_c2m_basis"                        : "fclaw_map_3d_c2m_basis",
     "FCLAW2D_MAP_BRICK2C"                          : "FCLAW_MAP_2D_BRICK2C",
     "fclaw2d_map_brick2c"                          : "fclaw_map_2d_brick2c",
-    "fclaw2d_map_destroy"                          : "fclaw_map_destroy"
+    "fclaw2d_map_destroy"                          : "fclaw_map_destroy",
+    "fclaw2d_map_new_nomap_brick"                  : "fclaw_map_new_nomap_brick"
 }
 
 import glob
