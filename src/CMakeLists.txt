@@ -41,7 +41,6 @@ add_library(forestclaw_c OBJECT
   fclaw_output.c
   fclaw_farraybox.cpp
   forestclaw.c
-  fclaw2d_block.c
   fclaw2d_options.c
   fclaw2d_global.c
   fclaw2d_vtable.c
@@ -178,7 +177,6 @@ install(FILES
 	fclaw2d_options.h 
 	fclaw2d_global.h
 	fclaw2d_domain.h
-	fclaw2d_block.h
 	fclaw2d_patch.h
 	fclaw2d_vtable.h
 	fclaw2d_output.h

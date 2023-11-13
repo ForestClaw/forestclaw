@@ -49,7 +49,6 @@ libforestclaw_installed_headers = \
 	src/fclaw2d_options.h \
 	src/fclaw2d_global.h \
 	src/fclaw2d_domain.h \
-	src/fclaw2d_block.h \
 	src/fclaw2d_patch.h \
 	src/fclaw2d_vtable.h \
 	src/fclaw2d_output.h \
@@ -127,7 +126,6 @@ libforestclaw_compiled_sources = \
 	src/fclaw_run.c \
 	src/fclaw_farraybox.cpp \
 	src/forestclaw.c \
-	src/fclaw2d_block.c \
 	src/fclaw2d_options.c \
 	src/fclaw2d_global.c \
 	src/fclaw2d_vtable.c \
