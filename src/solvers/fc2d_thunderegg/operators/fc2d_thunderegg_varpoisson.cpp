@@ -355,7 +355,7 @@ void fc2d_thunderegg_varpoisson_solve(fclaw_global_t *glob)
                                         double unit_y, double &x, double &y) 
     {
         double x1,y1,z1;
-        FCLAW2D_MAP_BRICK2C(&cont,&block_no,&unit_x, &unit_y, &x1, &y1, &z1);
+        FCLAW_MAP_2D_BRICK2C(&cont,&block_no,&unit_x, &unit_y, &x1, &y1, &z1);
         x = fclaw_opt->ax + (fclaw_opt->bx - fclaw_opt->ax) * x1;
         y = fclaw_opt->ay + (fclaw_opt->by - fclaw_opt->ay) * y1;
     };

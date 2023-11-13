@@ -82,7 +82,7 @@ static void
 
     /* Brick mapping to computational coordinates [0,1]x[0,1] */
     double xc1, yc1, zc1;
-    FCLAW2D_MAP_BRICK2C(&cont,&blockno,&xc,&yc,&xc1,&yc1,&zc1);
+    FCLAW_MAP_2D_BRICK2C(&cont,&blockno,&xc,&yc,&xc1,&yc1,&zc1);
 
     *xp = xc1;
     *yp = yc1;

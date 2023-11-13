@@ -68,7 +68,7 @@ fclaw2d_map_c2m_latlong (fclaw_map_context_t * cont, int blockno,
     /* fclaw_map_context_t *brick_map = (fclaw_map_context_t*) cont->user_data; */
 
     /* Scale's brick mapping to [0,1]x[0,1] to create a single "logical" block */
-    FCLAW2D_MAP_BRICK2C(&cont,&blockno,&xc,&yc,&xc1,&yc1,&zc1);
+    FCLAW_MAP_2D_BRICK2C(&cont,&blockno,&xc,&yc,&xc1,&yc1,&zc1);
 
     /* Scale into lat/long box */
     lat[0] = cont->user_double[0];

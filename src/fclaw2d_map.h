@@ -231,11 +231,11 @@ void FCLAW_MAP_3D_C2M_BASIS (fclaw_map_context_t ** cont,
  * \param [out] mz      Transformed z-coordinate.
  */
 
-#define FCLAW2D_MAP_BRICK2C FCLAW_F77_FUNC_(fclaw2d_map_brick2c, \
-                                            FCLAW2D_MAP_BRICK2C)
-void FCLAW2D_MAP_BRICK2C (fclaw_map_context_t ** cont, int *blockno,
-                          const double *xc, const double *yc,
-                          double *xp, double *yp, double *zp);
+#define FCLAW_MAP_2D_BRICK2C FCLAW_F77_FUNC_(fclaw_map_2d_brick2c, \
+                                             FCLAW_MAP_2D_BRICK2C)
+void FCLAW_MAP_2D_BRICK2C (fclaw_map_context_t ** cont, int *blockno,
+                           const double *xc, const double *yc,
+                           double *xp, double *yp, double *zp);
 
 
 /** Deallocate a mapping context.

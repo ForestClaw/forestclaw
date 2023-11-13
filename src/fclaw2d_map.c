@@ -115,11 +115,10 @@ FCLAW_MAP_3D_C2M_BASIS (fclaw_map_context_t ** pcont,
     /* DAC : Still need to decide what should go here */
     cont->basis_3dx (cont, *xc, *yc, *zc, t, tinv, tderivs, *flag);
 }
-//#endif
 
-void FCLAW2D_MAP_BRICK2C (fclaw_map_context_t ** pcont, int *blockno,
-                          const double *xc, const double *yc,
-                          double *xp, double *yp, double *zp)
+void FCLAW_MAP_2D_BRICK2C (fclaw_map_context_t ** pcont, int *blockno,
+                           const double *xc, const double *yc,
+                           double *xp, double *yp, double *zp)
 {
     fclaw_map_context_t *cont = *pcont;
 

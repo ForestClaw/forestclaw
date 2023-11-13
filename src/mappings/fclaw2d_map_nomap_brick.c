@@ -67,7 +67,7 @@ void
                                 double *xp, double *yp, double *zp)
 {
     /* Brick mapping to computational coordinates [0,1]x[0,1] */
-    FCLAW2D_MAP_BRICK2C(&cont,&blockno,&xc,&yc,xp,yp,zp);    
+    FCLAW_MAP_2D_BRICK2C(&cont,&blockno,&xc,&yc,xp,yp,zp);    
 }
 
 

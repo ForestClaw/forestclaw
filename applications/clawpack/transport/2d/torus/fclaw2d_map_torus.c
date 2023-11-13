@@ -68,7 +68,7 @@ fclaw2d_map_c2m_torus (fclaw_map_context_t * cont, int blockno,
 
     /* Data is not already in brick domain */
     double xc1,yc1,zc1;
-    FCLAW2D_MAP_BRICK2C(&cont,&blockno,&xc,&yc,&xc1,&yc1,&zc1);
+    FCLAW_MAP_2D_BRICK2C(&cont,&blockno,&xc,&yc,&xc1,&yc1,&zc1);
 
     double alpha = cont->user_double[0];
     double beta = cont->user_double[1];

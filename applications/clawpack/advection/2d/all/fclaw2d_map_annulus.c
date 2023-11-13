@@ -69,7 +69,7 @@ fclaw2d_map_c2m_annulus (fclaw_map_context_t * cont, int blockno,
 
     /* Scale's brick mapping to [0,1]x[0,1] */
     /* fclaw_map_context_t *brick_map = (fclaw_map_context_t*) cont->user_data; */
-    FCLAW2D_MAP_BRICK2C(&cont,&blockno,&xc,&yc,&xc1,&yc1,&zc1);
+    FCLAW_MAP_2D_BRICK2C(&cont,&blockno,&xc,&yc,&xc1,&yc1,&zc1);
 
     /* blockno is ignored in the current annulus mapping;  it just assumes
        a single "logical" block in [0,1]x[0,1] */
