@@ -354,7 +354,7 @@ TEST_CASE("3d fclaw_clawpatch patch_build")
 
         fclaw_patch_data_delete(glob, &domain->blocks[0].patches[0]);
         fclaw_domain_destroy(domain);
-        fclaw2d_map_destroy(map);
+        fclaw_map_destroy(map);
         fclaw_global_destroy(glob);
     }
 }

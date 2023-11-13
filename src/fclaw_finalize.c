@@ -177,7 +177,7 @@ void fclaw_finalize(fclaw_global_t* glob)
     {
         fclaw_map_context_t* map = fclaw_map_get(glob);
         if (map != NULL) {
-            fclaw2d_map_destroy(map);
+            fclaw_map_destroy(map);
         }
     }
     else

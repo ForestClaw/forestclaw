@@ -244,7 +244,7 @@ void FCLAW_MAP_2D_BRICK2C (fclaw_map_context_t ** cont, int *blockno,
  * \param [in] cont     Mapping context where the \a destroy member is either
  *                      NULL or a valid function that is then called.
  */
-void fclaw2d_map_destroy (fclaw_map_context_t * cont);
+void fclaw_map_destroy (fclaw_map_context_t * cont);
 
 fclaw_map_context_t* fclaw2d_map_new_nomap_brick(fclaw_map_context_t* brick);
 void fclaw2d_map_c2m_nomap_brick(fclaw_map_context_t * cont, int blockno,

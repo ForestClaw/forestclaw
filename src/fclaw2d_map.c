@@ -140,12 +140,12 @@ void FCLAW_MAP_2D_BRICK2C (fclaw_map_context_t ** pcont, int *blockno,
 
 /* This function is expected to be called from C or C++. */
 void
-fclaw2d_map_destroy (fclaw_map_context_t * cont)
+fclaw_map_destroy (fclaw_map_context_t * cont)
 {
 #ifndef P4_TO_P8
     if (cont->brick != NULL)
     {
-        fclaw2d_map_destroy(cont->brick);  /* recursive call */
+        fclaw_map_destroy(cont->brick);  /* recursive call */
     }
 #endif
     if (cont->destroy == NULL)
