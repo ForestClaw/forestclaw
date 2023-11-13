@@ -50,18 +50,14 @@ add_library(forestclaw_c OBJECT
   fclaw2d_map_brick.c
   fclaw2d_convenience.c
   fclaw2d_exchange.c
-  fclaw2d_advance.c
   fclaw2d_physical_bc.c
   fclaw2d_ghost_fill.c
   fclaw2d_output.c
   fclaw2d_diagnostics.c
-  fclaw2d_update_single_step.c
   fclaw2d_domain.c
   fclaw2d_regrid.c
   fclaw2d_patch.c
   fclaw2d_partition.c
-  fclaw2d_timeinterp.c
-  fclaw2d_time_sync.c
   fclaw2d_corner_neighbors.c
   fclaw2d_face_neighbors.c
   fclaw2d_output_tikz.c
@@ -180,21 +176,17 @@ install(FILES
   fclaw2d_include_all.h 
 	fclaw2d_defs.h 
 	fclaw2d_options.h 
-	fclaw2d_advance.h 
 	fclaw2d_global.h
 	fclaw2d_domain.h
 	fclaw2d_block.h
 	fclaw2d_patch.h
 	fclaw2d_vtable.h
 	fclaw2d_output.h
-	fclaw2d_time_sync.h
-	fclaw2d_update_single_step.h
 	fclaw2d_physical_bc.h
 	fclaw2d_ghost_fill.h
 	fclaw2d_corner_neighbors.h
 	fclaw2d_face_neighbors.h
 	fclaw2d_map.h
-	fclaw2d_timeinterp.h
 	fclaw2d_regrid.h
 	fclaw2d_map_brick.h
 	fclaw2d_partition.h

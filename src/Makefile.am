@@ -47,21 +47,17 @@ libforestclaw_installed_headers = \
 	src/fclaw2d_include_all.h \
 	src/fclaw2d_defs.h \
 	src/fclaw2d_options.h \
-	src/fclaw2d_advance.h \
 	src/fclaw2d_global.h \
 	src/fclaw2d_domain.h \
 	src/fclaw2d_block.h \
 	src/fclaw2d_patch.h \
 	src/fclaw2d_vtable.h \
 	src/fclaw2d_output.h \
-	src/fclaw2d_time_sync.h \
-	src/fclaw2d_update_single_step.h \
 	src/fclaw2d_physical_bc.h \
 	src/fclaw2d_ghost_fill.h \
 	src/fclaw2d_corner_neighbors.h \
 	src/fclaw2d_face_neighbors.h \
 	src/fclaw2d_map.h \
-	src/fclaw2d_timeinterp.h \
 	src/fclaw2d_regrid.h \
 	src/fclaw2d_map_brick.h \
 	src/fclaw2d_partition.h \
@@ -140,18 +136,14 @@ libforestclaw_compiled_sources = \
 	src/fclaw2d_map_brick.c \
 	src/fclaw2d_convenience.c \
 	src/fclaw2d_exchange.c \
-	src/fclaw2d_advance.c \
 	src/fclaw2d_physical_bc.c \
 	src/fclaw2d_ghost_fill.c \
 	src/fclaw2d_output.c \
 	src/fclaw2d_diagnostics.c \
-	src/fclaw2d_update_single_step.c \
 	src/fclaw2d_domain.c \
 	src/fclaw2d_regrid.c \
 	src/fclaw2d_patch.c \
 	src/fclaw2d_partition.c \
-	src/fclaw2d_timeinterp.c \
-	src/fclaw2d_time_sync.c \
 	src/fclaw2d_corner_neighbors.c \
 	src/fclaw2d_face_neighbors.c \
 	src/fclaw2d_output_tikz.c \
