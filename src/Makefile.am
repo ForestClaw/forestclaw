@@ -42,13 +42,13 @@ libforestclaw_installed_headers = \
 	src/fclaw_include_all.h \
   	src/fclaw_rays.h \
   	src/fclaw_elliptic_solver.h \
+	src/fclaw_farraybox.hpp \
 	src/fp_exception_glibc_extension.h \
 	src/fclaw2d_include_all.h \
 	src/fclaw2d_defs.h \
 	src/fclaw2d_options.h \
 	src/fclaw2d_advance.h \
 	src/fclaw2d_elliptic_solver.h \
-	src/fclaw2d_farraybox.hpp \
 	src/fclaw2d_global.h \
 	src/fclaw2d_forestclaw.h \
 	src/fclaw2d_domain.h \
@@ -132,6 +132,7 @@ libforestclaw_compiled_sources = \
     src/fclaw_forestclaw.c \
   	src/fclaw_elliptic_solver.c \
 	src/fclaw_run.c \
+	src/fclaw_farraybox.cpp \
 	src/forestclaw.c \
 	src/fclaw2d_block.c \
 	src/fclaw2d_options.c \
@@ -162,7 +163,6 @@ libforestclaw_compiled_sources = \
 	src/fclaw2d_time_sync.c \
 	src/fclaw2d_corner_neighbors.c \
 	src/fclaw2d_face_neighbors.c \
-	src/fclaw2d_farraybox.cpp \
 	src/fclaw2d_output_tikz.c \
 	src/fclaw2d_file.c \
 	src/fclaw2d_wrap.c \
