@@ -26,7 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_defs.h>
 #include <sc.h>
 
-#include <fclaw2d_farraybox.hpp>
+#include <fclaw_farraybox.hpp>
 
 /* Difference in nan values :
    The first one is not trapped; the second one is.

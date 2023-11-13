@@ -34,7 +34,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_regrid.h>
 #include <fclaw_domain.h>
 #include <fclaw_patch.h>
-#include <fclaw3d_map.h>
 #include <fclaw2d_map.h>
 #include <fclaw_convenience.h>
 #include <fclaw3d_metric.hpp>
@@ -52,7 +51,6 @@ struct TestData {
     fclaw_global_t* glob;
     fclaw_options_t fopts;
     fclaw_domain_t *domain;
-    fclaw3d_map_context_t* map3d;
     fclaw2d_map_context_t* map;
     fclaw_clawpatch_options_t* opts;
     fclaw_patch_vtable_t* patch_vt;

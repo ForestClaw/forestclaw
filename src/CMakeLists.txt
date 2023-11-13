@@ -6,7 +6,6 @@ add_library(forestclaw_c OBJECT
   fclaw_options.c 
   fclaw_filesystem.cpp
   fclaw_gauges.c 
-  fclaw_package.c 
   fclaw_packing.c
   fclaw_pointer_map.c
   fclaw_math.c
@@ -41,16 +40,10 @@ add_library(forestclaw_c OBJECT
   fclaw_output.c
   fclaw_farraybox.cpp
   forestclaw.c
-  fclaw2d_options.c
-  fclaw2d_global.c
   fclaw2d_map.c
   fclaw2d_map_query.c
   fclaw2d_map_brick.c
   fclaw2d_convenience.c
-  fclaw2d_exchange.c
-  fclaw2d_diagnostics.c
-  fclaw2d_domain.c
-  fclaw2d_patch.c
   fclaw2d_output_tikz.c
   fclaw2d_file.c
   fclaw2d_wrap.c
@@ -120,7 +113,6 @@ target_link_libraries(FORESTCLAW::FORESTCLAW INTERFACE forestclaw)
 install(FILES
   fclaw_base.h 
 	fclaw_timer.h 
-	fclaw_package.h 
   fclaw_packing.h
 	fclaw_pointer_map.h 
 	fclaw_filesystem.h 
@@ -158,19 +150,12 @@ install(FILES
 	forestclaw.h 
 	forestclaw2d.h 
 	fp_exception_glibc_extension.h 
-  fclaw2d_include_all.h 
 	fclaw2d_defs.h 
-	fclaw2d_options.h 
-	fclaw2d_global.h
-	fclaw2d_domain.h
-	fclaw2d_patch.h
 	fclaw2d_map.h
 	fclaw2d_map_brick.h
-	fclaw2d_exchange.h
 	fclaw2d_convenience.h
 	fclaw2d_map_query.h
 	fclaw2d_map_query_defs.h
-	fclaw2d_diagnostics.h
   fclaw2d_file.h
   fclaw2d_wrap.h
   fclaw2d_to_3d.h
@@ -197,10 +182,7 @@ if(BUILD_TESTING)
       fclaw_options.h.TEST.cpp
       fclaw_patch.h.TEST.cpp
       fclaw_elliptic_solver.h.TEST.cpp
-      fclaw2d_diagnostics.h.TEST.cpp
-      fclaw2d_global.h.TEST.cpp
-      fclaw2d_options.h.TEST.cpp
-      fclaw2d_patch.h.TEST.cpp
+      fclaw_diagnostics.h.TEST.cpp
       fclaw_vtable.h.TEST.cpp
   )
 

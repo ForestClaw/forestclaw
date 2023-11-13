@@ -24,7 +24,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "radial_user.h"
-#include "fclaw2d_global.h"
 
 #include <fclaw_include_all.h>
 

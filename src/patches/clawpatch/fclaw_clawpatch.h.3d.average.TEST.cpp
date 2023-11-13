@@ -33,7 +33,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_global.h>
 #include <fclaw_domain.h>
 #include <fclaw_patch.h>
-#include <fclaw3d_map.h>
 #include <fclaw_convenience.h>
 #include <fclaw3d_metric.hpp>
 #include <fclaw3d_metric.h>
@@ -51,7 +50,6 @@ struct CubeDomain {
     fclaw_global_t* glob;
     fclaw_options_t fopts;
     fclaw_domain_t *domain;
-    fclaw3d_map_context_t* map;
     fclaw_clawpatch_options_t* opts;
 
     CubeDomain(int minlevel, int maxlevel){

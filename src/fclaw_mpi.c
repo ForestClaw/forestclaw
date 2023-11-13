@@ -24,7 +24,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include <fclaw_mpi.h>
-#include <fclaw2d_global.h>
+#include <fclaw_global.h>
 
 /* Functions with C prototypes to use forestclaw from C code */
 
@@ -72,15 +72,15 @@ fclaw_mpi_barrier (sc_MPI_Comm mpicomm)
 }
 
 void
-fclaw_mpi_serialization_enter (struct fclaw2d_global *glob)
+fclaw_mpi_serialization_enter (struct fclaw_global *glob)
 {
-    fclaw2d_domain_serialization_enter(glob->domain);
+    fclaw_domain_serialization_enter(glob->domain);
 }
 
 void
-fclaw_mpi_serialization_leave (struct fclaw2d_global *glob)
+fclaw_mpi_serialization_leave (struct fclaw_global *glob)
 {
-    fclaw2d_domain_serialization_leave(glob->domain);
+    fclaw_domain_serialization_leave(glob->domain);
 }
 
 

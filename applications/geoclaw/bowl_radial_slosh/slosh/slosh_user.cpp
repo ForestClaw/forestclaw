@@ -24,7 +24,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "slosh_user.h"
-#include "fclaw2d_global.h"
 #include <fclaw_filesystem.h>
 
 void slosh_link_solvers(fclaw_global_t *glob)

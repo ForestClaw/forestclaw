@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -23,44 +23,49 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FCLAW2D_EXCHANGE_H
-#define FCLAW2D_EXCHANGE_H
+#include <fclaw_global.h>
+#include <fclaw_diagnostics.h>
+#include <test.hpp>
 
-#include <fclaw_timer.h>
-
-#ifdef __cplusplus
-extern "C"
+TEST_CASE("fclaw_diagnostics_vtable_initialize stores two seperate vtables in two seperate globs")
 {
-#if 0
+	fclaw_global_t* glob1 = fclaw_global_new();
+	fclaw_global_t* glob2 = fclaw_global_new();
+
+	fclaw_diagnostics_vtable_initialize(glob1);
+	fclaw_diagnostics_vtable_initialize(glob2);
+
+	CHECK_NE(fclaw_diagnostics_vt(glob1), fclaw_diagnostics_vt(glob2));
+
+	fclaw_global_destroy(glob1);
+	fclaw_global_destroy(glob2);
 }
-#endif
-#endif
 
-struct fclaw2d_global;
-
-void fclaw2d_exchange_setup(struct fclaw2d_global* glob,
-                            fclaw2d_timer_names_t running);
-
-void fclaw2d_exchange_delete(struct fclaw2d_global* glob);
-
-void fclaw2d_exchange_ghost_patches_begin(struct fclaw2d_global* glob,
-                                          int minlevel,
-                                          int maxlevel,
-                                          int time_interp,
-                                          fclaw2d_timer_names_t running);
-
-void fclaw2d_exchange_ghost_patches_end(struct fclaw2d_global* glob,
-                                        int minlevel,
-                                        int maxlevel,
-                                        int time_interp,
-                                        fclaw2d_timer_names_t running);
-
-
-#ifdef __cplusplus
-#if 0
+TEST_CASE("fclaw_diagnostics_vtable_initialize sets is_set flag")
 {
-#endif
+	fclaw_global_t* glob = fclaw_global_new();
+
+	fclaw_diagnostics_vtable_initialize(glob);
+
+	CHECK_UNARY(fclaw_diagnostics_vt(glob)->is_set);
+
+	fclaw_global_destroy(glob);
 }
-#endif
+
+#ifdef FCLAW_ENABLE_DEBUG
+
+TEST_CASE("fclaw_diagnostics_vtable_initialize fails if called twice on a glob")
+{
+	fclaw_global_t* glob1 = fclaw_global_new();
+	fclaw_global_t* glob2 = fclaw_global_new();
+
+	fclaw_diagnostics_vtable_initialize(glob1);
+	CHECK_SC_ABORTED(fclaw_diagnostics_vtable_initialize(glob1));
+	fclaw_diagnostics_vtable_initialize(glob2);
+	CHECK_SC_ABORTED(fclaw_diagnostics_vtable_initialize(glob2));
+
+	fclaw_global_destroy(glob1);
+	fclaw_global_destroy(glob2);
+}
 
 #endif
