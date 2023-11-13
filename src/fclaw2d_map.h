@@ -304,7 +304,7 @@ fclaw_map_context_t *fclaw2d_map_new_fortran (fclaw2d_map_c2m_fortran_t
    ---------------------------------------------------------------------------------- */
 
 /* This is called to determine is a map is a pillow sphere or not */
-int fclaw2d_map_pillowsphere(struct fclaw_global* glob);
+int fclaw_map_pillowsphere(struct fclaw_global* glob);
 
 
 #if 0
