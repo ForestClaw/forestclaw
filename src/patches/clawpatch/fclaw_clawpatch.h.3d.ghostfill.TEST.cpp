@@ -88,7 +88,7 @@ struct TestData {
 
         if(domain->refine_dim == 2)
         {
-            map = fclaw2d_map_new_nomap();
+            map = fclaw_map_new_nomap();
             fclaw_map_store(glob, map);
         }
         //map = fclaw3d_map_new_nomap();

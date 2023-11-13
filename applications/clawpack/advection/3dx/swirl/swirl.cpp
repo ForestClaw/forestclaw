@@ -60,7 +60,7 @@ void create_domain(fclaw_global_t *glob)
                                       fclaw_opt->minlevel);
 
         /* Size is set by [ax,bx] x [ay, by], set in .ini file */
-        cont = fclaw2d_map_new_nomap();
+        cont = fclaw_map_new_nomap();
         break;
 
     case 1:

@@ -95,7 +95,7 @@ struct SinglePatchDomain {
         domain = fclaw_domain_new_unitsquare(sc_MPI_COMM_WORLD, 0);
         fclaw_global_store_domain(glob, domain);
 
-        map = fclaw2d_map_new_nomap();
+        map = fclaw_map_new_nomap();
         fclaw_map_store(glob, map);
 
         fclaw_vtables_initialize(glob);
@@ -149,7 +149,7 @@ struct QuadDomain {
         domain = fclaw_domain_new_unitsquare(sc_MPI_COMM_WORLD, 1);
         fclaw_global_store_domain(glob, domain);
 
-        map = fclaw2d_map_new_nomap();
+        map = fclaw_map_new_nomap();
         fclaw_map_store(glob, map);
 
         fclaw_vtables_initialize(glob);
@@ -284,7 +284,7 @@ TEST_CASE("3dx fclaw_clawpatch patch_build")
 	    fclaw_domain_t* domain = fclaw_domain_new_unitsquare(sc_MPI_COMM_WORLD, 0);
 	    fclaw_global_store_domain(glob, domain);
 
-        fclaw_map_context_t* map = fclaw2d_map_new_nomap();
+        fclaw_map_context_t* map = fclaw_map_new_nomap();
         fclaw_map_store(glob, map);
 
         fclaw_vtables_initialize(glob);

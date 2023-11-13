@@ -83,7 +83,7 @@ void radialdam_global_post_process(fclaw_options_t *fclaw_opt,
 
 /* ------------------------------- Mapping functions ---------------------------------- */
 
-fclaw_map_context_t* fclaw2d_map_new_nomap();
+fclaw_map_context_t* fclaw_map_new_nomap();
 
 fclaw_map_context_t* fclaw2d_map_new_pillowdisk(const double scale[],
                                                   const double shift[],

@@ -82,7 +82,7 @@ struct QuadDomain {
         domain = fclaw_domain_new_unitsquare(sc_MPI_COMM_WORLD, 1);
         fclaw_global_store_domain(glob, domain);
 
-        map = fclaw2d_map_new_nomap();
+        map = fclaw_map_new_nomap();
         fclaw_map_store(glob,map);
 
         fclaw_vtables_initialize(glob);
@@ -147,7 +147,7 @@ struct QuadDomainBrick {
         domain = fclaw_domain_new_2d_brick(sc_MPI_COMM_WORLD, fopts.mi, fopts.mj, 0,0,0);
         fclaw_global_store_domain(glob, domain);
 
-        map = fclaw2d_map_new_nomap();
+        map = fclaw_map_new_nomap();
         fclaw_map_store(glob, map);
 
         fclaw_vtables_initialize(glob);

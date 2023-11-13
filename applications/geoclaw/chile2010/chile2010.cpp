@@ -45,7 +45,7 @@ fclaw_domain_t* create_domain(sc_MPI_Comm mpicomm,
 
     /* Size is set by [ax,bx] x [ay, by], set in .ini file */
     conn = p4est_connectivity_new_unitsquare();
-    cont = fclaw2d_map_new_nomap();
+    cont = fclaw_map_new_nomap();
 
     domain = fclaw2d_domain_new_conn_map (mpicomm, fclaw_opt->minlevel, conn, cont);
     fclaw_domain_list_levels(domain, FCLAW_VERBOSITY_ESSENTIAL);

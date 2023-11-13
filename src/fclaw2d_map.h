@@ -359,7 +359,7 @@ void FCLAW_MAP_SET_CONTEXT (fclaw_map_context_t** a_context);
 
 /* -------------------------------------- No map -------------------------------------- */
 
-fclaw_map_context_t* fclaw2d_map_new_nomap();
+fclaw_map_context_t* fclaw_map_new_nomap();
 
 
 /* -------------------------------- Brick mapping ----------------------------------- */

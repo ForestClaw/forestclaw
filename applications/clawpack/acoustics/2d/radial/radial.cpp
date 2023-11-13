@@ -52,7 +52,7 @@ create_domain(fclaw_global_t * glob)
         domain =
             fclaw_domain_new_unitsquare (glob->mpicomm,
                                            fclaw_opt->minlevel);
-        cont = fclaw2d_map_new_nomap ();
+        cont = fclaw_map_new_nomap ();
         break;
     case 1:
         /* Map five-patch square to a disk using the pillowdisk.  Input
