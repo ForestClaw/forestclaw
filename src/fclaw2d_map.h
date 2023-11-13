@@ -42,7 +42,7 @@ typedef struct fclaw_global fclaw_global_t;
 struct p4est_connectivity;
 struct fclaw_global;
 
-struct fclaw2d_map_context;
+struct fclaw_map_context;
 
 /** This prototype matches the Fortran mapc2m functions used in ClawPatch.
  */
@@ -52,7 +52,7 @@ typedef void (*fclaw2d_map_c2m_fortran_t) (const double *xc, const double *yc,
 
 #define FCLAW2D_MAP_QUERY FCLAW_F77_FUNC_(fclaw2d_map_query,FCLAW2D_MAP_QUERY)
 
-typedef struct fclaw2d_map_context fclaw_map_context_t;
+typedef struct fclaw_map_context fclaw_map_context_t;
 typedef struct fclaw2d_map_data fclaw2d_map_data_t;
 
 /** This function is used to query the map for general properties.
@@ -61,8 +61,8 @@ typedef struct fclaw2d_map_data fclaw2d_map_data_t;
  *                      Be sure to use the symbolic constants above.
  * \return              Result of the query.
  */
-typedef int (*fclaw2d_map_query_t) (fclaw_map_context_t * cont,
-                                    int query_identifier);
+typedef int (*fclaw_map_query_t) (fclaw_map_context_t * cont,
+                                  int query_identifier);
 
 /** This function performs the coordinate transformation.
  * \param [in] cont     Matching mapping context.
@@ -73,49 +73,49 @@ typedef int (*fclaw2d_map_query_t) (fclaw_map_context_t * cont,
  * \param [out] yp      Transformed y-coordinate.
  * \param [out] zp      Transformed z-coordinate.
  */
-typedef void (*fclaw2d_map_c2m_t) (fclaw_map_context_t * cont, int blockno,
-                                   double xc, double yc,
-                                   double *xp, double *yp, double *zp);
+typedef void (*fclaw_map_2d_c2m_t) (fclaw_map_context_t * cont, int blockno,
+                                    double xc, double yc,
+                                    double *xp, double *yp, double *zp);
 
 
 
 /* Covariant and contravariant basis vectors needed for exact solution */
-typedef void (*fclaw2d_map_c2m_basis_t)(fclaw_map_context_t * cont, 
-                                        double xc, double yc, 
-                                        double *t, double *tinv, 
-                                        double *tderivs, int flag);
+typedef void (*fclaw_map_2d_c2m_basis_t)(fclaw_map_context_t * cont, 
+                                         double xc, double yc, 
+                                         double *t, double *tinv, 
+                                         double *tderivs, int flag);
 
 /* For extruded mesh mappings */
-typedef void (*fclaw3dx_map_c2m_t) (fclaw_map_context_t * cont, int blockno,
-                                   double xc, double yc,double zc,
-                                   double *xp, double *yp, double *zp);
+typedef void (*fclaw_map_3d_c2m_t) (fclaw_map_context_t * cont, int blockno,
+                                    double xc, double yc,double zc,
+                                    double *xp, double *yp, double *zp);
 
 
 /* Covariant and contravariant basis vectors needed for exact solution */
-typedef void (*fclaw3dx_map_c2m_basis_t)(fclaw_map_context_t * cont, 
+typedef void (*fclaw_map_3d_c2m_basis_t)(fclaw_map_context_t * cont, 
                                         double xc, double yc, double zc,
                                         double *t, double *tinv, 
                                         double *tderivs, int flag);
 
 /** Destructor for a fclaw2d_map_context.
  */
-typedef void (*fclaw2d_map_destroy_t) (fclaw_map_context_t * cont);
+typedef void (*fclaw_map_destroy_t) (fclaw_map_context_t * cont);
 
 /** Mapping context that is interpreted by its query and c2m members.
  * The callbacks are free to define the meaning of the user_* fields.
  */
-struct fclaw2d_map_context
+struct fclaw_map_context
 {
-    fclaw2d_map_query_t       query;
+    fclaw_map_query_t       query;
 
-    fclaw2d_map_c2m_t         mapc2m;
-    fclaw2d_map_c2m_basis_t   basis;
+    fclaw_map_2d_c2m_t         mapc2m;
+    fclaw_map_2d_c2m_basis_t   basis;
 
-    fclaw3dx_map_c2m_t         mapc2m_3dx;   /* Takes a 2d context */
-    fclaw3dx_map_c2m_basis_t   basis_3dx;
+    fclaw_map_3d_c2m_t         mapc2m_3dx;   /* Takes a 2d context */
+    fclaw_map_3d_c2m_basis_t   basis_3dx;
     int is_extruded;
 
-    fclaw2d_map_destroy_t destroy;
+    fclaw_map_destroy_t destroy;
 
     /* Used strictly for 2d mapping */
     int user_int[16];
@@ -140,7 +140,7 @@ struct fclaw2d_map_context
  * @param map the map to store
  */
 void fclaw_map_store (fclaw_global_t* glob,
-                      struct fclaw2d_map_context * map);
+                      struct fclaw_map_context * map);
 
 /**
  * Get map from the glob

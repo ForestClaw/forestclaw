@@ -719,10 +719,16 @@ fclaw_1to2 = {
     "fclaw2d_ray_deallocate_rays"                  : "fclaw_ray_deallocate_rays",
 
     #===== ./src/fclaw2d_map.c =====
+    "fclaw2d_map_context"                          : "fclaw_map_context",
     "fclaw2d_map_context_t"                        : "fclaw_map_context_t",
     "fclaw2d_map_store_t"                          : "fclaw_map_store_t",
-    "fclaw2d_get_map"                              : "fclaw_get_map"
-
+    "fclaw2d_get_map"                              : "fclaw_get_map",
+    "fclaw2d_map_query_t"                          : "fclaw_map_query_t",
+    "fclaw2d_map_c2m_t"                            : "fclaw_map_2d_c2m_t",
+    "fclaw2d_map_c2m_basis_t"                      : "fclaw_map_2d_c2m_basis_t",
+    "fclaw3dx_map_c2m_t"                           : "fclaw_map_3d_c2m_t",
+    "fclaw3dx_map_c2m_basis_t"                     : "fclaw_map_3d_c2m_basis_t",
+    "fclaw2d_map_destroy_t"                        : "fclaw_map_destroy_t"
 }
 
 import glob
