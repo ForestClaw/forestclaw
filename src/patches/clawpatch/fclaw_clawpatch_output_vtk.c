@@ -739,7 +739,7 @@ fclaw2d_output_vtk_coordinate_cb (fclaw_global_t * glob,
             const double x = xlower + i * dx;
             if (fclaw_opt->manifold)
             {
-                FCLAW2D_MAP_C2M(&cont,&blockno,&x,&y,&xpp,&ypp,&zpp);
+                FCLAW_MAP_2D_C2M(&cont,&blockno,&x,&y,&xpp,&ypp,&zpp);
                 *d++ = xpp;
                 *d++ = ypp;
                 *d++ = zpp;

@@ -25,7 +25,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "tsunami_user.h"
 
-#include <fclaw2d_clawpatch_options.h>
+#include <fclaw_clawpatch_options.h>
 
 #include <fclaw_pointer_map.h>
 
@@ -139,13 +139,13 @@ user_options_t* tsunami_options_register (fclaw_app_t * app,
     return user;
 }
 
-void tsunami_options_store (fclaw2d_global_t* glob, user_options_t* user)
+void tsunami_options_store (fclaw_global_t* glob, user_options_t* user)
 {
     FCLAW_ASSERT(fclaw_pointer_map_get(glob->options,"user") == NULL);
     fclaw_pointer_map_insert(glob->options, "user", user, NULL);
 }
 
-user_options_t* tsunami_get_options(fclaw2d_global_t* glob)
+user_options_t* tsunami_get_options(fclaw_global_t* glob)
 {
     user_options_t* user = (user_options_t*) 
                               fclaw_pointer_map_get(glob->options, "user");

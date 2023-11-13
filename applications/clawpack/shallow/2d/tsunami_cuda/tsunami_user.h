@@ -26,7 +26,7 @@
 #ifndef TSUNAMI_USER_H
 #define TSUNAMI_USER_H
 
-#include <fclaw2d_include_all.h>
+#include <fclaw_include_all.h>
 #include <fc2d_cudaclaw.h>
 
 #ifdef __cplusplus
@@ -71,17 +71,17 @@ void geoclaw_setprob_cuda(double grav, double dry_tolerance, double sea_level);
 
 /* --------------------------------------- Cuda ----------------------------------------*/
 
-void geoclaw_problem_setup(fclaw2d_global_t *glob);
-void tsunami_link_solvers(fclaw2d_global_t *glob);
+void geoclaw_problem_setup(fclaw_global_t *glob);
+void tsunami_link_solvers(fclaw_global_t *glob);
 
 user_options_t* tsunami_options_register (fclaw_app_t * app,
                                           const char *configfile);
 
-void tsunami_options_store (fclaw2d_global_t* glob, user_options_t* user);
+void tsunami_options_store (fclaw_global_t* glob, user_options_t* user);
 
-user_options_t* tsunami_get_options(fclaw2d_global_t* glob);
+user_options_t* tsunami_get_options(fclaw_global_t* glob);
 
-fclaw2d_map_context_t* fclaw2d_map_new_nomap();
+fclaw_map_context_t* fclaw2d_map_new_nomap();
 
 #ifdef __cplusplus
 #if 0

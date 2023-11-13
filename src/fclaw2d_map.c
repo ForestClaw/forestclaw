@@ -66,7 +66,7 @@ FCLAW_MAP_QUERY (fclaw_map_context_t ** pcont,
 /* This function can be called from Fortran inside of ClawPatch. */
 
 void
-FCLAW2D_MAP_C2M (fclaw_map_context_t ** pcont, int *blockno,
+FCLAW_MAP_2D_C2M (fclaw_map_context_t ** pcont, int *blockno,
                  const double *xc, const double *yc,
                  double *xp, double *yp, double *zp)
 {

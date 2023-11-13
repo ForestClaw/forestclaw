@@ -191,10 +191,10 @@ void FCLAW_MAP_QUERY (fclaw_map_context_t ** cont,
  * \param [out] mz      Transformed z-coordinate.
  */
 
-#define FCLAW2D_MAP_C2M FCLAW_F77_FUNC_(fclaw2d_map_c2m,FCLAW2D_MAP_C2M)
-void FCLAW2D_MAP_C2M (fclaw_map_context_t ** cont, int *blockno,
-                      const double *xc, const double *yc,
-                      double *xp, double *yp, double *zp);
+#define FCLAW_MAP_2D_C2M FCLAW_F77_FUNC_(fclaw_map_2d_c2m,FCLAW_MAP_2D_C2M)
+void FCLAW_MAP_2D_C2M (fclaw_map_context_t ** cont, int *blockno,
+                       const double *xc, const double *yc,
+                       double *xp, double *yp, double *zp);
 
 
 #define FCLAW2D_MAP_C2M_BASIS FCLAW_F77_FUNC_(fclaw2d_map_c2m_basis, \

@@ -3,7 +3,6 @@
 #include <fclaw2d_map_brick.h>
 
 #include <fclaw2d_map.h>
-#include <fclaw2d_convenience.h>
 
 static int
 fclaw2d_map_query_brick (fclaw_map_context_t * cont, int query_identifier)
@@ -85,52 +84,6 @@ void fclaw2d_map_destroy_brick(fclaw_map_context_t *cont)
 
     FCLAW_FREE (cont->user_data);
     FCLAW_FREE (cont);
-}
-
-
-fclaw_map_context_t* fclaw2d_map_new_brick_conn
-  (p4est_connectivity_t *conn, int mi, int mj)
-{
-    fclaw_map_context_t *cont;
-    fclaw2d_block_ll_t *bv;
-    int i,nb,vnum;
-
-    cont = FCLAW_ALLOC_ZERO (fclaw_map_context_t, 1);
-    cont->query = fclaw2d_map_query_brick;
-    cont->mapc2m = fclaw2d_map_c2m_brick;
-    cont->destroy = fclaw2d_map_destroy_brick;
-
-    nb = (int) conn->num_trees;
-    bv = FCLAW_ALLOC_ZERO(fclaw2d_block_ll_t,1);
-
-    /* We don't store this in user_double[], since that only has limited
-       storage (16 doubles) */
-    bv->xv = FCLAW_ALLOC_ZERO(double,nb);
-    bv->yv = FCLAW_ALLOC_ZERO(double,nb);
-
-    bv->nb = nb;  /* These integer values could also be stored in user_int[] data */
-    bv->mi = mi;
-    bv->mj = mj;
-
-    for (i = 0; i < nb; i++)
-    {
-        vnum = conn->tree_to_vertex[4 * i];
-        /* (x,y) coordinates of lower-left corner */
-        bv->xv[i] = conn->vertices[3*vnum];
-        bv->yv[i] = conn->vertices[3*vnum+1];
-    }
-    cont->user_data = (void*) bv;
-
-    /* Write data for Matlab plotting */
-    FILE *fid;
-    fid = fopen("brick.dat","w");
-    fprintf(fid,"%8d %8d\n",mi, mj);
-    for(i = 0; i < nb; i++)
-    {
-        fprintf(fid,"%12g %12g\n",bv->xv[i], bv->yv[i]);
-    }
-    fclose(fid);
-    return cont;
 }
 
 fclaw_map_context_t*

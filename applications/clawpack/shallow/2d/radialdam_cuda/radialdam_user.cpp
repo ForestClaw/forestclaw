@@ -25,7 +25,7 @@
 
 #include "radialdam_user.h"
 
-#include <fclaw2d_clawpatch.h>
+#include <fclaw_clawpatch.h>
 
 #include <fc2d_clawpack46.h>
 #include <fc2d_clawpack5.h>
@@ -33,9 +33,9 @@
 
 #include "../rp/shallow_user_fort.h"
 
-void radialdam_link_solvers(fclaw2d_global_t *glob)
+void radialdam_link_solvers(fclaw_global_t *glob)
 {
-	fclaw2d_vtable_t *vt = fclaw2d_vt(glob);
+	fclaw_vtable_t *vt = fclaw_vt(glob);
 
 	vt->problem_setup = &radialdam_problem_setup;  /* Version-independent */
 
@@ -77,8 +77,8 @@ void radialdam_link_solvers(fclaw2d_global_t *glob)
 			}
 			else if (user->example == 1)
 			{
-				fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt(glob);
-				fclaw2d_patch_vtable_t         *patch_vt = fclaw2d_patch_vt(glob);
+				fclaw_clawpatch_vtable_t *clawpatch_vt = fclaw_clawpatch_vt(glob);
+				fclaw_patch_vtable_t         *patch_vt = fclaw_patch_vt(glob);
 
 				patch_vt->setup = &radialdam_patch_setup;
 
@@ -94,7 +94,7 @@ void radialdam_link_solvers(fclaw2d_global_t *glob)
 }
 
 
-void radialdam_problem_setup(fclaw2d_global_t* glob)
+void radialdam_problem_setup(fclaw_global_t* glob)
 {
 	const user_options_t* user = radialdam_get_options(glob);
 
@@ -107,8 +107,8 @@ void radialdam_problem_setup(fclaw2d_global_t* glob)
 }
 
 
-void radialdam_patch_setup(fclaw2d_global_t *glob,
-		fclaw2d_patch_t *this_patch,
+void radialdam_patch_setup(fclaw_global_t *glob,
+		fclaw_patch_t *this_patch,
 		int this_block_idx,
 		int this_patch_idx)
 {
@@ -119,25 +119,25 @@ void radialdam_patch_setup(fclaw2d_global_t *glob,
 	double *xnormals,*ynormals,*xtangents,*ytangents;
 	double *surfnormals,*edgelengths,*curvature;
 
-	if (fclaw2d_patch_is_ghost(this_patch))
+	if (fclaw_patch_is_ghost(this_patch))
 	{
 		/* Mapped info is needed only for an update */
 		return;
 	}
 
-	fclaw2d_clawpatch_grid_data(glob,this_patch,&mx,&my,&mbc,
+	fclaw_clawpatch_2d_grid_data(glob,this_patch,&mx,&my,&mbc,
 			&xlower,&ylower,&dx,&dy);
 
-	fclaw2d_clawpatch_metric_data(glob,this_patch,&xp,&yp,&zp,
+	fclaw_clawpatch_2d_metric_data(glob,this_patch,&xp,&yp,&zp,
 			&xd,&yd,&zd,&area);
 
-	fclaw2d_clawpatch_metric_data2(glob,this_patch,
+	fclaw_clawpatch_2d_metric_data2(glob,this_patch,
 			&xnormals,&ynormals,
 			&xtangents,&ytangents,
 			&surfnormals,&edgelengths,
 			&curvature);
 
-	fclaw2d_clawpatch_aux_data(glob,this_patch,&aux,&maux);
+	fclaw_clawpatch_aux_data(glob,this_patch,&aux,&maux);
 
 	USER5_SETAUX_MANIFOLD(&mbc,&mx,&my,&xlower,&ylower,
 			&dx,&dy,&maux,aux,

@@ -17,7 +17,7 @@
       cont = get_context()
 
       IF (fclaw2d_map_is_used(cont)) THEN
-         CALL fclaw2d_map_c2m(cont,blockno,x,y,xp,yp,zp)
+         CALL fclaw_map_2d_c2m(cont,blockno,x,y,xp,yp,zp)
          r2 = (xp-x0)**2 + (yp-y0)**2
       ELSE
          r2 = (x-x0)**2 + (y-y0)**2

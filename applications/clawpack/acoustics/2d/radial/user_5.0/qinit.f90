@@ -28,7 +28,7 @@ SUBROUTINE clawpack5_qinit(meqn,mbc,mx,my,xlower,ylower, &
      DO j = 1-mbc,my+mbc
         yc = ylower + (j-0.5d0)*dy
         IF (fclaw2d_map_is_used(cont)) THEN
-           CALL fclaw2d_map_c2m(cont,blockno,xc,yc,xp,yp,zp)
+           CALL fclaw_map_2d_c2m(cont,blockno,xc,yc,xp,yp,zp)
            r = SQRT(xp**2 + yp**2)
         ELSE
            r = SQRT(xc**2 + yc**2)

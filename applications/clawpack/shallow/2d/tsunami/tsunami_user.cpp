@@ -25,15 +25,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "tsunami_user.h"
 
-#include <fclaw2d_clawpatch.h>
+#include <fclaw_clawpatch.h>
 
 #include <fc2d_clawpack46.h>
 
 #include <clawpack46_user_fort.h>
 
-void tsunami_link_solvers(fclaw2d_global_t *glob)
+void tsunami_link_solvers(fclaw_global_t *glob)
 {
-    fclaw2d_vtable_t *vt = fclaw2d_vt(glob);
+    fclaw_vtable_t *vt = fclaw_vt(glob);
     vt->problem_setup = &tsunami_problem_setup;  /* Version-independent */
 
     //fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt(glob);
@@ -46,7 +46,7 @@ void tsunami_link_solvers(fclaw2d_global_t *glob)
 }
 
 
-void tsunami_problem_setup(fclaw2d_global_t* glob)
+void tsunami_problem_setup(fclaw_global_t* glob)
 {
     const user_options_t* user = tsunami_get_options(glob);
 

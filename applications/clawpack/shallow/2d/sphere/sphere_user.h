@@ -26,7 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef SPHERE_USER_H
 #define SPHERE_USER_H
 
-#include <fclaw2d_clawpatch.h>
+#include <fclaw_clawpatch.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -45,15 +45,15 @@ void SETAUX_SPHERE(const int* mx, const int* my,const int* mbc,
                    double xtangents[], double ytangents[],
                    double surnormals[]);
 
-void sphere_link_solvers(fclaw2d_domain_t *domain);
+void sphere_link_solvers(fclaw_domain_t *domain);
 
-void sphere_patch_manifold_setup(fclaw2d_domain_t *domain,
-                                  fclaw2d_patch_t *this_patch,
+void sphere_patch_manifold_setup(fclaw_domain_t *domain,
+                                  fclaw_patch_t *this_patch,
                                   int this_block_idx,
                                   int this_patch_idx);
 
-double sphere_patch_update(fclaw2d_domain_t *domain,
-                            fclaw2d_patch_t *this_patch,
+double sphere_patch_update(fclaw_domain_t *domain,
+                            fclaw_patch_t *this_patch,
                             int this_block_idx,
                             int this_patch_idx,
                             double t,

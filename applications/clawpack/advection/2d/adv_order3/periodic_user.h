@@ -26,7 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef PERIODIC_USER_H
 #define PERIODIC_USER_H
 
-#include <fclaw2d_include_all.h>
+#include <fclaw_include_all.h>
 
 #include <fc2d_clawpack46.h>
 
@@ -56,13 +56,13 @@ typedef struct user_options
 
 user_options_t* periodic_options_register (fclaw_app_t * app, const char *configfile);
 
-void periodic_options_store (fclaw2d_global_t* glob, user_options_t* user);
+void periodic_options_store (fclaw_global_t* glob, user_options_t* user);
 
-const user_options_t* periodic_get_options(fclaw2d_global_t* glob);
+const user_options_t* periodic_get_options(fclaw_global_t* glob);
 
 /* ------------------- Public functions defined in periodic_user -----------------------*/
 
-void periodic_link_solvers(fclaw2d_global_t *glob);
+void periodic_link_solvers(fclaw_global_t *glob);
 
 /* ------------------------------------ Fortran ----------------------------------------*/
 #define PERIODIC_SETPROB FCLAW_F77_FUNC(periodic_setprob, PERIODIC_SETPROB)
@@ -98,7 +98,7 @@ void PERIODIC_FORT_INTERPOLATE_FACE(const int* mx, const int* my,
                                                const int* idir, const int* iside,
                                                const int* num_neighbors,
                                                const int* refratio, const int* igrid,
-                                               struct fclaw2d_patch_transform_data** 
+                                               struct fclaw_patch_transform_data** 
                                                transform_cptr);
 
 #define PERIODIC_FORT_INTERPOLATE_CORNER \
@@ -108,7 +108,7 @@ void PERIODIC_FORT_INTERPOLATE_CORNER(const int* mx, const int* my,
                                                  const int* mbc,const int* meqn, 
                                                  const int* a_refratio, double this_q[],
                                                  double neighbor_q[], const int* a_corner,
-                                                 struct fclaw2d_patch_transform_data** 
+                                                 struct fclaw_patch_transform_data** 
                                                  transform_cptr);
 
 

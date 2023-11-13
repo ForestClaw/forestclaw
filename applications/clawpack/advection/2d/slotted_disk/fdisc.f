@@ -14,7 +14,7 @@
 
       cont = fclaw_map_get_context()
 
-      call fclaw2d_map_c2m(cont,blockno,xc,yc,xp,yp,zp)
+      call fclaw_map_2d_c2m(cont,blockno,xc,yc,xp,yp,zp)
 
 c      call get_td_sdisk_parms(r,hmax,b,c)
 

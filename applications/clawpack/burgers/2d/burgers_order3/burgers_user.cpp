@@ -25,19 +25,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "burgers_user.h"
 
-#include <fclaw2d_include_all.h>
+#include <fclaw_include_all.h>
 
 /* Two versions of Clawpack */
 #include <fc2d_clawpack46.h>
 #include <fc2d_clawpack46_options.h>
 
-#include <fclaw2d_clawpatch.h>
+#include <fclaw_clawpatch.h>
 #include <fclaw2d_clawpatch_fort.h>
 
 #include <clawpack46_user_fort.h>
 
 
-void burgers_link_solvers(fclaw2d_global_t *glob)
+void burgers_link_solvers(fclaw_global_t *glob)
 {
     const user_options_t* user = burgers_get_options(glob);
     if (user->claw_version == 4)
@@ -46,7 +46,7 @@ void burgers_link_solvers(fclaw2d_global_t *glob)
 
         clawpack46_vt->fort_qinit     = &CLAWPACK46_QINIT;
 
-        fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt(glob);
+        fclaw_clawpatch_vtable_t *clawpatch_vt = fclaw_clawpatch_vt(glob);
         clawpatch_vt->fort_tag4coarsening = &TAG4COARSENING;
         clawpatch_vt->fort_tag4refinement = &TAG4REFINEMENT;
 
