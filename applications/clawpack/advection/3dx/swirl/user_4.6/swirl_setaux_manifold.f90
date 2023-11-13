@@ -105,7 +105,7 @@ subroutine swirl_set_velocity_manifold(mx,my,mz,mbc, &
          do i = 1-mbc,mx+mbc
 
             !! Get velocity normal to x-face
-            call fclaw3d_map_c2m(cont,blockno,xc(i)-dx2,yc(j),zc(k),xp,yp,zp)
+            call fclaw_map_3d_c2m(cont,blockno,xc(i)-dx2,yc(j),zc(k),xp,yp,zp)
             g = faceareas(i,j,k,1)/dydz
             u = compute_u(xp,yp,zp)
             v = compute_v(xp,yp,zp)
@@ -117,7 +117,7 @@ subroutine swirl_set_velocity_manifold(mx,my,mz,mbc, &
             un_scaled = g*(nv(1)*u + nv(2)*v + nv(3)*w)
 
             !! Get velocity normal to y-face
-            call fclaw3d_map_c2m(cont,blockno,xc(i),yc(j)-dy2,zc(k),xp,yp,zp)
+            call fclaw_map_3d_c2m(cont,blockno,xc(i),yc(j)-dy2,zc(k),xp,yp,zp)
             g = faceareas(i,j,k,2)/dxdz
             u = compute_u(xp,yp,zp)
             v = compute_v(xp,yp,zp)
@@ -129,7 +129,7 @@ subroutine swirl_set_velocity_manifold(mx,my,mz,mbc, &
             vn_scaled = g*(nv(1)*u + nv(2)*v + nv(3)*w)
 
             !! Get velocity normal to z-face
-            call fclaw3d_map_c2m(cont,blockno,xc(i),yc(j),zc(k)-dz2,xp,yp,zp)
+            call fclaw_map_3d_c2m(cont,blockno,xc(i),yc(j),zc(k)-dz2,xp,yp,zp)
             g = faceareas(i,j,k,3)/dxdy
             u = compute_u(xp,yp,zp)
             v = compute_v(xp,yp,zp)

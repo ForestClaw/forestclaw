@@ -91,16 +91,10 @@ FCLAW_MAP_2D_C2M_BASIS (fclaw_map_context_t ** pcont,
 }
 
 
-/* This pragma requires a fclaw3dx_map.{c,h} file, so I"ll hold off for 
-   now on adding these.   Ideally, the patch metric won't know whether
-   the mapping is for an extruded mesh or for a full octree mesh. 
-*/
-
-//#if PATCH_DIM == 3 && REFINE_DIM == 2
 void
-FCLAW3D_MAP_C2M (fclaw_map_context_t ** pcont, int *blockno,
-                 const double *xc, const double *yc, const double *zc,
-                 double *xp, double *yp, double *zp)
+FCLAW_MAP_3D_C2M (fclaw_map_context_t ** pcont, int *blockno,
+                  const double *xc, const double *yc, const double *zc,
+                  double *xp, double *yp, double *zp)
 {
     fclaw_map_context_t *cont = *pcont;
     FCLAW_ASSERT(cont->mapc2m_3dx != NULL);
@@ -110,10 +104,10 @@ FCLAW3D_MAP_C2M (fclaw_map_context_t ** pcont, int *blockno,
 
 
 void
-FCLAW3D_MAP_C2M_BASIS (fclaw_map_context_t ** pcont,
-                       const double *xc, const double *yc, const double *zc, 
-                       double *t, double *tinv, double *tderivs,
-                       int *flag)
+FCLAW_MAP_3D_C2M_BASIS (fclaw_map_context_t ** pcont,
+                        const double *xc, const double *yc, const double *zc, 
+                        double *t, double *tinv, double *tderivs,
+                        int *flag)
 {
     fclaw_map_context_t *cont = *pcont;
     FCLAW_ASSERT(cont->basis_3dx != NULL);

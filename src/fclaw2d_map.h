@@ -206,19 +206,19 @@ void FCLAW_MAP_2D_C2M_BASIS (fclaw_map_context_t ** cont,
                              int * flag);
 
 
-#define FCLAW3D_MAP_C2M FCLAW_F77_FUNC_(fclaw3d_map_c2m,FCLAW3D_MAP_C2M)
-void FCLAW3D_MAP_C2M (fclaw_map_context_t ** cont, int *blockno,
-                      const double *xc, const double *yc, const double *zc,
-                      double *xp, double *yp, double *zp);
+#define FCLAW_MAP_3D_C2M FCLAW_F77_FUNC_(fclaw_map_3d_c2m,FCLAW_MAP_3D_C2M)
+void FCLAW_MAP_3D_C2M (fclaw_map_context_t ** cont, int *blockno,
+                       const double *xc, const double *yc, const double *zc,
+                       double *xp, double *yp, double *zp);
 
 
-#define FCLAW3D_MAP_C2M_BASIS FCLAW_F77_FUNC_(fclaw3d_map_c2m_basis, \
-                                              FCLAW3D_MAP_C2M_BASIS)
+#define FCLAW_MAP_3D_C2M_BASIS FCLAW_F77_FUNC_(fclaw_map_3d_c2m_basis, \
+                                               FCLAW_MAP_3D_C2M_BASIS)
 
-void FCLAW3D_MAP_C2M_BASIS (fclaw_map_context_t ** cont, 
-                            const double *xc, const double *yc, const double *zc,
-                            double *t, double *tinv, double *tderivs,
-                            int * flag);
+void FCLAW_MAP_3D_C2M_BASIS (fclaw_map_context_t ** cont, 
+                             const double *xc, const double *yc, const double *zc,
+                             double *t, double *tinv, double *tderivs,
+                             int * flag);
 
 
 /** Map brick to computational coordinates in [0,1]x[0,1]
