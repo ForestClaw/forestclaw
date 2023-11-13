@@ -50,8 +50,6 @@ typedef void (*fclaw2d_map_c2m_fortran_t) (const double *xc, const double *yc,
                                            double *xp, double *yp,
                                            double *zp);
 
-#define FCLAW2D_MAP_QUERY FCLAW_F77_FUNC_(fclaw2d_map_query,FCLAW2D_MAP_QUERY)
-
 typedef struct fclaw_map_context fclaw_map_context_t;
 typedef struct fclaw2d_map_data fclaw2d_map_data_t;
 
@@ -170,16 +168,16 @@ void SET_ROTATION_MATRIX (const double rot_angles[],double rrot[]);
 
 
 
+#define FCLAW_MAP_QUERY FCLAW_F77_FUNC_(fclaw_map_query,FCLAW_MAP_QUERY)
+
 
 /** Query function for the mapping that can be called from Fortran.
  * \param [in] cont     Mapping context with matching callback functions.
  * \param [in] query_identifier Is passed to the map_query_t function.
  * \param [out] iresult         On return contains result of query.
  */
-
-
-void FCLAW2D_MAP_QUERY (fclaw_map_context_t ** cont,
-                        const int *query_identifier, int *iresult);
+void FCLAW_MAP_QUERY (fclaw_map_context_t ** cont,
+                      const int *query_identifier, int *iresult);
 
 
 

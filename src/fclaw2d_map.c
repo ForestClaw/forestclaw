@@ -56,8 +56,8 @@ fclaw_map_get(fclaw_global_t* glob)
 
 /* This function can be called from Fortran inside of ClawPatch. */
 void
-FCLAW2D_MAP_QUERY (fclaw_map_context_t ** pcont,
-                   const int *query_identifier, int *iresult)
+FCLAW_MAP_QUERY (fclaw_map_context_t ** pcont,
+                 const int *query_identifier, int *iresult)
 {
     fclaw_map_context_t *cont = *pcont;
     *iresult = cont->query (cont, *query_identifier);
