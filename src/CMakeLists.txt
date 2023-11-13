@@ -44,7 +44,6 @@ add_library(forestclaw_c OBJECT
   fclaw2d_block.c
   fclaw2d_options.c
   fclaw2d_global.c
-  fclaw2d_forestclaw.c
   fclaw2d_vtable.c
   fclaw2d_map.c
   fclaw2d_map_query.c
@@ -56,7 +55,6 @@ add_library(forestclaw_c OBJECT
   fclaw2d_physical_bc.c
   fclaw2d_ghost_fill.c
   fclaw2d_output.c
-  fclaw2d_run.c
   fclaw2d_diagnostics.c
   fclaw2d_rays.c
   fclaw2d_update_single_step.c
@@ -65,8 +63,6 @@ add_library(forestclaw_c OBJECT
   fclaw2d_patch.c
   fclaw2d_partition.c
   fclaw2d_timeinterp.c
-  fclaw2d_initialize.c
-  fclaw2d_finalize.c
   fclaw2d_time_sync.c
   fclaw2d_corner_neighbors.c
   fclaw2d_face_neighbors.c
@@ -189,7 +185,6 @@ install(FILES
 	fclaw2d_advance.h 
 	fclaw2d_elliptic_solver.h 
 	fclaw2d_global.h
-	fclaw2d_forestclaw.h
 	fclaw2d_domain.h
 	fclaw2d_block.h
 	fclaw2d_patch.h

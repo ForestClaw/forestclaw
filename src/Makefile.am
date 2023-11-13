@@ -50,7 +50,6 @@ libforestclaw_installed_headers = \
 	src/fclaw2d_advance.h \
 	src/fclaw2d_elliptic_solver.h \
 	src/fclaw2d_global.h \
-	src/fclaw2d_forestclaw.h \
 	src/fclaw2d_domain.h \
 	src/fclaw2d_block.h \
 	src/fclaw2d_patch.h \
@@ -137,7 +136,6 @@ libforestclaw_compiled_sources = \
 	src/fclaw2d_block.c \
 	src/fclaw2d_options.c \
 	src/fclaw2d_global.c \
-	src/fclaw2d_forestclaw.c \
 	src/fclaw2d_vtable.c \
 	src/fclaw2d_map.c \
 	src/fclaw2d_map_query.c \
@@ -150,7 +148,6 @@ libforestclaw_compiled_sources = \
 	src/fclaw2d_rays.c \
 	src/fclaw2d_ghost_fill.c \
 	src/fclaw2d_output.c \
-	src/fclaw2d_run.c \
 	src/fclaw2d_diagnostics.c \
 	src/fclaw2d_update_single_step.c \
 	src/fclaw2d_domain.c \
@@ -158,8 +155,6 @@ libforestclaw_compiled_sources = \
 	src/fclaw2d_patch.c \
 	src/fclaw2d_partition.c \
 	src/fclaw2d_timeinterp.c \
-	src/fclaw2d_initialize.c \
-	src/fclaw2d_finalize.c \
 	src/fclaw2d_time_sync.c \
 	src/fclaw2d_corner_neighbors.c \
 	src/fclaw2d_face_neighbors.c \
