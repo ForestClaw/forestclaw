@@ -289,8 +289,8 @@ void clawpatch_define(fclaw_global_t* glob,
             {
                 /* Scale to [0,1]x[0,1], based on blockno */
                 double z;
-                fclaw2d_map_c2m_nomap_brick(cont,cp->blockno,xl,yl,&xlower,&ylower,&z);
-                fclaw2d_map_c2m_nomap_brick(cont,cp->blockno,xu,yu,&xupper,&yupper,&z);
+                fclaw_map_2d_c2m_nomap_brick(cont,cp->blockno,xl,yl,&xlower,&ylower,&z);
+                fclaw_map_2d_c2m_nomap_brick(cont,cp->blockno,xu,yu,&xupper,&yupper,&z);
                 zlower = 0;
                 zupper = 1;
             }

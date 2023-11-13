@@ -67,7 +67,7 @@ void convert_brick(fclaw_global_t *glob,
     {
         double z;
             /* Scale to [0,1]x[0,1], based on blockno */
-        fclaw2d_map_c2m_nomap_brick(cont,blockno,xl,yl,&xlow,&ylow,&z);
+        fclaw_map_2d_c2m_nomap_brick(cont,blockno,xl,yl,&xlow,&ylow,&z);
     }
     else
     {
