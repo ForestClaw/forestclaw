@@ -164,9 +164,9 @@ fclaw2d_file_context_t *fclaw2d_file_open_write (const char *filename,
  *                              file context \b fc is only an input parameter
  *                              since it is only used to derive the filename of
  *                              partition file that will be created and to point
-                                to the domain, which defines partition that will
-                                be written to disk. See the description of the
-                                function above for more details.
+ *                              to the domain, which defines partition that will
+ *                              be written to disk. See the description of the
+ *                              function above for more details.
  * \param [in]     user_string  A NUL-terminated user string that is written to the
  *                              partition file header having \ref
  *                              FCLAW2D_FILE_USER_STRING_BYTES bytes including
@@ -183,7 +183,8 @@ fclaw2d_file_context_t *fclaw2d_file_open_write (const char *filename,
  *                              function returns NULL. In this case \b errcode
  *                              is set to \ref FCLAW2D_FILE_ERR_PARTITION.
  */
-fclaw2d_file_context_t *fclaw2d_file_write_partition (fclaw2d_file_context_t *fc,
+fclaw2d_file_context_t *fclaw2d_file_write_partition (fclaw2d_file_context_t *
+                                                      fc,
                                                       const char *user_string,
                                                       int *errcode);
 
