@@ -77,11 +77,6 @@ typedef enum fclaw3d_file_error
     FCLAW3D_FILE_ERR_DIM, /**< file has wrong dimension */
     FCLAW3D_FILE_ERR_UNKNOWN, /**< unknown error */
     FCLAW3D_FILE_ERR_NOT_IMPLEMENTED, /**< functionality is not implemented */
-    FCLAW3D_FILE_ERR_PARTITION, /**< failed to retrieve the necessary
-                                     necessary information for reading or
-                                     writing a partition; see \ref
-                                     fclaw2d_file_read_partition and \ref
-                                     fclaw2d_file_write_partition */
     FCLAW3D_FILE_ERR_LASTCODE /**< to define own error codes for
                                   a higher level application
                                   that is using fclaw3d_file
@@ -144,15 +139,12 @@ fclaw3d_file_context_t *fclaw3d_file_open_write (const char *filename,
  * \b errcode output parameter of this function refers to this internally created
  * file context and not to the \b fc.
  *
- * \note In contrast to the not partition related writing functions this
- * function returns only a NULL pointer if the given \b fc was invalid but it
- * can happen that the function outputs a non-zero \b errcode but still returns
- * \b fc unchanged because the \b errcode relates to an other only internally
- * managed file context that is used to write the separate partition file.
- *
- * If \b errcode does not relate to the internal file context but to passed
- * \b fc, \b errcode is set to \ref FCLAW3D_FILE_ERR_PARTITION. In this case
- * \b fc is freed, deallocated and the function returns NULL.
+ * \note In contrast to the not-partition-related writing functions this
+ * function always returns the passed \b fc, which stays unchanged, even if an
+ * error occured since this error then relates to the internal file context
+ * for writing the separate partition file.
+ * \b errcode always relates to the internal file context and not to the passed
+ * \b fc.
  *
  * This function does not abort on MPI I/O errors but returns NULL.
  * Without MPI I/O the function may abort on file system dependent
@@ -174,13 +166,11 @@ fclaw3d_file_context_t *fclaw3d_file_open_write (const char *filename,
  *                              Too long user strings result in an error with the
  *                              error code \ref FCLAW3D_FILE_ERR_IN_DATA.
  * \param [out]    errcode      An errcode that can be interpreted by
- *                              \ref fclaw3d_file_error_string.
- * \return                      The input file context if the domain and the
- *                              requirered information was successfully
- *                              retrieved from the passed \b fc. Otherwise the
- *                              passed \b fc is closed, deallocated and this
- *                              function returns NULL. In this case \b errcode
- *                              is set to \ref FCLAW3D_FILE_ERR_PARTITION.
+ *                              \ref fclaw3d_file_error_string. \b errcode
+ *                              does not refer to the passed but it refers to
+ *                              the internal file context used for for the
+ *                              partition file.
+ * \return                      Always the input file context.
  */
 fclaw3d_file_context_t *fclaw3d_file_write_partition (fclaw3d_file_context_t *
                                                       fc,

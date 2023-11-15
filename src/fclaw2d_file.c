@@ -3251,7 +3251,7 @@ fclaw2d_file_write_partition (fclaw2d_file_context_t * fc,
     FCLAW_ASSERT (user_string != NULL);
     FCLAW_ASSERT (errcode != NULL);
 
-    int errcode_internal, mpiret;
+    int errcode_internal, mpiret, retval;
     int mpisize;
     int64_t written_partition_size;
     size_t file_len;
@@ -3266,8 +3266,7 @@ fclaw2d_file_write_partition (fclaw2d_file_context_t * fc,
     {
         /* filename too long */
         *errcode = FCLAW2D_FILE_ERR_BAD_FILE;
-        /* TODO: Do we really want to close fc here? */
-        return NULL;
+        return fc;
     }
 
     /* derive partition filename */
@@ -3285,10 +3284,7 @@ fclaw2d_file_write_partition (fclaw2d_file_context_t * fc,
     {
         FCLAW_ASSERT (fc_p4est == NULL);
         /* The p4est file context was closed and deallocated. */
-        /* close and deallocate fclaw2d file context */
-        /* TODO: check return value of the closing function */
-        fclaw2d_file_close (fc, errcode);
-        return NULL;
+        return fc;
     }
 
     /* get the number of MPI processes */
@@ -3306,10 +3302,7 @@ fclaw2d_file_write_partition (fclaw2d_file_context_t * fc,
     {
         FCLAW_ASSERT (fc_p4est == NULL);
         /* The p4est file context was closed and deallocated. */
-        /* close and deallocate fclaw2d file context */
-        /* TODO: check return value of the closing function */
-        fclaw2d_file_close (fc, errcode);
-        return NULL;
+        return fc;
     }
 
     /* write the partition, i.e. the globals first quadrant array */
@@ -3323,14 +3316,18 @@ fclaw2d_file_write_partition (fclaw2d_file_context_t * fc,
     {
         FCLAW_ASSERT (fc_p4est == NULL);
         /* The p4est file context was closed and deallocated. */
-        /* close and deallocate fclaw2d file context */
-        /* TODO: check return value of the closing function */
-        fclaw2d_file_close (fc, errcode);
-        return NULL;
+        return fc;
     }
 
     /* close the partition file context */
-    fclaw2d_file_close_v1 (fc_p4est, &errcode_internal);
+    retval = fclaw2d_file_close_v1 (fc_p4est, &errcode_internal);
+    fclaw2d_file_translate_error_code_v1 (errcode_internal, errcode);
+    if (*errcode != FCLAW2D_FILE_ERR_SUCCESS)
+    {
+        FCLAW_EXECUTE_ASSERT_TRUE (retval != 0);
+        /* The p4est file context was closed and deallocated. */
+        return fc;
+    }
 
     return fc;
 }
