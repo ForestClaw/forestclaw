@@ -249,7 +249,7 @@ void clawpatch_define(fclaw_global_t* glob,
     int is_brick;
     if(glob->domain->refine_dim == 2)
     {
-        is_brick = FCLAW2D_MAP_IS_BRICK(&cont);
+        is_brick = FCLAW_MAP_IS_BRICK(&cont);
     }else {
         //TODO mappings
         is_brick = (fclaw_opt->mi > 1) || (fclaw_opt->mj > 1) || (fclaw_opt->mk > 1);

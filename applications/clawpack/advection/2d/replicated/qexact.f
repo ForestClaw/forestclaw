@@ -29,7 +29,7 @@ c     # Assume velocity is horizontal;  unit speed.
       integer blockno
       integer*8 cont, get_context
       double precision r,r0
-      logical fclaw2d_map_is_used
+      logical fclaw_map_is_used
       double precision Hsmooth,h1,h2
 
       double precision xloc(0:4),yloc(0:4),zloc(0:4)

@@ -144,7 +144,7 @@ void gauge_initialize(fclaw_global_t* glob, void** acc)
         double x1 = 1;
         double y1 = 1;
 
-        int is_brick = FCLAW2D_MAP_IS_BRICK(&cont);
+        int is_brick = FCLAW_MAP_IS_BRICK(&cont);
         int mi = fclaw_opt->mi;
         int mj = fclaw_opt->mj;
 

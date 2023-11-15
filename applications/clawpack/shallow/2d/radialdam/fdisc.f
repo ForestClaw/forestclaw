@@ -5,7 +5,7 @@
       double precision x,y
 
       integer*8 cont, fclaw_map_get_context
-      logical fclaw2d_map_is_used
+      logical fclaw_map_is_used
 
       double precision x0,y0,r0
       common /cdisc/ x0,y0,r0
@@ -14,7 +14,7 @@
 
       cont = fclaw_map_get_context()
 
-      IF (fclaw2d_map_is_used(cont)) THEN
+      IF (fclaw_map_is_used(cont)) THEN
          CALL fclaw_map_2d_c2m(cont,blockno,x,y,xp,yp,zp)
          r2 = (xp-x0)**2 + (yp-y0)**2
       ELSE

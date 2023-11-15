@@ -165,7 +165,7 @@ fclaw_map_destroy (fclaw_map_context_t * cont)
 int fclaw_map_pillowsphere(fclaw_global_t* glob)
 {
     fclaw_map_context_t *cont = fclaw_map_get(glob);
-    return FCLAW2D_MAP_IS_PILLOWSPHERE(&cont) != 0;    
+    return FCLAW_MAP_IS_PILLOWSPHERE(&cont) != 0;    
 }
 
 void set_scale(fclaw_map_context_t* cont, const double scale[])

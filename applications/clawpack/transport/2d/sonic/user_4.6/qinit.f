@@ -14,7 +14,7 @@
       double precision q0_physical
 
       integer*8 cont, get_context
-      logical fclaw2d_map_is_used
+      logical fclaw_map_is_used
 
       integer ii,jj
 
@@ -42,7 +42,7 @@ c                 # Discontinuous solution
               elseif (initchoice .eq. 2) then
                   q(i,j,1) = 1.d0
               elseif (initchoice .eq. 3) then
-                  if (fclaw2d_map_is_used(cont)) then
+                  if (fclaw_map_is_used(cont)) then
                       call fclaw_map_2d_c2m(cont,
      &                           blockno,xc,yc,xp,yp,zp)
                   else

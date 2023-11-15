@@ -10,11 +10,11 @@ double precision function fdisc(blockno,xc,yc,zc)
     double precision r_sphere_2d
 
     integer*8 cont, fclaw_map_get_context
-    integer fclaw2d_map_is_used
+    integer fclaw_map_is_used
 
     cont = fclaw_map_get_context()
 
-    if (fclaw2d_map_is_used(cont) .ne. 0) then
+    if (fclaw_map_is_used(cont) .ne. 0) then
         call fclaw_map_3d_c2m(cont,blockno,xc,yc,zc,xp,yp,zp)
     else
         xp = xc

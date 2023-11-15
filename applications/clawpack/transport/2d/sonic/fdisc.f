@@ -4,7 +4,7 @@
       double precision xc,yc, xp, yp, zp
       integer blockno
       integer*8 cont, get_context
-      logical fclaw2d_map_is_used
+      logical fclaw_map_is_used
 
       double precision dxc, xm, ym, w, wx, wy
 
@@ -19,7 +19,7 @@
 
       cont = get_context()
 
-      if (fclaw2d_map_is_used(cont)) then
+      if (fclaw_map_is_used(cont)) then
          call fclaw_map_2d_c2m(cont,
      &         blockno,xc,yc,xp,yp,zp)
       else

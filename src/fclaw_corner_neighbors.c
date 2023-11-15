@@ -240,7 +240,7 @@ void get_corner_neighbor(fclaw_global_t *glob,
     {
         //TODO 3d
         fclaw_map_context_t* cont = fclaw_map_get(glob);
-        ispillowsphere =  FCLAW2D_MAP_IS_PILLOWSPHERE(&cont);    
+        ispillowsphere =  FCLAW_MAP_IS_PILLOWSPHERE(&cont);    
     }
 
     fclaw_timer_start (&glob->timers[FCLAW_TIMER_NEIGHBOR_SEARCH]);

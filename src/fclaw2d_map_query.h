@@ -38,44 +38,44 @@ extern "C"
 #endif
 #endif
 
-#define FCLAW2D_MAP_IS_USED FCLAW_F77_FUNC_(fclaw2d_map_is_used,FCLAW2D_MAP_IS_USED)
-int FCLAW2D_MAP_IS_USED(fclaw_map_context_t** cont);
+#define FCLAW_MAP_IS_USED FCLAW_F77_FUNC_(fclaw_map_is_used,FCLAW_MAP_IS_USED)
+int FCLAW_MAP_IS_USED(fclaw_map_context_t** cont);
 
-#define FCLAW2D_MAP_IS_CART FCLAW_F77_FUNC_(fclaw2d_map_is_cart,FCLAW2D_MAP_IS_CART)
-int FCLAW2D_MAP_IS_CART(fclaw_map_context_t** cont);
+#define FCLAW_MAP_IS_CART FCLAW_F77_FUNC_(fclaw_map_is_cart,FCLAW_MAP_IS_CART)
+int FCLAW_MAP_IS_CART(fclaw_map_context_t** cont);
 
-#define FCLAW2D_MAP_IS_AFFINE FCLAW_F77_FUNC_(fclaw2d_map_is_affine,FCLAW2D_MAP_IS_AFFINE)
-int FCLAW2D_MAP_IS_AFFINE(fclaw_map_context_t** cont);
+#define FCLAW_MAP_IS_AFFINE FCLAW_F77_FUNC_(fclaw_map_is_affine,FCLAW_MAP_IS_AFFINE)
+int FCLAW_MAP_IS_AFFINE(fclaw_map_context_t** cont);
 
-#define FCLAW2D_MAP_IS_DISK FCLAW_F77_FUNC_(fclaw2d_map_is_disk,FCLAW2D_MAP_IS_DISK)
-int FCLAW2D_MAP_IS_DISK(fclaw_map_context_t** cont);
+#define FCLAW_MAP_IS_DISK FCLAW_F77_FUNC_(fclaw_map_is_disk,FCLAW_MAP_IS_DISK)
+int FCLAW_MAP_IS_DISK(fclaw_map_context_t** cont);
 
-#define FCLAW2D_MAP_IS_PILLOWDISK FCLAW_F77_FUNC_(fclaw2d_map_is_pillowdisk,FCLAW2D_MAP_IS_PILLOWDISK)
-int FCLAW2D_MAP_IS_PILLOWDISK(fclaw_map_context_t** cont);
+#define FCLAW_MAP_IS_PILLOWDISK FCLAW_F77_FUNC_(fclaw_map_is_pillowdisk,FCLAW_MAP_IS_PILLOWDISK)
+int FCLAW_MAP_IS_PILLOWDISK(fclaw_map_context_t** cont);
 
-#define FCLAW2D_MAP_IS_SQUAREDDISK FCLAW_F77_FUNC_(fclaw2d_map_is_squareddisk,FCLAW2D_MAP_IS_SQUAREDDISK)
-int FCLAW2D_MAP_IS_SQUAREDDISK(fclaw_map_context_t** cont);
+#define FCLAW_MAP_IS_SQUAREDDISK FCLAW_F77_FUNC_(fclaw_map_is_squareddisk,FCLAW_MAP_IS_SQUAREDDISK)
+int FCLAW_MAP_IS_SQUAREDDISK(fclaw_map_context_t** cont);
 
-#define FCLAW2D_MAP_IS_PILLOWSPHERE FCLAW_F77_FUNC_(fclaw2d_map_is_pillowsphere,FCLAW2D_MAP_IS_PILLOWSPHERE)
-int FCLAW2D_MAP_IS_PILLOWSPHERE(fclaw_map_context_t** cont);
+#define FCLAW_MAP_IS_PILLOWSPHERE FCLAW_F77_FUNC_(fclaw_map_is_pillowsphere,FCLAW_MAP_IS_PILLOWSPHERE)
+int FCLAW_MAP_IS_PILLOWSPHERE(fclaw_map_context_t** cont);
 
-#define FCLAW2D_MAP_IS_CUBEDSPHERE FCLAW_F77_FUNC_(fclaw2d_map_is_cubedsphere,FCLAW2D_MAP_IS_CUBEDSPHERE)
-int FCLAW2D_MAP_IS_CUBEDSPHERE(fclaw_map_context_t** cont);
+#define FCLAW_MAP_IS_CUBEDSPHERE FCLAW_F77_FUNC_(fclaw_map_is_cubedsphere,FCLAW_MAP_IS_CUBEDSPHERE)
+int FCLAW_MAP_IS_CUBEDSPHERE(fclaw_map_context_t** cont);
 
-#define FCLAW2D_MAP_IS_FLAT FCLAW_F77_FUNC_(fclaw2d_map_is_flat,FCLAW2D_MAP_IS_FLAT)
-int FCLAW2D_MAP_IS_FLAT(fclaw_map_context_t** cont);
+#define FCLAW_MAP_IS_FLAT FCLAW_F77_FUNC_(fclaw_map_is_flat,FCLAW_MAP_IS_FLAT)
+int FCLAW_MAP_IS_FLAT(fclaw_map_context_t** cont);
 
-#define FCLAW2D_MAP_IS_SPHERE FCLAW_F77_FUNC_(fclaw2d_map_is_sphere,FCLAW2D_MAP_IS_SPHERE)
-int FCLAW2D_MAP_IS_SPHERE(fclaw_map_context_t** cont);
+#define FCLAW_MAP_IS_SPHERE FCLAW_F77_FUNC_(fclaw_map_is_sphere,FCLAW_MAP_IS_SPHERE)
+int FCLAW_MAP_IS_SPHERE(fclaw_map_context_t** cont);
 
-#define FCLAW2D_MAP_IS_HEMISPHERE FCLAW_F77_FUNC_(fclaw2d_map_is_hemisphere,FCLAW2D_MAP_IS_HEMISPHERE)
-int FCLAW2D_MAP_IS_HEMISPHERE(fclaw_map_context_t** cont);
+#define FCLAW_MAP_IS_HEMISPHERE FCLAW_F77_FUNC_(fclaw_map_is_hemisphere,FCLAW_MAP_IS_HEMISPHERE)
+int FCLAW_MAP_IS_HEMISPHERE(fclaw_map_context_t** cont);
 
-#define FCLAW2D_MAP_IS_TORUS FCLAW_F77_FUNC_(fclaw2d_map_is_torus,FCLAW2D_MAP_TORUS)
-int FCLAW2D_MAP_IS_TORUS(fclaw_map_context_t** cont);
+#define FCLAW_MAP_IS_TORUS FCLAW_F77_FUNC_(fclaw_map_is_torus,FCLAW_MAP_TORUS)
+int FCLAW_MAP_IS_TORUS(fclaw_map_context_t** cont);
 
-#define FCLAW2D_MAP_IS_BRICK FCLAW_F77_FUNC_(fclaw2d_map_is_brick,FCLAW2D_MAP_BRICK)
-int FCLAW2D_MAP_IS_BRICK(fclaw_map_context_t** cont);
+#define FCLAW_MAP_IS_BRICK FCLAW_F77_FUNC_(fclaw_map_is_brick,FCLAW_MAP_BRICK)
+int FCLAW_MAP_IS_BRICK(fclaw_map_context_t** cont);
 
 
 #ifdef __cplusplus

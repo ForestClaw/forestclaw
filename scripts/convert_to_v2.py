@@ -765,7 +765,38 @@ fclaw_1to2 = {
     "FCLAW2D_MAP_QUERY_IS_HEMISPHERE"              : "FCLAW_MAP_QUERY_IS_HEMISPHERE",
     "FCLAW2D_MAP_QUERY_IS_TORUS"                   : "FCLAW_MAP_QUERY_IS_TORUS",
     "FCLAW2D_MAP_QUERY_IS_BRICK"                   : "FCLAW_MAP_QUERY_IS_BRICK",
-    "FCLAW2D_MAP_QUERY_LAST"                       : "FCLAW_MAP_QUERY_LAST"
+    "FCLAW2D_MAP_QUERY_LAST"                       : "FCLAW_MAP_QUERY_LAST",
+    "FCLAW2D_MAP_IS_USED"                          : "FCLAW_MAP_IS_USED",
+    "FCLAW2D_MAP_IS_CART"                          : "FCLAW_MAP_IS_CART",
+    "FCLAW2D_MAP_IS_AFFINE"                        : "FCLAW_MAP_IS_AFFINE",
+    "FCLAW2D_MAP_IS_DISK"                          : "FCLAW_MAP_IS_DISK",
+    "FCLAW2D_MAP_IS_PILLOWDISK"                    : "FCLAW_MAP_IS_PILLOWDISK",
+    "FCLAW2D_MAP_IS_SQUAREDDISK"                   : "FCLAW_MAP_IS_SQUAREDDISK",
+    "FCLAW2D_MAP_IS_PILLOWSPHERE"                  : "FCLAW_MAP_IS_PILLOWSPHERE",
+    "FCLAW2D_MAP_IS_CUBEDSPHERE"                   : "FCLAW_MAP_IS_CUBEDSPHERE",
+    "FCLAW2D_MAP_IS_FLAT"                          : "FCLAW_MAP_IS_FLAT",
+    "FCLAW2D_MAP_IS_SPHERE"                        : "FCLAW_MAP_IS_SPHERE",
+    "FCLAW2D_MAP_IS_HEMISPHERE"                    : "FCLAW_MAP_IS_HEMISPHERE",
+    "FCLAW2D_MAP_IS_TORUS"                         : "FCLAW_MAP_IS_TORUS",
+    "FCLAW2D_MAP_IS_BRICK"                         : "FCLAW_MAP_IS_BRICK",
+    "fclaw2d_map_query_last"                       : "fclaw_map_query_last",
+    "fclaw2d_map_is_used"                          : "fclaw_map_is_used",
+    "fclaw2d_map_is_cart"                          : "fclaw_map_is_cart",
+    "fclaw2d_map_is_affine"                        : "fclaw_map_is_affine",
+    "fclaw2d_map_is_disk"                          : "fclaw_map_is_disk",
+    "fclaw2d_map_is_pillowdisk"                    : "fclaw_map_is_pillowdisk",
+    "fclaw2d_map_is_squareddisk"                   : "fclaw_map_is_squareddisk",
+    "fclaw2d_map_is_pillowsphere"                  : "fclaw_map_is_pillowsphere",
+    "fclaw2d_map_is_cubedsphere"                   : "fclaw_map_is_cubedsphere",
+    "fclaw2d_map_is_flat"                          : "fclaw_map_is_flat",
+    "fclaw2d_map_is_sphere"                        : "fclaw_map_is_sphere",
+    "fclaw2d_map_is_hemisphere"                    : "fclaw_map_is_hemisphere",
+    "fclaw2d_map_is_torus"                         : "fclaw_map_is_torus",
+    "fclaw2d_map_is_brick"                         : "fclaw_map_is_brick",
+
+
+
+
 
 }
 
@@ -817,9 +848,9 @@ def process_file(filepath, identifier_map):
             f.write(new_code)
 
 
-def process_directory(root_dir, identifier_map):
+def process_directory(root_dir, identifier_map, excluded_files=[]):
     # Use glob to find all C++ files recursively.
-    for filepath in [f for f in glob.glob(f"{root_dir}/**/*", recursive=True) if f.lower().endswith(('.c', '.h', '.cpp', '.hpp', '.f', '.f90', '.cu'))]:
+    for filepath in [f for f in glob.glob(f"{root_dir}/**/*", recursive=True) if f.lower().endswith(('.c', '.h', '.cpp', '.hpp', '.f', '.f90', '.cu')) and f not in excluded_files]:
         process_file(filepath, identifier_map)
         
 if __name__ == "__main__":

@@ -56,7 +56,7 @@ void convert_brick(fclaw_global_t *glob,
 {
     fclaw_map_context_t* cont = fclaw_map_get(glob);
 
-    int is_brick = FCLAW2D_MAP_IS_BRICK(&cont);
+    int is_brick = FCLAW_MAP_IS_BRICK(&cont);
 
     double xl = this_patch->xlower;
     double yl = this_patch->ylower;

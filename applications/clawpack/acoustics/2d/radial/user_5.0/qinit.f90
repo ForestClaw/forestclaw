@@ -13,7 +13,7 @@ SUBROUTINE clawpack5_qinit(meqn,mbc,mx,my,xlower,ylower, &
 
   INTEGER blockno, fc2d_clawpack5_get_block
   INTEGER*8 cont, fclaw_map_get_context
-  LOGICAL fclaw2d_map_is_used
+  LOGICAL fclaw_map_is_used
 
   DOUBLE PRECISION pi
   COMMON /compi/ pi
@@ -27,7 +27,7 @@ SUBROUTINE clawpack5_qinit(meqn,mbc,mx,my,xlower,ylower, &
      xc = xlower + (i-0.5d0)*dx
      DO j = 1-mbc,my+mbc
         yc = ylower + (j-0.5d0)*dy
-        IF (fclaw2d_map_is_used(cont)) THEN
+        IF (fclaw_map_is_used(cont)) THEN
            CALL fclaw_map_2d_c2m(cont,blockno,xc,yc,xp,yp,zp)
            r = SQRT(xp**2 + yp**2)
         ELSE

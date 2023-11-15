@@ -5,13 +5,13 @@
       double precision xc,yc, zc
 
       integer*8 cont, fclaw_map_get_context
-      integer fclaw2d_map_is_used
+      integer fclaw_map_is_used
 
       double precision xp, yp, zp
 
       cont = fclaw_map_get_context()
 
-      if (fclaw2d_map_is_used(cont) .ne. 0) then
+      if (fclaw_map_is_used(cont) .ne. 0) then
          call fclaw_map_3d_c2m(cont,
      &         blockno,xc,yc,zc,xp,yp,zp)
       else
