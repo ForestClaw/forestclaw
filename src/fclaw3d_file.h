@@ -77,6 +77,11 @@ typedef enum fclaw3d_file_error
     FCLAW3D_FILE_ERR_DIM, /**< file has wrong dimension */
     FCLAW3D_FILE_ERR_UNKNOWN, /**< unknown error */
     FCLAW3D_FILE_ERR_NOT_IMPLEMENTED, /**< functionality is not implemented */
+    FCLAW3D_FILE_ERR_PARTITION, /**< failed to retrieve the necessary
+                                     necessary information for reading or
+                                     writing a partition; see \ref
+                                     fclaw2d_file_read_partition and \ref
+                                     fclaw2d_file_write_partition */
     FCLAW3D_FILE_ERR_LASTCODE /**< to define own error codes for
                                   a higher level application
                                   that is using fclaw3d_file
@@ -130,6 +135,58 @@ fclaw3d_file_context_t *fclaw3d_file_open_write (const char *filename,
                                                  int write_partition,
                                                  fclaw3d_domain_t * domain,
                                                  int *errcode);
+
+/** Write the partition of the domain associated with \b fc to disk.
+ *
+ * This function derives the partition filename from the base filename 'fn' of
+ * the given file context \b fc such that the function creates a file named
+ * 'fn_partition.f3d' that will contain the partition of the domain that is
+ * associated with the given file context \b fc.
+ *
+ * This means in particular that the given \b fc stays unchanged and that the
+ * internally creates a new file context that will be freed and deallocated at
+ * the end of the function in any case. This is important to notice since the
+ * \b errcode output parameter of this function refers to this internally created
+ * file context and not to the \b fc.
+ *
+ * \note In contrast to the not partition related writing functions this
+ * function returns only a NULL pointer if the given \b fc was invalid but it
+ * can happen that the function outputs a non-zero \b errcode but still returns
+ * \b fc unchanged because the \b errcode relates to an other only internally
+ * managed file context that is used to write the separate partition file.
+ *
+ * If \b errcode does not relate to the internal file context but to passed
+ * \b fc, \b errcode is set to \ref FCLAW3D_FILE_ERR_PARTITION. In this case
+ * \b fc is freed, deallocated and the function returns NULL.
+ *
+ * \param [in]     fc           Context previously created by \ref
+ *                              fclaw3d_file_open_write.  In this function the
+ *                              file context \b fc is only an input parameter
+ *                              since it is only used to derive the filename of
+ *                              partition file that will be created and to point
+ *                              to the domain, which defines partition that will
+ *                              be written to disk. See the description of the
+ *                              function above for more details.
+ * \param [in]     user_string  A NUL-terminated user string that is written to the
+ *                              partition file header having \ref
+ *                              FCLAW3D_FILE_USER_STRING_BYTES bytes including
+ *                              the NUL-termination. Shorter user strings are
+ *                              padded by spaces in the file header.
+ *                              Too long user strings result in an error with the
+ *                              error code \ref FCLAW3D_FILE_ERR_IN_DATA.
+ * \param [out]    errcode      An errcode that can be interpreted by
+ *                              \ref fclaw3d_file_error_string.
+ * \return                      The input file context if the domain and the
+ *                              requirered information was successfully
+ *                              retrieved from the passed \b fc. Otherwise the
+ *                              passed \b fc is closed, deallocated and this
+ *                              function returns NULL. In this case \b errcode
+ *                              is set to \ref FCLAW3D_FILE_ERR_PARTITION.
+ */
+fclaw3d_file_context_t *fclaw3d_file_write_partition (fclaw3d_file_context_t *
+                                                      fc,
+                                                      const char *user_string,
+                                                      int *errcode);
 
 /** Write a serial data block to an opened parallel file.
  *
