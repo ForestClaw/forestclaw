@@ -57,7 +57,7 @@ fclaw_domain_t* create_domain(sc_MPI_Comm mpicomm, fclaw_options_t* fclaw_opt,
         domain = fclaw_domain_new_2d_brick (mpicomm, mi, mj, a, b,
                                            fclaw_opt->minlevel);
         brick = fclaw2d_map_new_brick (domain, mi, mj, a, b);
-        cont = fclaw2d_map_new_nomap_brick (brick);
+        cont = fclaw_map_new_nomap_brick (brick);
         break;
 
     case 1:

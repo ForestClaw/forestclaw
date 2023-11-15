@@ -81,7 +81,7 @@ void tsunami_options_store (fclaw_global_t* glob, user_options_t* user);
 
 user_options_t* tsunami_get_options(fclaw_global_t* glob);
 
-fclaw_map_context_t* fclaw2d_map_new_nomap();
+fclaw_map_context_t* fclaw_map_new_nomap();
 
 #ifdef __cplusplus
 #if 0

@@ -40,27 +40,27 @@ extern "C"
    Note : These categories are not completely well defined, and are used
    primarily for the user's benefit and so subject to the user's interpretation
 */
-#define FCLAW2D_MAP_QUERY_IS_USED           0     /* is the map used at all? */
-#define FCLAW2D_MAP_QUERY_IS_SCALEDSHIFT    1     /* x_i -> a_i x_i + b_i */
-#define FCLAW2D_MAP_QUERY_IS_AFFINE         2     /* x -> A x + b */
-#define FCLAW2D_MAP_QUERY_IS_NONLINEAR      3     /* x -> F(x) */
-#define FCLAW2D_MAP_QUERY_IS_CART           4     /* x -> x   (Cartesian) */
-#define FCLAW2D_MAP_QUERY_IS_GRAPH          5     /* (x,y) -> (x,y,f(x,y)) */
-#define FCLAW2D_MAP_QUERY_IS_PLANAR         6     /* (x,y) -> (?,?,0) */
-#define FCLAW2D_MAP_QUERY_IS_ALIGNED        7     /* (x,y) -> (f(x),g(y),0) */
-#define FCLAW2D_MAP_QUERY_IS_FLAT           8     /* Zero curvature */
-#define FCLAW2D_MAP_QUERY_IS_SPHERE         9     /* A topological sphere */
-#define FCLAW2D_MAP_QUERY_IS_DISK          10     /* A topological disk */
-#define FCLAW2D_MAP_QUERY_IS_PILLOWDISK    11     /* Pillow disk */
-#define FCLAW2D_MAP_QUERY_IS_SQUAREDDISK   12     /* Squared disk */
-#define FCLAW2D_MAP_QUERY_IS_PILLOWSPHERE  13     /* Pillow sphere */
-#define FCLAW2D_MAP_QUERY_IS_CUBEDSPHERE   14     /* Cubed sphere */
-#define FCLAW2D_MAP_QUERY_IS_FIVEPATCH     15     /* Five patch unit square */
-#define FCLAW2D_MAP_QUERY_IS_BILINEAR      16     /* Five patch unit square */
-#define FCLAW2D_MAP_QUERY_IS_HEMISPHERE    17     /* Hemisphere grid */
-#define FCLAW2D_MAP_QUERY_IS_TORUS         18     /* Hemisphere grid */
-#define FCLAW2D_MAP_QUERY_IS_BRICK         19     /* Is a Cartesian brick */
-#define FCLAW2D_MAP_QUERY_LAST             20     /* Number of "official" queries. */
+#define FCLAW_MAP_QUERY_IS_USED           0     /* is the map used at all? */
+#define FCLAW_MAP_QUERY_IS_SCALEDSHIFT    1     /* x_i -> a_i x_i + b_i */
+#define FCLAW_MAP_QUERY_IS_AFFINE         2     /* x -> A x + b */
+#define FCLAW_MAP_QUERY_IS_NONLINEAR      3     /* x -> F(x) */
+#define FCLAW_MAP_QUERY_IS_CART           4     /* x -> x   (Cartesian) */
+#define FCLAW_MAP_QUERY_IS_GRAPH          5     /* (x,y) -> (x,y,f(x,y)) */
+#define FCLAW_MAP_QUERY_IS_PLANAR         6     /* (x,y) -> (?,?,0) */
+#define FCLAW_MAP_QUERY_IS_ALIGNED        7     /* (x,y) -> (f(x),g(y),0) */
+#define FCLAW_MAP_QUERY_IS_FLAT           8     /* Zero curvature */
+#define FCLAW_MAP_QUERY_IS_SPHERE         9     /* A topological sphere */
+#define FCLAW_MAP_QUERY_IS_DISK          10     /* A topological disk */
+#define FCLAW_MAP_QUERY_IS_PILLOWDISK    11     /* Pillow disk */
+#define FCLAW_MAP_QUERY_IS_SQUAREDDISK   12     /* Squared disk */
+#define FCLAW_MAP_QUERY_IS_PILLOWSPHERE  13     /* Pillow sphere */
+#define FCLAW_MAP_QUERY_IS_CUBEDSPHERE   14     /* Cubed sphere */
+#define FCLAW_MAP_QUERY_IS_FIVEPATCH     15     /* Five patch unit square */
+#define FCLAW_MAP_QUERY_IS_BILINEAR      16     /* Five patch unit square */
+#define FCLAW_MAP_QUERY_IS_HEMISPHERE    17     /* Hemisphere grid */
+#define FCLAW_MAP_QUERY_IS_TORUS         18     /* Torus grid */
+#define FCLAW_MAP_QUERY_IS_BRICK         19     /* Is a Cartesian brick */
+#define FCLAW_MAP_QUERY_LAST             20     /* Number of "official" queries. */
 
 #if 0
 /* Generic query function (kept up to date with list above) */

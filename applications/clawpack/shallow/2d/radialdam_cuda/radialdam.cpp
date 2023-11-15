@@ -61,7 +61,7 @@ fclaw_domain_t* create_domain(sc_MPI_Comm mpicomm,
 		case 0:
 			/* Use [ax,bx]x[ay,by] */
 			conn = p4est_connectivity_new_unitsquare();
-			cont = fclaw2d_map_new_nomap();
+			cont = fclaw_map_new_nomap();
 			break;
 		case 1:
 			conn = p4est_connectivity_new_unitsquare();

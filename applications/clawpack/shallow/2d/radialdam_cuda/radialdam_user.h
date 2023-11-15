@@ -102,7 +102,7 @@ void radialdam_patch_setup(fclaw_global_t *glob,
                            int this_block_idx,
                            int this_patch_idx);
 
-fclaw_map_context_t* fclaw2d_map_new_nomap();
+fclaw_map_context_t* fclaw_map_new_nomap();
 
 fclaw_map_context_t* fclaw2d_map_new_pillowdisk5(const double scale[],
                                                    const double shift[],

@@ -744,7 +744,29 @@ fclaw_1to2 = {
     "fclaw2d_map_destroy"                          : "fclaw_map_destroy",
     "fclaw2d_map_new_nomap_brick"                  : "fclaw_map_new_nomap_brick",
     "fclaw2d_map_pillowphere"                      : "fclaw_map_pillowsphere",
-    "fclaw2d_map_new_nomap"                        : "fclaw_map_new_nomap"
+    "fclaw2d_map_new_nomap"                        : "fclaw_map_new_nomap",
+    "FCLAW2D_MAP_QUERY_IS_USED"                    : "FCLAW_MAP_QUERY_IS_USED",
+    "FCLAW2D_MAP_QUERY_IS_SCALEDSHIFT"             : "FCLAW_MAP_QUERY_IS_SCALEDSHIFT",
+    "FCLAW2D_MAP_QUERY_IS_AFFINE"                  : "FCLAW_MAP_QUERY_IS_AFFINE",
+    "FCLAW2D_MAP_QUERY_IS_NONLINEAR"               : "FCLAW_MAP_QUERY_IS_NONLINEAR",
+    "FCLAW2D_MAP_QUERY_IS_CART"                    : "FCLAW_MAP_QUERY_IS_CART",
+    "FCLAW2D_MAP_QUERY_IS_GRAPH"                   : "FCLAW_MAP_QUERY_IS_GRAPH",
+    "FCLAW2D_MAP_QUERY_IS_PLANAR"                  : "FCLAW_MAP_QUERY_IS_PLANAR",
+    "FCLAW2D_MAP_QUERY_IS_ALIGNED"                 : "FCLAW_MAP_QUERY_IS_ALIGNED",
+    "FCLAW2D_MAP_QUERY_IS_FLAT"                    : "FCLAW_MAP_QUERY_IS_FLAT",
+    "FCLAW2D_MAP_QUERY_IS_SPHERE"                  : "FCLAW_MAP_QUERY_IS_SPHERE",
+    "FCLAW2D_MAP_QUERY_IS_DISK"                    : "FCLAW_MAP_QUERY_IS_DISK",
+    "FCLAW2D_MAP_QUERY_IS_PILLOWDISK"              : "FCLAW_MAP_QUERY_IS_PILLOWDISK",
+    "FCLAW2D_MAP_QUERY_IS_SQUAREDDISK"             : "FCLAW_MAP_QUERY_IS_SQUAREDDISK",
+    "FCLAW2D_MAP_QUERY_IS_PILLOWSPHERE"            : "FCLAW_MAP_QUERY_IS_PILLOWSPHERE",
+    "FCLAW2D_MAP_QUERY_IS_CUBEDSPHERE"             : "FCLAW_MAP_QUERY_IS_CUBEDSPHERE",
+    "FCLAW2D_MAP_QUERY_IS_FIVEPATCH"               : "FCLAW_MAP_QUERY_IS_FIVEPATCH",
+    "FCLAW2D_MAP_QUERY_IS_BILINEAR"                : "FCLAW_MAP_QUERY_IS_BILINEAR",
+    "FCLAW2D_MAP_QUERY_IS_HEMISPHERE"              : "FCLAW_MAP_QUERY_IS_HEMISPHERE",
+    "FCLAW2D_MAP_QUERY_IS_TORUS"                   : "FCLAW_MAP_QUERY_IS_TORUS",
+    "FCLAW2D_MAP_QUERY_IS_BRICK"                   : "FCLAW_MAP_QUERY_IS_BRICK",
+    "FCLAW2D_MAP_QUERY_LAST"                       : "FCLAW_MAP_QUERY_LAST"
+
 }
 
 import glob
@@ -780,27 +802,37 @@ def replace_identifiers_and_includes(filepath, code, identifier_map):
             
     return new_code, changes
 
+def process_file(filepath, identifier_map):
+    # Read the existing code from the file
+    with open(filepath, 'r') as f:
+        old_code = f.read()
+    
+    # Replace the identifiers
+    new_code, changes = replace_identifiers_and_includes(filepath, old_code, identifier_map)
+
+    if changes:
+        print(f"Upadated   {filepath}...")
+        # Write the new code back to the file
+        with open(filepath, 'w') as f:
+            f.write(new_code)
+
+
 def process_directory(root_dir, identifier_map):
     # Use glob to find all C++ files recursively.
     for filepath in [f for f in glob.glob(f"{root_dir}/**/*", recursive=True) if f.lower().endswith(('.c', '.h', '.cpp', '.hpp', '.f', '.f90', '.cu'))]:
-        # Read the existing code from the file
-        with open(filepath, 'r') as f:
-            old_code = f.read()
+        process_file(filepath, identifier_map)
         
-        # Replace the identifiers
-        new_code, changes = replace_identifiers_and_includes(filepath, old_code, identifier_map)
-
-        if changes:
-            print(f"Upadated   {filepath}...")
-            # Write the new code back to the file
-            with open(filepath, 'w') as f:
-                f.write(new_code)
-
-
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="A simple script to demonstrate argparse.")
-    parser.add_argument("-d", "--directory", help="directory to recursively update files in", required=True)
+    parser.add_argument("-d", "--directory", help="directory to recursively update files in")
+    parser.add_argument("-f", "--files", nargs="+", help="files to convert")
+
     args = parser.parse_args()
     print("Processing files...")
-    process_directory(args.directory, fclaw_1to2)
+    if(args.directory is not None):
+        process_directory(args.directory, fclaw_1to2)
+    if(args.files is not None):
+        for file in args.files:
+            process_file(file, fclaw_1to2)
+
     print("Done!")

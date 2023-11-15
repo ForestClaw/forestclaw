@@ -46,7 +46,7 @@ int FCLAW2D_MAP_IS_USED(fclaw_map_context_t** pcont)
 {
     int iresult;
     fclaw_map_context_t *cont = *pcont;
-    int id = FCLAW2D_MAP_QUERY_IS_USED;
+    int id = FCLAW_MAP_QUERY_IS_USED;
     iresult = cont->query(cont,id);
     return iresult != 0;
 }
@@ -55,7 +55,7 @@ int FCLAW2D_MAP_IS_DISK(fclaw_map_context_t** pcont)
 {
     int iresult;
     fclaw_map_context_t *cont = *pcont;
-    int id = FCLAW2D_MAP_QUERY_IS_DISK;
+    int id = FCLAW_MAP_QUERY_IS_DISK;
     iresult = cont->query(cont,id);
     return iresult != 0;
 }
@@ -64,7 +64,7 @@ int FCLAW2D_MAP_IS_CART(fclaw_map_context_t** pcont)
 {
     int iresult;
     fclaw_map_context_t *cont = *pcont;
-    int id = FCLAW2D_MAP_QUERY_IS_CART;
+    int id = FCLAW_MAP_QUERY_IS_CART;
     iresult = cont->query(cont,id);
     return iresult != 0;
 }
@@ -73,7 +73,7 @@ int FCLAW2D_MAP_IS_AFFINE(fclaw_map_context_t** pcont)
 {
     int iresult;
     fclaw_map_context_t *cont = *pcont;
-    int id = FCLAW2D_MAP_QUERY_IS_AFFINE;
+    int id = FCLAW_MAP_QUERY_IS_AFFINE;
     iresult = cont->query(cont,id);
     return iresult != 0;
 }
@@ -83,7 +83,7 @@ int FCLAW2D_MAP_IS_PILLOWDISK(fclaw_map_context_t** pcont)
 {
     int iresult;
     fclaw_map_context_t *cont = *pcont;
-    int id = FCLAW2D_MAP_QUERY_IS_PILLOWDISK;
+    int id = FCLAW_MAP_QUERY_IS_PILLOWDISK;
     iresult = cont->query(cont,id);
     return iresult != 0;
 }
@@ -92,7 +92,7 @@ int FCLAW2D_MAP_IS_SQUAREDDISK(fclaw_map_context_t** pcont)
 {
     int iresult;
     fclaw_map_context_t *cont = *pcont;
-    int id = FCLAW2D_MAP_QUERY_IS_SQUAREDDISK;
+    int id = FCLAW_MAP_QUERY_IS_SQUAREDDISK;
     iresult = cont->query(cont,id);
     return iresult != 0;
 }
@@ -101,7 +101,7 @@ int  FCLAW2D_MAP_IS_PILLOWSPHERE(fclaw_map_context_t** pcont)
 {
     int iresult;
     fclaw_map_context_t *cont = *pcont;
-    int id = FCLAW2D_MAP_QUERY_IS_PILLOWSPHERE;
+    int id = FCLAW_MAP_QUERY_IS_PILLOWSPHERE;
     iresult = cont->query(cont,id);
     return iresult != 0;
 }
@@ -110,7 +110,7 @@ int FCLAW2D_MAP_IS_CUBEDSPHERE(fclaw_map_context_t** pcont)
 {
     int iresult;
     fclaw_map_context_t *cont = *pcont;
-    int id = FCLAW2D_MAP_QUERY_IS_CUBEDSPHERE;
+    int id = FCLAW_MAP_QUERY_IS_CUBEDSPHERE;
     iresult = cont->query(cont,id);
     return iresult != 0;
 }
@@ -119,7 +119,7 @@ int FCLAW2D_MAP_IS_FLAT(fclaw_map_context_t** pcont)
 {
     int iresult;
     fclaw_map_context_t *cont = *pcont;
-    int id = FCLAW2D_MAP_QUERY_IS_FLAT;
+    int id = FCLAW_MAP_QUERY_IS_FLAT;
     iresult = cont->query(cont,id);
     return iresult != 0;
 }
@@ -128,7 +128,7 @@ int FCLAW2D_MAP_IS_SPHERE(fclaw_map_context_t** pcont)
 {
     int iresult;
     fclaw_map_context_t *cont = *pcont;
-    int id = FCLAW2D_MAP_QUERY_IS_SPHERE;
+    int id = FCLAW_MAP_QUERY_IS_SPHERE;
     iresult = cont->query(cont,id);
     return iresult != 0;
 }
@@ -137,7 +137,7 @@ int FCLAW2D_MAP_IS_HEMISPHERE(fclaw_map_context_t** pcont)
 {
     int iresult;
     fclaw_map_context_t *cont = *pcont;
-    int id = FCLAW2D_MAP_QUERY_IS_HEMISPHERE;
+    int id = FCLAW_MAP_QUERY_IS_HEMISPHERE;
     iresult = cont->query(cont,id);
     return iresult != 0;
 }
@@ -146,7 +146,7 @@ int FCLAW2D_MAP_IS_TORUS(fclaw_map_context_t** pcont)
 {
     int iresult;
     fclaw_map_context_t *cont = *pcont;
-    int id = FCLAW2D_MAP_QUERY_IS_TORUS;
+    int id = FCLAW_MAP_QUERY_IS_TORUS;
     iresult = cont->query(cont,id);
     return iresult != 0;
 }
@@ -156,7 +156,7 @@ int FCLAW2D_MAP_IS_BRICK(fclaw_map_context_t** pcont)
     fclaw_map_context_t *cont = *pcont;
     fclaw_map_context_t *brick = cont->brick;
     int iresult;
-    int id = FCLAW2D_MAP_QUERY_IS_BRICK;
+    int id = FCLAW_MAP_QUERY_IS_BRICK;
     if (brick != NULL)
     {
         iresult = brick->query(cont,id);
