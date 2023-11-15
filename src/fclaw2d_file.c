@@ -3170,8 +3170,8 @@ fclaw2d_file_translate_error_code_to_v1 (int errcode, int *errcode_v1)
 
 fclaw2d_file_context_t *
 fclaw2d_file_open_write (const char *filename,
-                         const char *user_string, int write_partition,
-                         fclaw2d_domain_t * domain, int *errcode)
+                         const char *user_string, fclaw2d_domain_t * domain,
+                         int *errcode)
 {
     FCLAW_ASSERT (filename != NULL);
     FCLAW_ASSERT (user_string != NULL);

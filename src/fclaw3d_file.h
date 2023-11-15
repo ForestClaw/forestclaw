@@ -118,10 +118,6 @@ typedef struct fclaw3d_file_context fclaw3d_file_context_t;
  *                         user strings are padded by spaces in the file header.
  *                         Too long user strings result in an error with the
  *                         error code \ref FCLAW3D_FILE_ERR_IN_DATA.
- * \param [in]  write_partition A Boolean to decide whether the partition is
- *                         written to disk. The filename of the partition file
- *                         is derived from the given filename. Currently,
- *                         this flag does not have any effect.
  * \param [in]   domain    The underlying p8est is used for the metadata of the
  *                         the created file and the \b domain is written to the
  *                         file.
@@ -132,7 +128,6 @@ typedef struct fclaw3d_file_context fclaw3d_file_context_t;
  */
 fclaw3d_file_context_t *fclaw3d_file_open_write (const char *filename,
                                                  const char *user_string,
-                                                 int write_partition,
                                                  fclaw3d_domain_t * domain,
                                                  int *errcode);
 
@@ -158,6 +153,10 @@ fclaw3d_file_context_t *fclaw3d_file_open_write (const char *filename,
  * If \b errcode does not relate to the internal file context but to passed
  * \b fc, \b errcode is set to \ref FCLAW3D_FILE_ERR_PARTITION. In this case
  * \b fc is freed, deallocated and the function returns NULL.
+ *
+ * This function does not abort on MPI I/O errors but returns NULL.
+ * Without MPI I/O the function may abort on file system dependent
+ * errors.
  *
  * \param [in]     fc           Context previously created by \ref
  *                              fclaw3d_file_open_write.  In this function the
