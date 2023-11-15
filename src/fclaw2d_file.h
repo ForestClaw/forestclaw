@@ -158,21 +158,15 @@ fclaw2d_file_context_t *fclaw2d_file_open_write (const char *filename,
  * If \b errcode does not relate to the internal file context but to passed
  * \b fc, \b errcode is set to \ref FCLAW2D_FILE_ERR_PARTITION. In this case
  * \b fc is freed, deallocated and the function returns NULL.
-
- * TODO: How do we know to what file context \b errcode is referring? One option
- * would be to introduce a special error code for an invalid file context in
- * the sense that we could not retrieve the base name or the domain since these
- * are the requirements to \b fc in this function. We may want to remove the
- * explicit documentation of what is needed from \b fc for the parttion writing
- * and restrict ourselves to 'neccessary information'.
  *
  * \param [in]     fc           Context previously created by \ref
  *                              fclaw2d_file_open_write.  In this function the
  *                              file context \b fc is only an input parameter
  *                              since it is only used to derive the filename of
- *                              partition file that will be created. See the
- *                              description of the function above for more
- *                              details.
+ *                              partition file that will be created and to point
+                                to the domain, which defines partition that will
+                                be written to disk. See the description of the
+                                function above for more details.
  * \param [in]     user_string  A NUL-terminated user string that is written to the
  *                              partition file header having \ref
  *                              FCLAW2D_FILE_USER_STRING_BYTES bytes including
@@ -183,11 +177,11 @@ fclaw2d_file_context_t *fclaw2d_file_open_write (const char *filename,
  * \param [out]    errcode      An errcode that can be interpreted by
  *                              \ref fclaw2d_file_error_string.
  * \return                      The input file context if the domain and the
- *                              base filename was successfully retrieved from
- *                              the passed \b fc. Otherwise the passed \b fc
- *                              is closed, deallocated and this function returns'
- *                              NULL. In this case \b errcode is set to \ref
- *                              FCLAW2D_FILE_ERR_PARTITION.
+ *                              requirered information was successfully
+ *                              retrieved from the passed \b fc. Otherwise the
+ *                              passed \b fc is closed, deallocated and this
+ *                              function returns NULL. In this case \b errcode
+ *                              is set to \ref FCLAW2D_FILE_ERR_PARTITION.
  */
 fclaw2d_file_context_t *fclaw2d_file_write_partition (fclaw2d_file_context_t *fc,
                                                       const char *user_string,
