@@ -3244,6 +3244,98 @@ fclaw2d_file_open_write (const char *filename,
 }
 
 fclaw2d_file_context_t *
+fclaw2d_file_write_partition (fclaw2d_file_context_t * fc,
+                              const char *user_string, int *errcode)
+{
+    FCLAW_ASSERT (fc != NULL);
+    FCLAW_ASSERT (user_string != NULL);
+    FCLAW_ASSERT (errcode != NULL);
+
+    int errcode_internal, mpiret;
+    int mpisize;
+    int64_t written_partition_size;
+    size_t file_len;
+    char buf[FCLAW2D_FILE_NAME_BYTES];
+    p4est_t *p4est;
+    fclaw2d_file_context_p4est_v1_t *fc_p4est;
+    sc_array_t arr;
+
+    file_len = strlen (fc->basename) +
+        strlen ("_partition." FCLAW2D_FILE_EXT) + 1;
+    if (file_len > FCLAW2D_FILE_NAME_BYTES)
+    {
+        /* filename too long */
+        *errcode = FCLAW2D_FILE_ERR_BAD_FILE;
+        /* TODO: Do we really want to close fc here? */
+        return NULL;
+    }
+
+    /* derive partition filename */
+    sc_strcopy (buf, file_len, fc->basename);
+    strcat (buf, "_partition." FCLAW2D_FILE_EXT);
+
+    /* get the underlying p4est */
+    p4est = ((p4est_wrap_t *) fc->domain->pp)->p4est;
+
+    /* create a new file */
+    fc_p4est = fclaw2d_file_open_create_v1 (p4est, buf, "Partition file",
+                                            &errcode_internal);
+    fclaw2d_file_translate_error_code_v1 (errcode_internal, errcode);
+    if (*errcode != FCLAW2D_FILE_ERR_SUCCESS)
+    {
+        FCLAW_ASSERT (fc_p4est == NULL);
+        /* The p4est file context was closed and deallocated. */
+        /* close and deallocate fclaw2d file context */
+        /* TODO: check return value of the closing function */
+        fclaw2d_file_close (fc, errcode);
+        return NULL;
+    }
+
+    /* get the number of MPI processes */
+    mpiret = sc_MPI_Comm_size (fc->fc->mpicomm, &mpisize);
+    SC_CHECK_MPI (mpiret);
+    written_partition_size = (int64_t) mpisize;
+
+    /* write the number of MPI processes */
+    sc_array_init_data (&arr, &written_partition_size, sizeof (int64_t), 1);
+    fc_p4est =
+        fclaw2d_file_write_block_v1 (fc_p4est, arr.elem_size, &arr,
+                                     "Partition size", &errcode_internal);
+    fclaw2d_file_translate_error_code_v1 (errcode_internal, errcode);
+    if (*errcode != FCLAW2D_FILE_ERR_SUCCESS)
+    {
+        FCLAW_ASSERT (fc_p4est == NULL);
+        /* The p4est file context was closed and deallocated. */
+        /* close and deallocate fclaw2d file context */
+        /* TODO: check return value of the closing function */
+        fclaw2d_file_close (fc, errcode);
+        return NULL;
+    }
+
+    /* write the partition, i.e. the globals first quadrant array */
+    sc_array_init_data (&arr, p4est->global_first_quadrant,
+                        sizeof (p4est_gloidx_t) * (mpisize + 1), 1);
+    fc_p4est =
+        fclaw2d_file_write_block_v1 (fc_p4est, arr.elem_size, &arr,
+                                     "Partition", &errcode_internal);
+    fclaw2d_file_translate_error_code_v1 (errcode_internal, errcode);
+    if (*errcode != FCLAW2D_FILE_ERR_SUCCESS)
+    {
+        FCLAW_ASSERT (fc_p4est == NULL);
+        /* The p4est file context was closed and deallocated. */
+        /* close and deallocate fclaw2d file context */
+        /* TODO: check return value of the closing function */
+        fclaw2d_file_close (fc, errcode);
+        return NULL;
+    }
+
+    /* close the partition file context */
+    fclaw2d_file_close_v1 (fc_p4est, &errcode_internal);
+
+    return fc;
+}
+
+fclaw2d_file_context_t *
 fclaw2d_file_write_block (fclaw2d_file_context_t *
                           fc, const char *user_string,
                           size_t block_size,
