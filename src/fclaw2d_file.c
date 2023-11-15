@@ -39,6 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <p8est_wrap.h>
 #endif
 
+#define FCLAW2D_FILE_NAME_BYTES BUFSIZ /**< maximal number of filename bytes */
 #ifndef P4_TO_P8
 #define FCLAW2D_FILE_EXT "f2d" /**< file extension of fclaw2d data files */
 #else
@@ -2983,6 +2984,7 @@ typedef struct fclaw2d_file_context
 {
     fclaw2d_domain_t *domain;
     fclaw2d_file_context_p4est_v1_t *fc;
+    char basename[FCLAW2D_FILE_NAME_BYTES];
 }
 fclaw2d_file_context_t;
 
@@ -3178,12 +3180,20 @@ fclaw2d_file_open_write (const char *filename,
     FCLAW_ASSERT (errcode != NULL);
 
     int errcode_internal;
+    size_t file_len;
     p4est_wrap_t *wrap;
     p4est_t *p4est;
     fclaw2d_file_context_p4est_v1_t *fc;
     fclaw2d_file_context_t *fclaw_fc;
-    int buf_size;
-    char *buf;
+    char buf[FCLAW2D_FILE_NAME_BYTES];
+
+    file_len = strlen (filename) + strlen ("." FCLAW2D_FILE_EXT) + 1;
+    if (file_len > FCLAW2D_FILE_NAME_BYTES)
+    {
+        /* filename too long */
+        *errcode = FCLAW2D_FILE_ERR_BAD_FILE;
+        return NULL;
+    }
 
     /* get p4est_wrap_t from domain */
     wrap = (p4est_wrap_t *) domain->pp;
@@ -3191,13 +3201,10 @@ fclaw2d_file_open_write (const char *filename,
     FCLAW_ASSERT (p4est_is_valid (p4est));
 
     /* create the file */
-    buf_size = strlen (filename) + strlen ("." FCLAW2D_FILE_EXT) + 1;
-    buf = FCLAW_ALLOC (char, buf_size);
-    sc_strcopy (buf, (size_t) buf_size, filename);
+    sc_strcopy (buf, file_len, filename);
     strcat (buf, "." FCLAW2D_FILE_EXT);
     fc = fclaw2d_file_open_create_v1 (p4est, buf, user_string,
                                       &errcode_internal);
-    FCLAW_FREE (buf);
     fclaw2d_file_translate_error_code_v1 (errcode_internal, errcode);
     if (*errcode != FCLAW2D_FILE_ERR_SUCCESS)
     {
@@ -3231,6 +3238,7 @@ fclaw2d_file_open_write (const char *filename,
     fclaw_fc = FCLAW_ALLOC (fclaw2d_file_context_t, 1);
     fclaw_fc->fc = fc;
     fclaw_fc->domain = domain;
+    sc_strcopy (fclaw_fc->basename, strlen (filename) + 1, filename);
 
     return fclaw_fc;
 }
@@ -3317,8 +3325,8 @@ fclaw2d_file_open_read (const char *filename, char *user_string,
     FCLAW_ASSERT (errcode != NULL);
 
     int errcode_internal;
-    int buf_size;
-    char *buf;
+    size_t file_len;
+    char buf[FCLAW2D_FILE_NAME_BYTES];
     char read_user_string[FCLAW2D_FILE_USER_STRING_BYTES_V1 + 1];
     p4est_gloidx_t global_num_quadrants;
     fclaw2d_file_context_p4est_v1_t *p4est_fc;
@@ -3326,16 +3334,21 @@ fclaw2d_file_open_read (const char *filename, char *user_string,
     p4est_connectivity_t *conn;
     p4est_t              *p4est;
 
+    file_len = strlen (filename) + strlen ("." FCLAW2D_FILE_EXT) + 1;
+    if (file_len > FCLAW2D_FILE_NAME_BYTES)
+    {
+        /* filename is too long */
+        *errcode = FCLAW2D_FILE_ERR_BAD_FILE;
+        return NULL;
+    }
+
     /* WARNING: Currently, we do not handle wrong endianness. */
     /* open the given file */
-    buf_size = strlen (filename) + strlen ("." FCLAW2D_FILE_EXT) + 1;
-    buf = FCLAW_ALLOC (char, buf_size);
-    sc_strcopy (buf, (size_t) buf_size, filename);
+    sc_strcopy (buf, file_len, filename);
     strcat (buf, "." FCLAW2D_FILE_EXT);
     p4est_fc = fclaw2d_file_open_read_ext_v1 (mpicomm, buf, user_string,
                                               &global_num_quadrants,
                                               &errcode_internal);
-    FCLAW_FREE (buf);
     fclaw2d_file_translate_error_code_v1 (errcode_internal, errcode);
     if (*errcode != FCLAW2D_FILE_ERR_SUCCESS)
     {
@@ -3372,6 +3385,7 @@ fclaw2d_file_open_read (const char *filename, char *user_string,
     fclaw_fc = FCLAW_ALLOC (fclaw2d_file_context_t, 1);
     fclaw_fc->fc = p4est_fc;
     fclaw_fc->domain = *domain;
+    sc_strcopy (fclaw_fc->basename, strlen (filename) + 1, filename);
 
     return fclaw_fc;
 }
