@@ -80,7 +80,7 @@ fclaw2d_map_c2m_latlong (fclaw_map_context_t * cont, int blockno,
 
     /* blockno is ignored in the current latlong mapping;  it just assumes
        a single "logical" block in [long0,long1]x[lat0,lat1] */
-    MAPC2M_LATLONG(&blockno,&xc2,&yc2,xp,yp,zp);
+    FCLAW_MAP_2D_C2M_LATLONG(&blockno,&xc2,&yc2,xp,yp,zp);
 
     if (cont->is_extruded == 0)
     {        

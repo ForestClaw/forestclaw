@@ -794,14 +794,40 @@ fclaw_1to2 = {
     "fclaw2d_map_is_torus"                         : "fclaw_map_is_torus",
     "fclaw2d_map_is_brick"                         : "fclaw_map_is_brick",
 
+    "MAPC2M_IDENTITY"                              : "FCLAW_MAP_2D_C2M_IDENTITY",
+    "MAPC2M_CART"                                  : "FCLAW_MAP_2D_C2M_CART",
+    "MAPC2M_PILLOWDISK"                            : "FCLAW_MAP_2D_C2M_PILLOWDISK",
+    "MAPC2M_PILLOWDISK5"                           : "FCLAW_MAP_2D_C2M_PILLOWDISK5",
+    "MAPC2M_SQUAREDDISK"                           : "FCLAW_MAP_2D_C2M_SQUAREDDISK",
+    "MAPC2M_FIVEPATCH"                             : "FCLAW_MAP_2D_C2M_FIVEPATCH",
+    "MAPC2M_CUBEDSPHERE"                           : "FCLAW_MAP_2D_C2M_CUBEDSPHERE",
+    "MAPC2M_PILLOWSPHERE"                          : "FCLAW_MAP_2D_C2M_PILLOWSPHERE",
+    "MAPC2M_TORUS"                                 : "FCLAW_MAP_2D_C2M_TORUS",
+    "MAPC2M_TWISTED_TORUS"                         : "FCLAW_MAP_2D_C2M_TWISTED_TORUS",
+    "MAPC2M_BRICK"                                 : "FCLAW_MAP_2D_C2M_BRICK",
+    "MAPC2M_LATLONG"                               : "FCLAW_MAP_2D_C2M_LATLONG",
+    "MAPC2M_ANNULUS"                               : "FCLAW_MAP_2D_C2M_ANNULUS",
 
-
+    "mapc2m_identity"                              : "fclaw_map_2d_c2m_identity",
+    "mapc2m_cart"                                  : "fclaw_map_2d_c2m_cart",
+    "mapc2m_pillowdisk"                            : "fclaw_map_2d_c2m_pillowdisk",
+    "mapc2m_pillowdisk5"                           : "fclaw_map_2d_c2m_pillowdisk5",
+    "mapc2m_squareddisk"                           : "fclaw_map_2d_c2m_squareddisk",
+    "mapc2m_fivepatch"                             : "fclaw_map_2d_c2m_fivepatch",
+    "mapc2m_cubedsphere"                           : "fclaw_map_2d_c2m_cubedsphere",
+    "mapc2m_pillowsphere"                          : "fclaw_map_2d_c2m_pillowsphere",
+    "mapc2m_torus"                                 : "fclaw_map_2d_c2m_torus",
+    "mapc2m_twisted_torus"                         : "fclaw_map_2d_c2m_twisted_torus",
+    "mapc2m_brick"                                 : "fclaw_map_2d_c2m_brick",
+    "mapc2m_latlong"                               : "fclaw_map_2d_c2m_latlong",
+    "mapc2m_annulus"                               : "fclaw_map_2d_c2m_annulus",
 
 
 }
 
 import glob
 import argparse
+import re
 try:
     import pygments
 except ModuleNotFoundError:
@@ -812,6 +838,17 @@ except ModuleNotFoundError:
 import pygments.lexers
 from pygments.token import Token
 
+def replace_preproc_identifiers(token, identifier_map):
+    # Function to replace each match
+    def replace_match(match):
+        identifier = match.group(0)
+        new_identifier = identifier_map.get(identifier, identifier)
+        return new_identifier
+
+    # Replace the identifiers based on the replacement map
+    new_token = re.sub(r'\b[A-Za-z_][A-Za-z0-9_]*\b', replace_match, token)
+    return new_token
+
 def replace_identifiers_and_includes(filepath, code, identifier_map):
     lexer = pygments.lexers.get_lexer_for_filename(filepath, stripnl=False, ensurenl=False)
     tokens = lexer.get_tokens(code)
@@ -820,7 +857,11 @@ def replace_identifiers_and_includes(filepath, code, identifier_map):
     changes = False
 
     for ttype, value in tokens:
-        if ttype in Token.Comment.PreprocFile:
+        if ttype in Token.Comment.Preproc:
+            new_value = replace_preproc_identifiers(value, identifier_map)
+            changes = changes or (new_value != value)
+            new_code += new_value
+        elif ttype in Token.Comment.PreprocFile:
             new_value = identifier_map.get(value, value)
             changes = changes or (new_value != value)
             new_code += new_value

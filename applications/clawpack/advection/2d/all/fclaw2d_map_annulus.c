@@ -77,7 +77,7 @@ fclaw2d_map_c2m_annulus (fclaw_map_context_t * cont, int blockno,
     double theta[2];
     theta[0] = cont->user_double[1];
     theta[1] = cont->user_double[2];
-    MAPC2M_ANNULUS(&blockno,&xc1,&yc1,xp,yp,zp,&beta,theta);
+    FCLAW_MAP_2D_C2M_ANNULUS(&blockno,&xc1,&yc1,xp,yp,zp,&beta,theta);
 
     scale_map(cont, xp,yp,zp);
     rotate_map(cont, xp, yp, zp);

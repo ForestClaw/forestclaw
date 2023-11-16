@@ -7,10 +7,11 @@ c     # either the upper hemisphere (blockno == 0) or the lower hemisphere
 c     # (blockno == 1).
 c     #
 c     # ------------------------------------------------------------------
-      subroutine mapc2m_pillowsphere(blockno, xc1,yc1,xp,yp,zp)
+      subroutine fclaw_map_2d_c2m_pillowsphere(
+     &      blockno, xc1,yc1,xp,yp,zp)
       implicit none
 
-      external mapc2m_cart
+      external fclaw_map_2d_c2m_cart
       double precision xc1,yc1, xp, yp, zp
 
       double precision x1, y1, d, rp2, xc, yc, zc
@@ -19,7 +20,7 @@ c     # ------------------------------------------------------------------
       logical ispillowsphere
 
 c     # Map to [-1,1]x[-1,1]
-      call mapc2m_cart(blockno,xc1,yc1,xc,yc,zc)
+      call fclaw_map_2d_c2m_cart(blockno,xc1,yc1,xc,yc,zc)
 
 c     # Map xc and yc from ghost cells to interior
       d = max(xc - 1.0,0.d0) + max(-1 - xc,0.d0)

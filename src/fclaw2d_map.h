@@ -365,59 +365,59 @@ fclaw_map_context_t *
    ---------------------------------------------------------------------------------- */
 
 /* Single block mappings */
-#define MAPC2M_IDENTITY FCLAW_F77_FUNC (mapc2m_identity,MAPC2M_IDENTITY)
-void MAPC2M_IDENTITY (int* blockno, double *xc, double *yc,
+#define FCLAW_MAP_2D_C2M_IDENTITY FCLAW_F77_FUNC (fclaw_map_2d_c2m_identity,FCLAW_MAP_2D_C2M_IDENTITY)
+void FCLAW_MAP_2D_C2M_IDENTITY (int* blockno, double *xc, double *yc,
                       double *xp, double *yp, double *zp);
 
 /* Single block mappings */
-#define MAPC2M_CART FCLAW_F77_FUNC (mapc2m_cart,MAPC2M_CART)
-void MAPC2M_CART (int* blockno, double *xc, double *yc,
+#define FCLAW_MAP_2D_C2M_CART FCLAW_F77_FUNC (fclaw_map_2d_c2m_cart,FCLAW_MAP_2D_C2M_CART)
+void FCLAW_MAP_2D_C2M_CART (int* blockno, double *xc, double *yc,
                   double *xp, double *yp, double *zp);
 
 
-#define MAPC2M_PILLOWDISK FCLAW_F77_FUNC (mapc2m_pillowdisk,MAPC2M_PILLOWDISK)
-void MAPC2M_PILLOWDISK (int* blockno, double *xc, double *yc,
+#define FCLAW_MAP_2D_C2M_PILLOWDISK FCLAW_F77_FUNC (fclaw_map_2d_c2m_pillowdisk,FCLAW_MAP_2D_C2M_PILLOWDISK)
+void FCLAW_MAP_2D_C2M_PILLOWDISK (int* blockno, double *xc, double *yc,
                         double *xp, double *yp, double *zp);
 
-#define MAPC2M_PILLOWDISK5 FCLAW_F77_FUNC (mapc2m_pillowdisk5,MAPC2M_PILLOWDISK5)
-void MAPC2M_PILLOWDISK5 (int* blockno, double *xc, double *yc,
+#define FCLAW_MAP_2D_C2M_PILLOWDISK5 FCLAW_F77_FUNC (fclaw_map_2d_c2m_pillowdisk5,FCLAW_MAP_2D_C2M_PILLOWDISK5)
+void FCLAW_MAP_2D_C2M_PILLOWDISK5 (int* blockno, double *xc, double *yc,
                          double *xp, double *yp, double *zp, double *alpha);
 
 /* multi-block mappings */
-#define MAPC2M_SQUAREDDISK FCLAW_F77_FUNC (mapc2m_squareddisk,MAPC2M_SQUAREDDISK)
-void MAPC2M_SQUAREDDISK (int *blockno, double *xc, double *yc,
+#define FCLAW_MAP_2D_C2M_SQUAREDDISK FCLAW_F77_FUNC (fclaw_map_2d_c2m_squareddisk,FCLAW_MAP_2D_C2M_SQUAREDDISK)
+void FCLAW_MAP_2D_C2M_SQUAREDDISK (int *blockno, double *xc, double *yc,
                          double *xp, double *yp, double *zp, double *alpha);
 
-#define MAPC2M_FIVEPATCH FCLAW_F77_FUNC (mapc2m_fivepatch,MAPC2M_FIVEPATCH)
-void MAPC2M_FIVEPATCH (int* blockno, double *xc, double *yc,
+#define FCLAW_MAP_2D_C2M_FIVEPATCH FCLAW_F77_FUNC (fclaw_map_2d_c2m_fivepatch,FCLAW_MAP_2D_C2M_FIVEPATCH)
+void FCLAW_MAP_2D_C2M_FIVEPATCH (int* blockno, double *xc, double *yc,
                        double *xp, double *yp, double *zp,double *alpha);
 
-#define MAPC2M_CUBEDSPHERE FCLAW_F77_FUNC (mapc2m_cubedsphere,MAPC2M_CUBEDSPHERE)
-void MAPC2M_CUBEDSPHERE (int* blockno, double *xc, double *yc,
+#define FCLAW_MAP_2D_C2M_CUBEDSPHERE FCLAW_F77_FUNC (fclaw_map_2d_c2m_cubedsphere,FCLAW_MAP_2D_C2M_CUBEDSPHERE)
+void FCLAW_MAP_2D_C2M_CUBEDSPHERE (int* blockno, double *xc, double *yc,
                          double *xp, double *yp, double *zp);
 
-#define MAPC2M_PILLOWSPHERE FCLAW_F77_FUNC (mapc2m_pillowsphere,MAPC2M_PILLOWSPHERE)
-void MAPC2M_PILLOWSPHERE (int* blockno, double *xc, double *yc,
+#define FCLAW_MAP_2D_C2M_PILLOWSPHERE FCLAW_F77_FUNC (fclaw_map_2d_c2m_pillowsphere,FCLAW_MAP_2D_C2M_PILLOWSPHERE)
+void FCLAW_MAP_2D_C2M_PILLOWSPHERE (int* blockno, double *xc, double *yc,
                           double *xp, double *yp, double *zp);
 
-#define MAPC2M_TORUS FCLAW_F77_FUNC (mapc2m_torus,MAPC2M_TORUS)
-void MAPC2M_TORUS (double *xc, double *yc, double *xp, double *yp, double *zp, 
+#define FCLAW_MAP_2D_C2M_TORUS FCLAW_F77_FUNC (fclaw_map_2d_c2m_torus,FCLAW_MAP_2D_C2M_TORUS)
+void FCLAW_MAP_2D_C2M_TORUS (double *xc, double *yc, double *xp, double *yp, double *zp, 
                    double* alpha, double* beta);
 
-#define MAPC2M_TWISTED_TORUS FCLAW_F77_FUNC (mapc2m_twisted_torus,MAPC2M_TWISTED_TORUS)
-void MAPC2M_TWISTED_TORUS (int* blockno, double *xc, double *yc,
+#define FCLAW_MAP_2D_C2M_TWISTED_TORUS FCLAW_F77_FUNC (fclaw_map_2d_c2m_twisted_torus,FCLAW_MAP_2D_C2M_TWISTED_TORUS)
+void FCLAW_MAP_2D_C2M_TWISTED_TORUS (int* blockno, double *xc, double *yc,
                    double *xp, double *yp, double *zp, double* alpha);
 
-#define MAPC2M_BRICK FCLAW_F77_FUNC (mapc2m_brick,MAPC2M_BRICK)
-void MAPC2M_BRICK (int* blockno, double *xc, double *yc,
+#define FCLAW_MAP_2D_C2M_BRICK FCLAW_F77_FUNC (fclaw_map_2d_c2m_brick,FCLAW_MAP_2D_C2M_BRICK)
+void FCLAW_MAP_2D_C2M_BRICK (int* blockno, double *xc, double *yc,
                    double *xp, double *yp, double *zp, int *mi, int *mj);
 
-#define MAPC2M_LATLONG FCLAW_F77_FUNC (mapc2m_latlong,MAPC2M_LATLONG)
-void MAPC2M_LATLONG (int* blockno, double *xc, double *yc,
+#define FCLAW_MAP_2D_C2M_LATLONG FCLAW_F77_FUNC (fclaw_map_2d_c2m_latlong,FCLAW_MAP_2D_C2M_LATLONG)
+void FCLAW_MAP_2D_C2M_LATLONG (int* blockno, double *xc, double *yc,
                    double *xp, double *yp, double *zp);
 
-#define MAPC2M_ANNULUS FCLAW_F77_FUNC (mapc2m_annulus,MAPC2M_ANNULUS)
-void MAPC2M_ANNULUS (int* blockno, double *xc, double *yc,
+#define FCLAW_MAP_2D_C2M_ANNULUS FCLAW_F77_FUNC (fclaw_map_2d_c2m_annulus,FCLAW_MAP_2D_C2M_ANNULUS)
+void FCLAW_MAP_2D_C2M_ANNULUS (int* blockno, double *xc, double *yc,
                      double *xp, double *yp, double *zp, double *alpha,
                      double *theta);
 

@@ -74,7 +74,7 @@ fclaw2d_map_c2m_torus (fclaw_map_context_t * cont, int blockno,
     double beta = cont->user_double[1];
 
     /* Don't pass in block number */
-    MAPC2M_TORUS(&xc1,&yc1,xp,yp,zp,&alpha,&beta);
+    FCLAW_MAP_2D_C2M_TORUS(&xc1,&yc1,xp,yp,zp,&alpha,&beta);
 
     scale_map(cont,xp,yp,zp);
     rotate_map(cont,xp,yp,zp);

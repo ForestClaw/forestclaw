@@ -1,4 +1,4 @@
-      subroutine mapc2m_pillowdisk5(blockno,xc1,yc1,
+      subroutine fclaw_map_2d_c2m_pillowdisk5(blockno,xc1,yc1,
      &      xp,yp,zp,alpha)
       implicit none
 
@@ -6,12 +6,12 @@
       double precision xc1, yc1
       double precision xc,yc,zc,xp,yp,zp,alpha
 
-      call mapc2m_fivepatch(blockno,xc1,yc1,xc,yc,zc,alpha)
+      call fclaw_map_2d_c2m_fivepatch(blockno,xc1,yc1,xc,yc,zc,alpha)
 
 c     # Map from [-1,1]x[-1,1] back to [0,1]x[0,1]
       xc = (xc + 1)/2.d0
       yc = (yc + 1)/2.d0
 
-      call mapc2m_pillowdisk(blockno,xc,yc,xp,yp,zp)
+      call fclaw_map_2d_c2m_pillowdisk(blockno,xc,yc,xp,yp,zp)
 
       end

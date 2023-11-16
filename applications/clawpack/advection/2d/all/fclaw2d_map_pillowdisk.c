@@ -66,7 +66,7 @@ fclaw2d_map_c2m_pillowdisk(fclaw_map_context_t * cont, int blockno,
                       double *xp, double *yp, double *zp)
 {
     /* Unit disk centered at (0,0) */
-    MAPC2M_PILLOWDISK(&blockno,&xc,&yc,xp,yp,zp);
+    FCLAW_MAP_2D_C2M_PILLOWDISK(&blockno,&xc,&yc,xp,yp,zp);
 
     if (cont->is_extruded == 0)
     {

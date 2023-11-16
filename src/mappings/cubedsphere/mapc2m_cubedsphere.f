@@ -1,4 +1,4 @@
-      subroutine mapc2m_cubedsphere(blockno,xc,yc,xp,yp,zp)
+      subroutine fclaw_map_2d_c2m_cubedsphere(blockno,xc,yc,xp,yp,zp)
       implicit none
 
       double precision xc,yc,xp,yp,zp

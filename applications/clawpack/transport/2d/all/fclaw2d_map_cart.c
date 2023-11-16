@@ -88,7 +88,7 @@ fclaw2d_map_c2m_cart(fclaw_map_context_t * cont, int blockno,
     FCLAW_MAP_2D_BRICK2C(&cont,&blockno,&xc,&yc,&xc1,&yc1,&zc1);
 
     /* Unit square in [-1,1] x [-1,1] */
-    MAPC2M_CART(&blockno,&xc1,&yc1,xp,yp,zp);
+    FCLAW_MAP_2D_C2M_CART(&blockno,&xc1,&yc1,xp,yp,zp);
 
     scale_map(cont, xp,yp,zp);
     shift_map(cont, xp,yp,zp);

@@ -68,10 +68,10 @@ fclaw2d_map_c2m_pillowsphere5(fclaw_map_context_t * cont, int blockno,
 {
     double xp1, yp1, zp1;
     double alpha = cont->user_double[0];
-    MAPC2M_FIVEPATCH(&blockno,&xc,&yc,&xp1,&yp1,&zp1,&alpha);
+    FCLAW_MAP_2D_C2M_FIVEPATCH(&blockno,&xc,&yc,&xp1,&yp1,&zp1,&alpha);
     xp1 = (xp1 + 1)/2.0;
     yp1 = (yp1 + 1)/2.0;
-    MAPC2M_PILLOWSPHERE(&blockno,&xp1,&yp1,xp,yp,zp);
+    FCLAW_MAP_2D_C2M_PILLOWSPHERE(&blockno,&xp1,&yp1,xp,yp,zp);
 
     /* These can probably be replaced by C functions at some point. */
     scale_map(cont,xp,yp,zp);
@@ -88,7 +88,7 @@ fclaw3dx_map_c2m_pillowsphere5(fclaw_map_context_t * cont, int blockno,
     /* map to fivepatch square in [-1,1]x[-1,1] */
     double xp1, yp1, zp1;
     double alpha = cont->user_double[0];
-    MAPC2M_FIVEPATCH(&blockno,&xc,&yc,&xp1,&yp1,&zp1,&alpha);
+    FCLAW_MAP_2D_C2M_FIVEPATCH(&blockno,&xc,&yc,&xp1,&yp1,&zp1,&alpha);
 
     /* Map to unit square */
     xp1 = (xp1 + 1)/2.0;
@@ -99,7 +99,7 @@ fclaw3dx_map_c2m_pillowsphere5(fclaw_map_context_t * cont, int blockno,
     Note : Since we only have a single unit square, we will only have the 
     upper half of the sphere 
     */
-    MAPC2M_PILLOWSPHERE(&blockno,&xp1,&yp1,xp,yp,zp);
+    FCLAW_MAP_2D_C2M_PILLOWSPHERE(&blockno,&xp1,&yp1,xp,yp,zp);
 
 
     /* Map point on sphere to point in shell */
