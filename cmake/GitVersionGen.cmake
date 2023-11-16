@@ -9,13 +9,13 @@
 # This script is intended for use with CMake and shallow copies of repositories.
 
 # Check if the .tarball-version file exists
-if(EXISTS "${CMAKE_CURRENT_LIST_DIR}/.tarball-version")
+if(EXISTS "${CMAKE_CURRENT_LIST_DIR}/../.tarball-version")
   # If .tarball-version exists, read the version from it and remove the leading character
-  file(READ "${CMAKE_CURRENT_LIST_DIR}/.tarball-version" FORESTCLAW_FULL_VERSION)
+  file(READ "${CMAKE_CURRENT_LIST_DIR}/../.tarball-version" FORESTCLAW_FULL_VERSION)
   string(STRIP "${FORESTCLAW_FULL_VERSION}" FORESTCLAW_FULL_VERSION)
-elseif(EXISTS "${CMAKE_CURRENT_LIST_DIR}/.repository-version")
+elseif(EXISTS "${CMAKE_CURRENT_LIST_DIR}/../.repository-version")
   # If .tarball-version does not exist, read the version number from the .repository-version file and remove the leading character
-  file(READ "${CMAKE_CURRENT_LIST_DIR}/.repository-version" FORESTCLAW_FULL_VERSION)
+  file(READ "${CMAKE_CURRENT_LIST_DIR}/../.repository-version" FORESTCLAW_FULL_VERSION)
   string(STRIP "${FORESTCLAW_FULL_VERSION}" FORESTCLAW_FULL_VERSION)
 
   # Get the current commit hash (short version) and check if the current commit is tagged with the version number
