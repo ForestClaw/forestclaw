@@ -128,7 +128,9 @@ void run_program(fclaw2d_global_t* glob)
                                   glob->domain, &errcode);
     check_fclaw2d_file_error_code (errcode, "file open write");
 
-    fc = fclaw2d_file_write_partition (fc, "Test partition write", &errcode);
+    retval = fclaw2d_file_write_partition ("swirl_io_test_partition",
+                                           "Test partition write", glob->domain,
+                                           &errcode);
     check_fclaw2d_file_error_code (errcode, "file write partition");
 
     /* write a block to the file */

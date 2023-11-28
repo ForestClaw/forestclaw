@@ -172,10 +172,8 @@ fclaw3d_file_context_t *fclaw3d_file_open_write (const char *filename,
  *                              partition file.
  * \return                      Always the input file context.
  */
-fclaw3d_file_context_t *fclaw3d_file_write_partition (fclaw3d_file_context_t *
-                                                      fc,
-                                                      const char *user_string,
-                                                      int *errcode);
+int fclaw3d_file_write_partition (const char *filename, const char *user_string,
+                                  fclaw3d_domain_t *domain, int *errcode);
 
 /** Write a serial data block to an opened parallel file.
  *
