@@ -196,30 +196,6 @@ fclaw2d_vtk_write_header (fclaw2d_domain_t * domain, fclaw2d_vtk_state_t * s)
     return retval ? -1 : 0;
 }
 
-/**
- * @brief Write the buffer to file
- *
- * @param s the vtk state
- * @param psize_field the size of the buffer
- */
-static void
-write_buffer (fclaw2d_vtk_state_t * s, int64_t psize_field)
-{
-#ifndef P4EST_ENABLE_MPIIO
-    size_t retvalz;
-
-    retvalz = fwrite (s->buf, psize_field, 1, s->file);
-    SC_CHECK_ABORT (retvalz == 1, "VTK file write failed");
-#else
-    int mpiret;
-    MPI_Status mpistatus;
-
-    mpiret = MPI_File_write (s->mpifile, s->buf, psize_field, MPI_BYTE,
-                             &mpistatus);
-    SC_CHECK_MPI (mpiret);
-#endif
-}
-
 static void
 write_position_cb (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
                    int blockno, int patchno, void *user)
