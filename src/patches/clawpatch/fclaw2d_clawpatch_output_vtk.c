@@ -59,6 +59,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_options.h>
 #include <fclaw2d_map.h>
+#include <sc_io.h>
 
 typedef struct fclaw2d_vtk_state
 {
@@ -91,6 +92,7 @@ typedef struct fclaw2d_vtk_state
     MPI_Offset mpibegin;
 #endif
     char *buf;
+    sc_io_sink_t *sink;
 }
 fclaw2d_vtk_state_t;
 
@@ -226,7 +228,7 @@ write_position_cb (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
     fclaw2d_vtk_state_t *s = (fclaw2d_vtk_state_t *) g->user;
 
     s->coordinate_cb (g->glob, patch, blockno, patchno, s->buf);
-    write_buffer (s, s->psize_position);
+    sc_io_sink_write (s->sink, s->buf, s->psize_position);
 }
 
 static void
@@ -322,7 +324,7 @@ write_connectivity_cb (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
         }
 #endif
     }
-    write_buffer (s, s->psize_connectivity);
+    sc_io_sink_write (s->sink, s->buf, s->psize_connectivity);
 }
 
 static void
@@ -354,7 +356,7 @@ write_offsets_cb (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
             *idata++ = k;
         }
     }
-    write_buffer (s, s->psize_offsets);
+    sc_io_sink_write (s->sink, s->buf, s->psize_offsets);
 }
 
 static void
@@ -374,7 +376,7 @@ write_types_cb (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
         *cdata++ = 12;
 #endif
     }
-    write_buffer (s, s->psize_types);
+    sc_io_sink_write (s->sink, s->buf, s->psize_types);
 }
 
 static void
@@ -390,7 +392,7 @@ write_mpirank_cb (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
     {
         *idata++ = domain->mpirank;
     }
-    write_buffer (s, s->psize_mpirank);
+    sc_io_sink_write (s->sink, s->buf, s->psize_mpirank);
 }
 
 static void
@@ -406,7 +408,7 @@ write_blockno_cb (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
     {
         *idata++ = blockno;
     }
-    write_buffer (s, s->psize_blockno);
+    sc_io_sink_write (s->sink, s->buf, s->psize_blockno);
 }
 
 static void
@@ -437,7 +439,7 @@ write_patchno_cb (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
             *idata++ = gpno;
         }
     }
-    write_buffer (s, s->psize_patchno);
+    sc_io_sink_write (s->sink, s->buf, s->psize_patchno);
 }
 
 static void
@@ -449,7 +451,7 @@ write_meqn_cb (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
     fclaw2d_vtk_state_t *s = (fclaw2d_vtk_state_t *) g->user;
 
     s->value_cb (g->glob, patch, blockno, patchno, s->buf);
-    write_buffer (s, s->psize_meqn);
+    sc_io_sink_write (s->sink, s->buf, s->psize_meqn);
 }
 
 static void
@@ -460,6 +462,7 @@ fclaw2d_vtk_write_field (fclaw2d_global_t * glob, fclaw2d_vtk_state_t * s,
     fclaw2d_domain_t *domain = glob->domain;
 
     int64_t bcount;
+    sc_array_t buffer;
 #ifndef P4EST_ENABLE_MPIIO
     size_t retvalz;
 #else
@@ -472,6 +475,10 @@ fclaw2d_vtk_write_field (fclaw2d_global_t * glob, fclaw2d_vtk_state_t * s,
 #endif
 
     s->buf = P4EST_ALLOC (char, psize_field);
+    /* The buffer array will be resized when required. */
+    sc_array_init_size (&buffer, 1, psize_field);
+    s->sink = sc_io_sink_new (SC_IO_TYPE_BUFFER, SC_IO_MODE_APPEND,
+                              SC_IO_ENCODE_NONE, &buffer);
 #ifdef P4EST_ENABLE_MPIIO
     mpipos = s->mpibegin + offset_field;
     if (domain->mpirank > 0)
@@ -495,11 +502,26 @@ fclaw2d_vtk_write_field (fclaw2d_global_t * glob, fclaw2d_vtk_state_t * s,
         retvalz = fwrite (&bcount, s->ndsize, 1, s->file);
         SC_CHECK_ABORT (retvalz == 1, "VTK file write failed");
 #else
-        mpiret = MPI_File_write (s->mpifile, &bcount, 1, MPI_LONG, &mpistatus);
+        mpiret =
+            MPI_File_write (s->mpifile, &bcount, 1, MPI_LONG, &mpistatus);
         SC_CHECK_MPI (mpiret);
 #endif
     }
     fclaw2d_global_iterate_patches (glob, cb, s);
+
+#ifdef P4EST_ENABLE_MPIIO
+    mpiret =
+        MPI_File_write_all (s->mpifile, buffer.array, s->sink->buffer_bytes,
+                            MPI_BYTE, &mpistatus);
+    SC_CHECK_MPI (mpiret);
+#else
+    retvalz = fwrite (buffer.array, s->sink->buffer_bytes, 1, s->file);
+    SC_CHECK_ABORT (retvalz == 1, "VTK file write failed");
+#endif
+
+    /* free buffers */
+    sc_array_reset (&buffer);
+    sc_io_sink_destroy (s->sink);
     P4EST_FREE (s->buf);
 
 #ifdef P4EST_ENABLE_MPIIO
@@ -661,6 +683,9 @@ fclaw2d_vtk_write_file (fclaw2d_global_t * glob, const char *basename,
         s->offset_patchno + s->psize_patchno * domain->global_num_patches;
     s->offset_end = s->ndsize +
         s->offset_meqn + s->psize_meqn * domain->global_num_patches;
+
+    s->buf = NULL;
+    s->sink = NULL;
 
     /* write header meta data and check for error */
     retval = 0;
