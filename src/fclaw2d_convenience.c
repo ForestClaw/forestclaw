@@ -276,6 +276,17 @@ fclaw2d_domain_new (p4est_wrap_t * wrap, sc_keyvalue_t * attributes)
     domain->local_minlevel = local_minlevel;
     domain->local_maxlevel = local_maxlevel;
 
+    /* determine maximum number of local patches */
+    domain->local_max_patches = 0;
+    for (i = 0; i < wrap->p4est->mpisize; ++i)
+    {
+        domain->local_max_patches = SC_MAX (domain->local_max_patches,
+                                            wrap->p4est->
+                                            global_first_quadrant[i + 1] -
+                                            wrap->p4est->
+                                            global_first_quadrant[i]);
+    }
+
     /* allocate ghost patches */
     domain->ghost_patches =
         FCLAW_ALLOC_ZERO (fclaw2d_patch_t, domain->num_ghost_patches);
