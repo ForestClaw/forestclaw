@@ -101,6 +101,7 @@ fclaw2d_domain_new (p4est_wrap_t * wrap, sc_keyvalue_t * attributes)
     int tree_maxlevel, local_maxlevel;
     int levels[2], global_levels[2];
     p4est_topidx_t vnum;
+    p4est_gloidx_t current_local_num_patches;
     p4est_connectivity_t *conn = wrap->conn;
     p4est_ghost_t *ghost = wrap->match_aux ? wrap->ghost_aux : wrap->ghost;
 #ifdef FCLAW_ENABLE_DEBUG
@@ -280,11 +281,12 @@ fclaw2d_domain_new (p4est_wrap_t * wrap, sc_keyvalue_t * attributes)
     domain->local_max_patches = 0;
     for (i = 0; i < wrap->p4est->mpisize; ++i)
     {
+        current_local_num_patches =
+            wrap->p4est->global_first_quadrant[i + 1] -
+            wrap->p4est->global_first_quadrant[i];
+
         domain->local_max_patches = SC_MAX (domain->local_max_patches,
-                                            wrap->p4est->
-                                            global_first_quadrant[i + 1] -
-                                            wrap->p4est->
-                                            global_first_quadrant[i]);
+                                            (int) current_local_num_patches);
     }
 
     /* allocate ghost patches */
