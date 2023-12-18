@@ -179,6 +179,7 @@ struct fclaw2d_domain
                                              one domain to a derived one. */
 
     int local_num_patches;      /**< sum of patches over all blocks on this proc */
+    int local_max_patches;      /**< maximum over all procs of local_num_patches */
     /** @{ */
     /** Local to proc.  If this proc doesn't
         store any patches at all, we set
