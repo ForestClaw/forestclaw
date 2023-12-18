@@ -323,6 +323,23 @@ fclaw2d_domain_new (p4est_wrap_t * wrap, sc_keyvalue_t * attributes)
     return domain;
 }
 
+fclaw2d_domain_t *
+fclaw2d_domain_new_p4est (p4est_t *p4est)
+{
+    FCLAW_ASSERT (p4est != NULL);
+    FCLAW_ASSERT (p4est->user_pointer == NULL);
+
+    p4est_wrap_t *wrap;
+
+    /* create p4est_wrap from the given p4est */
+    wrap = p4est_wrap_new_p4est (p4est, 0, P4EST_CONNECT_FULL, NULL, NULL);
+
+    FCLAW_ASSERT (wrap->p4est->data_size == 0);
+
+    /* attributes of the created domain is initialized by sc_keyvalue_new */
+    return fclaw2d_domain_new (wrap, NULL);
+}
+
 static void
 fclaw2d_check_initial_level (sc_MPI_Comm mpicomm, int initial_level)
 {
