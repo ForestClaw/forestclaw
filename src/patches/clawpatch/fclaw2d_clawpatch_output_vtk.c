@@ -200,17 +200,20 @@ static void
 write_position_cb (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
                    int blockno, int patchno, void *user)
 {
+    int retval;
     fclaw2d_global_iterate_t *g = (fclaw2d_global_iterate_t*) user;
     fclaw2d_vtk_state_t *s = (fclaw2d_vtk_state_t *) g->user;
 
     s->coordinate_cb (g->glob, patch, blockno, patchno, s->buf);
-    sc_io_sink_write (s->sink, s->buf, s->psize_position);
+    retval = sc_io_sink_write (s->sink, s->buf, s->psize_position);
+    SC_CHECK_ABORT (retval == 0, "VTK buffer write failed");
 }
 
 static void
 write_connectivity_cb (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
                        int blockno, int patchno, void *user)
 {
+    int retval;
     fclaw2d_global_iterate_t *g = (fclaw2d_global_iterate_t*) user;
     fclaw2d_vtk_state_t *s = (fclaw2d_vtk_state_t *) g->user;
     int i, j;
@@ -300,13 +303,15 @@ write_connectivity_cb (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
         }
 #endif
     }
-    sc_io_sink_write (s->sink, s->buf, s->psize_connectivity);
+    retval = sc_io_sink_write (s->sink, s->buf, s->psize_connectivity);
+    SC_CHECK_ABORT (retval == 0, "VTK buffer write failed");
 }
 
 static void
 write_offsets_cb (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
                   int blockno, int patchno, void *user)
 {
+    int retval;
     fclaw2d_global_iterate_t *g = (fclaw2d_global_iterate_t*) user;
     fclaw2d_vtk_state_t *s = (fclaw2d_vtk_state_t *) g->user;
     int c;
@@ -332,13 +337,15 @@ write_offsets_cb (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
             *idata++ = k;
         }
     }
-    sc_io_sink_write (s->sink, s->buf, s->psize_offsets);
+    retval = sc_io_sink_write (s->sink, s->buf, s->psize_offsets);
+    SC_CHECK_ABORT (retval == 0, "VTK buffer write failed");
 }
 
 static void
 write_types_cb (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
                 int blockno, int patchno, void *user)
 {
+    int retval;
     fclaw2d_global_iterate_t *g = (fclaw2d_global_iterate_t*) user;
     fclaw2d_vtk_state_t *s = (fclaw2d_vtk_state_t *) g->user;
     int c;
@@ -352,13 +359,15 @@ write_types_cb (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
         *cdata++ = 12;
 #endif
     }
-    sc_io_sink_write (s->sink, s->buf, s->psize_types);
+    retval = sc_io_sink_write (s->sink, s->buf, s->psize_types);
+    SC_CHECK_ABORT (retval == 0, "VTK buffer write failed");
 }
 
 static void
 write_mpirank_cb (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
                   int blockno, int patchno, void *user)
 {
+    int retval;
     fclaw2d_global_iterate_t *g = (fclaw2d_global_iterate_t*) user;
     fclaw2d_vtk_state_t *s = (fclaw2d_vtk_state_t *) g->user;
     int c;
@@ -368,13 +377,15 @@ write_mpirank_cb (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
     {
         *idata++ = domain->mpirank;
     }
-    sc_io_sink_write (s->sink, s->buf, s->psize_mpirank);
+    retval = sc_io_sink_write (s->sink, s->buf, s->psize_mpirank);
+    SC_CHECK_ABORT (retval == 0, "VTK buffer write failed");
 }
 
 static void
 write_blockno_cb (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
                   int blockno, int patchno, void *user)
 {
+    int retval;
     fclaw2d_global_iterate_t *g = (fclaw2d_global_iterate_t*) user;
     fclaw2d_vtk_state_t *s = (fclaw2d_vtk_state_t *) g->user;
     int c;
@@ -384,13 +395,15 @@ write_blockno_cb (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
     {
         *idata++ = blockno;
     }
-    sc_io_sink_write (s->sink, s->buf, s->psize_blockno);
+    retval = sc_io_sink_write (s->sink, s->buf, s->psize_blockno);
+    SC_CHECK_ABORT (retval == 0, "VTK buffer write failed");
 }
 
 static void
 write_patchno_cb (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
                   int blockno, int patchno, void *user)
 {
+    int retval;
     fclaw2d_global_iterate_t *g = (fclaw2d_global_iterate_t*) user;
     fclaw2d_vtk_state_t *s = (fclaw2d_vtk_state_t *) g->user;
     int c;
@@ -415,19 +428,22 @@ write_patchno_cb (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
             *idata++ = gpno;
         }
     }
-    sc_io_sink_write (s->sink, s->buf, s->psize_patchno);
+    retval = sc_io_sink_write (s->sink, s->buf, s->psize_patchno);
+    SC_CHECK_ABORT (retval == 0, "VTK buffer write failed");
 }
 
 static void
 write_meqn_cb (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
                int blockno, int patchno, void *user)
 {
+    int retval;
     fclaw2d_global_iterate_t* g = (fclaw2d_global_iterate_t*) user;
 
     fclaw2d_vtk_state_t *s = (fclaw2d_vtk_state_t *) g->user;
 
     s->value_cb (g->glob, patch, blockno, patchno, s->buf);
-    sc_io_sink_write (s->sink, s->buf, s->psize_meqn);
+    retval = sc_io_sink_write (s->sink, s->buf, s->psize_meqn);
+    SC_CHECK_ABORT (retval == 0, "VTK buffer write failed");
 }
 
 static void
