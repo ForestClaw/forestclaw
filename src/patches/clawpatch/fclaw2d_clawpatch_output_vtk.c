@@ -31,6 +31,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define PATCH_DIM 2
 #endif
 
+#define FCLAW_VTK_CEIL(x, y) (((x) + (y) - 1) / (y)) /**< round x / y up */
+
 #if REFINE_DIM == 2 && PATCH_DIM == 2
 
 #include <fclaw2d_clawpatch_output_vtk.h>
@@ -39,6 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_clawpatch_options.h>
 
 #define PATCH_CHILDREN 4
+#define FCLAW_VTK_BUF_THRESHOLD 6000
 
 #elif REFINE_DIM == 2 && PATCH_DIM == 3
 
@@ -50,6 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <_fclaw2d_to_fclaw3dx.h>
 
 #define PATCH_CHILDREN 8
+#define FCLAW_VTK_BUF_THRESHOLD 6000
 
 #else
 #error "This combination of REFINE_DIM and PATCH_DIM is unsupported"
@@ -202,16 +206,54 @@ fclaw2d_vtk_write_header (fclaw2d_domain_t * domain, fclaw2d_vtk_state_t * s)
  * \param [in,out]  s               The VTK state.
  * \param [in]      psize_field     The number of bytes, which are intended to
  *                                  add to the buffer.
+ * \param [in]      threshold       If the sum of the bytes, which are already
+ *                                  stored in the buffer and \b psize_field
+ *                                  is greater than \b threshold, the buffer
+ *                                  is flushed to disk. The \b psize_field
+ *                                  many new bytes are added to the buffer.
+ *                                  -1 means that there is no threshold and
+ *                                  the data just added to \b s->sink.
  */
 static void
-add_to_buffer (fclaw2d_vtk_state_t * s, int64_t psize_field)
+add_to_buffer (fclaw2d_vtk_state_t * s, int64_t psize_field,
+               int64_t threshold)
 {
     FCLAW_ASSERT (s != NULL);
 
-    int retval;
+    int mpiret;
+    size_t bytes_in, bytes_out;
+#ifdef P4EST_ENABLE_MPIIO
+    MPI_Status mpistatus;
+#else
+    size_t retvalz;
+#endif
 
-    retval = sc_io_sink_write (s->sink, s->buf, (size_t) psize_field);
-    SC_CHECK_ABORT (retval == 0, "VTK buffer write failed");
+    if (threshold != -1
+        && (s->sink->buffer_bytes + (size_t) psize_field > threshold))
+    {
+        /* buffer threshold exceeded */
+        /* write the current buffer to disk */
+#ifdef P4EST_ENABLE_MPIIO
+        mpiret =
+            MPI_File_write_all (s->mpifile, s->sink->buffer->array,
+                                s->sink->buffer_bytes, MPI_BYTE, &mpistatus);
+        SC_CHECK_MPI (mpiret);
+#else
+        retvalz =
+            fwrite (s->sink->buffer->array, s->sink->buffer_bytes, 1,
+                    s->file);
+        SC_CHECK_ABORT (retvalz == 1, "VTK file write failed");
+#endif
+        /* reset the sink */
+        mpiret = sc_io_sink_complete (s->sink, &bytes_in, &bytes_out);
+        SC_CHECK_ABORT (mpiret == 0, "VTK buffer completion failed");
+        /* reset the buffer */
+        sc_array_reset (s->sink->buffer);
+        s->sink->buffer_bytes = 0;
+    }
+
+    mpiret = sc_io_sink_write (s->sink, s->buf, (size_t) psize_field);
+    SC_CHECK_ABORT (mpiret == 0, "VTK buffer write failed");
 }
 
 static void
@@ -222,7 +264,7 @@ write_position_cb (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
     fclaw2d_vtk_state_t *s = (fclaw2d_vtk_state_t *) g->user;
 
     s->coordinate_cb (g->glob, patch, blockno, patchno, s->buf);
-    add_to_buffer (s, s->psize_position);
+    add_to_buffer (s, s->psize_position, FCLAW_VTK_BUF_THRESHOLD);
 }
 
 static void
@@ -318,7 +360,7 @@ write_connectivity_cb (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
         }
 #endif
     }
-    add_to_buffer (s, s->psize_connectivity);
+    add_to_buffer (s, s->psize_connectivity, FCLAW_VTK_BUF_THRESHOLD);
 }
 
 static void
@@ -350,7 +392,7 @@ write_offsets_cb (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
             *idata++ = k;
         }
     }
-    add_to_buffer (s, s->psize_offsets);
+    add_to_buffer (s, s->psize_offsets, FCLAW_VTK_BUF_THRESHOLD);
 }
 
 static void
@@ -370,7 +412,7 @@ write_types_cb (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
         *cdata++ = 12;
 #endif
     }
-    add_to_buffer (s, s->psize_types);
+    add_to_buffer (s, s->psize_types, FCLAW_VTK_BUF_THRESHOLD);
 }
 
 static void
@@ -386,7 +428,7 @@ write_mpirank_cb (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
     {
         *idata++ = domain->mpirank;
     }
-    add_to_buffer (s, s->psize_mpirank);
+    add_to_buffer (s, s->psize_mpirank, FCLAW_VTK_BUF_THRESHOLD);
 }
 
 static void
@@ -402,7 +444,7 @@ write_blockno_cb (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
     {
         *idata++ = blockno;
     }
-    add_to_buffer (s, s->psize_blockno);
+    add_to_buffer (s, s->psize_blockno, FCLAW_VTK_BUF_THRESHOLD);
 }
 
 static void
@@ -433,7 +475,7 @@ write_patchno_cb (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
             *idata++ = gpno;
         }
     }
-    add_to_buffer (s, s->psize_patchno);
+    add_to_buffer (s, s->psize_patchno, FCLAW_VTK_BUF_THRESHOLD);
 }
 
 static void
@@ -445,7 +487,7 @@ write_meqn_cb (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
     fclaw2d_vtk_state_t *s = (fclaw2d_vtk_state_t *) g->user;
 
     s->value_cb (g->glob, patch, blockno, patchno, s->buf);
-    add_to_buffer (s, s->psize_meqn);
+    add_to_buffer (s, s->psize_meqn, FCLAW_VTK_BUF_THRESHOLD);
 }
 
 static void
@@ -460,6 +502,8 @@ fclaw2d_vtk_write_field (fclaw2d_global_t * glob, fclaw2d_vtk_state_t * s,
 #ifndef P4EST_ENABLE_MPIIO
     size_t retvalz;
 #else
+    int i;
+    int max_num_writes, local_num_writes;
     int mpiret;
     MPI_Offset mpipos;
 #ifdef P4EST_ENABLE_DEBUG
@@ -504,10 +548,37 @@ fclaw2d_vtk_write_field (fclaw2d_global_t * glob, fclaw2d_vtk_state_t * s,
     fclaw2d_global_iterate_patches (glob, cb, s);
 
 #ifdef P4EST_ENABLE_MPIIO
-    mpiret =
-        MPI_File_write_all (s->mpifile, buffer.array, s->sink->buffer_bytes,
-                            MPI_BYTE, &mpistatus);
-    SC_CHECK_MPI (mpiret);
+    if (s->sink->buffer_bytes > 0)
+    {
+        /* write the remaining buffered bytes */
+        mpiret =
+            MPI_File_write_all (s->mpifile, buffer.array,
+                                s->sink->buffer_bytes, MPI_BYTE, &mpistatus);
+        SC_CHECK_MPI (mpiret);
+    }
+
+    /* Ensure that the collective function MPI_File_write_all is called
+     * equally often on each rank.
+     */
+    max_num_writes =
+        FCLAW_VTK_CEIL (glob->domain->local_max_patches * psize_field,
+                        FCLAW_VTK_BUF_THRESHOLD);
+    local_num_writes =
+        FCLAW_VTK_CEIL (glob->domain->local_num_patches * psize_field,
+                        FCLAW_VTK_BUF_THRESHOLD);
+    FCLAW_ASSERT (max_num_writes - local_num_writes >= 0);
+
+    for (i = 0; i < max_num_writes - local_num_writes; ++i)
+    {
+        /* This rank has less patches than the rank that holds the maximal
+         * number of patches. We compensate this by empty write calls to avoid
+         * a deadlock.
+         */
+        mpiret =
+            MPI_File_write_all (s->mpifile, buffer.array, 0, MPI_BYTE,
+                                &mpistatus);
+        SC_CHECK_MPI (mpiret);
+    }
 #else
     retvalz = fwrite (buffer.array, s->sink->buffer_bytes, 1, s->file);
     SC_CHECK_ABORT (retvalz == 1, "VTK file write failed");
