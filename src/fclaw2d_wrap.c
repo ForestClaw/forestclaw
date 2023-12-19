@@ -105,6 +105,7 @@ fclaw_domain_t* fclaw_domain_wrap_2d(fclaw2d_domain_t* domain_2d)
     domain->mpirank = domain_2d->mpirank;
 
     domain->local_num_patches = domain_2d->local_num_patches;
+    domain->local_max_patches = domain_2d->local_max_patches;
     domain->local_minlevel = domain_2d->local_minlevel;
     domain->local_maxlevel = domain_2d->local_maxlevel;
     domain->global_num_patches = domain_2d->global_num_patches;

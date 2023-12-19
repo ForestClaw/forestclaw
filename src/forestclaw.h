@@ -132,6 +132,7 @@ struct fclaw_domain
     int mpirank;                /**< MPI rank */
 
     int local_num_patches;      /**< sum of patches over all blocks on this proc */
+    int local_max_patches;      /**< maximum over all procs of local_num_patches */
     /** @{ */
     /** Local to proc.  If this proc doesn't
         store any patches at all, we set
