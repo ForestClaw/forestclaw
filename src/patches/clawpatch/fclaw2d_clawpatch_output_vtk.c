@@ -104,7 +104,7 @@ typedef struct fclaw2d_vtk_state
      * patches.
      * We track the number of buffered patches in \b num_buffered_patches and
      * if the buffer contains more than \b patch_threshold many patches, the
-     * patches are written to disk and buffer is flushed.
+     * patches are written to disk and the buffer is flushed.
      * The variable \b num_buffered_patches relates to the number of buffered
      * patches during one fclaw2d_vtk_write_field call.
      * If \b patch_threshold is -1, there are no intermediate writes but all
