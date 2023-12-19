@@ -41,7 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_clawpatch_options.h>
 
 #define PATCH_CHILDREN 4
-#define FCLAW_VTK_BUF_THRESHOLD 6000
+#define FCLAW_VTK_BUF_THRESHOLD -1
 
 #elif REFINE_DIM == 2 && PATCH_DIM == 3
 
@@ -53,7 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <_fclaw2d_to_fclaw3dx.h>
 
 #define PATCH_CHILDREN 8
-#define FCLAW_VTK_BUF_THRESHOLD 6000
+#define FCLAW_VTK_BUF_THRESHOLD -1
 
 #else
 #error "This combination of REFINE_DIM and PATCH_DIM is unsupported"
@@ -201,22 +201,19 @@ fclaw2d_vtk_write_header (fclaw2d_domain_t * domain, fclaw2d_vtk_state_t * s)
 }
 
 /** This function add to a buffer and writes to file if a threshold is exceeded.
- * The writing is not yet implemented.
  *
  * \param [in,out]  s               The VTK state.
  * \param [in]      psize_field     The number of bytes, which are intended to
  *                                  add to the buffer.
- * \param [in]      threshold       If the sum of the bytes, which are already
- *                                  stored in the buffer and \b psize_field
- *                                  is greater than \b threshold, the buffer
- *                                  is flushed to disk. The \b psize_field
- *                                  many new bytes are added to the buffer.
+ * \param [in]      threshold       If the number of patches, which are already
+ *                                  stored in the buffer + 1 is greater than
+ *                                  \b threshold, the buffer is flushed to disk.
+ *                                  Then the new patch is added to the buffer.
  *                                  -1 means that there is no threshold and
  *                                  the data just added to \b s->sink.
  */
 static void
-add_to_buffer (fclaw2d_vtk_state_t * s, int64_t psize_field,
-               int64_t threshold)
+add_to_buffer (fclaw2d_vtk_state_t * s, int64_t psize_field, int threshold)
 {
     FCLAW_ASSERT (s != NULL);
 
@@ -227,17 +224,24 @@ add_to_buffer (fclaw2d_vtk_state_t * s, int64_t psize_field,
 #else
     size_t retvalz;
 #endif
+    FCLAW_ASSERT (threshold == -1 || threshold > 0);
+    FCLAW_ASSERT (s->sink->buffer_bytes % psize_field == 0);
 
     if (threshold != -1
-        && (s->sink->buffer_bytes + (size_t) psize_field > threshold))
+        && ((s->sink->buffer_bytes / psize_field) + 1 > (size_t) threshold))
     {
+        FCLAW_ASSERT ((int) s->sink->buffer_bytes >= psize_field);
         /* buffer threshold exceeded */
         /* write the current buffer to disk */
 #ifdef P4EST_ENABLE_MPIIO
-        mpiret =
-            MPI_File_write_all (s->mpifile, s->sink->buffer->array,
-                                s->sink->buffer_bytes, MPI_BYTE, &mpistatus);
-        SC_CHECK_MPI (mpiret);
+        if (s->sink->buffer_bytes > 0)
+        {
+            mpiret =
+                MPI_File_write_all (s->mpifile, s->sink->buffer->array,
+                                    (int) s->sink->buffer_bytes, MPI_BYTE,
+                                    &mpistatus);
+            SC_CHECK_MPI (mpiret);
+        }
 #else
         retvalz =
             fwrite (s->sink->buffer->array, s->sink->buffer_bytes, 1,
@@ -505,6 +509,7 @@ fclaw2d_vtk_write_field (fclaw2d_global_t * glob, fclaw2d_vtk_state_t * s,
     int i;
     int max_num_writes, local_num_writes;
     int mpiret;
+    int threshold;
     MPI_Offset mpipos;
 #ifdef P4EST_ENABLE_DEBUG
     MPI_Offset mpinew;
@@ -548,7 +553,7 @@ fclaw2d_vtk_write_field (fclaw2d_global_t * glob, fclaw2d_vtk_state_t * s,
     fclaw2d_global_iterate_patches (glob, cb, s);
 
 #ifdef P4EST_ENABLE_MPIIO
-    if (s->sink->buffer_bytes > 0)
+    if (s->sink->buffer_bytes > 0 || FCLAW_VTK_BUF_THRESHOLD == -1)
     {
         /* write the remaining buffered bytes */
         mpiret =
@@ -557,27 +562,30 @@ fclaw2d_vtk_write_field (fclaw2d_global_t * glob, fclaw2d_vtk_state_t * s,
         SC_CHECK_MPI (mpiret);
     }
 
-    /* Ensure that the collective function MPI_File_write_all is called
-     * equally often on each rank.
-     */
-    max_num_writes =
-        FCLAW_VTK_CEIL (glob->domain->local_max_patches * psize_field,
-                        FCLAW_VTK_BUF_THRESHOLD);
-    local_num_writes =
-        FCLAW_VTK_CEIL (glob->domain->local_num_patches * psize_field,
-                        FCLAW_VTK_BUF_THRESHOLD);
-    FCLAW_ASSERT (max_num_writes - local_num_writes >= 0);
-
-    for (i = 0; i < max_num_writes - local_num_writes; ++i)
+    if (FCLAW_VTK_BUF_THRESHOLD != -1)
     {
-        /* This rank has less patches than the rank that holds the maximal
-         * number of patches. We compensate this by empty write calls to avoid
-         * a deadlock.
+        /* Ensure that the collective function MPI_File_write_all is called
+         * equally often on each rank.
          */
-        mpiret =
-            MPI_File_write_all (s->mpifile, buffer.array, 0, MPI_BYTE,
-                                &mpistatus);
-        SC_CHECK_MPI (mpiret);
+        max_num_writes =
+            FCLAW_VTK_CEIL (glob->domain->local_max_patches,
+                            FCLAW_VTK_BUF_THRESHOLD);
+        local_num_writes =
+            FCLAW_VTK_CEIL (glob->domain->local_num_patches,
+                            FCLAW_VTK_BUF_THRESHOLD);
+        FCLAW_ASSERT (max_num_writes - local_num_writes >= 0);
+
+        for (i = 0; i < max_num_writes - local_num_writes; ++i)
+        {
+            /* This rank has less patches than the rank that holds the maximal
+             * number of patches. We compensate this by empty write calls to avoid
+             * a deadlock.
+             */
+            mpiret =
+                MPI_File_write_all (s->mpifile, buffer.array, 0, MPI_BYTE,
+                                    &mpistatus);
+            SC_CHECK_MPI (mpiret);
+        }
     }
 #else
     retvalz = fwrite (buffer.array, s->sink->buffer_bytes, 1, s->file);
