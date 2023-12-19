@@ -31,7 +31,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define PATCH_DIM 2
 #endif
 
-#define FCLAW_VTK_CEIL(x, y) (((x) + (y) - 1) / (y)) /**< round x / y up */
+/** Round up quotient x / y. */
+#define FCLAW_VTK_CEIL(x, y) (((x) + (y) - 1) / (y)) /**< round up the quotient
+                                                        x / y; this is a local
+                                                        macro used for
+                                                        computations regarding
+                                                        the VTK patch buffering */
 
 #if REFINE_DIM == 2 && PATCH_DIM == 2
 
