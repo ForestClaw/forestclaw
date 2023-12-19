@@ -202,7 +202,11 @@ fclaw2d_vtk_write_header (fclaw2d_domain_t * domain, fclaw2d_vtk_state_t * s)
     return retval ? -1 : 0;
 }
 
-/** This function add to a buffer and writes to file if a threshold is exceeded.
+/** This function adds to a buffer and writes to file if a threshold is exceeded.
+ *
+ * This function assumes that the buffer consists of patch data of the size
+ * \b psize_field. This means it must hold
+ * \b s->sink->buffer_bytes % \b s->sink->buffer_bytes == 0.
  *
  * \param [in,out]  s               The VTK state.
  * \param [in]      psize_field     The number of bytes, which are intended to
