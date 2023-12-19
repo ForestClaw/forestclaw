@@ -41,8 +41,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_clawpatch_options.h>
 
 #define PATCH_CHILDREN 4
-#define FCLAW_VTK_BUF_THRESHOLD -1 /**< maximal patch count in the local buffer;
-                                        -1 means no threshold */
 
 #elif REFINE_DIM == 2 && PATCH_DIM == 3
 
@@ -54,8 +52,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <_fclaw2d_to_fclaw3dx.h>
 
 #define PATCH_CHILDREN 8
-#define FCLAW_VTK_BUF_THRESHOLD -1 /**< maximal patch count in the local buffer;
-                                        -1 means no threshold */
 
 #else
 #error "This combination of REFINE_DIM and PATCH_DIM is unsupported"
@@ -98,7 +94,23 @@ typedef struct fclaw2d_vtk_state
     MPI_Offset mpibegin;
 #endif
     char *buf;
-    sc_io_sink_t *sink;
+
+    /* The following three struct elements are dedicated to manage buffering
+     * patches.
+     * We track the number of buffered patches in \b num_buffered_patches and
+     * if the buffer contains more than \b patch_threshold many patches, the
+     * patches are written to disk and buffer is flushed.
+     * The variable \b num_buffered_patches relates to the number of buffered
+     * patches during one fclaw2d_vtk_write_field call.
+     * If \b patch_threshold is -1, there are no intermediate writes but all
+     * patches during a fclaw2d_vtk_write_field are buffered and then written
+     * to the disk.
+     */
+    sc_io_sink_t *sink; /**< the sink to manage the patches buffer */
+    int num_buffered_patches; /**< the number of patches buffered during the
+                                   current fclaw2d_vtk_write_field call */
+    int patch_threshold; /**< maximal number of patches that are buffered during
+                              a call of fclaw2d_vtk_write_field */
 }
 fclaw2d_vtk_state_t;
 
@@ -219,7 +231,7 @@ fclaw2d_vtk_write_header (fclaw2d_domain_t * domain, fclaw2d_vtk_state_t * s)
  *                                  the data just added to \b s->sink.
  */
 static void
-add_to_buffer (fclaw2d_vtk_state_t * s, int64_t psize_field, int threshold)
+add_to_buffer (fclaw2d_vtk_state_t * s, int64_t psize_field)
 {
     FCLAW_ASSERT (s != NULL);
 
@@ -229,17 +241,19 @@ add_to_buffer (fclaw2d_vtk_state_t * s, int64_t psize_field, int threshold)
 #else
     size_t retvalz;
 #endif
-    FCLAW_ASSERT (threshold == -1 || threshold > 0);
+    FCLAW_ASSERT (s->patch_threshold == -1 || s->patch_threshold > 0);
     FCLAW_ASSERT (((int) s->sink->buffer_bytes) % psize_field == 0);
 
-    if (threshold != -1
-        && ((((int) s->sink->buffer_bytes) / psize_field) + 1 > threshold))
+    if (s->patch_threshold != -1
+        && (s->num_buffered_patches + 1 > s->patch_threshold))
     {
         FCLAW_ASSERT ((int) s->sink->buffer_bytes >= psize_field);
+        FCLAW_ASSERT (((int) s->sink->buffer_bytes) / psize_field ==
+                      s->num_buffered_patches);
         /* buffer threshold exceeded */
         /* write the current buffer to disk */
 #ifdef P4EST_ENABLE_MPIIO
-        if (s->sink->buffer_bytes > 0)
+        if (s->num_buffered_patches > 0)
         {
             mpiret =
                 MPI_File_write_all (s->mpifile, s->sink->buffer->array,
@@ -259,10 +273,12 @@ add_to_buffer (fclaw2d_vtk_state_t * s, int64_t psize_field, int threshold)
         /* reset the buffer */
         sc_array_reset (s->sink->buffer);
         s->sink->buffer_bytes = 0;
+        s->num_buffered_patches = 0;
     }
 
     mpiret = sc_io_sink_write (s->sink, s->buf, (size_t) psize_field);
     SC_CHECK_ABORT (mpiret == 0, "VTK buffer write failed");
+    ++s->num_buffered_patches;
 }
 
 static void
@@ -273,7 +289,7 @@ write_position_cb (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
     fclaw2d_vtk_state_t *s = (fclaw2d_vtk_state_t *) g->user;
 
     s->coordinate_cb (g->glob, patch, blockno, patchno, s->buf);
-    add_to_buffer (s, s->psize_position, FCLAW_VTK_BUF_THRESHOLD);
+    add_to_buffer (s, s->psize_position);
 }
 
 static void
@@ -369,7 +385,7 @@ write_connectivity_cb (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
         }
 #endif
     }
-    add_to_buffer (s, s->psize_connectivity, FCLAW_VTK_BUF_THRESHOLD);
+    add_to_buffer (s, s->psize_connectivity);
 }
 
 static void
@@ -401,7 +417,7 @@ write_offsets_cb (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
             *idata++ = k;
         }
     }
-    add_to_buffer (s, s->psize_offsets, FCLAW_VTK_BUF_THRESHOLD);
+    add_to_buffer (s, s->psize_offsets);
 }
 
 static void
@@ -421,7 +437,7 @@ write_types_cb (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
         *cdata++ = 12;
 #endif
     }
-    add_to_buffer (s, s->psize_types, FCLAW_VTK_BUF_THRESHOLD);
+    add_to_buffer (s, s->psize_types);
 }
 
 static void
@@ -437,7 +453,7 @@ write_mpirank_cb (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
     {
         *idata++ = domain->mpirank;
     }
-    add_to_buffer (s, s->psize_mpirank, FCLAW_VTK_BUF_THRESHOLD);
+    add_to_buffer (s, s->psize_mpirank);
 }
 
 static void
@@ -453,7 +469,7 @@ write_blockno_cb (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
     {
         *idata++ = blockno;
     }
-    add_to_buffer (s, s->psize_blockno, FCLAW_VTK_BUF_THRESHOLD);
+    add_to_buffer (s, s->psize_blockno);
 }
 
 static void
@@ -484,7 +500,7 @@ write_patchno_cb (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
             *idata++ = gpno;
         }
     }
-    add_to_buffer (s, s->psize_patchno, FCLAW_VTK_BUF_THRESHOLD);
+    add_to_buffer (s, s->psize_patchno);
 }
 
 static void
@@ -496,7 +512,7 @@ write_meqn_cb (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
     fclaw2d_vtk_state_t *s = (fclaw2d_vtk_state_t *) g->user;
 
     s->value_cb (g->glob, patch, blockno, patchno, s->buf);
-    add_to_buffer (s, s->psize_meqn, FCLAW_VTK_BUF_THRESHOLD);
+    add_to_buffer (s, s->psize_meqn);
 }
 
 static void
@@ -526,6 +542,8 @@ fclaw2d_vtk_write_field (fclaw2d_global_t * glob, fclaw2d_vtk_state_t * s,
     sc_array_init_size (&buffer, 1, psize_field);
     s->sink = sc_io_sink_new (SC_IO_TYPE_BUFFER, SC_IO_MODE_APPEND,
                               SC_IO_ENCODE_NONE, &buffer);
+    FCLAW_ASSERT (s->num_buffered_patches == 0);
+    s->num_buffered_patches = 0;
 #ifdef P4EST_ENABLE_MPIIO
     mpipos = s->mpibegin + offset_field;
     if (domain->mpirank > 0)
@@ -557,7 +575,7 @@ fclaw2d_vtk_write_field (fclaw2d_global_t * glob, fclaw2d_vtk_state_t * s,
     fclaw2d_global_iterate_patches (glob, cb, s);
 
 #ifdef P4EST_ENABLE_MPIIO
-    if (s->sink->buffer_bytes > 0 || FCLAW_VTK_BUF_THRESHOLD == -1)
+    if (s->num_buffered_patches > 0 || s->patch_threshold == -1)
     {
         /* write the remaining buffered bytes */
         mpiret =
@@ -567,17 +585,17 @@ fclaw2d_vtk_write_field (fclaw2d_global_t * glob, fclaw2d_vtk_state_t * s,
         SC_CHECK_MPI (mpiret);
     }
 
-    if (FCLAW_VTK_BUF_THRESHOLD != -1)
+    if (s->patch_threshold != -1)
     {
         /* Ensure that the collective function MPI_File_write_all is called
          * equally often on each rank.
          */
         max_num_writes =
             FCLAW_VTK_CEIL (glob->domain->local_max_patches,
-                            FCLAW_VTK_BUF_THRESHOLD);
+                            s->patch_threshold);
         local_num_writes =
             FCLAW_VTK_CEIL (glob->domain->local_num_patches,
-                            FCLAW_VTK_BUF_THRESHOLD);
+                            s->patch_threshold);
         FCLAW_ASSERT (max_num_writes - local_num_writes >= 0);
 
         for (i = 0; i < max_num_writes - local_num_writes; ++i)
@@ -601,6 +619,7 @@ fclaw2d_vtk_write_field (fclaw2d_global_t * glob, fclaw2d_vtk_state_t * s,
     sc_array_reset (&buffer);
     sc_io_sink_destroy (s->sink);
     P4EST_FREE (s->buf);
+    s->num_buffered_patches = 0;
 
 #ifdef P4EST_ENABLE_MPIIO
 #ifdef P4EST_ENABLE_DEBUG
@@ -764,6 +783,11 @@ fclaw2d_vtk_write_file (fclaw2d_global_t * glob, const char *basename,
 
     s->buf = NULL;
     s->sink = NULL;
+    /* The threshold may be adjusted; see the documentation of
+     * fclaw2d_vtk_state_t for further information.
+     */
+    s->patch_threshold = -1;
+    s->num_buffered_patches = 0;
 
     /* write header meta data and check for error */
     retval = 0;
