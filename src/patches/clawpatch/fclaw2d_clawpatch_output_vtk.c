@@ -41,7 +41,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_clawpatch_options.h>
 
 #define PATCH_CHILDREN 4
-#define FCLAW_VTK_BUF_THRESHOLD -1
+#define FCLAW_VTK_BUF_THRESHOLD -1 /**< maximal patch count in the local buffer;
+                                        -1 means no threshold */
 
 #elif REFINE_DIM == 2 && PATCH_DIM == 3
 
@@ -53,7 +54,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <_fclaw2d_to_fclaw3dx.h>
 
 #define PATCH_CHILDREN 8
-#define FCLAW_VTK_BUF_THRESHOLD -1
+#define FCLAW_VTK_BUF_THRESHOLD -1 /**< maximal patch count in the local buffer;
+                                        -1 means no threshold */
 
 #else
 #error "This combination of REFINE_DIM and PATCH_DIM is unsupported"
@@ -218,17 +220,16 @@ add_to_buffer (fclaw2d_vtk_state_t * s, int64_t psize_field, int threshold)
     FCLAW_ASSERT (s != NULL);
 
     int mpiret;
-    size_t bytes_in, bytes_out;
 #ifdef P4EST_ENABLE_MPIIO
     MPI_Status mpistatus;
 #else
     size_t retvalz;
 #endif
     FCLAW_ASSERT (threshold == -1 || threshold > 0);
-    FCLAW_ASSERT (s->sink->buffer_bytes % psize_field == 0);
+    FCLAW_ASSERT (((int) s->sink->buffer_bytes) % psize_field == 0);
 
     if (threshold != -1
-        && ((s->sink->buffer_bytes / psize_field) + 1 > (size_t) threshold))
+        && ((((int) s->sink->buffer_bytes) / psize_field) + 1 > threshold))
     {
         FCLAW_ASSERT ((int) s->sink->buffer_bytes >= psize_field);
         /* buffer threshold exceeded */
@@ -249,7 +250,7 @@ add_to_buffer (fclaw2d_vtk_state_t * s, int64_t psize_field, int threshold)
         SC_CHECK_ABORT (retvalz == 1, "VTK file write failed");
 #endif
         /* reset the sink */
-        mpiret = sc_io_sink_complete (s->sink, &bytes_in, &bytes_out);
+        mpiret = sc_io_sink_complete (s->sink, NULL, NULL);
         SC_CHECK_ABORT (mpiret == 0, "VTK buffer completion failed");
         /* reset the buffer */
         sc_array_reset (s->sink->buffer);
@@ -509,7 +510,6 @@ fclaw2d_vtk_write_field (fclaw2d_global_t * glob, fclaw2d_vtk_state_t * s,
     int i;
     int max_num_writes, local_num_writes;
     int mpiret;
-    int threshold;
     MPI_Offset mpipos;
 #ifdef P4EST_ENABLE_DEBUG
     MPI_Offset mpinew;
@@ -558,7 +558,8 @@ fclaw2d_vtk_write_field (fclaw2d_global_t * glob, fclaw2d_vtk_state_t * s,
         /* write the remaining buffered bytes */
         mpiret =
             MPI_File_write_all (s->mpifile, buffer.array,
-                                s->sink->buffer_bytes, MPI_BYTE, &mpistatus);
+                                (int) s->sink->buffer_bytes, MPI_BYTE,
+                                &mpistatus);
         SC_CHECK_MPI (mpiret);
     }
 
