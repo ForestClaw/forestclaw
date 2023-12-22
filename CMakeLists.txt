@@ -19,6 +19,8 @@ include(CTest)
 
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/Modules)
 
+file(GENERATE OUTPUT .gitignore CONTENT "*")
+
 set(CMAKE_CXX_STANDARD 17)
 
 # --- user options
