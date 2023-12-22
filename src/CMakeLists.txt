@@ -94,7 +94,6 @@ set_target_properties(forestclaw PROPERTIES EXPORT_NAME FORESTCLAW)
 
 target_sources(forestclaw PRIVATE $<TARGET_OBJECTS:forestclaw_f> $<TARGET_OBJECTS:forestclaw_c>)
 
-target_link_libraries(forestclaw PRIVATE ZLIB::ZLIB)
 target_link_libraries(forestclaw PUBLIC P4EST::P4EST SC::SC)
 if(mpi)
   target_link_libraries(forestclaw PUBLIC MPI::MPI_C INTERFACE MPI::MPI_CXX)

@@ -17,6 +17,8 @@ project(FORESTCLAW
 
 include(CTest)
 
+include(FetchContent)
+
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/Modules)
 
 file(GENERATE OUTPUT .gitignore CONTENT "*")
@@ -40,14 +42,16 @@ if(cudaclaw)
   find_package(CUDAToolkit REQUIRED)
 endif()
 
-#find_package(LAPACK)
-#find_package(BLAS)
-find_package(ZLIB)
-
 # --- p4est, sc
+include(cmake/GitSubmodule.cmake)
 
-include(cmake/sc.cmake)
-include(cmake/p4est.cmake)
+git_submodule(${CMAKE_CURRENT_SOURCE_DIR}/sc)
+FetchContent_Declare(SC SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/sc)
+FetchContent_MakeAvailable(SC)
+
+git_submodule(${CMAKE_CURRENT_SOURCE_DIR}/p4est)
+FetchContent_Declare(P4EST SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/p4est)
+FetchContent_MakeAvailable(P4EST)
 
 # --- ThunderEgg
 if(thunderegg)
