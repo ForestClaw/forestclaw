@@ -172,14 +172,14 @@ fclaw_debugf (const char *fmt, ...)
 static int logging_rank = 0;
 static const char* logging_prefix = NULL;
 
-void 
+void
 fclaw_set_logging_prefix(const char* new_name)
 {
     if(new_name == NULL || strcmp(new_name, "") == 0)
     {
         logging_prefix=NULL;
-    } 
-    else 
+    }
+    else
     {
         logging_prefix=new_name;
     }
@@ -209,8 +209,13 @@ log_handler (const char *name, FILE * log_stream, const char *filename, int line
         char                bn[BUFSIZ], *bp;
 
         snprintf (bn, BUFSIZ, "%s", filename);
+#ifdef SC_HAVE_LIBGEN_H
         bp = basename (bn);
+#else
+        bp = bn;
+#endif
         fprintf (log_stream, "%s:%d ", bp, lineno);
+
     }
 
     fputs (msg, log_stream);
@@ -583,11 +588,11 @@ fclaw_app_options_register_core (fclaw_app_t * a, const char *configfile)
 void fclaw_app_print_options(fclaw_app_t *app)
 {
         sc_options_print_summary (fclaw_get_package_id (),
-                                  FCLAW_VERBOSITY_ESSENTIAL, app->opt);    
+                                  FCLAW_VERBOSITY_ESSENTIAL, app->opt);
 }
 
 int get_keys(const char *key,
-            const sc_keyvalue_entry_type_t type, 
+            const sc_keyvalue_entry_type_t type,
             void *entry,
             const void *u)
 {
@@ -668,7 +673,7 @@ check_sections_in_files(fclaw_app_t* a, sc_array_t* filenames){
             // if there are keys in an unexpected file, print a warning
             if(strcmp(filename, ao->configfile) != 0 && iniparser_find_entry(ini, section))
             {
-                fclaw_global_productionf("Unexpected section [%s] was found in file %s.\n", 
+                fclaw_global_productionf("Unexpected section [%s] was found in file %s.\n",
                                          section, filename);
             }
         }
@@ -773,7 +778,7 @@ fclaw_app_options_parse (fclaw_app_t * a, int *first_arg,
     for(size_t i = 0; i < filenames->elem_count; i++)
     {
         const char* filename = *(const char**) sc_array_index(filenames, i);
-        int retval = sc_options_load (fclaw_package_id, FCLAW_VERBOSITY_ESSENTIAL, 
+        int retval = sc_options_load (fclaw_package_id, FCLAW_VERBOSITY_ESSENTIAL,
                                       a->opt, filename);
         if (retval > 0)
         {
