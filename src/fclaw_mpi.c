@@ -26,6 +26,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_mpi.h>
 #include <fclaw_global.h>
 
+#ifdef FCLAW_HAVE_UNISTD_H
+#include <unistd.h>    /* getpid */
+#elif defined(_MSC_VER)
+#include <process.h>   /* _getpid */
+#endif
+
 /* Functions with C prototypes to use forestclaw from C code */
 
 void
