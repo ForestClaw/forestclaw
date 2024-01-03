@@ -10,15 +10,13 @@ target_include_directories(testutils PUBLIC ${PROJECT_BINARY_DIR})
 
 
 target_include_directories(testutils PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(testutils PUBLIC forestclaw)
+target_link_libraries(testutils PUBLIC forestclaw
+"$<$<BOOL:${SC_ENABLE_MPI}>:MPI::MPI_C>"
+)
 
 if(TARGET ThunderEgg::ThunderEgg)
     target_link_libraries(testutils PUBLIC ThunderEgg::ThunderEgg)
 endif(TARGET ThunderEgg::ThunderEgg)
-
-if(mpi)
-  target_link_libraries(testutils PUBLIC MPI::MPI_C)
-endif(mpi)
 
 
 macro(register_unit_tests test_executable)

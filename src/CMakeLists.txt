@@ -58,8 +58,7 @@ target_include_directories(forestclaw_c PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${PR
 target_link_libraries(forestclaw_c PRIVATE P4EST::P4EST SC::SC
 $<$<BOOL:${mpi}>:MPI::MPI_C>
 )
-# FIXME: this is a temporary workaround until we use FetchContent to have these definitions in the same namespace
-target_compile_definitions(forestclaw_c PRIVATE $<$<BOOL:${mpi}>:SC_ENABLE_MPI>)
+target_compile_definitions(forestclaw_c PRIVATE $<$<BOOL:${FCLAW_ENABLE_MPI}>:SC_ENABLE_MPI>)
 
 
 # -- fortran library
@@ -94,10 +93,12 @@ set_target_properties(forestclaw PROPERTIES EXPORT_NAME FORESTCLAW)
 
 target_sources(forestclaw PRIVATE $<TARGET_OBJECTS:forestclaw_f> $<TARGET_OBJECTS:forestclaw_c>)
 
-target_link_libraries(forestclaw PUBLIC P4EST::P4EST SC::SC)
-if(mpi)
-  target_link_libraries(forestclaw PUBLIC MPI::MPI_C INTERFACE MPI::MPI_CXX)
-endif(mpi)
+target_link_libraries(forestclaw
+PUBLIC
+P4EST::P4EST SC::SC "$<$<BOOL:${SC_ENABLE_MPI}>:MPI::MPI_C>"
+INTERFACE
+"$<$<BOOL:${SC_ENABLE_MPI}>:MPI::MPI_CXX>"
+)
 
 target_include_directories(forestclaw
   INTERFACE
