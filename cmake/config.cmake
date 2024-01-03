@@ -43,11 +43,6 @@ if(MPI_FOUND)
   set(FCLAW_ENABLE_MPIIO 1)
 endif(MPI_FOUND)
 
-# check_symbol_exists(sqrt math.h FCLAW_NONEED_M)
-# if(NOT FCLAW_NONEED_M)
-#   set(CMAKE_REQUIRED_LIBRARIES ${CMAKE_REQUIRED_LIBRARIES} m)
-#   check_symbol_exists(sqrt math.h FCLAW_NEED_M)
-# endif()
 
 check_include_file(fenv.h FCLAW_HAVE_FENV_H)
 if(FCLAW_HAVE_FENV_H)
@@ -59,9 +54,8 @@ if(FCLAW_HAVE_FENV_H)
   set(CMAKE_REQUIRED_LIBRARIES)
 endif()
 
-check_include_file(signal.h FCLAW_HAVE_SIGNAL_H)
-
-check_include_file(unistd.h FCLAW_HAVE_UNISTD_H)
+set(FCLAW_HAVE_SIGNAL_H ${SC_HAVE_SIGNAL_H})
+set(FCLAW_HAVE_UNISTD_H ${P4EST_HAVE_UNISTD_H})
 
 set(FCLAW_PACKAGE \"${PROJECT_NAME}\")
 
