@@ -11,7 +11,7 @@ target_include_directories(testutils PUBLIC ${PROJECT_BINARY_DIR})
 
 target_include_directories(testutils PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(testutils PUBLIC forestclaw
-"$<$<BOOL:${SC_ENABLE_MPI}>:MPI::MPI_C>"
+"$<$<BOOL:${FCLAW_ENABLE_MPI}>:MPI::MPI_C>"
 )
 
 if(TARGET ThunderEgg::ThunderEgg)
