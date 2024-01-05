@@ -150,36 +150,38 @@ libforestclaw_compiled_sources = \
 	src/fortran_source2d/fdisc.f \
 	src/fortran_source2d/philim.f
 
-# this variable is used for headers that are not publicly installed
-FCLAW_CPPFLAGS = \
-    -I@top_srcdir@/src \
-	-I@top_srcdir@/src/fortran_source2d
+## In case we like to build only the library and no programs
+justlibs-local: src/libforestclaw.la
 
-FCLAW_FFLAGS = $(FCLAW_CPPFLAGS)   # (orignally used for metric.i;  not needed now)
-
+## Using libtool to build the ForestClaw library
 lib_LTLIBRARIES += src/libforestclaw.la
 src_libforestclaw_la_SOURCES = \
 	$(libforestclaw_internal_headers) \
  	$(libforestclaw_compiled_sources)
-
 src_libforestclaw_la_CPPFLAGS = $(AM_CPPFLAGS) $(FCLAW_CPPFLAGS)
 
-FCLAW_LDADD = @top_builddir@/src/libforestclaw.la \
-	          @FCLAW_P4EST_LDADD@ \
-              @FCLAW_SC_LDADD@
+## This is the official API versioning scheme of libtool.  Please see:
+## Read https://www.gnu.org/software/libtool/manual/libtool.html#Versioning
+src_libforestclaw_la_LDFLAGS = -version-info 2:0:0
+src_libforestclaw_la_LIBADD = @FCLAW_P4EST_LIBADD@ @FCLAW_SC_LIBADD@
 
+## Explicitly depend on other libraries
+EXTRA_src_libforestclaw_la_DEPENDENCIES = @FCLAW_P4EST_EDEPS@ @FCLAW_SC_EDEPS@
 
-LDADD += @top_builddir@/src/libforestclaw.la \
-	     @FCLAW_P4EST_LDADD@ \
-	     @FCLAW_SC_LDADD@
-
-EXTRA_src_libforestclaw_la_DEPENDENCIES = @FCLAW_P4EST_LDADD@ @FCLAW_SC_LDADD@
+## Code p4est and libsc installation path into ForestClaw executables
+AM_LDFLAGS += @FCLAW_P4EST_RPATH@ @FCLAW_SC_RPATH@
+LDADD += src/libforestclaw.la \
+	@FCLAW_P4EST_LDADD@ \
+	@FCLAW_SC_LDADD@
 
 nodist_include_HEADERS += $(libforestclaw_generated_headers)
 include_HEADERS += $(libforestclaw_installed_headers)
 
-AM_CPPFLAGS += $(FCLAW_CPPFLAGS) @FCLAW_SC_CPPFLAGS@ @FCLAW_P4EST_CPPFLAGS@
-AM_FFLAGS += $(FCLAW_FFLAGS)
+## These flags are passed to populate the include path
+AM_CPPFLAGS += \
+	-I@top_srcdir@/src \
+	-I@top_srcdir@/src/fortran_source2d \
+	@FCLAW_SC_CPPFLAGS@ @FCLAW_P4EST_CPPFLAGS@
 
 ## UNIT TESTS
 check_PROGRAMS += src/forestclaw.TEST
