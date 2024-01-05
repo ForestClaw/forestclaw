@@ -1,8 +1,6 @@
 # provides imported targets THUNDEREGG::THUNDEREGG, ...
 include(ExternalProject)
 
-set(thunderegg_external true CACHE BOOL "build thunderegg library" FORCE)
-
 # --- thunderegg externalProject
 # this keeps project scopes totally separate, which avoids
 # tricky to diagnose behaviors

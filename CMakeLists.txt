@@ -32,10 +32,6 @@ message(STATUS "${PROJECT_NAME} ${PROJECT_VERSION}  install prefix: ${CMAKE_INST
 
 # --- external libs
 
-if(mpi)
-  find_package(MPI COMPONENTS C CXX REQUIRED)
-endif()
-
 if(cudaclaw)
   enable_language(CUDA)
   set(CMAKE_CUDA_STANDARD 14)
@@ -58,11 +54,7 @@ if(thunderegg)
   include(cmake/ThunderEgg.cmake)
 endif(thunderegg)
 
-
-if(cudaclaw)
-endif(cudaclaw)
 # --- configure
-
 
 include(cmake/config.cmake)
 include(cmake/compilers.cmake)

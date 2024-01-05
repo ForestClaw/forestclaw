@@ -1,4 +1,3 @@
-option(mpi "use MPI library")
 option(openmp "use OpenMP")
 option(applications "build applications" off)
 
@@ -7,8 +6,6 @@ option(clawpack "build Clawpack")
 option(geoclaw "build Geoclaw")
 option(cudaclaw "build CudaClaw")
 option(thunderegg "build ThunderEgg")
-
-option(thunderegg_external "force build of ThunderEgg")
 
 option(CMAKE_TLS_VERIFY "verify TLS cert" on)
 

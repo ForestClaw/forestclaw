@@ -1,5 +1,4 @@
 include(CheckIncludeFile)
-include(CheckIncludeFiles)
 include(CheckSymbolExists)
 
 # --- generate fclaw_config.h
@@ -11,6 +10,7 @@ set(FCLAW_ENABLE_MPI ${P4EST_ENABLE_MPI} CACHE BOOL "Enable MPI support")
 set(FCLAW_ENABLE_MPIIO ${P4EST_ENABLE_MPIIO} CACHE BOOL "Enable MPI-IO support")
 
 if(FCLAW_ENABLE_MPI)
+  find_package(MPI COMPONENTS C CXX REQUIRED)
   set(CMAKE_REQUIRED_LIBRARIES MPI::MPI_C)
   set(FCLAW_CC \"${MPI_C_COMPILER}\")
   set(FCLAW_CPP ${MPI_C_COMPILER})
