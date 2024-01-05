@@ -170,10 +170,11 @@ EXTRA_src_libforestclaw_la_DEPENDENCIES = @FCLAW_P4EST_EDEPS@ @FCLAW_SC_EDEPS@
 
 ## Code p4est and libsc installation path into ForestClaw executables
 AM_LDFLAGS += @FCLAW_P4EST_RPATH@ @FCLAW_SC_RPATH@
+
+## Flags to support linking against ForestClaw and support libraries
 LDADD += src/libforestclaw.la \
 	@FCLAW_P4EST_LDADD@ \
 	@FCLAW_SC_LDADD@
-
 FCLAW_LDADD = src/libforestclaw.la \
 	@FCLAW_P4EST_LDADD@ \
 	@FCLAW_SC_LDADD@
@@ -208,5 +209,4 @@ src_forestclaw_TEST_CPPFLAGS = \
 src_forestclaw_TEST_LDADD = \
 	test/libtestutils.la \
 	$(test_libtestutils_la_LDADD) \
-    $(LDADD) \
-    $(FCLAW_LDADD)
+    $(LDADD)
