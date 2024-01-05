@@ -150,6 +150,9 @@ libforestclaw_compiled_sources = \
 	src/fortran_source2d/fdisc.f \
 	src/fortran_source2d/philim.f
 
+## Extra flags that are not provided by general AM_CPPFLAGS
+FCLAW_CPPFLAGS =
+
 ## In case we like to build only the library and no programs
 justlibs-local: src/libforestclaw.la
 
