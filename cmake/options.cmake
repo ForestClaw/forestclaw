@@ -1,5 +1,5 @@
 option(openmp "use OpenMP")
-option(applications "build applications" off)
+option(fclaw_applications "build applications" off)
 
 option(clawpatch "build Clawpatch")
 option(clawpack "build Clawpack")

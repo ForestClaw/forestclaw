@@ -135,8 +135,8 @@ include(cmake/install.cmake)
 
 
 # --- examples
-if(applications)
+if(fclaw_applications)
   add_subdirectory(applications)
-endif(applications)
+endif()
 
 include(cmake/documentation.cmake)

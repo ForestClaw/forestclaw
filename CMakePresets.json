@@ -20,7 +20,8 @@
   "cacheVariables": {
     "CMAKE_BUILD_TYPE": "Release",
     "mpi": true,
-    "clawpack": true}
+    "clawpack": true,
+    "fclaw_applications": false}
 },
 {
   "name": "mac", "inherits": "default",
