@@ -19,7 +19,7 @@ source "$BLP4"                                          && \
 rm "$BLP4"                                              || exit 1
 
 # clone, build and install ForestClaw
-git clone https://github.com/forestclaw/forestclaw.git -b develop       && \
+git clone --depth 1 https://github.com/forestclaw/forestclaw.git -b develop && \
 cd forestclaw                                           && \
 ./bootstrap "$PREFIX/libsc/share/aclocal" "$PREFIX/p4est/share/aclocal" && \
 mkdir build                                             && \
