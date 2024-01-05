@@ -168,9 +168,6 @@ src_libforestclaw_la_LIBADD = @FCLAW_P4EST_LIBADD@ @FCLAW_SC_LIBADD@
 ## Explicitly depend on other libraries
 EXTRA_src_libforestclaw_la_DEPENDENCIES = @FCLAW_P4EST_EDEPS@ @FCLAW_SC_EDEPS@
 
-## Initialize AM_LDFLAGS variable
-AM_LDFLAGS =
-
 ## Code p4est and libsc installation path into ForestClaw executables
 AM_LDFLAGS += @FCLAW_P4EST_RPATH@ @FCLAW_SC_RPATH@
 LDADD += src/libforestclaw.la \
