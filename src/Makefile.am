@@ -177,6 +177,10 @@ LDADD += src/libforestclaw.la \
 	@FCLAW_P4EST_LDADD@ \
 	@FCLAW_SC_LDADD@
 
+FCLAW_LDADD = src/libforestclaw.la \
+	@FCLAW_P4EST_LDADD@ \
+	@FCLAW_SC_LDADD@
+
 nodist_include_HEADERS += $(libforestclaw_generated_headers)
 include_HEADERS += $(libforestclaw_installed_headers)
 
