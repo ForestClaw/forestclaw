@@ -73,6 +73,9 @@ typedef void (*fclaw2d_vtk_patch_data_t) (struct fclaw2d_global * glob,
  *                         1 for MPI_File_write (less memory usage).
  * @param[in] coordniate_cb the callback to write a patch's coordinate binary data
  * @param[in] value_cb the callback to write a patch's value binary data
+ * @param[in] patch_threshold The maximal number of buffered patches.
+ *                            -1 means that an unlimited number of patches is
+ *                            buffered and flushed to disk at the end.
  * @return          0 if successful, negative otherwise.
  *                  Collective with identical value on all ranks.
  */
@@ -85,7 +88,8 @@ fclaw2d_vtk_write_file (struct fclaw2d_global * glob, const char *basename,
                         int meqn,
                         double vtkspace, int vtkwrite,
                         fclaw2d_vtk_patch_data_t coordinate_cb,
-                        fclaw2d_vtk_patch_data_t value_cb);
+                        fclaw2d_vtk_patch_data_t value_cb,
+                        int patch_threshold);
 
 /**
  * @brief Output vtu file

@@ -223,7 +223,7 @@ fclaw2d_vtk_write_header (fclaw2d_domain_t * domain, fclaw2d_vtk_state_t * s)
  *
  * This function assumes that the buffer consists of patch data of the size
  * \b psize_field. This means it must hold
- * \b s->sink->buffer_bytes % \b s->sink->buffer_bytes == 0.
+ * \b s->sink->buffer_bytes % \b psize_field == 0.
  *
  * \param [in,out]  s               The VTK state.
  * \param [in]      psize_field     The number of bytes, which are intended to
@@ -723,9 +723,12 @@ fclaw2d_vtk_write_file (fclaw2d_global_t * glob, const char *basename,
                         int meqn,
                         double vtkspace, int vtkwrite,
                         fclaw2d_vtk_patch_data_t coordinate_cb,
-                        fclaw2d_vtk_patch_data_t value_cb)
+                        fclaw2d_vtk_patch_data_t value_cb,
+                        int patch_threshold)
 {
     fclaw2d_domain_t *domain = glob->domain;
+
+    FCLAW_ASSERT (patch_threshold == -1 || patch_threshold > 0);
 
     int retval, gretval;
     int mpiret;
@@ -788,10 +791,8 @@ fclaw2d_vtk_write_file (fclaw2d_global_t * glob, const char *basename,
 
     s->buf = NULL;
     s->sink = NULL;
-    /* The threshold may be adjusted; see the documentation of
-     * fclaw2d_vtk_state_t for further information.
-     */
-    s->patch_threshold = -1;
+    /* See the documentation of fclaw2d_vtk_state_t for further information. */
+    s->patch_threshold = patch_threshold;
     s->num_buffered_patches = 0;
 
     /* write header meta data and check for error */
@@ -1018,6 +1019,9 @@ void fclaw2d_clawpatch_output_vtk (fclaw2d_global_t * glob, int iframe)
     char basename[BUFSIZ];
     snprintf (basename, BUFSIZ, "%s_frame_%04d", fclaw_opt->prefix, iframe);
 
+    /* The last parameter of the call of fclaw2d_vtk_write_file can be replaced
+     * by a value from flcaw_opt or clawpatch_opt.
+     */
     (void) fclaw2d_vtk_write_file (glob, basename,
                                    clawpatch_opt->mx, clawpatch_opt->my,
 #if PATCH_DIM == 3
@@ -1026,7 +1030,7 @@ void fclaw2d_clawpatch_output_vtk (fclaw2d_global_t * glob, int iframe)
                                    clawpatch_opt->meqn,
                                    fclaw_opt->vtkspace, 0,
                                    fclaw2d_output_vtk_coordinate_cb,
-                                   fclaw2d_output_vtk_value_cb);
+                                   fclaw2d_output_vtk_value_cb, -1);
 }
 
 
