@@ -232,7 +232,7 @@ fclaw2d_vtk_write_header (fclaw2d_domain_t * domain, fclaw2d_vtk_state_t * s)
  *                                  stored in the buffer + 1 is greater than
  *                                  \b threshold, the buffer is flushed to disk.
  *                                  Then the new patch is added to the buffer.
- *                                  -1 means that there is no threshold and
+ *                                  0 means that there is no threshold and
  *                                  the data just added to \b s->sink.
  */
 static void
@@ -1030,7 +1030,7 @@ void fclaw2d_clawpatch_output_vtk (fclaw2d_global_t * glob, int iframe)
                                    clawpatch_opt->meqn,
                                    fclaw_opt->vtkspace, 0,
                                    fclaw2d_output_vtk_coordinate_cb,
-                                   fclaw2d_output_vtk_value_cb, -1);
+                                   fclaw2d_output_vtk_value_cb, 0);
 }
 
 
