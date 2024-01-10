@@ -56,7 +56,7 @@ void phasefield_create_domain(fclaw_global_t* glob)
     fclaw_domain_t *domain = fclaw_domain_new_2d_brick(glob->mpicomm, mi,mj,a,b, fclaw_opt->minlevel);
 
     /* Map unit square to disk using mapc2m_disk.f */
-    fclaw_map_context_t *brick = fclaw2d_map_new_brick(domain, mi, mj, a, b);
+    fclaw_map_context_t *brick = fclaw_map_new_2d_brick(domain, mi, mj, a, b);
     fclaw_map_context_t *cont = fclaw_map_new_nomap_brick(brick);
 
     fclaw_global_store_domain(glob, domain);

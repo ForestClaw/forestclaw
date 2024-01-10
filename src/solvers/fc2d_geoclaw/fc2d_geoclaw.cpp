@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_defs.h>
 
 /* Some mapping functions */
-#include <fclaw2d_map_brick.h>
+#include <fclaw_map_brick.h>
 #include <fclaw_map.h>
 #include <fclaw_map_query.h>
 

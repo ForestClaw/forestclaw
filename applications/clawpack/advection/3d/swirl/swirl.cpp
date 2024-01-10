@@ -125,7 +125,7 @@ void create_domain(fclaw_global_t *glob)
                                       mi, mj, mk, a, b, c,
                                       fclaw_opt->minlevel);
 
-        brick = fclaw2d_map_new_brick (domain, mi, mj, a, b);
+        brick = fclaw_map_new_2d_brick (domain, mi, mj, a, b);
 
         cont = fclaw2d_map_new_bilinear(brick, 
                                         fclaw_opt->scale,

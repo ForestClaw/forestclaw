@@ -829,6 +829,14 @@ fclaw_1to2 = {
     "mapc2m_latlong"                               : "fclaw_map_2d_c2m_latlong",
     "mapc2m_annulus"                               : "fclaw_map_2d_c2m_annulus",
 
+    #===== ./src/fclaw2d_map_brick.h =====
+    "<fclaw2d_map_brick.h>"                        : "<fclaw_map_brick.h>",
+    "fclaw2d_map_brick_get_dim"                    : "fclaw_map_brick_get_2d_dim",
+    "FCLAW2D_MAP_BRICK_GET_DIM"                    : "FCLAW_MAP_BRICK_GET_2D_DIM",
+    "fclaw2d_block_ll"                             : "fclaw_block_ll",
+    "fclaw2d_block_ll_t"                           : "fclaw_block_ll_t",
+    "fclaw2d_map_new_brick"                        : "fclaw_map_new_2d_brick",
+    "fclaw2d_map_destroy_brick"                    : "fclaw_map_destroy_brick",
 
 }
 

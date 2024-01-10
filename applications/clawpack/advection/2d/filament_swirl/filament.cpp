@@ -48,7 +48,7 @@ void filament_create_domain(fclaw_global_t *glob)
         fclaw_domain_new_2d_brick (glob->mpicomm, mi, mj, a, b,
                                       fclaw_opt->minlevel);
     fclaw_map_context_t* brick = 
-        fclaw2d_map_new_brick (domain, mi, mj, a, b);
+        fclaw_map_new_2d_brick (domain, mi, mj, a, b);
         
     /* Square in [-1,1]x[-1,1], shifted by (1,1,0) */
     fclaw_map_context_t *cont  = 

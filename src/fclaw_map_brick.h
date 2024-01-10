@@ -41,11 +41,11 @@ struct fclaw_map_context;
 
 
 
-#define FCLAW2D_MAP_BRICK_GET_DIM FCLAW_F77_FUNC (fclaw2d_map_brick_get_dim, \
-                                                  FCLAW2D_MAP_BRICK_GET_DIM)
+#define FCLAW2D_MAP_BRICK_GET_DIM FCLAW_F77_FUNC (fclaw_map_brick_get_2d_dim, \
+                                                  FCLAW_MAP_BRICK_GET_2D_DIM)
 
-void FCLAW2D_MAP_BRICK_GET_DIM(struct fclaw_map_context **cont,
-                               int *mi, int* mj);
+void FCLAW_MAP_BRICK_GET_2D_DIM(struct fclaw_map_context **cont,
+                                int *mi, int* mj);
 
 
 
@@ -57,20 +57,20 @@ void WRITE_BRICK_DATA(int* n,
                       double xv[],
                       double yv[]);
 
-typedef struct fclaw2d_block_ll
+typedef struct fclaw_block_ll
 {
     int nb;
     int mi, mj;
     double *xv;
     double *yv;
 }
-fclaw2d_block_ll_t;
+fclaw_block_ll_t;
 
 struct fclaw_map_context*
-fclaw2d_map_new_brick (fclaw_domain_t *domain,
+fclaw_map_new_2d_brick (fclaw_domain_t *domain,
                        int mi, int mj, int periodic_i, int periodic_j);
 
-void fclaw2d_map_destroy_brick (struct fclaw_map_context *cont);
+void fclaw_map_destroy_brick (struct fclaw_map_context *cont);
 
 #ifdef __cplusplus
 #if 0

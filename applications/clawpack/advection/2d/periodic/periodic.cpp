@@ -48,7 +48,7 @@ void create_domain(fclaw_global_t *glob)
     /* Create mapping context (square periodic domain based on a brick) */
     //const user_options_t *user = (user_options_t*) annulus_get_options(glob);
     fclaw_map_context_t *brick =
-              fclaw2d_map_new_brick(domain, mi, mj, a, b);
+              fclaw_map_new_2d_brick(domain, mi, mj, a, b);
 
     fclaw_map_context_t *cont = 
               fclaw_map_new_nomap_brick(brick);
