@@ -728,7 +728,7 @@ fclaw2d_vtk_write_file (fclaw2d_global_t * glob, const char *basename,
 {
     fclaw2d_domain_t *domain = glob->domain;
 
-    FCLAW_ASSERT (patch_threshold == -1 || patch_threshold > 0);
+    FCLAW_ASSERT (patch_threshold >= 0);
 
     int retval, gretval;
     int mpiret;
