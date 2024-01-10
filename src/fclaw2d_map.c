@@ -27,7 +27,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw_global.h>
 #include <fclaw2d_map.h>
-#include <fclaw2d_map_query.h>  /* Needed for pillowsphere query */
+#include <fclaw_map_query.h>  /* Needed for pillowsphere query */
 
 #define MAP_KEY "map_2d"
 

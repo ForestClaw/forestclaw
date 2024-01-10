@@ -769,6 +769,9 @@ fclaw_1to2 = {
     "FCLAW2D_MAP_QUERY_IS_TORUS"                   : "FCLAW_MAP_QUERY_IS_TORUS",
     "FCLAW2D_MAP_QUERY_IS_BRICK"                   : "FCLAW_MAP_QUERY_IS_BRICK",
     "FCLAW2D_MAP_QUERY_LAST"                       : "FCLAW_MAP_QUERY_LAST",
+
+    #===== ./src/fclaw2d_map_query.h =====
+    "<fclaw2d_map_query.h>"                        : "<fclaw_map_query.h>",
     "FCLAW2D_MAP_IS_USED"                          : "FCLAW_MAP_IS_USED",
     "FCLAW2D_MAP_IS_CART"                          : "FCLAW_MAP_IS_CART",
     "FCLAW2D_MAP_IS_AFFINE"                        : "FCLAW_MAP_IS_AFFINE",

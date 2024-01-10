@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #if PATCH_DIM == 2
 
-#include <fclaw2d_map_query.h>
+#include <fclaw_map_query.h>
 
 #elif PATCH_DIM == 3
 

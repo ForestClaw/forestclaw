@@ -48,7 +48,7 @@
 
 #include <fclaw2d_map.h>
 #include <fclaw2d_map_brick.h>
-#include <fclaw2d_map_query.h>
+#include <fclaw_map_query.h>
 
 #include <fclaw_math.h>
 

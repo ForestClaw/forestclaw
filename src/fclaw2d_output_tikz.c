@@ -27,7 +27,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_base.h>   /* Needed for MPI declarations */
 
 #include <fclaw2d_map_brick.h>
-#include <fclaw2d_map_query.h>
+#include <fclaw_map_query.h>
 #include <fclaw2d_map.h>
 
 #include <fclaw_domain.h>
