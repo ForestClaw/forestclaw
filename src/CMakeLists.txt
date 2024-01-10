@@ -53,8 +53,8 @@ add_library(forestclaw_c OBJECT
   fclaw3d_file.c
   fclaw3d_wrap.c
   fp_exception_glibc_extension.c
-  mappings/fclaw2d_map_nomap.c
-  mappings/fclaw2d_map_nomap_brick.c
+  mappings/fclaw_map_nomap.c
+  mappings/fclaw_map_nomap_brick.c
 )
 target_include_directories(forestclaw_c PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${PROJECT_BINARY_DIR}/include patches/clawpatch)
 target_link_libraries(forestclaw_c PRIVATE P4EST::P4EST SC::SC)
