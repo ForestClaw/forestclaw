@@ -324,15 +324,30 @@ fclaw2d_domain_new (p4est_wrap_t * wrap, sc_keyvalue_t * attributes)
 }
 
 fclaw2d_domain_t *
-fclaw2d_domain_new_p4est (p4est_t *p4est)
+fclaw2d_domain_new_p4est (p4est_t * p4est)
 {
     FCLAW_ASSERT (p4est != NULL);
     FCLAW_ASSERT (p4est->user_pointer == NULL);
 
     p4est_wrap_t *wrap;
+    p4est_mesh_params_t params;
 
     /* create p4est_wrap from the given p4est */
-    wrap = p4est_wrap_new_p4est (p4est, 0, P4EST_CONNECT_FULL, NULL, NULL);
+    wrap = p4est_wrap_new_p4est (p4est, 1, P4EST_CONNECT_FULL, NULL, NULL);
+
+    /* fill the hollow wrap and using mesh_new_params for mesh creation with
+     * edgehanging corner neighbors */
+    wrap->hollow = 0;
+    wrap->flags = P4EST_ALLOC_ZERO (uint8_t, p4est->local_num_quadrants);
+    wrap->ghost = p4est_ghost_new (p4est, wrap->btype);
+    p4est_mesh_params_init (&params);
+    params.compute_level_lists = 1;
+    params.compute_tree_index = 1;
+    params.btype = wrap->btype;
+#ifdef P4_TO_P8
+    params.edgehanging_corners = 1;
+#endif
+    wrap->mesh = p4est_mesh_new_params (p4est, wrap->ghost, &params);
 
     FCLAW_ASSERT (wrap->p4est->data_size == 0);
 
