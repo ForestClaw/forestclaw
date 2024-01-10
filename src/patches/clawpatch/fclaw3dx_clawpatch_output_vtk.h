@@ -74,7 +74,7 @@ typedef void (*fclaw3dx_vtk_patch_data_t) (struct fclaw2d_global * glob,
  * @param[in] coordniate_cb the callback to write a patch's coordinate binary data
  * @param[in] value_cb the callback to write a patch's value binary data
  * @param[in] patch_threshold The maximal number of buffered patches.
- *                            -1 means that an unlimited number of patches is
+ *                            0 means that an unlimited number of patches is
  *                            buffered and flushed to disk at the end.
  * @return          0 if successful, negative otherwise.
  *                  Collective with identical value on all ranks.
