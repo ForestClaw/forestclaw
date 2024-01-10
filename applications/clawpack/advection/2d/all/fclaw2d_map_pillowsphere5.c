@@ -1,6 +1,6 @@
 /* Five bilinear patches */
 
-#include <fclaw2d_map.h>
+#include <fclaw_map.h>
 
 #ifdef __cplusplus
 extern "C"

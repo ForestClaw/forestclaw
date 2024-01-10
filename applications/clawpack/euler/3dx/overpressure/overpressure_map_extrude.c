@@ -29,7 +29,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /* For 2d mappings */
 #include "../all/euler3d_user.h"
 
-#include <fclaw2d_map.h>
+#include <fclaw_map.h>
 
 
 /* User defined extruded mesh mapping */

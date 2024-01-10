@@ -31,7 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_global.h>
 
 #include <fclaw_options.h>
-#include <fclaw2d_map.h>
+#include <fclaw_map.h>
 
 typedef struct fclaw2d_vtk_state
 {

@@ -1,6 +1,6 @@
 /* Pillow grid surface.  Matches p4est_connectivity_new_pillow (). */
 
-#include <fclaw2d_map.h>
+#include <fclaw_map.h>
 
 #if 0
 /* Fix syntax highlighting */

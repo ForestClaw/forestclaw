@@ -718,7 +718,8 @@ fclaw_1to2 = {
     "fclaw2d_ray_allocate_rays"                    : "fclaw_ray_allocate_rays",
     "fclaw2d_ray_deallocate_rays"                  : "fclaw_ray_deallocate_rays",
 
-    #===== ./src/fclaw2d_map.c =====
+    #===== ./src/fclaw2d_map.h =====
+    "<fclaw2d_map.h>"                              : "<fclaw_map.h>",
     "fclaw2d_map_context"                          : "fclaw_map_context",
     "fclaw2d_map_context_t"                        : "fclaw_map_context_t",
     "fclaw2d_map_store_t"                          : "fclaw_map_store_t",

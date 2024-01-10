@@ -1,6 +1,6 @@
 /* Spherical disk in xy plane.  Matches p4est_connectivity_new_disk (). */
 
-#include <fclaw2d_map.h>
+#include <fclaw_map.h>
 
 #ifdef __cplusplus
 extern "C"

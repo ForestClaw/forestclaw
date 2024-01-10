@@ -1,6 +1,6 @@
 /* Cubed sphere surface.  Matches p4est_connectivity_new_cubed (). */
 
-#include <fclaw2d_map.h>
+#include <fclaw_map.h>
 
 #ifdef __cplusplus
 extern "C"

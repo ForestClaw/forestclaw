@@ -28,8 +28,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_forestclaw.h>
 #include <fclaw_clawpatch.hpp>
 
-#include <fclaw2d_map.h>
-#include <fclaw2d_map_query.h>
+#include <fclaw_map.h>
+#include <fclaw_map_query.h>
 #include <p4est_connectivity.h>
 
 #include <fc2d_clawpack46.h>

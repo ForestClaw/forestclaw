@@ -40,7 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_clawpatch_output_vtk.h>
 
 #include <fclaw_global.h>
-#include <fclaw2d_map.h>
+#include <fclaw_map.h>
 #include <fclaw2d_map_brick.h>
 #include <fclaw_options.h>
 #include <fclaw_patch.h>

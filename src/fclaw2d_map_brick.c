@@ -2,7 +2,7 @@
 
 #include <fclaw2d_map_brick.h>
 
-#include <fclaw2d_map.h>
+#include <fclaw_map.h>
 
 static int
 fclaw2d_map_query_brick (fclaw_map_context_t * cont, int query_identifier)

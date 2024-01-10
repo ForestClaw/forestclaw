@@ -44,9 +44,9 @@ libforestclaw_installed_headers = \
 	src/fclaw_farraybox.hpp \
 	src/fclaw_map_query_defs.h \
 	src/fclaw_map_query.h \
+	src/fclaw_map.h \
 	src/fp_exception_glibc_extension.h \
 	src/fclaw2d_defs.h \
-	src/fclaw2d_map.h \
 	src/fclaw2d_map_brick.h \
 	src/fclaw2d_convenience.h \
 	src/fclaw2d_file.h \
@@ -102,8 +102,8 @@ libforestclaw_compiled_sources = \
 	src/fclaw_run.c \
 	src/fclaw_farraybox.cpp \
 	src/fclaw_map_query.c \
+	src/fclaw_map.c \
 	src/forestclaw.c \
-	src/fclaw2d_map.c \
 	src/fclaw2d_map_brick.c \
 	src/fclaw2d_convenience.c \
 	src/fclaw2d_output_tikz.c \

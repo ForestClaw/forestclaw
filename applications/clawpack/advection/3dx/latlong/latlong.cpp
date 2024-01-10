@@ -24,7 +24,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 /* Needed for 2d mappings */
-#include <fclaw2d_map.h>
+#include <fclaw_map.h>
 
 #include "latlong_user.h"
 

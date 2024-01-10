@@ -37,7 +37,7 @@
 #include <fclaw_convenience.h>
 #include <fclaw2d_metric.hpp>
 #include <fclaw2d_metric.h>
-#include <fclaw2d_map.h>
+#include <fclaw_map.h>
 #include <fclaw_options.h>
 #include <test.hpp>
 #include <test/test.hpp>
