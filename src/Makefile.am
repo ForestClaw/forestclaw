@@ -42,13 +42,13 @@ libforestclaw_installed_headers = \
   	src/fclaw_rays.h \
   	src/fclaw_elliptic_solver.h \
 	src/fclaw_farraybox.hpp \
+	src/fclaw_map_query_defs.h \
 	src/fp_exception_glibc_extension.h \
 	src/fclaw2d_defs.h \
 	src/fclaw2d_map.h \
 	src/fclaw2d_map_brick.h \
 	src/fclaw2d_convenience.h \
 	src/fclaw2d_map_query.h \
-	src/fclaw2d_map_query_defs.h \
 	src/fclaw2d_file.h \
 	src/fclaw2d_wrap.h \
     src/fclaw2d_to_3d.h \

@@ -745,6 +745,9 @@ fclaw_1to2 = {
     "fclaw2d_map_new_nomap_brick"                  : "fclaw_map_new_nomap_brick",
     "fclaw2d_map_pillowphere"                      : "fclaw_map_pillowsphere",
     "fclaw2d_map_new_nomap"                        : "fclaw_map_new_nomap",
+
+    #===== ./src/fclaw2d_map_query_defs.h =====
+    "<fclaw2d_map_query_defs.h>"                   : "<fclaw_map_query_defs.h>",
     "FCLAW2D_MAP_QUERY_IS_USED"                    : "FCLAW_MAP_QUERY_IS_USED",
     "FCLAW2D_MAP_QUERY_IS_SCALEDSHIFT"             : "FCLAW_MAP_QUERY_IS_SCALEDSHIFT",
     "FCLAW2D_MAP_QUERY_IS_AFFINE"                  : "FCLAW_MAP_QUERY_IS_AFFINE",

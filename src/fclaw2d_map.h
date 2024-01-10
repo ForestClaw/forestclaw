@@ -27,7 +27,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define FCLAW2D_MAP_H
 
 #include <fclaw_base.h>
-#include <fclaw2d_map_query_defs.h>
+#include <fclaw_map_query_defs.h>
 
 #ifdef __cplusplus
 extern "C"

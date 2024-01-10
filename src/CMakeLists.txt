@@ -147,6 +147,7 @@ install(FILES
   fclaw_elliptic_solver.h
   fclaw_output.h
   fclaw_farraybox.hpp
+	fclaw_map_query_defs.h
 	forestclaw.h 
 	forestclaw2d.h 
 	fp_exception_glibc_extension.h 
@@ -155,7 +156,6 @@ install(FILES
 	fclaw2d_map_brick.h
 	fclaw2d_convenience.h
 	fclaw2d_map_query.h
-	fclaw2d_map_query_defs.h
   fclaw2d_file.h
   fclaw2d_wrap.h
   fclaw2d_to_3d.h
