@@ -107,7 +107,7 @@ typedef struct fclaw2d_vtk_state
      * patches are written to disk and the buffer is flushed.
      * The variable \b num_buffered_patches relates to the number of buffered
      * patches during one fclaw2d_vtk_write_field call.
-     * If \b patch_threshold is -1, there are no intermediate writes but all
+     * If \b patch_threshold is 0, there are no intermediate writes but all
      * patches during a fclaw2d_vtk_write_field are buffered and then written
      * to the disk.
      */
@@ -246,10 +246,10 @@ add_to_buffer (fclaw2d_vtk_state_t * s, int64_t psize_field)
 #else
     size_t retvalz;
 #endif
-    FCLAW_ASSERT (s->patch_threshold == -1 || s->patch_threshold > 0);
+    FCLAW_ASSERT (s->patch_threshold >= 0);
     FCLAW_ASSERT (((int) s->sink->buffer_bytes) % psize_field == 0);
 
-    if (s->patch_threshold != -1
+    if (s->patch_threshold != 0
         && (s->num_buffered_patches + 1 > s->patch_threshold))
     {
         FCLAW_ASSERT ((int) s->sink->buffer_bytes >= psize_field);
@@ -580,7 +580,7 @@ fclaw2d_vtk_write_field (fclaw2d_global_t * glob, fclaw2d_vtk_state_t * s,
     fclaw2d_global_iterate_patches (glob, cb, s);
 
 #ifdef P4EST_ENABLE_MPIIO
-    if (s->num_buffered_patches > 0 || s->patch_threshold == -1)
+    if (s->num_buffered_patches > 0 || s->patch_threshold == 0)
     {
         /* write the remaining buffered bytes */
         mpiret =
@@ -590,7 +590,7 @@ fclaw2d_vtk_write_field (fclaw2d_global_t * glob, fclaw2d_vtk_state_t * s,
         SC_CHECK_MPI (mpiret);
     }
 
-    if (s->patch_threshold != -1)
+    if (s->patch_threshold != 0)
     {
         /* Ensure that the collective function MPI_File_write_all is called
          * equally often on each rank.
@@ -791,7 +791,7 @@ fclaw2d_vtk_write_file (fclaw2d_global_t * glob, const char *basename,
     /* The threshold may be adjusted; see the documentation of
      * fclaw2d_vtk_state_t for further information.
      */
-    s->patch_threshold = -1;
+    s->patch_threshold = 0;
     s->num_buffered_patches = 0;
 
     /* write header meta data and check for error */
