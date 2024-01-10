@@ -1030,7 +1030,7 @@ void fclaw2d_clawpatch_output_vtk (fclaw2d_global_t * glob, int iframe)
                                    clawpatch_opt->meqn,
                                    fclaw_opt->vtkspace, 0,
                                    fclaw2d_output_vtk_coordinate_cb,
-                                   fclaw2d_output_vtk_value_cb, 0);
+                                   fclaw2d_output_vtk_value_cb, clawpatch_opt->vtk_patch_threshold);
 }
 
 
