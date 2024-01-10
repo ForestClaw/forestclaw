@@ -352,41 +352,33 @@ fclaw2d_check_initial_level (sc_MPI_Comm mpicomm, int initial_level)
                      "Initial level %d too fine for p4est", initial_level);
 }
 
+#ifndef P4_TO_P8
 fclaw2d_domain_t *
 fclaw2d_domain_new_unitsquare (sc_MPI_Comm mpicomm, int initial_level)
 {
-    fclaw2d_check_initial_level (mpicomm, initial_level);
-    return fclaw2d_domain_new (p4est_wrap_new_unitsquare (mpicomm,
-                                                          initial_level),
-                               NULL);
+    return fclaw2d_domain_new_conn (mpicomm, initial_level,
+                                    p4est_connectivity_new_unitsquare ());
 }
-
-#ifndef P4_TO_P8
 
 fclaw2d_domain_t *
 fclaw2d_domain_new_torus (sc_MPI_Comm mpicomm, int initial_level)
 {
-    fclaw2d_check_initial_level (mpicomm, initial_level);
-    return
-        fclaw2d_domain_new (p4est_wrap_new_periodic (mpicomm, initial_level),
-                            NULL);
+    return fclaw2d_domain_new_conn (mpicomm, initial_level,
+                                    p4est_connectivity_new_periodic ());
 }
 
 fclaw2d_domain_t *
 fclaw2d_domain_new_twosphere (sc_MPI_Comm mpicomm, int initial_level)
 {
-    fclaw2d_check_initial_level (mpicomm, initial_level);
-    return
-        fclaw2d_domain_new (p4est_wrap_new_pillow (mpicomm, initial_level),
-                            NULL);
+    return fclaw2d_domain_new_conn (mpicomm, initial_level,
+                                    p4est_connectivity_new_pillow ());
 }
 
 fclaw2d_domain_t *
 fclaw2d_domain_new_cubedsphere (sc_MPI_Comm mpicomm, int initial_level)
 {
-    fclaw2d_check_initial_level (mpicomm, initial_level);
-    return fclaw2d_domain_new (p4est_wrap_new_cubed (mpicomm, initial_level),
-                               NULL);
+    return fclaw2d_domain_new_conn (mpicomm, initial_level,
+                                    p4est_connectivity_new_cubed ());
 }
 
 fclaw2d_domain_t *
@@ -394,10 +386,9 @@ fclaw2d_domain_new_disk (sc_MPI_Comm mpicomm,
                          int periodic_in_x, int periodic_in_y,
                          int initial_level)
 {
-    fclaw2d_check_initial_level (mpicomm, initial_level);
-    return fclaw2d_domain_new
-        (p4est_wrap_new_disk (mpicomm, periodic_in_x, periodic_in_y,
-                              initial_level), NULL);
+    return fclaw2d_domain_new_conn (mpicomm, initial_level,
+                                    p4est_connectivity_new_disk (periodic_in_x,
+                                                                 periodic_in_y));
 }
 
 #endif /* P4_TO_P8 */
@@ -414,19 +405,19 @@ fclaw2d_domain_new_brick (sc_MPI_Comm mpicomm,
 #endif
                           int initial_level)
 {
-    p4est_wrap_t *wrap;
-
-    fclaw2d_check_initial_level (mpicomm, initial_level);
-    wrap = p4est_wrap_new_brick (mpicomm, blocks_in_x, blocks_in_y,
+    return fclaw2d_domain_new_conn (mpicomm, initial_level,
+                                    p4est_connectivity_new_brick (blocks_in_x,
+                                                                  blocks_in_y,
 #ifdef P4_TO_P8
-                                 blocks_in_z,
+                                                                  blocks_in_z,
 #endif
-                                 periodic_in_x, periodic_in_y,
+                                                                  periodic_in_x,
+                                                                  periodic_in_y
 #ifdef P4_TO_P8
-                                 periodic_in_z,
+                                                                  ,
+                                                                  periodic_in_z
 #endif
-                                 initial_level);
-    return fclaw2d_domain_new (wrap, NULL);
+                                    ));
 }
 
 fclaw2d_domain_t *
@@ -434,13 +425,24 @@ fclaw2d_domain_new_conn (sc_MPI_Comm mpicomm, int initial_level,
                          p4est_connectivity_t * conn)
 {
     p4est_wrap_t *wrap;
-    fclaw2d_domain_t *domain;
+    p4est_wrap_params_t params;
 
     fclaw2d_check_initial_level (mpicomm, initial_level);
-    wrap = p4est_wrap_new_conn (mpicomm, conn, initial_level);
-    domain = fclaw2d_domain_new (wrap, NULL);
 
-    return domain;
+    /* Wrap the connectivity. This does the same as p4est_wrap_new_conn,
+     * except for setting edgehanging_corners to 1. */
+    p4est_wrap_params_init (&params);
+    params.initial_level = initial_level;
+    params.hollow = 0;
+    params.mesh_params.btype = P4EST_CONNECT_FULL;
+    params.mesh_params.compute_level_lists = 1;
+    params.mesh_params.compute_tree_index = 1;
+#ifdef P4_TO_P8
+    params.mesh_params.edgehanging_corners = 1;
+#endif
+    wrap = p4est_wrap_new_params (mpicomm, conn, &params);
+
+    return fclaw2d_domain_new (wrap, NULL);
 }
 
 void

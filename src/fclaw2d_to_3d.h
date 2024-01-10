@@ -169,7 +169,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define fclaw2d_file_read_array         fclaw3d_file_read_array
 #define fclaw2d_file_error_string       fclaw3d_file_error_string
 #define fclaw2d_file_close              fclaw3d_file_close
-#define fclaw2d_domain_new_unitsquare   fclaw3d_domain_new_unitcube
 #define fclaw2d_domain_new_brick        fclaw3d_domain_new_brick
 #define fclaw2d_domain_new_conn         fclaw3d_domain_new_conn
 #define fclaw2d_domain_new_p4est        fclaw3d_domain_new_p8est
