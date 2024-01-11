@@ -164,6 +164,13 @@ clawpatch_check(fclaw2d_clawpatch_options_t *clawpatch_opt)
         return FCLAW_EXIT_ERROR;            
     }
 
+    if (clawpatch_opt->vtk_patch_threshold < 0)
+    {
+        fclaw_global_essentialf("Clawpatch error : vtk-patch-threshold must be " \
+                                "non-negative.\n");
+        return FCLAW_EXIT_ERROR;            
+    }
+
     return FCLAW_NOEXIT;
 }
 
