@@ -106,7 +106,7 @@ clawpatch_register(fclaw2d_clawpatch_options_t *clawpatch_options,
     /* ---------------------- vtk options -------------------------- */
     sc_options_add_int(opt, 0, "vtk-patch-threshold", 
                        &clawpatch_options->vtk_patch_threshold, 0,
-                       "Patch threshold for writing vtk output. 0 means buffer all patches before writing [0]");
+                       "Number of patches to buffer before each write in vtk output. 0 means buffer all patches before writing [0]");
 
     /* Set verbosity level for reporting timing */
     sc_keyvalue_t *kv = clawpatch_options->kv_refinement_criteria = kv_refinement_criterea_new();
