@@ -321,7 +321,7 @@ void fclaw2d_regrid(fclaw2d_global_t *glob)
     }
 
     /* User defined */
-    fclaw2d_after_regrid(glob);
+    fclaw2d_after_regrid(glob, have_new_refinement);
 
     /* Only if gauges count > 0 */
     fclaw_locate_gauges(glob);
