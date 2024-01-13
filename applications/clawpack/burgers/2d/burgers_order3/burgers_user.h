@@ -26,7 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef BURGERS_USER_H
 #define BURGERS_USER_H
 
-#include <fclaw2d_include_all.h>
+#include <fclaw_include_all.h>
 
 #include <fc2d_clawpack46.h>
 
@@ -47,15 +47,15 @@ typedef struct user_options
 
 } user_options_t;
 
-void burgers_link_solvers(fclaw2d_global_t *glob);
+void burgers_link_solvers(fclaw_global_t *glob);
 
 /* ------------------------------------- Options ---------------------------------------*/
 user_options_t* burgers_options_register (fclaw_app_t * app,
                                         const char *configfile);
 
-void burgers_options_store (fclaw2d_global_t* glob, user_options_t* user);
+void burgers_options_store (fclaw_global_t* glob, user_options_t* user);
 
-const user_options_t* burgers_get_options(fclaw2d_global_t* glob);
+const user_options_t* burgers_get_options(fclaw_global_t* glob);
 
 /* ------------------------------------ Fortran ----------------------------------------*/
 #define BURGERS_FLUX2 FCLAW_F77_FUNC(burgers_flux2,BURGERS_FLUX2)
@@ -89,7 +89,7 @@ void PERIODIC_FORT_INTERPOLATE_FACE(const int* mx, const int* my,
                                                const int* idir, const int* iside,
                                                const int* num_neighbors,
                                                const int* refratio, const int* igrid,
-                                               struct fclaw2d_patch_transform_data** 
+                                               struct fclaw_patch_transform_data** 
                                                transform_cptr);
 
 #define PERIODIC_FORT_INTERPOLATE_CORNER \
@@ -100,7 +100,7 @@ void PERIODIC_FORT_INTERPOLATE_CORNER(const int* mx, const int* my,
                                                  const int* mbc,const int* meqn, 
                                                  const int* a_refratio, double this_q[],
                                                  double neighbor_q[], const int* a_corner,
-                                                 struct fclaw2d_patch_transform_data** 
+                                                 struct fclaw_patch_transform_data** 
                                                  transform_cptr);
 
 #define RPN2CONS_UPDATE FCLAW_F77_FUNC(rpn2cons_update,RPN2CONS_UPDATE)

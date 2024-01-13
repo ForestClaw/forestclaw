@@ -39,7 +39,7 @@ c     # Assume a single field variable only
             else
 c              # Map computational coordinates to physical coordinates
 c              # In this case, physical and computational are the same.
-               call fclaw2d_map_c2m(cont,blockno,xc,yc,
+               call fclaw_map_2d_c2m(cont,blockno,xc,yc,
      &                              xc1,yc1,zc1)
                soln(1,i,j) = qexact(xc1,yc1,t,flow_flag)
             endif

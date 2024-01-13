@@ -41,7 +41,7 @@ void create_domain(fclaw_global_t *glob)
 
     /* Mapped, multi-block domain */
     fclaw_domain_t         *domain;
-    fclaw2d_map_context_t    *cont = NULL, *brick = NULL;
+    fclaw_map_context_t    *cont = NULL, *brick = NULL;
 
 
     const user_options_t *user_opt = square_get_options(glob);
@@ -52,7 +52,7 @@ void create_domain(fclaw_global_t *glob)
             fclaw_domain_new_2d_brick (glob->mpicomm, mi, mj, a, b,
                                       fclaw_opt->minlevel);
 
-        brick = fclaw2d_map_new_brick(domain,mi,mj,a,b);
+        brick = fclaw_map_new_2d_brick(domain,mi,mj,a,b);
         cont = fclaw2d_map_new_identity(brick);
         break;
 
@@ -61,7 +61,7 @@ void create_domain(fclaw_global_t *glob)
         domain =
             fclaw_domain_new_2d_brick (glob->mpicomm, mi, mj, a, b,
                                       fclaw_opt->minlevel);
-        brick = fclaw2d_map_new_brick(domain,mi,mj,a,b);
+        brick = fclaw_map_new_2d_brick(domain,mi,mj,a,b);
 
         cont = fclaw2d_map_new_cart(brick,
                                     fclaw_opt->scale, 
@@ -93,7 +93,7 @@ void create_domain(fclaw_global_t *glob)
             fclaw_domain_new_2d_brick(glob->mpicomm, mi, mj, a, b,
                                       fclaw_opt->minlevel);
 
-        brick = fclaw2d_map_new_brick(domain,mi,mj,a,b);
+        brick = fclaw_map_new_2d_brick(domain,mi,mj,a,b);
 
         cont = fclaw2d_map_new_bilinear(brick, 
                                         fclaw_opt->scale,
@@ -109,7 +109,7 @@ void create_domain(fclaw_global_t *glob)
     fclaw_global_store_domain(glob, domain);
 
     /* Store mapping in the glob */
-    fclaw2d_map_store (glob, cont);            
+    fclaw_map_store (glob, cont);            
 
     /* print out some info */
     fclaw_domain_list_levels(domain, FCLAW_VERBOSITY_ESSENTIAL);

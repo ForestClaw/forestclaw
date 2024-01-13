@@ -47,7 +47,7 @@ void create_domain(fclaw_global_t *glob)
 
     /* Mapped, multi-block domain */
     fclaw_domain_t         *domain;
-    fclaw2d_map_context_t    *cont = NULL, *brick = NULL;
+    fclaw_map_context_t    *cont = NULL, *brick = NULL;
 
     fclaw_clawpatch_options_t *clawpatch_opt = fclaw_clawpatch_get_options(glob);
     fc3d_clawpack46_options_t *claw3_opt = fc3d_clawpack46_get_options(glob);
@@ -65,8 +65,8 @@ void create_domain(fclaw_global_t *glob)
                                      fclaw_opt->minlevel);
 
         /* Size is set by [ax,bx] x [ay, by], set in .ini file */            
-        brick = fclaw2d_map_new_brick(domain,mi,mj,a,b);        
-        cont = fclaw2d_map_new_nomap_brick(brick);
+        brick = fclaw_map_new_2d_brick(domain,mi,mj,a,b);        
+        cont = fclaw_map_new_nomap_brick(brick);
 
         break;
     case 1:
@@ -79,7 +79,7 @@ void create_domain(fclaw_global_t *glob)
             fclaw_domain_new_2d_brick (glob->mpicomm, mi, mj, a, b,
                                      fclaw_opt->minlevel);
 
-        brick = fclaw2d_map_new_brick(domain,mi,mj,a,b);
+        brick = fclaw_map_new_2d_brick(domain,mi,mj,a,b);
 
         /* Square in [-1,1]x[-1,1], scaled/shifted to [0,1]x[0,1] */
         cont = fclaw2d_map_new_cart(brick,
@@ -94,7 +94,7 @@ void create_domain(fclaw_global_t *glob)
                                           fclaw_opt->minlevel);
 
         /* Create brick mapping */        
-        brick = fclaw2d_map_new_brick(domain, mi, mj, a, b);
+        brick = fclaw_map_new_2d_brick(domain, mi, mj, a, b);
         
         cont = fclaw2d_map_new_latlong(brick,fclaw_opt->scale,
                                        rotate,
@@ -131,7 +131,7 @@ void create_domain(fclaw_global_t *glob)
 
 
     /* Store mapping in the glob */
-    fclaw2d_map_store (glob, cont);            
+    fclaw_map_store (glob, cont);            
 
     /* Store the domain in the glob */
     fclaw_global_store_domain(glob, domain);

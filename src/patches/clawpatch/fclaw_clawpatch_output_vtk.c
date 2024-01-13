@@ -36,7 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
                                                         the VTK patch buffering */
 
 #include <fclaw_options.h>
-#include <fclaw2d_map.h>
+#include <fclaw_map.h>
 #include <sc_io.h>
 
 typedef struct fclaw2d_vtk_state
@@ -855,7 +855,7 @@ fclaw2d_output_vtk_coordinate_cb (fclaw_global_t * glob,
                                 &xlower,&ylower,&dx,&dy);
 
     const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
-    fclaw2d_map_context_t* cont = fclaw2d_map_get(glob);
+    fclaw_map_context_t* cont = fclaw_map_get(glob);
 
     /* Enumerate point coordinates in the patch */
     double *d = (double *) a;
@@ -869,7 +869,7 @@ fclaw2d_output_vtk_coordinate_cb (fclaw_global_t * glob,
             const double x = xlower + i * dx;
             if (fclaw_opt->manifold)
             {
-                FCLAW2D_MAP_C2M(&cont,&blockno,&x,&y,&xpp,&ypp,&zpp);
+                FCLAW_MAP_2D_C2M(&cont,&blockno,&x,&y,&xpp,&ypp,&zpp);
                 *d++ = xpp;
                 *d++ = ypp;
                 *d++ = zpp;
@@ -896,7 +896,7 @@ fclaw3d_output_vtk_coordinate_cb (fclaw_global_t * glob,
                                 &xlower,&ylower,&zlower, &dx,&dy, &dz);
 
     const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
-    fclaw2d_map_context_t* cont = fclaw2d_map_get(glob);
+    fclaw_map_context_t* cont = fclaw_map_get(glob);
     /* Enumerate point coordinates in the patch */
     double *d = (double *) a;
     int i, j, k;
@@ -912,7 +912,7 @@ fclaw3d_output_vtk_coordinate_cb (fclaw_global_t * glob,
                 const double x = xlower + i * dx;
                 if (fclaw_opt->manifold)
                 {
-                    FCLAW3D_MAP_C2M(&cont,&blockno,&x,&y,&z,&xpp,&ypp,&zpp);
+                    FCLAW_MAP_3D_C2M(&cont,&blockno,&x,&y,&z,&xpp,&ypp,&zpp);
                     *d++ = xpp;
                     *d++ = ypp;
                     *d++ = zpp;

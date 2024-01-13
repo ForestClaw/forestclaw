@@ -43,7 +43,7 @@ void create_domain(fclaw_global_t *glob)
 
     /* Mapped, multi-block domain */
     fclaw_domain_t         *domain;
-    fclaw2d_map_context_t    *cont = NULL;
+    fclaw_map_context_t    *cont = NULL;
 
     const user_options_t *user_opt = sphere_get_options(glob);
     switch (user_opt->example) {
@@ -66,7 +66,7 @@ void create_domain(fclaw_global_t *glob)
     sphere_map_extrude(cont,user_opt->maxelev);
 
     /* Store mapping in the glob */
-    fclaw2d_map_store (glob, cont);            
+    fclaw_map_store (glob, cont);            
 
     /* Store the domain in the glob */
     fclaw_global_store_domain(glob, domain);

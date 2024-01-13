@@ -60,7 +60,7 @@ void disk_global_post_process(fclaw_options_t *fclaw_opt,
                               fclaw_clawpatch_options_t *clawpatch_opt,
                               user_options_t *user_opt);
 
-void disk_map_extrude(fclaw2d_map_context_t *cont, 
+void disk_map_extrude(fclaw_map_context_t *cont, 
                       const double maxelev);
 
 

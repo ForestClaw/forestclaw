@@ -28,7 +28,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /* User defined extruded mesh mapping */
 static void
-filament_map_3dx(fclaw2d_map_context_t * cont, int blockno,
+filament_map_3dx(fclaw_map_context_t * cont, int blockno,
                double xc, double yc, double zc,
                double *xp, double *yp, double *zp)
 {
@@ -46,7 +46,7 @@ filament_map_3dx(fclaw2d_map_context_t * cont, int blockno,
 }
 
 
-void filament_map_extrude(fclaw2d_map_context_t* cont,
+void filament_map_extrude(fclaw_map_context_t* cont,
                           const double maxelev)
 
 {

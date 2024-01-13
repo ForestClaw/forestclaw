@@ -12,7 +12,7 @@
 
       cont = fclaw_map_get_context()
 
-      call fclaw3d_map_c2m(cont,
+      call fclaw_map_3d_c2m(cont,
      &      blockno,xc,yc,zc,xp,yp,zp)
 
       rp = sqrt(xp**2 + yp**2 + zp**2)

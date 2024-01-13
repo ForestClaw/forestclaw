@@ -25,13 +25,13 @@ c      include 'fclaw2d_metric_terms.i'
       integer i,j,m
       double precision dxdy
       integer*8 cont, fclaw_map_get_context
-      logical fclaw2d_map_is_used
+      logical fclaw_map_is_used
 
       cont = fclaw_map_get_context()
 
       dxdy = dx*dy
       do m = 1,meqn
-         if (fclaw2d_map_is_used(cont)) then
+         if (fclaw_map_is_used(cont)) then
             do j = 1,my
                do i = 1,mx
                   sum(m) = sum(m) + q(m,i,j)*area(i,j)
@@ -69,11 +69,11 @@ c      include 'fclaw2d_metric_terms.i'
       integer i,j
       double precision sum
       integer*8 cont, fclaw_map_get_context
-      logical fclaw2d_map_is_used
+      logical fclaw_map_is_used
 
       cont = fclaw_map_get_context()
 
-      if (fclaw2d_map_is_used(cont)) then
+      if (fclaw_map_is_used(cont)) then
          sum = 0
          do j = 1,my
             do i = 1,mx
@@ -110,14 +110,14 @@ c      include 'fclaw2d_metric_terms.i'
       integer i,j,m
       double precision dxdy, eij
       integer*8 cont, fclaw_map_get_context
-      logical fclaw2d_map_is_used
+      logical fclaw_map_is_used
 
       cont = fclaw_map_get_context()
 
 c     # error_norm(:) comes in with values;  do not initialize it here!
       dxdy = dx*dy
       do m = 1,meqn
-         if (fclaw2d_map_is_used(cont)) then
+         if (fclaw_map_is_used(cont)) then
             do j = 1,my
                do i = 1,mx
                   eij = abs(error(m,i,j))

@@ -65,15 +65,6 @@ void fclaw_domain_iterate_level_mthread (struct fclaw_domain * domain, int level
  */
 int fclaw_domain_exchange_allocated(fclaw_domain_t *domain);
 
-/* below are the functions needed for dimension independence */
-
-/** safeguard value for dimension-independent domain */
-#define FCLAW2D_DOMAIN_MAGIC 0x56780202
-
-void fclaw2d_domain_iterate_cb
-  (fclaw_domain_t * d2, fclaw_patch_t * patch,
-   int blockno, int patchno, void *user);
-
 #ifdef __cplusplus
 #if 0
 {                               /* need this because indent is dumb */

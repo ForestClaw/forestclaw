@@ -7,7 +7,6 @@ libforestclaw_generated_headers = src/fclaw_config.h
 libforestclaw_installed_headers = \
 	src/fclaw_base.h \
 	src/fclaw_timer.h \
-	src/fclaw_package.h \
 	src/fclaw_packing.h \
 	src/fclaw_filesystem.h \
 	src/fclaw_pointer_map.h \
@@ -42,50 +41,20 @@ libforestclaw_installed_headers = \
 	src/fclaw_include_all.h \
   	src/fclaw_rays.h \
   	src/fclaw_elliptic_solver.h \
+	src/fclaw_farraybox.hpp \
+	src/fclaw_map_query_defs.h \
+	src/fclaw_map_query.h \
+	src/fclaw_map.h \
+	src/fclaw_map_brick.h \
 	src/fp_exception_glibc_extension.h \
-	src/fclaw2d_include_all.h \
 	src/fclaw2d_defs.h \
-	src/fclaw2d_options.h \
-	src/fclaw2d_advance.h \
-	src/fclaw2d_elliptic_solver.h \
-	src/fclaw2d_farraybox.hpp \
-	src/fclaw2d_global.h \
-	src/fclaw2d_forestclaw.h \
-	src/fclaw2d_domain.h \
-	src/fclaw2d_block.h \
-	src/fclaw2d_patch.h \
-	src/fclaw2d_vtable.h \
-	src/fclaw2d_output.h \
-	src/fclaw2d_time_sync.h \
-	src/fclaw2d_update_single_step.h \
-	src/fclaw2d_physical_bc.h \
-	src/fclaw2d_rays.h \
-	src/fclaw2d_ghost_fill.h \
-	src/fclaw2d_corner_neighbors.h \
-	src/fclaw2d_face_neighbors.h \
-	src/fclaw2d_map.h \
-	src/fclaw2d_timeinterp.h \
-	src/fclaw2d_regrid.h \
-	src/fclaw2d_map_brick.h \
-	src/fclaw2d_partition.h \
-	src/fclaw2d_exchange.h \
 	src/fclaw2d_convenience.h \
-	src/fclaw2d_map_query.h \
-	src/fclaw2d_map_query_defs.h \
-	src/fclaw2d_diagnostics.h \
 	src/fclaw2d_file.h \
 	src/fclaw2d_wrap.h \
     src/fclaw2d_to_3d.h \
 	src/forestclaw3d.h \
-	src/fclaw3d_include_all.h \
 	src/fclaw3d_defs.h \
-	src/fclaw3d_exchange.h \
-	src/fclaw3d_options.h \
-	src/fclaw3d_patch.h \
-	src/fclaw3d_domain.h \
-	src/fclaw3d_global.h \
 	src/fclaw3d_convenience.h \
-	src/fclaw3d_map.h \
 	src/fclaw3d_file.h \
 	src/fclaw3d_wrap.h 
 
@@ -99,7 +68,6 @@ libforestclaw_compiled_sources = \
 	src/fclaw_base.c \
 	src/fclaw_options.c \
 	src/fclaw_gauges.c \
-	src/fclaw_package.c \
 	src/fclaw_packing.c \
 	src/fclaw_filesystem.cpp \
 	src/fclaw_pointer_map.c \
@@ -132,49 +100,18 @@ libforestclaw_compiled_sources = \
     src/fclaw_forestclaw.c \
   	src/fclaw_elliptic_solver.c \
 	src/fclaw_run.c \
+	src/fclaw_farraybox.cpp \
+	src/fclaw_map_query.c \
+	src/fclaw_map.c \
+	src/fclaw_map_brick.c \
 	src/forestclaw.c \
-	src/fclaw2d_block.c \
-	src/fclaw2d_options.c \
-	src/fclaw2d_global.c \
-	src/fclaw2d_forestclaw.c \
-	src/fclaw2d_vtable.c \
-	src/fclaw2d_map.c \
-	src/fclaw2d_map_query.c \
-	src/fclaw2d_map_brick.c \
 	src/fclaw2d_convenience.c \
-	src/fclaw2d_exchange.c \
-	src/fclaw2d_advance.c \
-	src/fclaw2d_elliptic_solver.c \
-	src/fclaw2d_physical_bc.c \
-	src/fclaw2d_rays.c \
-	src/fclaw2d_ghost_fill.c \
-	src/fclaw2d_output.c \
-	src/fclaw2d_run.c \
-	src/fclaw2d_diagnostics.c \
-	src/fclaw2d_update_single_step.c \
-	src/fclaw2d_domain.c \
-	src/fclaw2d_regrid.c \
-	src/fclaw2d_patch.c \
-	src/fclaw2d_partition.c \
-	src/fclaw2d_timeinterp.c \
-	src/fclaw2d_initialize.c \
-	src/fclaw2d_finalize.c \
-	src/fclaw2d_time_sync.c \
-	src/fclaw2d_corner_neighbors.c \
-	src/fclaw2d_face_neighbors.c \
-	src/fclaw2d_farraybox.cpp \
 	src/fclaw2d_output_tikz.c \
 	src/fclaw2d_file.c \
 	src/fclaw2d_wrap.c \
 	src/forestclaw2d.c \
 	src/forestclaw3d.c \
 	src/fclaw3d_convenience.c \
-	src/fclaw3d_domain.c \
-	src/fclaw3d_exchange.c \
-	src/fclaw3d_options.c \
-	src/fclaw3d_patch.c \
-	src/fclaw3d_global.c \
-	src/fclaw3d_map.c \
 	src/fclaw3d_file.c \
 	src/fclaw3d_wrap.c \
 	src/fp_exception_glibc_extension.c \
@@ -194,8 +131,8 @@ libforestclaw_compiled_sources = \
 	src/mappings/torus/mapc2m_torus.f \
 	src/mappings/torus/mapc2m_twisted_torus.f \
 	src/mappings/latlong/mapc2m_latlong.f \
-	src/mappings/fclaw2d_map_nomap.c \
-	src/mappings/fclaw2d_map_nomap_brick.c \
+	src/mappings/fclaw_map_nomap.c \
+	src/mappings/fclaw_map_nomap_brick.c \
 	src/fortran_source2d/fclaw_dopri5.f \
 	src/fortran_source2d/cellave2.f \
 	src/fortran_source2d/cellave3.f \
@@ -243,12 +180,9 @@ src_forestclaw_TEST_SOURCES = \
     src/fclaw_global.h.TEST.cpp \
     src/fclaw_options.h.TEST.cpp \
     src/fclaw_patch.h.TEST.cpp \
-	src/fclaw2d_elliptic_solver.h.TEST.cpp \
-	src/fclaw2d_diagnostics.h.TEST.cpp \
-	src/fclaw2d_global.h.TEST.cpp \
-	src/fclaw2d_options.h.TEST.cpp \
-	src/fclaw2d_patch.h.TEST.cpp \
-	src/fclaw2d_vtable.h.TEST.cpp 
+	src/fclaw_elliptic_solver.h.TEST.cpp \
+	src/fclaw_diagnostics.h.TEST.cpp \
+	src/fclaw_vtable.h.TEST.cpp 
 
 src_forestclaw_TEST_CPPFLAGS = \
 	$(test_libtestutils_la_CPPFLAGS) \

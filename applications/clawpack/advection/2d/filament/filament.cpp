@@ -44,7 +44,7 @@ void create_domain(fclaw_global_t *glob)
     int a = 0; /* non-periodic */
     int b = 0;
     
-    fclaw2d_map_context_t    *cont = NULL, *brick = NULL;
+    fclaw_map_context_t    *cont = NULL, *brick = NULL;
     fclaw_domain_t *domain = NULL;
 
     user_options_t *user = (user_options_t*) filament_get_options(glob);
@@ -54,7 +54,7 @@ void create_domain(fclaw_global_t *glob)
         domain =
             fclaw_domain_new_2d_brick (glob->mpicomm, mi, mj, a, b,
                                       fclaw_opt->minlevel);
-        brick = fclaw2d_map_new_brick (domain, mi, mj, a, b);
+        brick = fclaw_map_new_2d_brick (domain, mi, mj, a, b);
         
         /* Square in [-1,1]x[-1,1], shifted by (1,1,0) */
         cont = fclaw2d_map_new_cart(brick,
@@ -82,7 +82,7 @@ void create_domain(fclaw_global_t *glob)
         domain =
             fclaw_domain_new_2d_brick (glob->mpicomm, mi, mj, a, b,
                                       fclaw_opt->minlevel);
-        brick = fclaw2d_map_new_brick (domain, mi, mj, a, b);
+        brick = fclaw_map_new_2d_brick (domain, mi, mj, a, b);
         cont = fclaw2d_map_new_bilinear (brick, 
                                          fclaw_opt->scale,
                                          fclaw_opt->shift, 
@@ -94,7 +94,7 @@ void create_domain(fclaw_global_t *glob)
     }
 
     /* Store mapping in the glob */
-    fclaw2d_map_store (glob, cont);            
+    fclaw_map_store (glob, cont);            
     
     /* Store domain in glob */
     fclaw_global_store_domain(glob, domain);

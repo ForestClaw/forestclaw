@@ -49,9 +49,9 @@ extern "C"
  *                      Must be destroyed by fclaw2d_p4est_map_destroy.
  *                      The connectivity must stay alive the whole time.
  */
-fclaw2d_map_context_t *fclaw2d_p4est_map_new (const p4est_connectivity_t *
+fclaw_map_context_t *fclaw2d_p4est_map_new (const p4est_connectivity_t *
                                               conn);
-void fclaw2d_p4est_map_destroy (fclaw2d_map_context_t * cont);
+void fclaw2d_p4est_map_destroy (fclaw_map_context_t * cont);
 
 #ifdef __cplusplus
 #if 0

@@ -230,7 +230,7 @@ fclaw_1to2 = {
     "fclaw2d_global_new_comm"              : "fclaw_global_new_comm",
     "fclaw2d_global_destroy"               : "fclaw_global_destroy",
     "fclaw2d_global_store_domain"          : "fclaw_global_store_domain",
-    "fclaw2d_global_store_map"             : "fclaw2d_map_store",
+    "fclaw2d_global_store_map"             : "fclaw_map_store",
     "fclaw2d_global_iterate_level"         : "fclaw_global_iterate_level",
     "fclaw2d_global_iterate_patches"       : "fclaw_global_iterate_patches",
     "fclaw2d_global_iterate_families"      : "fclaw_global_iterate_families",
@@ -716,12 +716,133 @@ fclaw_1to2 = {
     "fclaw2d_ray_vt"                               : "fclaw_ray_vt",
     "fclaw2d_ray_vtable_initialize"                : "fclaw_ray_vtable_initialize",
     "fclaw2d_ray_allocate_rays"                    : "fclaw_ray_allocate_rays",
-    "fclaw2d_ray_deallocate_rays"                  : "fclaw_ray_deallocate_rays"
+    "fclaw2d_ray_deallocate_rays"                  : "fclaw_ray_deallocate_rays",
+
+    #===== ./src/fclaw2d_map.h =====
+    "<fclaw2d_map.h>"                              : "<fclaw_map.h>",
+    "fclaw2d_map_context"                          : "fclaw_map_context",
+    "fclaw2d_map_context_t"                        : "fclaw_map_context_t",
+    "fclaw2d_map_store_t"                          : "fclaw_map_store_t",
+    "fclaw2d_get_map"                              : "fclaw_get_map",
+    "fclaw2d_map_query_t"                          : "fclaw_map_query_t",
+    "fclaw2d_map_c2m_t"                            : "fclaw_map_2d_c2m_t",
+    "fclaw2d_map_c2m_basis_t"                      : "fclaw_map_2d_c2m_basis_t",
+    "fclaw3dx_map_c2m_t"                           : "fclaw_map_3d_c2m_t",
+    "fclaw3dx_map_c2m_basis_t"                     : "fclaw_map_3d_c2m_basis_t",
+    "fclaw2d_map_destroy_t"                        : "fclaw_map_destroy_t",
+    "FCLAW2D_MAP_QUERY"                            : "FCLAW_MAP_QUERY",
+    "fclaw2d_map_query"                            : "fclaw_map_query",
+    "FCLAW2D_MAP_C2M"                              : "FCLAW_MAP_2D_C2M",
+    "fclaw2d_map_c2m"                              : "fclaw_map_2d_c2m",
+    "FCLAW2D_MAP_C2M_BASIS"                        : "FCLAW_MAP_2D_C2M_BASIS",
+    "fclaw2d_map_c2m_basis"                        : "fclaw_map_2d_c2m_basis",
+    "FCLAW3D_MAP_C2M"                              : "FCLAW_MAP_3D_C2M",
+    "fclaw3d_map_c2m"                              : "fclaw_map_3d_c2m",
+    "FCLAW3D_MAP_C2M_BASIS"                        : "FCLAW_MAP_3D_C2M_BASIS",
+    "fclaw3d_map_c2m_basis"                        : "fclaw_map_3d_c2m_basis",
+    "FCLAW2D_MAP_BRICK2C"                          : "FCLAW_MAP_2D_BRICK2C",
+    "fclaw2d_map_brick2c"                          : "fclaw_map_2d_brick2c",
+    "fclaw2d_map_destroy"                          : "fclaw_map_destroy",
+    "fclaw2d_map_new_nomap_brick"                  : "fclaw_map_new_nomap_brick",
+    "fclaw2d_map_pillowphere"                      : "fclaw_map_pillowsphere",
+    "fclaw2d_map_new_nomap"                        : "fclaw_map_new_nomap",
+
+    #===== ./src/fclaw2d_map_query_defs.h =====
+    "<fclaw2d_map_query_defs.h>"                   : "<fclaw_map_query_defs.h>",
+    "FCLAW2D_MAP_QUERY_IS_USED"                    : "FCLAW_MAP_QUERY_IS_USED",
+    "FCLAW2D_MAP_QUERY_IS_SCALEDSHIFT"             : "FCLAW_MAP_QUERY_IS_SCALEDSHIFT",
+    "FCLAW2D_MAP_QUERY_IS_AFFINE"                  : "FCLAW_MAP_QUERY_IS_AFFINE",
+    "FCLAW2D_MAP_QUERY_IS_NONLINEAR"               : "FCLAW_MAP_QUERY_IS_NONLINEAR",
+    "FCLAW2D_MAP_QUERY_IS_CART"                    : "FCLAW_MAP_QUERY_IS_CART",
+    "FCLAW2D_MAP_QUERY_IS_GRAPH"                   : "FCLAW_MAP_QUERY_IS_GRAPH",
+    "FCLAW2D_MAP_QUERY_IS_PLANAR"                  : "FCLAW_MAP_QUERY_IS_PLANAR",
+    "FCLAW2D_MAP_QUERY_IS_ALIGNED"                 : "FCLAW_MAP_QUERY_IS_ALIGNED",
+    "FCLAW2D_MAP_QUERY_IS_FLAT"                    : "FCLAW_MAP_QUERY_IS_FLAT",
+    "FCLAW2D_MAP_QUERY_IS_SPHERE"                  : "FCLAW_MAP_QUERY_IS_SPHERE",
+    "FCLAW2D_MAP_QUERY_IS_DISK"                    : "FCLAW_MAP_QUERY_IS_DISK",
+    "FCLAW2D_MAP_QUERY_IS_PILLOWDISK"              : "FCLAW_MAP_QUERY_IS_PILLOWDISK",
+    "FCLAW2D_MAP_QUERY_IS_SQUAREDDISK"             : "FCLAW_MAP_QUERY_IS_SQUAREDDISK",
+    "FCLAW2D_MAP_QUERY_IS_PILLOWSPHERE"            : "FCLAW_MAP_QUERY_IS_PILLOWSPHERE",
+    "FCLAW2D_MAP_QUERY_IS_CUBEDSPHERE"             : "FCLAW_MAP_QUERY_IS_CUBEDSPHERE",
+    "FCLAW2D_MAP_QUERY_IS_FIVEPATCH"               : "FCLAW_MAP_QUERY_IS_FIVEPATCH",
+    "FCLAW2D_MAP_QUERY_IS_BILINEAR"                : "FCLAW_MAP_QUERY_IS_BILINEAR",
+    "FCLAW2D_MAP_QUERY_IS_HEMISPHERE"              : "FCLAW_MAP_QUERY_IS_HEMISPHERE",
+    "FCLAW2D_MAP_QUERY_IS_TORUS"                   : "FCLAW_MAP_QUERY_IS_TORUS",
+    "FCLAW2D_MAP_QUERY_IS_BRICK"                   : "FCLAW_MAP_QUERY_IS_BRICK",
+    "FCLAW2D_MAP_QUERY_LAST"                       : "FCLAW_MAP_QUERY_LAST",
+
+    #===== ./src/fclaw2d_map_query.h =====
+    "<fclaw2d_map_query.h>"                        : "<fclaw_map_query.h>",
+    "FCLAW2D_MAP_IS_USED"                          : "FCLAW_MAP_IS_USED",
+    "FCLAW2D_MAP_IS_CART"                          : "FCLAW_MAP_IS_CART",
+    "FCLAW2D_MAP_IS_AFFINE"                        : "FCLAW_MAP_IS_AFFINE",
+    "FCLAW2D_MAP_IS_DISK"                          : "FCLAW_MAP_IS_DISK",
+    "FCLAW2D_MAP_IS_PILLOWDISK"                    : "FCLAW_MAP_IS_PILLOWDISK",
+    "FCLAW2D_MAP_IS_SQUAREDDISK"                   : "FCLAW_MAP_IS_SQUAREDDISK",
+    "FCLAW2D_MAP_IS_PILLOWSPHERE"                  : "FCLAW_MAP_IS_PILLOWSPHERE",
+    "FCLAW2D_MAP_IS_CUBEDSPHERE"                   : "FCLAW_MAP_IS_CUBEDSPHERE",
+    "FCLAW2D_MAP_IS_FLAT"                          : "FCLAW_MAP_IS_FLAT",
+    "FCLAW2D_MAP_IS_SPHERE"                        : "FCLAW_MAP_IS_SPHERE",
+    "FCLAW2D_MAP_IS_HEMISPHERE"                    : "FCLAW_MAP_IS_HEMISPHERE",
+    "FCLAW2D_MAP_IS_TORUS"                         : "FCLAW_MAP_IS_TORUS",
+    "FCLAW2D_MAP_IS_BRICK"                         : "FCLAW_MAP_IS_BRICK",
+    "fclaw2d_map_query_last"                       : "fclaw_map_query_last",
+    "fclaw2d_map_is_used"                          : "fclaw_map_is_used",
+    "fclaw2d_map_is_cart"                          : "fclaw_map_is_cart",
+    "fclaw2d_map_is_affine"                        : "fclaw_map_is_affine",
+    "fclaw2d_map_is_disk"                          : "fclaw_map_is_disk",
+    "fclaw2d_map_is_pillowdisk"                    : "fclaw_map_is_pillowdisk",
+    "fclaw2d_map_is_squareddisk"                   : "fclaw_map_is_squareddisk",
+    "fclaw2d_map_is_pillowsphere"                  : "fclaw_map_is_pillowsphere",
+    "fclaw2d_map_is_cubedsphere"                   : "fclaw_map_is_cubedsphere",
+    "fclaw2d_map_is_flat"                          : "fclaw_map_is_flat",
+    "fclaw2d_map_is_sphere"                        : "fclaw_map_is_sphere",
+    "fclaw2d_map_is_hemisphere"                    : "fclaw_map_is_hemisphere",
+    "fclaw2d_map_is_torus"                         : "fclaw_map_is_torus",
+    "fclaw2d_map_is_brick"                         : "fclaw_map_is_brick",
+
+    "MAPC2M_IDENTITY"                              : "FCLAW_MAP_2D_C2M_IDENTITY",
+    "MAPC2M_CART"                                  : "FCLAW_MAP_2D_C2M_CART",
+    "MAPC2M_PILLOWDISK"                            : "FCLAW_MAP_2D_C2M_PILLOWDISK",
+    "MAPC2M_PILLOWDISK5"                           : "FCLAW_MAP_2D_C2M_PILLOWDISK5",
+    "MAPC2M_SQUAREDDISK"                           : "FCLAW_MAP_2D_C2M_SQUAREDDISK",
+    "MAPC2M_FIVEPATCH"                             : "FCLAW_MAP_2D_C2M_FIVEPATCH",
+    "MAPC2M_CUBEDSPHERE"                           : "FCLAW_MAP_2D_C2M_CUBEDSPHERE",
+    "MAPC2M_PILLOWSPHERE"                          : "FCLAW_MAP_2D_C2M_PILLOWSPHERE",
+    "MAPC2M_TORUS"                                 : "FCLAW_MAP_2D_C2M_TORUS",
+    "MAPC2M_TWISTED_TORUS"                         : "FCLAW_MAP_2D_C2M_TWISTED_TORUS",
+    "MAPC2M_BRICK"                                 : "FCLAW_MAP_2D_C2M_BRICK",
+    "MAPC2M_LATLONG"                               : "FCLAW_MAP_2D_C2M_LATLONG",
+    "MAPC2M_ANNULUS"                               : "FCLAW_MAP_2D_C2M_ANNULUS",
+
+    "mapc2m_identity"                              : "fclaw_map_2d_c2m_identity",
+    "mapc2m_cart"                                  : "fclaw_map_2d_c2m_cart",
+    "mapc2m_pillowdisk"                            : "fclaw_map_2d_c2m_pillowdisk",
+    "mapc2m_pillowdisk5"                           : "fclaw_map_2d_c2m_pillowdisk5",
+    "mapc2m_squareddisk"                           : "fclaw_map_2d_c2m_squareddisk",
+    "mapc2m_fivepatch"                             : "fclaw_map_2d_c2m_fivepatch",
+    "mapc2m_cubedsphere"                           : "fclaw_map_2d_c2m_cubedsphere",
+    "mapc2m_pillowsphere"                          : "fclaw_map_2d_c2m_pillowsphere",
+    "mapc2m_torus"                                 : "fclaw_map_2d_c2m_torus",
+    "mapc2m_twisted_torus"                         : "fclaw_map_2d_c2m_twisted_torus",
+    "mapc2m_brick"                                 : "fclaw_map_2d_c2m_brick",
+    "mapc2m_latlong"                               : "fclaw_map_2d_c2m_latlong",
+    "mapc2m_annulus"                               : "fclaw_map_2d_c2m_annulus",
+
+    #===== ./src/fclaw2d_map_brick.h =====
+    "<fclaw2d_map_brick.h>"                        : "<fclaw_map_brick.h>",
+    "fclaw2d_map_brick_get_dim"                    : "fclaw_map_brick_get_2d_dim",
+    "FCLAW2D_MAP_BRICK_GET_DIM"                    : "FCLAW_MAP_BRICK_GET_2D_DIM",
+    "fclaw2d_block_ll"                             : "fclaw_block_ll",
+    "fclaw2d_block_ll_t"                           : "fclaw_block_ll_t",
+    "fclaw2d_map_new_brick"                        : "fclaw_map_new_2d_brick",
+    "fclaw2d_map_destroy_brick"                    : "fclaw_map_destroy_brick",
 
 }
 
 import glob
 import argparse
+import re
 try:
     import pygments
 except ModuleNotFoundError:
@@ -732,6 +853,17 @@ except ModuleNotFoundError:
 import pygments.lexers
 from pygments.token import Token
 
+def replace_preproc_identifiers(token, identifier_map):
+    # Function to replace each match
+    def replace_match(match):
+        identifier = match.group(0)
+        new_identifier = identifier_map.get(identifier, identifier)
+        return new_identifier
+
+    # Replace the identifiers based on the replacement map
+    new_token = re.sub(r'\b[A-Za-z_][A-Za-z0-9_]*\b', replace_match, token)
+    return new_token
+
 def replace_identifiers_and_includes(filepath, code, identifier_map):
     lexer = pygments.lexers.get_lexer_for_filename(filepath, stripnl=False, ensurenl=False)
     tokens = lexer.get_tokens(code)
@@ -740,7 +872,11 @@ def replace_identifiers_and_includes(filepath, code, identifier_map):
     changes = False
 
     for ttype, value in tokens:
-        if ttype in Token.Comment.PreprocFile:
+        if ttype in Token.Comment.Preproc:
+            new_value = replace_preproc_identifiers(value, identifier_map)
+            changes = changes or (new_value != value)
+            new_code += new_value
+        elif ttype in Token.Comment.PreprocFile:
             new_value = identifier_map.get(value, value)
             changes = changes or (new_value != value)
             new_code += new_value
@@ -753,27 +889,37 @@ def replace_identifiers_and_includes(filepath, code, identifier_map):
             
     return new_code, changes
 
-def process_directory(root_dir, identifier_map):
+def process_file(filepath, identifier_map):
+    # Read the existing code from the file
+    with open(filepath, 'r') as f:
+        old_code = f.read()
+    
+    # Replace the identifiers
+    new_code, changes = replace_identifiers_and_includes(filepath, old_code, identifier_map)
+
+    if changes:
+        print(f"Upadated   {filepath}...")
+        # Write the new code back to the file
+        with open(filepath, 'w') as f:
+            f.write(new_code)
+
+
+def process_directory(root_dir, identifier_map, excluded_files=[]):
     # Use glob to find all C++ files recursively.
-    for filepath in [f for f in glob.glob(f"{root_dir}/**/*", recursive=True) if f.lower().endswith(('.c', '.h', '.cpp', '.hpp', '.f', '.f90', '.cu'))]:
-        # Read the existing code from the file
-        with open(filepath, 'r') as f:
-            old_code = f.read()
+    for filepath in [f for f in glob.glob(f"{root_dir}/**/*", recursive=True) if f.lower().endswith(('.c', '.h', '.cpp', '.hpp', '.f', '.f90', '.cu')) and f not in excluded_files]:
+        process_file(filepath, identifier_map)
         
-        # Replace the identifiers
-        new_code, changes = replace_identifiers_and_includes(filepath, old_code, identifier_map)
-
-        if changes:
-            print(f"Upadated   {filepath}...")
-            # Write the new code back to the file
-            with open(filepath, 'w') as f:
-                f.write(new_code)
-
-
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="A simple script to demonstrate argparse.")
-    parser.add_argument("-d", "--directory", help="directory to recursively update files in", required=True)
+    parser.add_argument("-d", "--directory", help="directory to recursively update files in")
+    parser.add_argument("-f", "--files", nargs="+", help="files to convert")
+
     args = parser.parse_args()
     print("Processing files...")
-    process_directory(args.directory, fclaw_1to2)
+    if(args.directory is not None):
+        process_directory(args.directory, fclaw_1to2)
+    if(args.files is not None):
+        for file in args.files:
+            process_file(file, fclaw_1to2)
+
     print("Done!")

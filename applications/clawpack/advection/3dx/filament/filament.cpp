@@ -42,7 +42,7 @@ void create_domain(fclaw_global_t *glob)
     int minlevel = fclaw_opt->minlevel;
     int check = mi*mx*pow_int(2,minlevel);
 
-    fclaw2d_map_context_t *cont, *brick;
+    fclaw_map_context_t *cont, *brick;
     fclaw_domain_t *domain = NULL;
 
     fc3d_clawpack46_options_t *claw3_opt = fc3d_clawpack46_get_options(glob);
@@ -59,10 +59,10 @@ void create_domain(fclaw_global_t *glob)
             fclaw_domain_new_2d_brick (glob->mpicomm, mi, mj, a, b,
                                      fclaw_opt->minlevel);
         /* Size is set by [ax,bx] x [ay, by], set in .ini file */            
-        brick = fclaw2d_map_new_brick(domain,mi,mj,a,b);
+        brick = fclaw_map_new_2d_brick(domain,mi,mj,a,b);
 
         
-        cont = fclaw2d_map_new_nomap_brick(brick);
+        cont = fclaw_map_new_nomap_brick(brick);
         break;
 
     case 1:
@@ -75,7 +75,7 @@ void create_domain(fclaw_global_t *glob)
             fclaw_domain_new_2d_brick (glob->mpicomm, mi, mj, a, b,
                                      fclaw_opt->minlevel);
 
-        brick = fclaw2d_map_new_brick(domain,mi,mj,a,b);
+        brick = fclaw_map_new_2d_brick(domain,mi,mj,a,b);
 
         /* Square in [-1,1]x[-1,1], scaled/shifted to [0,1]x[0,1] */
         cont = fclaw2d_map_new_cart(brick,
@@ -109,7 +109,7 @@ void create_domain(fclaw_global_t *glob)
             fclaw_domain_new_2d_brick(glob->mpicomm, mi, mj, a, b,
                                      fclaw_opt->minlevel);
 
-        brick = fclaw2d_map_new_brick (domain, mi, mj, a, b);
+        brick = fclaw_map_new_2d_brick (domain, mi, mj, a, b);
 
         cont = fclaw2d_map_new_bilinear(brick, 
                                         fclaw_opt->scale,
@@ -125,7 +125,7 @@ void create_domain(fclaw_global_t *glob)
         filament_map_extrude(cont,user->maxelev);
 
     /* Store mapping in the glob */
-    fclaw2d_map_store (glob, cont);            
+    fclaw_map_store (glob, cont);            
 
     /* Store the domain in the glob */
     fclaw_global_store_domain(glob, domain);

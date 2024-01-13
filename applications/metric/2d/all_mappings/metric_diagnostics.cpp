@@ -29,7 +29,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_clawpatch.hpp>
 
 static
-double metric_surface_area(fclaw2d_map_context_t* cont)
+double metric_surface_area(fclaw_map_context_t* cont)
 {
     double exact_area;
 
@@ -126,7 +126,7 @@ void metric_diagnostics(fclaw2d_domain_t *domain, const double t)
     fclaw2d_domain_iterate_patches(domain,cb_total_area,(void *) &sum);
     sum = fclaw2d_domain_global_sum (domain, sum);
 
-    fclaw2d_map_context_t* cont = fclaw2d_domain_get_map_context(domain);
+    fclaw_map_context_t* cont = fclaw2d_domain_get_map_context(domain);
     double exact_area = metric_surface_area(cont);
 
     fclaw_global_productionf("%30s %24.16f\n","Total area",sum);

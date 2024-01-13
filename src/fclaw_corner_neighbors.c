@@ -27,7 +27,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw_block.h>
 #include <fclaw_ghost_fill.h>
-#include <fclaw2d_map_query.h>
+#include <fclaw_map_query.h>
 #include <fclaw_options.h>
 #include <fclaw_global.h>
 #include <fclaw_physical_bc.h>
@@ -239,8 +239,8 @@ void get_corner_neighbor(fclaw_global_t *glob,
     if(domain->refine_dim == 2)
     {
         //TODO 3d
-        fclaw2d_map_context_t* cont = fclaw2d_map_get(glob);
-        ispillowsphere =  FCLAW2D_MAP_IS_PILLOWSPHERE(&cont);    
+        fclaw_map_context_t* cont = fclaw_map_get(glob);
+        ispillowsphere =  FCLAW_MAP_IS_PILLOWSPHERE(&cont);    
     }
 
     fclaw_timer_start (&glob->timers[FCLAW_TIMER_NEIGHBOR_SEARCH]);

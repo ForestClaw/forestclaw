@@ -381,10 +381,10 @@ void create_domain(fclaw_global_t * glob)
 
     fclaw_domain_t *domain = fclaw_domain_new_unitsquare(glob->mpicomm,
                                                              fclaw_opt->minlevel);
-    fclaw2d_map_context_t *cont = fclaw2d_map_new_nomap();
+    fclaw_map_context_t *cont = fclaw_map_new_nomap();
 
     fclaw_global_store_domain(glob, domain);
-    fclaw2d_map_store(glob, cont);
+    fclaw_map_store(glob, cont);
 
     fclaw_domain_list_levels(domain, FCLAW_VERBOSITY_ESSENTIAL);
     fclaw_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);

@@ -28,7 +28,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw_diagnostics.h>
 #include <fclaw_options.h>
-#include <fclaw2d_map.h>
+#include <fclaw_map.h>
 #include <fclaw_domain.h>
 #include <fclaw_forestclaw.h>
 
@@ -175,9 +175,9 @@ void fclaw_finalize(fclaw_global_t* glob)
     fclaw_diagnostics_finalize(glob);
     if(glob->domain->refine_dim == 2)
     {
-        fclaw2d_map_context_t* map = fclaw2d_map_get(glob);
+        fclaw_map_context_t* map = fclaw_map_get(glob);
         if (map != NULL) {
-            fclaw2d_map_destroy(map);
+            fclaw_map_destroy(map);
         }
     }
     else

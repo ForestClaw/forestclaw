@@ -35,7 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw_domain.h>
 #include <fclaw_diagnostics.h>
-#include <fclaw2d_map.h>
+#include <fclaw_map.h>
 
 /* much of this will eventually move into fclaw_global.c */
 

@@ -38,7 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_physical_bc.h>
 #include <fclaw_ghost_fill.h>
 #include <fclaw_diagnostics.h>
-#include <fclaw2d_map.h>
+#include <fclaw_map.h>
 #include <fclaw_patch.h>
 #include <fclaw_domain.h>
 
@@ -82,7 +82,7 @@ void fclaw_initialize(fclaw_global_t *glob)
 	/* This mapping context is needed by fortran mapping functions */
     if((*domain)->refine_dim == 2)
     {
-	    fclaw2d_map_context_t *cont = fclaw2d_map_get(glob);
+	    fclaw_map_context_t *cont = fclaw_map_get(glob);
         //TODO set this this somewhere else
 	    FCLAW_MAP_SET_CONTEXT(&cont);
     }

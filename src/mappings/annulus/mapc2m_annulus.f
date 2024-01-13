@@ -1,4 +1,5 @@
-      subroutine mapc2m_annulus(blockno,xc,yc,xp,yp,zp,beta,theta)
+      subroutine fclaw_map_2d_c2m_annulus(
+     &      blockno,xc,yc,xp,yp,zp,beta,theta)
       implicit none
 
       integer blockno

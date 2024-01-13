@@ -34,9 +34,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_diagnostics.h>
 
 /* Some mapping functions */
-#include <fclaw2d_map_brick.h>
-#include <fclaw2d_map.h>
-#include <fclaw2d_map_query.h>
+#include <fclaw_map_brick.h>
+#include <fclaw_map.h>
+#include <fclaw_map_query.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -129,7 +129,7 @@ void gauge_initialize(fclaw_global_t* glob, void** acc)
 
           ----------------------------------------------------- */
 
-        fclaw2d_map_context_t* cont = fclaw2d_map_get(glob);
+        fclaw_map_context_t* cont = fclaw_map_get(glob);
 
         int num_blocks = glob->domain->num_blocks;
 
@@ -144,7 +144,7 @@ void gauge_initialize(fclaw_global_t* glob, void** acc)
         double x1 = 1;
         double y1 = 1;
 
-        int is_brick = FCLAW2D_MAP_IS_BRICK(&cont);
+        int is_brick = FCLAW_MAP_IS_BRICK(&cont);
         int mi = fclaw_opt->mi;
         int mj = fclaw_opt->mj;
 
@@ -172,8 +172,8 @@ void gauge_initialize(fclaw_global_t* glob, void** acc)
                 brick grid */ 
 
                 double z;
-                fclaw2d_map_c2m_nomap_brick(cont,nb,x0,y0,&xll,&yll,&z);
-                fclaw2d_map_c2m_nomap_brick(cont,nb,x1,y1,&xur,&yur,&z);                
+                fclaw_map_2d_c2m_nomap_brick(cont,nb,x0,y0,&xll,&yll,&z);
+                fclaw_map_2d_c2m_nomap_brick(cont,nb,x1,y1,&xur,&yur,&z);                
             }
             else
             {

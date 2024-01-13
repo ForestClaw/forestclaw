@@ -86,7 +86,7 @@ void overpressure_options_store (fclaw_global_t* glob, user_options_t* user);
 
 user_options_t* overpressure_get_options(fclaw_global_t* glob);
 
-void overpressure_map_extrude(fclaw2d_map_context_t* cont,
+void overpressure_map_extrude(fclaw_map_context_t* cont,
                               const double maxelev,
                               const int mapping,
                               const double minz,

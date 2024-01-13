@@ -35,7 +35,7 @@ void create_domain(fclaw2d_global_t* glob)
 
 	fclaw2d_domain_t *domain = fclaw2d_domain_new_unitsquare(glob->mpicomm, fclaw_opt->minlevel);
 
-	fclaw2d_map_context_t *cont = fclaw2d_map_new_nomap();
+	fclaw_map_context_t *cont = fclaw2d_map_new_nomap();
 
 	fclaw2d_global_store_domain(glob, domain);
 	fclaw2d_global_store_map(glob, cont);

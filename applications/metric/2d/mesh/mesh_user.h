@@ -60,7 +60,7 @@ void mesh_patch_setup(fclaw2d_domain_t *domain,
 const user_options_t* mesh_user_get_options(fclaw2d_global_t* glob);
 
 /* Mappings */
-fclaw2d_map_context_t* fclaw2d_map_new_nomap();
+fclaw_map_context_t* fclaw2d_map_new_nomap();
 
 #ifdef __cplusplus
 #if 0

@@ -27,7 +27,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "../all/advection_user.h"
 
-#include <fclaw2d_map.h>
+#include <fclaw_map.h>
 
 static
 void create_domain(fclaw_global_t *glob)
@@ -50,7 +50,7 @@ void create_domain(fclaw_global_t *glob)
 
     /* Mapped, multi-block domain */
     fclaw_domain_t         *domain;
-    fclaw2d_map_context_t    *cont = NULL;
+    fclaw_map_context_t    *cont = NULL;
     
     /* Get 2d mapping */
     const user_options_t *user_opt = disk_get_options(glob);
@@ -94,7 +94,7 @@ void create_domain(fclaw_global_t *glob)
     disk_map_extrude(cont,user_opt->maxelev);
 
     /* Store mapping in the glob */
-    fclaw2d_map_store (glob, cont);            
+    fclaw_map_store (glob, cont);            
 
     /* Store the domain in the glob */
     fclaw_global_store_domain(glob, domain);

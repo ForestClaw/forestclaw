@@ -85,7 +85,7 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, amr_options_t* gparms)
     /* Mapped, multi-block domain */
     p4est_connectivity_t     *conn = NULL;
     fclaw2d_domain_t         *domain;
-    fclaw2d_map_context_t    *cont = NULL;
+    fclaw_map_context_t    *cont = NULL;
 
     /* Map unit square to disk using mapc2m_disk.f */
     gparms->manifold = 0;

@@ -37,7 +37,7 @@
 #include <fclaw_convenience.h>
 #include <fclaw2d_metric.hpp>
 #include <fclaw2d_metric.h>
-#include <fclaw2d_map.h>
+#include <fclaw_map.h>
 #include <fclaw_options.h>
 #include <test.hpp>
 #include <test/test.hpp>
@@ -47,7 +47,7 @@ namespace{
 struct QuadDomain {
     fclaw_global_t* glob;
     fclaw_options_t fopts;
-    fclaw2d_map_context_t    *map;
+    fclaw_map_context_t    *map;
     fclaw_domain_t  *domain;
     fclaw_clawpatch_options_t* opts;
 
@@ -82,8 +82,8 @@ struct QuadDomain {
         domain = fclaw_domain_new_unitsquare(sc_MPI_COMM_WORLD, 1);
         fclaw_global_store_domain(glob, domain);
 
-        map = fclaw2d_map_new_nomap();
-        fclaw2d_map_store(glob,map);
+        map = fclaw_map_new_nomap();
+        fclaw_map_store(glob,map);
 
         fclaw_vtables_initialize(glob);
         fclaw_clawpatch_vtable_initialize(glob, 4);
@@ -103,7 +103,7 @@ struct QuadDomain {
         fclaw_patch_data_delete(glob, &domain->blocks[0].patches[2]);
         fclaw_patch_data_delete(glob, &domain->blocks[0].patches[3]);
         fclaw_clawpatch_options_destroy(opts);
-        fclaw2d_map_destroy(map);
+        fclaw_map_destroy(map);
         fclaw_domain_destroy(domain);
         fclaw_global_destroy(glob);
     }
@@ -111,7 +111,7 @@ struct QuadDomain {
 struct QuadDomainBrick {
     fclaw_global_t* glob;
     fclaw_options_t fopts;
-    fclaw2d_map_context_t* map;
+    fclaw_map_context_t* map;
     fclaw_domain_t *domain;
     fclaw_clawpatch_options_t* opts;
 
@@ -147,8 +147,8 @@ struct QuadDomainBrick {
         domain = fclaw_domain_new_2d_brick(sc_MPI_COMM_WORLD, fopts.mi, fopts.mj, 0,0,0);
         fclaw_global_store_domain(glob, domain);
 
-        map = fclaw2d_map_new_nomap();
-        fclaw2d_map_store(glob, map);
+        map = fclaw_map_new_nomap();
+        fclaw_map_store(glob, map);
 
         fclaw_vtables_initialize(glob);
         fclaw_clawpatch_vtable_initialize(glob, 4);
@@ -167,7 +167,7 @@ struct QuadDomainBrick {
         fclaw_patch_data_delete(glob, &domain->blocks[2].patches[0]);
         fclaw_patch_data_delete(glob, &domain->blocks[3].patches[0]);
         fclaw_clawpatch_options_destroy(opts);
-        fclaw2d_map_destroy(map);
+        fclaw_map_destroy(map);
         fclaw_domain_destroy(domain);
         fclaw_global_destroy(glob);
     }

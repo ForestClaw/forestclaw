@@ -31,8 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_global.h>
 #include <fclaw_domain.h>
 #include <fclaw_patch.h>
-#include <fclaw2d_map.h>
-#include <fclaw3d_map.h>
+#include <fclaw_map.h>
 #include <fclaw_convenience.h>
 #include <fclaw3d_metric.hpp>
 #include <fclaw3d_metric.h>
@@ -66,7 +65,6 @@ struct SinglePatchDomain {
     fclaw_global_t* glob;
     fclaw_options_t fopts;
     fclaw_domain_t *domain;
-    fclaw3d_map_context_t* map;
     fclaw_clawpatch_options_t* opts;
 
     SinglePatchDomain(){
@@ -119,7 +117,6 @@ struct OctDomain {
     fclaw_global_t* glob;
     fclaw_options_t fopts;
     fclaw_domain_t *domain;
-    fclaw3d_map_context_t* map;
     fclaw_clawpatch_options_t* opts;
 
     OctDomain(){
@@ -290,8 +287,8 @@ TEST_CASE("3d fclaw_clawpatch patch_build")
 	    fclaw_domain_t* domain = fclaw_domain_new_unitcube(sc_MPI_COMM_WORLD, 0);
 	    fclaw_global_store_domain(glob, domain);
 
-        fclaw2d_map_context_t* map = fclaw2d_map_new_nomap();
-        fclaw2d_map_store(glob, map);
+        fclaw_map_context_t* map = fclaw_map_new_nomap();
+        fclaw_map_store(glob, map);
 
         fclaw_vtables_initialize(glob);
         fclaw_clawpatch_vtable_initialize(glob, 4);
@@ -357,7 +354,7 @@ TEST_CASE("3d fclaw_clawpatch patch_build")
 
         fclaw_patch_data_delete(glob, &domain->blocks[0].patches[0]);
         fclaw_domain_destroy(domain);
-        fclaw2d_map_destroy(map);
+        fclaw_map_destroy(map);
         fclaw_global_destroy(glob);
     }
 }

@@ -64,7 +64,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_timeinterp.h>
 #include <fclaw_diagnostics.h>
 
-#include <fclaw2d_map_query.h>
+#include <fclaw_map_query.h>
 
 #include <fclaw_pointer_map.h>
 
@@ -244,12 +244,12 @@ void clawpatch_define(fclaw_global_t* glob,
         fclaw_patch_set_block_corner_count(glob,patch,icorner,0);
     }
 
-    fclaw2d_map_context_t* cont = fclaw2d_map_get(glob);
+    fclaw_map_context_t* cont = fclaw_map_get(glob);
 
     int is_brick;
     if(glob->domain->refine_dim == 2)
     {
-        is_brick = FCLAW2D_MAP_IS_BRICK(&cont);
+        is_brick = FCLAW_MAP_IS_BRICK(&cont);
     }else {
         //TODO mappings
         is_brick = (fclaw_opt->mi > 1) || (fclaw_opt->mj > 1) || (fclaw_opt->mk > 1);
@@ -289,8 +289,8 @@ void clawpatch_define(fclaw_global_t* glob,
             {
                 /* Scale to [0,1]x[0,1], based on blockno */
                 double z;
-                fclaw2d_map_c2m_nomap_brick(cont,cp->blockno,xl,yl,&xlower,&ylower,&z);
-                fclaw2d_map_c2m_nomap_brick(cont,cp->blockno,xu,yu,&xupper,&yupper,&z);
+                fclaw_map_2d_c2m_nomap_brick(cont,cp->blockno,xl,yl,&xlower,&ylower,&z);
+                fclaw_map_2d_c2m_nomap_brick(cont,cp->blockno,xu,yu,&xupper,&yupper,&z);
                 zlower = 0;
                 zupper = 1;
             }
