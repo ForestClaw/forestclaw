@@ -319,7 +319,7 @@ void fclaw_regrid(fclaw_global_t *glob)
     }
 
     /* User defined */
-    fclaw_after_regrid(glob);
+    fclaw_after_regrid(glob, have_new_refinement);
 
     /* Only if gauges count > 0 */
     fclaw_locate_gauges(glob);

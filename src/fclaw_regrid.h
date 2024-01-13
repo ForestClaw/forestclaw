@@ -67,8 +67,6 @@ void fclaw_regrid_set_neighbor_types(struct fclaw_global *glob);
 
 void fclaw_regrid(struct fclaw_global *glob);
 
-void fclaw_after_regrid(struct fclaw_global *glob);
-
 void fclaw_regrid_set_neighbor_types(struct fclaw_global *glob);
 
 

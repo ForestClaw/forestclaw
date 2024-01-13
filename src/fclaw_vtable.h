@@ -62,8 +62,9 @@ typedef void (*fclaw_output_frame_t)(struct fclaw_global * glob, int iframe);
  * @brief Called after each regridding
  *  
  * @param glob the global context
+ * @param have_new_refinement true if there is a new refinement
  */
-typedef void (*fclaw_after_regrid_t)(struct fclaw_global *glob);
+typedef void (*fclaw_after_regrid_t)(struct fclaw_global *glob, int have_new_refinement);
 
 /* ------------------------------------ vtable ---------------------------------------- */  
 /**
@@ -104,8 +105,9 @@ void fclaw_vtable_initialize(struct fclaw_global* glob);
  * @brief Called after each regridding
  * 
  * @param glob the global context
+ * @param have_new_refinement true if there is a new refinement
  */
-void fclaw_after_regrid(struct fclaw_global *glob);
+void fclaw_after_regrid(struct fclaw_global *glob, int have_new_refinement);
 
 #ifdef __cplusplus
 #if 0

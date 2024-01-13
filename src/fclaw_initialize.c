@@ -41,6 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_map.h>
 #include <fclaw_patch.h>
 #include <fclaw_domain.h>
+#include <fclaw_vtable.h>
 
 #if defined(_OPENMP)
 #include <omp.h>
@@ -241,7 +242,7 @@ void fclaw_initialize(fclaw_global_t *glob)
     fclaw_diagnostics_initialize(glob);
     fclaw_locate_gauges(glob);
 
-    fclaw_after_regrid(glob);
+    fclaw_after_regrid(glob, 1);
 
     /* Print global minimum and maximum levels */
     fclaw_global_infof("Global minlevel %d maxlevel %d\n",

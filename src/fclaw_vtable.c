@@ -52,12 +52,12 @@ fclaw_vtable_t* fclaw_vt(fclaw_global_t *glob)
 }
 
 
-void fclaw_after_regrid(fclaw_global_t *glob)
+void fclaw_after_regrid(fclaw_global_t *glob, int have_new_refinement)
 {
     fclaw_vtable_t *vt = fclaw_vt(glob);
     if (vt->after_regrid != NULL)
     {
-        vt->after_regrid(glob);
+        vt->after_regrid(glob, have_new_refinement);
     }
 }
 
