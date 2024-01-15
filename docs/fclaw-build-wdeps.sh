@@ -18,6 +18,9 @@ wget -N "https://github.com/cburstedde/p4est/raw/develop/doc/$BLP4"     && \
 source "$BLP4"                                          && \
 rm "$BLP4"                                              || exit 1
 
+# provide environment for the Fortran compile
+export LIBS="$LIBS -lgfortran"
+
 # clone, build and install ForestClaw
 git clone --depth 1 https://github.com/forestclaw/forestclaw.git -b develop && \
 cd forestclaw                                           && \
@@ -29,5 +32,5 @@ cd build                                                && \
 (make -j V=0 || make -j V=0 || make -j V=0)             && \
 make -j install V=0                                     && \
 cd ../../                                               && \
-rm -rf forestclaw.git                                   && \
+rm -rf forestclaw/.git                                  && \
 rm -r forestclaw                                        || bdie "ForestClaw"
