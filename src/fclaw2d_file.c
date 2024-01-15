@@ -1850,6 +1850,29 @@ fclaw2d_file_section_metadata_v1_t;
 
 /** currently unused */
 #if 0
+/** This function checks for successful completion and cleans up if required.
+ *
+ * \param[in,out]  file     The MPI file that will be closed in case of an error.
+ * \param[in]      eclass   The eclass that indicates if an error occured.
+ *                          \b eclass is a MPI, libsc or fclaw2d_file_v1 error
+ *                          code.
+ * \param[out]     errcode  The error code that is obtained by converting
+ *                          \b eclass to fclaw2d_file_v1 error code.
+ * @return                  -1 if \b eclass indicates an error,
+ *                          0 otherwise.
+ */
+static int
+fclaw2d_file_info_cleanup_v1 (sc_MPI_File *file, int eclass, int *errcode)
+{
+    if (!FCLAW2D_FILE_IS_SUCCESS_V1 (eclass))
+    {
+        fclaw2d_file_error_cleanup_v1 (file);
+        fclaw2d_file_error_code_v1 (eclass, errcode);
+        return -1;
+    }
+    return 0;
+}
+
 /** Read metadata information of a file written by a matching forest.
  * Matching refers to the global count of quadrants; partition is irrelevant.
  *
@@ -1901,7 +1924,6 @@ fclaw2d_file_info_v1 (p4est_t * p4est, const char *filename,
                       int *errcode)
 {
     int mpiret, eclass;
-    int retval;
     int count, count_error;
     long long_header;
     size_t current_size, num_pad_bytes;
@@ -1928,12 +1950,10 @@ fclaw2d_file_info_v1 (p4est_t * p4est, const char *filename,
     *errcode = eclass = sc_MPI_SUCCESS; /* MPI defines MPI_SUCCESS to equal 0. */
     file = sc_MPI_FILE_NULL;
 
-    if ((retval =
-         sc_io_open (p4est->mpicomm, filename, SC_IO_READ,
-                     sc_MPI_INFO_NULL, &file)) != sc_MPI_SUCCESS)
-    {
-    }
+    eclass = sc_io_open (p4est->mpicomm, filename, SC_IO_READ,
+                         sc_MPI_INFO_NULL, &file);
 
+    /* we do not use the general error handling since we can not close the file */
     if (!FCLAW2D_FILE_IS_SUCCESS_V1 (eclass))
     {
         *errcode = eclass;
@@ -1946,11 +1966,10 @@ fclaw2d_file_info_v1 (p4est_t * p4est, const char *filename,
     FCLAW_ASSERT (FCLAW2D_FILE_IS_SUCCESS_V1 (eclass));
     if (p4est->mpirank == 0)
     {
-        if ((retval = sc_io_read_at (file, 0, metadata,
+        if ((eclass = sc_io_read_at (file, 0, metadata,
                                      FCLAW2D_FILE_METADATA_BYTES_V1,
                                      sc_MPI_BYTE, &count)) != sc_MPI_SUCCESS)
         {
-            *errcode = eclass;
             /* There is no count error for a non-successful read. */
             count_error = 0;
         }
@@ -1961,10 +1980,9 @@ fclaw2d_file_info_v1 (p4est_t * p4est, const char *filename,
     }
     mpiret = sc_MPI_Bcast (&eclass, 1, sc_MPI_INT, 0, p4est->mpicomm);
     SC_CHECK_MPI (mpiret);
-    if (!FCLAW2D_FILE_IS_SUCCESS_V1 (eclass))
+    if (fclaw2d_file_info_cleanup_v1 (&file, eclass, errcode))
     {
-        fclaw2d_file_error_cleanup_v1 (&file);
-        fclaw2d_file_error_code_v1 (*errcode, errcode);
+        /* an error has occured and a clean up was performed  */
         return -1;
     }
     mpiret = sc_MPI_Bcast (&count_error, 1, sc_MPI_INT, 0, p4est->mpicomm);
@@ -1976,10 +1994,8 @@ fclaw2d_file_info_v1 (p4est_t * p4est, const char *filename,
             fclaw_errorf ("%s", FCLAW2D_FILE_STRING_V1
                           " file_info: read count error for file metadata reading");
         }
-        *errcode = FCLAW2D_FILE_ERR_COUNT_V1;
-        fclaw2d_file_error_cleanup_v1 (&file);
-        fclaw2d_file_error_code_v1 (*errcode, errcode);
-        return -1;
+        eclass = FCLAW2D_FILE_ERR_COUNT_V1;
+        return fclaw2d_file_info_cleanup_v1 (&file, eclass, errcode);
     }
 
     /* broadcast file metadata to all ranks and null-terminate it */
@@ -1995,9 +2011,8 @@ fclaw2d_file_info_v1 (p4est_t * p4est, const char *filename,
                                               &global_num_quadrants)) !=
         sc_MPI_SUCCESS)
     {
-        *errcode = FCLAW2D_FILE_ERR_FORMAT_V1;
-        fclaw2d_file_error_code_v1 (*errcode, errcode);
-        return fclaw2d_file_error_cleanup_v1 (&file);
+        eclass = FCLAW2D_FILE_ERR_FORMAT_V1;
+        return fclaw2d_file_info_cleanup_v1 (&file, eclass, errcode);
     }
 
     /* check global number of quadrants */
@@ -2008,9 +2023,8 @@ fclaw2d_file_info_v1 (p4est_t * p4est, const char *filename,
             fclaw_errorf ("%s", FCLAW2D_FILE_STRING_V1
                           " file_info: global number of quadrant mismatch");
         }
-        *errcode = FCLAW2D_FILE_ERR_FORMAT_V1;
-        fclaw2d_file_error_code_v1 (*errcode, errcode);
-        return fclaw2d_file_error_cleanup_v1 (&file);
+        eclass = FCLAW2D_FILE_ERR_FORMAT_V1;
+        return fclaw2d_file_info_cleanup_v1 (&file, eclass, errcode);
     }
 
     current_position =
@@ -2023,14 +2037,12 @@ fclaw2d_file_info_v1 (p4est_t * p4est, const char *filename,
         for (;;)
         {
             /* read block metadata for current record */
-            mpiret = sc_io_read_at (file, current_position, block_metadata,
+            eclass = sc_io_read_at (file, current_position, block_metadata,
                                     FCLAW2D_FILE_FIELD_HEADER_BYTES_V1,
                                     sc_MPI_BYTE, &count);
-            *errcode = eclass;
-            if (!FCLAW2D_FILE_IS_SUCCESS_V1 (eclass))
+            if (fclaw2d_file_info_cleanup_v1 (&file, eclass, errcode))
             {
-                fclaw2d_file_error_code_v1 (*errcode, errcode);
-                return fclaw2d_file_error_cleanup_v1 (&file);
+                return -1;
             }
             if (FCLAW2D_FILE_FIELD_HEADER_BYTES_V1 != count)
             {
@@ -2114,15 +2126,14 @@ fclaw2d_file_info_v1 (p4est_t * p4est, const char *filename,
                                                FCLAW2D_FILE_BYTE_DIV_V1, NULL,
                                                &num_pad_bytes);
             /* read padding bytes */
-            mpiret = sc_io_read_at (file,
+            eclass = sc_io_read_at (file,
                                     current_position +
                                     FCLAW2D_FILE_FIELD_HEADER_BYTES_V1 +
                                     current_size, block_metadata,
                                     num_pad_bytes, sc_MPI_BYTE, &count);
-            *errcode = eclass;
-            if (!FCLAW2D_FILE_IS_SUCCESS_V1 (eclass))
+            if (fclaw2d_file_info_cleanup_v1 (&file, eclass, errcode))
             {
-                return fclaw2d_file_error_cleanup_v1 (&file);
+                return -1;
             }
             /* check '\n' in padding bytes */
             if (block_metadata[0] != '\n'
