@@ -1854,11 +1854,11 @@ fclaw2d_file_section_metadata_v1_t;
  *
  * \param[in,out]  file     The MPI file that will be closed in case of an error.
  * \param[in]      eclass   The eclass that indicates if an error occured.
- *                          \b eclass is a MPI, libsc or fclaw2d_file_v1 error
+ *                          \b eclass is an MPI, libsc or fclaw2d_file_v1 error
  *                          code.
  * \param[out]     errcode  The error code that is obtained by converting
  *                          \b eclass to fclaw2d_file_v1 error code.
- * @return                  -1 if \b eclass indicates an error,
+ * \return                  -1 if \b eclass indicates an error,
  *                          0 otherwise.
  */
 static int
