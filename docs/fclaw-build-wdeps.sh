@@ -28,7 +28,7 @@ cd forestclaw                                           && \
 mkdir build                                             && \
 cd build                                                && \
 ../configure $CONFIG --with-sc="$PREFIX/libsc" --with-p4est="$PREFIX/p4est" \
-                     --prefix="$PREFIX/fclaw"           && \
+                     --prefix="$PREFIX/fclaw" --enable-clawpack         && \
 (make -j V=0 || make -j V=0 || make -j V=0)             && \
 make -j install V=0                                     && \
 cd ../../                                               && \
