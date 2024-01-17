@@ -12,3 +12,6 @@
 [submodule "cub"]
 	path = cub
 	url = ./cub
+[submodule "thunderegg"]
+	path = thunderegg
+	url = https://github.com/scivision/thunderegg

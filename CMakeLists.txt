@@ -41,18 +41,14 @@ endif()
 # --- p4est, sc
 include(cmake/GitSubmodule.cmake)
 
-git_submodule(${CMAKE_CURRENT_SOURCE_DIR}/sc)
-FetchContent_Declare(SC SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/sc)
-FetchContent_MakeAvailable(SC)
-
 git_submodule(${CMAKE_CURRENT_SOURCE_DIR}/p4est)
-FetchContent_Declare(P4EST SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/p4est)
-FetchContent_MakeAvailable(P4EST)
+add_subdirectory(p4est)
 
 # --- ThunderEgg
 if(thunderegg)
-  include(cmake/ThunderEgg.cmake)
-endif(thunderegg)
+  git_submodule(${CMAKE_CURRENT_SOURCE_DIR}/thunderegg)
+  add_subdirectory(thunderegg)
+endif()
 
 # --- configure
 

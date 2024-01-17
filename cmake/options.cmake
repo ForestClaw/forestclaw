@@ -7,6 +7,9 @@ option(geoclaw "build Geoclaw")
 option(cudaclaw "build CudaClaw")
 option(thunderegg "build ThunderEgg")
 
+set(mpi true)
+# needed by ThunderEgg, P4EST, Libsc
+
 option(CMAKE_TLS_VERIFY "verify TLS cert" on)
 
 # --- default install directory under build/local
