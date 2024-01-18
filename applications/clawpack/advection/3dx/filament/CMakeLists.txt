@@ -1,4 +1,4 @@
-set(all ${PROJECT_SOURCE_DIR}/clawpack/advection/3d/all)
+set(all ${PROJECT_SOURCE_DIR}/clawpack/advection/3dx/all)
 set(all2d ${PROJECT_SOURCE_DIR}/clawpack/advection/2d/all)
 
 add_library(filament3dx_f OBJECT 
@@ -36,5 +36,5 @@ target_link_libraries(filament3dx PRIVATE
  FORESTCLAW::CLAWPACK3_46
 )
 
-add_test(NAME clawpack_advection_3d_filament COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/regressions.sh WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-set_tests_properties(clawpack_advection_3d_filament PROPERTIES ENVIRONMENT "${FCLAW_TEST_ENVIRONMENT}")
+add_test(NAME clawpack_advection_3dx_filament COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/regressions.sh WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+set_tests_properties(clawpack_advection_3dx_filament PROPERTIES ENVIRONMENT "${FCLAW_TEST_ENVIRONMENT}")

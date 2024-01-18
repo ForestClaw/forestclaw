@@ -1,9 +1,9 @@
 #!/bin/sh
 # absolute path to application we are testing
-application=$FCLAW_APPLICATIONS_BUILD_DIR/clawpack/euler/3d/overpressure/overpressure
+application=$FCLAW_APPLICATIONS_BUILD_DIR/clawpack/euler/3dx/overpressure/overpressure
 
 # change to source dir for working directory
-cd $FCLAW_APPLICATIONS_SRC_DIR/clawpack/euler/3d/overpressure/
+cd $FCLAW_APPLICATIONS_SRC_DIR/clawpack/euler/3dx/overpressure/
 
 # run programs, exit script with nonzero on failure (or else script will exit with value of last program run)
 
