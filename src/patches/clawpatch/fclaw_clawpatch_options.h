@@ -88,6 +88,8 @@ struct fclaw_clawpatch_options
     int save_aux;             /**< Save the aux array when retaking a time step */
 
 
+    int vtk_patch_threshold; /**< The buffer threshold for vtk output */
+
     int is_registered; /**< true if options have been registered */
 
 };

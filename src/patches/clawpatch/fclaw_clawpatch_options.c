@@ -92,6 +92,11 @@ clawpatch_register(fclaw_clawpatch_options_t *clawpatch_options,
                          &clawpatch_options->save_aux,0,
                          "Save aux variables when re-taking a time step [F]");
 
+    /* ---------------------- vtk options -------------------------- */
+    sc_options_add_int(opt, 0, "vtk-patch-threshold", 
+                       &clawpatch_options->vtk_patch_threshold, 0,
+                       "Number of patches to buffer before each write in vtk output. 0 means buffer all patches before writing [0]");
+
     /* Set verbosity level for reporting timing */
     sc_keyvalue_t *kv = clawpatch_options->kv_refinement_criteria;
     sc_options_add_keyvalue (opt, 0, "refinement-criteria", 
@@ -143,6 +148,13 @@ clawpatch_check(fclaw_clawpatch_options_t *clawpatch_opt)
         fclaw_global_essentialf("Clawpatch error : Default refinement criteria " \
                                 "must be one of 'value','difference','minmax', " \
                                 "'gradient', or 'user'.\n");
+        return FCLAW_EXIT_ERROR;            
+    }
+
+    if (clawpatch_opt->vtk_patch_threshold < 0)
+    {
+        fclaw_global_essentialf("Clawpatch error : vtk-patch-threshold must be " \
+                                "non-negative.\n");
         return FCLAW_EXIT_ERROR;            
     }
 

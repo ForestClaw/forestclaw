@@ -193,7 +193,7 @@ fclaw2d_vtk_write_header (fclaw_domain_t * domain, fclaw2d_vtk_state_t * s)
  *
  * This function assumes that the buffer consists of patch data of the size
  * \b psize_field. This means it must hold
- * \b s->sink->buffer_bytes % \b s->sink->buffer_bytes == 0.
+ * \b s->sink->buffer_bytes % \b psize_field == 0.
  *
  * \param [in,out]  s               The VTK state.
  * \param [in]      psize_field     The number of bytes, which are intended to
@@ -202,7 +202,7 @@ fclaw2d_vtk_write_header (fclaw_domain_t * domain, fclaw2d_vtk_state_t * s)
  *                                  stored in the buffer + 1 is greater than
  *                                  \b threshold, the buffer is flushed to disk.
  *                                  Then the new patch is added to the buffer.
- *                                  -1 means that there is no threshold and
+ *                                  0 means that there is no threshold and
  *                                  the data just added to \b s->sink.
  */
 static void
@@ -710,9 +710,12 @@ fclaw_vtk_write_file (int dim, fclaw_global_t * glob, const char *basename,
                       int meqn,
                       double vtkspace, int vtkwrite,
                       fclaw_vtk_patch_data_t coordinate_cb,
-                      fclaw_vtk_patch_data_t value_cb)
+                      fclaw_vtk_patch_data_t value_cb,
+                      int patch_threshold)
 {
     fclaw_domain_t *domain = glob->domain;
+
+    FCLAW_ASSERT (patch_threshold >= 0);
 
     int retval, gretval;
     int mpiret;
@@ -779,10 +782,8 @@ fclaw_vtk_write_file (int dim, fclaw_global_t * glob, const char *basename,
 
     s->buf = NULL;
     s->sink = NULL;
-    /* The threshold may be adjusted; see the documentation of
-     * fclaw2d_vtk_state_t for further information.
-     */
-    s->patch_threshold = 0;
+    /* See the documentation of fclaw2d_vtk_state_t for further information. */
+    s->patch_threshold = patch_threshold;
     s->num_buffered_patches = 0;
 
     /* write header meta data and check for error */
@@ -825,10 +826,11 @@ fclaw_vtk_write_2d_file (fclaw_global_t * glob, const char *basename,
                         int meqn,
                         double vtkspace, int vtkwrite,
                         fclaw_vtk_patch_data_t coordinate_cb,
-                        fclaw_vtk_patch_data_t value_cb)
+                        fclaw_vtk_patch_data_t value_cb,
+                        int patch_threshold)
 {
     return fclaw_vtk_write_file(2,glob,basename,mx,my,0,meqn,vtkspace,vtkwrite,
-                                coordinate_cb,value_cb);
+                                coordinate_cb,value_cb, patch_threshold);
 }
 
 int
@@ -837,10 +839,11 @@ fclaw_vtk_write_3d_file (fclaw_global_t * glob, const char *basename,
                         int meqn,
                         double vtkspace, int vtkwrite,
                         fclaw_vtk_patch_data_t coordinate_cb,
-                        fclaw_vtk_patch_data_t value_cb)
+                        fclaw_vtk_patch_data_t value_cb,
+                        int patch_threshold)
 {
     return fclaw_vtk_write_file(3,glob,basename,mx,my,mz,meqn,vtkspace,vtkwrite,
-                                coordinate_cb,value_cb);
+                                coordinate_cb,value_cb, patch_threshold);
 }
 
 static void
@@ -1050,7 +1053,8 @@ void fclaw_clawpatch_output_vtk_to_file (fclaw_global_t * glob, const char* file
                                 clawpatch_opt->meqn,
                                 fclaw_opt->vtkspace, 0,
                                 fclaw2d_output_vtk_coordinate_cb,
-                                fclaw2d_output_vtk_value_cb);
+                                fclaw2d_output_vtk_value_cb,
+                                clawpatch_opt->vtk_patch_threshold);
 
     }
     else 
@@ -1062,7 +1066,8 @@ void fclaw_clawpatch_output_vtk_to_file (fclaw_global_t * glob, const char* file
                                 clawpatch_opt->meqn,
                                 fclaw_opt->vtkspace, 0,
                                 fclaw3d_output_vtk_coordinate_cb,
-                                fclaw3d_output_vtk_value_cb);
+                                fclaw3d_output_vtk_value_cb,
+                                clawpatch_opt->vtk_patch_threshold);
     }
 }
 void fclaw_clawpatch_output_vtk (fclaw_global_t * glob, int iframe)

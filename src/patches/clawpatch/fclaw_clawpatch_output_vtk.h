@@ -73,6 +73,9 @@ typedef void (*fclaw_vtk_patch_data_t) (struct fclaw_global * glob,
  *                         1 for MPI_File_write (less memory usage).
  * @param[in] coordniate_cb the callback to write a patch's coordinate binary data
  * @param[in] value_cb the callback to write a patch's value binary data
+ * @param[in] patch_threshold The maximal number of buffered patches.
+ *                            0 means that an unlimited number of patches is
+ *                            buffered and flushed to disk at the end.
  * @return          0 if successful, negative otherwise.
  *                  Collective with identical value on all ranks.
  */
@@ -82,8 +85,8 @@ fclaw_vtk_write_2d_file (struct fclaw_global * glob, const char *basename,
                          int meqn,
                          double vtkspace, int vtkwrite,
                          fclaw_vtk_patch_data_t coordinate_cb,
-                         fclaw_vtk_patch_data_t value_cb);
-
+                         fclaw_vtk_patch_data_t value_cb,
+                         int patch_threshold);
 /** 
  * Write a file in VTK format for the whole domain in parallel.
  * @param[in] glob the global context
@@ -97,6 +100,9 @@ fclaw_vtk_write_2d_file (struct fclaw_global * glob, const char *basename,
  *                         1 for MPI_File_write (less memory usage).
  * @param[in] coordniate_cb the callback to write a patch's coordinate binary data
  * @param[in] value_cb the callback to write a patch's value binary data
+ * @param[in] patch_threshold The maximal number of buffered patches.
+ *                            0 means that an unlimited number of patches is
+ *                            buffered and flushed to disk at the end.
  * @return          0 if successful, negative otherwise.
  *                  Collective with identical value on all ranks.
  */
@@ -106,7 +112,8 @@ fclaw_vtk_write_3d_file (struct fclaw_global * glob, const char *basename,
                          int meqn,
                          double vtkspace, int vtkwrite,
                          fclaw_vtk_patch_data_t coordinate_cb,
-                         fclaw_vtk_patch_data_t value_cb);
+                         fclaw_vtk_patch_data_t value_cb,
+                         int patch_threshold);
 
 /**
  * @brief Output vtu file
@@ -115,7 +122,6 @@ fclaw_vtk_write_3d_file (struct fclaw_global * glob, const char *basename,
  * @param filename the filename to output to
  */
 void fclaw_clawpatch_output_vtk_to_file (struct fclaw_global* glob, const char* filename);
-
 
 /**
  * @brief Output vtu file
