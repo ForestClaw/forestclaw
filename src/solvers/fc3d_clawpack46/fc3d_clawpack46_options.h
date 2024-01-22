@@ -60,7 +60,6 @@ struct fc3d_clawpack46_options
     /* Output */
     int ascii_out;
     int vtk_out;
-    int vtpd_out;
 
     int is_registered;
 };

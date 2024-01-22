@@ -27,7 +27,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_clawpatch.h>
 #include <fclaw_ghost_fill.h>
 #include <fclaw_clawpatch_options.h>
-#include <fclaw_clawpatch_output_vtpd.h>
+#include <fclaw_clawpatch_output_vtk.h>
 #include <fclaw3d_clawpatch46_fort.h>
 #include <fclaw_clawpatch_output_ascii.h>
 #include <fclaw_global.h>
@@ -359,8 +359,8 @@ void test_ghost_fill(TestData& tdata, TestData& tdata_out, std::string output_fi
     //write output if --vtk option passed to test runner
     if(test_output_vtk())
     {
-        INFO("Test failed output error to " << output_filename << ".vtpd");
-        fclaw_clawpatch_output_vtpd_to_file(tdata_out.glob,output_filename.c_str());
+        INFO("Test failed output error to " << output_filename << ".vtu");
+        fclaw_clawpatch_output_vtk_to_file(tdata_out.glob,output_filename.c_str());
     }
 }
 
