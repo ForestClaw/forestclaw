@@ -23,33 +23,10 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef REFINE_DIM
-#define REFINE_DIM 2
-#endif
-
-#ifndef PATCH_DIM
-#define PATCH_DIM 2
-#endif
-
-
-#if PATCH_DIM == 2
-
 #include <fclaw2d_global.h>
 #include <fclaw2d_map.h>
 #include <fclaw2d_map_query.h>  /* Needed for pillowsphere query */
 
-#elif PATCH_DIM == 3 && REFINE_DIM == 2
-
-#include <fclaw2d_global.h>
-#include <fclaw3dx_map.h>
-//#include <fclaw3d_map_query.h>  /* Needed for pillowsphere query */
-//#include <_fclaw2d_to_fclaw3d.h>
-
-#else /* this is full 3D */
-#include <fclaw3d_map.h>
-#endif
-
-#ifndef P4_TO_P8
 
 /* This function can be called from Fortran inside of ClawPatch. */
 void
@@ -141,8 +118,6 @@ void FCLAW2D_MAP_BRICK2C (fclaw2d_map_context_t ** pcont, int *blockno,
     }
 }
 
-#endif /* !P4_TO_P8 */
-
 /* This function is expected to be called from C or C++. */
 void
 fclaw2d_map_destroy (fclaw2d_map_context_t * cont)
@@ -162,8 +137,6 @@ fclaw2d_map_destroy (fclaw2d_map_context_t * cont)
         cont->destroy (cont);
     }
 }
-
-#ifndef P4_TO_P8
 
 #if 0
 /* Cubed sphere surface.  Matches p4est_connectivity_new_cubed (). */
@@ -560,4 +533,3 @@ void rotate_map(fclaw2d_map_context_t* cont, double *xp, double *yp, double *zp)
     *zp = vrot[2];
 }
 
-#endif /* !P4_TO_P8 */
