@@ -287,7 +287,7 @@ static int fclaw2d_file_error_string_v1 (int errclass, char *string,
  * same label. This leads to correct error managing.
  */
 #define FCLAW2D_FILE_CHECK_MPI_V1(errcode, user_msg) do {FCLAW2D_FILE_CHECK_VERBOSE_V1 (errcode, user_msg);\
-                                                        if (!FCLAW2D_FILE_IS_SUCCESS_V1 (mpiret)) {\
+                                                        if (!FCLAW2D_FILE_IS_SUCCESS_V1 (errcode)) {\
                                                         goto fclaw2d_read_write_error;}} while (0)
 
 /** Use this macro after \ref FCLAW2D_FILE_CHECK_MPI_V1 *directly* after the end of
@@ -711,7 +711,7 @@ fclaw2d_file_open_create_v1 (p4est_t * p4est, const char *filename,
                                             FCLAW2D_FILE_BYTE_DIV_V1, count);
     }
 
-    /* error sync to using file context communicator  */
+    /* error sync using file context communicator  */
     FCLAW2D_HANDLE_MPI_ERROR_V1 (mpiret, file_context, p4est->mpicomm,
                                  errcode);
     FCLAW2D_HANDLE_MPI_COUNT_ERROR_V1 (count_error, file_context, errcode);
@@ -1856,7 +1856,7 @@ fclaw2d_file_section_metadata_v1_t;
 /** This function checks for successful completion and cleans up if required.
  *
  * \param[in,out]  file     The MPI file that will be closed in case of an error.
- * \param[in]      eclass   The eclass that indicates if an error occured.
+ * \param[in]      eclass   The eclass that indicates if an error occurred.
  *                          \b eclass is an MPI, libsc or fclaw2d_file_v1 error
  *                          code.
  * \param[out]     errcode  The error code that is obtained by converting
@@ -1985,7 +1985,7 @@ fclaw2d_file_info_v1 (p4est_t * p4est, const char *filename,
     SC_CHECK_MPI (mpiret);
     if (fclaw2d_file_info_cleanup_v1 (&file, eclass, errcode))
     {
-        /* an error has occured and a clean up was performed  */
+        /* an error has occurred and a clean up was performed  */
         return -1;
     }
     mpiret = sc_MPI_Bcast (&count_error, 1, sc_MPI_INT, 0, p4est->mpicomm);
