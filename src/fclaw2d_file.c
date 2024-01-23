@@ -689,6 +689,8 @@ fclaw2d_file_open_create_v1 (p4est_t * p4est, const char *filename,
     FCLAW2D_FILE_CHECK_OPEN_V1 (mpiret, file_context, "File open create",
                                 errcode);
 
+    /* comm of the file context is needed for parallel error management */
+    file_context->mpicomm = p4est->mpicomm;
     if (p4est->mpirank == 0)
     {
         /* write padded fclaw2d-defined header */
@@ -709,10 +711,7 @@ fclaw2d_file_open_create_v1 (p4est_t * p4est, const char *filename,
                                             FCLAW2D_FILE_BYTE_DIV_V1, count);
     }
 
-    /* initialize the file context */
-    file_context->mpicomm = p4est->mpicomm;
-
-    /* postponed error sync to use file context communicator  */
+    /* error sync to using file context communicator  */
     FCLAW2D_HANDLE_MPI_ERROR_V1 (mpiret, file_context, p4est->mpicomm,
                                  errcode);
     FCLAW2D_HANDLE_MPI_COUNT_ERROR_V1 (count_error, file_context, errcode);
