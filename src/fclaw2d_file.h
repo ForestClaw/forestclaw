@@ -50,7 +50,7 @@ extern "C"
 /** Error values for fclaw2d_file functions.
  * In the future we may add further error codes. Therefore, the error codes
  * should only be used by the enum but not by the explicit numeric values since
- * these explicit numeric values may change.  
+ * these explicit numeric values may change.
  */
 typedef enum fclaw2d_file_error
 {

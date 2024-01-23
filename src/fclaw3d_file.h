@@ -50,7 +50,7 @@ extern "C"
 /** Error values for fclaw2d_file functions.
  * In the future we may add further error codes. Therefore, the error codes
  * should only be used by the enum but not by the explicit numeric values since
- * these explicit numeric values may change.  
+ * these explicit numeric values may change.
  */
 typedef enum fclaw3d_file_error
 {
@@ -150,16 +150,12 @@ fclaw3d_file_context_t *fclaw3d_file_open_write (const char *filename,
  * Without MPI I/O the function may abort on file system dependent
  * errors.
  *
- * \param [in]     fc           Context previously created by \ref
- *                              fclaw3d_file_open_write.  In this function the
- *                              file context \b fc is only an input parameter
- *                              since it is only used to derive the filename of
- *                              partition file that will be created and to point
- *                              to the domain, which defines partition that will
- *                              be written to disk. See the description of the
- *                              function above for more details.
- * \param [in]     user_string  A NUL-terminated user string that is written to the
- *                              partition file header having \ref
+ * \param [in]     filename     Path to partition file base name that is to be
+ *                              created. This means that the user shall not pass
+ *                              the file extension since the partition file
+ *                              extension is specified by fclaw3d_file as '.fp3d'.
+ * \param [in]     user_string  A NUL-terminated user string that is written to
+ *                              the partition file header having \ref
  *                              FCLAW3D_FILE_USER_STRING_BYTES bytes including
  *                              the NUL-termination. Shorter user strings are
  *                              padded by spaces in the file header.
@@ -170,7 +166,10 @@ fclaw3d_file_context_t *fclaw3d_file_open_write (const char *filename,
  *                              does not refer to the passed but it refers to
  *                              the internal file context used for for the
  *                              partition file.
- * \return                      Always the input file context.
+ * \return                      0 for a successful write of the partition file.
+ *                              -1 in case of an error. See also \b errcode
+ *                              to examine the error of the partition file
+ *                              I/O process.
  */
 int fclaw3d_file_write_partition (const char *filename, const char *user_string,
                                   fclaw3d_domain_t *domain, int *errcode);
