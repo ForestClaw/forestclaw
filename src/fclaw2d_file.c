@@ -309,6 +309,18 @@ static int fclaw2d_file_error_string_v1 (int errclass, char *string,
 /** A macro to check for file write related count errors.
  * These errors are handled as fatal errors. The macro is only applicable for
  * collective calls.
+ *
+ * This macro is only allowed to be used in combination with the macro pair
+ * \ref FCLAW2D_FILE_CHECK_MPI_V1 and \ref FCLAW2D_HANDLE_MPI_ERROR_V1 since
+ * the check count macro pair relies on the goto label used by the mpi error
+ * pair of macros.
+ *
+ * The reason for this is that by the MPI standard we must ensure that the
+ * broadcasts for error sync are called in the same sequence on all processes.
+ * This is done by jumping to the MPI error handle even in the case of a count
+ * error. This works since in this case the handling of the MPI error is passed
+ * without throwing an error since we only call \ref FCLAW2D_FILE_CHECK_COUNT_V1
+ * after \ref FCLAW2D_FILE_CHECK_MPI_V1.
  */
 #define FCLAW2D_FILE_CHECK_COUNT_V1(icount,ocount,fc,cperrcode) do { int fclaw2d_count_error_global, fclaw2d_mpiret,\
                                                  fclaw2d_rank;                                               \
@@ -336,15 +348,25 @@ static int fclaw2d_file_error_string_v1 (int errclass, char *string,
 #define FCLAW2D_FILE_CHECK_COUNT_SERIAL_V1(icount, ocount) do {if (((int) icount) != ocount) {                        \
                                                         SC_LERRORF ("Count error on rank 0 at %s:%d.\n",__FILE__,\
                                                         __LINE__);                                               \
-                                                        goto fclaw2d_write_count_error;}} while (0)
+                                                        goto fclaw2d_read_write_error;}} while (0)
 
 /** A macro to handle a file write error that occurred on rank 0 but need to be
  * handled collectivly. We need count_error as input since we need a variable to
  * broadcast the count error status. count_error is true if there is a count error
  * and false otherwise.
+ *
+ * This macro must always be used after \ref FCLAW2D_HANDLE_MPI_ERROR_V1 since
+ * the two macros share the goto label.
+ *
+ * The reason for this is that by the MPI standard we must ensure that the
+ * broadcasts for error sync are called in the same sequence on all processes.
+ * This is done by jumping to the MPI error handle even in the case of a count
+ * error. This works since in this case the handling of the MPI error is passed
+ * without throwing an error since we only call \ref FCLAW2D_HANDLE_MPI_COUNT_ERROR_V1
+ * after \ref FCLAW2D_HANDLE_MPI_ERROR_V1.
  */
 /* Remark: Since we use a declaration after the label we need an empty statement. */
-#define FCLAW2D_HANDLE_MPI_COUNT_ERROR_V1(count_error,fc,cperrcode) do {fclaw2d_write_count_error: ;\
+#define FCLAW2D_HANDLE_MPI_COUNT_ERROR_V1(count_error,fc,cperrcode) do {\
                                                     int fclaw2d_mpiret_handle = sc_MPI_Bcast (&count_error, 1, sc_MPI_INT, 0,\
                                                     fc->mpicomm);\
                                                     SC_CHECK_MPI (fclaw2d_mpiret_handle);\
