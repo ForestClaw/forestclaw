@@ -13,11 +13,11 @@ endif
 # initialize empty variables
 AM_CPPFLAGS =
 AM_FFLAGS =
+AM_LDFLAGS =
 CLEANFILES =
 DISTCLEANFILES =
 EXTRA_DIST =
 LDADD = $(FLIBS)
-LINT_CSOURCES =
 TESTS = 
 bin_PROGRAMS =
 check_PROGRAMS =
