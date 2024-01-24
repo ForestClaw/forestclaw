@@ -67,7 +67,7 @@ check_fclaw2d_file_error_code (int errcode, const char *str)
          */
         /* examine the error code */
         retval = fclaw2d_file_error_string (errcode, err_str, &reslen);
-        /* check for error in the error sting function */
+        /* check for error in the error string function */
         SC_CHECK_ABORTF (!retval, "%s: error string function not successful",
                          str);
         SC_ABORTF ("%s: %*.*s", str, reslen, reslen, err_str);
@@ -129,8 +129,8 @@ void run_program(fclaw2d_global_t* glob)
     check_fclaw2d_file_error_code (errcode, "file open write");
 
     retval = fclaw2d_file_write_partition ("swirl_io_test_partition",
-                                           "Test partition write", glob->domain,
-                                           &errcode);
+                                           "Test partition write",
+                                           glob->domain, &errcode);
     check_fclaw2d_file_error_code (errcode, "file write partition");
 
     /* write a block to the file */
@@ -182,7 +182,7 @@ void run_program(fclaw2d_global_t* glob)
     FCLAW_EXECUTE_ASSERT_FALSE (retval);
 
     fc = fclaw2d_file_open_read ("swirl_io_test", read_user_string,
-                                 glob->domain->mpicomm, 0, &read_domain,
+                                 glob->domain->mpicomm, NULL, &read_domain,
                                  &errcode);
     check_fclaw2d_file_error_code (errcode, "file open read");
 
@@ -227,8 +227,8 @@ void run_program(fclaw2d_global_t* glob)
     /* sanity check of read domain */
     FCLAW_ASSERT (p4est_checksum (((p4est_wrap_t *) read_domain->pp)->p4est)
                   ==
-                  p4est_checksum (((p4est_wrap_t *) glob->domain->
-                                   pp)->p4est));
+                  p4est_checksum (((p4est_wrap_t *) glob->domain->pp)->
+                                  p4est));
 
     fclaw2d_domain_destroy (read_domain);
 

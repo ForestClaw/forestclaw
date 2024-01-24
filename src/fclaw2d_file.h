@@ -171,8 +171,9 @@ fclaw2d_file_context_t *fclaw2d_file_open_write (const char *filename,
  *                              to examine the error of the partition file
  *                              I/O process.
  */
-int fclaw2d_file_write_partition (const char *filename, const char *user_string,
-                                  fclaw2d_domain_t *domain, int *errcode);
+int fclaw2d_file_write_partition (const char *filename,
+                                  const char *user_string,
+                                  fclaw2d_domain_t * domain, int *errcode);
 
 /** Write a serial data block to an opened parallel file.
  *
@@ -304,7 +305,8 @@ fclaw2d_file_context_t *fclaw2d_file_write_array (fclaw2d_file_context_t *
  * \param [in]  mpicomm       MPI communicator that is used to read the file and
  *                            is used for potential other reading operations of
  *                            MPI communicator dependent objects.
- * \param [in]  read_partition A Boolean to decide if the partition is read
+ * \param [in]  read_partition TODO: Update documentation 
+ *                            A Boolean to decide if the partition is read
  *                            from file. If the partition is read, it is used
  *                            for the parallel I/O operations and stored in the
  *                            returned \b domain. If the MPI size and the
@@ -325,7 +327,7 @@ fclaw2d_file_context_t *fclaw2d_file_write_array (fclaw2d_file_context_t *
 fclaw2d_file_context_t *fclaw2d_file_open_read (const char *filename,
                                                 char *user_string,
                                                 sc_MPI_Comm mpicomm,
-                                                int read_partition,
+                                                const char *par_filename,
                                                 fclaw2d_domain_t ** domain,
                                                 int *errcode);
 

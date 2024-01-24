@@ -1668,8 +1668,8 @@ fclaw2d_file_read_field_ext_v1 (fclaw2d_file_context_p4est_v1_t * fc,
                   || quadrant_size == quadrant_data->elem_size);
 
     /* check gfq in the debug mode */
-    FCLAW_ASSERT (gfq[0] == 0);
-    FCLAW_ASSERT (gfq[mpisize] == fc->global_num_quadrants);
+    FCLAW_ASSERT (gfq != NULL || gfq[0] == 0);
+    FCLAW_ASSERT (gfq != NULL || gfq[mpisize] == fc->global_num_quadrants);
 
     if (quadrant_data != NULL)
     {
@@ -1887,7 +1887,7 @@ fclaw2d_file_section_metadata_v1_t;
  *                          0 otherwise.
  */
 static int
-fclaw2d_file_info_cleanup_v1 (sc_MPI_File *file, int eclass, int *errcode)
+fclaw2d_file_info_cleanup_v1 (sc_MPI_File * file, int eclass, int *errcode)
 {
     if (!FCLAW2D_FILE_IS_SUCCESS_V1 (eclass))
     {
@@ -2617,6 +2617,11 @@ fclaw2d_file_data_to_p4est (sc_MPI_Comm mpicomm, int mpisize,
  *                            be created by this function. The data size
  *                            must be zero if no quadrant data was stored.
  * \param [out]   p4est       The p4est that is created from the file.
+ * \param [in]    gfq_in      The global first quadrant array that is used for
+ *                            the created p4est and also for the parititon of
+ *                            the parallel I/O. If \b gfq_in is NULL, the
+ *                            function computes and uses a uniform parititon.
+ *                            If \b gfq_in is not NULL it is copied,
  * \param [in,out] quad_string The user string of the quadrant section.
 *                             At least \ref FCLAW2D_FILE_USER_STRING_BYTES_V1 bytes.
  *                            The user string is read on rank 0 and internally
@@ -2636,8 +2641,9 @@ fclaw2d_file_data_to_p4est (sc_MPI_Comm mpicomm, int mpisize,
 static fclaw2d_file_context_p4est_v1_t *
 fclaw2d_file_read_p4est_v1 (fclaw2d_file_context_p4est_v1_t * fc,
                             p4est_connectivity_t * conn, size_t data_size,
-                            p4est_t ** p4est, char *quad_string,
-                            char *quad_data_string, int *errcode)
+                            p4est_t ** p4est, p4est_gloidx_t * gfq_in,
+                            char *quad_string, char *quad_data_string,
+                            int *errcode)
 {
     int mpisize, mpiret;
     int written_data;
@@ -2717,13 +2723,21 @@ fclaw2d_file_read_p4est_v1 (fclaw2d_file_context_p4est_v1_t * fc,
                                     P4EST_STRING, errcode);
     }
 
-    gfq = FCLAW_ALLOC (p4est_gloidx_t, mpisize + 1);
-  /** Compute a uniform global first quadrant array to use a uniform
-   * partition to read the data fields in parallel.
-   */
-    p4est_comm_global_first_quadrant (fc->global_num_quadrants, mpisize, gfq);
+    if (gfq_in == NULL)
+    {
+        gfq = FCLAW_ALLOC (p4est_gloidx_t, mpisize + 1);
+        /** Compute a uniform global first quadrant array to use a uniform
+         * partition to read the data fields in parallel.
+         */
+        p4est_comm_global_first_quadrant (fc->global_num_quadrants, mpisize,
+                                          gfq);
 
-    FCLAW_ASSERT (gfq[mpisize] == pertree[conn->num_trees]);
+        FCLAW_ASSERT (gfq[mpisize] == pertree[conn->num_trees]);
+    }
+    else
+    {
+        gfq = gfq_in;
+    }
 
     /* read the quadrants */
     fc = fclaw2d_file_read_field_ext_v1 (fc, gfq, quadrants.elem_size,
@@ -3450,7 +3464,7 @@ fclaw2d_file_write_array (fclaw2d_file_context_t *
 
 fclaw2d_file_context_t *
 fclaw2d_file_open_read (const char *filename, char *user_string,
-                        sc_MPI_Comm mpicomm, int read_partition,
+                        sc_MPI_Comm mpicomm, const char *par_filename,
                         fclaw2d_domain_t ** domain, int *errcode)
 {
     FCLAW_ASSERT (filename != NULL);
@@ -3459,14 +3473,18 @@ fclaw2d_file_open_read (const char *filename, char *user_string,
     FCLAW_ASSERT (errcode != NULL);
 
     int errcode_internal;
+    int mpiret, mpisize, retval;
+    int64_t partition_size;
     size_t file_len;
     char buf[FCLAW2D_FILE_NAME_BYTES];
     char read_user_string[FCLAW2D_FILE_USER_STRING_BYTES_V1 + 1];
-    p4est_gloidx_t global_num_quadrants;
-    fclaw2d_file_context_p4est_v1_t *p4est_fc;
+    p4est_gloidx_t global_num_quadrants, par_global_num_quadrants;
+    p4est_gloidx_t *read_gfq;
+    fclaw2d_file_context_p4est_v1_t *p4est_fc, *partition_fc;
     fclaw2d_file_context_t *fclaw_fc;
     p4est_connectivity_t *conn;
     p4est_t *p4est;
+    sc_array_t arr;
 
     file_len = strlen (filename) + strlen ("." FCLAW2D_FILE_EXT) + 1;
     if (file_len > FCLAW2D_FILE_NAME_BYTES)
@@ -3490,6 +3508,87 @@ fclaw2d_file_open_read (const char *filename, char *user_string,
         return NULL;
     }
 
+    /* default gfq */
+    read_gfq = NULL;
+
+    if (par_filename != NULL)
+    {
+        /* open the partition file */
+        partition_fc =
+            fclaw2d_file_open_read_ext_v1 (mpicomm, par_filename, user_string,
+                                           &par_global_num_quadrants,
+                                           &errcode_internal);
+        /* TODO: How to handle the errors related to this file context? */
+        fclaw2d_file_translate_error_code_v1 (errcode_internal, errcode);
+        if (*errcode != FCLAW2D_FILE_ERR_SUCCESS)
+        {
+            FCLAW_ASSERT (partition_fc == NULL);
+            return NULL;
+        }
+        if (par_global_num_quadrants != global_num_quadrants)
+        {
+            /* number of global quadrants mismatch */
+            /* TODO: partition_fc was successfully opened, so we can close it properly */
+
+            /* TODO: close p4est_fc */
+            *errcode = FCLAW2D_FILE_ERR_P4EST;
+            return NULL;
+        }
+
+        /* read the partition size */
+        sc_array_init_data (&arr, &partition_size, sizeof (int64_t), 1);
+        partition_fc =
+            fclaw2d_file_read_block_v1 (partition_fc, sizeof (int64_t), &arr,
+                                        user_string, &errcode_internal);
+        fclaw2d_file_translate_error_code_v1 (errcode_internal, errcode);
+        if (*errcode != FCLAW2D_FILE_ERR_SUCCESS)
+        {
+            FCLAW_ASSERT (partition_fc == NULL);
+            return NULL;
+        }
+
+        /* get mpisize */
+        mpiret = sc_MPI_Comm_size (mpicomm, &mpisize);
+        SC_CHECK_MPI (mpiret);
+
+        if (partition_size == mpisize)
+        {
+            /* allocate space for the read gfq array */
+            read_gfq = FCLAW_ALLOC (p4est_gloidx_t, partition_size + 1);
+            /* read the gfq array */
+            sc_array_init_data (&arr, read_gfq, sizeof (p4est_gloidx_t) *
+                                (partition_size + 1), 1);
+            partition_fc = fclaw2d_file_read_block_v1 (partition_fc,
+                                                       sizeof (p4est_gloidx_t)
+                                                       * (partition_size + 1),
+                                                       &arr, user_string,
+                                                       &errcode_internal);
+            fclaw2d_file_translate_error_code_v1 (errcode_internal, errcode);
+            if (*errcode != FCLAW2D_FILE_ERR_SUCCESS)
+            {
+                FCLAW_ASSERT (partition_fc == NULL);
+                return NULL;
+            }
+
+        }
+        else
+        {
+            /* the MPI count does not coincide with partition size */
+            /* we use a uniform partition */
+            /* TODO: Rescale given partition instead? */
+            read_gfq = NULL;
+        }
+
+        /* close the partition file */
+        retval = fclaw2d_file_close_v1 (partition_fc, &errcode_internal);
+        fclaw2d_file_translate_error_code_v1 (errcode_internal, errcode);
+        if (*errcode != FCLAW2D_FILE_ERR_SUCCESS)
+        {
+            FCLAW_EXECUTE_ASSERT_TRUE (retval != 0);
+            return NULL;
+        }
+    }
+
     /* read the p4est connectivity */
     p4est_fc = fclaw2d_file_read_connectivity_v1 (p4est_fc, &conn,
                                                   read_user_string,
@@ -3502,9 +3601,10 @@ fclaw2d_file_open_read (const char *filename, char *user_string,
     }
 
     /* read the p4est */
-    p4est_fc = fclaw2d_file_read_p4est_v1 (p4est_fc, conn, 0, &p4est,
-                                           read_user_string, read_user_string,
-                                           &errcode_internal);
+    p4est_fc =
+        fclaw2d_file_read_p4est_v1 (p4est_fc, conn, 0, &p4est, read_gfq,
+                                    read_user_string, read_user_string,
+                                    &errcode_internal);
     fclaw2d_file_translate_error_code_v1 (errcode_internal, errcode);
     if (*errcode != FCLAW2D_FILE_ERR_SUCCESS)
     {
