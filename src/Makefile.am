@@ -7,7 +7,7 @@ libforestclaw_generated_headers = src/fclaw_config.h
 libforestclaw_installed_headers = \
 	src/forestclaw.h \
 	src/fclaw_convenience.h \
-	src/fclaw_wraph.h \
+	src/fclaw_wrap.h \
 	src/fclaw_base.h \
 	src/fclaw_timer.h \
 	src/fclaw_package.h \
