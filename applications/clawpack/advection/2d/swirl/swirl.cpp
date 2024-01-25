@@ -54,6 +54,7 @@ void create_domain(fclaw2d_global_t *glob)
     fclaw2d_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);
 }
 
+#if FCLAW_SWIRL_IO_DEMO
 static void
 check_fclaw2d_file_error_code (int errcode, const char *str)
 {
@@ -73,6 +74,7 @@ check_fclaw2d_file_error_code (int errcode, const char *str)
         SC_ABORTF ("%s: %*.*s", str, reslen, reslen, err_str);
     }
 }
+#endif
 
 static
 void run_program(fclaw2d_global_t* glob)

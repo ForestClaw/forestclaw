@@ -126,6 +126,7 @@ fclaw2d_file_context_t *fclaw2d_file_open_write (const char *filename,
                                                  fclaw2d_domain_t * domain,
                                                  int *errcode);
 
+#if 0
 /** Write the partition of the domain associated with \b fc to disk.
  *
  * This function derives the partition filename from the base filename 'fn' of
@@ -174,6 +175,7 @@ fclaw2d_file_context_t *fclaw2d_file_open_write (const char *filename,
 int fclaw2d_file_write_partition (const char *filename,
                                   const char *user_string,
                                   fclaw2d_domain_t * domain, int *errcode);
+#endif
 
 /** Write a serial data block to an opened parallel file.
  *
