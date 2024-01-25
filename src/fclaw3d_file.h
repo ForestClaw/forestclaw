@@ -141,7 +141,7 @@ fclaw3d_file_context_t *fclaw3d_file_open_write (const char *filename,
  *
  * \note In contrast to the not-partition-related writing functions this
  * function always returns the passed \b fc, which stays unchanged, even if an
- * error occured since this error then relates to the internal file context
+ * error occurred since this error then relates to the internal file context
  * for writing the separate partition file.
  * \b errcode always relates to the internal file context and not to the passed
  * \b fc.
@@ -305,18 +305,17 @@ fclaw3d_file_context_t *fclaw3d_file_write_array (fclaw3d_file_context_t *
  * \param [in]  mpicomm       MPI communicator that is used to read the file and
  *                            is used for potential other reading operations of
  *                            MPI communicator dependent objects.
- * \param [in]  read_partition TODO: Update documentation
- *                            A Boolean to decide if the partition is read
- *                            from file. If the partition is read, it is used
- *                            for the parallel I/O operations and stored in the
- *                            returned \b domain. If the MPI size and the
- *                            partition size do not coincide a partition for the
- *                            current MPI size is computed. For \b read_partition
- *                            false a uniform partition with respect to the
- *                            quadrant count is computed and used.
+ * \param [in]  par_filename  The path to the base name file that is used to
+ *                            load the parititon. If \b par_filename is NULL,
+ *                            a uniform parititon with respect to the patch
+ *                            count is computed and used. If the partition is
+ *                            read, it is used for the parallel I/O operations
+ *                            and stored in the returned \b domain. If the MPI
+ *                            size and the partition size do not coincide a
+ *                            partition for the current MPI size is computed.
  *                            The function call results in an error if there
  *                            is no partition to read.
- *                            Currently, this flag does not have any effect.
+ *                            Currently, this parameter does not have any effect.
  * \param [out] domain        Newly allocated domain that is read from the file.
  * \param [out] errcode       An errcode that can be interpreted by
  *                            \ref fclaw3d_file_error_string.
