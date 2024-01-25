@@ -188,12 +188,16 @@ void run_program(fclaw2d_global_t* glob)
                                  glob->domain->mpicomm, NULL, &read_domain,
                                  &errcode);
     check_fclaw2d_file_error_code (errcode, "file open read");
+    fclaw_global_productionf ("Opened file with user string: %s\n",
+                              read_user_string);
 
     /* read a block from the file */
     test_int = -1;
     fc = fclaw2d_file_read_block (fc, read_user_string, sizeof (int64_t),
                                   &block_arr, &errcode);
     check_fclaw2d_file_error_code (errcode, "file read block");
+    fclaw_global_productionf ("Read block with user string: %s\n",
+                              read_user_string);
     FCLAW_ASSERT (test_int == 12);
 
     /* read an array from the file */
@@ -207,6 +211,8 @@ void run_program(fclaw2d_global_t* glob)
     fc = fclaw2d_file_read_array (fc, read_user_string, 3 * sizeof (char),
                                   &read_arr, &errcode);
     check_fclaw2d_file_error_code (errcode, "file write array");
+    fclaw_global_productionf ("Read array with user string: %s\n",
+                              read_user_string);
     /* check read array */
     for (i = 0; i < read_domain->local_num_patches; ++i)
     {
