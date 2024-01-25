@@ -1140,11 +1140,11 @@ void fclaw_domain_indirect_end (fclaw_domain_t * domain,
  *                              \ref fclaw_PATCH_BOUNDARY.
  */
 fclaw_patch_relation_t
-fclaw_domain_indirect_neighbors (fclaw_domain_t * domain,
-                                 fclaw_domain_indirect_t * ind,
-                                 int ghostno, int faceno, int rproc[],
-                                 int *rblockno, int rpatchno[],
-                                 int *rfaceno);
+fclaw_domain_indirect_face_neighbors (fclaw_domain_t * domain,
+                                      fclaw_domain_indirect_t * ind,
+                                      int ghostno, int faceno, int rproc[],
+                                      int *rblockno, int rpatchno[],
+                                      int *rfaceno);
 
 /** Destroy all context data for indirect ghost neighbor patches.
  * \param [in] domain           Must be the same domain used in begin and end.

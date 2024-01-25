@@ -962,11 +962,11 @@ void fclaw_domain_indirect_end (fclaw_domain_t * domain,
 }
 
 fclaw_patch_relation_t
-fclaw_domain_indirect_neighbors (fclaw_domain_t * domain,
-                                 fclaw_domain_indirect_t * indirect,
-                                 int ghostno, int faceno, int rproc[],
-                                 int *rblockno, int rpatchno[],
-                                 int *rfaceno)
+fclaw_domain_indirect_face_neighbors (fclaw_domain_t * domain,
+                                      fclaw_domain_indirect_t * indirect,
+                                      int ghostno, int faceno, int rproc[],
+                                      int *rblockno, int rpatchno[],
+                                      int *rfaceno)
 {
     if(domain->refine_dim == 2)
     {
