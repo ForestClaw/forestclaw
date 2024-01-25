@@ -29,7 +29,7 @@
 #include "../all/advection_user.h"
 #include <p4est_wrap.h>         /* just temporary for testing */
 
-#define FCLAW_SWIRL_IO_DEMO 1
+#define FCLAW_SWIRL_IO_DEMO 0
 
 static
 void create_domain(fclaw2d_global_t *glob)
@@ -63,7 +63,7 @@ check_fclaw2d_file_error_code (int errcode, const char *str)
     if (errcode != FCLAW2D_FILE_ERR_SUCCESS)
     {
         /* In case of a not successful fclaw2d_file function call we always
-         * close the file if applicable and deallocate the file context.  
+         * close the file if applicable and deallocate the file context.
          */
         /* examine the error code */
         retval = fclaw2d_file_error_string (errcode, err_str, &reslen);
