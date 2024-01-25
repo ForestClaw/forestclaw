@@ -542,7 +542,7 @@ void
 fclaw_domain_iterate_level (fclaw_domain_t * domain, int level,
                               fclaw_patch_callback_t pcb, void *user)
 {
-    fclaw_patch_callback_wrap_user_t wrap;
+    fclaw_patch_wrap_user_t wrap;
     wrap.pcb = pcb;
     wrap.user = user;
 
@@ -566,7 +566,7 @@ void
 fclaw_domain_iterate_patches (fclaw_domain_t * domain,
                                 fclaw_patch_callback_t pcb, void *user)
 {
-    fclaw_patch_callback_wrap_user_t wrap;
+    fclaw_patch_wrap_user_t wrap;
     wrap.pcb = pcb;
     wrap.user = user;
 
@@ -590,7 +590,7 @@ void
 fclaw_domain_iterate_families (fclaw_domain_t * domain,
                                  fclaw_patch_callback_t pcb, void *user)
 {
-    fclaw_patch_callback_wrap_user_t wrap;
+    fclaw_patch_wrap_user_t wrap;
     wrap.pcb = pcb;
     wrap.user = user;
 
@@ -758,7 +758,7 @@ fclaw_domain_iterate_adapted(fclaw_domain_t *old_domain, fclaw_domain_t *new_dom
 {
     FCLAW_ASSERT(old_domain->refine_dim == new_domain->refine_dim);
 
-    fclaw_match_callback_wrap_user_t mcb_wrap_user;
+    fclaw_match_wrap_user_t mcb_wrap_user;
     mcb_wrap_user.mcb = mcb;
     mcb_wrap_user.user = user;
 
@@ -818,7 +818,7 @@ void fclaw_domain_iterate_partitioned(fclaw_domain_t *old_domain, fclaw_domain_t
 {
     FCLAW_ASSERT(old_domain->refine_dim == new_domain->refine_dim);
 
-    fclaw_transfer_callback_wrap_user_t wrap;
+    fclaw_transfer_wrap_user_t wrap;
     wrap.tcb = tcb;
     wrap.user = user;
 

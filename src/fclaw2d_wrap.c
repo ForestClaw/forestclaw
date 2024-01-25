@@ -160,8 +160,8 @@ void fclaw2d_patch_callback_wrap(fclaw2d_domain_t * domain_2d,
                                  fclaw2d_patch_t * patch_2d,
                                  int blockno, int patchno, void *user)
 {
-    fclaw_patch_callback_wrap_user_t* wrap = 
-        (fclaw_patch_callback_wrap_user_t*) user;
+    fclaw_patch_wrap_user_t* wrap = 
+        (fclaw_patch_wrap_user_t*) user;
     fclaw_domain_t* domain = get_domain(domain_2d);
     fclaw_patch_t* patch = get_patch(patch_2d);
     wrap->pcb(domain, patch, blockno, patchno, wrap->user);
@@ -176,8 +176,8 @@ fclaw2d_transfer_callback_wrap(fclaw2d_domain_t * old_domain_2d,
                                int old_patchno, int new_patchno,
                                void *user)
 {
-    fclaw_transfer_callback_wrap_user_t* wrap = 
-        (fclaw_transfer_callback_wrap_user_t*) user;
+    fclaw_transfer_wrap_user_t* wrap = 
+        (fclaw_transfer_wrap_user_t*) user;
 
     fclaw_domain_t* old_domain = get_domain(old_domain_2d);
     fclaw_patch_t* old_patch = get_patch(old_patch_2d);
@@ -200,8 +200,8 @@ fclaw2d_match_callback_wrap(fclaw2d_domain_t * old_domain_2d,
                             int old_patchno, int new_patchno,
                             void *user)
 {
-    fclaw_match_callback_wrap_user_t* wrap = 
-        (fclaw_match_callback_wrap_user_t*) user;
+    fclaw_match_wrap_user_t* wrap = 
+        (fclaw_match_wrap_user_t*) user;
 
     fclaw_domain_t* old_domain = get_domain(old_domain_2d);
     fclaw_patch_t* old_patch = get_patch(old_patch_2d);

@@ -58,13 +58,13 @@ extern "C"
  * passing the user pointer specified in the struct.
  * 
  */
-typedef struct fclaw_patch_wrap_callback_user
+typedef struct fclaw_patch_wrap_user
 {
     /** Dimension independent patch callback to call */
     fclaw_patch_callback_t pcb;
     /** User pointer to pass to dimension independent callback */
     void* user;
-} fclaw_patch_wrap_callback_user_t;
+} fclaw_patch_wrap_user_t;
 
 /**
  * @brief Callback wrapper struct for transfer callbacks.
@@ -81,13 +81,13 @@ typedef struct fclaw_patch_wrap_callback_user
  * passing the user pointer specified in the struct.
  * 
  */
-typedef struct fclaw_transfer_wrap_callback_user
+typedef struct fclaw_transfer_wrap_user
 {
     /** Dimension independent transfer callback to call */
     fclaw_transfer_callback_t tcb;
     /** User pointer to pass to dimension independent callback */
     void *user;
-} fclaw_transfer_wrap_callback_user_t;
+} fclaw_transfer_wrap_user_t;
 
 /**
  * @brief Callback wrapper struct for match callbacks.
@@ -104,13 +104,13 @@ typedef struct fclaw_transfer_wrap_callback_user
  * passing the user pointer specified in the struct.
  * 
  */
-typedef struct fclaw_match_wrap_callback_user
+typedef struct fclaw_match_wrap_user
 {
     /** Dimension independent match callback to call */
     fclaw_match_callback_t mcb;
     /** User pointer to pass to dimension independent callback */
     void *user;
-} fclaw_match_wrap_callback_user_t;
+} fclaw_match_wrap_user_t;
 
 /**
  * @brief Callback wrapper struct for match callbacks.
@@ -150,7 +150,7 @@ typedef struct fclaw_integrate_ray_wrap_user
  * passing the user pointer specified in the struct.
  * 
  */
-typedef struct fclaw_interpolate_pointer_wrap_user
+typedef struct fclaw_interpolate_point_wrap_user
 {
     /** Dimension independent interpolate callback to call */
     fclaw_interpolate_point_t interpolate;
