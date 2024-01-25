@@ -2,6 +2,8 @@
 
 # -- c library
 add_library(forestclaw_c OBJECT 
+  forestclaw.c
+  fclaw_convenience.c
   fclaw_base.c 
   fclaw_options.c 
   fclaw_filesystem.cpp
@@ -44,10 +46,12 @@ add_library(forestclaw_c OBJECT
   fclaw2d_farraybox.cpp
   fclaw2d_output_tikz.c
   fclaw2d_file.c
+  fclaw2d_wrap.c
   forestclaw2d.c
   forestclaw3d.c
   fclaw3d_convenience.c
   fclaw3d_file.c
+  fclaw3d_wrap.c
   fp_exception_glibc_extension.c
   mappings/fclaw2d_map_nomap.c
   mappings/fclaw2d_map_nomap_brick.c
@@ -107,6 +111,8 @@ add_library(FORESTCLAW::FORESTCLAW INTERFACE IMPORTED GLOBAL)
 target_link_libraries(FORESTCLAW::FORESTCLAW INTERFACE forestclaw)
 
 install(FILES
+  forestclaw.h
+  fclaw_convenience.h
   fclaw_base.h 
 	fclaw_timer.h 
 	fclaw_package.h 
@@ -117,6 +123,7 @@ install(FILES
 	fclaw_gauges.h 
 	fclaw_mpi.h 
 	fclaw_math.h 
+  fclaw_wrap.h
 	forestclaw2d.h 
 	fp_exception_glibc_extension.h 
   fclaw2d_include_all.h 
@@ -150,11 +157,13 @@ install(FILES
 	fclaw2d_map_query_defs.h
 	fclaw2d_diagnostics.h
   fclaw2d_file.h
+  fclaw2d_wrap.h
   fclaw2d_to_3d.h
   forestclaw3d.h
   fclaw3d_convenience.h
   fclaw3d_defs.h
   fclaw3d_file.h
+  fclaw3d_wrap.h
   DESTINATION include
 )
 
