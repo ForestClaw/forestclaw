@@ -3473,18 +3473,28 @@ fclaw2d_file_open_read (const char *filename, char *user_string,
     FCLAW_ASSERT (errcode != NULL);
 
     int errcode_internal;
+#if 0
     int mpiret, mpisize, retval;
     int64_t partition_size;
+#endif
     size_t file_len;
     char buf[FCLAW2D_FILE_NAME_BYTES];
     char read_user_string[FCLAW2D_FILE_USER_STRING_BYTES_V1 + 1];
-    p4est_gloidx_t global_num_quadrants, par_global_num_quadrants;
+    p4est_gloidx_t global_num_quadrants;
+#if 0
+    p4est_gloidx_t par_global_num_quadrants;
+#endif
     p4est_gloidx_t *read_gfq;
-    fclaw2d_file_context_p4est_v1_t *p4est_fc, *partition_fc;
+    fclaw2d_file_context_p4est_v1_t *p4est_fc;
+#if 0
+    fclaw2d_file_context_t *partition_fc;
+#endif
     fclaw2d_file_context_t *fclaw_fc;
     p4est_connectivity_t *conn;
     p4est_t *p4est;
+#if 0
     sc_array_t arr;
+#endif
 
     file_len = strlen (filename) + strlen ("." FCLAW2D_FILE_EXT) + 1;
     if (file_len > FCLAW2D_FILE_NAME_BYTES)
@@ -3511,6 +3521,7 @@ fclaw2d_file_open_read (const char *filename, char *user_string,
     /* default gfq */
     read_gfq = NULL;
 
+#if 0
     if (par_filename != NULL)
     {
         /* open the partition file */
@@ -3588,6 +3599,7 @@ fclaw2d_file_open_read (const char *filename, char *user_string,
             return NULL;
         }
     }
+#endif
 
     /* read the p4est connectivity */
     p4est_fc = fclaw2d_file_read_connectivity_v1 (p4est_fc, &conn,
