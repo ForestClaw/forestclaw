@@ -188,6 +188,7 @@ fclaw_patch_is_ghost (const fclaw_patch_t * patch)
 int
 fclaw_patch_get_ghost_block(const fclaw_patch_t * patch)
 {
+    FCLAW_ASSERT(fclaw_patch_is_ghost(patch));
     if(patch->refine_dim == 2)
     {
         return patch->d2->u.blockno;
