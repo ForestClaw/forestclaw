@@ -51,13 +51,13 @@ libforestclaw_installed_headers = \
 	src/fclaw2d_map_query_defs.h \
 	src/fclaw2d_diagnostics.h \
 	src/fclaw2d_file.h \
-	src/fclaw2d_wraph.h \
+	src/fclaw2d_wrap.h \
         src/fclaw2d_to_3d.h \
 	src/forestclaw3d.h \
 	src/fclaw3d_defs.h \
 	src/fclaw3d_convenience.h \
 	src/fclaw3d_file.h \
-	src/fclaw3d_wraph.h 
+	src/fclaw3d_wrap.h 
 
 libforestclaw_internal_headers =
 
