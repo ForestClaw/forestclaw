@@ -45,8 +45,11 @@ extern "C"
 
 /**
  * @brief Wraps a 2d domain in a fclaw_domain_t struct.
+ *
+ * This overwrites the user pointer in the domain and domain patches with a
+ * pointer to the dimension independent types.
  * 
- * @param domain2d The domain to wrap
+ * @param[in,out] domain2d The domain to wrap
  * @return struct fclaw_domain* the wrapped domain
  */
 struct fclaw_domain* fclaw_domain_wrap_2d(fclaw2d_domain_t *domain2d);
