@@ -310,7 +310,7 @@ void fclaw_domain_integrate_rays (fclaw_domain_t * domain,
                                   sc_array_t * integrals,
                                   void * user)
 {
-    fclaw_integrate_ray_wrap_user_t wrap_user;
+    fclaw_intersect_wrap_user_t wrap_user;
     wrap_user.intersect = intersect;
     wrap_user.user = user;
 
@@ -335,7 +335,7 @@ void fclaw_overlap_exchange (fclaw_domain_t * domain,
                              fclaw_interpolate_point_t interpolate,
                              void *user)
 {
-    fclaw_interpolate_point_user_wrap_t wrap_user;
+    fclaw_interpolate_point_wrap_user_t wrap_user;
     wrap_user.interpolate = interpolate;
     wrap_user.user = user;
 

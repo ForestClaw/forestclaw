@@ -50,10 +50,10 @@ extern "C"
  * called from dimension dependent code.
  *
  * This type should be passed in as the user pointer alongside
- * @ref fclaw2d_patch_wrap_callback or @ref fclaw3d_patch_wrap_callback
+ * @ref fclaw2d_patch_wrap_cb or @ref fclaw3d_patch_wrap_cb
  * to the function that takes a dimensioned callback.
  *
- * @ref fclaw2d_patch_wrap_callback or @ref fclaw3d_patch_wrap_callback
+ * @ref fclaw2d_patch_wrap_cb or @ref fclaw3d_patch_wrap_cb
  * will then call the dimension independent callback specified in the struct,
  * passing the user pointer specified in the struct.
  * 
@@ -73,10 +73,10 @@ typedef struct fclaw_patch_wrap_user
  * called from dimension dependent code.
  *
  * This type should be passed in as the user pointer alongside
- * @ref fclaw2d_transfer_wrap_callback or @ref fclaw3d_transfer_wrap_callback
+ * @ref fclaw2d_transfer_wrap_cb or @ref fclaw3d_transfer_wrap_cb
  * to the function that takes a dimensioned callback.
  *
- * @ref fclaw2d_transfer_wrap_callback or @ref fclaw3d_transfer_wrap_callback
+ * @ref fclaw2d_transfer_wrap_cb or @ref fclaw3d_transfer_wrap_cb
  * will then call the dimension independent callback specified in the struct,
  * passing the user pointer specified in the struct.
  * 
@@ -96,10 +96,10 @@ typedef struct fclaw_transfer_wrap_user
  * called from dimension dependent code.
  *
  * This type should be passed in as the user pointer alongside
- * @ref fclaw2d_match_wrap_callback or @ref fclaw3d_match_wrap_callback
+ * @ref fclaw2d_match_wrap_cb or @ref fclaw3d_match_wrap_cb
  * to the function that takes a dimensioned callback.
  *
- * @ref fclaw2d_match_wrap_callback or @ref fclaw3d_match_wrap_callback
+ * @ref fclaw2d_match_wrap_cb or @ref fclaw3d_match_wrap_cb
  * will then call the dimension independent callback specified in the struct,
  * passing the user pointer specified in the struct.
  * 
@@ -119,21 +119,21 @@ typedef struct fclaw_match_wrap_user
  * called from dimension dependent code.
  *
  * This type should be passed in as the user pointer alongside
- * @ref fclaw2d_integrate_ray_wrap_callback or @ref fclaw3d_integrate_ray_wrap_callback
+ * @ref fclaw2d_integrate_ray_wrap_cb or @ref fclaw3d_integrate_ray_wrap_cb
  * to the function that takes a dimensioned callback.
  *
- * @ref fclaw2d_integrate_ray_wrap_callback or @ref fclaw3d_integrate_ray_wrap_callback
+ * @ref fclaw2d_integrate_ray_wrap_cb or @ref fclaw3d_integrate_ray_wrap_cb
  * will then call the dimension independent callback specified in the struct,
  * passing the user pointer specified in the struct.
  * 
  */
-typedef struct fclaw_integrate_ray_wrap_user
+typedef struct fclaw_intersect_wrap_user
 {
     /** Dimension independent integrate ray callback to call */
     fclaw_integrate_ray_t intersect;
     /** User pointer to pass to dimension independent callback */
     void *user;
-} fclaw_integrate_ray_wrap_user_t;
+} fclaw_intersect_wrap_user_t;
 
 /**
  * @brief Callback wrapper struct for match callbacks.
@@ -142,10 +142,10 @@ typedef struct fclaw_integrate_ray_wrap_user
  * called from dimension dependent code.
  *
  * This type should be passed in as the user pointer alongside
- * @ref fclaw2d_iterpolate_point_wrap_callback or @ref fclaw3d_iterpolate_point_wrap_callback
+ * @ref fclaw2d_iterpolate_point_wrap_cb or @ref fclaw3d_iterpolate_point_wrap_cb
  * to the function that takes a dimensioned callback.
  *
- * @ref fclaw2d_iterpolate_point_wrap_callback or @ref fclaw3d_iterpolate_point_wrap_callback
+ * @ref fclaw2d_iterpolate_point_wrap_cb or @ref fclaw3d_iterpolate_point_wrap_cb
  * will then call the dimension independent callback specified in the struct,
  * passing the user pointer specified in the struct.
  * 
@@ -156,7 +156,7 @@ typedef struct fclaw_interpolate_point_wrap_user
     fclaw_interpolate_point_t interpolate;
     /** User pointer to pass to dimension independent callback */
     void *user;
-} fclaw_interpolate_point_user_wrap_t;
+} fclaw_interpolate_point_wrap_user_t;
 
 #ifdef __cplusplus
 #if 0

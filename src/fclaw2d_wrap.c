@@ -222,8 +222,8 @@ fclaw2d_intersect_wrap_cb (fclaw2d_domain_t * domain_2d,
                         void *ray, double *integral,
                         void *user)
 {
-    fclaw_integrate_ray_wrap_user_t* wrap = 
-        (fclaw_integrate_ray_wrap_user_t*) user;
+    fclaw_intersect_wrap_user_t* wrap = 
+        (fclaw_intersect_wrap_user_t*) user;
 
     fclaw_domain_t* domain = get_domain(domain_2d);
     fclaw_patch_t* patch;
@@ -279,8 +279,8 @@ fclaw2d_interpolate_point_wrap_cb (fclaw2d_domain_t * domain_2d,
                                 int blockno, int patchno,
                                 void *point, void *user)
 {
-    fclaw_interpolate_point_user_wrap_t* wrap = 
-        (fclaw_interpolate_point_user_wrap_t*) user;
+    fclaw_interpolate_point_wrap_user_t* wrap = 
+        (fclaw_interpolate_point_wrap_user_t*) user;
 
     fclaw_domain_t* domain;
 

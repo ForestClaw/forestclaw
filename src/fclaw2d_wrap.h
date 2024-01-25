@@ -43,12 +43,28 @@ extern "C"
 #endif
 #endif
 
+/**
+ * @brief Wraps a 2d domain in a fclaw_domain_t struct.
+ * 
+ * @param domain2d The domain to wrap
+ * @return struct fclaw_domain* the wrapped domain
+ */
 struct fclaw_domain* fclaw_domain_wrap_2d(fclaw2d_domain_t *domain2d);
 
+/**
+ * @brief Wraps a patch callback for 2d domains.
+ * This is used by passing this callback to a function that takes a @ref fclaw2d_patch_callback_t.
+ * The user pointer should be a pointer to a @ref fclaw_patch_wrap_user_t.
+ */
 void fclaw2d_patch_wrap_cb(fclaw2d_domain_t * domain, 
                            fclaw2d_patch_t * patch,
                            int blockno, int patchno, void *user);
 
+/**
+ * @brief Wraps a transfer callback for 2d domains.
+ * This is used by passing this callback to a function that takes a @ref fclaw2d_transfer_callback_t.
+ * The user pointer should be a pointer to a @ref fclaw_transfer_wrap_user_t.
+ */
 void
 fclaw2d_transfer_wrap_cb(fclaw2d_domain_t * old_domain,
                          fclaw2d_patch_t * old_patch,
@@ -58,6 +74,11 @@ fclaw2d_transfer_wrap_cb(fclaw2d_domain_t * old_domain,
                          int old_patchno, int new_patchno,
                          void *user);
 
+/**
+ * @brief Wraps a match callback for 2d domains.
+ * This is used by passing this callback to a function that takes a @ref fclaw2d_match_callback_t.
+ * The user pointer should be a pointer to a @ref fclaw_match_wrap_user_t.
+ */
 void
 fclaw2d_match_wrap_cb(fclaw2d_domain_t * old_domain,
                       fclaw2d_patch_t * old_patch_2d,
@@ -67,14 +88,22 @@ fclaw2d_match_wrap_cb(fclaw2d_domain_t * old_domain,
                       int blockno,
                       int old_patchno, int new_patchno,
                       void *user);
-
+/**
+ * @brief Wraps a intersect callback for 2d domains.
+ * This is used by passing this callback to a function that takes a @ref fclaw2d_intersect_callback_t.
+ * The user pointer should be a pointer to a @ref fclaw_intersect_wrap_user_t.
+ */
 int 
 fclaw2d_intersect_wrap_cb (fclaw2d_domain_t * domain,
                            fclaw2d_patch_t * patch,
                            int blockno, int patchno,
                            void *ray, double *integral,
                            void *user);
-
+/**
+ * @brief Wraps a interpolate_point callback for 2d domains.
+ * This is used by passing this callback to a function that takes a @ref fclaw2d_interpolate_point_callback_t.
+ * The user pointer should be a pointer to a @ref fclaw_interpolate_point_wrap_user_t.
+ */
 int
 fclaw2d_interpolate_point_wrap_cb (fclaw2d_domain_t * domain,
                                    fclaw2d_patch_t * patch,
