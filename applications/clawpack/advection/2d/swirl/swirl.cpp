@@ -121,9 +121,8 @@ void run_program(fclaw2d_global_t* glob)
      * the workflow must be extended by providing buffers with the required
      * data and the functions may be called at a more suitable place.
      */
-    /** WARNING: This is work in progress and currently not a valid example
-     * workflow.
-    */
+    /* create a file, which is open for further writing */
+    /* the passed domain is written to the file */
     fc = fclaw2d_file_open_write ("swirl_io_test", "ForestClaw data file",
                                   glob->domain, &errcode);
     check_fclaw2d_file_error_code (errcode, "file open write");
@@ -183,6 +182,8 @@ void run_program(fclaw2d_global_t* glob)
     check_fclaw2d_file_error_code (errcode, "file close 1");
     FCLAW_EXECUTE_ASSERT_FALSE (retval);
 
+    /* open the file for reading */
+    /* the domain stored in the file is read to read_domain */
     fc = fclaw2d_file_open_read ("swirl_io_test", read_user_string,
                                  glob->domain->mpicomm, NULL, &read_domain,
                                  &errcode);
@@ -200,7 +201,7 @@ void run_program(fclaw2d_global_t* glob)
      * equals to sizeof (sc_array_t). The sc_array will be resized by
      * \ref fclaw2d_file_read_array. Each entry of the output sc_array
      * is an sc_array with one element and element size equals to the
-     * patch size.
+     * patch data size.
      */
     sc_array_init (&read_arr, sizeof (sc_array_t));
     fc = fclaw2d_file_read_array (fc, read_user_string, 3 * sizeof (char),
