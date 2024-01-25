@@ -185,6 +185,23 @@ fclaw_patch_is_ghost (const fclaw_patch_t * patch)
     }
 }
 
+int
+fclaw_patch_get_ghost_block(const fclaw_patch_t * patch)
+{
+    if(patch->refine_dim == 2)
+    {
+        return patch->d2->u.blockno;
+    }
+    else if(patch->refine_dim == 3)
+    {
+        return patch->d3->u.blockno;
+    }
+    else
+    {
+        SC_ABORT_NOT_REACHED();
+    }
+}
+
 int 
 fclaw_patch_boundary_type(fclaw_domain_t *domain, int blockno, int patchno, int boundaries[])
 {

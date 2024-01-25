@@ -241,6 +241,16 @@ int fclaw_patch_is_first_sibling (const fclaw_patch_t * patch);
  */
 int fclaw_patch_is_ghost (const fclaw_patch_t * patch);
 
+/**
+ * @brief The the block number of a ghost patch.
+ *
+ * This should only be called on a ghost patch.
+ * 
+ * @param patch the patch
+ * @return int the block number.
+ */
+int fclaw_patch_get_ghost_block(const fclaw_patch_t *patch);
+
 ///@}
 /* ---------------------------------------------------------------------- */
 ///                      @name Patch Iterators
