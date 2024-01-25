@@ -352,11 +352,11 @@ static char* old_path = NULL;
 void fclaw2d_set_global_context(fclaw2d_global_t *glob)
 {
     fclaw_options_t* opts = fclaw2d_get_options(glob);
-    fclaw_set_logging_prefix(opts->logging_prefix);
 
     // Change run directory
-    if(opts->run_directory != NULL){
+    if(strcmp(opts->run_directory,"") != 0){
         FCLAW_ASSERT(old_path == NULL);
+        fclaw_set_logging_prefix(opts->logging_prefix);
         old_path = fclaw_cwd();
         fclaw_cd(opts->run_directory);
     }
