@@ -131,8 +131,6 @@ fclaw_domain_t* fclaw_domain_wrap_2d(fclaw2d_domain_t* domain_2d)
         copy_patch(&domain->ghost_patches[patchno], &domain_2d->ghost_patches[patchno]);
     }
 
-    domain->attributes = domain_2d->attributes;
-
     domain_2d->user = domain;
 
     return domain;
@@ -267,7 +265,6 @@ fclaw_domain_t* domain_wrap_meta(fclaw2d_domain_t* domain_2d)
     domain->mpicomm = domain_2d->mpicomm;
     domain->mpisize = domain_2d->mpisize;
     domain->mpirank = domain_2d->mpirank;
-    domain->attributes = domain_2d->attributes;
     domain_2d->user = domain;
 
     return domain;
