@@ -42,46 +42,6 @@ int fclaw_patch_edge_neighbors (fclaw_domain_t * domain,
                                         rproc,rblockno,rpatchno,redge,
                                         (fclaw3d_patch_relation_t*) neighbor_size);
 }
-void
-fclaw_domain_attribute_add (fclaw_domain_t * domain,
-                              const char *name, void *attribute)
-{
-    sc_keyvalue_t *a = domain->attributes;
-
-    FCLAW_ASSERT (a != NULL);
-    FCLAW_ASSERT (!sc_keyvalue_exists (a, name));
-    sc_keyvalue_set_pointer (a, name, attribute);
-}
-
-void *
-fclaw_domain_attribute_access (fclaw_domain_t * domain,
-                                 const char *name, void *default_attr)
-{
-    sc_keyvalue_t *a = domain->attributes;
-
-    FCLAW_ASSERT (a != NULL);
-    return sc_keyvalue_get_pointer (a, name, default_attr);
-}
-
-void
-fclaw_domain_attribute_remove (fclaw_domain_t * domain, const char *name)
-{
-    sc_keyvalue_t *a = domain->attributes;
-#ifdef FCLAW_ENABLE_DEBUG
-    sc_keyvalue_entry_type_t et;
-#endif
-
-    FCLAW_ASSERT (a != NULL);
-    FCLAW_ASSERT (sc_keyvalue_exists (a, name));
-#ifndef FCLAW_ENABLE_DEBUG
-    (void)
-#else
-    et =
-#endif
-        sc_keyvalue_unset (a, name);
-    FCLAW_ASSERT (et == SC_KEYVALUE_ENTRY_POINTER);
-}
-
 int
 fclaw_domain_dimension (const fclaw_domain_t * domain)
 {

@@ -155,8 +155,6 @@ struct fclaw_domain
     int num_ghost_patches;      /**< number of off-proc patches relevant to this proc */
     fclaw_patch_t *ghost_patches;     /**< array of off-proc patches */
 
-    sc_keyvalue_t *attributes;  /**< Reserved to store domain attributes */
-
     /* formerly in domain_data_t */
 
     int count_set_patch;
@@ -168,38 +166,6 @@ struct fclaw_domain
     void *user; /**< user data pointer */
 };
 
-///@}
-/* ---------------------------------------------------------------------- */
-///                      @name Domain Attributes
-/* ---------------------------------------------------------------------- */
-///@{
-
-/** Add a named attribute to the domain.
- * Attribute names starting with 'fclaw' are reserved.
- * \param [in] domain   This domain will get a new attribute.
- * \param [in] name     This name must not yet be used for another attribute.
- * \param [in] attribute        Arbitrary data stored under \a name.
- */
-void fclaw_domain_attribute_add (fclaw_domain_t * domain,
-                                 const char *name, void *attribute);
-
-/** Access a named attribute of the domain.
- * \param [in] domain   The domain may or may not have the queried attribute.
- * \param [in] name     The attribute by this \a name is retrieved.
- * \param [in] default_attr     Returned if the attribute does not exist.
- * \return              The data that was previously stored under \a name,
- *                      or \a default_attr if the attribute does not exist.
- */
-void *fclaw_domain_attribute_access (fclaw_domain_t * domain,
-                                     const char *name, void *default_attr);
-
-/** Remove a named attribute from the domain.
- * It is NOT necessary to call this function before domain destruction.
- * \param [in] domain   The domain must have the attribute \a name.
- * \param [in] name     An attribute of this name must exist.
- */
-void fclaw_domain_attribute_remove (fclaw_domain_t * domain,
-                                    const char *name);
 ///@}
 /* ---------------------------------------------------------------------- */
 ///                  @name Topological Properties
