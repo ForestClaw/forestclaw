@@ -46,41 +46,41 @@ extern "C"
 
 struct fclaw_domain* fclaw_domain_wrap_3d(fclaw3d_domain_t *domain2d);
 
-void fclaw3d_patch_callback_wrap(fclaw3d_domain_t * domain, 
-                                 fclaw3d_patch_t * patch,
-                                 int blockno, int patchno, void *user);
+void fclaw3d_patch_wrap_cb(fclaw3d_domain_t * domain, 
+                           fclaw3d_patch_t * patch,
+                           int blockno, int patchno, void *user);
 
 void
-fclaw3d_transfer_callback_wrap(fclaw3d_domain_t * old_domain,
-                               fclaw3d_patch_t * old_patch,
-                               fclaw3d_domain_t * new_domain,
-                               fclaw3d_patch_t * new_patch,
-                               int blockno,
-                               int old_patchno, int new_patchno,
-                               void *user);
+fclaw3d_transfer_wrap_cb(fclaw3d_domain_t * old_domain,
+                         fclaw3d_patch_t * old_patch,
+                         fclaw3d_domain_t * new_domain,
+                         fclaw3d_patch_t * new_patch,
+                         int blockno,
+                         int old_patchno, int new_patchno,
+                         void *user);
 
 void
-fclaw3d_match_callback_wrap(fclaw3d_domain_t * old_domain,
-                            fclaw3d_patch_t * old_patch_3d,
-                            fclaw3d_domain_t * new_domain,
-                            fclaw3d_patch_t * new_patch_3d,
-                            fclaw3d_patch_relation_t newsize,
-                            int blockno,
-                            int old_patchno, int new_patchno,
-                            void *user);
+fclaw3d_match_wrap_cb(fclaw3d_domain_t * old_domain,
+                      fclaw3d_patch_t * old_patch_3d,
+                      fclaw3d_domain_t * new_domain,
+                      fclaw3d_patch_t * new_patch_3d,
+                      fclaw3d_patch_relation_t newsize,
+                      int blockno,
+                      int old_patchno, int new_patchno,
+                      void *user);
 
 int 
-fclaw3d_intersect_wrap (fclaw3d_domain_t * domain,
-                        fclaw3d_patch_t * patch,
-                        int blockno, int patchno,
-                        void *ray, double *integral,
-                        void *user);
+fclaw3d_intersect_wrap_cb (fclaw3d_domain_t * domain,
+                           fclaw3d_patch_t * patch,
+                           int blockno, int patchno,
+                           void *ray, double *integral,
+                           void *user);
 
 int
-fclaw3d_interpolate_point_wrap (fclaw3d_domain_t * domain,
-                                fclaw3d_patch_t * patch,
-                                int blockno, int patchno,
-                                void *point, void *user);
+fclaw3d_interpolate_point_wrap_cb (fclaw3d_domain_t * domain,
+                                   fclaw3d_patch_t * patch,
+                                   int blockno, int patchno,
+                                   void *point, void *user);
 
 #ifdef __cplusplus
 #if 0

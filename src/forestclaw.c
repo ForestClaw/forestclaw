@@ -548,12 +548,12 @@ fclaw_domain_iterate_level (fclaw_domain_t * domain, int level,
 
     if (domain->refine_dim == 2)
     {
-        fclaw2d_domain_iterate_level(domain->d2,level,fclaw2d_patch_callback_wrap,
+        fclaw2d_domain_iterate_level(domain->d2,level,fclaw2d_patch_wrap_cb,
                                      &wrap);
     }
     else if (domain->refine_dim == 3)
     {
-        fclaw3d_domain_iterate_level(domain->d3,level,fclaw3d_patch_callback_wrap,
+        fclaw3d_domain_iterate_level(domain->d3,level,fclaw3d_patch_wrap_cb,
                                      &wrap);
     }
     else
@@ -572,12 +572,12 @@ fclaw_domain_iterate_patches (fclaw_domain_t * domain,
 
     if(domain->refine_dim == 2)
     {
-        fclaw2d_domain_iterate_patches(domain->d2,fclaw2d_patch_callback_wrap,
+        fclaw2d_domain_iterate_patches(domain->d2,fclaw2d_patch_wrap_cb,
                                        &wrap);
     }
     else if (domain->refine_dim == 3)
     {
-        fclaw3d_domain_iterate_patches(domain->d3,fclaw3d_patch_callback_wrap,
+        fclaw3d_domain_iterate_patches(domain->d3,fclaw3d_patch_wrap_cb,
                                        &wrap);
     }
     else
@@ -596,12 +596,12 @@ fclaw_domain_iterate_families (fclaw_domain_t * domain,
 
     if(domain->refine_dim == 2)
     {
-        fclaw2d_domain_iterate_families(domain->d2,fclaw2d_patch_callback_wrap,
+        fclaw2d_domain_iterate_families(domain->d2,fclaw2d_patch_wrap_cb,
                                         &wrap);
     }
     else if (domain->refine_dim == 3)
     {
-        fclaw3d_domain_iterate_families(domain->d3,fclaw3d_patch_callback_wrap,
+        fclaw3d_domain_iterate_families(domain->d3,fclaw3d_patch_wrap_cb,
                                         &wrap);
     }
     else
@@ -766,14 +766,14 @@ fclaw_domain_iterate_adapted(fclaw_domain_t *old_domain, fclaw_domain_t *new_dom
     {
         fclaw2d_domain_iterate_adapted(old_domain->d2,
                                        new_domain->d2,
-                                       fclaw2d_match_callback_wrap,
+                                       fclaw2d_match_wrap_cb,
                                        &mcb_wrap_user);
     }
     else if (old_domain->refine_dim == 3)
     {
         fclaw3d_domain_iterate_adapted(old_domain->d3,
                                        new_domain->d3,
-                                       fclaw3d_match_callback_wrap,
+                                       fclaw3d_match_wrap_cb,
                                        &mcb_wrap_user);
     }
     else
@@ -826,14 +826,14 @@ void fclaw_domain_iterate_partitioned(fclaw_domain_t *old_domain, fclaw_domain_t
     {
         fclaw2d_domain_iterate_partitioned(old_domain->d2,
                                            new_domain->d2,
-                                           fclaw2d_transfer_callback_wrap,
+                                           fclaw2d_transfer_wrap_cb,
                                            &wrap);
     }
     else if(old_domain->refine_dim == 3)
     {
         fclaw3d_domain_iterate_partitioned(old_domain->d3,
                                            new_domain->d3,
-                                           fclaw3d_transfer_callback_wrap,
+                                           fclaw3d_transfer_wrap_cb,
                                            &wrap);
     }
     else 

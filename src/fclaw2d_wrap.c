@@ -156,7 +156,7 @@ fclaw_patch_t* get_patch(fclaw2d_patch_t* patch_2d)
     return (fclaw_patch_t*) patch_2d->user;
 }
 
-void fclaw2d_patch_callback_wrap(fclaw2d_domain_t * domain_2d, 
+void fclaw2d_patch_wrap_cb(fclaw2d_domain_t * domain_2d, 
                                  fclaw2d_patch_t * patch_2d,
                                  int blockno, int patchno, void *user)
 {
@@ -168,7 +168,7 @@ void fclaw2d_patch_callback_wrap(fclaw2d_domain_t * domain_2d,
 }
 
 void
-fclaw2d_transfer_callback_wrap(fclaw2d_domain_t * old_domain_2d,
+fclaw2d_transfer_wrap_cb(fclaw2d_domain_t * old_domain_2d,
                                fclaw2d_patch_t * old_patch_2d,
                                fclaw2d_domain_t * new_domain_2d,
                                fclaw2d_patch_t * new_patch_2d,
@@ -191,7 +191,7 @@ fclaw2d_transfer_callback_wrap(fclaw2d_domain_t * old_domain_2d,
 }
 
 void
-fclaw2d_match_callback_wrap(fclaw2d_domain_t * old_domain_2d,
+fclaw2d_match_wrap_cb(fclaw2d_domain_t * old_domain_2d,
                             fclaw2d_patch_t * old_patch_2d,
                             fclaw2d_domain_t * new_domain_2d,
                             fclaw2d_patch_t * new_patch_2d,
@@ -216,7 +216,7 @@ fclaw2d_match_callback_wrap(fclaw2d_domain_t * old_domain_2d,
 }
 
 int 
-fclaw2d_intersect_wrap (fclaw2d_domain_t * domain_2d,
+fclaw2d_intersect_wrap_cb (fclaw2d_domain_t * domain_2d,
                         fclaw2d_patch_t * patch_2d,
                         int blockno, int patchno,
                         void *ray, double *integral,
@@ -274,7 +274,7 @@ fclaw_domain_t* domain_wrap_meta(fclaw2d_domain_t* domain_2d)
 }
 
 int
-fclaw2d_interpolate_point_wrap (fclaw2d_domain_t * domain_2d,
+fclaw2d_interpolate_point_wrap_cb (fclaw2d_domain_t * domain_2d,
                                 fclaw2d_patch_t * patch_2d,
                                 int blockno, int patchno,
                                 void *point, void *user)

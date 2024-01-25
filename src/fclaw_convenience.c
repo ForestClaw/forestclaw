@@ -316,12 +316,12 @@ void fclaw_domain_integrate_rays (fclaw_domain_t * domain,
 
     if(domain->refine_dim == 2)
     {
-        fclaw2d_domain_integrate_rays(domain->d2,fclaw2d_intersect_wrap,
+        fclaw2d_domain_integrate_rays(domain->d2,fclaw2d_intersect_wrap_cb,
                                       rays,integrals,&wrap_user);
     }
     else if(domain->refine_dim == 3)
     {
-        fclaw3d_domain_integrate_rays(domain->d3,fclaw3d_intersect_wrap,
+        fclaw3d_domain_integrate_rays(domain->d3,fclaw3d_intersect_wrap_cb,
                                       rays,integrals,&wrap_user);
     }
     else
@@ -341,11 +341,11 @@ void fclaw_overlap_exchange (fclaw_domain_t * domain,
 
     if(domain->refine_dim == 2)
     {
-        fclaw2d_overlap_exchange(domain->d2,query_points,fclaw2d_interpolate_point_wrap,&wrap_user);
+        fclaw2d_overlap_exchange(domain->d2,query_points,fclaw2d_interpolate_point_wrap_cb,&wrap_user);
     }
     else if(domain->refine_dim == 3)
     {
-        fclaw3d_overlap_exchange(domain->d3,query_points,fclaw3d_interpolate_point_wrap,&wrap_user);
+        fclaw3d_overlap_exchange(domain->d3,query_points,fclaw3d_interpolate_point_wrap_cb,&wrap_user);
     }
     else
     {
