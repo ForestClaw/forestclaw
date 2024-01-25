@@ -39,7 +39,7 @@ extern "C"
 
 /** 
  * @file
- * Main ForestClaw structures and routines
+ * Main dimension independent ForestClaw structures and routines
  */
 
 /* ---------------------------------------------------------------------- */
@@ -318,6 +318,9 @@ int fclaw_patch_boundary_type (fclaw_domain_t * domain,
 int fclaw_patch_normal_match (fclaw_domain_t * domain,
                               int blockno, int patchno, int faceno);
 
+/**
+ * @brief The type of face neighbor
+ */
 typedef enum fclaw_face_neighbor
 {
     /** Physical boundary */
@@ -707,6 +710,8 @@ void fclaw_patch_corner_swap (int dim, int *cornerno, int *rcornerno);
  * This function assumes that the two patches are of the SAME size and that the
  * patches lie in coordinate systems with the same orientation.
  * It is LEGAL to call this function for both local and ghost patches.
+ * It is ILLEGAL to call this function for patches from face-neighboring blocks.
+ * Use \ref fclaw2d_patch_transform_face for such patches instead.
  * \param [in] ipatch       The patch that the input coordinates are relative to.
  * \param [in] opatch       The patch that the output coordinates are relative to.
  * \param [in] icorner      Corner number of this patch to transform across.
@@ -729,6 +734,8 @@ void fclaw_patch_2d_transform_corner (fclaw_patch_t * ipatch,
  * This function assumes that the neighbor patch is smaller (HALF size) and that
  * the patches lie in coordinate systems with the same orientation.
  * It is LEGAL to call this function for both local and ghost patches.
+ * It is ILLEGAL to call this function for patches from face-neighboring blocks.
+ * Use \ref fclaw2d_patch_transform_face2 for such patches instead.
  * \param [in] ipatch       The patch that the input coordinates are relative to.
  * \param [in] opatch       The patch that the output coordinates are relative to.
  * \param [in] icorner      Corner number of this patch to transform across.
@@ -781,6 +788,9 @@ void fclaw_patch_3d_transform_corner (fclaw_patch_t * ipatch,
  * This function assumes that the neighbor patch is smaller (HALF size) and that
  * the patches lie in coordinate systems with the same orientation.
  * It is LEGAL to call this function for both local and ghost patches.
+ * It is ILLEGAL to call this function for patches from face- or
+ * edge-neighboring blocks. Use \ref fclaw3d_patch_transform_face2 or
+ * \ref fclaw_patch_3d_transform_edge2 for such patches instead.
  * \param [in] ipatch       The patch that the input coordinates are relative to.
  * \param [in] opatch       The patch that the output coordinates are relative to.
  * \param [in] icorner      Corner number of this patch to transform across.
@@ -1107,9 +1117,9 @@ void fclaw_domain_indirect_end (fclaw_domain_t * domain,
                                 fclaw_domain_indirect_t * ind);
 
 /** Call this analogously to \ref fclaw_domain_face_neighbors.
- * We only return an indirect ghost neighbor patch:  This is defined as a ghost
- * patch that is neighbor to the calling ghost patch and belongs to a processor
- * that is neither the owner of that ghost patch nor our own processor.
+ * Return an indirect face neighbor patch:  It is defined as a ghost patch
+ * that is face neighbor to the calling ghost patch and belongs to a process
+ * that is neither the owner of that ghost patch nor our own process.
  * \param [in] domain           Must be the same domain used in begin and end.
  * \param [in] ind              Must have been initialized by \ref
  *                              fclaw_domain_indirect_end.
