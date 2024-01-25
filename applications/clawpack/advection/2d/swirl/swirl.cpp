@@ -128,10 +128,12 @@ void run_program(fclaw2d_global_t* glob)
                                   glob->domain, &errcode);
     check_fclaw2d_file_error_code (errcode, "file open write");
 
+#if 0
     retval = fclaw2d_file_write_partition ("swirl_io_test_partition",
                                            "Test partition write",
                                            glob->domain, &errcode);
     check_fclaw2d_file_error_code (errcode, "file write partition");
+#endif
 
     /* write a block to the file */
     /* Initialize a sc_array with one element and the element size equals
