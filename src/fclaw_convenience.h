@@ -366,4 +366,4 @@ void fclaw_overlap_exchange (fclaw_domain_t * domain,
 }
 #endif
 
-#endif /* !FCLAW2D_CONVENIENCE_H */
+#endif /* !FCLAW_CONVENIENCE_H */

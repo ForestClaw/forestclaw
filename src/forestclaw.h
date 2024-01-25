@@ -1175,4 +1175,4 @@ int fclaw_domain_is_meta (fclaw_domain_t * domain);
 }
 #endif
 
-#endif /* !FORESTCLAW2D_H */
+#endif /* !FORESTCLAW_H */
