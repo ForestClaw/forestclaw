@@ -103,8 +103,6 @@ struct SinglePatchDomain {
         opts.maux = 1;
         opts.rhs_fields = 1;
         fclaw3dx_clawpatch_options_store(glob, &opts);
-
-        you_can_safely_remove_this_call(glob->domain);
     }
     void setup(){
         fclaw_build_mode_t build_mode = FCLAW_BUILD_FOR_UPDATE;
@@ -158,8 +156,6 @@ struct QuadDomain {
         opts.maux = 1;
         opts.rhs_fields = 1;
         fclaw3dx_clawpatch_options_store(glob, &opts);
-
-        you_can_safely_remove_this_call(glob->domain);
     }
     void setup(){
         fclaw_build_mode_t build_mode = FCLAW_BUILD_FOR_UPDATE;
@@ -288,7 +284,6 @@ TEST_CASE("fclaw3dx_clawpatch patch_build")
         opts.rhs_fields = rhs_fields;
         fclaw3dx_clawpatch_options_store(glob, &opts);
 
-        you_can_safely_remove_this_call(glob->domain);
         CHECK(domain->blocks[0].patches[0].user == nullptr);
         fclaw_patch_build(glob, &domain->blocks[0].patches[0], 0, 0, &build_mode);
         CHECK(domain->blocks[0].patches[0].user != nullptr);
