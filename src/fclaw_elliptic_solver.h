@@ -24,8 +24,8 @@
 */
 
 
-#ifndef FCLAW2D_ELLIPTIC_SOLVER_H
-#define FCLAW2D_ELLIPTIC_SOLVER_H
+#ifndef FCLAW_ELLIPTIC_SOLVER_H
+#define FCLAW_ELLIPTIC_SOLVER_H
 
 #ifdef __cplusplus
 extern "C"

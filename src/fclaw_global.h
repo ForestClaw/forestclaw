@@ -23,8 +23,8 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FCLAW2D_GLOBAL_H
-#define FCLAW2D_GLOBAL_H
+#ifndef FCLAW_GLOBAL_H
+#define FCLAW_GLOBAL_H
 
 #include <forestclaw.h>  /* Needed to declare callbacks (below) */
 #include <fclaw_map.h>   /* Needed to store the map context */

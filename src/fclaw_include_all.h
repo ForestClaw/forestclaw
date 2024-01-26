@@ -23,8 +23,8 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FCLAW2D_INCLUDE_ALL_H
-#define FCLAW2D_INCLUDE_ALL_H
+#ifndef FCLAW_INCLUDE_ALL_H
+#define FCLAW_INCLUDE_ALL_H
 
 #include <fclaw_base.h>
 #include <fclaw_package.h>
