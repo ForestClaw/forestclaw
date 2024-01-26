@@ -26,24 +26,43 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_block.h>
 #include <fclaw_global.h>
 #include <fclaw2d_defs.h>
+#include <fclaw3d_defs.h>
 
 #include <fclaw_patch.h>
-
+#include <fclaw2d_wrap.h>
+#include <fclaw3d_wrap.h>
 #include <forestclaw2d.h>
+#include <forestclaw3d.h>
 
 
 void fclaw_block_get_block_boundary(fclaw_global_t * glob,
                                       fclaw_patch_t * patch,
                                       int *intersects_block)
 {
-    int iside;
-
-    for (iside = 0; iside < FCLAW2D_NUMFACES; iside++)
+    if(glob->domain->refine_dim == 2)
     {
+        for (int iside = 0; iside < FCLAW2D_NUMFACES; iside++)
+        {
         int iface_flags = fclaw2d_patch_block_face_flags[iside];
         int is_block_face = (patch->d2->flags & iface_flags) != 0;
 
         /* True for physical and block boundaries across a face */
         intersects_block[iside] = is_block_face;
+        }
+    }
+    else if(glob->domain->refine_dim == 3)
+    {
+        for (int iside = 0; iside < FCLAW3D_NUMFACES; iside++)
+        {
+            int iface_flags = fclaw3d_patch_block_face_flags[iside];
+            int is_block_face = (patch->d3->flags & iface_flags) != 0;
+
+            /* True for physical and block boundaries across a face */
+            intersects_block[iside] = is_block_face;
+        }
+    }
+    else 
+    {
+        SC_ABORT_NOT_REACHED();
     }
 }
