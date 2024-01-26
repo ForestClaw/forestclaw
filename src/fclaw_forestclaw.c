@@ -46,11 +46,11 @@ void fclaw_vtables_initialize(fclaw_global_t *glob)
 
 void fclaw_problem_setup(fclaw_global_t *glob)
 {
-	fclaw_vtable_t *fclaw_vt = fclaw_vt(glob);
+	fclaw_vtable_t *fc_vt = fclaw_vt(glob);
 	
     /* User defined problem setup */
-    if (fclaw_vt->problem_setup != NULL)
+    if (fc_vt->problem_setup != NULL)
     {
-        fclaw_vt->problem_setup(glob);
+        fc_vt->problem_setup(glob);
     }
 }
