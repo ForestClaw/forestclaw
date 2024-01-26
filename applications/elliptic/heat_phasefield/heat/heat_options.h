@@ -26,7 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef HEAT_OPTIONS_H
 #define HEAT_OPTIONS_H
 
-#include <fclaw2d_include_all.h>
+#include <fclaw_include_all.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -92,9 +92,9 @@ heat_options_t* heat_options_register (fclaw_app_t * app,
                                        const char *section,
                                        const char *configfile);
 
-void heat_options_store(fclaw2d_global_t* glob, heat_options_t* user);
+void heat_options_store(fclaw_global_t* glob, heat_options_t* user);
 
-const heat_options_t* heat_get_options(fclaw2d_global_t* glob);
+const heat_options_t* heat_get_options(fclaw_global_t* glob);
 
 
 #ifdef __cplusplus

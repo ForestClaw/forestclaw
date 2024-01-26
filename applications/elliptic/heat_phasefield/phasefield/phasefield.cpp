@@ -28,13 +28,13 @@
     
 #include <fclaw_filesystem.h>
 
-#include <fclaw2d_include_all.h>
+#include <fclaw_include_all.h>
 
-#include <fclaw2d_global.h>
-#include <fclaw2d_output.h>
-#include <fclaw2d_diagnostics.h>
+#include <fclaw_global.h>
+#include <fclaw_output.h>
+#include <fclaw_diagnostics.h>
 
-#include <fclaw2d_elliptic_solver.h>
+#include <fclaw_elliptic_solver.h>
 
 #include <fclaw2d_clawpatch_options.h>
 #include <fclaw2d_clawpatch.h>
@@ -42,10 +42,10 @@
 #include <fc2d_thunderegg.h>
 #include <fc2d_thunderegg_options.h>
 
-void phasefield_create_domain(fclaw2d_global_t* glob)
+void phasefield_create_domain(fclaw_global_t* glob)
 {
     /* Mapped, multi-block domain */
-    fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+    fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
  
     int mi = fclaw_opt->mi;
     int mj = fclaw_opt->mj;
@@ -53,31 +53,25 @@ void phasefield_create_domain(fclaw2d_global_t* glob)
     int a = fclaw_opt->periodic_x;
     int b = fclaw_opt->periodic_y;
 
-    fclaw2d_domain_t *domain = fclaw2d_domain_new_brick(glob->mpicomm, mi,mj,a,b, fclaw_opt->minlevel);
+    fclaw_domain_t *domain = fclaw_domain_new_2d_brick(glob->mpicomm, mi,mj,a,b, fclaw_opt->minlevel);
 
     /* Map unit square to disk using mapc2m_disk.f */
-    fclaw2d_map_context_t *brick = fclaw2d_map_new_brick(domain, mi, mj, a, b);
-    fclaw2d_map_context_t *cont = fclaw2d_map_new_nomap_brick(brick);
+    fclaw_map_context_t *brick = fclaw_map_new_2d_brick(domain, mi, mj, a, b);
+    fclaw_map_context_t *cont = fclaw_map_new_nomap_brick(brick);
 
-    fclaw2d_global_store_domain(glob, domain);
-    fclaw2d_global_store_map(glob, cont);
+    fclaw_global_store_domain(glob, domain);
+    fclaw_map_store(glob, cont);
 
-    fclaw2d_domain_list_levels(domain, FCLAW_VERBOSITY_ESSENTIAL);
-    fclaw2d_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);  
+    fclaw_domain_list_levels(domain, FCLAW_VERBOSITY_ESSENTIAL);
+    fclaw_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);  
 }
 
-void phasefield_run_program(fclaw2d_global_t* glob)
+void phasefield_run_program(fclaw_global_t* glob)
 {
-    fclaw2d_set_global_context(glob);
-
-    /* ---------------------------------------------------------------
-       Set domain data.
-       --------------------------------------------------------------- */
-    fclaw2d_domain_data_new(glob->domain);
-
+    fclaw_set_global_context(glob);
 
     /* Initialize virtual table for ForestClaw */
-    fclaw2d_vtables_initialize(glob);
+    fclaw_vtables_initialize(glob);
 
     /* Test thunderegg solver */
     fc2d_thunderegg_solver_initialize(glob);
@@ -90,14 +84,14 @@ void phasefield_run_program(fclaw2d_global_t* glob)
        --------------------------------------------------------------- */
 
     /* Set up grid and RHS */
-    fclaw2d_initialize(glob);
+    fclaw_initialize(glob);
 
     phasefield_run(glob);
 
     /* ---------------------------------------------------------------
        Finalize
        --------------------------------------------------------------- */
-    fclaw2d_finalize(glob);
+    fclaw_finalize(glob);
 
-    fclaw2d_clear_global_context(glob);
+    fclaw_clear_global_context(glob);
 }

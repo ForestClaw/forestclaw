@@ -26,7 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef POISSON_USER_H
 #define POISSON_USER_H
 
-#include <fclaw2d_include_all.h>
+#include <fclaw_include_all.h>
 
 #include "poisson_options.h"
 #include "poisson_diagnostics.h"
@@ -42,7 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fc2d_thunderegg_starpatch.h>
 #include <fc2d_thunderegg_fivepoint.h>
 
-#include <fclaw2d_elliptic_solver.h>
+#include <fclaw_elliptic_solver.h>
 
 
 //#include <fclaw2d_farraybox.hpp>
@@ -59,7 +59,7 @@ extern "C"
 
 /* --------------------------- Problem dependent functions -----------------------------*/
 
-void poisson_link_solvers(fclaw2d_global_t *glob);
+void poisson_link_solvers(fclaw_global_t *glob);
 
 
 /* --------------------------- Fortran functions ---------------------------------------*/

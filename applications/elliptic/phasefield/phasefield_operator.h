@@ -38,10 +38,10 @@ extern "C"
     /* fix syntax highlighting */
 #endif    
 
-struct fclaw2d_global;
+struct fclaw_global;
 
 
-void phasefield_solve(struct fclaw2d_global *glob);
+void phasefield_solve(struct fclaw_global *glob);
 
 void phasefield_set_lambda(double lambda);
 

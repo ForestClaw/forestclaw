@@ -12,7 +12,7 @@ class phasefield : public ThunderEgg::PatchOperator<2>
 
     const phasefield_options_t *phase_opt;
 
-    phasefield(fclaw2d_global_t *glob,
+    phasefield(fclaw_global_t *glob,
                const ThunderEgg::Vector<2>& phi_n_in,
                const ThunderEgg::Domain<2>& domain,
                const ThunderEgg::GhostFiller<2>& ghost_filler);
