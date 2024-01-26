@@ -28,7 +28,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fc2d_cudaclaw.h>
 
-#include <fclaw2d_include_all.h>
+#include <fclaw_include_all.h>
 
 #include <fclaw2d_clawpatch.h>
 #include <fclaw2d_clawpatch_options.h>
@@ -58,15 +58,15 @@ typedef struct user_options
 } user_options_t;
 
 
-void radial_link_solvers(fclaw2d_global_t *glob);
+void radial_link_solvers(fclaw_global_t *glob);
 
 /* --------------------------------------- Options ----------------------------------------*/
       
 user_options_t* radial_options_register (fclaw_app_t * app, const char *configfile);
 
-void radial_options_store (fclaw2d_global_t* glob, user_options_t* user);
+void radial_options_store (fclaw_global_t* glob, user_options_t* user);
 
-user_options_t* radial_get_options(fclaw2d_global_t* glob);
+user_options_t* radial_get_options(fclaw_global_t* glob);
 
 /* --------------------------------------- Cuda ----------------------------------------*/
 

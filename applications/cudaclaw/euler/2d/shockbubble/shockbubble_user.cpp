@@ -25,7 +25,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "shockbubble_user.h"
 
-void shockbubble_problem_setup(fclaw2d_global_t* glob)
+void shockbubble_problem_setup(fclaw_global_t* glob)
 {
     const user_options_t* user = shockbubble_get_options(glob);
 
@@ -43,7 +43,7 @@ void shockbubble_problem_setup(fclaw2d_global_t* glob)
     }
 
     /* We want to make sure node 0 gets here before proceeding */
-    fclaw2d_domain_barrier (glob->domain);  
+    fclaw_domain_barrier (glob->domain);  
 
     /* Call CUDA setprob to set parameters needed for Riemann solvers */ 
     setprob_cuda();    
@@ -74,15 +74,15 @@ void shockbubble_problem_setup(fclaw2d_global_t* glob)
 }
 #endif
 
-void shockbubble_link_solvers(fclaw2d_global_t *glob)
+void shockbubble_link_solvers(fclaw_global_t *glob)
 {
     // const user_options_t* user = shockbubble_get_options(glob);
     // fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt(glob);
 
     // fc2d_clawpack46_options_t *clawopt = fc2d_clawpack46_get_options(glob);
 
-    fclaw2d_vtable_t *fclaw_vt = fclaw2d_vt(glob);
-    fclaw_vt->problem_setup = &shockbubble_problem_setup;
+    fclaw_vtable_t *fc_vt = fclaw_vt(glob);
+    fc_vt->problem_setup = &shockbubble_problem_setup;
 
     //fc2d_clawpack46_vtable_t *claw46_vt = fc2d_clawpack46_vt(glob);
     fc2d_cudaclaw_vtable_t *cuclaw_vt   = fc2d_cudaclaw_vt(glob);
