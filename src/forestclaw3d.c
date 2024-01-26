@@ -53,7 +53,7 @@ fclaw3d_patch_edge_neighbors (fclaw2d_domain_t * domain,
     p4est_ghost_t *ghost = wrap->match_aux ? wrap->ghost_aux : wrap->ghost;
     p4est_mesh_t *mesh = wrap->match_aux ? wrap->mesh_aux : wrap->mesh;
     p4est_locidx_t local_num, qid, qte;
-    p4est_locidx_t edgeid, cstart, cend;
+    p4est_locidx_t cstart, cend;
     const p4est_quadrant_t *q;
     p4est_tree_t *rtree;
     fclaw2d_block_t *block;
@@ -149,7 +149,7 @@ fclaw3d_patch_edge_neighbors (fclaw2d_domain_t * domain,
     /* get rproc and rpatchno for each neighbor */
     for(int i=0; i < num_neighbors; i++)
     {
-        p4est_locidx_t qid = rpatchno[i];
+        qid = rpatchno[i];
         if (qid < mesh->local_num_quadrants)
         {
             /* local quadrant may be in a different tree */
