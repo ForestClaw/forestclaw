@@ -45,31 +45,6 @@ fclaw_domain_get_domain (fclaw_domain_t *d)
 
 #endif
 
-void you_can_safely_remove_this_call(fclaw_domain_t *domain)
-{
-    fclaw_domain_data_t* ddata = (fclaw_domain_data_t*) domain->user;
-    ddata = FCLAW_ALLOC_ZERO (fclaw_domain_data_t, 1);
-    domain->user = ddata;
-
-    ddata->count_set_patch = ddata->count_delete_patch = 0;
-    
-    ddata->domain_exchange = NULL;
-    ddata->domain_indirect = NULL;
-}
-
-void you_can_safely_remove_this_call(fclaw_domain_t* domain)
-{
-    fclaw_domain_data_t* ddata = (fclaw_domain_data_t*) domain->user;
-
-    FCLAW_FREE (ddata);
-    domain->user = NULL;
-}
-
-fclaw_domain_data_t *fclaw_domain_get_data(fclaw_domain_t *domain)
-{
-    return (fclaw_domain_data_t *) domain->user;
-}
-
 void fclaw_domain_setup(fclaw_global_t* glob,
                           fclaw_domain_t* new_domain)
 {
@@ -85,7 +60,6 @@ void fclaw_domain_setup(fclaw_global_t* glob,
     else
     {
         fclaw_global_infof("Rebuilding  domain\n");
-        you_can_safely_remove_this_call(new_domain);
     }
     fclaw_global_infof("Done\n");
 }
@@ -93,7 +67,6 @@ void fclaw_domain_setup(fclaw_global_t* glob,
 void fclaw_domain_reset(fclaw_global_t* glob)
 {
     fclaw_domain_t** domain = &glob->domain;
-    fclaw_domain_data_t *ddata = fclaw_domain_get_data (*domain);
     int i, j;
 
     for(i = 0; i < (*domain)->num_blocks; i++)
@@ -110,21 +83,19 @@ void fclaw_domain_reset(fclaw_global_t* glob)
         block->user = NULL;
     }
 
-    if (ddata->domain_exchange != NULL)
+    if ((*domain)->exchange != NULL)
     {
         /* TO DO: translate fclaw2d_exchange files */
         fclaw_exchange_delete(glob);
     }
 
     /* Output memory discrepancy for the ClawPatch */
-    if (ddata->count_set_patch != ddata->count_delete_patch)
+    if ((*domain)->count_set_patch != (*domain)->count_delete_patch)
     {
         printf ("[%d] This domain had Clawpatch set %d and deleted %d times\n",
                 (*domain)->mpirank,
-                ddata->count_set_patch, ddata->count_delete_patch);
+                (*domain)->count_set_patch, (*domain)->count_delete_patch);
     }
-
-    you_can_safely_remove_this_call(*domain);  // Delete allocated pointers to set of functions.
 
     fclaw_domain_destroy(*domain);
     *domain = NULL;

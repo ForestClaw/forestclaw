@@ -48,27 +48,10 @@ extern "C"
  */
 struct fclaw_global;
 
-typedef struct fclaw_domain_data
-{
-    /* Debug counters and timers */
-    int count_set_patch;
-    int count_delete_patch;
-
-    fclaw_domain_exchange_t *domain_exchange;
-    fclaw_domain_indirect_t *domain_indirect;
-
-} fclaw_domain_data_t;
-
-void you_can_safely_remove_this_call(struct fclaw_domain *domain);
-
-void you_can_safely_remove_this_call(struct fclaw_domain* domain);
-
 void fclaw_domain_setup(struct fclaw_global* glob,
                           struct fclaw_domain* new_domain);
 
 void fclaw_domain_reset(struct fclaw_global* glob);
-
-fclaw_domain_data_t* fclaw_domain_get_data(struct fclaw_domain *domain);
 
 /* OpenMP iterator (not part of forestclaw2d.h */
 void fclaw_domain_iterate_level_mthread (struct fclaw_domain * domain, int level,
