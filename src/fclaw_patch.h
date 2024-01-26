@@ -392,6 +392,64 @@ void fclaw_patch_interpolate_face(struct fclaw_global* glob,
                                     struct fclaw_patch_transform_data* transform_data);
 
 /**
+ * @brief Copies values from a edge-neighboring grid
+ * 
+ * @param[in]     glob the global context
+ * @param[in,out] this_patch this patch context
+ * @param[in]     neighbor_patch the neighbor patch context
+ * @param[in]     this_blockno the block number of this patch
+ * @param[in]     neighbor_blockno the block number of the neighbor patch
+ * @param[in]     is_block_corner true if corner is on the corner of a block
+ * @param[in]     iedge the edge that the neighboring patch is on
+ * @param[in]     time_interp true if ghost filling for time interpolated level (non-global update)
+ * @param[in]     tranform_data the tranform data for the neighbor's coordinate system
+ */
+void fclaw_patch_copy_edge(struct fclaw_global* glob,
+                           struct fclaw_patch *this_patch,
+                           struct fclaw_patch *neighbor_patch,
+                           int this_blockno,
+                           int neighbor_blockno,
+                           int iedge,
+                           int time_interp,
+                           struct fclaw_patch_transform_data *transform_data);
+
+/**
+ * @brief Averages values from a edge-neighboring fine grid
+ * 
+ * @param[in]     glob the global context
+ * @param[in,out] coarse_patch the coarse patch context
+ * @param[in]     fine_patch the fine patch context
+ * @param[in]     iedge_coarse the edge of the coarse patch that the fine patch is on
+ * @param[in]     time_interp true if ghost filling for time interpolated level (non-global update)
+ * @param[in]     tranform_data the tranform data for the neighbor's coordinate system
+ */
+void fclaw_patch_average_edge(struct fclaw_global* glob,
+                              struct fclaw_patch *coarse_patch,
+                              struct fclaw_patch *fine_patch,
+                              int iedge_coarse,
+                              int time_interp,
+                              struct fclaw_patch_transform_data* transform_data);
+
+/**
+ * @brief Interpolates values from a edge-neighboring coarse grid
+ * 
+ * @param[in]     glob the global context
+ * @param[in]     coarse_patch the coarse patch context
+ * @param[in,out] fine_patch the fine patch context
+ * @param[in]     iedge the edge of the coarse patch that the fine patch is on
+ * @param[in]     time_interp true if ghost filling for time interpolated level (non-global update)
+ * @param[in]     tranform_data the tranform data for the neighbor's coordinate system
+ */
+void fclaw_patch_interpolate_edge(struct fclaw_global* glob,
+                                    struct fclaw_patch* coarse_patch,
+                                    struct fclaw_patch* fine_patch,
+                                    int iedge,
+                                    int time_interp,
+                                    struct fclaw_patch_transform_data* transform_data);
+
+
+
+/**
  * @brief Copies values from a corner-neighboring grid
  * 
  * @param[in]     glob the global context
@@ -1037,6 +1095,65 @@ typedef void (*fclaw_patch_interpolate_face_t)(struct fclaw_global* glob,
                                                  *transform_data);
 
 /**
+ * @brief Copies values from a edge-neighboring grid
+ * 
+ * @param[in]     glob the global context
+ * @param[in,out] this_patch this patch context
+ * @param[in]     neighbor_patch the neighbor patch context
+ * @param[in]     this_blockno the block number of this patch
+ * @param[in]     neighbor_blockno the block number of the neighbor patch
+ * @param[in]     iedge the edge that the neighboring patch is on
+ * @param[in]     time_interp true if ghost filling for time interpolated level (non-global update)
+ * @param[in]     tranform_data the tranform data for the neighbor's coordinate system
+ */
+typedef void (*fclaw_patch_copy_edge_t)(struct fclaw_global* glob,
+                                        struct fclaw_patch *this_patch,
+                                        struct fclaw_patch *neighbor_patch,
+                                        int this_blockno,
+                                        int neighbor_blockno,
+                                        int iedge,
+                                        int time_interp,
+                                        struct fclaw_patch_transform_data 
+                                        *transform_data);
+    
+/**
+ * @brief Averages values from a edge-neighboring fine grid
+ * 
+ * @param[in]     glob the global context
+ * @param[in,out] coarse_patch the coarse patch context
+ * @param[in]     fine_patch the fine patch context
+ * @param[in]     icorner the corner of the coarse patch that the fine patch is on
+ * @param[in]     time_interp true if ghost filling for time interpolated level (non-global update)
+ * @param[in]     tranform_data the tranform data for the neighbor's coordinate system
+ */
+typedef void (*fclaw_patch_average_edge_t)(struct fclaw_global* glob,
+                                           struct fclaw_patch *coarse_patch,
+                                           struct fclaw_patch *fine_patch,
+                                           int icorner,
+                                           int time_interp,
+                                           struct fclaw_patch_transform_data 
+                                           *transform_data);
+
+/**
+ * @brief Interpolates values from a edge-neighboring coarse grid
+ * 
+ * @param[in]     glob the global context
+ * @param[in]     coarse_patch the coarse patch context
+ * @param[in,out] fine_patch the fine patch context
+ * @param[in]     iedge the edge of the coarse patch that the fine patch is on
+ * @param[in]     time_interp true if ghost filling for time interpolated level (non-global update)
+ * @param[in]     tranform_data the tranform data for the neighbor's coordinate system
+ */   
+typedef void (*fclaw_patch_interpolate_edge_t)(struct fclaw_global* glob,
+                                               struct fclaw_patch *coarse_patch,
+                                               struct fclaw_patch *fine_patch,
+                                               int iedge,
+                                               int time_interp,
+                                               struct fclaw_patch_transform_data 
+                                               *transform_data);
+ 
+
+/**
  * @brief Copies values from a corner-neighboring grid
  * 
  * @param[in]     glob the global context
@@ -1395,15 +1512,15 @@ struct fclaw_patch_vtable
 {
     /** @{ @name Creating/Deleting/Building */
 
-    /** @copybrief ::fclaw2d_patch_new_t */
+    /** @copybrief ::fclaw_patch_new_t */
     fclaw_patch_new_t                   patch_new;
-    /** @copybrief ::fclaw2d_patch_delete_t */
+    /** @copybrief ::fclaw_patch_delete_t */
     fclaw_patch_delete_t                patch_delete;
-    /** @copybrief ::fclaw2d_patch_build_t */
+    /** @copybrief ::fclaw_patch_build_t */
     fclaw_patch_build_t                 build;
-    /** @copybrief ::fclaw2d_patch_build_from_fine_t */
+    /** @copybrief ::fclaw_patch_build_from_fine_t */
     fclaw_patch_build_from_fine_t       build_from_fine;
-    /** @copybrief ::fclaw2d_patch_setup_t */
+    /** @copybrief ::fclaw_patch_setup_t */
     fclaw_patch_setup_t                 setup;
 
     /** @} */
@@ -1413,57 +1530,57 @@ struct fclaw_patch_vtable
 
     /** @{ @name User Data */
 
-    /** @copybrief ::fclaw2d_patch_create_user_data_t */
+    /** @copybrief ::fclaw_patch_create_user_data_t */
     fclaw_patch_create_user_data_t      create_user_data;
-    /** @copybrief ::fclaw2d_patch_destroy_user_data_t */
+    /** @copybrief ::fclaw_patch_destroy_user_data_t */
     fclaw_patch_destroy_user_data_t     destroy_user_data;
 
     /** @} */
 
     /** @{ @name Solver Functions */
 
-    /** @copybrief ::fclaw2d_patch_initialize_t */
+    /** @copybrief ::fclaw_patch_initialize_t */
     fclaw_patch_initialize_t            initialize;
-    /** @copybrief ::fclaw2d_patch_physical_bc_t */
+    /** @copybrief ::fclaw_patch_physical_bc_t */
     fclaw_patch_physical_bc_t           physical_bc;
-    /** @copybrief ::fclaw2d_patch_single_step_update_t */
+    /** @copybrief ::fclaw_patch_single_step_update_t */
     fclaw_patch_single_step_update_t    single_step_update;
-    /** @copybrief ::fclaw2d_patch_rhs_t */
+    /** @copybrief ::fclaw_patch_rhs_t */
     fclaw_patch_rhs_t                   rhs;
 
     /** @} */
 
     /** @{ @name Time Stepping */
 
-    /** @copybrief ::fclaw2d_patch_restore_step_t */
+    /** @copybrief ::fclaw_patch_restore_step_t */
     fclaw_patch_restore_step_t          restore_step;
-    /** @copybrief ::fclaw2d_patch_save_step_t */
+    /** @copybrief ::fclaw_patch_save_step_t */
     fclaw_patch_save_step_t             save_step;
-    /** @copybrief ::fclaw2d_patch_setup_timeinterp_t */
+    /** @copybrief ::fclaw_patch_setup_timeinterp_t */
     fclaw_patch_setup_timeinterp_t      setup_timeinterp;
 
     /** @} */
 
     /** @{ @name Regridding Functions */
 
-    /** @copybrief ::fclaw2d_patch_tag4refinement_t */
+    /** @copybrief ::fclaw_patch_tag4refinement_t */
     fclaw_patch_tag4refinement_t        tag4refinement;
-    /** @copybrief ::fclaw2d_patch_tag4coarsening_t */
+    /** @copybrief ::fclaw_patch_tag4coarsening_t */
     fclaw_patch_tag4coarsening_t        tag4coarsening;
-    /** @copybrief ::fclaw2d_patch_average2coarse_t */
+    /** @copybrief ::fclaw_patch_average2coarse_t */
     fclaw_patch_average2coarse_t        average2coarse;
-    /** @copybrief ::fclaw2d_patch_interpolate2fine_t */
+    /** @copybrief ::fclaw_patch_interpolate2fine_t */
     fclaw_patch_interpolate2fine_t      interpolate2fine;
 
     /** @} */
 
     /** @{ @name Time Syncing Functions for Conservation */
 
-    /** @copybrief ::fclaw2d_patch_time_sync_f2c_t */
+    /** @copybrief ::fclaw_patch_time_sync_f2c_t */
     fclaw_patch_time_sync_f2c_t         time_sync_f2c;
-    /** @copybrief ::fclaw2d_patch_time_sync_samesize_t */
+    /** @copybrief ::fclaw_patch_time_sync_samesize_t */
     fclaw_patch_time_sync_samesize_t    time_sync_samesize;
-    /** @copybrief ::fclaw2d_patch_time_sync_reset_t */
+    /** @copybrief ::fclaw_patch_time_sync_reset_t */
     fclaw_patch_time_sync_reset_t       time_sync_reset;
 
     /** @} */
@@ -1471,77 +1588,87 @@ struct fclaw_patch_vtable
 
     /** @{ @name Face Ghost Filling Functions */
 
-    /** @copybrief ::fclaw2d_patch_copy_face_t */
+    /** @copybrief ::fclaw_patch_copy_face_t */
     fclaw_patch_copy_face_t             copy_face;
-    /** @copybrief ::fclaw2d_patch_average_face_t */
+    /** @copybrief ::fclaw_patch_average_face_t */
     fclaw_patch_average_face_t          average_face;
-    /** @copybrief ::fclaw2d_patch_interpolate_face_t */
+    /** @copybrief ::fclaw_patch_interpolate_face_t */
     fclaw_patch_interpolate_face_t      interpolate_face;
 
     /** @} */
 
+    /** @{ @name Edge Ghost Filling Functions */
+
+    /** @copybrief ::fclaw_patch_copy_edge_t */
+    fclaw_patch_copy_edge_t              copy_edge;
+    /** @copybrief ::fclaw_patch_average_edge_t */
+    fclaw_patch_average_edge_t           average_edge;
+    /** @copybrief ::fclaw_patch_average_edge_t */
+    fclaw_patch_interpolate_edge_t       interpolate_edge;
+
+    /** @} */
     /** @{ @name Block Face and Interior Corner Ghost Filling Functions */
 
-    /** @copybrief ::fclaw2d_patch_copy_corner_t */
+    /** @copybrief ::fclaw_patch_copy_corner_t */
     fclaw_patch_copy_corner_t           copy_corner;
-    /** @copybrief ::fclaw2d_patch_average_corner_t */
+    /** @copybrief ::fclaw_patch_average_corner_t */
     fclaw_patch_average_corner_t        average_corner;
-    /** @copybrief ::fclaw2d_patch_interpolate_corner_t */
+    /** @copybrief ::fclaw_patch_interpolate_corner_t */
     fclaw_patch_interpolate_corner_t    interpolate_corner;
 
     /** @} */
 
     /** @{ @name Block Corner Ghost Filling Functions */
 
-    /** @copybrief ::fclaw2d_patch_copy_corner_t */
+    /** @copybrief ::fclaw_patch_copy_corner_t */
     fclaw_patch_copy_corner_t           copy_block_corner;
-    /** @copybrief ::fclaw2d_patch_average_corner_t */
+    /** @copybrief ::fclaw_patch_average_corner_t */
     fclaw_patch_average_corner_t        average_block_corner;
-    /** @copybrief ::fclaw2d_patch_interpolate_corner_t */
+    /** @copybrief ::fclaw_patch_interpolate_corner_t */
     fclaw_patch_interpolate_corner_t    interpolate_block_corner;
 
     /** @} */
 
     /** @{ @name Transform Functions */
 
-    /** @copybrief ::fclaw2d_patch_transform_init_data_t */
+    /** @copybrief ::fclaw_patch_transform_init_data_t */
     fclaw_patch_transform_init_data_t        transform_init_data;
-    /** @copybrief ::fclaw2d_patch_transform_blockface_t */
+    /** @copybrief ::fclaw_patch_transform_blockface_t */
     fclaw_patch_transform_blockface_t        transform_face;
-    /** @copybrief ::fclaw2d_patch_transform_blockface_intra_t */
+    /** @copybrief ::fclaw_patch_transform_blockface_intra_t */
     fclaw_patch_transform_blockface_intra_t  transform_face_intra;
 
     /** @} */
 
     /** @{ @name Ghost Packing Functions (for parallel use) */
 
-    /** @copybrief ::fclaw2d_patch_ghost_packsize_t */
+    /** @copybrief ::fclaw_patch_ghost_packsize_t */
     fclaw_patch_ghost_packsize_t        ghost_packsize;
-    /** @copybrief ::fclaw2d_patch_local_ghost_pack_t */
+    /** @copybrief ::fclaw_patch_local_ghost_pack_t */
     fclaw_patch_local_ghost_pack_t      local_ghost_pack;
-    /** @copybrief ::fclaw2d_patch_local_ghost_alloc_t */
+    /** @copybrief ::fclaw_patch_local_ghost_alloc_t */
     fclaw_patch_local_ghost_alloc_t     local_ghost_alloc;
-    /** @copybrief ::fclaw2d_patch_local_ghost_free_t */
+    /** @copybrief ::fclaw_patch_local_ghost_free_t */
     fclaw_patch_local_ghost_free_t      local_ghost_free;
 
-    /** @copybrief ::fclaw2d_patch_remote_ghost_build_t */
+    /** @copybrief ::fclaw_patch_remote_ghost_build_t */
     fclaw_patch_remote_ghost_build_t    remote_ghost_build;
-    /** @copybrief ::fclaw2d_patch_remote_ghost_setup_t */
+    /** @copybrief ::fclaw_patch_remote_ghost_setup_t */
     fclaw_patch_remote_ghost_setup_t    remote_ghost_setup;
-    /** @copybrief ::fclaw2d_patch_remote_ghost_unpack_t */
+    /** @copybrief ::fclaw_patch_remote_ghost_unpack_t */
     fclaw_patch_remote_ghost_unpack_t   remote_ghost_unpack;
-    /** @copybrief ::fclaw2d_patch_remote_ghost_delete_t */
+    /** @copybrief ::fclaw_patch_remote_ghost_delete_t */
     fclaw_patch_remote_ghost_delete_t   remote_ghost_delete;
 
     /** @} */
 
     /** @{ @name Parallel Load Balancing (partitioning) */
 
-    /** @copybrief ::fclaw2d_patch_partition_pack_t */
+    /** @copybrief ::fclaw_patch_partition_pack_t */
     fclaw_patch_partition_pack_t         partition_pack;
-    /** @copybrief ::fclaw2d_patch_partition_unpack_t */
+    /** @copybrief ::fclaw_patch_partition_unpack_t */
     fclaw_patch_partition_unpack_t       partition_unpack;
-    /** @copybrief ::fclaw2d_patch_partition_packsize_t */
+    /** @copybrief ::fclaw_patch_partition_packsize_t */
     fclaw_patch_partition_packsize_t     partition_packsize;
 
     /** @} */
@@ -1711,6 +1838,17 @@ void fclaw_patch_set_face_type(struct fclaw_patch *patch, int iface,
                                  fclaw_patch_relation_t face_type);
 
 /**
+ * @brief Set the edge type for a patch
+ * 
+ * @param patch the patch context
+ * @param iedge the edge
+ * @param edge_type the edge type
+ */
+void fclaw_patch_set_edge_type(fclaw_patch_t *patch,int iedge,
+							   fclaw_patch_relation_t edge_type);
+
+
+/**
  * @brief Set the corner type for a patch
  * 
  * @param patch the patch context
@@ -1733,17 +1871,25 @@ void fclaw_patch_set_missing_corner(struct fclaw_patch *patch, int icorner);
  * 
  * @param patch the patch context
  * @param iface the face
- * @return fclaw2d_patch_relation_t the face type
+ * @return fclaw_patch_relation_t the face type
  */
 fclaw_patch_relation_t fclaw_patch_get_face_type(struct fclaw_patch* patch,
                                                         int iface);
-
+/**
+ * @brief Get the edge type of a patch
+ * 
+ * @param patch the patch context
+ * @param iface the edge
+ * @return fclaw3d_patch_relation_t the edge type
+ */
+fclaw_patch_relation_t fclaw_patch_get_edge_type(fclaw_patch_t* patch,
+												 int iedge);
 /**
  * @brief Get the corner type of a patch
  * 
  * @param patch the patch context
  * @param icorner the corner
- * @return fclaw2d_patch_relation_t the patch relation
+ * @return fclaw_patch_relation_t the patch relation
  */
 fclaw_patch_relation_t fclaw_patch_get_corner_type(struct fclaw_patch* patch,
                                                           int icorner);
