@@ -47,15 +47,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define  PRIORITY_EXTRA         FCLAW_TIMER_PRIORITY_EXTRA
 
 
-#define FCLAW2D_STATS_SET(stats,glob,NAME) do {               \
-    SC_CHECK_ABORT (!(glob)->timers[FCLAW2D_TIMER_ ## NAME].running,              \
+#define FCLAW_STATS_SET(stats,glob,NAME) do {               \
+    SC_CHECK_ABORT (!(glob)->timers[FCLAW_TIMER_ ## NAME].running,              \
                     "Timer " #NAME " still running in fclaw2d_domain_finalize");  \
-    sc_stats_set1 ((stats) + FCLAW2D_TIMER_ ## NAME,                              \
-                   (glob)->timers[FCLAW2D_TIMER_ ## NAME].cumulative, #NAME);     \
+    sc_stats_set1 ((stats) + FCLAW_TIMER_ ## NAME,                              \
+                   (glob)->timers[FCLAW_TIMER_ ## NAME].cumulative, #NAME);     \
 } while (0)
 
-#define FCLAW2D_STATS_SET_GROUP(stats,NAME,GROUP) do {                  \
-    sc_stats_set_group_prio ((stats) + FCLAW2D_TIMER_ ## NAME,          \
+#define FCLAW_STATS_SET_GROUP(stats,NAME,GROUP) do {                  \
+    sc_stats_set_group_prio ((stats) + FCLAW_TIMER_ ## NAME,          \
                    GROUP_ ## GROUP, PRIORITY_ ## GROUP);    \
 } while (0)
 
@@ -132,43 +132,43 @@ fclaw2d_timer_report(fclaw_global_t *glob)
 
     fclaw_timer_stop (&glob->timers[FCLAW_TIMER_WALLTIME]);
 
-    FCLAW2D_STATS_SET (stats, glob, INIT);
-    FCLAW2D_STATS_SET (stats, glob, OUTPUT);
-    FCLAW2D_STATS_SET (stats, glob, DIAGNOSTICS);
-    FCLAW2D_STATS_SET (stats, glob, REGRID);
-    FCLAW2D_STATS_SET (stats, glob, ADVANCE);
-    FCLAW2D_STATS_SET (stats, glob, GHOSTFILL);
-    FCLAW2D_STATS_SET (stats, glob, ADAPT_COMM);
-    FCLAW2D_STATS_SET (stats, glob, PARTITION_COMM);
-    FCLAW2D_STATS_SET (stats, glob, GHOSTPATCH_COMM);
-    FCLAW2D_STATS_SET (stats, glob, DIAGNOSTICS_COMM);
-    FCLAW2D_STATS_SET (stats, glob, CFL_COMM);
-    FCLAW2D_STATS_SET (stats, glob, WALLTIME);
-    FCLAW2D_STATS_SET (stats, glob, REGRID_BUILD);
-    FCLAW2D_STATS_SET (stats, glob, REGRID_TAGGING);
-    FCLAW2D_STATS_SET (stats, glob, TIMESYNC);
-    FCLAW2D_STATS_SET (stats, glob, PARTITION);
-    FCLAW2D_STATS_SET (stats, glob, PARTITION_BUILD);
-    FCLAW2D_STATS_SET (stats, glob, ADVANCE_STEP2);
-    FCLAW2D_STATS_SET (stats, glob, ADVANCE_B4STEP2);
-    FCLAW2D_STATS_SET (stats, glob, GHOSTPATCH_BUILD);
-    FCLAW2D_STATS_SET (stats, glob, GHOSTFILL_COPY);
-    FCLAW2D_STATS_SET (stats, glob, GHOSTFILL_AVERAGE);
-    FCLAW2D_STATS_SET (stats, glob, GHOSTFILL_INTERP);
-    FCLAW2D_STATS_SET (stats, glob, GHOSTFILL_PHYSBC);
-    FCLAW2D_STATS_SET (stats, glob, GHOSTFILL_STEP1);
-    FCLAW2D_STATS_SET (stats, glob, GHOSTFILL_STEP2);
-    FCLAW2D_STATS_SET (stats, glob, GHOSTFILL_STEP3);
-    FCLAW2D_STATS_SET (stats, glob, NEIGHBOR_SEARCH);
-    FCLAW2D_STATS_SET (stats, glob, CUDA_ALLOCATE);
-    FCLAW2D_STATS_SET (stats, glob, CUDA_MEMCOPY_H2H);
-    FCLAW2D_STATS_SET (stats, glob, CUDA_MEMCOPY_H2D);
-    FCLAW2D_STATS_SET (stats, glob, CUDA_MEMCOPY_D2H);
-    FCLAW2D_STATS_SET (stats, glob, ELLIPTIC_SOLVE);
-    FCLAW2D_STATS_SET (stats, glob, EXTRA1);
-    FCLAW2D_STATS_SET (stats, glob, EXTRA2);
-    FCLAW2D_STATS_SET (stats, glob, EXTRA3);
-    FCLAW2D_STATS_SET (stats, glob, EXTRA4);
+    FCLAW_STATS_SET (stats, glob, INIT);
+    FCLAW_STATS_SET (stats, glob, OUTPUT);
+    FCLAW_STATS_SET (stats, glob, DIAGNOSTICS);
+    FCLAW_STATS_SET (stats, glob, REGRID);
+    FCLAW_STATS_SET (stats, glob, ADVANCE);
+    FCLAW_STATS_SET (stats, glob, GHOSTFILL);
+    FCLAW_STATS_SET (stats, glob, ADAPT_COMM);
+    FCLAW_STATS_SET (stats, glob, PARTITION_COMM);
+    FCLAW_STATS_SET (stats, glob, GHOSTPATCH_COMM);
+    FCLAW_STATS_SET (stats, glob, DIAGNOSTICS_COMM);
+    FCLAW_STATS_SET (stats, glob, CFL_COMM);
+    FCLAW_STATS_SET (stats, glob, WALLTIME);
+    FCLAW_STATS_SET (stats, glob, REGRID_BUILD);
+    FCLAW_STATS_SET (stats, glob, REGRID_TAGGING);
+    FCLAW_STATS_SET (stats, glob, TIMESYNC);
+    FCLAW_STATS_SET (stats, glob, PARTITION);
+    FCLAW_STATS_SET (stats, glob, PARTITION_BUILD);
+    FCLAW_STATS_SET (stats, glob, ADVANCE_STEP2);
+    FCLAW_STATS_SET (stats, glob, ADVANCE_B4STEP2);
+    FCLAW_STATS_SET (stats, glob, GHOSTPATCH_BUILD);
+    FCLAW_STATS_SET (stats, glob, GHOSTFILL_COPY);
+    FCLAW_STATS_SET (stats, glob, GHOSTFILL_AVERAGE);
+    FCLAW_STATS_SET (stats, glob, GHOSTFILL_INTERP);
+    FCLAW_STATS_SET (stats, glob, GHOSTFILL_PHYSBC);
+    FCLAW_STATS_SET (stats, glob, GHOSTFILL_STEP1);
+    FCLAW_STATS_SET (stats, glob, GHOSTFILL_STEP2);
+    FCLAW_STATS_SET (stats, glob, GHOSTFILL_STEP3);
+    FCLAW_STATS_SET (stats, glob, NEIGHBOR_SEARCH);
+    FCLAW_STATS_SET (stats, glob, CUDA_ALLOCATE);
+    FCLAW_STATS_SET (stats, glob, CUDA_MEMCOPY_H2H);
+    FCLAW_STATS_SET (stats, glob, CUDA_MEMCOPY_H2D);
+    FCLAW_STATS_SET (stats, glob, CUDA_MEMCOPY_D2H);
+    FCLAW_STATS_SET (stats, glob, ELLIPTIC_SOLVE);
+    FCLAW_STATS_SET (stats, glob, EXTRA1);
+    FCLAW_STATS_SET (stats, glob, EXTRA2);
+    FCLAW_STATS_SET (stats, glob, EXTRA3);
+    FCLAW_STATS_SET (stats, glob, EXTRA4);
 
     int d = glob->count_grids_per_proc;
     glob->count_grids_per_proc = (d > 0) ? d : 1;   /* To avoid division by zero */
@@ -240,9 +240,9 @@ fclaw2d_timer_report(fclaw_global_t *glob)
                    glob->timers[FCLAW_TIMER_PARTITION_COMM].cumulative +
                    glob->timers[FCLAW_TIMER_DIAGNOSTICS_COMM].cumulative +
                    glob->timers[FCLAW_TIMER_CFL_COMM].cumulative,
-                   "FCLAW2D_TIMER_GLOBAL_COMM");
+                   "FCLAW_TIMER_GLOBAL_COMM");
 
-    /* Just subtracting FCLAW2D_TIMER_GLOBAL here doesn't work ... */
+    /* Just subtracting FCLAW_TIMER_GLOBAL here doesn't work ... */
     sc_stats_set1 (&stats[FCLAW_TIMER_LOCAL_COMM],
                    glob->timers[FCLAW_TIMER_WALLTIME].cumulative -
                    (glob->timers[FCLAW_TIMER_ADAPT_COMM].cumulative +
@@ -250,7 +250,7 @@ fclaw2d_timer_report(fclaw_global_t *glob)
                    glob->timers[FCLAW_TIMER_PARTITION_COMM].cumulative +
                    glob->timers[FCLAW_TIMER_DIAGNOSTICS_COMM].cumulative +
                     glob->timers[FCLAW_TIMER_CFL_COMM].cumulative),
-                   "FCLAW2D_TIMER_LOCAL_COMM");
+                   "FCLAW_TIMER_LOCAL_COMM");
 
 
     /* --------------------------------- Set stats groups ------------------------------*/
@@ -275,72 +275,72 @@ fclaw2d_timer_report(fclaw_global_t *glob)
         GROUP_COUNT
     };
 
-    FCLAW2D_STATS_SET_GROUP(stats,WALLTIME,              WALL);
+    FCLAW_STATS_SET_GROUP(stats,WALLTIME,              WALL);
 
-    FCLAW2D_STATS_SET_GROUP(stats,ADVANCE,               EXCLUSIVE1);
-    FCLAW2D_STATS_SET_GROUP(stats,ELLIPTIC_SOLVE,        EXCLUSIVE1);
-    FCLAW2D_STATS_SET_GROUP(stats,GHOSTFILL,             EXCLUSIVE1);
-    FCLAW2D_STATS_SET_GROUP(stats,GHOSTPATCH_COMM,       EXCLUSIVE1);
-    FCLAW2D_STATS_SET_GROUP(stats,REGRID,                EXCLUSIVE1);
-    FCLAW2D_STATS_SET_GROUP(stats,ADAPT_COMM,            EXCLUSIVE1);
+    FCLAW_STATS_SET_GROUP(stats,ADVANCE,               EXCLUSIVE1);
+    FCLAW_STATS_SET_GROUP(stats,ELLIPTIC_SOLVE,        EXCLUSIVE1);
+    FCLAW_STATS_SET_GROUP(stats,GHOSTFILL,             EXCLUSIVE1);
+    FCLAW_STATS_SET_GROUP(stats,GHOSTPATCH_COMM,       EXCLUSIVE1);
+    FCLAW_STATS_SET_GROUP(stats,REGRID,                EXCLUSIVE1);
+    FCLAW_STATS_SET_GROUP(stats,ADAPT_COMM,            EXCLUSIVE1);
 
 
     if (priority == FCLAW_TIMER_PRIORITY_SUMMARY)
-        FCLAW2D_STATS_SET_GROUP(stats,UNACCOUNTED,           EXCLUSIVE1);
+        FCLAW_STATS_SET_GROUP(stats,UNACCOUNTED,           EXCLUSIVE1);
     else
-        FCLAW2D_STATS_SET_GROUP(stats,UNACCOUNTED,           EXCLUSIVE2);    
+        FCLAW_STATS_SET_GROUP(stats,UNACCOUNTED,           EXCLUSIVE2);    
 
-    FCLAW2D_STATS_SET_GROUP(stats,INIT,                  EXCLUSIVE2);
-    FCLAW2D_STATS_SET_GROUP(stats,OUTPUT,                EXCLUSIVE2);
-    FCLAW2D_STATS_SET_GROUP(stats,DIAGNOSTICS,           EXCLUSIVE2);
-    FCLAW2D_STATS_SET_GROUP(stats,PARTITION_COMM,        EXCLUSIVE2);
-    FCLAW2D_STATS_SET_GROUP(stats,DIAGNOSTICS_COMM,      EXCLUSIVE2);
-    FCLAW2D_STATS_SET_GROUP(stats,CFL_COMM,              EXCLUSIVE2);
+    FCLAW_STATS_SET_GROUP(stats,INIT,                  EXCLUSIVE2);
+    FCLAW_STATS_SET_GROUP(stats,OUTPUT,                EXCLUSIVE2);
+    FCLAW_STATS_SET_GROUP(stats,DIAGNOSTICS,           EXCLUSIVE2);
+    FCLAW_STATS_SET_GROUP(stats,PARTITION_COMM,        EXCLUSIVE2);
+    FCLAW_STATS_SET_GROUP(stats,DIAGNOSTICS_COMM,      EXCLUSIVE2);
+    FCLAW_STATS_SET_GROUP(stats,CFL_COMM,              EXCLUSIVE2);
 
-    FCLAW2D_STATS_SET_GROUP(stats,LOCAL_COMM,            COMM);
-    FCLAW2D_STATS_SET_GROUP(stats,GLOBAL_COMM,           COMM);
+    FCLAW_STATS_SET_GROUP(stats,LOCAL_COMM,            COMM);
+    FCLAW_STATS_SET_GROUP(stats,GLOBAL_COMM,           COMM);
 
-    FCLAW2D_STATS_SET_GROUP(stats,ADVANCE_STEPS_COUNTER, COUNTERS1);
-    FCLAW2D_STATS_SET_GROUP(stats,ELLIPTIC_GRIDS_COUNTER, COUNTERS1);
-    FCLAW2D_STATS_SET_GROUP(stats,GRIDS_PER_PROC,        COUNTERS1);
+    FCLAW_STATS_SET_GROUP(stats,ADVANCE_STEPS_COUNTER, COUNTERS1);
+    FCLAW_STATS_SET_GROUP(stats,ELLIPTIC_GRIDS_COUNTER, COUNTERS1);
+    FCLAW_STATS_SET_GROUP(stats,GRIDS_PER_PROC,        COUNTERS1);
 
-    FCLAW2D_STATS_SET_GROUP(stats,GRIDS_INTERIOR,        COUNTERS2);
-    FCLAW2D_STATS_SET_GROUP(stats,GRIDS_LOCAL_BOUNDARY,  COUNTERS2);
-    FCLAW2D_STATS_SET_GROUP(stats,GRIDS_REMOTE_BOUNDARY, COUNTERS2);
+    FCLAW_STATS_SET_GROUP(stats,GRIDS_INTERIOR,        COUNTERS2);
+    FCLAW_STATS_SET_GROUP(stats,GRIDS_LOCAL_BOUNDARY,  COUNTERS2);
+    FCLAW_STATS_SET_GROUP(stats,GRIDS_REMOTE_BOUNDARY, COUNTERS2);
 
-    FCLAW2D_STATS_SET_GROUP(stats,REGRID_BUILD,          REGRID);
-    FCLAW2D_STATS_SET_GROUP(stats,REGRID_TAGGING,        REGRID);
+    FCLAW_STATS_SET_GROUP(stats,REGRID_BUILD,          REGRID);
+    FCLAW_STATS_SET_GROUP(stats,REGRID_TAGGING,        REGRID);
 
-    FCLAW2D_STATS_SET_GROUP(stats,PARTITION,             PARTITION);  
-    FCLAW2D_STATS_SET_GROUP(stats,PARTITION_BUILD,       PARTITION);
+    FCLAW_STATS_SET_GROUP(stats,PARTITION,             PARTITION);  
+    FCLAW_STATS_SET_GROUP(stats,PARTITION_BUILD,       PARTITION);
 
-    FCLAW2D_STATS_SET_GROUP(stats,ADVANCE_STEP2,         ADVANCE);
-    FCLAW2D_STATS_SET_GROUP(stats,ADVANCE_B4STEP2,       ADVANCE);
+    FCLAW_STATS_SET_GROUP(stats,ADVANCE_STEP2,         ADVANCE);
+    FCLAW_STATS_SET_GROUP(stats,ADVANCE_B4STEP2,       ADVANCE);
 
-    FCLAW2D_STATS_SET_GROUP(stats,GHOSTPATCH_BUILD,      GHOST);
-    FCLAW2D_STATS_SET_GROUP(stats,TIMESYNC,              GHOST);
-    FCLAW2D_STATS_SET_GROUP(stats,GHOSTFILL_COPY,        GHOST);
-    FCLAW2D_STATS_SET_GROUP(stats,GHOSTFILL_AVERAGE,     GHOST);
-    FCLAW2D_STATS_SET_GROUP(stats,GHOSTFILL_INTERP,      GHOST);
-    FCLAW2D_STATS_SET_GROUP(stats,GHOSTFILL_PHYSBC,      GHOST);
-    FCLAW2D_STATS_SET_GROUP(stats,GHOSTFILL_STEP1,       GHOST);
-    FCLAW2D_STATS_SET_GROUP(stats,GHOSTFILL_STEP2,       GHOST);
-    FCLAW2D_STATS_SET_GROUP(stats,GHOSTFILL_STEP3,       GHOST);
+    FCLAW_STATS_SET_GROUP(stats,GHOSTPATCH_BUILD,      GHOST);
+    FCLAW_STATS_SET_GROUP(stats,TIMESYNC,              GHOST);
+    FCLAW_STATS_SET_GROUP(stats,GHOSTFILL_COPY,        GHOST);
+    FCLAW_STATS_SET_GROUP(stats,GHOSTFILL_AVERAGE,     GHOST);
+    FCLAW_STATS_SET_GROUP(stats,GHOSTFILL_INTERP,      GHOST);
+    FCLAW_STATS_SET_GROUP(stats,GHOSTFILL_PHYSBC,      GHOST);
+    FCLAW_STATS_SET_GROUP(stats,GHOSTFILL_STEP1,       GHOST);
+    FCLAW_STATS_SET_GROUP(stats,GHOSTFILL_STEP2,       GHOST);
+    FCLAW_STATS_SET_GROUP(stats,GHOSTFILL_STEP3,       GHOST);
 
-    FCLAW2D_STATS_SET_GROUP(stats,NEIGHBOR_SEARCH,       SEARCH);
+    FCLAW_STATS_SET_GROUP(stats,NEIGHBOR_SEARCH,       SEARCH);
 
-    FCLAW2D_STATS_SET_GROUP(stats,CUDA_ALLOCATE,         CUDA);
-    FCLAW2D_STATS_SET_GROUP(stats,CUDA_MEMCOPY_H2H,      CUDA);
-    FCLAW2D_STATS_SET_GROUP(stats,CUDA_MEMCOPY_H2D,      CUDA);
-    FCLAW2D_STATS_SET_GROUP(stats,CUDA_MEMCOPY_D2H,      CUDA);
+    FCLAW_STATS_SET_GROUP(stats,CUDA_ALLOCATE,         CUDA);
+    FCLAW_STATS_SET_GROUP(stats,CUDA_MEMCOPY_H2H,      CUDA);
+    FCLAW_STATS_SET_GROUP(stats,CUDA_MEMCOPY_H2D,      CUDA);
+    FCLAW_STATS_SET_GROUP(stats,CUDA_MEMCOPY_D2H,      CUDA);
 
-    FCLAW2D_STATS_SET_GROUP(stats,EXTRA1,                EXTRA);
-    FCLAW2D_STATS_SET_GROUP(stats,EXTRA1,                EXTRA);
+    FCLAW_STATS_SET_GROUP(stats,EXTRA1,                EXTRA);
+    FCLAW_STATS_SET_GROUP(stats,EXTRA1,                EXTRA);
 
-    FCLAW2D_STATS_SET_GROUP(stats,EXTRA1,                EXTRA);
-    FCLAW2D_STATS_SET_GROUP(stats,EXTRA2,                EXTRA);
-    FCLAW2D_STATS_SET_GROUP(stats,EXTRA3,                EXTRA);
-    FCLAW2D_STATS_SET_GROUP(stats,EXTRA4,                EXTRA);
+    FCLAW_STATS_SET_GROUP(stats,EXTRA1,                EXTRA);
+    FCLAW_STATS_SET_GROUP(stats,EXTRA2,                EXTRA);
+    FCLAW_STATS_SET_GROUP(stats,EXTRA3,                EXTRA);
+    FCLAW_STATS_SET_GROUP(stats,EXTRA4,                EXTRA);
 
     /* ----------------------------------- Compute timers ------------------------------*/
 
@@ -383,13 +383,13 @@ fclaw2d_timer_report(fclaw_global_t *glob)
 
     /* Write out individual processor timers */
     printf("%12s time on proc %d : %12.4f\n","ADVANCE",
-           domain->mpirank,glob->timers[FCLAW2D_TIMER_ADVANCE].cumulative);
+           domain->mpirank,glob->timers[FCLAW_TIMER_ADVANCE].cumulative);
     printf("%12s time on proc %d : %12.4f\n","GHOSTCOMM",
-           domain->mpirank,glob->timers[FCLAW2D_TIMER_GHOSTCOMM].cumulative);
+           domain->mpirank,glob->timers[FCLAW_TIMER_GHOSTCOMM].cumulative);
     printf("%12s time on proc %d : %12.4f\n","EXCHANGE",
-           domain->mpirank,glob->timers[FCLAW2D_TIMER_EXCHANGE].cumulative);
+           domain->mpirank,glob->timers[FCLAW_TIMER_EXCHANGE].cumulative);
     printf("%12s time on proc %d : %12.4f\n","REGRID",
-           domain->mpirank,glob->timers[FCLAW2D_TIMER_REGRID].cumulative);
+           domain->mpirank,glob->timers[FCLAW_TIMER_REGRID].cumulative);
     printf("\n");
 #endif
 
