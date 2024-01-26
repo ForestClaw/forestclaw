@@ -252,7 +252,7 @@ void fclaw3d_metric_patch_mesh_data(struct fclaw_global* glob,
  *             (i,j,k,2) contains the area of face with normal (0,1,0) (front face)
  *             (i,j,k,3) contains the area of face with normal (0,0,1) (bottom face)
  */
-void fclaw3d_metric_patch_mesh_data2(struct fclaw2d_global* glob,
+void fclaw3d_metric_patch_mesh_data2(struct fclaw_global* glob,
 									 struct fclaw2d_patch* patch,
                                      double **xrot, double **yrot, double **zrot);
 #endif
