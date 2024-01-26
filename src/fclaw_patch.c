@@ -28,7 +28,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_patch.h>
 #include <fclaw_global.h>
 #include <fclaw_domain.h>
+
 #include <fclaw2d_defs.h>
+#include <forestclaw2d.h>
 
 struct fclaw_patch_transform_data;
 
@@ -1054,7 +1056,7 @@ int fclaw_patch_on_coarsefine_interface(fclaw_patch_t *patch)
 int
 fclaw_patch_on_parallel_boundary (const fclaw_patch_t * patch)
 {
-	return patch->flags & FCLAW2D_PATCH_ON_PARALLEL_BOUNDARY ? 1 : 0;
+	return patch->d2->flags & FCLAW2D_PATCH_ON_PARALLEL_BOUNDARY ? 1 : 0;
 }
 
 int* fclaw_patch_block_corner_count(fclaw_global_t* glob,
