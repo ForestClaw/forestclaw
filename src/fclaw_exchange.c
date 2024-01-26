@@ -31,14 +31,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw_options.h>
 
+#include <forestclaw2d.h>
+
 /* Also needed in fclaw2d_domain_reset */
 /* edit: right now this is not the case, switching to static */
 static
 fclaw_domain_exchange_t*
     get_exchange_data(fclaw_global_t* glob)
 {
-    fclaw_domain_data_t *ddata = fclaw_domain_get_data (glob->domain);
-    return ddata->domain_exchange;
+    return glob->domain->exchange;
 }
 
 /* Should these be access functions in domain?  */
@@ -46,24 +47,21 @@ static
 void set_exchange_data(fclaw_global_t* glob,
                        fclaw_domain_exchange_t *e)
 {
-    fclaw_domain_data_t *ddata = fclaw_domain_get_data (glob->domain);
-    ddata->domain_exchange = e;
+    glob->domain->exchange = e;
 }
 
 static
 fclaw_domain_indirect_t*
     get_indirect_data(fclaw_global_t* glob)
 {
-    fclaw_domain_data_t *ddata = fclaw_domain_get_data (glob->domain);
-    return ddata->domain_indirect;
+    return glob->domain->indirect;
 }
 
 static
 void set_indirect_data(fclaw_global_t* glob,
                        fclaw_domain_indirect_t *ind)
 {
-    fclaw_domain_data_t *ddata = fclaw_domain_get_data (glob->domain);
-    ddata->domain_indirect = ind;
+    glob->domain->indirect = ind;
 }
 
 static
@@ -91,7 +89,7 @@ void build_remote_ghost_patches(fclaw_global_t* glob)
     {
         ghost_patch = &domain->ghost_patches[i];
 
-        blockno = ghost_patch->u.blockno;
+        blockno = fclaw_patch_get_ghost_block(ghost_patch);
 
         /* not clear how useful this patchno is.  In any case, it isn't
            used in defining the ClawPatch, so probably doesn't
@@ -136,12 +134,12 @@ unpack_remote_ghost_patches(fclaw_global_t* glob,
 
         if (level >= minlevel-1)
         {
-            int blockno = ghost_patch->u.blockno;
+            int blockno = fclaw_patch_get_ghost_block(ghost_patch);
 
             int patchno = i;
 
             /* access data stored on remote procs. */
-            void *q = e->ghost_data[patchno];
+            void *q = e->d2->ghost_data[patchno];
 
             int unpack_to_timeinterp_patch=0;
             if (time_interp && level == minlevel-1)
@@ -189,10 +187,9 @@ void fclaw_exchange_setup(fclaw_global_t* glob,
         int np;
         for (np = 0; np < domain->blocks[nb].num_patches; ++np)
         {
-            if (domain->blocks[nb].patches[np].flags &
-                FCLAW2D_PATCH_ON_PARALLEL_BOUNDARY)
+            if (fclaw_patch_on_parallel_boundary(&domain->blocks[nb].patches[np]))
             {                
-                fclaw_patch_local_ghost_alloc(glob, &e->patch_data[zz++]);
+                fclaw_patch_local_ghost_alloc(glob, &e->d2->patch_data[zz++]);
             }
         }
     }
@@ -269,10 +266,9 @@ void fclaw_exchange_delete(fclaw_global_t* glob)
             int np;
             for (np = 0; np < (*domain)->blocks[nb].num_patches; ++np)
             {
-                if ((*domain)->blocks[nb].patches[np].flags &
-                    FCLAW2D_PATCH_ON_PARALLEL_BOUNDARY)
+                if (fclaw_patch_on_parallel_boundary(&(*domain)->blocks[nb].patches[np]))
                 {
-                    fclaw_patch_local_ghost_free(glob,&e_old->patch_data[zz++]);
+                    fclaw_patch_local_ghost_free(glob,&e_old->d2->patch_data[zz++]);
                 }
             }
         }
@@ -315,8 +311,7 @@ void fclaw_exchange_ghost_patches_begin(fclaw_global_t* glob,
         int np;
         for (np = 0; np < domain->blocks[nb].num_patches; ++np)
         {
-            if (domain->blocks[nb].patches[np].flags &
-                FCLAW2D_PATCH_ON_PARALLEL_BOUNDARY)
+            if (fclaw_patch_on_parallel_boundary(&domain->blocks[nb].patches[np]))
             {
                 fclaw_patch_t *this_patch = &domain->blocks[nb].patches[np];
                 int level = this_patch->level;
@@ -326,7 +321,7 @@ void fclaw_exchange_ghost_patches_begin(fclaw_global_t* glob,
 
                 /* Pack q and area into one contingous block */
                 fclaw_patch_local_ghost_pack(glob,this_patch,
-                                               e->patch_data[zz++],
+                                               e->d2->patch_data[zz++],
                                                pack_time_interp);
             }
         }
