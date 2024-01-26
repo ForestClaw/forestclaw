@@ -67,13 +67,13 @@ void fclaw2d_clawpatch_transform_init_data(fclaw_global_t* glob,
 void fclaw2d_clawpatch_face_transformation (int faceno, int rfaceno, int ftransform[])
 {
     /* Defined in forestclaw2d.c */
-    fclaw_patch_face_transformation (faceno, rfaceno, ftransform);
+    fclaw_patch_face_transformation (2, faceno, rfaceno, ftransform);
 }
 
 void fclaw2d_clawpatch_face_transformation_intra (int ftransform[])
 {
     /* Defined in forestclaw2d.c */
-    fclaw_patch_face_transformation_intra (ftransform);
+    fclaw_patch_face_transformation_intra (2, ftransform);
 }
 
 
