@@ -73,17 +73,21 @@ typedef enum
  */
 struct fclaw_patch_data
 {
+    int refine_dim;
+
     /** Pointer to the core patch structure in the domain */
     const fclaw_patch_t *real_patch;
 
     /** Neighbor relation on each face */
-    fclaw_patch_relation_t face_neighbors[4];
+    fclaw_patch_relation_t face_neighbors[6];
+    /** Neighbor relation on each edge */
+    fclaw_patch_relation_t edge_neighbors[12];
     /** Neighbor relation on each corner */
-    fclaw_patch_relation_t corner_neighbors[4];
+    fclaw_patch_relation_t corner_neighbors[8];
     /** True if coner has neighbor */
-    int corners[4];
+    int corners[8];
     /** The number of patches that meet at each corner */
-    int block_corner_count[4];
+    int block_corner_count[8];
     /** True if this patch lies on a coarse-fine interface */
     int on_coarsefine_interface;
     /** True if there are finer neighbors */
@@ -159,16 +163,6 @@ struct fclaw_patch;
 ///                         @name Creating/Deleting Patches
 /* ------------------------------------------------------------------------------------ */
 ///@{
-
-/**
- * DEPRECATED
- * @deprecated NOT USED
- */
-void fclaw_patch_reset_data(struct fclaw_global* glob,
-                              struct fclaw_patch* old_patch,
-                              struct fclaw_patch* new_patch,
-                              int blockno,int old_patchno, int new_patchno);
-
 
 /**
  * @brief Deallocate the user data pointer for a patch
