@@ -3,7 +3,8 @@ c     # adapted from the C-function 'fclaw2d_map_c2m_disk'
 c     # in fclaw2d_map.c (C. Burstedde)
 c     # -------------------------------------------------------
 
-      subroutine fclaw_map_2d_c2m_squareddisk(blockno,xc,yc,xp,yp,zp,alpha)
+      subroutine fclaw_map_2d_c2m_squareddisk(
+     &   blockno,xc,yc,xp,yp,zp,alpha)
       implicit none
 
       double precision xc,yc,xp,yp,zp
