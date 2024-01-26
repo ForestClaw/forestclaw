@@ -111,12 +111,26 @@ struct fclaw_patch_data
  */
 struct fclaw_patch_transform_data
 {
+    int dim;
+
     /** Pointer to this patch */
     struct fclaw_patch *this_patch;
+    /** This patch's blockno */
+    int this_blockno;
+    /** This patch's patchno */
+    int this_patchno;
     /** Pointer to the neighbor patch */
     struct fclaw_patch *neighbor_patch;
+    /** Neighbor patch's blockno */
+    int neighbor_blockno;
+    /** Neighbor patch's patchno */
+    int neighbor_patchno;
+    /** Neighbor type */
+    fclaw_patch_relation_t neighbor_type;
     /**
      * @brief Transform array
+     * 
+     * .        For 2D:
      * 
      *          This array holds 9 integers.
      *  [0,2]   The coordinate axis sequence of the origin face,
@@ -132,19 +146,45 @@ struct fclaw_patch_transform_data
      *          [8] & 4: Both patches are in the same block,
      *                   the \a ftransform contents are ignored.
      *  [1,4,7] 0 (unused for compatibility with 3D).ftransform 
+     *
+     * .        For 3D:
+     *
+     *  [0]..[2]    The coordinate axis sequence of the origin face,
+     *              the first two referring to the tangentials and the
+     *              third to the normal.  A permutation of (0, 1, 2).
+     *  [3]..[5]    The coordinate axis sequence of the target face.
+     *  [6]..[8]    Edge reversal flags for tangential axes (boolean);
+     *              face code in [0, 3] for the normal coordinate q:
+     *              0: q' = -q
+     *              1: q' = q + 1
+     *              2: q' = q - 1
+     *              3: q' = 2 - q
+     *
      */
     int transform[9];
-    /** The corner that the neighboring patch is on. */
-    int icorner;
     /**
      * @brief Base index
      * 
      * 1 for cell-centered (1 .. mx); 0 for nodes (0 .. mx)
      */
     int based;
-    /** True if patch is on a block corner */
+    
+    /** The corner that the neighboring patch is on. */
+    int icorner;
+    /** The edge that the neighboring patch is on. */
+    int iedge;
+    /** The face that the neighboring patch is on */
+    int iface;
+
+    /** True if neighbor is across a block corner */
     int is_block_corner;
-    /** -1 for interior faces or block corners */
+    /** True if neighbor is accross a block edge */
+    int is_block_edge;
+    /** True if neighbor is across a block face */
+    int is_block_face;
+    /** -1 for unless neighbor is across a block edge */
+    int block_iedge;   
+    /** -1 for unless neighbor is across a block face */
     int block_iface;   
 
     /** Pointer to the glboal context */
