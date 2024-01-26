@@ -457,7 +457,6 @@ void fclaw_face_neighbor_ghost(fclaw_global_t* glob,
 {
 	fclaw_domain_t *domain = glob->domain;
 
-	fclaw_domain_data_t *ddata = fclaw_domain_get_data(domain);
 	const fclaw_options_t *gparms = fclaw_get_options(glob);
 	int refratio = gparms->refratio;
 
@@ -473,7 +472,7 @@ void fclaw_face_neighbor_ghost(fclaw_global_t* glob,
 	transform_data.glob = glob;
 	transform_data.based = 1;      /* cell-centered data in this routine. */
 
-	fclaw_domain_indirect_t *ind = ddata->domain_indirect;
+	fclaw_domain_indirect_t *ind = domain->indirect;
 
 	/* Loop over ghost patches to do any face exchanges that didn't happen
 	   before the ghost patch exchange was done */
