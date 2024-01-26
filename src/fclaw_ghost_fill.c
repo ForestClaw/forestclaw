@@ -162,7 +162,7 @@ void copy2ghost(fclaw_global_t *glob,
     fclaw_global_iterate_level(glob, level, cb_parallel_wrap,
                          (void *) &parallel_mode);
     /* corner exchanges */
-    parallel_mode.cb_fill = cb_corner_fill;
+    parallel_mode.cb_fill = fclaw_corner_fill_cb;
     fclaw_global_iterate_level(glob, level, cb_parallel_wrap,
                           (void *) &parallel_mode);
 }
@@ -194,7 +194,7 @@ void average2ghost(fclaw_global_t *glob,
                    cb_interface_wrap, (void *) &parallel_mode);
 
     /* Corner average */
-    parallel_mode.cb_fill = cb_corner_fill;
+    parallel_mode.cb_fill = fclaw_corner_fill_cb;
     fclaw_global_iterate_level(glob, coarse_level, cb_interface_wrap,
                    (void *) &parallel_mode);
 
@@ -255,7 +255,7 @@ void interpolate2ghost(fclaw_global_t *glob,
                                          (void *) &parallel_mode);
 
     /* Corner interpolate */
-    parallel_mode.cb_fill = cb_corner_fill;
+    parallel_mode.cb_fill = fclaw_corner_fill_cb;
     fclaw_global_iterate_level(glob,coarse_level, cb_interface_wrap,
                   (void *) &parallel_mode);
     /* -----------------------------------------------------
@@ -276,7 +276,7 @@ void interpolate2ghost(fclaw_global_t *glob,
 
     /* Interpolate to corners at parallel boundaries from coarse grid
        ghost patches */
-    parallel_mode.cb_fill = cb_corner_fill;
+    parallel_mode.cb_fill = fclaw_corner_fill_cb;
     fclaw_global_iterate_level(glob, fine_level, cb_interface_wrap,
                                  (void *) &parallel_mode);
 }
