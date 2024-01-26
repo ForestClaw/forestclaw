@@ -77,8 +77,8 @@ FCLAW_MAP_3D_C2M (fclaw_map_context_t ** pcont, int *blockno,
                  double *xp, double *yp, double *zp)
 {
     fclaw_map_context_t *cont = *pcont;
-    FCLAW_ASSERT(cont->mapc2m_3dx != NULL);
-    cont->mapc2m_3dx (cont, *blockno, *xc, *yc, *zc, xp, yp, zp);
+    FCLAW_ASSERT(cont->mapc2m_3d != NULL);
+    cont->mapc2m_3d (cont, *blockno, *xc, *yc, *zc, xp, yp, zp);
 }
 
 
@@ -90,10 +90,10 @@ FCLAW_MAP_3D_C2M_BASIS (fclaw_map_context_t ** pcont,
                        int *flag)
 {
     fclaw_map_context_t *cont = *pcont;
-    FCLAW_ASSERT(cont->basis_3dx != NULL);
+    FCLAW_ASSERT(cont->basis_3d != NULL);
 
     /* DAC : Still need to decide what should go here */
-    cont->basis_3dx (cont, *xc, *yc, *zc, t, tinv, tderivs, *flag);
+    cont->basis_3d (cont, *xc, *yc, *zc, t, tinv, tderivs, *flag);
 }
 //#endif
 
@@ -462,7 +462,7 @@ fclaw2d_options_postprocess_map_data(fclaw2d_map_data_t * map_data)
 }
 #endif
 
-int fclaw2d_map_pillowsphere(fclaw_global_t* glob)
+int fclaw_map_pillowsphere(fclaw_global_t* glob)
 {
     fclaw_map_context_t *cont = glob->cont;
     return FCLAW_MAP_IS_PILLOWSPHERE(&cont) != 0;    

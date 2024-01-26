@@ -549,6 +549,12 @@ fclaw_1to2 = {
     "fclaw2d_map_new_nomap_brick"                  : "fclaw_map_new_nomap_brick",
     "fclaw2d_map_pillowphere"                      : "fclaw_map_pillowsphere",
     "fclaw2d_map_new_nomap"                        : "fclaw_map_new_nomap",
+    "mapc2m_3dx"                                   : "mapc2m_3d",
+    "basis_3dx"                                    : "basis_3d",
+    "fclaw2d_map_c2m_nomap_brick"                  : "fclaw_map_2d_c2m_nomap_brick",
+    "fclaw2d_map_pillowsphere"                     : "fclaw_map_pillowsphere",
+    "user_int_3dx"                                 : "user_int_3d",
+    "user_double_3dx"                              : "user_double_3d",
 
     #===== ./src/fclaw2d_map_query_defs.h =====
     "<fclaw2d_map_query_defs.h>"                   : "<fclaw_map_query_defs.h>",

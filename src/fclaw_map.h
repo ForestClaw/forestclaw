@@ -110,8 +110,8 @@ struct fclaw_map_context
     fclaw_map_2d_c2m_t         mapc2m;
     fclaw_map_2d_c2m_basis_t   basis;
 
-    fclaw_map_3d_c2m_t         mapc2m_3dx;   /* Takes a 2d context */
-    fclaw_map_3d_c2m_basis_t   basis_3dx;
+    fclaw_map_3d_c2m_t         mapc2m_3d; 
+    fclaw_map_3d_c2m_basis_t   basis_3d;
     int is_extruded;
 
     fclaw_map_destroy_t destroy;
@@ -121,8 +121,8 @@ struct fclaw_map_context
     double user_double[16];
 
     /* Create separate data for 2d and 3dx */
-    int user_int_3dx[16];
-    double user_double_3dx[16];
+    int user_int_3d[16];
+    double user_double_3d[16];
 
     double scale[3];
     double shift[3];
@@ -230,7 +230,7 @@ void FCLAW_MAP_2D_BRICK2C (fclaw_map_context_t ** cont, int *blockno,
 void fclaw_map_destroy (fclaw_map_context_t * cont);
 
 fclaw_map_context_t* fclaw_map_new_nomap_brick(fclaw_map_context_t* brick);
-void fclaw2d_map_c2m_nomap_brick(fclaw_map_context_t * cont, int blockno,
+void fclaw_map_2d_c2m_nomap_brick(fclaw_map_context_t * cont, int blockno,
                                  double xc, double yc,
                                  double *xp, double* yp, double *zp);
 
@@ -300,7 +300,7 @@ fclaw_map_context_t* fclaw2d_map_new_brick_conn
    ---------------------------------------------------------------------------------- */
 
 /* This is called to determine is a map is a pillow sphere or not */
-int fclaw2d_map_pillowsphere(struct fclaw_global* glob);
+int fclaw_map_pillowsphere(struct fclaw_global* glob);
 
 
 #if 0

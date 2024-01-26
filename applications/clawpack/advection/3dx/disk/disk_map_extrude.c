@@ -14,7 +14,7 @@ disk_map_3dx(fclaw_map_context_t * cont,
        shifted or rotated. */
     cont->mapc2m(cont,blockno,xc,yc,xp,yp,zp);
 
-    double maxelev = cont->user_double_3dx[0];  
+    double maxelev = cont->user_double_3d[0];  
 
     /* Extrude surface map in z direction */
     *zp = maxelev*zc;
@@ -27,8 +27,8 @@ void disk_map_extrude(fclaw_map_context_t *cont,
                       const double maxelev)
 {
     /* Modify the 2d mapping to included extruded details */
-    cont->mapc2m_3dx = disk_map_3dx;
-    cont->user_double_3dx[0] = maxelev;
+    cont->mapc2m_3d = disk_map_3dx;
+    cont->user_double_3d[0] = maxelev;
 
     cont->is_extruded = 1;
 }

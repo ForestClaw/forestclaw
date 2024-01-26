@@ -37,7 +37,7 @@ filament_map_3dx(fclaw_map_context_t * cont, int blockno,
     cont->mapc2m(cont,blockno,xc,yc,xp,yp,zp);
 
     /* Extrude in z direction to constant height maxelev. */
-    double maxelev = cont->user_double_3dx[0]; 
+    double maxelev = cont->user_double_3d[0]; 
     *zp = maxelev*zc;
 
     /* Whether it makes sense to scale/shift this mapping is up to the user */
@@ -51,9 +51,9 @@ void filament_map_extrude(fclaw_map_context_t* cont,
 
 {
     /* May be needed to get more general mappings */
-    cont->mapc2m_3dx = filament_map_3dx;
+    cont->mapc2m_3d = filament_map_3dx;
 
-    cont->user_double_3dx[0] = maxelev;
+    cont->user_double_3d[0] = maxelev;
 
     cont->is_extruded = 1;
 

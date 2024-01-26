@@ -170,8 +170,8 @@ void gauge_initialize(fclaw_global_t* glob, void** acc)
                 brick grid */ 
 
                 double z;
-                fclaw2d_map_c2m_nomap_brick(cont,nb,x0,y0,&xll,&yll,&z);
-                fclaw2d_map_c2m_nomap_brick(cont,nb,x1,y1,&xur,&yur,&z);                
+                fclaw_map_2d_c2m_nomap_brick(cont,nb,x0,y0,&xll,&yll,&z);
+                fclaw_map_2d_c2m_nomap_brick(cont,nb,x1,y1,&xur,&yur,&z);                
             }
             else
             {

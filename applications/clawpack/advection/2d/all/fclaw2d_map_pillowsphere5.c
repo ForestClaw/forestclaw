@@ -133,7 +133,7 @@ fclaw_map_context_t* fclaw2d_map_new_pillowsphere5(const double scale[],
     cont = FCLAW_ALLOC_ZERO (fclaw_map_context_t, 1);
     cont->query = fclaw2d_map_query_pillowsphere5;
     cont->mapc2m = fclaw2d_map_c2m_pillowsphere5;
-    cont->mapc2m_3dx = fclaw3dx_map_c2m_pillowsphere5;
+    cont->mapc2m_3d = fclaw3dx_map_c2m_pillowsphere5;
 
     cont->user_double[0] = alpha;
 

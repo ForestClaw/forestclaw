@@ -87,7 +87,7 @@ fclaw_map_context_t* fclaw_map_new_nomap()
     cont = FCLAW_ALLOC_ZERO (fclaw_map_context_t, 1);
     cont->query = fclaw2d_map_query_nomap;
     cont->mapc2m = fclaw2d_map_c2m_nomap;
-    cont->mapc2m_3dx = fclaw3dx_map_c2m_nomap;
+    cont->mapc2m_3d = fclaw3dx_map_c2m_nomap;
 
     return cont;
 }
