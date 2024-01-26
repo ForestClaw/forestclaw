@@ -129,7 +129,7 @@ void get_face_neighbors(fclaw_global_t *glob,
 		int iface1, rface1;
 		iface1 = iface;
 		rface1 = rfaceno;
-		fclaw_patch_face_swap(&iface1,&rface1);
+		fclaw_patch_face_swap(domain->refine_dim,&iface1,&rface1);
 		fclaw_patch_transform_blockface (glob, iface1, rface1,
 										   ftransform_finegrid->transform);
 		ftransform_finegrid->block_iface = iface1;
