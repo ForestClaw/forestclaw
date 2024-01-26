@@ -158,7 +158,7 @@ void copy2ghost(fclaw_global_t *glob,
     parallel_mode.ghost_mode = ghost_mode;
     parallel_mode.user = (void*) &e_info;
 
-    parallel_mode.cb_fill = cb_face_fill;
+    parallel_mode.cb_fill = fclaw_face_fill_cb;
     fclaw_global_iterate_level(glob, level, cb_parallel_wrap,
                          (void *) &parallel_mode);
     /* corner exchanges */
@@ -189,7 +189,7 @@ void average2ghost(fclaw_global_t *glob,
 	parallel_mode.user = (void*) &e_info;
 	parallel_mode.ghost_mode = ghost_mode;
 
-    parallel_mode.cb_fill = cb_face_fill;
+    parallel_mode.cb_fill = fclaw_face_fill_cb;
     fclaw_global_iterate_level(glob, coarse_level,
                    cb_interface_wrap, (void *) &parallel_mode);
 
@@ -207,7 +207,7 @@ void average2ghost(fclaw_global_t *glob,
 		int fine_level = coarse_level + 1;
 
 		/* Face average */
-		parallel_mode.cb_fill = cb_face_fill;
+		parallel_mode.cb_fill = fclaw_face_fill_cb;
 		fclaw_global_iterate_level(glob, fine_level,
 									 cb_interface_wrap, (void *) &parallel_mode);
 
@@ -250,7 +250,7 @@ void interpolate2ghost(fclaw_global_t *glob,
     parallel_mode.user = (void*) &e_info;
 
     /* Face interpolate */
-    parallel_mode.cb_fill = cb_face_fill;
+    parallel_mode.cb_fill = fclaw_face_fill_cb;
     fclaw_global_iterate_level(glob,coarse_level, cb_interface_wrap,
                                          (void *) &parallel_mode);
 
@@ -270,7 +270,7 @@ void interpolate2ghost(fclaw_global_t *glob,
        patches */
     int fine_level = coarse_level + 1;
 
-    parallel_mode.cb_fill = cb_face_fill;
+    parallel_mode.cb_fill = fclaw_face_fill_cb;
     fclaw_global_iterate_level(glob, fine_level, cb_interface_wrap,
                                  (void *) &parallel_mode);
 
