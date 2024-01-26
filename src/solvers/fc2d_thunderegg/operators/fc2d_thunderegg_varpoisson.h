@@ -38,10 +38,10 @@ extern "C"
     /* Needed to fix syntax highlighting */
 #endif    
 
-struct fclaw2d_global;
+struct fclaw_global;
 
 
-void fc2d_thunderegg_varpoisson_solve(struct fclaw2d_global *glob);
+void fc2d_thunderegg_varpoisson_solve(struct fclaw_global *glob);
 
 
 #ifdef __cplusplus

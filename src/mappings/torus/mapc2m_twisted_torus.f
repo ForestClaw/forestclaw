@@ -1,4 +1,4 @@
-      subroutine mapc2m_twisted_torus(blockno,xc,yc,xp,yp,zp,alpha)
+      subroutine fclaw_map_2d_c2m_twisted_torus(blockno,xc,yc,xp,yp,zp,alpha)
       implicit none
 
       integer blockno

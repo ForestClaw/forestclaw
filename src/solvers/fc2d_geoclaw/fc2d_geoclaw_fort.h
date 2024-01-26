@@ -37,7 +37,7 @@ extern "C"
 /* Needed to get syntax highlighting to work */
 #endif
 
-struct fclaw2d_patch_transform_data;  /* Should be replaced by long int?  */
+struct fclaw_patch_transform_data;  /* Should be replaced by long int?  */
 
 
 /* --------------------------------------- Typedefs ----------------------------------- */
@@ -357,7 +357,7 @@ void FC2D_GEOCLAW_FORT_COPY_FACE(const int* mx,
                                  const int* my, const int* mbc, 
                                  const int* meqn, double qthis[], double qneighbor[], 
                                  const int* a_idir,
-                                 struct fclaw2d_patch_transform_data** transform_cptr);
+                                 struct fclaw_patch_transform_data** transform_cptr);
 
 
 #define FC2D_GEOCLAW_FORT_AVERAGE_FACE \
@@ -377,7 +377,7 @@ void FC2D_GEOCLAW_FORT_AVERAGE_FACE(const int* mx,
                                     const int* idir, 
                                     const int* iface_coarse,
                                     const int* igrid, 
-                                    struct fclaw2d_patch_transform_data** transform_data);
+                                    struct fclaw_patch_transform_data** transform_data);
 
 #define FC2D_GEOCLAW_FORT_INTERPOLATE_FACE \
                                FCLAW_F77_FUNC(fc2d_geoclaw_fort_interpolate_face, \
@@ -393,7 +393,7 @@ void FC2D_GEOCLAW_FORT_INTERPOLATE_FACE(const int* mx,
                                         const int* idir, 
                                         const int* iside,
                                         const int* igrid,
-                                        struct fclaw2d_patch_transform_data** transform_cptr);
+                                        struct fclaw_patch_transform_data** transform_cptr);
 
 
 #define FC2D_GEOCLAW_FORT_COPY_CORNER \
@@ -405,7 +405,7 @@ void FC2D_GEOCLAW_FORT_COPY_CORNER(const int* mx,
                                    const int* meqn, 
                                    double this_q[], double neighbor_q[],
                                    const int* a_corner,
-                                   struct fclaw2d_patch_transform_data** transform_cptr);
+                                   struct fclaw_patch_transform_data** transform_cptr);
 
 #define FC2D_GEOCLAW_FORT_AVERAGE_CORNER \
                             FCLAW_F77_FUNC(fc2d_geoclaw_fort_average_corner, \
@@ -419,7 +419,7 @@ void FC2D_GEOCLAW_FORT_AVERAGE_CORNER(const int* mx,
                                       double auxcoarse[], double auxfine[],
                                       const int* mcapa,
                                       const int* corner, 
-                                      struct fclaw2d_patch_transform_data** transform_cptr);
+                                      struct fclaw_patch_transform_data** transform_cptr);
     
 #define FC2D_GEOCLAW_FORT_INTERPOLATE_CORNER \
                               FCLAW_F77_FUNC(fc2d_geoclaw_fort_interpolate_corner, \
@@ -433,7 +433,7 @@ void FC2D_GEOCLAW_FORT_INTERPOLATE_CORNER(const int* mx,
                                           const int* maux, 
                                           double aux_coarse[], double aux_fine[], 
                                           const int* corner,
-                                          struct fclaw2d_patch_transform_data** transform_cptr);
+                                          struct fclaw_patch_transform_data** transform_cptr);
 
 
 

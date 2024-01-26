@@ -38,10 +38,10 @@ extern "C"
     /* fix syntax highlighting */
 #endif    
 
-struct fclaw2d_global;
+struct fclaw_global;
 
 
-void fc2d_thunderegg_fivepoint_solve(struct fclaw2d_global *glob);
+void fc2d_thunderegg_fivepoint_solve(struct fclaw_global *glob);
 
 /* Everything is defined in the .cpp function */
 

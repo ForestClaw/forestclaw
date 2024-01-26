@@ -1,5 +1,5 @@
 C     # This returns a unit square map in [-1,1]x[-1,1]
-      subroutine mapc2m_fivepatch(blockno,xc,yc,xp,yp,zp,alpha)
+      subroutine fclaw_map_2d_c2m_fivepatch(blockno,xc,yc,xp,yp,zp,alpha)
       implicit none
 
       integer blockno

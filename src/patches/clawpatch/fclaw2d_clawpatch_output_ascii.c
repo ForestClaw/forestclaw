@@ -48,23 +48,23 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <_fclaw2d_to_fclaw3dx.h>
 
 #endif
-#include <fclaw2d_patch.h>
-#include <fclaw2d_global.h>
-#include <fclaw2d_options.h>
+#include <fclaw_patch.h>
+#include <fclaw_global.h>
+#include <fclaw_options.h>
 
 
-void cb_clawpatch_output_ascii (fclaw2d_domain_t * domain,
-                                fclaw2d_patch_t * patch,
+void cb_clawpatch_output_ascii (fclaw_domain_t * domain,
+                                fclaw_patch_t * patch,
                                 int blockno, int patchno,
                                 void *user)
 {
-    fclaw2d_global_iterate_t* s = (fclaw2d_global_iterate_t*) user;
-    fclaw2d_global_t *glob = (fclaw2d_global_t*) s->glob;
+    fclaw_global_iterate_t* s = (fclaw_global_iterate_t*) user;
+    fclaw_global_t *glob = (fclaw_global_t*) s->glob;
 
 
     /* Get info not readily available to user */
     int global_num, local_num, level;
-    fclaw2d_patch_get_info(glob->domain,patch,
+    fclaw_patch_get_info(glob->domain,patch,
                            blockno,patchno,
                            &global_num,&local_num, &level);
     
@@ -72,7 +72,7 @@ void cb_clawpatch_output_ascii (fclaw2d_domain_t * domain,
     double *q;
     fclaw2d_clawpatch_soln_data(glob,patch,&q,&meqn);
 
-    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+    const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
     int iframe = *((int *) s->user);
     char fname[BUFSIZ];
     snprintf (fname, BUFSIZ, "%s.q%04d", fclaw_opt->prefix, iframe);
@@ -109,7 +109,7 @@ void cb_clawpatch_output_ascii (fclaw2d_domain_t * domain,
 
 
 /* This function isn't virtualized;  should it be? */
-void fclaw2d_clawpatch_time_header_ascii(fclaw2d_global_t* glob, int iframe)
+void fclaw2d_clawpatch_time_header_ascii(fclaw_global_t* glob, int iframe)
 {
     const fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
     fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt(glob);
@@ -136,15 +136,15 @@ void fclaw2d_clawpatch_time_header_ascii(fclaw2d_global_t* glob, int iframe)
            vt->output_frame = &fclaw2d_clawpatch_output_ascii;
     -------------------------------------------------------------------- */
 
-void fclaw2d_clawpatch_output_ascii(fclaw2d_global_t* glob,int iframe)
+void fclaw2d_clawpatch_output_ascii(fclaw_global_t* glob,int iframe)
 {
-    fclaw2d_domain_t *domain = glob->domain;
+    fclaw_domain_t *domain = glob->domain;
     fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt(glob);
 
     /* BEGIN NON-SCALABLE CODE */
     /* Write the file contents in serial.
        Use only for small numbers of processors. */
-    fclaw2d_domain_serialization_enter (domain);
+    fclaw_domain_serialization_enter (domain);
 
     if (glob->mpirank == 0)
     {
@@ -152,9 +152,9 @@ void fclaw2d_clawpatch_output_ascii(fclaw2d_global_t* glob,int iframe)
     }
 
     /* Write out each patch to fort.qXXXX */
-    fclaw2d_global_iterate_patches (glob, clawpatch_vt->cb_output_ascii, &iframe);
+    fclaw_global_iterate_patches (glob, clawpatch_vt->cb_output_ascii, &iframe);
 
-    fclaw2d_domain_serialization_leave (domain);
+    fclaw_domain_serialization_leave (domain);
     /* END OF NON-SCALABLE CODE */
 }
 

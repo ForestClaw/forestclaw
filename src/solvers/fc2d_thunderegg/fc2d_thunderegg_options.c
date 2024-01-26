@@ -25,7 +25,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "fc2d_thunderegg_options.h"
 
-#include <fclaw2d_global.h>
+#include <fclaw_global.h>
 #include <fclaw_options.h>
 
 static void*
@@ -228,12 +228,12 @@ fc2d_thunderegg_options_t*  fc2d_thunderegg_options_register (fclaw_app_t * app,
     return mg_opt;
 }
 
-fc2d_thunderegg_options_t* fc2d_thunderegg_get_options(fclaw2d_global_t *glob)
+fc2d_thunderegg_options_t* fc2d_thunderegg_get_options(fclaw_global_t *glob)
 {
-    return (fc2d_thunderegg_options_t*) fclaw2d_global_get_options(glob,"fc2d_thunderegg");
+    return (fc2d_thunderegg_options_t*) fclaw_global_get_options(glob,"fc2d_thunderegg");
 }
 
-void fc2d_thunderegg_options_store (fclaw2d_global_t* glob, fc2d_thunderegg_options_t* mg_opt)
+void fc2d_thunderegg_options_store (fclaw_global_t* glob, fc2d_thunderegg_options_t* mg_opt)
 {
-    fclaw2d_global_options_store(glob, "fc2d_thunderegg", mg_opt);
+    fclaw_global_options_store(glob, "fc2d_thunderegg", mg_opt);
 }

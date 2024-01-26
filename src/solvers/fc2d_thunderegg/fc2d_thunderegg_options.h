@@ -36,7 +36,7 @@ extern "C"
 #endif
 #endif
 
-struct fclaw2d_global;
+struct fclaw_global;
 
 typedef struct fc2d_thunderegg_options fc2d_thunderegg_options_t;
 
@@ -117,12 +117,12 @@ fc2d_thunderegg_options_t*  fc2d_thunderegg_options_register (fclaw_app_t * app,
 void fc2d_thunderegg_package_register(fclaw_app_t* app,
                                      fc2d_thunderegg_options_t* mg_opt);
 
-fc2d_thunderegg_options_t* fc2d_thunderegg_get_options(struct fclaw2d_global *glob);
+fc2d_thunderegg_options_t* fc2d_thunderegg_get_options(struct fclaw_global *glob);
 
-void fc2d_thunderegg_options_store (struct fclaw2d_global* glob, 
+void fc2d_thunderegg_options_store (struct fclaw_global* glob, 
                                    fc2d_thunderegg_options_t* mg_opt);
 
-void fc2d_thunderegg_output(struct fclaw2d_global *glob, int iframe);
+void fc2d_thunderegg_output(struct fclaw_global *glob, int iframe);
 
 
 #ifdef __cplusplus

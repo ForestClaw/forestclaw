@@ -49,13 +49,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #endif
 
-#include <fclaw2d_global.h>
-#include <fclaw2d_options.h>
-#include <fclaw2d_domain.h>
-#include <fclaw2d_diagnostics.h>
+#include <fclaw_global.h>
+#include <fclaw_options.h>
+#include <fclaw_domain.h>
+#include <fclaw_diagnostics.h>
 
-void fclaw2d_clawpatch_diagnostics_cons_default(fclaw2d_global_t *glob,
-                                                fclaw2d_patch_t *patch,
+void fclaw2d_clawpatch_diagnostics_cons_default(fclaw_global_t *glob,
+                                                fclaw_patch_t *patch,
                                                 int blockno,
                                                 int patchno,
                                                 void *user)
@@ -92,8 +92,8 @@ void fclaw2d_clawpatch_diagnostics_cons_default(fclaw2d_global_t *glob,
 
 }
 
-void fclaw2d_clawpatch_diagnostics_error_default(fclaw2d_global_t *glob,
-                                                 fclaw2d_patch_t *patch,
+void fclaw2d_clawpatch_diagnostics_error_default(fclaw_global_t *glob,
+                                                 fclaw_patch_t *patch,
                                                  int blockno,
                                                  int patchno,
                                                  void *user)

@@ -24,19 +24,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include <fclaw_base.h>
-#include <fclaw2d_options.h>
-#include <fclaw2d_global.h>
+#include <fclaw_options.h>
+#include <fclaw_global.h>
 
 /* ---------------------------------------------------------
    Public interface to ForestClaw options
    --------------------------------------------------------- */
 
-void fclaw2d_options_store (fclaw2d_global_t *glob, fclaw_options_t* gparms)
+void fclaw_options_store (fclaw_global_t *glob, fclaw_options_t* gparms)
 {
-    fclaw2d_global_options_store(glob, "fclaw2d", gparms);
+    fclaw_global_options_store(glob, "fclaw2d", gparms);
 }
 
-fclaw_options_t* fclaw2d_get_options(fclaw2d_global_t* glob)
+fclaw_options_t* fclaw_get_options(fclaw_global_t* glob)
 {
-    return (fclaw_options_t*) fclaw2d_global_get_options(glob, "fclaw2d");
+    return (fclaw_options_t*) fclaw_global_get_options(glob, "fclaw2d");
 }

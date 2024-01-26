@@ -31,9 +31,9 @@ extern "C"
 {
 #endif
 
-struct fclaw2d_global;
-struct fclaw2d_patch;
-struct fclaw2d_domain;
+struct fclaw_global;
+struct fclaw_patch;
+struct fclaw_domain;
 
 /** 
  * @file
@@ -49,8 +49,8 @@ struct fclaw2d_domain;
  * @param patchno the patch number
  * @param user the user data pointer
  */
-void fclaw3dx_clawpatch_output_ascii_cb (struct fclaw2d_domain * domain,
-                                         struct fclaw2d_patch * patch,
+void fclaw3dx_clawpatch_output_ascii_cb (struct fclaw_domain * domain,
+                                         struct fclaw_patch * patch,
                                          int blockno, int patchno,
                                          void *user);
 
@@ -60,7 +60,7 @@ void fclaw3dx_clawpatch_output_ascii_cb (struct fclaw2d_domain * domain,
  * @param glob the global context
  * @param iframe the frame index
  */
-void fclaw3dx_clawpatch_output_ascii(struct fclaw2d_global* glob,int iframe);
+void fclaw3dx_clawpatch_output_ascii(struct fclaw_global* glob,int iframe);
 
 /**
  * @brief output ascii time header
@@ -68,7 +68,7 @@ void fclaw3dx_clawpatch_output_ascii(struct fclaw2d_global* glob,int iframe);
  * @param glob the global context
  * @param iframe the frame index
  */
-void fclaw3dx_clawpatch_time_header_ascii(struct fclaw2d_global* glob, int iframe);
+void fclaw3dx_clawpatch_time_header_ascii(struct fclaw_global* glob, int iframe);
 
 
 #ifdef __cplusplus

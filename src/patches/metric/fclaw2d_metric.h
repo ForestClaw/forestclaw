@@ -31,7 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW2D_METRIC_H
 #define FCLAW2D_METRIC_H
 
-#include <fclaw2d_patch.h>                /* Needed to get enum for build modes */
+#include <fclaw_patch.h>                /* Needed to get enum for build modes */
 
 #include "fclaw2d_metric_default_fort.h"  /* Needed for fort typdefs in vtable */
 
@@ -44,8 +44,8 @@ extern "C"
 /** Typedef for ::fclaw2d_metric_vtable */
 typedef struct fclaw2d_metric_vtable fclaw2d_metric_vtable_t;
 
-struct fclaw2d_global;
-struct fclaw2d_patch;
+struct fclaw_global;
+struct fclaw_patch;
 
 /* --------------------------- Metric routines (typedefs) ----------------------------- */
 /**
@@ -56,8 +56,8 @@ struct fclaw2d_patch;
  * @param[in] block_no the block number
  * @param[in] patchno the patch number
  */
-typedef void (*fclaw2d_metric_compute_mesh_t)(struct fclaw2d_global *glob,
-											  struct fclaw2d_patch *this_patch,
+typedef void (*fclaw2d_metric_compute_mesh_t)(struct fclaw_global *glob,
+											  struct fclaw_patch *this_patch,
 											  int blockno,
 											  int patchno);
 
@@ -69,8 +69,8 @@ typedef void (*fclaw2d_metric_compute_mesh_t)(struct fclaw2d_global *glob,
  * @param[in] block_no the block number
  * @param[in] patchno the patch number
  */
-typedef void (*fclaw2d_metric_compute_area_t)(struct fclaw2d_global *glob,
-											  struct fclaw2d_patch *patch,
+typedef void (*fclaw2d_metric_compute_area_t)(struct fclaw_global *glob,
+											  struct fclaw_patch *patch,
 											  int blockno,
 											  int patchno);
 
@@ -82,8 +82,8 @@ typedef void (*fclaw2d_metric_compute_area_t)(struct fclaw2d_global *glob,
  * @param[in] block_no the block number
  * @param[in] patchno the patch number
  */
-typedef void (*fclaw2d_metric_compute_area_ghost_t)(struct fclaw2d_global *glob,
-													struct fclaw2d_patch *patch,
+typedef void (*fclaw2d_metric_compute_area_ghost_t)(struct fclaw_global *glob,
+													struct fclaw_patch *patch,
 													int blockno,
 													int patchno);
 
@@ -95,8 +95,8 @@ typedef void (*fclaw2d_metric_compute_area_ghost_t)(struct fclaw2d_global *glob,
  * @param[in] block_no the block number
  * @param[in] patchno the patch number
  */
-typedef void (*fclaw2d_metric_compute_basis_t)(struct fclaw2d_global *glob,
-												 struct fclaw2d_patch *this_patch,
+typedef void (*fclaw2d_metric_compute_basis_t)(struct fclaw_global *glob,
+												 struct fclaw_patch *this_patch,
 												 int blockno,
 												 int patchno);
 
@@ -117,14 +117,14 @@ typedef void (*fclaw2d_metric_compute_basis_t)(struct fclaw2d_global *glob,
  * @param[in] patchno the patch number
  * @param[in] build_mode the build mode
  */
-void fclaw2d_metric_patch_define(struct fclaw2d_global* glob,
-								 struct fclaw2d_patch *this_patch,
+void fclaw2d_metric_patch_define(struct fclaw_global* glob,
+								 struct fclaw_patch *this_patch,
 								 int mx, int my, int mbc, 
 								 double dx, double dy, 
 								 double xlower, double ylower,
 								 double xupper, double yupper,
 								 int blockno, int patchno,
-								 fclaw2d_build_mode_t build_mode);
+								 fclaw_build_mode_t build_mode);
 
 
 /**
@@ -135,8 +135,8 @@ void fclaw2d_metric_patch_define(struct fclaw2d_global* glob,
  * @param[in] blockno the block number
  * @param[in] patchno the patch number
  */
-void fclaw2d_metric_patch_build(struct fclaw2d_global* glob,
-								struct fclaw2d_patch* this_patch,
+void fclaw2d_metric_patch_build(struct fclaw_global* glob,
+								struct fclaw_patch* this_patch,
 								int blockno,
 								int patchno);
 
@@ -150,9 +150,9 @@ void fclaw2d_metric_patch_build(struct fclaw2d_global* glob,
  * @param[in] coarse_patchno the block number of the coarse patch
  * @param[in] fine0_patchno the patch number of the first fine patch
  */
-void fclaw2d_metric_patch_build_from_fine(struct fclaw2d_global *glob,
-										  struct fclaw2d_patch *fine_patches,
-										  struct fclaw2d_patch *coarse_coarse,
+void fclaw2d_metric_patch_build_from_fine(struct fclaw_global *glob,
+										  struct fclaw_patch *fine_patches,
+										  struct fclaw_patch *coarse_coarse,
 										  int blockno,
 										  int coarse_patchno,
 										  int fine0_patchno);
@@ -164,8 +164,8 @@ void fclaw2d_metric_patch_build_from_fine(struct fclaw2d_global *glob,
  * @param[in] blockno the block number
  * @param[in] patchno the patch number
  */
-void fclaw2d_metric_patch_compute_area(struct fclaw2d_global *glob,
-									   struct fclaw2d_patch* this_patch,
+void fclaw2d_metric_patch_compute_area(struct fclaw_global *glob,
+									   struct fclaw_patch* this_patch,
 									   int blockno, int patchno);
 
 /* --------------------------------- Access functions --------------------------------- */
@@ -180,8 +180,8 @@ void fclaw2d_metric_patch_compute_area(struct fclaw2d_global *glob,
  * @param[out] xlower, ylower the coordinate of the lower left corner
  * @param[out] dx, dy the spacings in the x and y directions
  */
-void fclaw2d_metric_patch_grid_data(struct fclaw2d_global* glob,
-									struct fclaw2d_patch* this_patch,
+void fclaw2d_metric_patch_grid_data(struct fclaw_global* glob,
+									struct fclaw_patch* this_patch,
 									int* mx, int* my, int* mbc,
 									double* xlower, double* ylower,
 									double* dx, double* dy);
@@ -198,8 +198,8 @@ void fclaw2d_metric_patch_grid_data(struct fclaw2d_global* glob,
  *             (i,j,2) contains the the left edge length for cell (i,j).
  * @param[out] curvature the curvature for each cell in the patch
  */
-void fclaw2d_metric_patch_scalar(struct fclaw2d_global* glob,
-								 struct fclaw2d_patch* this_patch,
+void fclaw2d_metric_patch_scalar(struct fclaw_global* glob,
+								 struct fclaw_patch* this_patch,
 								 double **area, double** edgelengths,
 								 double **curvature);
 
@@ -219,8 +219,8 @@ void fclaw2d_metric_patch_scalar(struct fclaw2d_global* glob,
  * @param[out] surfnormals the surface normal for each cell center of the patch
  *             An array of dimension(-mbc:mx+mbc+1,-mbc:my+mbc+1,3)
  */
-void fclaw2d_metric_patch_vector(struct fclaw2d_global* glob,
-                                 struct fclaw2d_patch* this_patch,
+void fclaw2d_metric_patch_vector(struct fclaw_global* glob,
+                                 struct fclaw_patch* this_patch,
                                  double **xnormals, double **ynormals,
                                  double **xtangents, double **ytangents,
                                  double **surfnormals);
@@ -234,8 +234,8 @@ void fclaw2d_metric_patch_vector(struct fclaw2d_global* glob,
  * @param[out] xd, yd, zd the coordinates of the nodes
  * @param[out] area the area of each cell
  */
-void fclaw2d_metric_patch_mesh_data(struct fclaw2d_global* glob,
-									struct fclaw2d_patch* this_patch,
+void fclaw2d_metric_patch_mesh_data(struct fclaw_global* glob,
+									struct fclaw_patch* this_patch,
 									double **xp, double **yp, double **zp,
 									double **xd, double **yd, double **zd,
 									double **area);
@@ -261,8 +261,8 @@ void fclaw2d_metric_patch_mesh_data(struct fclaw2d_global* glob,
  *             (i,j,2) contains the the left edge length for cell (i,j).
  * @param[out] curvature the curvature for each cell in the patch
  */
-void fclaw2d_metric_patch_mesh_data2(struct fclaw2d_global* glob,
-									 struct fclaw2d_patch* this_patch,
+void fclaw2d_metric_patch_mesh_data2(struct fclaw_global* glob,
+									 struct fclaw_patch* this_patch,
 									 double **xnormals, double **ynormals,
 									 double **xtangents, double **ytangents,
 									 double **surfnormals,
@@ -275,8 +275,8 @@ void fclaw2d_metric_patch_mesh_data2(struct fclaw2d_global* glob,
  * @param this_patch the patch to get the are for
  * @return double* the area array
  */
-double* fclaw2d_metric_patch_get_area(struct fclaw2d_global* glob,
-	                                  struct fclaw2d_patch* this_patch);
+double* fclaw2d_metric_patch_get_area(struct fclaw_global* glob,
+	                                  struct fclaw_patch* this_patch);
 
 
 /* ---------------------------- Metric default (virtualized) -------------------------- */
@@ -288,8 +288,8 @@ double* fclaw2d_metric_patch_get_area(struct fclaw2d_global* glob,
  * 
  * @details @copydetails ::fclaw2d_metric_compute_area_t
  */
-void fclaw2d_metric_compute_area_default(struct fclaw2d_global *glob,
-										 struct fclaw2d_patch* this_patch,
+void fclaw2d_metric_compute_area_default(struct fclaw_global *glob,
+										 struct fclaw_patch* this_patch,
 										 int blockno, int patchno);
 
 
@@ -300,8 +300,8 @@ void fclaw2d_metric_compute_area_default(struct fclaw2d_global *glob,
  * 
  * @details @copydetails ::fclaw2d_metric_compute_area_ghost_t
  */
-void fclaw2d_metric_compute_area_ghost_default(struct fclaw2d_global* glob,
-											   struct fclaw2d_patch* this_patch,
+void fclaw2d_metric_compute_area_ghost_default(struct fclaw_global* glob,
+											   struct fclaw_patch* this_patch,
 											   int blockno,
 											   int patchno);
 
@@ -314,8 +314,8 @@ void fclaw2d_metric_compute_area_ghost_default(struct fclaw2d_global* glob,
  * 
  * @details @copydetails ::fclaw2d_metric_compute_mesh_t
  */
-void fclaw2d_metric_compute_mesh_default(struct fclaw2d_global *glob,
-										 struct fclaw2d_patch *this_patch,
+void fclaw2d_metric_compute_mesh_default(struct fclaw_global *glob,
+										 struct fclaw_patch *this_patch,
 										 int blockno,
 										 int patchno);
 
@@ -327,8 +327,8 @@ void fclaw2d_metric_compute_mesh_default(struct fclaw2d_global *glob,
  * 
  * @details @copydetails ::fclaw2d_metric_compute_basis_t
  */
-void fclaw2d_metric_compute_basis_default(struct fclaw2d_global *glob,
-											struct fclaw2d_patch *this_patch,
+void fclaw2d_metric_compute_basis_default(struct fclaw_global *glob,
+											struct fclaw_patch *this_patch,
 											int blockno,
 											int patchno);
 
@@ -369,15 +369,15 @@ struct fclaw2d_metric_vtable
  * 
  * @return fclaw2d_metric_vtable_t* the vtable
  */
-fclaw2d_metric_vtable_t* fclaw2d_metric_vt(struct fclaw2d_global* glob);
+fclaw2d_metric_vtable_t* fclaw2d_metric_vt(struct fclaw_global* glob);
 
 /**
  * @brief Initializes a global vtable variable
  */
-void fclaw2d_metric_vtable_initialize(struct fclaw2d_global* glob);
+void fclaw2d_metric_vtable_initialize(struct fclaw_global* glob);
 
-int fclaw2d_metric_patch_nodes_size(struct fclaw2d_global* glob,
-                                    struct fclaw2d_patch* patch);
+int fclaw2d_metric_patch_nodes_size(struct fclaw_global* glob,
+                                    struct fclaw_patch* patch);
 
 
 

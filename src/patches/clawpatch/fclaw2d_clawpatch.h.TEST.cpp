@@ -23,66 +23,66 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <fclaw2d_global.h>
+#include <fclaw_global.h>
 #include <fclaw2d_clawpatch.h>
-#include <fclaw2d_forestclaw.h>
+#include <fclaw_forestclaw.h>
 #include <fclaw3dx_clawpatch.h>
 #include <test.hpp>
 
 TEST_CASE("fclaw2d_clawpatch_vtable_initialize stores two separate vtables in two separate globs")
 {
-	fclaw2d_global_t* glob1 = fclaw2d_global_new();
-	fclaw2d_global_t* glob2 = fclaw2d_global_new();
-    fclaw2d_vtables_initialize(glob1);
-    fclaw2d_vtables_initialize(glob2);
+	fclaw_global_t* glob1 = fclaw_global_new();
+	fclaw_global_t* glob2 = fclaw_global_new();
+    fclaw_vtables_initialize(glob1);
+    fclaw_vtables_initialize(glob2);
 
 	fclaw2d_clawpatch_vtable_initialize(glob1,4);
 	fclaw2d_clawpatch_vtable_initialize(glob2,4);
 
 	CHECK_NE(fclaw2d_clawpatch_vt(glob1), fclaw2d_clawpatch_vt(glob2));
 
-	fclaw2d_global_destroy(glob1);
-	fclaw2d_global_destroy(glob2);
+	fclaw_global_destroy(glob1);
+	fclaw_global_destroy(glob2);
 }
 
 TEST_CASE("fclaw3dx_clawpatch_vtable_initialize stores two separate vtables in two separate globs")
 {
-	fclaw2d_global_t* glob1 = fclaw2d_global_new();
-	fclaw2d_global_t* glob2 = fclaw2d_global_new();
-    fclaw2d_vtables_initialize(glob1);
-    fclaw2d_vtables_initialize(glob2);
+	fclaw_global_t* glob1 = fclaw_global_new();
+	fclaw_global_t* glob2 = fclaw_global_new();
+    fclaw_vtables_initialize(glob1);
+    fclaw_vtables_initialize(glob2);
 
 	fclaw3dx_clawpatch_vtable_initialize(glob1,4);
 	fclaw3dx_clawpatch_vtable_initialize(glob2,4);
 
 	CHECK_NE(fclaw3dx_clawpatch_vt(glob1), fclaw3dx_clawpatch_vt(glob2));
 
-	fclaw2d_global_destroy(glob1);
-	fclaw2d_global_destroy(glob2);
+	fclaw_global_destroy(glob1);
+	fclaw_global_destroy(glob2);
 }
 
 TEST_CASE("fclaw2d_clawpatch_vtable_initialize sets is_set flag")
 {
-	fclaw2d_global_t* glob = fclaw2d_global_new();
+	fclaw_global_t* glob = fclaw_global_new();
 
-    fclaw2d_vtables_initialize(glob);
+    fclaw_vtables_initialize(glob);
 	fclaw2d_clawpatch_vtable_initialize(glob, 4);
 
 	CHECK_UNARY(fclaw2d_clawpatch_vt(glob)->is_set);
 
-	fclaw2d_global_destroy(glob);
+	fclaw_global_destroy(glob);
 }
 
 TEST_CASE("fclaw3dx_clawpatch_vtable_initialize sets is_set flag")
 {
-	fclaw2d_global_t* glob = fclaw2d_global_new();
+	fclaw_global_t* glob = fclaw_global_new();
 
-    fclaw2d_vtables_initialize(glob);
+    fclaw_vtables_initialize(glob);
 	fclaw3dx_clawpatch_vtable_initialize(glob, 4);
 
 	CHECK_UNARY(fclaw3dx_clawpatch_vt(glob)->is_set);
 
-	fclaw2d_global_destroy(glob);
+	fclaw_global_destroy(glob);
 }
 
 
@@ -91,46 +91,46 @@ TEST_CASE("fclaw3dx_clawpatch_vtable_initialize sets is_set flag")
 
 TEST_CASE("fclaw2d_clawpatch_vtable_initialize fails if called twice on a glob")
 {
-	fclaw2d_global_t* glob1 = fclaw2d_global_new();
-	fclaw2d_global_t* glob2 = fclaw2d_global_new();
-    fclaw2d_vtables_initialize(glob1);
-    fclaw2d_vtables_initialize(glob2);
+	fclaw_global_t* glob1 = fclaw_global_new();
+	fclaw_global_t* glob2 = fclaw_global_new();
+    fclaw_vtables_initialize(glob1);
+    fclaw_vtables_initialize(glob2);
 
 	fclaw2d_clawpatch_vtable_initialize(glob1,4);
 	CHECK_SC_ABORTED(fclaw2d_clawpatch_vtable_initialize(glob1,4));
 	fclaw2d_clawpatch_vtable_initialize(glob2,4);
 	CHECK_SC_ABORTED(fclaw2d_clawpatch_vtable_initialize(glob2,4));
 
-	fclaw2d_global_destroy(glob1);
-	fclaw2d_global_destroy(glob2);
+	fclaw_global_destroy(glob1);
+	fclaw_global_destroy(glob2);
 }
 
 TEST_CASE("fclaw3dx_clawpatch_vtable_initialize fails if called twice on a glob")
 {
-	fclaw2d_global_t* glob1 = fclaw2d_global_new();
-	fclaw2d_global_t* glob2 = fclaw2d_global_new();
-    fclaw2d_vtables_initialize(glob1);
-    fclaw2d_vtables_initialize(glob2);
+	fclaw_global_t* glob1 = fclaw_global_new();
+	fclaw_global_t* glob2 = fclaw_global_new();
+    fclaw_vtables_initialize(glob1);
+    fclaw_vtables_initialize(glob2);
 
 	fclaw3dx_clawpatch_vtable_initialize(glob1,4);
 	CHECK_SC_ABORTED(fclaw3dx_clawpatch_vtable_initialize(glob1,4));
 	fclaw3dx_clawpatch_vtable_initialize(glob2,4);
 	CHECK_SC_ABORTED(fclaw3dx_clawpatch_vtable_initialize(glob2,4));
 
-	fclaw2d_global_destroy(glob1);
-	fclaw2d_global_destroy(glob2);
+	fclaw_global_destroy(glob1);
+	fclaw_global_destroy(glob2);
 }
 
 TEST_CASE("fclaw3dx_clawpatch_vt fails is fclaw2d_clawpatch_vt is set")
 {
-	fclaw2d_global_t* glob = fclaw2d_global_new();
+	fclaw_global_t* glob = fclaw_global_new();
 
-    fclaw2d_vtables_initialize(glob);
+    fclaw_vtables_initialize(glob);
 	fclaw2d_clawpatch_vtable_initialize(glob, 4);
 
 	CHECK_SC_ABORTED(fclaw3dx_clawpatch_vt(glob));
 
-	fclaw2d_global_destroy(glob);
+	fclaw_global_destroy(glob);
 }
 
 #endif

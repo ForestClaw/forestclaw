@@ -34,9 +34,9 @@ extern "C"
 #endif
 #endif
 
-struct fclaw2d_global;
-struct fclaw2d_domain;
-struct fclaw2d_patch;
+struct fclaw_global;
+struct fclaw_domain;
+struct fclaw_patch;
 
 
 typedef struct fc2d_thunderegg_time_info
@@ -45,7 +45,7 @@ typedef struct fc2d_thunderegg_time_info
 } fc2d_thunderegg_time_info_t;
 
 
-void fc2d_thunderegg_physical_bc(struct fclaw2d_global *glob);
+void fc2d_thunderegg_physical_bc(struct fclaw_global *glob);
 
 
 #ifdef __cplusplus

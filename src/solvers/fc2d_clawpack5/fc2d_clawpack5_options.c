@@ -27,7 +27,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "fclaw_base.h"
 
 #include <fclaw2d_clawpatch_options.h>
-#include <fclaw2d_global.h>
+#include <fclaw_global.h>
 #include <fclaw_options.h>
 #include <fclaw_pointer_map.h>
 #include <fclaw_packing.h>
@@ -317,12 +317,12 @@ fc2d_clawpack5_options_t*  fc2d_clawpack5_options_register (fclaw_app_t * app,
     return clawopt;
 }
 
-fc2d_clawpack5_options_t* fc2d_clawpack5_get_options(fclaw2d_global_t *glob)
+fc2d_clawpack5_options_t* fc2d_clawpack5_get_options(fclaw_global_t *glob)
 {
-    return (fc2d_clawpack5_options_t*) fclaw2d_global_get_options(glob,"fc2d_clawpack5");
+    return (fc2d_clawpack5_options_t*) fclaw_global_get_options(glob,"fc2d_clawpack5");
 }
 
-void fc2d_clawpack5_options_store (fclaw2d_global_t* glob, fc2d_clawpack5_options_t* clawopt)
+void fc2d_clawpack5_options_store (fclaw_global_t* glob, fc2d_clawpack5_options_t* clawopt)
 {
-    fclaw2d_global_options_store(glob,"fc2d_clawpack5",clawopt);
+    fclaw_global_options_store(glob,"fc2d_clawpack5",clawopt);
 }

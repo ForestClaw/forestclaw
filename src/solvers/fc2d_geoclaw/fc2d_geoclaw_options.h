@@ -36,7 +36,7 @@ extern "C"
 #endif
 #endif
 
-struct fclaw2d_global;
+struct fclaw_global;
 
 typedef struct fc2d_geoclaw_options
 {
@@ -82,10 +82,10 @@ fc2d_geoclaw_options_t *fc2d_geoclaw_options_register (fclaw_app_t * app,
                                                        const char *section,
                                                        const char *configfile);
 
-void fc2d_geoclaw_options_store (struct fclaw2d_global* glob, 
+void fc2d_geoclaw_options_store (struct fclaw_global* glob, 
                                  fc2d_geoclaw_options_t* geo_opt);
 
-fc2d_geoclaw_options_t* fc2d_geoclaw_get_options(struct fclaw2d_global *glob);
+fc2d_geoclaw_options_t* fc2d_geoclaw_get_options(struct fclaw_global *glob);
 
 
 

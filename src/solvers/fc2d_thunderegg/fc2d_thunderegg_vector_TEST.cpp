@@ -29,26 +29,26 @@
 #include <fclaw2d_clawpatch_options.h>
 #include <fclaw2d_clawpatch46_fort.h>
 #include <fclaw2d_clawpatch_output_ascii.h>
-#include <fclaw2d_diagnostics.h>
-#include <fclaw2d_map_brick.h>
-#include <fclaw2d_forestclaw.h>
-#include <fclaw2d_global.h>
-#include <fclaw2d_domain.h>
-#include <fclaw2d_patch.h>
-#include <fclaw2d_convenience.h>
+#include <fclaw_diagnostics.h>
+#include <fclaw_map_brick.h>
+#include <fclaw_forestclaw.h>
+#include <fclaw_global.h>
+#include <fclaw_domain.h>
+#include <fclaw_patch.h>
+#include <fclaw_convenience.h>
 #include <fclaw2d_metric.hpp>
 #include <fclaw2d_metric.h>
-#include <fclaw2d_options.h>
+#include <fclaw_options.h>
 #include <test.hpp>
 #include <test/test.hpp>
 using namespace ThunderEgg;
 
 namespace{
 struct QuadDomain {
-    fclaw2d_global_t* glob;
+    fclaw_global_t* glob;
     fclaw_options_t fopts;
-    fclaw2d_domain_t *domain;
-    fclaw2d_map_context_t *map;
+    fclaw_domain_t *domain;
+    fclaw_map_context_t *map;
     fclaw2d_clawpatch_options_t opts;
 
     QuadDomain(){
@@ -56,9 +56,9 @@ struct QuadDomain {
         int size;
         sc_MPI_Comm_rank(sc_MPI_COMM_WORLD, &rank);
         sc_MPI_Comm_size(sc_MPI_COMM_WORLD, &size);
-        glob = fclaw2d_global_new_comm(sc_MPI_COMM_WORLD, rank, size);
+        glob = fclaw_global_new_comm(sc_MPI_COMM_WORLD, rank, size);
 
-        fclaw2d_vtables_initialize(glob);
+        fclaw_vtables_initialize(glob);
         fclaw2d_clawpatch_vtable_initialize(glob, 4);
     
         memset(&fopts, 0, sizeof(fopts));
@@ -73,11 +73,11 @@ struct QuadDomain {
         fopts.compute_error = true;
         fopts.subcycle = true;
 
-        domain = fclaw2d_domain_new_unitsquare(glob->mpicomm,fopts.minlevel);
-        map = fclaw2d_map_new_nomap();
-        fclaw2d_options_store(glob, &fopts);
-        fclaw2d_global_store_domain(glob, domain);
-        fclaw2d_global_store_map(glob, map);
+        domain = fclaw_domain_new_unitsquare(glob->mpicomm,fopts.minlevel);
+        map = fclaw_map_new_nomap();
+        fclaw_options_store(glob, &fopts);
+        fclaw_global_store_domain(glob, domain);
+        fclaw_map_store(glob, map);
 
         memset(&opts, 0, sizeof(opts));
         opts.mx   = 5;
@@ -88,29 +88,29 @@ struct QuadDomain {
         opts.rhs_fields = 1;
         fclaw2d_clawpatch_options_store(glob, &opts);
 
-        fclaw2d_domain_data_new(glob->domain);
+        you_can_safely_remove_this_call(glob->domain);
 
     }
     void setup(){
-        fclaw2d_build_mode_t build_mode = FCLAW2D_BUILD_FOR_UPDATE;
-        fclaw2d_patch_build(glob, &domain->blocks[0].patches[0], 0, 0, &build_mode);
-        fclaw2d_patch_build(glob, &domain->blocks[0].patches[1], 0, 1, &build_mode);
-        fclaw2d_patch_build(glob, &domain->blocks[0].patches[2], 0, 2, &build_mode);
-        fclaw2d_patch_build(glob, &domain->blocks[0].patches[3], 0, 3, &build_mode);
+        fclaw_build_mode_t build_mode = FCLAW_BUILD_FOR_UPDATE;
+        fclaw_patch_build(glob, &domain->blocks[0].patches[0], 0, 0, &build_mode);
+        fclaw_patch_build(glob, &domain->blocks[0].patches[1], 0, 1, &build_mode);
+        fclaw_patch_build(glob, &domain->blocks[0].patches[2], 0, 2, &build_mode);
+        fclaw_patch_build(glob, &domain->blocks[0].patches[3], 0, 3, &build_mode);
     }
     ~QuadDomain(){
-        fclaw2d_patch_data_delete(glob, &domain->blocks[0].patches[0]);
-        fclaw2d_patch_data_delete(glob, &domain->blocks[0].patches[1]);
-        fclaw2d_patch_data_delete(glob, &domain->blocks[0].patches[2]);
-        fclaw2d_patch_data_delete(glob, &domain->blocks[0].patches[3]);
-        fclaw2d_global_destroy(glob);
+        fclaw_patch_data_delete(glob, &domain->blocks[0].patches[0]);
+        fclaw_patch_data_delete(glob, &domain->blocks[0].patches[1]);
+        fclaw_patch_data_delete(glob, &domain->blocks[0].patches[2]);
+        fclaw_patch_data_delete(glob, &domain->blocks[0].patches[3]);
+        fclaw_global_destroy(glob);
     }
 };
 struct QuadDomainBrick {
-    fclaw2d_global_t* glob;
+    fclaw_global_t* glob;
     fclaw_options_t fopts;
-    fclaw2d_domain_t *domain;
-    fclaw2d_map_context_t *map;
+    fclaw_domain_t *domain;
+    fclaw_map_context_t *map;
     fclaw2d_clawpatch_options_t opts;
 
     QuadDomainBrick(){
@@ -118,9 +118,9 @@ struct QuadDomainBrick {
         int size;
         sc_MPI_Comm_rank(sc_MPI_COMM_WORLD, &rank);
         sc_MPI_Comm_size(sc_MPI_COMM_WORLD, &size);
-        glob = fclaw2d_global_new_comm(sc_MPI_COMM_WORLD, rank, size);
+        glob = fclaw_global_new_comm(sc_MPI_COMM_WORLD, rank, size);
 
-        fclaw2d_vtables_initialize(glob);
+        fclaw_vtables_initialize(glob);
         fclaw2d_clawpatch_vtable_initialize(glob, 4);
     
         memset(&fopts, 0, sizeof(fopts));
@@ -135,13 +135,13 @@ struct QuadDomainBrick {
         fopts.compute_error = true;
         fopts.subcycle = true;
 
-        domain = fclaw2d_domain_new_brick(glob->mpicomm,fopts.mi,fopts.mj,0,0,fopts.minlevel);
-        fclaw2d_map_context_t *brick =
-              fclaw2d_map_new_brick(domain, fopts.mi, fopts.mj, 0, 0);
-        map = fclaw2d_map_new_nomap_brick(brick);
-        fclaw2d_global_store_domain(glob, domain);
-        fclaw2d_global_store_map(glob, map);
-        fclaw2d_options_store(glob, &fopts);
+        domain = fclaw_domain_new_2d_brick(glob->mpicomm,fopts.mi,fopts.mj,0,0,fopts.minlevel);
+        fclaw_map_context_t *brick =
+              fclaw_map_new_2d_brick(domain, fopts.mi, fopts.mj, 0, 0);
+        map = fclaw_map_new_nomap_brick(brick);
+        fclaw_global_store_domain(glob, domain);
+        fclaw_map_store(glob, map);
+        fclaw_options_store(glob, &fopts);
 
         memset(&opts, 0, sizeof(opts));
         opts.mx   = 5;
@@ -152,21 +152,21 @@ struct QuadDomainBrick {
         opts.rhs_fields = 1;
         fclaw2d_clawpatch_options_store(glob, &opts);
 
-        fclaw2d_domain_data_new(glob->domain);
+        you_can_safely_remove_this_call(glob->domain);
     }
     void setup(){
-        fclaw2d_build_mode_t build_mode = FCLAW2D_BUILD_FOR_UPDATE;
-        fclaw2d_patch_build(glob, &domain->blocks[0].patches[0], 0, 0, &build_mode);
-        fclaw2d_patch_build(glob, &domain->blocks[1].patches[0], 1, 0, &build_mode);
-        fclaw2d_patch_build(glob, &domain->blocks[2].patches[0], 2, 0, &build_mode);
-        fclaw2d_patch_build(glob, &domain->blocks[3].patches[0], 3, 0, &build_mode);
+        fclaw_build_mode_t build_mode = FCLAW_BUILD_FOR_UPDATE;
+        fclaw_patch_build(glob, &domain->blocks[0].patches[0], 0, 0, &build_mode);
+        fclaw_patch_build(glob, &domain->blocks[1].patches[0], 1, 0, &build_mode);
+        fclaw_patch_build(glob, &domain->blocks[2].patches[0], 2, 0, &build_mode);
+        fclaw_patch_build(glob, &domain->blocks[3].patches[0], 3, 0, &build_mode);
     }
     ~QuadDomainBrick(){
-        fclaw2d_patch_data_delete(glob, &domain->blocks[0].patches[0]);
-        fclaw2d_patch_data_delete(glob, &domain->blocks[1].patches[0]);
-        fclaw2d_patch_data_delete(glob, &domain->blocks[2].patches[0]);
-        fclaw2d_patch_data_delete(glob, &domain->blocks[3].patches[0]);
-        fclaw2d_global_destroy(glob);
+        fclaw_patch_data_delete(glob, &domain->blocks[0].patches[0]);
+        fclaw_patch_data_delete(glob, &domain->blocks[1].patches[0]);
+        fclaw_patch_data_delete(glob, &domain->blocks[2].patches[0]);
+        fclaw_patch_data_delete(glob, &domain->blocks[3].patches[0]);
+        fclaw_global_destroy(glob);
     }
 };
 }

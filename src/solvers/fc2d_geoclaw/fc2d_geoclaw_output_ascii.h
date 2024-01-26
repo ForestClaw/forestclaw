@@ -35,9 +35,9 @@ extern "C"
 #endif
 
 
-struct fclaw2d_global;
+struct fclaw_global;
 
-void fc2d_geoclaw_output_ascii(struct fclaw2d_global* glob,int iframe);
+void fc2d_geoclaw_output_ascii(struct fclaw_global* glob,int iframe);
 
 
 #ifdef __cplusplus

@@ -29,22 +29,22 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "fc2d_thunderegg.h"
 #include "fc2d_thunderegg_options.h"
 
-#include <fclaw2d_elliptic_solver.h>
+#include <fclaw_elliptic_solver.h>
 
-#include <fclaw2d_global.h>
-#include <fclaw2d_domain.h>
-#include <fclaw2d_patch.h>
+#include <fclaw_global.h>
+#include <fclaw_domain.h>
+#include <fclaw_patch.h>
 #include <fclaw2d_clawpatch.h>
-#include <fclaw2d_physical_bc.h>
+#include <fclaw_physical_bc.h>
 
-void cb_fc2d_thunderegg_physical_bc(fclaw2d_domain_t *domain,
-                                   fclaw2d_patch_t *patch,
+void cb_fc2d_thunderegg_physical_bc(fclaw_domain_t *domain,
+                                   fclaw_patch_t *patch,
                                    int blockno,
                                    int patchno,
                                    void *user)
 
 {
-    fclaw2d_global_iterate_t* s = (fclaw2d_global_iterate_t*) user;
+    fclaw_global_iterate_t* s = (fclaw_global_iterate_t*) user;
     fc2d_thunderegg_time_info_t *tinfo = (fc2d_thunderegg_time_info_t*) s->user;
 
     double t = tinfo->t;
@@ -52,7 +52,7 @@ void cb_fc2d_thunderegg_physical_bc(fclaw2d_domain_t *domain,
 
     /* Determine which faces are at the physical boundary */
     int intersects_bc[4];
-    fclaw2d_physical_get_bc(s->glob,blockno,patchno,intersects_bc);
+    fclaw_physical_get_bc(s->glob,blockno,patchno,intersects_bc);
 
     int mx, my, mbc;
     double xlower, ylower, dx, dy;
@@ -84,14 +84,14 @@ void cb_fc2d_thunderegg_physical_bc(fclaw2d_domain_t *domain,
 }
 
 /* This is needed by other routines, so we don't set it to static. */
-void fc2d_thunderegg_physical_get_bc(fclaw2d_global_t *glob,
+void fc2d_thunderegg_physical_get_bc(fclaw_global_t *glob,
                                     int blockno,
                                     int patchno,
                                     int *intersects_bdry)
 {
     // const int numfaces = get_faces_per_patch(domain);
     int bdry[4];
-    fclaw2d_patch_boundary_type(glob->domain,blockno,patchno,bdry);
+    fclaw_patch_boundary_type(glob->domain,blockno,patchno,bdry);
     int i;
     for(i = 0; i < 4; i++)
     {
@@ -106,12 +106,12 @@ void fc2d_thunderegg_physical_get_bc(fclaw2d_global_t *glob,
    Public interface : Set physical boundary conditions on a patch
    ----------------------------------------------------------------------------- */
 
-void fc2d_thunderegg_physical_bc(fclaw2d_global_t *glob)
+void fc2d_thunderegg_physical_bc(fclaw_global_t *glob)
 {
 
     fc2d_thunderegg_time_info_t tinfo;
     tinfo.t = glob->curr_time;
-    fclaw2d_global_iterate_patches(glob,
+    fclaw_global_iterate_patches(glob,
                                    cb_fc2d_thunderegg_physical_bc,
                                    (void *) &tinfo);
 }
