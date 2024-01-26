@@ -456,14 +456,14 @@ void fc2d_clawpack5_solver_initialize(fclaw_global_t* glob)
     int claw_version = 5;
     fclaw2d_clawpatch_vtable_initialize(glob, claw_version);
 
-    fclaw_vtable_t*          fclaw_vt = fclaw_vt(glob);
+    fclaw_vtable_t*          fc_vt = fclaw_vt(glob);
     fclaw_patch_vtable_t*    patch_vt = fclaw_patch_vt(glob);
     fclaw2d_clawpatch_vtable_t*      clawpatch_vt = fclaw2d_clawpatch_vt(glob);
 
     fc2d_clawpack5_vtable_t*   claw5_vt = fc2d_clawpack5_vt_new();
 
-    fclaw_vt->output_frame      = clawpack5_output;
-    fclaw_vt->problem_setup     = clawpack5_setprob;    
+    fc_vt->output_frame      = clawpack5_output;
+    fc_vt->problem_setup     = clawpack5_setprob;    
 
     /* Default patch functions */
     patch_vt->initialize            = clawpack5_qinit;

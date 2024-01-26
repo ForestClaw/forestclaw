@@ -88,8 +88,6 @@ struct QuadDomain {
         opts.rhs_fields = 1;
         fclaw2d_clawpatch_options_store(glob, &opts);
 
-        you_can_safely_remove_this_call(glob->domain);
-
     }
     void setup(){
         fclaw_build_mode_t build_mode = FCLAW_BUILD_FOR_UPDATE;
@@ -151,8 +149,6 @@ struct QuadDomainBrick {
         opts.maux = 1;
         opts.rhs_fields = 1;
         fclaw2d_clawpatch_options_store(glob, &opts);
-
-        you_can_safely_remove_this_call(glob->domain);
     }
     void setup(){
         fclaw_build_mode_t build_mode = FCLAW_BUILD_FOR_UPDATE;

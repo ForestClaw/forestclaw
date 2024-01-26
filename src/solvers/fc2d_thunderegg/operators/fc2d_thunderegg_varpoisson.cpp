@@ -46,6 +46,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <p4est_bits.h>
 #include <p4est_wrap.h>
 
+#include <forestclaw2d.h>
+
 #include <ThunderEgg.h>
 
 using namespace std;
@@ -346,7 +348,7 @@ void fc2d_thunderegg_varpoisson_solve(fclaw_global_t *glob)
 
     // get p4est structure
     fclaw_domain_t *domain = glob->domain;
-    p4est_wrap_t *wrap = (p4est_wrap_t *)domain->pp;
+    p4est_wrap_t *wrap = (p4est_wrap_t *)domain->d2->pp;
 
     // create map function
     P4estDomainGenerator::BlockMapFunc bmf = [&](int block_no, double unit_x,      

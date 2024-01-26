@@ -40,7 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /* Basic forestclaw functions */
 #include <fclaw_patch.h>
 #include <fclaw_convenience.h>  /* Needed to get search function for gauges */
-#include "fclaw2d_options.h"
+#include <fclaw_options.h>
 #include <fclaw_global.h>
 #include <fclaw_vtable.h>
 #include <fclaw_diagnostics.h>
@@ -847,14 +847,14 @@ void fc2d_geoclaw_solver_initialize(fclaw_global_t* glob)
     
     fclaw_gauges_vtable_t*           gauges_vt = fclaw_gauges_vt(glob);
 
-    fclaw_vtable_t*                fclaw_vt = fclaw_vt(glob);
+    fclaw_vtable_t*                fc_vt = fclaw_vt(glob);
     fclaw_patch_vtable_t*          patch_vt = fclaw_patch_vt(glob);
     fclaw2d_clawpatch_vtable_t*  clawpatch_vt = fclaw2d_clawpatch_vt(glob);
 
     fc2d_geoclaw_vtable_t*  geoclaw_vt = fc2d_geoclaw_vt_new();
 
     /* ForestClaw virtual tables */
-    fclaw_vt->problem_setup               = geoclaw_setprob;  
+    fc_vt->problem_setup               = geoclaw_setprob;  
     // fclaw_vt->after_regrid                = geoclaw_after_regrid;  /* Handle gauges */
 
     /* Set basic patch operations */
@@ -863,7 +863,7 @@ void fc2d_geoclaw_solver_initialize(fclaw_global_t* glob)
     patch_vt->physical_bc                 = geoclaw_bc2;
     patch_vt->single_step_update          = geoclaw_update;  /* Includes b4step2 and src2 */
          
-    fclaw_vt->output_frame                = geoclaw_output;
+    fc_vt->output_frame                = geoclaw_output;
 
     /* Regridding */
     patch_vt->tag4refinement              = geoclaw_patch_tag4refinement;

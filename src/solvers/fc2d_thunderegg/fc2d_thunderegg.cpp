@@ -170,8 +170,8 @@ void fc2d_thunderegg_solver_initialize(fclaw_global_t* glob)
     //fclaw2d_clawpatch_vtable_t*      clawpatch_vt = fclaw2d_clawpatch_vt(glob);
 
 	/* ForestClaw vtable items */
-	fclaw_vtable_t*   fclaw_vt = fclaw_vt(glob);
-	fclaw_vt->output_frame      = thunderegg_output;
+	fclaw_vtable_t*   fc_vt = fclaw_vt(glob);
+	fc_vt->output_frame      = thunderegg_output;
 
 	/* These could be over-written by user specific settings */
 	fclaw_patch_vtable_t*   patch_vt = fclaw_patch_vt(glob);  
