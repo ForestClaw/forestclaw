@@ -71,10 +71,10 @@ int FCLAW_MAP_IS_SPHERE(fclaw_map_context_t** cont);
 #define FCLAW_MAP_IS_HEMISPHERE FCLAW_F77_FUNC_(fclaw_map_is_hemisphere,FCLAW_MAP_IS_HEMISPHERE)
 int FCLAW_MAP_IS_HEMISPHERE(fclaw_map_context_t** cont);
 
-#define FCLAW_MAP_IS_TORUS FCLAW_F77_FUNC_(fclaw_map_is_torus,FCLAW2D_MAP_TORUS)
+#define FCLAW_MAP_IS_TORUS FCLAW_F77_FUNC_(fclaw_map_is_torus,FCLAW_MAP_IS_TORUS)
 int FCLAW_MAP_IS_TORUS(fclaw_map_context_t** cont);
 
-#define FCLAW_MAP_IS_BRICK FCLAW_F77_FUNC_(fclaw_map_is_brick,FCLAW2D_MAP_BRICK)
+#define FCLAW_MAP_IS_BRICK FCLAW_F77_FUNC_(fclaw_map_is_brick,FCLAW_MAP_IS_BRICK)
 int FCLAW_MAP_IS_BRICK(fclaw_map_context_t** cont);
 
 
