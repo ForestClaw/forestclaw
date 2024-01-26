@@ -26,7 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW2D_INTEGRATE_H
 #define FCLAW2D_INTEGRATE_H
 
-#include "fclaw2d_convenience.h"  /* Needed for def. of fclaw2d_integrate_t */
+#include <fclaw_convenience.h>  /* Needed for def. of fclaw2d_integrate_t */
 
 #ifdef __cplusplus
 extern "C"
