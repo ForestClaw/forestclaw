@@ -65,8 +65,6 @@ void  cb_partition_transfer(fclaw_domain_t * old_domain,
 {
     /* Transfer data to new domain */
     fclaw_global_iterate_t *g = (fclaw_global_iterate_t *) user;
-    fclaw_domain_data_t *ddata_old = fclaw_domain_get_data (old_domain);
-    fclaw_domain_data_t *ddata_new = fclaw_domain_get_data (new_domain);
 
     if (old_patch != NULL)
     {
@@ -77,8 +75,8 @@ void  cb_partition_transfer(fclaw_domain_t * old_domain,
 
         new_patch->user = old_patch->user;
         old_patch->user = NULL;
-        ++ddata_old->count_delete_patch;
-        ++ddata_new->count_set_patch;
+        ++old_domain->count_delete_patch;
+        ++new_domain->count_set_patch;
     }
     else
     {
@@ -98,8 +96,8 @@ void  cb_partition_transfer(fclaw_domain_t * old_domain,
         /* Reason for the following two lines: the glob contains the old domain 
         which is incremented in ddata_old  but we really want to increment the 
         new domain. */
-        --ddata_old->count_set_patch;
-        ++ddata_new->count_set_patch;
+        --old_domain->count_set_patch;
+        ++new_domain->count_set_patch;
 
 
     }
