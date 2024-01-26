@@ -36,6 +36,7 @@ libforestclaw_installed_headers = \
 	src/fclaw_rays.h \
 	src/fclaw_ghost_fill.h \
 	src/fclaw_corner_neighbors.h \
+	src/fclaw_edge_neighbors.h \
 	src/fclaw_face_neighbors.h \
 	src/fclaw_map.h \
 	src/fclaw_timeinterp.h \
@@ -103,6 +104,7 @@ libforestclaw_compiled_sources = \
 	src/fclaw_finalize.c \
 	src/fclaw_time_sync.c \
 	src/fclaw_corner_neighbors.c \
+	src/fclaw_edge_neighbors.c \
 	src/fclaw_face_neighbors.c \
 	src/fclaw_farraybox.cpp \
 	src/fclaw2d_convenience.c \
