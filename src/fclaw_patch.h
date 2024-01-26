@@ -461,19 +461,6 @@ void fclaw_patch_interpolate_corner(struct fclaw_global* glob,
                                       struct fclaw_patch_transform_data* transform_data);
 
 ///@}
-/**
- * DEPRECATED
- * @deprecated NOT USED
- */
-void fclaw_patch_create_user_data(struct fclaw_global* glob,
-                                    struct fclaw_patch* patch);
-
-/**
- * DEPRECATED
- * @deprecated NOT USED
- */
-void fclaw_patch_destroy_user_data(struct fclaw_global* glob,
-                                     struct fclaw_patch* patch);
 
 /* ------------------------------------------------------------------------------------ */
 ///                         @name Transform Functions
