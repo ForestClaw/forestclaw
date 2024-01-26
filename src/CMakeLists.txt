@@ -21,7 +21,6 @@ add_library(forestclaw_c OBJECT
   fclaw_map.c
   fclaw_map_query.c
   fclaw_map_brick.c
-  fclaw_convenience.c
   fclaw_exchange.c
   fclaw_advance.c
   fclaw_elliptic_solver.c
@@ -43,6 +42,7 @@ add_library(forestclaw_c OBJECT
   fclaw_corner_neighbors.c
   fclaw_face_neighbors.c
   fclaw_farraybox.cpp
+  fclaw2d_convenience.c
   fclaw2d_output_tikz.c
   fclaw2d_file.c
   fclaw2d_wrap.c

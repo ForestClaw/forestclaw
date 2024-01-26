@@ -25,18 +25,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "transport_user.h"
 
-void transport_problem_setup(fclaw2d_global_t* glob)
+void transport_problem_setup(fclaw_global_t* glob)
 {
     SETPROB();
 }
 
-void transport_patch_setup_manifold(fclaw2d_global_t *glob,
-                                    fclaw2d_patch_t *patch,
+void transport_patch_setup_manifold(fclaw_global_t *glob,
+                                    fclaw_patch_t *patch,
                                     int blockno,
                                     int patchno,
                                     int claw_version)
 {
-    if (fclaw2d_patch_is_ghost(patch))
+    if (fclaw_patch_is_ghost(patch))
         return;
 
     int mx,my,mbc;
@@ -60,8 +60,8 @@ void transport_patch_setup_manifold(fclaw2d_global_t *glob,
                               &maux,aux,&blockno,xd,yd,zd,area);
 }
 
-void transport_b4step2_manifold(fclaw2d_global_t *glob,
-                                fclaw2d_patch_t *patch,
+void transport_b4step2_manifold(fclaw_global_t *glob,
+                                fclaw_patch_t *patch,
                                 int blockno,
                                 int patchno,
                                 double t,

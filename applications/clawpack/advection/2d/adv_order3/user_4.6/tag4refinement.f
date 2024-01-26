@@ -14,7 +14,7 @@
       common /refinement_comm/ refinement_strategy
 
       integer*8 cont, get_context
-      logical fclaw2d_map_is_used
+      logical fclaw_map_is_used
 
       integer example
       common /example_comm/ example  

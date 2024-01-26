@@ -1,6 +1,6 @@
 /* Pillow grid surface.  Matches p4est_connectivity_new_pillow (). */
 
-#include <fclaw2d_map.h>
+#include <fclaw_map.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -11,42 +11,42 @@ extern "C"
 #endif
 
 static int
-fclaw2d_map_query_torus (fclaw2d_map_context_t * cont, int query_identifier)
+fclaw2d_map_query_torus (fclaw_map_context_t * cont, int query_identifier)
 {
     switch (query_identifier)
     {
-    case FCLAW2D_MAP_QUERY_IS_USED:
+    case FCLAW_MAP_QUERY_IS_USED:
         return 1;
         /* no break necessary after return statement */
-    case FCLAW2D_MAP_QUERY_IS_SCALEDSHIFT:
+    case FCLAW_MAP_QUERY_IS_SCALEDSHIFT:
         return 0;
-    case FCLAW2D_MAP_QUERY_IS_AFFINE:
+    case FCLAW_MAP_QUERY_IS_AFFINE:
         return 0;
-    case FCLAW2D_MAP_QUERY_IS_NONLINEAR:
+    case FCLAW_MAP_QUERY_IS_NONLINEAR:
         return 1;
-    case FCLAW2D_MAP_QUERY_IS_CART:
+    case FCLAW_MAP_QUERY_IS_CART:
         return 0;
-    case FCLAW2D_MAP_QUERY_IS_GRAPH:
+    case FCLAW_MAP_QUERY_IS_GRAPH:
         return 0;
-    case FCLAW2D_MAP_QUERY_IS_PLANAR:
+    case FCLAW_MAP_QUERY_IS_PLANAR:
         return 0;
-    case FCLAW2D_MAP_QUERY_IS_ALIGNED:
+    case FCLAW_MAP_QUERY_IS_ALIGNED:
         return 0;
-    case FCLAW2D_MAP_QUERY_IS_FLAT:
+    case FCLAW_MAP_QUERY_IS_FLAT:
         return 0;
-    case FCLAW2D_MAP_QUERY_IS_DISK:
+    case FCLAW_MAP_QUERY_IS_DISK:
         return 0;
-    case FCLAW2D_MAP_QUERY_IS_SPHERE:
+    case FCLAW_MAP_QUERY_IS_SPHERE:
         return 0;
-    case FCLAW2D_MAP_QUERY_IS_PILLOWDISK:
+    case FCLAW_MAP_QUERY_IS_PILLOWDISK:
         return 0;
-    case FCLAW2D_MAP_QUERY_IS_SQUAREDDISK:
+    case FCLAW_MAP_QUERY_IS_SQUAREDDISK:
         return 0;
-    case FCLAW2D_MAP_QUERY_IS_PILLOWSPHERE:
+    case FCLAW_MAP_QUERY_IS_PILLOWSPHERE:
         return 0;
-    case FCLAW2D_MAP_QUERY_IS_CUBEDSPHERE:
+    case FCLAW_MAP_QUERY_IS_CUBEDSPHERE:
         return 0;
-    case FCLAW2D_MAP_QUERY_IS_BRICK:
+    case FCLAW_MAP_QUERY_IS_BRICK:
         return 0;
     default:
         printf("\n");
@@ -61,35 +61,35 @@ fclaw2d_map_query_torus (fclaw2d_map_context_t * cont, int query_identifier)
 
 
 static void
-fclaw2d_map_c2m_torus (fclaw2d_map_context_t * cont, int blockno,
+fclaw2d_map_c2m_torus (fclaw_map_context_t * cont, int blockno,
                        double xc, double yc,
                        double *xp, double *yp, double *zp)
 {
 
     /* Data is not already in brick domain */
     double xc1,yc1,zc1;
-    FCLAW2D_MAP_BRICK2C(&cont,&blockno,&xc,&yc,&xc1,&yc1,&zc1);
+    FCLAW_MAP_2D_BRICK2C(&cont,&blockno,&xc,&yc,&xc1,&yc1,&zc1);
 
     double alpha = cont->user_double[0];
     double beta = cont->user_double[1];
 
     /* Don't pass in block number */
-    MAPC2M_TORUS(&xc1,&yc1,xp,yp,zp,&alpha,&beta);
+    FCLAW_MAP_2D_C2M_TORUS(&xc1,&yc1,xp,yp,zp,&alpha,&beta);
 
     scale_map(cont,xp,yp,zp);
     rotate_map(cont,xp,yp,zp);
 }
 
-fclaw2d_map_context_t *
-    fclaw2d_map_new_torus (fclaw2d_map_context_t* brick,
+fclaw_map_context_t *
+    fclaw2d_map_new_torus (fclaw_map_context_t* brick,
                            const double scale[],
                            const double rotate[],
                            const double alpha,
                            const double beta)
 {
-    fclaw2d_map_context_t *cont;
+    fclaw_map_context_t *cont;
 
-    cont = FCLAW_ALLOC_ZERO (fclaw2d_map_context_t, 1);
+    cont = FCLAW_ALLOC_ZERO (fclaw_map_context_t, 1);
     cont->query = fclaw2d_map_query_torus;
     cont->mapc2m = fclaw2d_map_c2m_torus;
 

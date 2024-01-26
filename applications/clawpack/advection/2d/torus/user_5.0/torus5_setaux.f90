@@ -56,14 +56,14 @@ subroutine torus5_set_edge_velocities(mx,my,mbc,  &
             yc = ylower + j*dy
 
 !!          # Map the brick to a unit square      
-            call fclaw2d_map_brick2c(cont, blockno,xc,yc,xc1,yc1,zc1)
+            call fclaw_map_2d_brick2c(cont, blockno,xc,yc,xc1,yc1,zc1)
 
 !!          # x-face - lower vertex
             xc = xlower + (i-1)*dx
             yc = ylower + (j-1)*dy
 
 !!          # Map the brick to a unit square      
-            call fclaw2d_map_brick2c(cont, blockno,xc,yc,xc2,yc2,zc2)
+            call fclaw_map_2d_brick2c(cont, blockno,xc,yc,xc2,yc2,zc2)
 
             call torus_edge_velocity(xc1,yc1,xc2,yc2,dy,vn)
             aux(2,i,j) = vn
@@ -78,12 +78,12 @@ subroutine torus5_set_edge_velocities(mx,my,mbc,  &
 !!         # y-face - right vertex
            xc = xlower + i*dx
            yc = ylower + (j-1)*dy
-           call fclaw2d_map_brick2c(cont,blockno,xc,yc,xc1,yc1,zc1)
+           call fclaw_map_2d_brick2c(cont,blockno,xc,yc,xc1,yc1,zc1)
 
 !!         # y-face - left vertex
            xc = xlower + (i-1)*dx
            yc = ylower + (j-1)*dy
-           call fclaw2d_map_brick2c(cont,blockno,xc,yc,xc2,yc2,zc2)
+           call fclaw_map_2d_brick2c(cont,blockno,xc,yc,xc2,yc2,zc2)
 
            call torus_edge_velocity(xc1,yc1,xc2,yc2,dx,vn)
            aux(3,i,j) = -vn

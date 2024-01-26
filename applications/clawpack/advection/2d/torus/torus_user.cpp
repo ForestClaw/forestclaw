@@ -28,7 +28,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "../all/advection_user.h"
 
 static
-void torus_problem_setup(fclaw2d_global_t *glob)
+void torus_problem_setup(fclaw_global_t *glob)
 {
     const user_options_t* user = torus_get_options(glob);
 
@@ -42,14 +42,14 @@ void torus_problem_setup(fclaw2d_global_t *glob)
         fclose(f);
     }
     /* Make sure node 0 writes `setprob.data` before proceeding */
-    fclaw2d_domain_barrier (glob->domain);
+    fclaw_domain_barrier (glob->domain);
     
     SETPROB();
 }
 
 static
-void torus_patch_setup(fclaw2d_global_t *glob,
-                       fclaw2d_patch_t *patch,
+void torus_patch_setup(fclaw_global_t *glob,
+                       fclaw_patch_t *patch,
                        int blockno,
                        int patchno)
 {
@@ -67,15 +67,15 @@ void torus_patch_setup(fclaw2d_global_t *glob,
 }
 
 
-void torus_link_solvers(fclaw2d_global_t *glob)
+void torus_link_solvers(fclaw_global_t *glob)
 {
-    fclaw2d_vtable_t *vt = fclaw2d_vt(glob);
+    fclaw_vtable_t *vt = fclaw_vt(glob);
     vt->problem_setup = &torus_problem_setup;  /* Version-independent */
 
     /* Torus uses special patch setup (not advection_patch_setup), since the
        streamfunction depends on computational coordinates, not physical
        coordinates */
-    fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt(glob);
+    fclaw_patch_vtable_t *patch_vt = fclaw_patch_vt(glob);
     patch_vt->setup   = &torus_patch_setup;
 
     const user_options_t *user =  torus_get_options(glob);

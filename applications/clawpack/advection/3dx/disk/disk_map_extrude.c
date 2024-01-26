@@ -4,7 +4,7 @@
 #include "../all/advection_user.h"
 
 static void
-disk_map_3dx(fclaw2d_map_context_t * cont, 
+disk_map_3dx(fclaw_map_context_t * cont, 
              int blockno,
              double xc, double yc, double zc,
              double *xp, double *yp, double *zp)
@@ -23,7 +23,7 @@ disk_map_3dx(fclaw2d_map_context_t * cont,
     shift_map(cont,xp,yp,zp);
 }
 
-void disk_map_extrude(fclaw2d_map_context_t *cont, 
+void disk_map_extrude(fclaw_map_context_t *cont, 
                       const double maxelev)
 {
     /* Modify the 2d mapping to included extruded details */

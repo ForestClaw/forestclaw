@@ -26,7 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef ADVECTION_USER_3D_H
 #define ADVECTION_USER_3D_H
 
-#include <fclaw2d_include_all.h>
+#include <fclaw_include_all.h>
 
 
 #include <fclaw3dx_clawpatch_pillow.h>
@@ -66,8 +66,8 @@ extern "C"
 /* Fix syntax */
 #endif
 
-void claw3_advection_patch_setup_manifold(fclaw2d_global_t *glob,
-                                          fclaw2d_patch_t *patch,
+void claw3_advection_patch_setup_manifold(fclaw_global_t *glob,
+                                          fclaw_patch_t *patch,
                                           int block,
                                           int patchno,
                                           int claw_version);

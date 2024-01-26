@@ -161,14 +161,14 @@ user_options_t* disk_options_register (fclaw_app_t * app,
     return user_opt;
 }
 
-void disk_options_store (fclaw2d_global_t* glob, user_options_t* user_opt)
+void disk_options_store (fclaw_global_t* glob, user_options_t* user_opt)
 {
-    fclaw2d_global_options_store(glob, "user", user_opt);
+    fclaw_global_options_store(glob, "user", user_opt);
 }
 
-const user_options_t* disk_get_options(fclaw2d_global_t* glob)
+const user_options_t* disk_get_options(fclaw_global_t* glob)
 {
-    return (user_options_t*) fclaw2d_global_get_options(glob, "user");
+    return (user_options_t*) fclaw_global_get_options(glob, "user");
 }
 
 void disk_global_post_process(fclaw_options_t *fclaw_opt,

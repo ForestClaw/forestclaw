@@ -46,7 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 typedef struct torthem
 {
-    fclaw2d_global_t *global;
+    fclaw_global_t *global;
 
 #if 0
     fc2d_clawpack46_options_t claw_opt;
@@ -71,7 +71,7 @@ torthem_init (torthem_t * torthem)
 
     memset (torthem, 0, sizeof (*torthem));
 #if 1
-    torthem->global = fclaw2d_global_new ();
+    torthem->global = fclaw_global_new ();
 #endif
 
 #if 0
@@ -171,8 +171,8 @@ torthem_destroy (torthem_t * torthem)
     fclaw_options_destroy (&torthem->fclaw_opt);
 
 #if 1
-    fclaw2d_finalize (torthem->global);
-    fclaw2d_global_destroy (torthem->global);
+    fclaw_finalize (torthem->global);
+    fclaw_global_destroy (torthem->global);
 #endif
 }
 

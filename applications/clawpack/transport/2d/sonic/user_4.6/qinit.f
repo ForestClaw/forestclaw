@@ -14,7 +14,7 @@
       double precision q0_physical
 
       integer*8 cont, get_context
-      logical fclaw2d_map_is_used
+      logical fclaw_map_is_used
 
       integer ii,jj
 
@@ -37,13 +37,13 @@ c                 # Discontinuous solution
                   call cellave2(blockno,xlow,ylow,dx,dy,w)
                   q(i,j,1) = w
               elseif (initchoice .eq. 1) then
-                  call fclaw2d_map_c2m(cont,blockno,xc,yc,xp,yp,zp)                  
+                  call fclaw_map_2d_c2m(cont,blockno,xc,yc,xp,yp,zp)                  
                   q(i,j,1) = q0_physical(xp,yp,zp)
               elseif (initchoice .eq. 2) then
                   q(i,j,1) = 1.d0
               elseif (initchoice .eq. 3) then
-                  if (fclaw2d_map_is_used(cont)) then
-                      call fclaw2d_map_c2m(cont,
+                  if (fclaw_map_is_used(cont)) then
+                      call fclaw_map_2d_c2m(cont,
      &                           blockno,xc,yc,xp,yp,zp)
                   else
                       xp = xc

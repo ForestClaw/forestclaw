@@ -25,7 +25,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "burgers_user.h"
 
-#include <fclaw2d_include_all.h>
+#include <fclaw_include_all.h>
 
 /* Two versions of Clawpack */
 #include <fc2d_clawpack46.h>
@@ -37,7 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <clawpack46_user_fort.h>
 
 
-void burgers_link_solvers(fclaw2d_global_t *glob)
+void burgers_link_solvers(fclaw_global_t *glob)
 {
     const user_options_t* user = burgers_get_options(glob);
     if (user->claw_version == 4)

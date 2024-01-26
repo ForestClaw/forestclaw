@@ -26,15 +26,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "correlatedcb_user.h"
 
 static
-void correlatedcb_problem_setup(fclaw2d_global_t* glob)
+void correlatedcb_problem_setup(fclaw_global_t* glob)
 {
     SETPROB();
 }
 
 
 static
-void correlatedcb_patch_setup_manifold(fclaw2d_global_t *glob,
-                                    fclaw2d_patch_t *patch,
+void correlatedcb_patch_setup_manifold(fclaw_global_t *glob,
+                                    fclaw_patch_t *patch,
                                     int blockno,
                                     int patchno)
 {
@@ -43,8 +43,8 @@ void correlatedcb_patch_setup_manifold(fclaw2d_global_t *glob,
 }
 
 static
-void correlatedcb_b4step2_manifold(fclaw2d_global_t *glob,
-                               fclaw2d_patch_t *patch,
+void correlatedcb_b4step2_manifold(fclaw_global_t *glob,
+                               fclaw_patch_t *patch,
                                int blockno,
                                int patchno,
                                double t,
@@ -54,13 +54,13 @@ void correlatedcb_b4step2_manifold(fclaw2d_global_t *glob,
     advection_b4step2_manifold(glob,patch,blockno,patchno,t,dt,user->claw_version);
 }
 
-void correlatedcb_link_solvers(fclaw2d_global_t *glob)
+void correlatedcb_link_solvers(fclaw_global_t *glob)
 {
     /* Custom setprob */
-    fclaw2d_vtable_t *vt = fclaw2d_vt(glob);
+    fclaw_vtable_t *vt = fclaw_vt(glob);
     vt->problem_setup  = &correlatedcb_problem_setup;  /* Version-independent */
 
-    fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt(glob);
+    fclaw_patch_vtable_t *patch_vt = fclaw_patch_vt(glob);
     patch_vt->setup = &correlatedcb_patch_setup_manifold;  
 
     const user_options_t* user = correlatedcb_get_options(glob);

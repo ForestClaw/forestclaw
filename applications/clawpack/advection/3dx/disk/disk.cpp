@@ -27,13 +27,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "../all/advection_user.h"
 
-#include <fclaw2d_map.h>
+#include <fclaw_map.h>
 
 static
-void create_domain(fclaw2d_global_t *glob)
+void create_domain(fclaw_global_t *glob)
 {
     /* Check that we are running a manifold example */
-    const fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
+    const fclaw_options_t* fclaw_opt = fclaw_get_options(glob);
     FCLAW_ASSERT(fclaw_opt->manifold != 0);
 
     /* Four aux array values required for this simulation */
@@ -49,8 +49,8 @@ void create_domain(fclaw2d_global_t *glob)
 
 
     /* Mapped, multi-block domain */
-    fclaw2d_domain_t         *domain;
-    fclaw2d_map_context_t    *cont = NULL;
+    fclaw_domain_t         *domain;
+    fclaw_map_context_t    *cont = NULL;
     
     /* Get 2d mapping */
     const user_options_t *user_opt = disk_get_options(glob);
@@ -59,7 +59,7 @@ void create_domain(fclaw2d_global_t *glob)
     case 1:
         /* Map unit square to the pillow disk using mapc2m_pillowdisk.f */
         domain =
-            fclaw2d_domain_new_unitsquare (glob->mpicomm,
+            fclaw_domain_new_unitsquare (glob->mpicomm,
                                            fclaw_opt->minlevel);
         cont =
             fclaw2d_map_new_pillowdisk (fclaw_opt->scale, 
@@ -76,7 +76,7 @@ void create_domain(fclaw2d_global_t *glob)
 
         /* Map five-patch square to pillow disk. */
         domain =
-            fclaw2d_domain_new_disk (glob->mpicomm, 0, 0,
+            fclaw_domain_new_2d_disk (glob->mpicomm, 0, 0,
                                      fclaw_opt->minlevel);
 
         cont =
@@ -94,28 +94,28 @@ void create_domain(fclaw2d_global_t *glob)
     disk_map_extrude(cont,user_opt->maxelev);
 
     /* Store mapping in the glob */
-    fclaw2d_global_store_map (glob, cont);            
+    fclaw_map_store (glob, cont);            
 
     /* Store the domain in the glob */
-    fclaw2d_global_store_domain(glob, domain);
+    fclaw_global_store_domain(glob, domain);
 
     /* print out some info */
-    fclaw2d_domain_list_levels(domain, FCLAW_VERBOSITY_ESSENTIAL);
-    fclaw2d_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);
+    fclaw_domain_list_levels(domain, FCLAW_VERBOSITY_ESSENTIAL);
+    fclaw_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);
 }
 
 static
-void run_program(fclaw2d_global_t* glob)
+void run_program(fclaw_global_t* glob)
 {
     /* ---------------------------------------------------------------
        Set domain data.
        --------------------------------------------------------------- */
-    fclaw2d_domain_data_new(glob->domain);
+    you_can_safely_remove_this_call(glob->domain);
 
     const user_options_t *user_opt = disk_get_options(glob);
 
     /* Initialize virtual table for ForestClaw */
-    fclaw2d_vtables_initialize(glob);
+    fclaw_vtables_initialize(glob);
 
     /* Initialize virtual tables for solvers */
     if (user_opt->claw_version == 4)
@@ -133,9 +133,9 @@ void run_program(fclaw2d_global_t* glob)
     /* ---------------------------------------------------------------
        Run
        --------------------------------------------------------------- */
-    fclaw2d_initialize(glob);
-    fclaw2d_run(glob);
-    fclaw2d_finalize(glob);
+    fclaw_initialize(glob);
+    fclaw_run(glob);
+    fclaw_finalize(glob);
 }
 
 int
@@ -168,10 +168,10 @@ main (int argc, char **argv)
         /* Options have been checked and are valid */
         int size, rank;
         sc_MPI_Comm mpicomm = fclaw_app_get_mpi_size_rank (app, &size, &rank);
-        fclaw2d_global_t *glob = fclaw2d_global_new_comm (mpicomm, size, rank);
+        fclaw_global_t *glob = fclaw_global_new_comm (mpicomm, size, rank);
 
         /* Store option packages in glob */
-        fclaw2d_options_store           (glob, fclaw_opt);
+        fclaw_options_store           (glob, fclaw_opt);
         fclaw3dx_clawpatch_options_store (glob, clawpatch_opt);
         fc3d_clawpack46_options_store   (glob, claw46_opt);
         disk_options_store              (glob, user_opt);
@@ -182,7 +182,7 @@ main (int argc, char **argv)
         /* Run the program */
         run_program(glob);
 
-        fclaw2d_global_destroy(glob);
+        fclaw_global_destroy(glob);
     }
     
     fclaw_app_destroy (app);

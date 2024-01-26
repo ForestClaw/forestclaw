@@ -26,7 +26,7 @@
 #ifndef OVERPRESSURE_USER_H
 #define OVERPRESSURE_USER_H
 
-#include <fclaw2d_include_all.h>
+#include <fclaw_include_all.h>
 
 #include <fclaw3dx_clawpatch_options.h>
 #include <fclaw3dx_clawpatch.h>
@@ -77,16 +77,16 @@ typedef struct user_options
 } user_options_t;
 
 
-void overpressure_link_solvers(fclaw2d_global_t *glob);
+void overpressure_link_solvers(fclaw_global_t *glob);
 
 user_options_t* overpressure_options_register (fclaw_app_t * app,
                                           const char *configfile);
 
-void overpressure_options_store (fclaw2d_global_t* glob, user_options_t* user);
+void overpressure_options_store (fclaw_global_t* glob, user_options_t* user);
 
-user_options_t* overpressure_get_options(fclaw2d_global_t* glob);
+user_options_t* overpressure_get_options(fclaw_global_t* glob);
 
-void overpressure_map_extrude(fclaw2d_map_context_t* cont,
+void overpressure_map_extrude(fclaw_map_context_t* cont,
                               const double maxelev,
                               const int mapping,
                               const double minz,

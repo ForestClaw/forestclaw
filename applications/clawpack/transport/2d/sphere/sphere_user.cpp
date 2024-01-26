@@ -26,7 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "sphere_user.h"
 
 static
-void sphere_problem_setup(fclaw2d_global_t* glob)
+void sphere_problem_setup(fclaw_global_t* glob)
 {
     const user_options_t* user = sphere_get_options(glob);
 
@@ -42,12 +42,12 @@ void sphere_problem_setup(fclaw2d_global_t* glob)
         fprintf(f,  "%-24d   %s",user->refine_pattern,"\% refinement_pattern\n");
         fclose(f);
     }
-    fclaw2d_domain_barrier (glob->domain);
+    fclaw_domain_barrier (glob->domain);
     SETPROB();
 }
 
-void sphere_patch_setup_manifold(fclaw2d_global_t *glob,
-                                    fclaw2d_patch_t *patch,
+void sphere_patch_setup_manifold(fclaw_global_t *glob,
+                                    fclaw_patch_t *patch,
                                     int blockno,
                                     int patchno)
 {
@@ -58,8 +58,8 @@ void sphere_patch_setup_manifold(fclaw2d_global_t *glob,
 
 
 static
-void sphere_b4step2(fclaw2d_global_t *glob,
-                    fclaw2d_patch_t *patch,
+void sphere_b4step2(fclaw_global_t *glob,
+                    fclaw_patch_t *patch,
                     int blockno,
                     int patchno,
                     double t, double dt)
@@ -72,13 +72,13 @@ void sphere_b4step2(fclaw2d_global_t *glob,
 
 
 static
-void cb_sphere_output_ascii (fclaw2d_domain_t * domain,
-                            fclaw2d_patch_t * patch,
+void cb_sphere_output_ascii (fclaw_domain_t * domain,
+                            fclaw_patch_t * patch,
                             int blockno, int patchno,
                             void *user)
 {
-    fclaw2d_global_iterate_t* s = (fclaw2d_global_iterate_t*) user;
-    fclaw2d_global_t      *glob = (fclaw2d_global_t*) s->glob;
+    fclaw_global_iterate_t* s = (fclaw_global_iterate_t*) user;
+    fclaw_global_t      *glob = (fclaw_global_t*) s->glob;
 
     //fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt(glob);
 
@@ -86,7 +86,7 @@ void cb_sphere_output_ascii (fclaw2d_domain_t * domain,
 
     /* Get info not readily available to user */
     int global_patch_num, local_patch_num, level;
-    fclaw2d_patch_get_info(glob->domain,patch,
+    fclaw_patch_get_info(glob->domain,patch,
                            blockno,patchno,
                            &global_patch_num,&local_patch_num,&level);
     
@@ -102,7 +102,7 @@ void cb_sphere_output_ascii (fclaw2d_domain_t * domain,
     double* error = fclaw2d_clawpatch_get_error(glob,patch);
     double* soln = fclaw2d_clawpatch_get_exactsoln(glob,patch);
 
-    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+    const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
     char fname[BUFSIZ];
     snprintf (fname, BUFSIZ, "%s.q%04d", fclaw_opt->prefix, iframe);
 
@@ -131,13 +131,13 @@ void cb_sphere_output_ascii (fclaw2d_domain_t * domain,
 
 
 
-void sphere_link_solvers(fclaw2d_global_t *glob)
+void sphere_link_solvers(fclaw_global_t *glob)
 {
     /* ForestClaw core functions */
-    fclaw2d_vtable_t *vt = fclaw2d_vt(glob);
+    fclaw_vtable_t *vt = fclaw_vt(glob);
     vt->problem_setup = &sphere_problem_setup;  /* Version-independent */
 
-    fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt(glob);
+    fclaw_patch_vtable_t *patch_vt = fclaw_patch_vt(glob);
     patch_vt->setup   = &sphere_patch_setup_manifold;
 
 
@@ -158,7 +158,7 @@ void sphere_link_solvers(fclaw2d_global_t *glob)
         fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt(glob);
 
         /* Include error in output files */
-        const fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
+        const fclaw_options_t* fclaw_opt = fclaw_get_options(glob);
         if (fclaw_opt->compute_error)
         {
             clawpatch_vt->fort_compute_patch_error = &SPHERE46_COMPUTE_ERROR;
@@ -179,7 +179,7 @@ void sphere_link_solvers(fclaw2d_global_t *glob)
         fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt(glob);
 
         /* Include error in output files */
-        const fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
+        const fclaw_options_t* fclaw_opt = fclaw_get_options(glob);
         if (fclaw_opt->compute_error)
         {
             clawpatch_vt->fort_compute_patch_error = &SPHERE5_COMPUTE_ERROR;
