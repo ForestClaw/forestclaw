@@ -23,12 +23,12 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "fclaw2d_rays.h"
-#include "fclaw2d_global.h"
-#include "fclaw2d_options.h"
-#include "fclaw2d_diagnostics.h"
+#include <fclaw_rays.h>
+#include <fclaw_global.h>
+#include <fclaw_options.h>
+#include <fclaw_diagnostics.h>
 
-#include "fclaw2d_convenience.h"
+#include <fclaw_convenience.h>
 
 #include <fclaw_pointer_map.h>
 

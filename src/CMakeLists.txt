@@ -14,36 +14,35 @@ add_library(forestclaw_c OBJECT
   fclaw_math.c
   fclaw_timer.c
   fclaw_mpi.c
-  fclaw2d_block.c
-  fclaw2d_options.c
-  fclaw2d_global.c
-  fclaw2d_forestclaw.c
-  fclaw2d_vtable.c
-  fclaw2d_map.c
-  fclaw2d_map_query.c
-  fclaw2d_map_brick.c
-  fclaw2d_convenience.c
-  fclaw2d_exchange.c
-  fclaw2d_advance.c
-  fclaw2d_elliptic_solver.c
-  fclaw2d_physical_bc.c
-  fclaw2d_ghost_fill.c
-  fclaw2d_output.c
-  fclaw2d_run.c
-  fclaw2d_diagnostics.c
-  fclaw2d_rays.c
-  fclaw2d_update_single_step.c
-  fclaw2d_domain.c
-  fclaw2d_regrid.c
-  fclaw2d_patch.c
-  fclaw2d_partition.c
-  fclaw2d_timeinterp.c
-  fclaw2d_initialize.c
-  fclaw2d_finalize.c
-  fclaw2d_time_sync.c
-  fclaw2d_corner_neighbors.c
-  fclaw2d_face_neighbors.c
-  fclaw2d_farraybox.cpp
+  fclaw_block.c
+  fclaw_global.c
+  fclaw_forestclaw.c
+  fclaw_vtable.c
+  fclaw_map.c
+  fclaw_map_query.c
+  fclaw_map_brick.c
+  fclaw_convenience.c
+  fclaw_exchange.c
+  fclaw_advance.c
+  fclaw_elliptic_solver.c
+  fclaw_physical_bc.c
+  fclaw_ghost_fill.c
+  fclaw_output.c
+  fclaw_run.c
+  fclaw_diagnostics.c
+  fclaw_rays.c
+  fclaw_update_single_step.c
+  fclaw_domain.c
+  fclaw_regrid.c
+  fclaw_patch.c
+  fclaw_partition.c
+  fclaw_timeinterp.c
+  fclaw_initialize.c
+  fclaw_finalize.c
+  fclaw_time_sync.c
+  fclaw_corner_neighbors.c
+  fclaw_face_neighbors.c
+  fclaw_farraybox.cpp
   fclaw2d_output_tikz.c
   fclaw2d_file.c
   fclaw2d_wrap.c
@@ -53,8 +52,8 @@ add_library(forestclaw_c OBJECT
   fclaw3d_file.c
   fclaw3d_wrap.c
   fp_exception_glibc_extension.c
-  mappings/fclaw2d_map_nomap.c
-  mappings/fclaw2d_map_nomap_brick.c
+  mappings/fclaw_map_nomap.c
+  mappings/fclaw_map_nomap_brick.c
 )
 target_include_directories(forestclaw_c PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${PROJECT_BINARY_DIR}/include patches/clawpatch)
 target_link_libraries(forestclaw_c PRIVATE P4EST::P4EST SC::SC)
@@ -178,12 +177,12 @@ if(BUILD_TESTING)
       fclaw_gauges.h.TEST.cpp
       fclaw_packing.h.TEST.cpp
       fclaw_pointer_map.h.TEST.cpp
-      fclaw2d_elliptic_solver.h.TEST.cpp
-      fclaw2d_diagnostics.h.TEST.cpp
-      fclaw2d_global.h.TEST.cpp
-      fclaw2d_options.h.TEST.cpp
-      fclaw2d_patch.h.TEST.cpp
-      fclaw2d_vtable.h.TEST.cpp
+      fclaw_elliptic_solver.h.TEST.cpp
+      fclaw_diagnostics.h.TEST.cpp
+      fclaw_global.h.TEST.cpp
+      fclaw_options.h.TEST.cpp
+      fclaw_patch.h.TEST.cpp
+      fclaw_vtable.h.TEST.cpp
   )
 
   target_link_libraries(forestclaw.TEST testutils forestclaw)
