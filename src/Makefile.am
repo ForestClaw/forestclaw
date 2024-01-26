@@ -29,7 +29,7 @@ libforestclaw_installed_headers = \
 	src/fclaw_block.h \
 	src/fclaw_patch.h \
 	src/fclaw_vtable.h \
-	src/fclaw2d_output.h \
+	src/fclaw_output.h \
 	src/fclaw_time_sync.h \
 	src/fclaw_update_single_step.h \
 	src/fclaw_physical_bc.h \
