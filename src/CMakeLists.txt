@@ -123,38 +123,37 @@ install(FILES
 	fclaw_mpi.h 
 	fclaw_math.h 
   fclaw_wrap.h
+  fclaw_include_all.h 
+	fclaw_advance.h 
+	fclaw_elliptic_solver.h 
+	fclaw_farraybox.hpp 
+	fclaw_global.h
+	fclaw_forestclaw.h
+	fclaw_domain.h
+	fclaw_block.h
+	fclaw_patch.h
+	fclaw_vtable.h
+	fclaw_output.h
+	fclaw_time_sync.h
+	fclaw_update_single_step.h
+	fclaw_physical_bc.h
+	fclaw_rays.h
+	fclaw_ghost_fill.h
+	fclaw_corner_neighbors.h
+	fclaw_face_neighbors.h
+	fclaw_map.h
+	fclaw_timeinterp.h
+	fclaw_regrid.h
+	fclaw_map_brick.h
+	fclaw_partition.h
+	fclaw_exchange.h
+	fclaw_convenience.h
+	fclaw_map_query.h
+	fclaw_map_query_defs.h
+	fclaw_diagnostics.h
 	forestclaw2d.h 
 	fp_exception_glibc_extension.h 
-  fclaw2d_include_all.h 
 	fclaw2d_defs.h 
-	fclaw2d_options.h 
-	fclaw2d_advance.h 
-	fclaw2d_elliptic_solver.h 
-	fclaw2d_farraybox.hpp 
-	fclaw2d_global.h
-	fclaw2d_forestclaw.h
-	fclaw2d_domain.h
-	fclaw2d_block.h
-	fclaw2d_patch.h
-	fclaw2d_vtable.h
-	fclaw2d_output.h
-	fclaw2d_time_sync.h
-	fclaw2d_update_single_step.h
-	fclaw2d_physical_bc.h
-	fclaw2d_rays.h
-	fclaw2d_ghost_fill.h
-	fclaw2d_corner_neighbors.h
-	fclaw2d_face_neighbors.h
-	fclaw2d_map.h
-	fclaw2d_timeinterp.h
-	fclaw2d_regrid.h
-	fclaw2d_map_brick.h
-	fclaw2d_partition.h
-	fclaw2d_exchange.h
-	fclaw2d_convenience.h
-	fclaw2d_map_query.h
-	fclaw2d_map_query_defs.h
-	fclaw2d_diagnostics.h
   fclaw2d_file.h
   fclaw2d_wrap.h
   fclaw2d_to_3d.h
