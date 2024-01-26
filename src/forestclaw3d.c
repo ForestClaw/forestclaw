@@ -44,7 +44,7 @@ fclaw3d_domain_num_edges (const fclaw3d_domain_t * domain)
 int
 fclaw3d_patch_edge_neighbors (fclaw2d_domain_t * domain,
                               int blockno, int patchno, int edgeno,
-                              int *rproc, int *rblockno, int *rpatchno,
+                              int rproc[2], int *rblockno, int rpatchno[2],
                               int *redge,
                               fclaw2d_patch_relation_t * neighbor_size)
 {
