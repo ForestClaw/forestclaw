@@ -39,11 +39,11 @@ struct fclaw_domain;
 struct fclaw_patch;
 
 
-void cb_face_fill(struct fclaw_domain *domain,
-                  struct fclaw_patch *this_patch,
-                  int this_block_idx,
-                  int this_patch_idx,
-                  void *user);
+void fclaw_face_fill_cb(struct fclaw_domain *domain,
+                        struct fclaw_patch *this_patch,
+                        int this_block_idx,
+                        int this_patch_idx,
+                        void *user);
 
 void fclaw_face_neighbor_ghost(struct fclaw_global* glob,
                                  int minlevel,
