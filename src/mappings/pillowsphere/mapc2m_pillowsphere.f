@@ -7,7 +7,8 @@ c     # either the upper hemisphere (blockno == 0) or the lower hemisphere
 c     # (blockno == 1).
 c     #
 c     # ------------------------------------------------------------------
-      subroutine fclaw_map_2d_c2m_pillowsphere(blockno, xc1,yc1,xp,yp,zp)
+      subroutine fclaw_map_2d_c2m_pillowsphere(
+     &      blockno, xc1,yc1,xp,yp,zp)
       implicit none
 
       external fclaw_map_2d_c2m_cart
