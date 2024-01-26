@@ -107,11 +107,6 @@ void create_domain(fclaw_global_t *glob)
 static
 void run_program(fclaw_global_t* glob)
 {
-    /* ---------------------------------------------------------------
-       Set domain data.
-       --------------------------------------------------------------- */
-    you_can_safely_remove_this_call(glob->domain);
-
     const user_options_t *user_opt = disk_get_options(glob);
 
     /* Initialize virtual table for ForestClaw */

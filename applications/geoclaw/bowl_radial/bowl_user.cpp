@@ -25,13 +25,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "bowl_user.h"
 
-#include <fclaw2d_include_all.h>
+#include <fclaw_include_all.h>
 
 #include <fclaw2d_clawpatch.h>
 #include <fc2d_geoclaw.h>
 
 
-void bowl_link_solvers(fclaw2d_global_t *glob)
+void bowl_link_solvers(fclaw_global_t *glob)
 {
 
 	/* User customizations ... */

@@ -126,9 +126,9 @@ void overpressure_patch_setup(fclaw_global_t *glob,
 void overpressure_link_solvers(fclaw_global_t *glob)
 {
     const user_options_t* user = overpressure_get_options(glob);
-    fclaw_vtable_t *fclaw_vt = fclaw_vt(glob);
+    fclaw_vtable_t *fc_vt = fclaw_vt(glob);
 
-    fclaw_vt->problem_setup = &overpressure_problem_setup;
+    fc_vt->problem_setup = &overpressure_problem_setup;
 
     fclaw_patch_vtable_t *patch_vt = fclaw_patch_vt(glob);
 

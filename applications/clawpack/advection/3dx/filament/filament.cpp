@@ -140,12 +140,6 @@ void run_program(fclaw_global_t* glob)
 {
     user_options_t *user = (user_options_t*) filament_get_options(glob);
 
-
-    /* ---------------------------------------------------------------
-       Set domain data.
-       --------------------------------------------------------------- */
-    you_can_safely_remove_this_call(glob->domain);
-
     /* Initialize virtual table for ForestClaw */
     fclaw_vtables_initialize(glob);
 

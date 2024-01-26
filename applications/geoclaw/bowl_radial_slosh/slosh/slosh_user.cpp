@@ -24,43 +24,38 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "slosh_user.h"
-#include "fclaw2d_global.h"
+#include <fclaw_global.h>
 #include <fclaw_filesystem.h>
 
-void slosh_link_solvers(fclaw2d_global_t *glob)
+void slosh_link_solvers(fclaw_global_t *glob)
 {
     fc2d_geoclaw_vtable_t* geoclaw_vt = fc2d_geoclaw_vt(glob);
     geoclaw_vt->qinit       = &FC2D_GEOCLAW_QINIT;
 }
 
-void slosh_create_domain(fclaw2d_global_t* glob)
+void slosh_create_domain(fclaw_global_t* glob)
 {
-    fclaw_options_t *fclaw_opts = fclaw2d_get_options(glob);
+    fclaw_options_t *fclaw_opts = fclaw_get_options(glob);
 
     /* Size is set by [ax,bx] x [ay, by], set in .ini file */
-    fclaw2d_domain_t *domain = 
-        fclaw2d_domain_new_unitsquare(glob->mpicomm, fclaw_opts->minlevel);
-    fclaw2d_map_context_t* cont = fclaw2d_map_new_nomap();
+    fclaw_domain_t *domain = 
+        fclaw_domain_new_unitsquare(glob->mpicomm, fclaw_opts->minlevel);
+    fclaw_map_context_t* cont = fclaw_map_new_nomap();
 
     /* store domain and map in glob */
-    fclaw2d_global_store_domain(glob, domain);
-    fclaw2d_global_store_map(glob, cont);
+    fclaw_global_store_domain(glob, domain);
+    fclaw_map_store(glob, cont);
 
-    fclaw2d_domain_list_levels(domain, FCLAW_VERBOSITY_ESSENTIAL);
-    fclaw2d_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);
+    fclaw_domain_list_levels(domain, FCLAW_VERBOSITY_ESSENTIAL);
+    fclaw_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);
 }
 
-void slosh_run_program(fclaw2d_global_t* glob)
+void slosh_run_program(fclaw_global_t* glob)
 {
-    fclaw2d_set_global_context(glob);
-
-    /* ---------------------------------------------------------------
-       Set domain data.
-       --------------------------------------------------------------- */
-    fclaw2d_domain_data_new(glob->domain);
+    fclaw_set_global_context(glob);
 
     /* Initialize virtual table for ForestClaw */
-    fclaw2d_vtables_initialize(glob);
+    fclaw_vtables_initialize(glob);
 
     fc2d_geoclaw_solver_initialize(glob);
 
@@ -72,10 +67,10 @@ void slosh_run_program(fclaw2d_global_t* glob)
     fc2d_geoclaw_module_setup(glob);
 
 
-    fclaw2d_initialize(glob);
+    fclaw_initialize(glob);
     fc2d_geoclaw_run(glob);
 
-    fclaw2d_finalize(glob);
+    fclaw_finalize(glob);
 
-    fclaw2d_clear_global_context(glob);
+    fclaw_clear_global_context(glob);
 }
