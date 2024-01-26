@@ -29,6 +29,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw_patch.h>
 
+#include <forestclaw2d.h>
+
 
 void fclaw_block_get_block_boundary(fclaw_global_t * glob,
                                       fclaw_patch_t * patch,
@@ -39,7 +41,7 @@ void fclaw_block_get_block_boundary(fclaw_global_t * glob,
     for (iside = 0; iside < FCLAW2D_NUMFACES; iside++)
     {
         int iface_flags = fclaw2d_patch_block_face_flags[iside];
-        int is_block_face = (patch->flags & iface_flags) != 0;
+        int is_block_face = (patch->d2->flags & iface_flags) != 0;
 
         /* True for physical and block boundaries across a face */
         intersects_block[iside] = is_block_face;
