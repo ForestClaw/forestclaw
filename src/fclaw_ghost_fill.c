@@ -67,6 +67,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw_ghost_fill.h>
 #include <fclaw_corner_neighbors.h>
+#include <fclaw_edge_neighbors.h>
 #include <fclaw_face_neighbors.h>
 
 #include <fclaw_global.h>
@@ -161,6 +162,15 @@ void copy2ghost(fclaw_global_t *glob,
     parallel_mode.cb_fill = fclaw_face_fill_cb;
     fclaw_global_iterate_level(glob, level, cb_parallel_wrap,
                          (void *) &parallel_mode);
+
+    if(glob->domain->refine_dim == 3)
+    {
+        /* edge exchanges */
+        parallel_mode.cb_fill = fclaw_edge_fill_cb;
+        fclaw_global_iterate_level(glob, level, cb_parallel_wrap,
+                              (void *) &parallel_mode);
+    }
+
     /* corner exchanges */
     parallel_mode.cb_fill = fclaw_corner_fill_cb;
     fclaw_global_iterate_level(glob, level, cb_parallel_wrap,
@@ -192,6 +202,14 @@ void average2ghost(fclaw_global_t *glob,
     parallel_mode.cb_fill = fclaw_face_fill_cb;
     fclaw_global_iterate_level(glob, coarse_level,
                    cb_interface_wrap, (void *) &parallel_mode);
+
+	if(glob->domain->refine_dim ==3)
+    {
+        /* Edge average */
+        parallel_mode.cb_fill = fclaw_edge_fill_cb;
+        fclaw_global_iterate_level(glob, coarse_level, cb_interface_wrap,
+                       (void *) &parallel_mode);
+    }
 
     /* Corner average */
     parallel_mode.cb_fill = fclaw_corner_fill_cb;
@@ -254,6 +272,14 @@ void interpolate2ghost(fclaw_global_t *glob,
     fclaw_global_iterate_level(glob,coarse_level, cb_interface_wrap,
                                          (void *) &parallel_mode);
 
+    if(glob->domain->refine_dim ==3)
+    {
+        /* Edge interpolate */
+        parallel_mode.cb_fill = fclaw_edge_fill_cb;
+        fclaw_global_iterate_level(glob, coarse_level, cb_interface_wrap,
+                                  (void *) &parallel_mode);
+    }
+
     /* Corner interpolate */
     parallel_mode.cb_fill = fclaw_corner_fill_cb;
     fclaw_global_iterate_level(glob,coarse_level, cb_interface_wrap,
@@ -273,6 +299,15 @@ void interpolate2ghost(fclaw_global_t *glob,
     parallel_mode.cb_fill = fclaw_face_fill_cb;
     fclaw_global_iterate_level(glob, fine_level, cb_interface_wrap,
                                  (void *) &parallel_mode);
+
+	if(glob->domain->refine_dim == 3)
+    {
+        /* Interpolate to edges at parallel boundaries from coarse grid
+           ghost patches */
+        parallel_mode.cb_fill = fclaw_edge_fill_cb;
+        fclaw_global_iterate_level(glob, fine_level, cb_interface_wrap,
+                                     (void *) &parallel_mode);
+    }
 
     /* Interpolate to corners at parallel boundaries from coarse grid
        ghost patches */
