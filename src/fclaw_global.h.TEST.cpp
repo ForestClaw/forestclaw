@@ -134,7 +134,7 @@ fclaw_packing_vtable_t dummy_opts_vt =
 };
 
 }
-TEST_CASE("fclaw2d_global_pack with no options structure")
+TEST_CASE("fclaw_global_pack with no options structure")
 {
 
 	for(double curr_time : {1.0, 1.2})
@@ -168,7 +168,7 @@ TEST_CASE("fclaw2d_global_pack with no options structure")
 		fclaw_global_destroy(glob2);
 	}
 }
-TEST_CASE("fclaw2d_global_pack with a single options structure")
+TEST_CASE("fclaw_global_pack with a single options structure")
 {
 
 	for(double curr_time : {1.0, 1.2})
@@ -219,7 +219,7 @@ TEST_CASE("fclaw2d_global_pack with a single options structure")
 		fclaw_global_destroy(glob2);
 	}
 }
-TEST_CASE("fclaw2d_global_pack with two options structure")
+TEST_CASE("fclaw_global_pack with two options structure")
 {
 
 	for(double curr_time : {1.0, 1.2})
@@ -271,7 +271,7 @@ TEST_CASE("fclaw2d_global_pack with two options structure")
 		fclaw_global_destroy(glob2);
 	}
 }
-TEST_CASE("fclaw2d_global_pack aborts with unregistered vtable")
+TEST_CASE("fclaw_global_pack aborts with unregistered vtable")
 {
 	fclaw_global_t* glob1;
    	glob1 = fclaw_global_new();
@@ -296,7 +296,7 @@ TEST_CASE("fclaw2d_global_packsize aborts with unregistered vtable")
 
 	CHECK_SC_ABORTED(fclaw2d_global_packsize(glob1));
 }
-TEST_CASE("fclaw2d_global_unppack aborts with unregistered vtable")
+TEST_CASE("fclaw_global_unppack aborts with unregistered vtable")
 {
 	fclaw_global_t* glob1;
    	glob1 = fclaw_global_new();
@@ -320,7 +320,7 @@ TEST_CASE("fclaw2d_global_unppack aborts with unregistered vtable")
 	fclaw_app_register_options_packing_vtable("dummy1",  nullptr);
 	CHECK_SC_ABORTED(fclaw2d_global_unpack(buffer, &glob2));
 }
-TEST_CASE("fclaw2d_global_options_store and fclaw2d_global_get_options test") {
+TEST_CASE("fclaw_global_options_store and fclaw_global_get_options test") {
     fclaw_global_t* glob = fclaw_global_new();
 
     // Test with an integer
@@ -363,7 +363,7 @@ TEST_CASE("fclaw2d_global_set_global")
     fclaw_global_clear_static();
 }
 
-TEST_CASE("fclaw2d_global_unset_global")
+TEST_CASE("fclaw_global_clear_static")
 {
     fclaw_global_t* glob = (fclaw_global_t*)123;
     fclaw_global_set_static(glob);

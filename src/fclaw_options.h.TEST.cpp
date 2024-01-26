@@ -31,7 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <sc_mpi.h>
 #include <test.hpp>
 
-TEST_CASE("fclaw2d_options can store options in two seperate globs")
+TEST_CASE("fclaw_options can store options in two seperate globs")
 {
 	fclaw_global_t* glob1 = fclaw_global_new();
 	fclaw_global_t* glob2 = fclaw_global_new();
@@ -52,7 +52,7 @@ TEST_CASE("fclaw2d_options can store options in two seperate globs")
 
 #ifdef FCLAW_ENABLE_DEBUG
 
-TEST_CASE("fclaw2d_get_options fails if not intialized")
+TEST_CASE("fclaw_get_options fails if not intialized")
 {
 	fclaw_global_t* glob1 = fclaw_global_new();
 	fclaw_global_t* glob2 = fclaw_global_new();
@@ -65,7 +65,7 @@ TEST_CASE("fclaw2d_get_options fails if not intialized")
 	fclaw_global_destroy(glob2);
 }
 
-TEST_CASE("fclaw2d_options_store fails if called twice on a glob")
+TEST_CASE("fclaw_options_store fails if called twice on a glob")
 {
 	fclaw_global_t* glob1 = fclaw_global_new();
 	fclaw_global_t* glob2 = fclaw_global_new();
@@ -79,7 +79,7 @@ TEST_CASE("fclaw2d_options_store fails if called twice on a glob")
 	fclaw_global_destroy(glob1);
 	fclaw_global_destroy(glob2);
 }
-TEST_CASE("fclaw2d_options packing/unpacking")
+TEST_CASE("fclaw_options packing/unpacking")
 {
 	fclaw_options_t* opts = FCLAW_ALLOC_ZERO(fclaw_options_t,1);
 	opts->dim = 3;
