@@ -23,7 +23,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <fclaw2d_corner_neighbors.h>
+#include <fclaw_corner_neighbors.h>
 
 #include <fclaw_block.h>
 #include <fclaw_ghost_fill.h>
@@ -222,7 +222,7 @@ void get_corner_neighbor(fclaw_global_t *glob,
                interpolation routines can be re-used. */
             int iface1 = block_iface;
             int rface1 = rfaceno;
-            fclaw_patch_face_swap(&iface1,&rface1);
+            fclaw_patch_face_swap(domain->refine_dim,&iface1,&rface1);
             fclaw_patch_transform_blockface(glob, iface1, rface1,
                                               ftransform_finegrid->transform);
             ftransform_finegrid->block_iface = iface1;
