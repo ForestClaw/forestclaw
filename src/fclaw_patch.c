@@ -84,8 +84,7 @@ void patch_data_new(fclaw_global_t* glob,
 	FCLAW_ASSERT(patch_vt->patch_new != NULL);
 	pdata->user_patch = patch_vt->patch_new();
 
-	fclaw_domain_data_t *ddata = fclaw_domain_get_data(glob->domain);
-	++ddata->count_set_patch; //this is now in cb_fclaw2d_regrid_repopulate 
+	++glob->domain->count_set_patch; //this is now in cb_fclaw2d_regrid_repopulate 
 	pdata->neighbors_set = 0;
 }
 
@@ -123,9 +122,8 @@ void fclaw_patch_data_delete(fclaw_global_t *glob,
             patch_vt->destroy_user_data(glob,this_patch);
         }
 
-        fclaw_domain_data_t *ddata = fclaw_domain_get_data(glob->domain);        
         patch_vt->patch_delete(pdata->user_patch);
-        ++ddata->count_delete_patch;
+        ++glob->domain->count_delete_patch;
 
 		FCLAW_FREE(pdata);
 		this_patch->user = NULL;
@@ -655,8 +653,7 @@ void fclaw_patch_remote_ghost_delete(fclaw_global_t *glob,
 		FCLAW_FREE(pdata);
 		this_patch->user = NULL;
 
-		fclaw_domain_data_t *ddata = fclaw_domain_get_data(glob->domain);
-		++ddata->count_delete_patch;
+		++glob->domain->count_delete_patch;
 	}
 }
 
