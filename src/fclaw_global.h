@@ -126,7 +126,16 @@ void fclaw_global_store_domain (fclaw_global_t* glob,
                                   struct fclaw_domain* domain);
 
 void fclaw_map_store (fclaw_global_t* glob,
-                               struct fclaw_map_context * map);
+                      struct fclaw_map_context * map);
+
+/**
+ * @brief Get the mapping context
+ * 
+ * @param glob the global context
+ * @return struct fclaw_map_context* the mapping context
+ */
+struct fclaw_map_context* fclaw_map_get(fclaw_global_t* glob);
+
 /**
  * @brief Pack global structure into buffer
  * 

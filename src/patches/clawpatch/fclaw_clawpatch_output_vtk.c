@@ -27,6 +27,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw_clawpatch.h>
 #include <fclaw_clawpatch_options.h>
+#include <fclaw_global.h>
 
 /** Round up quotient x / y. */
 #define FCLAW_VTK_CEIL(x, y) (((x) + (y) - 1) / (y)) /**< round up the quotient

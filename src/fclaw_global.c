@@ -198,6 +198,12 @@ fclaw_map_store (fclaw_global_t* glob,
     glob->cont = map;
 }
 
+fclaw_map_context_t*
+fclaw_map_get(fclaw_global_t* glob)
+{
+    return glob->cont;
+}
+
 void
 fclaw_global_destroy (fclaw_global_t * glob)
 {
