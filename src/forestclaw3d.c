@@ -53,7 +53,7 @@ fclaw3d_patch_edge_neighbors (fclaw2d_domain_t * domain,
     p4est_ghost_t *ghost = wrap->match_aux ? wrap->ghost_aux : wrap->ghost;
     p4est_mesh_t *mesh = wrap->match_aux ? wrap->mesh_aux : wrap->mesh;
     p4est_locidx_t local_num, qid, qte;
-    p4est_locidx_t cstart, cend;
+    p4est_locidx_t edgeid, cstart, cend;
     const p4est_quadrant_t *q;
     p4est_tree_t *rtree;
     fclaw2d_block_t *block;
@@ -92,9 +92,9 @@ fclaw3d_patch_edge_neighbors (fclaw2d_domain_t * domain,
             cend = fclaw2d_array_index_locidx (mesh->edge_offset, edge_offset_i + 1);
 
             /* get value in edge_edge array */
-            int e = *(int8_t *) sc_array_index_int (mesh->edge_edge,
+            edgeid = *(int8_t *) sc_array_index_int (mesh->edge_edge,
                                                     (int) cstart);
-            if ((e >= 0 && cstart + 1 < cend) || cstart + 2 < cend)
+            if ((edgeid >= 0 && cstart + 1 < cend) || cstart + 2 < cend)
             {
                 /* At least a five-edge, which is currently not supported */
             }
@@ -103,28 +103,28 @@ fclaw3d_patch_edge_neighbors (fclaw2d_domain_t * domain,
                 /* at least have one neighbor, get the first neighbor */
                 rpatchno[0] = fclaw2d_array_index_locidx (mesh->edge_quad, cstart);
                 /* decode */
-                if(e < 0)
+                if(edgeid < 0)
                 {
                     /* half sized neighbor */
                     num_neighbors = 2;
                     *neighbor_size = FCLAW2D_PATCH_HALFSIZE;
-                    *redge = (e + 24)%12;
+                    *redge = (edgeid + 24)%12;
                     /* get the second neighbor */
                     rpatchno[1] = fclaw2d_array_index_locidx (mesh->edge_quad, cstart+1);
                 }
-                else if (e > 23)
+                else if (edgeid > 23)
                 {
                     /* double sized neighbor */
                     num_neighbors = 1;
                     *neighbor_size = FCLAW2D_PATCH_DOUBLESIZE;
-                    *redge = (e - 24)%12;
+                    *redge = (edgeid - 24)%12;
                 }
                 else 
                 {
                     /* same sized neighbor inter-tree */
                     num_neighbors = 1;
                     *neighbor_size = FCLAW2D_PATCH_SAMESIZE;
-                    *redge = e%12;
+                    *redge = edgeid%12;
                 }
                 FCLAW_ASSERT (0 <= *redge && *redge < P8EST_EDGES);
             }
