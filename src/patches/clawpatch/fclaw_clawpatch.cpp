@@ -1057,7 +1057,7 @@ int clawpatch_tag4coarsening(fclaw_global_t *glob,
                              int patchno,
                              int initflag)
 {
-    const int num_children = fclaw_domain_num_children(glob->domain);
+    const int num_children = fclaw_domain_num_siblings(glob->domain);
     fclaw_clawpatch_vtable_t* clawpatch_vt = fclaw_clawpatch_vt(glob);
     int mx,my,mz,mbc,meqn;
     double xlower[num_children],ylower[num_children],zlower[num_children];
@@ -1132,7 +1132,7 @@ void clawpatch_interpolate2fine(fclaw_global_t* glob,
     int meqn = clawpatch_opt->meqn;
 
     /* Loop over four siblings (z-ordering) */
-    for (int igrid = 0; igrid < fclaw_domain_num_children(glob->domain); igrid++)
+    for (int igrid = 0; igrid < fclaw_domain_num_siblings(glob->domain); igrid++)
     {
         fclaw_patch_t *fine_patch = &fine_patches[igrid];
         double *qfine = fclaw_clawpatch_get_q(glob,fine_patch);
@@ -1188,7 +1188,7 @@ void clawpatch_average2coarse(fclaw_global_t *glob,
     int meqn = clawpatch_opt->meqn;
 
 
-    for(int igrid = 0; igrid < fclaw_domain_num_children(glob->domain); igrid++)
+    for(int igrid = 0; igrid < fclaw_domain_num_siblings(glob->domain); igrid++)
     {
         fclaw_patch_t *fine_patch = &fine_patches[igrid];
         double *qfine = fclaw_clawpatch_get_q(glob,fine_patch);
