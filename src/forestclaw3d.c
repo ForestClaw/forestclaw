@@ -53,7 +53,7 @@ fclaw3d_patch_edge_neighbors (fclaw2d_domain_t * domain,
     p4est_ghost_t *ghost = wrap->match_aux ? wrap->ghost_aux : wrap->ghost;
     p4est_mesh_t *mesh = wrap->match_aux ? wrap->mesh_aux : wrap->mesh;
     p4est_locidx_t local_num, qid, qte;
-    p4est_locidx_t edgeid, cstart, cend;
+    p4est_locidx_t edge_offset_i, edgeid, cstart, cend;
     const p4est_quadrant_t *q;
     p4est_tree_t *rtree;
     fclaw2d_block_t *block;
@@ -84,7 +84,7 @@ fclaw3d_patch_edge_neighbors (fclaw2d_domain_t * domain,
         {
             /* This is an inter-tree (face or edge) edge neighbor 
                or half/double sized neighbor */
-            p4est_locidx_t edge_offset_i =
+            edge_offset_i =
                 qte - (mesh->local_num_quadrants + mesh->ghost_num_quadrants);
             FCLAW_ASSERT (edge_offset_i < mesh->local_num_edges);
 
@@ -97,6 +97,8 @@ fclaw3d_patch_edge_neighbors (fclaw2d_domain_t * domain,
             if ((edgeid >= 0 && cstart + 1 < cend) || cstart + 2 < cend)
             {
                 /* At least a five-edge, which is currently not supported */
+                *neighbor_size = FCLAW2D_PATCH_BOUNDARY;
+                *redge = -1;
             }
             else
             {
