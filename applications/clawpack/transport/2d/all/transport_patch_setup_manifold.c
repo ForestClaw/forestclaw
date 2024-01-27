@@ -34,15 +34,15 @@ void transport_patch_setup_manifold(fclaw_global_t *glob,
 {
     int mx,my,mbc;
     double xlower,ylower,dx,dy;
-    fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mbc,
+    fclaw_clawpatch_2d_grid_data(glob,patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
     double *area, *edgelengths,*curvature;
-    fclaw2d_clawpatch_metric_scalar(glob, patch,&area,&edgelengths,
+    fclaw_clawpatch_2d_metric_scalar(glob, patch,&area,&edgelengths,
                                     &curvature);
     int maux;
     double *aux;
-    fclaw2d_clawpatch_aux_data(glob,patch,&aux,&maux);
+    fclaw_clawpatch_aux_data(glob,patch,&aux,&maux);
 
     //const user_options_t* user_opt = sphere_get_options(glob);
     FCLAW_ASSERT(maux == 7);

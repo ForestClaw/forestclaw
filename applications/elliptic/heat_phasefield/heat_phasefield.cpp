@@ -33,8 +33,8 @@
 
 #include <fclaw_elliptic_solver.h>
 
-#include <fclaw2d_clawpatch_options.h>
-#include <fclaw2d_clawpatch.h>
+#include <fclaw_clawpatch_options.h>
+#include <fclaw_clawpatch.h>
 
 #include <fc2d_thunderegg.h>
 #include <fc2d_thunderegg_options.h>
@@ -48,22 +48,22 @@ main (int argc, char **argv)
 
     /* Create new options packages */
     fclaw_options_t             *heat_fclaw_opt;
-    fclaw2d_clawpatch_options_t *heat_clawpatch_opt;
+    fclaw_clawpatch_options_t *heat_clawpatch_opt;
     fc2d_thunderegg_options_t   *heat_mg_opt;
     heat_options_t              *heat_user_opt;
 
     heat_fclaw_opt =                   fclaw_options_register(app, "heat",            "fclaw_options.ini");
-    heat_clawpatch_opt =   fclaw2d_clawpatch_options_register(app, "heat-clawpatch",  "fclaw_options.ini");
+    heat_clawpatch_opt =   fclaw_clawpatch_2d_options_register(app, "heat-clawpatch",  "fclaw_options.ini");
     heat_mg_opt =            fc2d_thunderegg_options_register(app, "heat-thunderegg", "fclaw_options.ini");
     heat_user_opt =                     heat_options_register(app, "heat-user",       "fclaw_options.ini");  
 
     fclaw_options_t             *phasefield_fclaw_opt;
-    fclaw2d_clawpatch_options_t *phasefield_clawpatch_opt;
+    fclaw_clawpatch_options_t *phasefield_clawpatch_opt;
     fc2d_thunderegg_options_t   *phasefield_mg_opt;
     phasefield_options_t        *phasefield_user_opt;
 
     phasefield_fclaw_opt =                   fclaw_options_register(app, "phasefield",           "fclaw_options.ini");
-    phasefield_clawpatch_opt =   fclaw2d_clawpatch_options_register(app, "phasefield-clawpatch",  "fclaw_options.ini");
+    phasefield_clawpatch_opt =   fclaw_clawpatch_2d_options_register(app, "phasefield-clawpatch",  "fclaw_options.ini");
     phasefield_mg_opt =            fc2d_thunderegg_options_register(app, "phasefield-thunderegg", "fclaw_options.ini");
     phasefield_user_opt =               phasefield_options_register(app, "phasefield-user",       "fclaw_options.ini");  
 
@@ -84,7 +84,7 @@ main (int argc, char **argv)
 
         /* Store option packages in glob */
         fclaw_options_store           (heat_glob, heat_fclaw_opt);
-        fclaw2d_clawpatch_options_store (heat_glob, heat_clawpatch_opt);
+        fclaw_clawpatch_options_store (heat_glob, heat_clawpatch_opt);
         fc2d_thunderegg_options_store    (heat_glob, heat_mg_opt);
         heat_options_store            (heat_glob, heat_user_opt);
 
@@ -100,7 +100,7 @@ main (int argc, char **argv)
 
         /* Store option packages in glob */
         fclaw_options_store           (phasefield_glob, phasefield_fclaw_opt);
-        fclaw2d_clawpatch_options_store (phasefield_glob, phasefield_clawpatch_opt);
+        fclaw_clawpatch_options_store (phasefield_glob, phasefield_clawpatch_opt);
         fc2d_thunderegg_options_store    (phasefield_glob, phasefield_mg_opt);
         phasefield_options_store            (phasefield_glob, phasefield_user_opt);
 

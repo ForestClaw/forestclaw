@@ -66,8 +66,8 @@ void filament_link_solvers(fclaw_global_t *glob)
     const user_options_t* user = filament_get_options(glob);
 
     /* example of how to set up a user defined criteria */
-    fclaw3dx_clawpatch_vtable_t *clawpatch_vt = fclaw3dx_clawpatch_vt(glob);
-    clawpatch_vt->fort_user_exceeds_threshold = &FCLAW3DX_USER_EXCEEDS_TH;
+    fclaw_clawpatch_vtable_t *clawpatch_vt = fclaw_clawpatch_vt(glob);
+    clawpatch_vt->d3->fort_user_exceeds_threshold = &FCLAW3D_USER_EXCEEDS_TH;
     
     if (user->claw_version == 4)
     {        

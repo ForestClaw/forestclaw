@@ -120,12 +120,12 @@ main (int argc, char **argv)
     /* Options */
     user_options_t              *user_opt;
     fclaw_options_t             *fclaw_opt;
-    fclaw3dx_clawpatch_options_t *clawpatch_opt;
+    fclaw_clawpatch_options_t *clawpatch_opt;
     fc3d_clawpack46_options_t   *claw46_opt;
 
     /* Register packages */
     fclaw_opt                  = fclaw_options_register(app, NULL, "fclaw_options.ini");
-    clawpatch_opt  = fclaw3dx_clawpatch_options_register(app, "clawpatch", "fclaw_options.ini");
+    clawpatch_opt  = fclaw_clawpatch_3d_options_register(app, "clawpatch", "fclaw_options.ini");
     claw46_opt       = fc3d_clawpack46_options_register(app, "claw3", "fclaw_options.ini");
     user_opt                 = latlong_options_register(app, "fclaw_options.ini");
 
@@ -142,7 +142,7 @@ main (int argc, char **argv)
         fclaw_global_t *glob = fclaw_global_new_comm (mpicomm, size, rank);
 
         fclaw_options_store            (glob, fclaw_opt);
-        fclaw3dx_clawpatch_options_store (glob, clawpatch_opt);
+        fclaw_clawpatch_options_store (glob, clawpatch_opt);
         fc3d_clawpack46_options_store    (glob, claw46_opt);
         latlong_options_store            (glob, user_opt);
 

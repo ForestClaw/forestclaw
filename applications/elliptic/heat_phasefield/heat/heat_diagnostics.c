@@ -25,8 +25,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "heat_diagnostics.h"
 
-#include <fclaw2d_clawpatch.h>
-#include <fclaw2d_clawpatch_options.h>
+#include <fclaw_clawpatch.h>
+#include <fclaw_clawpatch_options.h>
 
 
 #include <fclaw_global.h>
@@ -37,8 +37,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 void heat_diagnostics_initialize(fclaw_global_t *glob,
                                    void **acc_patch)
 {
-    const fclaw2d_clawpatch_options_t *clawpatch_opt = 
-              fclaw2d_clawpatch_get_options(glob);
+    const fclaw_clawpatch_options_t *clawpatch_opt = 
+              fclaw_clawpatch_get_options(glob);
 
     heat_error_info_t *error_data;
 
@@ -64,7 +64,7 @@ void heat_diagnostics_reset(fclaw_global_t *glob,
                               void* patch_acc)
 {
     heat_error_info_t *error_data = (heat_error_info_t*) patch_acc;
-    const fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
+    const fclaw_clawpatch_options_t *clawpatch_opt = fclaw_clawpatch_get_options(glob);
 
     int mfields = clawpatch_opt->rhs_fields;
 
@@ -98,12 +98,12 @@ void heat_compute(fclaw_domain_t *domain,
     /* Accumulate area for final computation of error */
     int mx, my, mbc;
     double xlower,ylower,dx,dy;
-    fclaw2d_clawpatch_grid_data(s->glob,patch,&mx,&my,&mbc,&xlower,&ylower,&dx,&dy);
+    fclaw_clawpatch_2d_grid_data(s->glob,patch,&mx,&my,&mbc,&xlower,&ylower,&dx,&dy);
 
-    fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt(s->glob);
-    double *area = fclaw2d_clawpatch_get_area(s->glob,patch);  
-    FCLAW_ASSERT(clawpatch_vt->fort_compute_patch_area != NULL);
-    error_data->area += clawpatch_vt->fort_compute_patch_area(&mx,&my,&mbc,&dx,&dy,area);
+    fclaw_clawpatch_vtable_t *clawpatch_vt = fclaw_clawpatch_vt(s->glob);
+    double *area = fclaw_clawpatch_get_2d_area(s->glob,patch);  
+    FCLAW_ASSERT(clawpatch_vt->d2->fort_compute_patch_area != NULL);
+    error_data->area += clawpatch_vt->d2->fort_compute_patch_area(&mx,&my,&mbc,&dx,&dy,area);
 
     /* Compute error */
     const fclaw_options_t *fclaw_opt = fclaw_get_options(s->glob);
@@ -139,7 +139,7 @@ void heat_diagnostics_gather(fclaw_global_t *glob,
     
     heat_error_info_t *error_data = (heat_error_info_t*) patch_acc;
     const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
-    const fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
+    const fclaw_clawpatch_options_t *clawpatch_opt = fclaw_clawpatch_get_options(glob);
     
     int mfields = clawpatch_opt->rhs_fields;  /* clawpatch->meqn */
 

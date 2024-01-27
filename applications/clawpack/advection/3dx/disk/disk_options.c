@@ -172,7 +172,7 @@ const user_options_t* disk_get_options(fclaw_global_t* glob)
 }
 
 void disk_global_post_process(fclaw_options_t *fclaw_opt,
-                              fclaw3dx_clawpatch_options_t *clawpatch_opt,
+                              fclaw_clawpatch_options_t *clawpatch_opt,
                               user_options_t *user_opt)
 {
     /* Check that we have enough resolution to handle cubed sphere corners */

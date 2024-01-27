@@ -27,8 +27,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw_include_all.h>
 
-#include <fclaw2d_clawpatch_options.h>
-#include <fclaw2d_clawpatch.h>
+#include <fclaw_clawpatch_options.h>
+#include <fclaw_clawpatch.h>
 
 #include <fc2d_clawpack46_options.h>
 
@@ -77,7 +77,7 @@ void run_program(fclaw_global_t* glob)
     int mi = fclaw_opt->mi;
 
 
-    fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
+    fclaw_clawpatch_options_t *clawpatch_opt = fclaw_clawpatch_get_options(glob);
     int mx = clawpatch_opt->mx;
 
     double dx = (bx-ax)/(mi*mx);
@@ -111,7 +111,7 @@ main (int argc, char **argv)
     /* Options */
     user_options_t              *user_opt;
     fclaw_options_t             *fclaw_opt;
-    fclaw2d_clawpatch_options_t *clawpatch_opt;
+    fclaw_clawpatch_options_t *clawpatch_opt;
     fc2d_clawpack46_options_t   *claw46_opt;
     fclaw_global_t            *glob;
     fclaw_domain_t            *domain;
@@ -122,7 +122,7 @@ main (int argc, char **argv)
 
     /* Create new options packages */
     fclaw_opt =                   fclaw_options_register(app,  NULL,        "fclaw_options.ini");
-    clawpatch_opt =   fclaw2d_clawpatch_options_register(app, "clawpatch",  "fclaw_options.ini");
+    clawpatch_opt =   fclaw_clawpatch_2d_options_register(app, "clawpatch",  "fclaw_options.ini");
     claw46_opt =        fc2d_clawpack46_options_register(app, "clawpack46", "fclaw_options.ini");
     user_opt =                  tsunami_options_register(app,               "fclaw_options.ini");  
 
@@ -143,7 +143,7 @@ main (int argc, char **argv)
 
         /* Store option packages in glob */
         fclaw_options_store           (glob, fclaw_opt);
-        fclaw2d_clawpatch_options_store (glob, clawpatch_opt);
+        fclaw_clawpatch_options_store (glob, clawpatch_opt);
         fc2d_clawpack46_options_store   (glob, claw46_opt);
         tsunami_options_store         (glob, user_opt);
 

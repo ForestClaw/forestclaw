@@ -31,8 +31,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw_include_all.h>
 
-#include <fclaw2d_clawpatch.h>
-#include <fclaw2d_clawpatch_options.h>
+#include <fclaw_clawpatch.h>
+#include <fclaw_clawpatch_options.h>
 #include <fclaw2d_clawpatch_fort.h>
 
 #include <fc2d_thunderegg.h>
@@ -98,12 +98,12 @@ void phasefield_initialize(fclaw_global_t *glob,
 
     int mx,my,mbc;
     double dx,dy,xlower,ylower;
-    fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mbc,
+    fclaw_clawpatch_2d_grid_data(glob,patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
     int meqn;
     double *q;
-    fclaw2d_clawpatch_soln_data(glob,patch,&q,&meqn);
+    fclaw_clawpatch_soln_data(glob,patch,&q,&meqn);
 
     PHASEFIELD_INIT(&meqn, &mbc, &mx, &my, &xlower, &ylower, &dx, &dy,q);
 }
@@ -118,16 +118,16 @@ void phasefield_rhs(fclaw_global_t *glob,
 
     int mx,my,mbc;
     double dx,dy,xlower,ylower;
-    fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mbc,
+    fclaw_clawpatch_2d_grid_data(glob,patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
     int mfields;
     double *rhs;
-    fclaw2d_clawpatch_rhs_data(glob,patch,&rhs,&mfields);
+    fclaw_clawpatch_rhs_data(glob,patch,&rhs,&mfields);
 
     int meqn;
     double *q;
-    fclaw2d_clawpatch_soln_data(glob,patch,&q,&meqn);
+    fclaw_clawpatch_soln_data(glob,patch,&q,&meqn);
 
     /* This function supplies an analytic right hand side. */
     int method = 1;
@@ -230,7 +230,7 @@ int phasefield_tag4refinement(fclaw_global_t *glob,
                              int blockno, int patchno,
                              int initflag)
 {
-    fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt(glob);
+    fclaw_clawpatch_vtable_t* clawpatch_vt = fclaw_clawpatch_vt(glob);
 
     const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
 
@@ -241,17 +241,17 @@ int phasefield_tag4refinement(fclaw_global_t *glob,
 
     int mx,my,mbc;
     double xlower,ylower,dx,dy;
-    fclaw2d_clawpatch_grid_data(glob,this_patch,&mx,&my,&mbc,
+    fclaw_clawpatch_2d_grid_data(glob,this_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
     double *q;
     int meqn;
-    fclaw2d_clawpatch_soln_data(glob,this_patch,&q,&meqn);
+    fclaw_clawpatch_soln_data(glob,this_patch,&q,&meqn);
 
     tag_patch = 0;
-    clawpatch_vt->fort_tag4refinement(&mx,&my,&mbc,&meqn,&xlower,&ylower,&dx,&dy,
-                                      &blockno, q,&refine_threshold,
-                                      &initflag,&tag_patch);
+    clawpatch_vt->d2->fort_tag4refinement(&mx,&my,&mbc,&meqn,&xlower,&ylower,&dx,&dy,
+                                          &blockno, q,&refine_threshold,
+                                          &initflag,&tag_patch);
     return tag_patch;
 }
 
@@ -269,22 +269,22 @@ int phasefield_tag4coarsening(fclaw_global_t *glob,
 
     int mx,my,mbc;
     double xlower,ylower,dx,dy;
-    fclaw2d_clawpatch_grid_data(glob,patch0,&mx,&my,&mbc,
+    fclaw_clawpatch_2d_grid_data(glob,patch0,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
     double *q[4];
     int meqn;
     for (int igrid = 0; igrid < 4; igrid++)
     {
-        fclaw2d_clawpatch_soln_data(glob,&fine_patches[igrid],&q[igrid],&meqn);
+        fclaw_clawpatch_soln_data(glob,&fine_patches[igrid],&q[igrid],&meqn);
     }
 
-    fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt(glob);
+    fclaw_clawpatch_vtable_t* clawpatch_vt = fclaw_clawpatch_vt(glob);
 
     int tag_patch = 0;
-    clawpatch_vt->fort_tag4coarsening(&mx,&my,&mbc,&meqn,&xlower,&ylower,&dx,&dy,
-                                      &blockno, q[0],q[1],q[2],q[3],
-                                      &coarsen_threshold,&initflag,&tag_patch);
+    clawpatch_vt->d2->fort_tag4coarsening(&mx,&my,&mbc,&meqn,&xlower,&ylower,&dx,&dy,
+                                          &blockno, q[0],q[1],q[2],q[3],
+                                          &coarsen_threshold,&initflag,&tag_patch);
     return tag_patch == 1;
 }
 
@@ -302,12 +302,12 @@ void phasefield_bc2(fclaw_global_t *glob,
 
     int mx,my,mbc;
     double xlower,ylower,dx,dy;
-    fclaw2d_clawpatch_grid_data(glob,patch, &mx,&my,&mbc,
+    fclaw_clawpatch_2d_grid_data(glob,patch, &mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
     double *q;
     int meqn;
-    fclaw2d_clawpatch_soln_data(glob,patch,&q,&meqn);
+    fclaw_clawpatch_soln_data(glob,patch,&q,&meqn);
 
     PHASEFIELD_FORT_BC2(&meqn,&mbc,&mx,&my,&xlower,&ylower,
                            &dx,&dy,q,&t,&dt,intersects_bc);
@@ -344,9 +344,9 @@ void phasefield_link_solvers(fclaw_global_t *glob)
     patch_vt->tag4refinement       = phasefield_tag4refinement;
     patch_vt->tag4coarsening       = phasefield_tag4coarsening;
 
-    fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt(glob);
-    clawpatch_vt->fort_tag4refinement = &PHASEFIELD_TAG4REFINEMENT;
-    clawpatch_vt->fort_tag4coarsening = &PHASEFIELD_TAG4COARSENING;
+    fclaw_clawpatch_vtable_t *clawpatch_vt = fclaw_clawpatch_vt(glob);
+    clawpatch_vt->d2->fort_tag4refinement = &PHASEFIELD_TAG4REFINEMENT;
+    clawpatch_vt->d2->fort_tag4coarsening = &PHASEFIELD_TAG4COARSENING;
 
 }
 

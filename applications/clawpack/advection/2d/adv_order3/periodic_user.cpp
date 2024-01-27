@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <clawpack46_user_fort.h>
 
-#include <fclaw2d_clawpatch.h>
+#include <fclaw_clawpatch.h>
 #include <fclaw2d_clawpatch_fort.h>
 
 static
@@ -87,12 +87,12 @@ void cb_periodic_output_ascii (fclaw_domain_t * domain,
                            this_block_idx,this_patch_idx,
                            &patch_num,&level);
     
-    fclaw2d_clawpatch_grid_data(glob,this_patch,&mx,&my,&mbc,
+    fclaw_clawpatch_2d_grid_data(glob,this_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
-    fclaw2d_clawpatch_soln_data(glob,this_patch,&q,&meqn);
-    error = fclaw2d_clawpatch_get_error(glob,this_patch);
-    soln = fclaw2d_clawpatch_get_exactsoln(glob,this_patch);
+    fclaw_clawpatch_soln_data(glob,this_patch,&q,&meqn);
+    error = fclaw_clawpatch_get_error(glob,this_patch);
+    soln = fclaw_clawpatch_get_exactsoln(glob,this_patch);
 
     char fname[BUFSIZ];
     snprintf (fname, BUFSIZ, "%s.q%04d", fclaw_opt->prefix, iframe);
@@ -130,7 +130,7 @@ void periodic_link_solvers(fclaw_global_t *glob)
         clawpack46_vt->fort_rpt2      = &CLAWPACK46_RPT2;
         clawpack46_vt->fort_rpn2_cons = &RPN2CONS_UPDATE;
 
-        fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt(glob);
+        fclaw_clawpatch_vtable_t *clawpatch_vt = fclaw_clawpatch_vt(glob);
         clawpatch_vt->fort_tag4coarsening = &TAG4COARSENING;
         clawpatch_vt->fort_tag4refinement = &TAG4REFINEMENT;
 

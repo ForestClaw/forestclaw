@@ -63,7 +63,7 @@ void replicated_options_store (fclaw_global_t* glob, user_options_t* user);
 const user_options_t* replicated_get_options(fclaw_global_t* glob);
 
 void replicated_global_post_process(fclaw_options_t *fclaw_opt, 
-                                    fclaw2d_clawpatch_options_t *clawpatch_opt,
+                                    fclaw_clawpatch_options_t *clawpatch_opt,
                                     user_options_t *user_opt);
 
 

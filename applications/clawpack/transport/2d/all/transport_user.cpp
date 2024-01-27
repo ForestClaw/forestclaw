@@ -41,16 +41,16 @@ void transport_patch_setup_manifold(fclaw_global_t *glob,
 
     int mx,my,mbc;
     double xlower,ylower,dx,dy;
-    fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mbc,
+    fclaw_clawpatch_2d_grid_data(glob,patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
     double *xd, *yd, *zd,*xp,*yp, *zp, *area;
-    fclaw2d_clawpatch_metric_data(glob,patch,&xp,&yp,&zp,
+    fclaw_clawpatch_2d_metric_data(glob,patch,&xp,&yp,&zp,
                                   &xd,&yd,&zd,&area);
 
     int maux;
     double *aux;
-    fclaw2d_clawpatch_aux_data(glob,patch,&aux,&maux);
+    fclaw_clawpatch_aux_data(glob,patch,&aux,&maux);
 
     if (claw_version == 4)
         USER46_SETAUX_MANIFOLD(&mbc,&mx,&my,&xlower,&ylower,&dx,&dy,
@@ -70,16 +70,16 @@ void transport_b4step2_manifold(fclaw_global_t *glob,
 {
     int mx, my, mbc;
     double xlower,ylower, dx,dy;
-    fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mbc,
+    fclaw_clawpatch_2d_grid_data(glob,patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
     double *xp,*yp,*zp,*xd,*yd,*zd;
     double *area;
-    fclaw2d_clawpatch_metric_data(glob,patch,&xp,&yp,&zp,&xd,&yd,&zd,&area);
+    fclaw_clawpatch_2d_metric_data(glob,patch,&xp,&yp,&zp,&xd,&yd,&zd,&area);
 
     int maux;
     double *aux;
-    fclaw2d_clawpatch_aux_data(glob,patch,&aux,&maux);
+    fclaw_clawpatch_aux_data(glob,patch,&aux,&maux);
 
     if (claw_version == 4)
         USER46_B4STEP2_MANIFOLD(&mx,&my,&mbc,&dx,&dy,&t,&maux,aux,&blockno,xd,yd,zd);
