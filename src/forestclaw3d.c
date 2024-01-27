@@ -57,7 +57,7 @@ fclaw3d_patch_edge_neighbors (fclaw2d_domain_t * domain,
     const p4est_quadrant_t *q;
     p4est_tree_t *rtree;
     fclaw2d_block_t *block;
-    int num_neighbors = 0;
+    int i, num_neighbors;
 
     FCLAW_ASSERT (domain->num_ghost_patches ==
                   (int) mesh->ghost_num_quadrants);
@@ -97,6 +97,7 @@ fclaw3d_patch_edge_neighbors (fclaw2d_domain_t * domain,
             if ((edgeid >= 0 && cstart + 1 < cend) || cstart + 2 < cend)
             {
                 /* At least a five-edge, which is currently not supported */
+                num_neighbors = 0;
                 *neighbor_size = FCLAW2D_PATCH_BOUNDARY;
                 *redge = -1;
             }
@@ -144,12 +145,13 @@ fclaw3d_patch_edge_neighbors (fclaw2d_domain_t * domain,
     {
         /* The value -1 is expected for an edge on the physical boundary */
         /* Currently we also return this for five- and more-edges */
+        num_neighbors = 0;
         *neighbor_size = FCLAW2D_PATCH_BOUNDARY;
         *redge = -1;
     }
 
     /* get rproc and rpatchno for each neighbor */
-    for(int i=0; i < num_neighbors; i++)
+    for(i = 0; i < num_neighbors; i++)
     {
         qid = rpatchno[i];
         if (qid < mesh->local_num_quadrants)
