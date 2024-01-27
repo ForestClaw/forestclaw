@@ -32,9 +32,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw_elliptic_solver.h>
 
-#include <fclaw2d_clawpatch.h>
-#include <fclaw2d_clawpatch_output_ascii.h> 
-#include <fclaw2d_clawpatch_output_vtk.h>
+#include <fclaw_clawpatch.h>
+#include <fclaw_clawpatch_output_ascii.h> 
+#include <fclaw_clawpatch_output_vtk.h>
 
 #include <fclaw_patch.h>
 #include <fclaw_global.h>
@@ -71,12 +71,12 @@ void thunderegg_rhs(fclaw_global_t *glob,
 
     int mx,my,mbc;
     double dx,dy,xlower,ylower;
-	fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mbc,
+	fclaw_clawpatch_2d_grid_data(glob,patch,&mx,&my,&mbc,
 								&xlower,&ylower,&dx,&dy);
 
     int mfields;
     double *rhs;
-	fclaw2d_clawpatch_rhs_data(glob,patch,&rhs,&mfields);
+	fclaw_clawpatch_rhs_data(glob,patch,&rhs,&mfields);
 	FCLAW_ASSERT(mfields == 1);
 
 	/* Compute right hand side */
@@ -136,12 +136,12 @@ void thunderegg_output(fclaw_global_t *glob, int iframe)
 
 	if (mg_options->ascii_out != 0)
 	{
-		fclaw2d_clawpatch_output_ascii(glob,iframe);
+		fclaw_clawpatch_output_ascii(glob,iframe);
 	}
 
 	if (mg_options->vtk_out != 0)
 	{
-		fclaw2d_clawpatch_output_vtk(glob,iframe);
+		fclaw_clawpatch_output_vtk(glob,iframe);
 	}
 }
 
@@ -164,7 +164,7 @@ void thunderegg_vt_destroy(void* vt)
 void fc2d_thunderegg_solver_initialize(fclaw_global_t* glob)
 {
 	int claw_version = 4; /* solution data is organized as (i,j,m) */
-	fclaw2d_clawpatch_vtable_initialize(glob, claw_version);
+	fclaw_clawpatch_vtable_initialize(glob, claw_version);
 
 
     //fclaw2d_clawpatch_vtable_t*      clawpatch_vt = fclaw2d_clawpatch_vt(glob);

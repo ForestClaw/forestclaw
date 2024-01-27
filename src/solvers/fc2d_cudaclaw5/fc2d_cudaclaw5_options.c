@@ -25,7 +25,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "fc2d_cudaclaw5_options.h"
 
-#include <fclaw2d_clawpatch_options.h>
+#include <fclaw_clawpatch_options.h>
 #include <fclaw_global.h>
 #include <fclaw_options.h>
 
@@ -83,7 +83,7 @@ cudaclaw5_postprocess (fc2d_cudaclaw5_options_t * clawopt)
 
 fclaw_exit_type_t
 cudaclaw5_check (fc2d_cudaclaw5_options_t * clawopt, 
-                 fclaw2d_clawpatch_options_t *clawpatch_opt)
+                 fclaw_clawpatch_options_t *clawpatch_opt)
 {
     clawopt->method[0] = 0;  /* Time stepping is controlled outside of cudaclaw */
 
@@ -174,7 +174,7 @@ static fclaw_exit_type_t
 options_check (fclaw_app_t * app, void *package, void *registered)
 {
     fc2d_cudaclaw5_options_t *clawopt;
-    fclaw2d_clawpatch_options_t *clawpatch_opt;
+    fclaw_clawpatch_options_t *clawpatch_opt;
 
     FCLAW_ASSERT (app != NULL);
     FCLAW_ASSERT (package != NULL);
@@ -183,7 +183,7 @@ options_check (fclaw_app_t * app, void *package, void *registered)
     clawopt = (fc2d_cudaclaw5_options_t*) package;
     FCLAW_ASSERT (clawopt->is_registered);
 
-    clawpatch_opt = (fclaw2d_clawpatch_options_t *)
+    clawpatch_opt = (fclaw_clawpatch_options_t *)
         fclaw_app_get_attribute(app,"clawpatch",NULL);
     FCLAW_ASSERT(clawpatch_opt->is_registered);
 

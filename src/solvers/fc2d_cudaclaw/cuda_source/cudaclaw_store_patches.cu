@@ -2,7 +2,7 @@
 #include <fclaw_global.h>
 #include <fclaw_patch.h>
 
-#include <fclaw2d_clawpatch.h>
+#include <fclaw_clawpatch.h>
 #include <fc2d_cudaclaw_options.h>
 
 #include "cudaclaw_allocate.h"
@@ -26,8 +26,8 @@ void cudaclaw_store_buffer(fclaw_global_t* glob,
 
     FCLAW_ASSERT(fluxes != NULL);
 
-    fclaw2d_clawpatch_aux_data(glob,this_patch,&aux,&maux);
-    fclaw2d_clawpatch_soln_data(glob,this_patch,&qold,&meqn);
+    fclaw_clawpatch_aux_data(glob,this_patch,&aux,&maux);
+    fclaw_clawpatch_soln_data(glob,this_patch,&qold,&meqn);
 
     fluxes->qold = qold;
     fluxes->aux = aux;

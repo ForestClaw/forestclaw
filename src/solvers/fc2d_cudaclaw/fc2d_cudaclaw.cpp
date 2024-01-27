@@ -38,13 +38,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_update_single_step.h>  
 
 #include <fclaw_patch.h>
-#include <fclaw2d_clawpatch.hpp>
-#include <fclaw2d_clawpatch.h>
+#include <fclaw_clawpatch.hpp>
+#include <fclaw_clawpatch.h>
 
-#include <fclaw2d_clawpatch_options.h>
-#include <fclaw2d_clawpatch_diagnostics.h>
-#include <fclaw2d_clawpatch_output_ascii.h> 
-#include <fclaw2d_clawpatch_output_vtk.h>
+#include <fclaw_clawpatch_options.h>
+#include <fclaw_clawpatch_diagnostics.h>
+#include <fclaw_clawpatch_output_ascii.h> 
+#include <fclaw_clawpatch_output_vtk.h>
 #include <fclaw2d_clawpatch_fort.h>
 
 #include "fc2d_cudaclaw_cuda.h"  
@@ -80,11 +80,11 @@ void cudaclaw_qinit(fclaw_global_t *glob,
     double dx,dy,xlower,ylower;
     double *q, *aux;
 
-    fclaw2d_clawpatch_grid_data(glob,this_patch,&mx,&my,&mbc,
+    fclaw_clawpatch_2d_grid_data(glob,this_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
-    fclaw2d_clawpatch_soln_data(glob,this_patch,&q,&meqn);
-    fclaw2d_clawpatch_aux_data(glob,this_patch,&aux,&maux);
+    fclaw_clawpatch_soln_data(glob,this_patch,&q,&meqn);
+    fclaw_clawpatch_aux_data(glob,this_patch,&aux,&maux);
 
     maxmx = mx;
     maxmy = my;
@@ -118,10 +118,10 @@ void cudaclaw_bc2(fclaw_global_t *glob,
     double xlower,ylower,dx,dy;
     double *aux,*q;
 
-    fclaw2d_clawpatch_grid_data(glob,this_patch, &mx,&my,&mbc,
+    fclaw_clawpatch_2d_grid_data(glob,this_patch, &mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
-    fclaw2d_clawpatch_aux_data(glob,this_patch,&aux,&maux);
+    fclaw_clawpatch_aux_data(glob,this_patch,&aux,&maux);
 
     maxmx = mx;
     maxmy = my;
@@ -148,7 +148,7 @@ void cudaclaw_bc2(fclaw_global_t *glob,
       In this case, this boundary condition won't be used to update
       anything
     */
-    fclaw2d_clawpatch_timesync_data(glob,this_patch,time_interp,&q,&meqn);
+    fclaw_clawpatch_timesync_data(glob,this_patch,time_interp,&q,&meqn);
 
     CUDACLAW_SET_BLOCK(&this_block_idx);
     cudaclaw_vt->fort_bc2(&maxmx,&maxmy,&meqn,&mbc,&mx,&my,&xlower,&ylower,
@@ -177,11 +177,11 @@ void cudaclaw_b4step2(fclaw_global_t *glob,
         return;
     }
 
-    fclaw2d_clawpatch_grid_data(glob,this_patch, &mx,&my,&mbc,
+    fclaw_clawpatch_2d_grid_data(glob,this_patch, &mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
-    fclaw2d_clawpatch_soln_data(glob,this_patch,&q,&meqn);
-    fclaw2d_clawpatch_aux_data(glob,this_patch,&aux,&maux);
+    fclaw_clawpatch_soln_data(glob,this_patch,&q,&meqn);
+    fclaw_clawpatch_aux_data(glob,this_patch,&aux,&maux);
 
     maxmx = mx;
     maxmy = my;
@@ -213,11 +213,11 @@ void cudaclaw_src2(fclaw_global_t *glob,
         return;
     }
 
-    fclaw2d_clawpatch_grid_data(glob,this_patch, &mx,&my,&mbc,
+    fclaw_clawpatch_2d_grid_data(glob,this_patch, &mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
-    fclaw2d_clawpatch_soln_data(glob,this_patch,&q,&meqn);
-    fclaw2d_clawpatch_aux_data(glob,this_patch,&aux,&maux);
+    fclaw_clawpatch_soln_data(glob,this_patch,&q,&meqn);
+    fclaw_clawpatch_aux_data(glob,this_patch,&aux,&maux);
 
     maxmx = mx;
     maxmy = my;
@@ -255,10 +255,10 @@ void cudaclaw_setaux(fclaw_global_t *glob,
     double xlower,ylower,dx,dy;
     double *aux;
 
-    fclaw2d_clawpatch_grid_data(glob,this_patch, &mx,&my,&mbc,
+    fclaw_clawpatch_2d_grid_data(glob,this_patch, &mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
-    fclaw2d_clawpatch_aux_data(glob,this_patch,&aux,&maux);
+    fclaw_clawpatch_aux_data(glob,this_patch,&aux,&maux);
 
     maxmx = mx;
     maxmy = my;
@@ -314,7 +314,7 @@ double cudaclaw_update(fclaw_global_t *glob,
     total = buffer_data->total_count; 
     
     /* Be sure to save current step! */
-    fclaw2d_clawpatch_save_current_step(glob, this_patch);
+    fclaw_clawpatch_save_current_step(glob, this_patch);
 
 
     maxcfl = 0;
@@ -378,12 +378,12 @@ void cudaclaw_output(fclaw_global_t *glob, int iframe)
 
     if (clawpack_options->ascii_out != 0)
     {
-        fclaw2d_clawpatch_output_ascii(glob,iframe);
+        fclaw_clawpatch_output_ascii(glob,iframe);
     }
 
     if (clawpack_options->vtk_out != 0)
     {
-        fclaw2d_clawpatch_output_vtk(glob,iframe);
+        fclaw_clawpatch_output_vtk(glob,iframe);
     }
 
 }
@@ -404,7 +404,7 @@ void cudaclaw_vt_destroy(void* vt)
 
 void fc2d_cudaclaw_solver_initialize(fclaw_global_t* glob)
 {
-	fclaw2d_clawpatch_options_t* clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
+	fclaw_clawpatch_options_t* clawpatch_opt = fclaw_clawpatch_get_options(glob);
 	fc2d_cudaclaw_options_t* clawopt = fc2d_cudaclaw_get_options(glob);
 
     clawopt->method[6] = clawpatch_opt->maux;
@@ -416,7 +416,7 @@ void fc2d_cudaclaw_solver_initialize(fclaw_global_t* glob)
     }
 
     int claw_version = 4;
-    fclaw2d_clawpatch_vtable_initialize(glob, claw_version);
+    fclaw_clawpatch_vtable_initialize(glob, claw_version);
 
     fclaw_vtable_t*                fc_vt = fclaw_vt(glob);
     fclaw_patch_vtable_t*          patch_vt = fclaw_patch_vt(glob);  
@@ -493,12 +493,12 @@ void fc2d_cudaclaw_set_capacity(fclaw_global_t *glob,
     clawopt = fc2d_cudaclaw_get_options(glob);
     mcapa = clawopt->mcapa;
 
-    fclaw2d_clawpatch_grid_data(glob,this_patch, &mx,&my,&mbc,
+    fclaw_clawpatch_2d_grid_data(glob,this_patch, &mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
-    area = fclaw2d_clawpatch_get_area(glob,this_patch);
+    area = fclaw_clawpatch_get_2d_area(glob,this_patch);
 
-    fclaw2d_clawpatch_aux_data(glob,this_patch,&aux,&maux);
+    fclaw_clawpatch_aux_data(glob,this_patch,&aux,&maux);
     FCLAW_ASSERT(maux >= mcapa && mcapa > 0);
 
     CUDACLAW_SET_CAPACITY(&mx,&my,&mbc,&dx,&dy,area,&mcapa,

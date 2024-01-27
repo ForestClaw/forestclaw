@@ -29,8 +29,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "fc2d_geoclaw_fort.h"
 #include "fc2d_geoclaw_options.h"
 
-#include <fclaw2d_clawpatch.h>  /* Include patch, domain declarations */
-#include <fclaw2d_clawpatch_options.h>  /* Include patch, domain declarations */
+#include <fclaw_clawpatch.h>  /* Include patch, domain declarations */
+#include <fclaw_clawpatch_options.h>  /* Include patch, domain declarations */
 
 #include <fclaw_patch.h>
 #include <fclaw_global.h>
@@ -55,16 +55,16 @@ void cb_geoclaw_output_ascii(fclaw_domain_t *domain,
 
     int mx,my,mbc;
     double xlower,ylower,dx,dy;
-    fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mbc,
+    fclaw_clawpatch_2d_grid_data(glob,patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
     double *q;
     int meqn;
-    fclaw2d_clawpatch_soln_data(glob,patch,&q,&meqn);
+    fclaw_clawpatch_soln_data(glob,patch,&q,&meqn);
 
     double *aux;
     int maux;
-    fclaw2d_clawpatch_aux_data(glob,patch,&aux,&maux);
+    fclaw_clawpatch_aux_data(glob,patch,&aux,&maux);
 
     FC2D_GEOCLAW_FORT_WRITE_FILE(&mx,&my,&meqn, &maux,&mbc,&xlower,&ylower,
                                  &dx,&dy,q,aux,&iframe,&global_num,&level,
@@ -77,7 +77,7 @@ void geoclaw_header_ascii(fclaw_global_t* glob,int iframe)
     double time = glob->curr_time;
     int ngrids = glob->domain->global_num_patches;
 
-    const fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
+    const fclaw_clawpatch_options_t *clawpatch_opt = fclaw_clawpatch_get_options(glob);
     int meqn = clawpatch_opt->meqn;
     int maux = clawpatch_opt->maux;
 
