@@ -147,6 +147,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define FCLAW2D_FILE_ERR_P4EST       FCLAW3D_FILE_ERR_P4EST
 #define FCLAW2D_FILE_ERR_IN_DATA     FCLAW3D_FILE_ERR_IN_DATA
 #define FCLAW2D_FILE_ERR_COUNT       FCLAW3D_FILE_ERR_COUNT
+#define FCLAW2D_FILE_ERR_DIM         FCLAW3D_FILE_ERR_DIM
 #define FCLAW2D_FILE_ERR_NOT_IMPLEMENTED FCLAW3D_FILE_ERR_NOT_IMPLEMENTED
 #define FCLAW2D_FILE_ERR_UNKNOWN     FCLAW3D_FILE_ERR_UNKNOWN
 #define FCLAW2D_FILE_ERR_LASTCODE    FCLAW3D_FILE_ERR_LASTCODE
@@ -162,6 +163,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define fclaw2d_domain_dimension        fclaw3d_domain_dimension
 #define fclaw2d_check_initial_level     fclaw3d_check_initial_level
 #define fclaw2d_file_open_write         fclaw3d_file_open_write
+#define fclaw2d_file_write_partition    fclaw3d_file_write_partition
 #define fclaw2d_file_write_block        fclaw3d_file_write_block
 #define fclaw2d_file_write_array        fclaw3d_file_write_array
 #define fclaw2d_file_open_read          fclaw3d_file_open_read
