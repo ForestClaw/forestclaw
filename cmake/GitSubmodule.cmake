@@ -7,7 +7,8 @@ function(git_submodule submod_dir)
 # get/update Git submodule directory to CMake, assuming the
 # Git submodule directory is a CMake project.
 
-if(NOT IS_DIRECTORY ${PROJECT_SOURCE_DIR}/.git)
+# EXISTS, do not use IS_DIRECTORY as in submodule .git is a file not a directory
+if(NOT EXISTS ${PROJECT_SOURCE_DIR}/.git)
   message(DEBUG "${PROJECT_SOURCE_DIR} is not a Git repository, skipping submodule ${submod_dir}")
   return()
 endif()
