@@ -25,23 +25,29 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifndef P4_TO_P8
 #include <fclaw2d_file.h>
+#include <fclaw2d_convenience.h>
 #include <p4est_algorithms.h>
 #include <p4est_bits.h>
 #include <p4est_communication.h>
 #include <p4est_wrap.h>
 #else
 #include <fclaw3d_file.h>
+#include <fclaw3d_convenience.h>
 #include <p8est_algorithms.h>
 #include <p8est_bits.h>
 #include <p8est_communication.h>
 #include <p8est_wrap.h>
 #endif
 
+#define FCLAW2D_FILE_NAME_BYTES BUFSIZ /**< maximal number of filename bytes */
 #ifndef P4_TO_P8
 #define FCLAW2D_FILE_EXT "f2d" /**< file extension of fclaw2d data files */
+#define FCLAW2D_PFILE_EXT "fp2d" /**< file extension of fclaw2d partition files */
 #else
 #define FCLAW2D_FILE_EXT    FCLAW3D_FILE_EXT
+#define FCLAW2D_PFILE_EXT   FCLAW3D_PFILE_EXT
 #define FCLAW3D_FILE_EXT "f3d" /**< file extension of fclaw3d data files */
+#define FCLAW3D_PFILE_EXT "fp3d" /**< file extension of fclaw3d partition files */
 #endif
 
 /* For legacy and compatibility reasons we provide here the first version
@@ -154,6 +160,7 @@ typedef enum fclaw2d_file_error_v1
     FCLAW2D_FILE_ERR_IN_DATA_V1, /**< input data of file function is invalid */
     FCLAW2D_FILE_ERR_COUNT_V1, /**< read or write count error that was not
                                  classified as a format error */
+    FCLAW2D_FILE_ERR_DIM_V1, /**< file has wrong dimension */
     FCLAW2D_FILE_ERR_UNKNOWN_V1, /**< unknown error */
     FCLAW2D_FILE_ERR_LASTCODE_V1 /**< to define own error codes for
                                   a higher level application
@@ -280,7 +287,7 @@ static int fclaw2d_file_error_string_v1 (int errclass, char *string,
  * same label. This leads to correct error managing.
  */
 #define FCLAW2D_FILE_CHECK_MPI_V1(errcode, user_msg) do {FCLAW2D_FILE_CHECK_VERBOSE_V1 (errcode, user_msg);\
-                                                        if (!FCLAW2D_FILE_IS_SUCCESS_V1 (mpiret)) {\
+                                                        if (!FCLAW2D_FILE_IS_SUCCESS_V1 (errcode)) {\
                                                         goto fclaw2d_read_write_error;}} while (0)
 
 /** Use this macro after \ref FCLAW2D_FILE_CHECK_MPI_V1 *directly* after the end of
@@ -302,6 +309,18 @@ static int fclaw2d_file_error_string_v1 (int errclass, char *string,
 /** A macro to check for file write related count errors.
  * These errors are handled as fatal errors. The macro is only applicable for
  * collective calls.
+ *
+ * This macro is only allowed to be used in combination with the macro pair
+ * \ref FCLAW2D_FILE_CHECK_MPI_V1 and \ref FCLAW2D_HANDLE_MPI_ERROR_V1 since
+ * the check count macro pair relies on the goto label used by the mpi error
+ * pair of macros.
+ *
+ * The reason for this is that by the MPI standard we must ensure that the
+ * broadcasts for error sync are called in the same sequence on all processes.
+ * This is done by jumping to the MPI error handle even in the case of a count
+ * error. This works since in this case the handling of the MPI error is passed
+ * without throwing an error since we only call \ref FCLAW2D_FILE_CHECK_COUNT_V1
+ * after \ref FCLAW2D_FILE_CHECK_MPI_V1.
  */
 #define FCLAW2D_FILE_CHECK_COUNT_V1(icount,ocount,fc,cperrcode) do { int fclaw2d_count_error_global, fclaw2d_mpiret,\
                                                  fclaw2d_rank;                                               \
@@ -329,15 +348,25 @@ static int fclaw2d_file_error_string_v1 (int errclass, char *string,
 #define FCLAW2D_FILE_CHECK_COUNT_SERIAL_V1(icount, ocount) do {if (((int) icount) != ocount) {                        \
                                                         SC_LERRORF ("Count error on rank 0 at %s:%d.\n",__FILE__,\
                                                         __LINE__);                                               \
-                                                        goto fclaw2d_write_count_error;}} while (0)
+                                                        goto fclaw2d_read_write_error;}} while (0)
 
 /** A macro to handle a file write error that occurred on rank 0 but need to be
  * handled collectivly. We need count_error as input since we need a variable to
  * broadcast the count error status. count_error is true if there is a count error
  * and false otherwise.
+ *
+ * This macro must always be used after \ref FCLAW2D_HANDLE_MPI_ERROR_V1 since
+ * the two macros share the goto label.
+ *
+ * The reason for this is that by the MPI standard we must ensure that the
+ * broadcasts for error sync are called in the same sequence on all processes.
+ * This is done by jumping to the MPI error handle even in the case of a count
+ * error. This works since in this case the handling of the MPI error is passed
+ * without throwing an error since we only call \ref FCLAW2D_HANDLE_MPI_COUNT_ERROR_V1
+ * after \ref FCLAW2D_HANDLE_MPI_ERROR_V1.
  */
 /* Remark: Since we use a declaration after the label we need an empty statement. */
-#define FCLAW2D_HANDLE_MPI_COUNT_ERROR_V1(count_error,fc,cperrcode) do {fclaw2d_write_count_error: ;\
+#define FCLAW2D_HANDLE_MPI_COUNT_ERROR_V1(count_error,fc,cperrcode) do {\
                                                     int fclaw2d_mpiret_handle = sc_MPI_Bcast (&count_error, 1, sc_MPI_INT, 0,\
                                                     fc->mpicomm);\
                                                     SC_CHECK_MPI (fclaw2d_mpiret_handle);\
@@ -380,8 +409,6 @@ fcaw2d_file_get_padding_string_v1 (size_t num_bytes, size_t divisor,
     }
 }
 
-/** currently unused */
-#if 0
 static int
 fclaw2d_file_check_file_metadata_v1 (sc_MPI_Comm mpicomm,
                                      const char *filename,
@@ -415,6 +442,14 @@ fclaw2d_file_check_file_metadata_v1 (sc_MPI_Comm mpicomm,
     metadata[FCLAW2D_FILE_MAGIC_BYTES_V1 - 1] = '\0';
     if (strcmp (metadata, FCLAW2D_FILE_MAGIC_NUMBER_V1))
     {
+        /* This check breaks if we change the magic string but this code is
+         * only dedicated to implement version 1 so there should be no
+         * version bump in \ref FCLAW2D_FILE_MAGIC_NUMBER_V1. */
+        if (!strcmp (metadata, "p8data0") || !strcmp (metadata, "p4data0"))
+        {
+            /* check if it is just a dimension mismatch */
+            return FCLAW2D_FILE_ERR_DIM_V1;
+        }
         /* TODO: check for wrong endianness */
         fclaw_errorf
             ("Error reading <%s>. Wrong magic number (in file = %s, magic number = %s).\n",
@@ -491,14 +526,13 @@ fclaw2d_file_check_file_metadata_v1 (sc_MPI_Comm mpicomm,
     if (read_global_num_quads < 0)
     {
         fclaw_errorf (FCLAW2D_FILE_STRING_V1
-                       " : Error reading <%s>. Negative global number of quadrants.\n",
-                       filename);
+                      " : Error reading <%s>. Negative global number of quadrants.\n",
+                      filename);
         error_flag = 1;
     }
 
     return (error_flag) ? FCLAW2D_FILE_ERR_FORMAT_V1 : sc_MPI_SUCCESS;
 }
-#endif
 
 /** Close an MPI file or its libsc-internal replacement in case of an error.
  * \param [in,out]  file    A sc_MPI_file
@@ -557,9 +591,11 @@ fclaw2d_file_check_user_string (const char *user_string)
     char copied_user_string[FCLAW2D_FILE_USER_STRING_BYTES_V1];
 
     /* copy user string */
-    sc_strcopy (copied_user_string, FCLAW2D_FILE_USER_STRING_BYTES_V1, user_string);
+    sc_strcopy (copied_user_string, FCLAW2D_FILE_USER_STRING_BYTES_V1,
+                user_string);
 
-    if (strlen (copied_user_string) < FCLAW2D_FILE_USER_STRING_BYTES_V1 - 1) {
+    if (strlen (copied_user_string) < FCLAW2D_FILE_USER_STRING_BYTES_V1 - 1)
+    {
         /* user_string is nul-terminated */
         return 0;
     }
@@ -570,11 +606,13 @@ fclaw2d_file_check_user_string (const char *user_string)
     /* check for nul at last byte position of user string */
     terminal_nul = user_string[FCLAW2D_FILE_USER_STRING_BYTES_V1 - 1] == '\0';
 
-    if (!terminal_nul) {
+    if (!terminal_nul)
+    {
         /* user_string is not nul-terminated */
         return -1;
     }
-    else {
+    else
+    {
         /* user_string is nul-terminated */
         return 0;
     }
@@ -673,6 +711,8 @@ fclaw2d_file_open_create_v1 (p4est_t * p4est, const char *filename,
     FCLAW2D_FILE_CHECK_OPEN_V1 (mpiret, file_context, "File open create",
                                 errcode);
 
+    /* comm of the file context is needed for parallel error management */
+    file_context->mpicomm = p4est->mpicomm;
     if (p4est->mpirank == 0)
     {
         /* write padded fclaw2d-defined header */
@@ -693,11 +733,12 @@ fclaw2d_file_open_create_v1 (p4est_t * p4est, const char *filename,
                                             FCLAW2D_FILE_BYTE_DIV_V1, count);
     }
 
+    /* error sync using file context communicator  */
     FCLAW2D_HANDLE_MPI_ERROR_V1 (mpiret, file_context, p4est->mpicomm,
                                  errcode);
+    FCLAW2D_HANDLE_MPI_COUNT_ERROR_V1 (count_error, file_context, errcode);
 
-    /* initialize the file context */
-    file_context->mpicomm = p4est->mpicomm;
+    /* continued file context initialization */
     file_context->local_num_quadrants = p4est->local_num_quadrants;
     file_context->global_num_quadrants = p4est->global_num_quadrants;
     mpiret = sc_MPI_Comm_size (p4est->mpicomm, &mpisize);
@@ -707,8 +748,6 @@ fclaw2d_file_open_create_v1 (p4est_t * p4est, const char *filename,
             (mpisize + 1) * sizeof (p4est_gloidx_t));
     file_context->gfq_owned = 1;
 
-    FCLAW2D_HANDLE_MPI_COUNT_ERROR_V1 (count_error, file_context, errcode);
-
     file_context->accessed_bytes = 0;
     file_context->num_calls = 0;
 
@@ -716,8 +755,6 @@ fclaw2d_file_open_create_v1 (p4est_t * p4est, const char *filename,
     return file_context;
 }
 
-/** currently unused */
-#if 0
 /** Open a file for reading without knowing the p4est that is associated
  * with the mesh-related data in the file (cf. \ref fclaw2d_file_open_read_v1).
  * For more general comments on open_read see the documentation of
@@ -806,7 +843,6 @@ fclaw2d_file_open_read_ext_v1 (sc_MPI_Comm mpicomm, const char *filename,
     fclaw2d_file_error_code_v1 (*errcode, errcode);
     return file_context;
 }
-#endif
 
 /** currently unused */
 #if 0
@@ -860,11 +896,12 @@ fclaw2d_file_open_read_v1 (p4est_t * p4est, const char *filename,
     {
         if (p4est->mpirank == 0)
         {
-            fclaw_errorf (FCLAW2D_FILE_STRING_V1 " open_read: global number of "
-                           "quadrants mismatch (in file = %lld,"
-                           " by parameter = %lld)\n",
-                           (long long) global_num_quadrants,
-                           (long long) p4est->global_num_quadrants);
+            fclaw_errorf (FCLAW2D_FILE_STRING_V1
+                          " open_read: global number of "
+                          "quadrants mismatch (in file = %lld,"
+                          " by parameter = %lld)\n",
+                          (long long) global_num_quadrants,
+                          (long long) p4est->global_num_quadrants);
         }
         fclaw2d_file_close_v1 (fc, errcode);
         FCLAW2D_FILE_CHECK_NULL_V1 (*errcode, fc,
@@ -1053,8 +1090,6 @@ fclaw2d_file_write_block_v1 (fclaw2d_file_context_p4est_v1_t * fc,
     return fc;
 }
 
-/** currently unused */
-#if 0
 /** Collectivly read and check block metadata.
  * If user_string == NULL data_size is not compared to
  * read_data_size.
@@ -1158,8 +1193,8 @@ fclaw2d_file_read_block_metadata_v1 (fclaw2d_file_context_p4est_v1_t * fc,
         if (rank == 0)
         {
             fclaw_errorf (FCLAW2D_FILE_STRING_V1
-                           ": Error reading. Wrong section data size (in file = %ld, by parameter = %ld).\n",
-                           *read_data_size, data_size);
+                          ": Error reading. Wrong section data size (in file = %ld, by parameter = %ld).\n",
+                          *read_data_size, data_size);
         }
         fclaw2d_file_error_cleanup_v1 (&fc->file);
         FCLAW_FREE (fc);
@@ -1253,10 +1288,7 @@ fclaw2d_file_read_block_metadata_v1 (fclaw2d_file_context_p4est_v1_t * fc,
 
     return fc;
 }
-#endif
 
-/** currently unused */
-#if 0
 /** Read a header block from an opened file.
  * This function requires an opened file context.
  * The header data is read on rank 0.
@@ -1413,7 +1445,6 @@ fclaw2d_file_read_block_v1 (fclaw2d_file_context_p4est_v1_t * fc,
     fclaw2d_file_error_code_v1 (*errcode, errcode);
     return fc;
 }
-#endif
 
 /** Write one (more) per-quadrant data set to a parallel output file.
  *
@@ -1602,8 +1633,6 @@ fclaw2d_file_write_field_v1 (fclaw2d_file_context_p4est_v1_t * fc,
     return fc;
 }
 
-/** currently unused */
-#if 0
 /** Read a data field and specify the partition for reading in parallel.
  * See also the documentation of \ref fclaw2d_file_read_field_v1.
  *
@@ -1639,8 +1668,8 @@ fclaw2d_file_read_field_ext_v1 (fclaw2d_file_context_p4est_v1_t * fc,
                   || quadrant_size == quadrant_data->elem_size);
 
     /* check gfq in the debug mode */
-    FCLAW_ASSERT (gfq[0] == 0);
-    FCLAW_ASSERT (gfq[mpisize] == fc->global_num_quadrants);
+    FCLAW_ASSERT (gfq != NULL || gfq[0] == 0);
+    FCLAW_ASSERT (gfq != NULL || gfq[mpisize] == fc->global_num_quadrants);
 
     if (quadrant_data != NULL)
     {
@@ -1716,10 +1745,7 @@ fclaw2d_file_read_field_ext_v1 (fclaw2d_file_context_p4est_v1_t * fc,
     fclaw2d_file_error_code_v1 (*errcode, errcode);
     return fc;
 }
-#endif
 
-/** currently unused */
-#if 0
 /** Read one (more) per-quadrant data set from a parallel input file.
  * This function requires an opened file context.
  * This function requires the appropriate number of readable bytes.
@@ -1835,7 +1861,6 @@ fclaw2d_file_read_field_v1 (fclaw2d_file_context_p4est_v1_t * fc,
     fclaw2d_file_error_code_v1 (*errcode, errcode);
     return retfc;
 }
-#endif
 
 /** A data type that encodes the metadata of one data block in a fclaw2d data file.
  */
@@ -1853,7 +1878,7 @@ fclaw2d_file_section_metadata_v1_t;
 /** This function checks for successful completion and cleans up if required.
  *
  * \param[in,out]  file     The MPI file that will be closed in case of an error.
- * \param[in]      eclass   The eclass that indicates if an error occured.
+ * \param[in]      eclass   The eclass that indicates if an error occurred.
  *                          \b eclass is an MPI, libsc or fclaw2d_file_v1 error
  *                          code.
  * \param[out]     errcode  The error code that is obtained by converting
@@ -1862,7 +1887,7 @@ fclaw2d_file_section_metadata_v1_t;
  *                          0 otherwise.
  */
 static int
-fclaw2d_file_info_cleanup_v1 (sc_MPI_File *file, int eclass, int *errcode)
+fclaw2d_file_info_cleanup_v1 (sc_MPI_File * file, int eclass, int *errcode)
 {
     if (!FCLAW2D_FILE_IS_SUCCESS_V1 (eclass))
     {
@@ -1982,7 +2007,7 @@ fclaw2d_file_info_v1 (p4est_t * p4est, const char *filename,
     SC_CHECK_MPI (mpiret);
     if (fclaw2d_file_info_cleanup_v1 (&file, eclass, errcode))
     {
-        /* an error has occured and a clean up was performed  */
+        /* an error has occurred and a clean up was performed  */
         return -1;
     }
     mpiret = sc_MPI_Bcast (&count_error, 1, sc_MPI_INT, 0, p4est->mpicomm);
@@ -2102,9 +2127,8 @@ fclaw2d_file_info_v1 (p4est_t * p4est, const char *filename,
                         FCLAW2D_FILE_USER_STRING_BYTES_V1,
                         &block_metadata[FCLAW2D_FILE_ARRAY_METADATA_BYTES_V1 +
                                         2]);
-            FCLAW_ASSERT (current_member->
-                          user_string[FCLAW2D_FILE_USER_STRING_BYTES_V1 -
-                                      1] == '\0');
+            FCLAW_ASSERT (current_member->user_string
+                          [FCLAW2D_FILE_USER_STRING_BYTES_V1 - 1] == '\0');
 
             /* get padding bytes of the current block */
             if (current_member->block_type == 'F')
@@ -2297,7 +2321,7 @@ fclaw2d_file_error_string_v1 (int errclass, char *string, int *resultlen)
     switch (errclass)
     {
     case FCLAW2D_FILE_ERR_SUCCESS_V1:
-        tstr = "No fclaw2d file error";
+        tstr = "No file error";
         break;
     case FCLAW2D_FILE_ERR_FORMAT_V1:
         tstr = "Wrong file format";
@@ -2317,6 +2341,9 @@ fclaw2d_file_error_string_v1 (int errclass, char *string, int *resultlen)
     case FCLAW2D_FILE_ERR_COUNT_V1:
         tstr =
             "Read or write count error that is not classified as an other error";
+        break;
+    case FCLAW2D_FILE_ERR_DIM_V1:
+        tstr = "The file has the wrong dimension";
         break;
 
         /* handle error codes as defined in libsc */
@@ -2414,7 +2441,7 @@ fclaw2d_file_error_string_v1 (int errclass, char *string, int *resultlen)
  *                            In case of error the file is tried to close
  *                            and fc is freed.
  */
-fclaw2d_file_context_p4est_v1_t *
+static fclaw2d_file_context_p4est_v1_t *
 fclaw2d_file_write_p4est_v1 (fclaw2d_file_context_p4est_v1_t * fc,
                              p4est_t * p4est, const char *quad_string,
                              const char *quad_data_string, int save_data,
@@ -2478,7 +2505,10 @@ fclaw2d_file_write_p4est_v1 (fclaw2d_file_context_p4est_v1_t * fc,
         FCLAW_ASSERT (fc == NULL);
         /* first write call failed */
         sc_array_destroy (quads);
-        sc_array_destroy (quad_data);
+        if (write_data)
+        {
+            sc_array_destroy (quad_data);
+        }
         return NULL;
     }
 
@@ -2495,7 +2525,10 @@ fclaw2d_file_write_p4est_v1 (fclaw2d_file_context_p4est_v1_t * fc,
         FCLAW_ASSERT (fc == NULL);
         /* first write call failed */
         sc_array_destroy (quads);
-        sc_array_destroy (quad_data);
+        if (write_data)
+        {
+            sc_array_destroy (quad_data);
+        }
         return NULL;
     }
 
@@ -2514,8 +2547,6 @@ fclaw2d_file_write_p4est_v1 (fclaw2d_file_context_p4est_v1_t * fc,
     return fc;
 }
 
-/** currently unused */
-#if 0
 /** Convert read data to a p4est.
  *
  * \param [in] mpicomm    MPI communicator of the p4est.
@@ -2558,7 +2589,6 @@ fclaw2d_file_data_to_p4est (sc_MPI_Comm mpicomm, int mpisize,
     FCLAW_ASSERT (gfq != NULL);
     FCLAW_ASSERT (quads != NULL &&
                   quads->elem_size == FCLAW2D_FILE_COMPRESSED_QUAD_SIZE_V1);
-    FCLAW_ASSERT (quad_data != NULL);
     FCLAW_ASSERT (errcode != NULL);
     *errcode = FCLAW2D_FILE_ERR_P4EST_V1;
 
@@ -2575,10 +2605,7 @@ fclaw2d_file_data_to_p4est (sc_MPI_Comm mpicomm, int mpisize,
     }
     return ptemp;
 }
-#endif
 
-/** currently unused */
-#if 0
 /** Read a p4est to an opened file using the MPI communicator of \a fc.
  *
  * \param [in,out] fc         Context previously created by \ref
@@ -2590,6 +2617,11 @@ fclaw2d_file_data_to_p4est (sc_MPI_Comm mpicomm, int mpisize,
  *                            be created by this function. The data size
  *                            must be zero if no quadrant data was stored.
  * \param [out]   p4est       The p4est that is created from the file.
+ * \param [in]    gfq_in      The global first quadrant array that is used for
+ *                            the created p4est and also for the parititon of
+ *                            the parallel I/O. If \b gfq_in is NULL, the
+ *                            function computes and uses a uniform parititon.
+ *                            If \b gfq_in is not NULL it is copied,
  * \param [in,out] quad_string The user string of the quadrant section.
 *                             At least \ref FCLAW2D_FILE_USER_STRING_BYTES_V1 bytes.
  *                            The user string is read on rank 0 and internally
@@ -2609,8 +2641,9 @@ fclaw2d_file_data_to_p4est (sc_MPI_Comm mpicomm, int mpisize,
 static fclaw2d_file_context_p4est_v1_t *
 fclaw2d_file_read_p4est_v1 (fclaw2d_file_context_p4est_v1_t * fc,
                             p4est_connectivity_t * conn, size_t data_size,
-                            p4est_t ** p4est, char *quad_string,
-                            char *quad_data_string, int *errcode)
+                            p4est_t ** p4est, p4est_gloidx_t * gfq_in,
+                            char *quad_string, char *quad_data_string,
+                            int *errcode)
 {
     int mpisize, mpiret;
     int written_data;
@@ -2636,7 +2669,8 @@ fclaw2d_file_read_p4est_v1 (fclaw2d_file_context_p4est_v1_t * fc,
     sc_array_init_size (&pertree_arr,
                         (conn->num_trees + 1) * sizeof (p4est_gloidx_t), 1);
     sc_array_init (&quadrants, FCLAW2D_FILE_COMPRESSED_QUAD_SIZE_V1);
-    sc_array_init (&quad_data, data_size);
+    /* dummy initialization */
+    sc_array_init (&quad_data, 1);
 
     /* temporary information */
     mpiret = sc_MPI_Comm_size (fc->mpicomm, &mpisize);
@@ -2666,8 +2700,8 @@ fclaw2d_file_read_p4est_v1 (fclaw2d_file_context_p4est_v1_t * fc,
         *errcode = FCLAW2D_FILE_ERR_P4EST_V1;
         sc_array_reset (&pertree_arr);
         FCLAW2D_FILE_CHECK_NULL_V1 (*errcode, fc,
-                                    FCLAW2D_FILE_STRING_V1 " file_read_" P4EST_STRING,
-                                    errcode);
+                                    FCLAW2D_FILE_STRING_V1 " file_read_"
+                                    P4EST_STRING, errcode);
     }
     for (jt = 0; jt < conn->num_trees; ++jt)
     {
@@ -2685,17 +2719,25 @@ fclaw2d_file_read_p4est_v1 (fclaw2d_file_context_p4est_v1_t * fc,
         *errcode = FCLAW2D_FILE_ERR_P4EST_V1;
         sc_array_reset (&pertree_arr);
         FCLAW2D_FILE_CHECK_NULL_V1 (*errcode, fc,
-                                    FCLAW2D_FILE_STRING_V1 " file_read_" P4EST_STRING,
-                                    errcode);
+                                    FCLAW2D_FILE_STRING_V1 " file_read_"
+                                    P4EST_STRING, errcode);
     }
 
-    gfq = FCLAW_ALLOC (p4est_gloidx_t, mpisize + 1);
-  /** Compute a uniform global first quadrant array to use a uniform
-   * partition to read the data fields in parallel.
-   */
-    p4est_comm_global_first_quadrant (fc->global_num_quadrants, mpisize, gfq);
+    if (gfq_in == NULL)
+    {
+        gfq = FCLAW_ALLOC (p4est_gloidx_t, mpisize + 1);
+        /** Compute a uniform global first quadrant array to use a uniform
+         * partition to read the data fields in parallel.
+         */
+        p4est_comm_global_first_quadrant (fc->global_num_quadrants, mpisize,
+                                          gfq);
 
-    FCLAW_ASSERT (gfq[mpisize] == pertree[conn->num_trees]);
+        FCLAW_ASSERT (gfq[mpisize] == pertree[conn->num_trees]);
+    }
+    else
+    {
+        gfq = gfq_in;
+    }
 
     /* read the quadrants */
     fc = fclaw2d_file_read_field_ext_v1 (fc, gfq, quadrants.elem_size,
@@ -2754,6 +2796,7 @@ fclaw2d_file_read_p4est_v1 (fclaw2d_file_context_p4est_v1_t * fc,
 
     if (written_data)
     {
+        sc_array_init (&quad_data, data_size);
         /* read the quadrant data */
         fc = fclaw2d_file_read_field_ext_v1 (fc, gfq, quad_data.elem_size,
                                              &quad_data, quad_data_string,
@@ -2765,12 +2808,18 @@ fclaw2d_file_read_p4est_v1 (fclaw2d_file_context_p4est_v1_t * fc,
             goto p4est_read_file_p4est_end;
         }
     }
+    else
+    {
+        FCLAW_ASSERT (data_size == 0);
+    }
 
     /* create the p4est from the read data */
     *p4est =
         fclaw2d_file_data_to_p4est (fc->mpicomm, mpisize, conn, gfq,
                                     (p4est_gloidx_t *) pertree_arr.array,
-                                    &quadrants, &quad_data, errcode);
+                                    &quadrants,
+                                    written_data ? &quad_data : NULL,
+                                    errcode);
     FCLAW_ASSERT ((p4est == NULL) ==
                   (*errcode != FCLAW2D_FILE_ERR_SUCCESS_V1));
     if (*errcode != FCLAW2D_FILE_ERR_SUCCESS_V1)
@@ -2781,8 +2830,8 @@ fclaw2d_file_read_p4est_v1 (fclaw2d_file_context_p4est_v1_t * fc,
         sc_array_reset (&quadrants);
         sc_array_reset (&quad_data);
         FCLAW2D_FILE_CHECK_NULL_V1 (*errcode, fc,
-                                    FCLAW2D_FILE_STRING_V1 " file_read_" P4EST_STRING,
-                                    errcode);
+                                    FCLAW2D_FILE_STRING_V1 " file_read_"
+                                    P4EST_STRING, errcode);
     }
 
     /* clean up und return */
@@ -2793,7 +2842,6 @@ fclaw2d_file_read_p4est_v1 (fclaw2d_file_context_p4est_v1_t * fc,
     sc_array_reset (&quad_data);
     return fc;
 }
-#endif
 
 /** Write a connectivity to an opened file.
  * This function writes two block sections to the opened file.
@@ -2865,8 +2913,6 @@ fclaw2d_file_write_connectivity_v1 (fclaw2d_file_context_p4est_v1_t * fc,
     return fc;
 }
 
-/** currently unused */
-#if 0
 /** Read a connectivity from an opened file.
  * This function reads two block sections from the opened file.
  * The first block contains the size of the serialized connectivity data
@@ -2943,8 +2989,8 @@ fclaw2d_file_read_connectivity_v1 (fclaw2d_file_context_p4est_v1_t * fc,
         /* close, dealloc file and set specific error code */
         *errcode = FCLAW2D_FILE_ERR_CONN_V1;
         FCLAW2D_FILE_CHECK_NULL_V1 (*errcode, fc,
-                                    FCLAW2D_FILE_STRING_V1 " file_read_connectivity",
-                                    errcode);
+                                    FCLAW2D_FILE_STRING_V1
+                                    " file_read_connectivity", errcode);
     }
 
     /* clean up */
@@ -2952,7 +2998,6 @@ fclaw2d_file_read_connectivity_v1 (fclaw2d_file_context_p4est_v1_t * fc,
 
     return fc;
 }
-#endif
 
 /** Close a file opened for parallel write/read and free the context.
  *
@@ -2995,6 +3040,7 @@ typedef struct fclaw2d_file_context
 {
     fclaw2d_domain_t *domain;
     fclaw2d_file_context_p4est_v1_t *fc;
+    char basename[FCLAW2D_FILE_NAME_BYTES];
 }
 fclaw2d_file_context_t;
 
@@ -3004,7 +3050,7 @@ fclaw2d_file_context_t;
  *
  * \param [in]  errcode_v1     A fclaw2d_file_v1 error code; see \ref
  *                             fclaw2d_file_error_v1
- * \param [in]  errcode        On output a fclaw2d_file errorcode; see \ref
+ * \param [out]  errcode       On output a fclaw2d_file errorcode; see \ref
  *                             fclaw2d_file_error.
  * \return                     0 in case of success and -1 otherwise.
  */
@@ -3013,81 +3059,175 @@ fclaw2d_file_translate_error_code_v1 (int errcode_v1, int *errcode)
 {
     FCLAW_ASSERT (errcode != NULL);
 
-    switch (errcode_v1) {
-        case FCLAW2D_FILE_ERR_SUCCESS_V1:
-            *errcode = FCLAW2D_FILE_ERR_SUCCESS;
-            return 0;
-        case FCLAW2D_FILE_ERR_FILE_V1:
-            *errcode = FCLAW2D_FILE_ERR_FILE;
-            return 0;
-        case FCLAW2D_FILE_ERR_NOT_SAME_V1:
-            *errcode = FCLAW2D_FILE_ERR_NOT_SAME;
-            return 0;
-        case FCLAW2D_FILE_ERR_AMODE_V1:
-            *errcode = FCLAW2D_FILE_ERR_AMODE;
-            return 0;
-        case FCLAW2D_FILE_ERR_NO_SUCH_FILE_V1:
-            *errcode = FCLAW2D_FILE_ERR_NO_SUCH_FILE;
-            return 0;
-        case FCLAW2D_FILE_ERR_FILE_EXIST_V1:
-            *errcode = FCLAW2D_FILE_ERR_FILE_EXIST;
-            return 0;
-        case FCLAW2D_FILE_ERR_BAD_FILE_V1:
-            *errcode = FCLAW2D_FILE_ERR_BAD_FILE;
-            return 0;
-        case FCLAW2D_FILE_ERR_ACCESS_V1:
-            *errcode = FCLAW2D_FILE_ERR_ACCESS;
-            return 0;
-        case FCLAW2D_FILE_ERR_NO_SPACE_V1:
-            *errcode = FCLAW2D_FILE_ERR_NO_SPACE;
-            return 0;
-        case FCLAW2D_FILE_ERR_QUOTA_V1:
-            *errcode = FCLAW2D_FILE_ERR_QUOTA;
-            return 0;
-        case FCLAW2D_FILE_ERR_READ_ONLY_V1:
-            *errcode = FCLAW2D_FILE_ERR_READ_ONLY;
-            return 0;
-        case FCLAW2D_FILE_ERR_IN_USE_V1:
-            *errcode = FCLAW2D_FILE_ERR_IN_USE;
-            return 0;
-        case FCLAW2D_FILE_ERR_IO_V1:
-            *errcode = FCLAW2D_FILE_ERR_IO;
-            return 0;
-        case FCLAW2D_FILE_ERR_FORMAT_V1:
-            *errcode = FCLAW2D_FILE_ERR_FORMAT;
-            return 0;
-        case FCLAW2D_FILE_ERR_SECTION_TYPE_V1:
-            *errcode = FCLAW2D_FILE_ERR_SECTION_TYPE;
-            return 0;
-        case FCLAW2D_FILE_ERR_CONN_V1:
-            *errcode = FCLAW2D_FILE_ERR_CONN;
-            return 0;
-        case FCLAW2D_FILE_ERR_P4EST_V1:
-            *errcode = FCLAW2D_FILE_ERR_P4EST;
-            return 0;
-        case FCLAW2D_FILE_ERR_IN_DATA_V1:
-            *errcode = FCLAW2D_FILE_ERR_IN_DATA;
-            return 0;
-        case FCLAW2D_FILE_ERR_COUNT_V1:
-            *errcode = FCLAW2D_FILE_ERR_COUNT;
-            return 0;
-        case FCLAW2D_FILE_ERR_UNKNOWN_V1:
-            *errcode = FCLAW2D_FILE_ERR_UNKNOWN;
-            return 0;
-        case FCLAW2D_FILE_ERR_LASTCODE_V1:
-            *errcode = FCLAW2D_FILE_ERR_LASTCODE;
-            return 0;
-        default:
-            *errcode = FCLAW2D_FILE_ERR_UNKNOWN;
-            return 0;
+    switch (errcode_v1)
+    {
+    case FCLAW2D_FILE_ERR_SUCCESS_V1:
+        *errcode = FCLAW2D_FILE_ERR_SUCCESS;
+        return 0;
+    case FCLAW2D_FILE_ERR_FILE_V1:
+        *errcode = FCLAW2D_FILE_ERR_FILE;
+        return 0;
+    case FCLAW2D_FILE_ERR_NOT_SAME_V1:
+        *errcode = FCLAW2D_FILE_ERR_NOT_SAME;
+        return 0;
+    case FCLAW2D_FILE_ERR_AMODE_V1:
+        *errcode = FCLAW2D_FILE_ERR_AMODE;
+        return 0;
+    case FCLAW2D_FILE_ERR_NO_SUCH_FILE_V1:
+        *errcode = FCLAW2D_FILE_ERR_NO_SUCH_FILE;
+        return 0;
+    case FCLAW2D_FILE_ERR_FILE_EXIST_V1:
+        *errcode = FCLAW2D_FILE_ERR_FILE_EXIST;
+        return 0;
+    case FCLAW2D_FILE_ERR_BAD_FILE_V1:
+        *errcode = FCLAW2D_FILE_ERR_BAD_FILE;
+        return 0;
+    case FCLAW2D_FILE_ERR_ACCESS_V1:
+        *errcode = FCLAW2D_FILE_ERR_ACCESS;
+        return 0;
+    case FCLAW2D_FILE_ERR_NO_SPACE_V1:
+        *errcode = FCLAW2D_FILE_ERR_NO_SPACE;
+        return 0;
+    case FCLAW2D_FILE_ERR_QUOTA_V1:
+        *errcode = FCLAW2D_FILE_ERR_QUOTA;
+        return 0;
+    case FCLAW2D_FILE_ERR_READ_ONLY_V1:
+        *errcode = FCLAW2D_FILE_ERR_READ_ONLY;
+        return 0;
+    case FCLAW2D_FILE_ERR_IN_USE_V1:
+        *errcode = FCLAW2D_FILE_ERR_IN_USE;
+        return 0;
+    case FCLAW2D_FILE_ERR_IO_V1:
+        *errcode = FCLAW2D_FILE_ERR_IO;
+        return 0;
+    case FCLAW2D_FILE_ERR_FORMAT_V1:
+        *errcode = FCLAW2D_FILE_ERR_FORMAT;
+        return 0;
+    case FCLAW2D_FILE_ERR_SECTION_TYPE_V1:
+        *errcode = FCLAW2D_FILE_ERR_SECTION_TYPE;
+        return 0;
+    case FCLAW2D_FILE_ERR_CONN_V1:
+        *errcode = FCLAW2D_FILE_ERR_CONN;
+        return 0;
+    case FCLAW2D_FILE_ERR_P4EST_V1:
+        *errcode = FCLAW2D_FILE_ERR_P4EST;
+        return 0;
+    case FCLAW2D_FILE_ERR_IN_DATA_V1:
+        *errcode = FCLAW2D_FILE_ERR_IN_DATA;
+        return 0;
+    case FCLAW2D_FILE_ERR_COUNT_V1:
+        *errcode = FCLAW2D_FILE_ERR_COUNT;
+        return 0;
+    case FCLAW2D_FILE_ERR_DIM_V1:
+        *errcode = FCLAW2D_FILE_ERR_DIM;
+        return 0;
+    case FCLAW2D_FILE_ERR_UNKNOWN_V1:
+        *errcode = FCLAW2D_FILE_ERR_UNKNOWN;
+        return 0;
+    case FCLAW2D_FILE_ERR_LASTCODE_V1:
+        *errcode = FCLAW2D_FILE_ERR_LASTCODE;
+        return 0;
+    default:
+        *errcode = FCLAW2D_FILE_ERR_UNKNOWN;
+        return 0;
+    }
+    return 0;
+}
+
+/**
+ * This function translates the fclaw2d_file error codes to fclaw_file_v1
+ * error classes.
+ *
+ * \param [in]  errcode         A fclaw2d_file error code; see \ref
+ *                              fclaw2d_file_error
+ * \param [out]  errcode_v1     On output a fclaw2d_file_v1 errorcode; see \ref
+ *                              fclaw2d_file_error_v1.
+ * \return                      0 in case of success and -1 otherwise.
+ */
+static int
+fclaw2d_file_translate_error_code_to_v1 (int errcode, int *errcode_v1)
+{
+    FCLAW_ASSERT (errcode_v1 != NULL);
+
+    switch (errcode)
+    {
+    case FCLAW2D_FILE_ERR_SUCCESS:
+        *errcode_v1 = FCLAW2D_FILE_ERR_SUCCESS_V1;
+        return 0;
+    case FCLAW2D_FILE_ERR_FILE:
+        *errcode_v1 = FCLAW2D_FILE_ERR_FILE_V1;
+        return 0;
+    case FCLAW2D_FILE_ERR_NOT_SAME:
+        *errcode_v1 = FCLAW2D_FILE_ERR_NOT_SAME_V1;
+        return 0;
+    case FCLAW2D_FILE_ERR_AMODE:
+        *errcode_v1 = FCLAW2D_FILE_ERR_AMODE;
+        return 0;
+    case FCLAW2D_FILE_ERR_NO_SUCH_FILE:
+        *errcode_v1 = FCLAW2D_FILE_ERR_NO_SUCH_FILE_V1;
+        return 0;
+    case FCLAW2D_FILE_ERR_FILE_EXIST:
+        *errcode_v1 = FCLAW2D_FILE_ERR_FILE_EXIST_V1;
+        return 0;
+    case FCLAW2D_FILE_ERR_BAD_FILE:
+        *errcode_v1 = FCLAW2D_FILE_ERR_BAD_FILE_V1;
+        return 0;
+    case FCLAW2D_FILE_ERR_ACCESS:
+        *errcode_v1 = FCLAW2D_FILE_ERR_ACCESS_V1;
+        return 0;
+    case FCLAW2D_FILE_ERR_NO_SPACE:
+        *errcode_v1 = FCLAW2D_FILE_ERR_NO_SPACE_V1;
+        return 0;
+    case FCLAW2D_FILE_ERR_QUOTA:
+        *errcode_v1 = FCLAW2D_FILE_ERR_QUOTA_V1;
+        return 0;
+    case FCLAW2D_FILE_ERR_READ_ONLY:
+        *errcode_v1 = FCLAW2D_FILE_ERR_READ_ONLY_V1;
+        return 0;
+    case FCLAW2D_FILE_ERR_IN_USE:
+        *errcode_v1 = FCLAW2D_FILE_ERR_IN_USE_V1;
+        return 0;
+    case FCLAW2D_FILE_ERR_IO:
+        *errcode_v1 = FCLAW2D_FILE_ERR_IO_V1;
+        return 0;
+    case FCLAW2D_FILE_ERR_FORMAT:
+        *errcode_v1 = FCLAW2D_FILE_ERR_FORMAT_V1;
+        return 0;
+    case FCLAW2D_FILE_ERR_SECTION_TYPE:
+        *errcode_v1 = FCLAW2D_FILE_ERR_SECTION_TYPE_V1;
+        return 0;
+    case FCLAW2D_FILE_ERR_CONN:
+        *errcode_v1 = FCLAW2D_FILE_ERR_CONN_V1;
+        return 0;
+    case FCLAW2D_FILE_ERR_P4EST:
+        *errcode_v1 = FCLAW2D_FILE_ERR_P4EST_V1;
+        return 0;
+    case FCLAW2D_FILE_ERR_IN_DATA:
+        *errcode_v1 = FCLAW2D_FILE_ERR_IN_DATA_V1;
+        return 0;
+    case FCLAW2D_FILE_ERR_COUNT:
+        *errcode_v1 = FCLAW2D_FILE_ERR_COUNT_V1;
+        return 0;
+    case FCLAW2D_FILE_ERR_DIM:
+        *errcode_v1 = FCLAW2D_FILE_ERR_DIM_V1;
+        return 0;
+    case FCLAW2D_FILE_ERR_UNKNOWN:
+        *errcode_v1 = FCLAW2D_FILE_ERR_UNKNOWN_V1;
+        return 0;
+    case FCLAW2D_FILE_ERR_LASTCODE:
+        *errcode_v1 = FCLAW2D_FILE_ERR_LASTCODE_V1;
+        return 0;
+    default:
+        *errcode_v1 = FCLAW2D_FILE_ERR_UNKNOWN_V1;
+        return 0;
     }
     return 0;
 }
 
 fclaw2d_file_context_t *
 fclaw2d_file_open_write (const char *filename,
-                         const char *user_string, int write_partition,
-                         fclaw2d_domain_t * domain, int *errcode)
+                         const char *user_string, fclaw2d_domain_t * domain,
+                         int *errcode)
 {
     FCLAW_ASSERT (filename != NULL);
     FCLAW_ASSERT (user_string != NULL);
@@ -3096,12 +3236,20 @@ fclaw2d_file_open_write (const char *filename,
     FCLAW_ASSERT (errcode != NULL);
 
     int errcode_internal;
+    size_t file_len;
     p4est_wrap_t *wrap;
     p4est_t *p4est;
     fclaw2d_file_context_p4est_v1_t *fc;
     fclaw2d_file_context_t *fclaw_fc;
-    int  buf_size;
-    char *buf;
+    char buf[FCLAW2D_FILE_NAME_BYTES];
+
+    file_len = strlen (filename) + strlen ("." FCLAW2D_FILE_EXT) + 1;
+    if (file_len > FCLAW2D_FILE_NAME_BYTES)
+    {
+        /* filename too long */
+        *errcode = FCLAW2D_FILE_ERR_BAD_FILE;
+        return NULL;
+    }
 
     /* get p4est_wrap_t from domain */
     wrap = (p4est_wrap_t *) domain->pp;
@@ -3109,13 +3257,10 @@ fclaw2d_file_open_write (const char *filename,
     FCLAW_ASSERT (p4est_is_valid (p4est));
 
     /* create the file */
-    buf_size = strlen (filename) + strlen ("." FCLAW2D_FILE_EXT) + 1;
-    buf = FCLAW_ALLOC (char, buf_size);
-    sc_strcopy (buf, (size_t) buf_size, filename);
+    sc_strcopy (buf, file_len, filename);
     strcat (buf, "." FCLAW2D_FILE_EXT);
     fc = fclaw2d_file_open_create_v1 (p4est, buf, user_string,
                                       &errcode_internal);
-    FCLAW_FREE (buf);
     fclaw2d_file_translate_error_code_v1 (errcode_internal, errcode);
     if (*errcode != FCLAW2D_FILE_ERR_SUCCESS)
     {
@@ -3149,9 +3294,101 @@ fclaw2d_file_open_write (const char *filename,
     fclaw_fc = FCLAW_ALLOC (fclaw2d_file_context_t, 1);
     fclaw_fc->fc = fc;
     fclaw_fc->domain = domain;
+    sc_strcopy (fclaw_fc->basename, strlen (filename) + 1, filename);
 
     return fclaw_fc;
 }
+
+#if 0
+int
+fclaw2d_file_write_partition (const char *filename, const char *user_string,
+                              fclaw2d_domain_t * domain, int *errcode)
+{
+    FCLAW_ASSERT (filename != NULL);
+    FCLAW_ASSERT (user_string != NULL);
+    FCLAW_ASSERT (domain != NULL);
+    FCLAW_ASSERT (errcode != NULL);
+
+    int errcode_internal, mpiret, retval;
+    int mpisize;
+    int64_t written_partition_size;
+    size_t file_len;
+    char buf[FCLAW2D_FILE_NAME_BYTES];
+    p4est_t *p4est;
+    fclaw2d_file_context_p4est_v1_t *fc_p4est;
+    sc_array_t arr;
+
+    file_len = strlen (filename) + strlen ("." FCLAW2D_PFILE_EXT) + 1;
+    if (file_len > FCLAW2D_FILE_NAME_BYTES)
+    {
+        /* filename too long */
+        *errcode = FCLAW2D_FILE_ERR_BAD_FILE;
+        return -1;
+    }
+
+    /* get file path */
+    sc_strcopy (buf, file_len, filename);
+    strcat (buf, "." FCLAW2D_PFILE_EXT);
+
+    /* get the underlying p4est */
+    p4est = ((p4est_wrap_t *) domain->pp)->p4est;
+
+    /* create a new file */
+    fc_p4est = fclaw2d_file_open_create_v1 (p4est, buf, "Partition file",
+                                            &errcode_internal);
+    fclaw2d_file_translate_error_code_v1 (errcode_internal, errcode);
+    if (*errcode != FCLAW2D_FILE_ERR_SUCCESS)
+    {
+        FCLAW_ASSERT (fc_p4est == NULL);
+        /* The p4est file context was closed and deallocated. */
+        return -1;
+    }
+
+    /* get the number of MPI processes */
+    mpiret = sc_MPI_Comm_size (domain->mpicomm, &mpisize);
+    SC_CHECK_MPI (mpiret);
+    written_partition_size = (int64_t) mpisize;
+
+    /* write the number of MPI processes */
+    sc_array_init_data (&arr, &written_partition_size, sizeof (int64_t), 1);
+    fc_p4est =
+        fclaw2d_file_write_block_v1 (fc_p4est, arr.elem_size, &arr,
+                                     "Partition size", &errcode_internal);
+    fclaw2d_file_translate_error_code_v1 (errcode_internal, errcode);
+    if (*errcode != FCLAW2D_FILE_ERR_SUCCESS)
+    {
+        FCLAW_ASSERT (fc_p4est == NULL);
+        /* The p4est file context was closed and deallocated. */
+        return -1;
+    }
+
+    /* write the partition, i.e. the globals first quadrant array */
+    sc_array_init_data (&arr, p4est->global_first_quadrant,
+                        sizeof (p4est_gloidx_t) * (mpisize + 1), 1);
+    fc_p4est =
+        fclaw2d_file_write_block_v1 (fc_p4est, arr.elem_size, &arr,
+                                     "Partition", &errcode_internal);
+    fclaw2d_file_translate_error_code_v1 (errcode_internal, errcode);
+    if (*errcode != FCLAW2D_FILE_ERR_SUCCESS)
+    {
+        FCLAW_ASSERT (fc_p4est == NULL);
+        /* The p4est file context was closed and deallocated. */
+        return -1;
+    }
+
+    /* close the partition file context */
+    retval = fclaw2d_file_close_v1 (fc_p4est, &errcode_internal);
+    fclaw2d_file_translate_error_code_v1 (errcode_internal, errcode);
+    if (*errcode != FCLAW2D_FILE_ERR_SUCCESS)
+    {
+        FCLAW_EXECUTE_ASSERT_TRUE (retval != 0);
+        /* The p4est file context was closed and deallocated. */
+        return -1;
+    }
+    *errcode = FCLAW2D_FILE_ERR_SUCCESS;
+    return sc_MPI_SUCCESS;
+}
+#endif
 
 fclaw2d_file_context_t *
 fclaw2d_file_write_block (fclaw2d_file_context_t *
@@ -3164,10 +3401,22 @@ fclaw2d_file_write_block (fclaw2d_file_context_t *
     FCLAW_ASSERT (block_data != NULL);
     FCLAW_ASSERT (errcode != NULL);
 
-    /* The functionality must be still implemented. */
-    *errcode = FCLAW2D_FILE_ERR_NOT_IMPLEMENTED;
+    int errcode_internal;
 
-    return NULL;
+    fc->fc =
+        fclaw2d_file_write_block_v1 (fc->fc, block_size, block_data,
+                                     user_string, &errcode_internal);
+    fclaw2d_file_translate_error_code_v1 (errcode_internal, errcode);
+    if (*errcode != FCLAW2D_FILE_ERR_SUCCESS)
+    {
+        FCLAW_ASSERT (fc->fc == NULL);
+        /* The p4est file context was closed and deallocated. */
+        /* deallocate fclaw2d file context */
+        FCLAW_FREE (fc);
+        return NULL;
+    }
+
+    return fc;
 }
 
 fclaw2d_file_context_t *
@@ -3179,17 +3428,45 @@ fclaw2d_file_write_array (fclaw2d_file_context_t *
     FCLAW_ASSERT (fc != NULL);
     FCLAW_ASSERT (user_string != NULL);
     FCLAW_ASSERT (patch_data != NULL);
+    FCLAW_ASSERT (patch_data->elem_size == sizeof (sc_array_t));
     FCLAW_ASSERT (errcode != NULL);
 
-    /* The functionality must be still implemented. */
-    *errcode = FCLAW2D_FILE_ERR_NOT_IMPLEMENTED;
+    int errcode_internal;
+    char *data_dest, *data_src;
+    size_t si;
+    sc_array_t contig_arr, *patch_arr;
 
-    return NULL;
+    /* copy the data to a contiguous array  */
+    sc_array_init_size (&contig_arr, patch_size, patch_data->elem_count);
+    for (si = 0; si < patch_data->elem_count; ++si)
+    {
+        patch_arr = (sc_array_t *) sc_array_index (patch_data, si);
+        data_src = (char *) sc_array_index (patch_arr, 0);
+        data_dest = (char *) sc_array_index (&contig_arr, si);
+
+        memcpy (data_dest, data_src, patch_size);
+    }
+
+    /* we use the partition of the underlying p4est */
+    fc->fc = fclaw2d_file_write_field_v1 (fc->fc, patch_size, &contig_arr,
+                                          user_string, &errcode_internal);
+    sc_array_reset (&contig_arr);
+    fclaw2d_file_translate_error_code_v1 (errcode_internal, errcode);
+    if (*errcode != FCLAW2D_FILE_ERR_SUCCESS)
+    {
+        FCLAW_ASSERT (fc->fc == NULL);
+        /* The p4est file context was closed and deallocated. */
+        /* deallocate fclaw2d file context */
+        FCLAW_FREE (fc);
+        return NULL;
+    }
+
+    return fc;
 }
 
 fclaw2d_file_context_t *
 fclaw2d_file_open_read (const char *filename, char *user_string,
-                        sc_MPI_Comm mpicomm, int read_partition,
+                        sc_MPI_Comm mpicomm, const char *par_filename,
                         fclaw2d_domain_t ** domain, int *errcode)
 {
     FCLAW_ASSERT (filename != NULL);
@@ -3197,10 +3474,168 @@ fclaw2d_file_open_read (const char *filename, char *user_string,
     FCLAW_ASSERT (domain != NULL);
     FCLAW_ASSERT (errcode != NULL);
 
-    /* The functionality must be still implemented. */
-    *errcode = FCLAW2D_FILE_ERR_NOT_IMPLEMENTED;
+    int errcode_internal;
+#if 0
+    int mpiret, mpisize, retval;
+    int64_t partition_size;
+#endif
+    size_t file_len;
+    char buf[FCLAW2D_FILE_NAME_BYTES];
+    char read_user_string[FCLAW2D_FILE_USER_STRING_BYTES_V1 + 1];
+    p4est_gloidx_t global_num_quadrants;
+#if 0
+    p4est_gloidx_t par_global_num_quadrants;
+#endif
+    p4est_gloidx_t *read_gfq;
+    fclaw2d_file_context_p4est_v1_t *p4est_fc;
+#if 0
+    fclaw2d_file_context_t *partition_fc;
+#endif
+    fclaw2d_file_context_t *fclaw_fc;
+    p4est_connectivity_t *conn;
+    p4est_t *p4est;
+#if 0
+    sc_array_t arr;
+#endif
 
-    return NULL;
+    file_len = strlen (filename) + strlen ("." FCLAW2D_FILE_EXT) + 1;
+    if (file_len > FCLAW2D_FILE_NAME_BYTES)
+    {
+        /* filename is too long */
+        *errcode = FCLAW2D_FILE_ERR_BAD_FILE;
+        return NULL;
+    }
+
+    /* WARNING: Currently, we do not handle wrong endianness. */
+    /* open the given file */
+    sc_strcopy (buf, file_len, filename);
+    strcat (buf, "." FCLAW2D_FILE_EXT);
+    p4est_fc = fclaw2d_file_open_read_ext_v1 (mpicomm, buf, user_string,
+                                              &global_num_quadrants,
+                                              &errcode_internal);
+    fclaw2d_file_translate_error_code_v1 (errcode_internal, errcode);
+    if (*errcode != FCLAW2D_FILE_ERR_SUCCESS)
+    {
+        FCLAW_ASSERT (p4est_fc == NULL);
+        return NULL;
+    }
+
+    /* default gfq */
+    read_gfq = NULL;
+
+#if 0
+    if (par_filename != NULL)
+    {
+        /* open the partition file */
+        partition_fc =
+            fclaw2d_file_open_read_ext_v1 (mpicomm, par_filename, user_string,
+                                           &par_global_num_quadrants,
+                                           &errcode_internal);
+        /* TODO: How to handle the errors related to this file context? */
+        fclaw2d_file_translate_error_code_v1 (errcode_internal, errcode);
+        if (*errcode != FCLAW2D_FILE_ERR_SUCCESS)
+        {
+            FCLAW_ASSERT (partition_fc == NULL);
+            return NULL;
+        }
+        if (par_global_num_quadrants != global_num_quadrants)
+        {
+            /* number of global quadrants mismatch */
+            /* TODO: partition_fc was successfully opened, so we can close it properly */
+
+            /* TODO: close p4est_fc */
+            *errcode = FCLAW2D_FILE_ERR_P4EST;
+            return NULL;
+        }
+
+        /* read the partition size */
+        sc_array_init_data (&arr, &partition_size, sizeof (int64_t), 1);
+        partition_fc =
+            fclaw2d_file_read_block_v1 (partition_fc, sizeof (int64_t), &arr,
+                                        user_string, &errcode_internal);
+        fclaw2d_file_translate_error_code_v1 (errcode_internal, errcode);
+        if (*errcode != FCLAW2D_FILE_ERR_SUCCESS)
+        {
+            FCLAW_ASSERT (partition_fc == NULL);
+            return NULL;
+        }
+
+        /* get mpisize */
+        mpiret = sc_MPI_Comm_size (mpicomm, &mpisize);
+        SC_CHECK_MPI (mpiret);
+
+        if (partition_size == mpisize)
+        {
+            /* allocate space for the read gfq array */
+            read_gfq = FCLAW_ALLOC (p4est_gloidx_t, partition_size + 1);
+            /* read the gfq array */
+            sc_array_init_data (&arr, read_gfq, sizeof (p4est_gloidx_t) *
+                                (partition_size + 1), 1);
+            partition_fc = fclaw2d_file_read_block_v1 (partition_fc,
+                                                       sizeof (p4est_gloidx_t)
+                                                       * (partition_size + 1),
+                                                       &arr, user_string,
+                                                       &errcode_internal);
+            fclaw2d_file_translate_error_code_v1 (errcode_internal, errcode);
+            if (*errcode != FCLAW2D_FILE_ERR_SUCCESS)
+            {
+                FCLAW_ASSERT (partition_fc == NULL);
+                return NULL;
+            }
+
+        }
+        else
+        {
+            /* the MPI count does not coincide with partition size */
+            /* we use a uniform partition */
+            /* TODO: Rescale given partition instead? */
+            read_gfq = NULL;
+        }
+
+        /* close the partition file */
+        retval = fclaw2d_file_close_v1 (partition_fc, &errcode_internal);
+        fclaw2d_file_translate_error_code_v1 (errcode_internal, errcode);
+        if (*errcode != FCLAW2D_FILE_ERR_SUCCESS)
+        {
+            FCLAW_EXECUTE_ASSERT_TRUE (retval != 0);
+            return NULL;
+        }
+    }
+#endif
+
+    /* read the p4est connectivity */
+    p4est_fc = fclaw2d_file_read_connectivity_v1 (p4est_fc, &conn,
+                                                  read_user_string,
+                                                  &errcode_internal);
+    fclaw2d_file_translate_error_code_v1 (errcode_internal, errcode);
+    if (*errcode != FCLAW2D_FILE_ERR_SUCCESS)
+    {
+        FCLAW_ASSERT (p4est_fc == NULL);
+        return NULL;
+    }
+
+    /* read the p4est */
+    p4est_fc =
+        fclaw2d_file_read_p4est_v1 (p4est_fc, conn, 0, &p4est, read_gfq,
+                                    read_user_string, read_user_string,
+                                    &errcode_internal);
+    fclaw2d_file_translate_error_code_v1 (errcode_internal, errcode);
+    if (*errcode != FCLAW2D_FILE_ERR_SUCCESS)
+    {
+        FCLAW_ASSERT (p4est_fc == NULL);
+        return NULL;
+    }
+
+    /* create domain from p4est */
+    *domain = fclaw2d_domain_new_p4est (p4est);
+
+    /* allocate and set fclaw file context */
+    fclaw_fc = FCLAW_ALLOC (fclaw2d_file_context_t, 1);
+    fclaw_fc->fc = p4est_fc;
+    fclaw_fc->domain = *domain;
+    sc_strcopy (fclaw_fc->basename, strlen (filename) + 1, filename);
+
+    return fclaw_fc;
 }
 
 fclaw2d_file_context_t *
@@ -3214,10 +3649,22 @@ fclaw2d_file_read_block (fclaw2d_file_context_t *
     FCLAW_ASSERT (block_data != NULL);
     FCLAW_ASSERT (errcode != NULL);
 
-    /* The functionality must be still implemented. */
-    *errcode = FCLAW2D_FILE_ERR_NOT_IMPLEMENTED;
+    int errcode_internal;
 
-    return NULL;
+    fc->fc =
+        fclaw2d_file_read_block_v1 (fc->fc, block_size, block_data,
+                                    user_string, &errcode_internal);
+    fclaw2d_file_translate_error_code_v1 (errcode_internal, errcode);
+    if (*errcode != FCLAW2D_FILE_ERR_SUCCESS)
+    {
+        FCLAW_ASSERT (fc->fc == NULL);
+        /* The p4est file context was closed and deallocated. */
+        /* deallocate fclaw2d file context */
+        FCLAW_FREE (fc);
+        return NULL;
+    }
+
+    return fc;
 }
 
 fclaw2d_file_context_t *
@@ -3229,12 +3676,43 @@ fclaw2d_file_read_array (fclaw2d_file_context_t *
     FCLAW_ASSERT (fc != NULL);
     FCLAW_ASSERT (user_string != NULL);
     FCLAW_ASSERT (patch_data != NULL);
+    FCLAW_ASSERT (patch_data->elem_size == sizeof (sc_array_t));
     FCLAW_ASSERT (errcode != NULL);
 
-    /* The functionality must be still implemented. */
-    *errcode = FCLAW2D_FILE_ERR_NOT_IMPLEMENTED;
+    size_t si;
+    int errcode_internal;
+    char *data_src, *data_dest;
+    sc_array_t contig_arr, *current_arr;
 
-    return NULL;
+    sc_array_init (&contig_arr, patch_size);
+    /* we use the partition of the underlying p4est */
+    fc->fc = fclaw2d_file_read_field_v1 (fc->fc, patch_size, &contig_arr,
+                                         user_string, &errcode_internal);
+    fclaw2d_file_translate_error_code_v1 (errcode_internal, errcode);
+    if (*errcode != FCLAW2D_FILE_ERR_SUCCESS)
+    {
+        FCLAW_ASSERT (fc->fc == NULL);
+        /* The p4est file context was closed and deallocated. */
+        /* deallocate fclaw2d file context */
+        FCLAW_FREE (fc);
+        return NULL;
+    }
+
+    /* copy data to discontiguous array */
+    sc_array_resize (patch_data, contig_arr.elem_count);
+    for (si = 0; si < contig_arr.elem_count; ++si)
+    {
+        data_src = (char *) sc_array_index (&contig_arr, si);
+
+        current_arr = (sc_array_t *) sc_array_index (patch_data, si);
+        sc_array_init_size (current_arr, patch_size, 1);
+        data_dest = (char *) sc_array_index (current_arr, 0);
+
+        memcpy (data_dest, data_src, patch_size);
+    }
+    sc_array_reset (&contig_arr);
+
+    return fc;
 }
 
 int
@@ -3263,28 +3741,46 @@ fclaw2d_file_error_string (int errcode, char *string, int *resultlen)
 {
     FCLAW_ASSERT (string != NULL);
     FCLAW_ASSERT (resultlen != NULL);
+    FCLAW_ASSERT (FCLAW2D_FILE_ERR_SUCCESS <= errcode
+                  && errcode < FCLAW2D_FILE_ERR_LASTCODE);
 
     int ret;
+    int errcode_v1;
+    const char *tstr = NULL;
 
-    if (errcode == FCLAW2D_FILE_ERR_NOT_IMPLEMENTED)
+    /* The version 1 originated error codes come first, FCLAW2D_FILE_ERR_UNKNOWN
+     * is the last error code that orgrinates from the first version of the
+     * file format.
+     */
+    if (FCLAW2D_FILE_ERR_SUCCESS <= errcode
+        && errcode <= FCLAW2D_FILE_ERR_UNKNOWN)
     {
-        if ((ret = snprintf (string, sc_MPI_MAX_ERROR_STRING, "%s",
-                             "The functionality must be still implemented.\n"))
-            < 0)
-        {
-            return sc_MPI_ERR_NO_MEM;
-        }
-        if (ret >= sc_MPI_MAX_ERROR_STRING)
-        {
-            ret = sc_MPI_MAX_ERROR_STRING - 1;
-        }
-        *resultlen = ret;
-    }
-    else
-    {
-        /* Other error codes must be still implemented. */
-        return -1;
+        /* use error string as in file format version 1 implementation */
+        fclaw2d_file_translate_error_code_to_v1 (errcode, &errcode_v1);
+        return fclaw2d_file_error_string_v1 (errcode_v1, string, resultlen);
     }
 
-    return 0;
+    /* handle remaining error codes */
+    switch (errcode)
+    {
+    case FCLAW2D_FILE_ERR_NOT_IMPLEMENTED:
+        tstr = "The functionality must be still implemented";
+        break;
+
+    default:
+        /* no valid fclaw2d file error code */
+        SC_ABORT_NOT_REACHED ();
+    }
+
+    if ((ret = snprintf (string, sc_MPI_MAX_ERROR_STRING, "%s", tstr)) < 0)
+    {
+        return sc_MPI_ERR_NO_MEM;
+    }
+    if (ret >= sc_MPI_MAX_ERROR_STRING)
+    {
+        ret = sc_MPI_MAX_ERROR_STRING - 1;
+    }
+    *resultlen = ret;
+
+    return sc_MPI_SUCCESS;
 }

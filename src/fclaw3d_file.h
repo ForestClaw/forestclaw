@@ -48,6 +48,9 @@ extern "C"
 #define FCLAW3D_FILE_MAX_FIELD_ENTRY_SIZE ((1000 * 1000 * 1000 * 1000 * 10) - 1) /**< maximal data size per field entry*/
 
 /** Error values for fclaw2d_file functions.
+ * In the future we may add further error codes. Therefore, the error codes
+ * should only be used by the enum but not by the explicit numeric values since
+ * these explicit numeric values may change.
  */
 typedef enum fclaw3d_file_error
 {
@@ -71,8 +74,9 @@ typedef enum fclaw3d_file_error
     FCLAW3D_FILE_ERR_IN_DATA, /**< input data of file function is invalid */
     FCLAW3D_FILE_ERR_COUNT, /**< read or write count error that was not
                                  classified as a format error */
-    FCLAW3D_FILE_ERR_NOT_IMPLEMENTED, /**< functionality is not implemented */
+    FCLAW3D_FILE_ERR_DIM, /**< file has wrong dimension */
     FCLAW3D_FILE_ERR_UNKNOWN, /**< unknown error */
+    FCLAW3D_FILE_ERR_NOT_IMPLEMENTED, /**< functionality is not implemented */
     FCLAW3D_FILE_ERR_LASTCODE /**< to define own error codes for
                                   a higher level application
                                   that is using fclaw3d_file
@@ -109,10 +113,6 @@ typedef struct fclaw3d_file_context fclaw3d_file_context_t;
  *                         user strings are padded by spaces in the file header.
  *                         Too long user strings result in an error with the
  *                         error code \ref FCLAW3D_FILE_ERR_IN_DATA.
- * \param [in]  write_partition A Boolean to decide whether the partition is
- *                         written to disk. The filename of the partition file
- *                         is derived from the given filename. Currently,
- *                         this flag does not have any effect.
  * \param [in]   domain    The underlying p8est is used for the metadata of the
  *                         the created file and the \b domain is written to the
  *                         file.
@@ -123,9 +123,59 @@ typedef struct fclaw3d_file_context fclaw3d_file_context_t;
  */
 fclaw3d_file_context_t *fclaw3d_file_open_write (const char *filename,
                                                  const char *user_string,
-                                                 int write_partition,
                                                  fclaw3d_domain_t * domain,
                                                  int *errcode);
+
+#if 0
+/** Write the partition of the domain associated with \b fc to disk.
+ *
+ * This function derives the partition filename from the base filename 'fn' of
+ * the given file context \b fc such that the function creates a file named
+ * 'fn_partition.f3d' that will contain the partition of the domain that is
+ * associated with the given file context \b fc.
+ *
+ * This means in particular that the given \b fc stays unchanged and that the
+ * internally creates a new file context that will be freed and deallocated at
+ * the end of the function in any case. This is important to notice since the
+ * \b errcode output parameter of this function refers to this internally created
+ * file context and not to the \b fc.
+ *
+ * \note In contrast to the not-partition-related writing functions this
+ * function always returns the passed \b fc, which stays unchanged, even if an
+ * error occurred since this error then relates to the internal file context
+ * for writing the separate partition file.
+ * \b errcode always relates to the internal file context and not to the passed
+ * \b fc.
+ *
+ * This function does not abort on MPI I/O errors but returns NULL.
+ * Without MPI I/O the function may abort on file system dependent
+ * errors.
+ *
+ * \param [in]     filename     Path to partition file base name that is to be
+ *                              created. This means that the user shall not pass
+ *                              the file extension since the partition file
+ *                              extension is specified by fclaw3d_file as '.fp3d'.
+ * \param [in]     user_string  A NUL-terminated user string that is written to
+ *                              the partition file header having \ref
+ *                              FCLAW3D_FILE_USER_STRING_BYTES bytes including
+ *                              the NUL-termination. Shorter user strings are
+ *                              padded by spaces in the file header.
+ *                              Too long user strings result in an error with the
+ *                              error code \ref FCLAW3D_FILE_ERR_IN_DATA.
+ * \param [out]    errcode      An errcode that can be interpreted by
+ *                              \ref fclaw3d_file_error_string. \b errcode
+ *                              does not refer to the passed but it refers to
+ *                              the internal file context used for for the
+ *                              partition file.
+ * \return                      0 for a successful write of the partition file.
+ *                              -1 in case of an error. See also \b errcode
+ *                              to examine the error of the partition file
+ *                              I/O process.
+ */
+int fclaw3d_file_write_partition (const char *filename,
+                                  const char *user_string,
+                                  fclaw3d_domain_t * domain, int *errcode);
+#endif
 
 /** Write a serial data block to an opened parallel file.
  *
@@ -257,17 +307,17 @@ fclaw3d_file_context_t *fclaw3d_file_write_array (fclaw3d_file_context_t *
  * \param [in]  mpicomm       MPI communicator that is used to read the file and
  *                            is used for potential other reading operations of
  *                            MPI communicator dependent objects.
- * \param [in]  read_partition A Boolean to decide if the partition is read
- *                            from file. If the partition is read, it is used
- *                            for the parallel I/O operations and stored in the
- *                            returned \b domain. If the MPI size and the
- *                            partition size do not coincide a partition for the
- *                            current MPI size is computed. For \b read_partition
- *                            false a uniform partition with respect to the
- *                            quadrant count is computed and used.
+ * \param [in]  par_filename  The path to the base name file that is used to
+ *                            load the parititon. If \b par_filename is NULL,
+ *                            a uniform parititon with respect to the patch
+ *                            count is computed and used. If the partition is
+ *                            read, it is used for the parallel I/O operations
+ *                            and stored in the returned \b domain. If the MPI
+ *                            size and the partition size do not coincide a
+ *                            partition for the current MPI size is computed.
  *                            The function call results in an error if there
  *                            is no partition to read.
- *                            Currently, this flag does not have any effect.
+ *                            Currently, this parameter does not have any effect.
  * \param [out] domain        Newly allocated domain that is read from the file.
  * \param [out] errcode       An errcode that can be interpreted by
  *                            \ref fclaw3d_file_error_string.
@@ -278,7 +328,7 @@ fclaw3d_file_context_t *fclaw3d_file_write_array (fclaw3d_file_context_t *
 fclaw3d_file_context_t *fclaw3d_file_open_read (const char *filename,
                                                 char *user_string,
                                                 sc_MPI_Comm mpicomm,
-                                                int read_partition,
+                                                const char *par_filename,
                                                 fclaw3d_domain_t ** domain,
                                                 int *errcode);
 

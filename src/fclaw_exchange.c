@@ -183,7 +183,7 @@ void fclaw_exchange_setup(fclaw_global_t* glob,
        on manifolds).*/
     int zz = 0;
     int nb;
-void ** patch_data = get_patch_data(domain);
+    void ** patch_data = get_patch_data(domain);
     for (nb = 0; nb < domain->num_blocks; ++nb)
     {
         int np;
@@ -258,6 +258,7 @@ void fclaw_exchange_delete(fclaw_global_t* glob)
 
     /* Free contiguous memory, if allocated.  If no memory was allocated
        (because we are not storing the area), nothing de-allocated. */
+    void ** patch_data = get_patch_data(*domain);
     if (e_old != NULL)
     {
         /* Delete local patches which are passed to other procs */
@@ -270,7 +271,7 @@ void fclaw_exchange_delete(fclaw_global_t* glob)
             {
                 if (fclaw_patch_on_parallel_boundary(&(*domain)->blocks[nb].patches[np]))
                 {
-                    fclaw_patch_local_ghost_free(glob,&e_old->d2->patch_data[zz++]);
+                    fclaw_patch_local_ghost_free(glob,&patch_data[zz++]);
                 }
             }
         }
