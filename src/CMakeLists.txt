@@ -40,6 +40,7 @@ add_library(forestclaw_c OBJECT
   fclaw_finalize.c
   fclaw_time_sync.c
   fclaw_corner_neighbors.c
+  fclaw_edge_neighbors.c
   fclaw_face_neighbors.c
   fclaw_farraybox.cpp
   fclaw2d_convenience.c
@@ -140,6 +141,7 @@ install(FILES
 	fclaw_rays.h
 	fclaw_ghost_fill.h
 	fclaw_corner_neighbors.h
+	fclaw_edge_neighbors.h
 	fclaw_face_neighbors.h
 	fclaw_map.h
 	fclaw_timeinterp.h

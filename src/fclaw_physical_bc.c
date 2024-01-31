@@ -25,8 +25,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw_physical_bc.h>
 
-#include <fclaw2d_defs.h>
-
 #include <fclaw_domain.h>
 #include <fclaw_global.h>
 #include <fclaw_patch.h>
@@ -55,7 +53,7 @@ void cb_fclaw_physical_set_bc(fclaw_domain_t *domain,
 
     t_info = (fclaw_physical_time_info_t*) s->user;
 
-    int intersects_bc[FCLAW2D_NUMFACES];
+    int intersects_bc[fclaw_domain_num_faces(domain)];
 
     /* Time dt should not be passed in here. If BCs are obtained by 
        evolving an ODE, then we should really evolve the ODE at the same time 
@@ -81,11 +79,11 @@ void fclaw_physical_get_bc(fclaw_global_t *glob,
                              int this_patch_idx,
                              int *intersects_bdry)
 {
-    // const int numfaces = get_faces_per_patch(domain);
-    int bdry[FCLAW2D_NUMFACES];
+    const int num_faces = fclaw_domain_num_faces(glob->domain);
+    int bdry[num_faces]; //overallocate for 3d
     fclaw_patch_boundary_type(glob->domain,this_block_idx,this_patch_idx,bdry);
     int i;
-    for(i = 0; i < FCLAW2D_NUMFACES; i++)
+    for(i = 0; i < num_faces; i++)
     {
         // Physical boundary conditions
         intersects_bdry[i] = bdry[i] == 1;

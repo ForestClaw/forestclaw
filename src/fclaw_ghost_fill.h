@@ -83,18 +83,6 @@ typedef struct fclaw_exchange_info
 
 } fclaw_exchange_info_t;
 
-void cb_corner_fill(struct fclaw_domain *domain,
-					struct fclaw_patch *this_patch,
-					int this_block_idx,
-					int this_patch_idx,
-					void *user);
-
-void cb_face_fill(struct fclaw_domain *domain,
-				  struct fclaw_patch *this_patch,
-				  int this_block_idx,
-				  int this_patch_idx,
-				  void *user);
-
 void fclaw_ghost_update(struct fclaw_global* glob,
 						  int fine_level,
 						  int coarse_level,

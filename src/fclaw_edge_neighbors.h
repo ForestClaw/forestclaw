@@ -23,8 +23,10 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FCLAW_FACE_NEIGHBORS_H
-#define FCLAW_FACE_NEIGHBORS_H
+#ifndef FCLAW_EDGE_NEIGHBORS_H
+#define FCLAW_EDGE_NEIGHBORS_H
+
+#include <fclaw_base.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -39,16 +41,11 @@ struct fclaw_domain;
 struct fclaw_patch;
 
 
-void fclaw_face_fill_cb(struct fclaw_domain *domain,
+void fclaw_edge_fill_cb(struct fclaw_domain *domain,
                         struct fclaw_patch *this_patch,
                         int this_block_idx,
                         int this_patch_idx,
                         void *user);
-
-void fclaw_face_neighbor_ghost(struct fclaw_global* glob,
-                                 int minlevel,
-                                 int maxlevel,
-                                 int time_interp);
 
 #ifdef __cplusplus
 #if 0

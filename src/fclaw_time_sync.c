@@ -30,6 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_patch.h>
 #include <fclaw_options.h>
 #include <fclaw_exchange.h>
+#include <fclaw_face_neighbors.h>
 
 typedef struct fclaw2d_time_sync_info
 {
@@ -95,7 +96,7 @@ void copy_at_blockbdry(fclaw_global_t *glob,
 	e_info.time_interp = 0;
 	e_info.read_parallel_patches = read_parallel_patches;
 
-	fclaw_global_iterate_level(glob, level, cb_face_fill,
+	fclaw_global_iterate_level(glob, level, fclaw_face_fill_cb,
 						 &e_info);    
 }
 
@@ -112,7 +113,7 @@ void fine2coarse(fclaw_global_t *glob,
 	e_info.time_interp = 0;
 	e_info.read_parallel_patches = read_parallel_patches;
 
-	fclaw_global_iterate_level(glob, level, cb_face_fill, &e_info);
+	fclaw_global_iterate_level(glob, level, fclaw_face_fill_cb, &e_info);
 }
 
 static

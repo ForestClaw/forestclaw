@@ -41,11 +41,11 @@ struct fclaw_domain;
 struct fclaw_patch;
 
 
-void cb_corner_fill(struct fclaw_domain *domain,
-                    struct fclaw_patch *this_patch,
-                    int this_block_idx,
-                    int this_patch_idx,
-                    void *user);
+void fclaw_corner_fill_cb(struct fclaw_domain *domain,
+                          struct fclaw_patch *this_patch,
+                          int this_block_idx,
+                          int this_patch_idx,
+                          void *user);
 
 #ifdef __cplusplus
 #if 0
