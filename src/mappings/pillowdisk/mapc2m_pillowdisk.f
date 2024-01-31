@@ -6,7 +6,7 @@ c     # Maps a logically rectangular Cartesian grid in [-1,1]x[-1,1] to
 c     # the unit disk.
 c     #
 c     # ------------------------------------------------------------------
-      subroutine mapc2m_pillowdisk(blockno,xc1,yc1,xp,yp,zp)
+      subroutine fclaw_map_2d_c2m_pillowdisk(blockno,xc1,yc1,xp,yp,zp)
       implicit none
 
       double precision xc1,yc1,xp,yp,zp
@@ -14,7 +14,7 @@ c     # ------------------------------------------------------------------
       integer blockno
 
 c     # Map to [-1,1]x[-1,1]
-      call mapc2m_cart(blockno,xc1,yc1,xc,yc,zc)
+      call fclaw_map_2d_c2m_cart(blockno,xc1,yc1,xc,yc,zc)
 
 c     # Get circle of radius sqrt(2.d0)
       call mapc2p_disk_circle(xc,yc,xp,yp)

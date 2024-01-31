@@ -51,16 +51,16 @@ typedef struct user_options
 
 } user_options_t;
 
-void swirl_link_solvers(fclaw2d_global_t *glob);
+void swirl_link_solvers(fclaw_global_t *glob);
 
 /* ------------------------------------- Options ---------------------------------------*/
 
 user_options_t* swirl_options_register (fclaw_app_t * app,
                                         const char *configfile);
 
-void swirl_options_store (fclaw2d_global_t* glob, user_options_t* user);
+void swirl_options_store (fclaw_global_t* glob, user_options_t* user);
 
-const user_options_t* swirl_get_options(fclaw2d_global_t* glob);
+const user_options_t* swirl_get_options(fclaw_global_t* glob);
 
 
 #define SWIRL_SETAUX_MANIFOLD FCLAW_F77_FUNC(swirl_setaux_manifold, \
@@ -94,7 +94,7 @@ void SWIRL_SET_VELOCITY_MANIFOLD(const int* mx, const int* my, const int*mz,
                                  double faceareas[],
                                  double aux[], const int* maux);
 
-void swirl_map_extrude(fclaw2d_map_context_t *cont, double maxelev);
+void swirl_map_extrude(fclaw_map_context_t *cont, double maxelev);
 
 #ifdef __cplusplus
 }

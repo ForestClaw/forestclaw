@@ -30,10 +30,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * @file 
  * C++ structures for clawpatch
  */
-#include <fclaw2d_farraybox.hpp>  /* Needed for FArray boxes */
+#include <fclaw_farraybox.hpp>  /* Needed for FArray boxes */
 
-struct fclaw2d_patch;
-struct fclaw2d_global;
+struct fclaw_patch;
+struct fclaw_global;
 struct fclaw3d_metric_patch_t;
 
 /**
@@ -104,7 +104,7 @@ public :
  * @return fclaw3dx_clawpatch_t* the clawpatch structure
  */
 fclaw3dx_clawpatch_t* 
-fclaw3dx_clawpatch_get_clawpatch(struct fclaw2d_patch* this_patch);
+fclaw3dx_clawpatch_get_clawpatch(struct fclaw_patch* this_patch);
 
 /**
  * @brief Get the metrix structure for a patch
@@ -114,7 +114,7 @@ fclaw3dx_clawpatch_get_clawpatch(struct fclaw2d_patch* this_patch);
  */
 
 struct fclaw3d_metric_patch_t* 
-fclaw3dx_clawpatch_get_metric_patch(struct fclaw2d_patch* this_patch);
+fclaw3dx_clawpatch_get_metric_patch(struct fclaw_patch* this_patch);
 
 
 

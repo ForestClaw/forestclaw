@@ -24,16 +24,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "sphere_user.h"
-#include <fclaw2d_forestclaw.h>
+#include <fclaw_forestclaw.h>
 
 #include <fc2d_clawpack46.h>
 
 
 static fc2d_clawpack46_vtable_t classic_claw;
 
-static fclaw2d_vtable_t vt;
+static fclaw_vtable_t vt;
 
-void sphere_link_solvers(fclaw2d_domain_t *domain)
+void sphere_link_solvers(fclaw_domain_t *domain)
 {
     fclaw2d_init_vtable(&vt);
     fc2d_clawpack46_init_vtable(&classic_claw);
@@ -62,8 +62,8 @@ void sphere_link_solvers(fclaw2d_domain_t *domain)
 
 }
 
-void sphere_patch_manifold_setup(fclaw2d_domain_t *domain,
-                                fclaw2d_patch_t *this_patch,
+void sphere_patch_manifold_setup(fclaw_domain_t *domain,
+                                fclaw_patch_t *this_patch,
                                 int this_block_idx,
                                 int this_patch_idx)
 {

@@ -45,14 +45,14 @@ typedef struct user_options
 
 } user_options_t;
 
-void correlatedcb_link_solvers(struct fclaw2d_global *glob);
+void correlatedcb_link_solvers(struct fclaw_global *glob);
 
-const user_options_t* correlatedcb_get_options(fclaw2d_global_t* glob);
+const user_options_t* correlatedcb_get_options(fclaw_global_t* glob);
 
 user_options_t* correlatedcb_options_register (fclaw_app_t * app,
                                              const char *configfile);
 
-void correlatedcb_options_store (fclaw2d_global_t* glob, user_options_t* user);
+void correlatedcb_options_store (fclaw_global_t* glob, user_options_t* user);
 
 
 #ifdef __cplusplus

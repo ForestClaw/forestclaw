@@ -15,13 +15,13 @@ c    # -------------------------------------------------------------------------
 
       integer i,j,m
       integer*8 cont, fclaw_map_get_context
-      logical fclaw2d_map_is_used
+      logical fclaw_map_is_used
 
       cont = fclaw_map_get_context()
 
       dxdy = dx*dy
       do m = 1,meqn
-         if (fclaw2d_map_is_used(cont)) then
+         if (fclaw_map_is_used(cont)) then
             do j = 1,my
                do i = 1,mx
                   y = q(i,j,m)*area(i,j) - c_kahan
@@ -57,11 +57,11 @@ c     # Compute area of a patch
 
       integer i,j,m
       integer*8 cont, fclaw_map_get_context
-      logical fclaw2d_map_is_used
+      logical fclaw_map_is_used
 
       cont = fclaw_map_get_context()
 
-      if (fclaw2d_map_is_used(cont)) then
+      if (fclaw_map_is_used(cont)) then
          sum = 0
          do j = 1,my
             do i = 1,mx
@@ -90,14 +90,14 @@ c     # Compute area of a patch
 
       integer i,j,m
       integer*8 cont, fclaw_map_get_context
-      logical fclaw2d_map_is_used
+      logical fclaw_map_is_used
 
       cont = fclaw_map_get_context()
 
 c     # error_norm(:) comes in with values;  do not initialize it here!
       dxdy = dx*dy
       do m = 1,meqn
-         if (fclaw2d_map_is_used(cont)) then
+         if (fclaw_map_is_used(cont)) then
             do j = 1,my
                do i = 1,mx
                   eij = abs(error(m,i,j))

@@ -28,30 +28,31 @@
 
 #include "../all/advection_user.h"
 #include <p4est_wrap.h>         /* just temporary for testing */
+#include <fclaw2d_convenience.h>
 
 #define FCLAW_SWIRL_IO_DEMO 0
 
 static
-void create_domain(fclaw2d_global_t *glob)
+void create_domain(fclaw_global_t *glob)
 {
-    const fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
+    const fclaw_options_t* fclaw_opt = fclaw_get_options(glob);
 
     /* Mapped, multi-block domain */
-    fclaw2d_domain_t *domain = 
-          fclaw2d_domain_new_unitsquare(glob->mpicomm, 
+    fclaw_domain_t *domain = 
+          fclaw_domain_new_unitsquare(glob->mpicomm, 
                                         fclaw_opt->minlevel);
     /* Create "empty" mapping */
-    fclaw2d_map_context_t* cont = fclaw2d_map_new_nomap();
+    fclaw_map_context_t* cont = fclaw_map_new_nomap();
 
     /* Store domain in the glob */
-    fclaw2d_global_store_domain(glob, domain);
+    fclaw_global_store_domain(glob, domain);
 
     /* Map unit square to disk using mapc2m_disk.f */
-    fclaw2d_global_store_map (glob, cont);
+    fclaw_map_store (glob, cont);
 
     /* Print out some info */
-    fclaw2d_domain_list_levels(domain, FCLAW_VERBOSITY_ESSENTIAL);
-    fclaw2d_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);
+    fclaw_domain_list_levels(domain, FCLAW_VERBOSITY_ESSENTIAL);
+    fclaw_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);
 }
 
 #if FCLAW_SWIRL_IO_DEMO
@@ -77,7 +78,7 @@ check_fclaw2d_file_error_code (int errcode, const char *str)
 #endif
 
 static
-void run_program(fclaw2d_global_t* glob)
+void run_program(fclaw_global_t* glob)
 {
 #if FCLAW_SWIRL_IO_DEMO
     int i;
@@ -90,13 +91,8 @@ void run_program(fclaw2d_global_t* glob)
     fclaw2d_domain_t *read_domain;
 #endif
 
-    /* ---------------------------------------------------------------
-       Set domain data.
-       --------------------------------------------------------------- */
-    fclaw2d_domain_data_new(glob->domain);
-
     /* Initialize virtual table for ForestClaw */
-    fclaw2d_vtables_initialize(glob);
+    fclaw_vtables_initialize(glob);
 
     /* Initialize virtual tables for solvers */
     const user_options_t *user_opt = swirl_get_options(glob);
@@ -114,8 +110,8 @@ void run_program(fclaw2d_global_t* glob)
     /* ---------------------------------------------------------------
        Run
        --------------------------------------------------------------- */
-    fclaw2d_initialize(glob);
-    fclaw2d_run(glob);
+    fclaw_initialize(glob);
+    fclaw_run(glob);
 
 #if FCLAW_SWIRL_IO_DEMO
     /* Example usage of forestclaw file functions. This is just for
@@ -126,13 +122,13 @@ void run_program(fclaw2d_global_t* glob)
     /* create a file, which is open for further writing */
     /* the passed domain is written to the file */
     fc = fclaw2d_file_open_write ("swirl_io_test", "ForestClaw data file",
-                                  glob->domain, &errcode);
+                                  glob->domain->d2, &errcode);
     check_fclaw2d_file_error_code (errcode, "file open write");
 
 #if 0
     retval = fclaw2d_file_write_partition ("swirl_io_test_partition",
                                            "Test partition write",
-                                           glob->domain, &errcode);
+                                           glob->domain->d2, &errcode);
     check_fclaw2d_file_error_code (errcode, "file write partition");
 #endif
 
@@ -238,7 +234,7 @@ void run_program(fclaw2d_global_t* glob)
     /* sanity check of read domain */
     FCLAW_ASSERT (p4est_checksum (((p4est_wrap_t *) read_domain->pp)->p4est)
                   ==
-                  p4est_checksum (((p4est_wrap_t *) glob->domain->pp)->
+                  p4est_checksum (((p4est_wrap_t *) glob->domain->d2->pp)->
                                   p4est));
 
     fclaw2d_domain_destroy (read_domain);
@@ -248,7 +244,7 @@ void run_program(fclaw2d_global_t* glob)
     FCLAW_EXECUTE_ASSERT_FALSE (retval);
 #endif
 
-    fclaw2d_finalize(glob);
+    fclaw_finalize(glob);
 }
 
 int
@@ -282,10 +278,10 @@ main (int argc, char **argv)
         /* Create global structure which stores the domain, timers, etc */
         int size, rank;
         sc_MPI_Comm mpicomm = fclaw_app_get_mpi_size_rank (app, &size, &rank);
-        fclaw2d_global_t *glob = fclaw2d_global_new_comm (mpicomm, size, rank);
+        fclaw_global_t *glob = fclaw_global_new_comm (mpicomm, size, rank);
 
         /* Store option packages in glob */
-        fclaw2d_options_store           (glob, fclaw_opt);
+        fclaw_options_store           (glob, fclaw_opt);
         fclaw2d_clawpatch_options_store (glob, clawpatch_opt);
         fc2d_clawpack46_options_store   (glob, claw46_opt);
         fc2d_clawpack5_options_store    (glob, claw5_opt);
@@ -301,7 +297,7 @@ main (int argc, char **argv)
 
         run_program(glob);
 
-        fclaw2d_global_destroy(glob);
+        fclaw_global_destroy(glob);
         //fclaw2d_global_destroy(glob2);
     }
 

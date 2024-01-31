@@ -28,19 +28,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw3dx_clawpatch_options.h>
 #include <fclaw3dx_clawpatch46_fort.h>
 #include <fclaw3dx_clawpatch_output_ascii.h>
-#include <fclaw2d_global.h>
-#include <fclaw2d_domain.h>
-#include <fclaw2d_patch.h>
-#include <fclaw2d_convenience.h>
+#include <fclaw_global.h>
+#include <fclaw_domain.h>
+#include <fclaw_patch.h>
+#include <fclaw_convenience.h>
 #include <fclaw3d_metric.hpp>
 #include <fclaw3d_metric.h>
-#include <fclaw2d_options.h>
+#include <fclaw_options.h>
 #include <test.hpp>
 #include <test/test.hpp>
 #include <fstream>
 #include <bitset>
 
-#include <fclaw2d_forestclaw.h>
+#include <fclaw_forestclaw.h>
 
 #define CHECK_BOX_DIMENSIONS(abox, mbc, mx, my, mz, mfields)\
 {\
@@ -61,10 +61,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace{
 struct SinglePatchDomain {
-    fclaw2d_global_t* glob;
+    fclaw_global_t* glob;
     fclaw_options_t fopts;
-    fclaw2d_domain_t *domain;
-    fclaw2d_map_context_t* map;
+    fclaw_domain_t *domain;
+    fclaw_map_context_t* map;
     fclaw3dx_clawpatch_options_t opts;
 
     SinglePatchDomain(){
@@ -72,9 +72,9 @@ struct SinglePatchDomain {
         int size;
         sc_MPI_Comm_rank(sc_MPI_COMM_WORLD, &rank);
         sc_MPI_Comm_size(sc_MPI_COMM_WORLD, &size);
-        glob = fclaw2d_global_new_comm(sc_MPI_COMM_WORLD, rank, size);
+        glob = fclaw_global_new_comm(sc_MPI_COMM_WORLD, rank, size);
 
-        fclaw2d_vtables_initialize(glob);
+        fclaw_vtables_initialize(glob);
         fclaw3dx_clawpatch_vtable_initialize(glob, 4);
         memset(&fopts, 0, sizeof(fopts));
         fopts.mi=1;
@@ -87,12 +87,12 @@ struct SinglePatchDomain {
         fopts.compute_error = true;
         fopts.subcycle = true;
 
-        domain = fclaw2d_domain_new_unitsquare(glob->mpicomm, fopts.minlevel);
-        map = fclaw2d_map_new_nomap();
-        fclaw2d_global_store_domain(glob, domain);
-        fclaw2d_global_store_map(glob, map);
+        domain = fclaw_domain_new_unitsquare(glob->mpicomm, fopts.minlevel);
+        map = fclaw_map_new_nomap();
+        fclaw_global_store_domain(glob, domain);
+        fclaw_map_store(glob, map);
 
-        fclaw2d_options_store(glob, &fopts);
+        fclaw_options_store(glob, &fopts);
 
         memset(&opts, 0, sizeof(opts));
         opts.mx   = 5;
@@ -103,23 +103,21 @@ struct SinglePatchDomain {
         opts.maux = 1;
         opts.rhs_fields = 1;
         fclaw3dx_clawpatch_options_store(glob, &opts);
-
-        fclaw2d_domain_data_new(glob->domain);
     }
     void setup(){
-        fclaw2d_build_mode_t build_mode = FCLAW2D_BUILD_FOR_UPDATE;
-        fclaw2d_patch_build(glob, &domain->blocks[0].patches[0], 0, 0, &build_mode);
+        fclaw_build_mode_t build_mode = FCLAW_BUILD_FOR_UPDATE;
+        fclaw_patch_build(glob, &domain->blocks[0].patches[0], 0, 0, &build_mode);
     }
     ~SinglePatchDomain(){
-        fclaw2d_patch_data_delete(glob, &domain->blocks[0].patches[0]);
-        fclaw2d_global_destroy(glob);
+        fclaw_patch_data_delete(glob, &domain->blocks[0].patches[0]);
+        fclaw_global_destroy(glob);
     }
 };
 struct QuadDomain {
-    fclaw2d_global_t* glob;
+    fclaw_global_t* glob;
     fclaw_options_t fopts;
-    fclaw2d_domain_t *domain;
-    fclaw2d_map_context_t* map;
+    fclaw_domain_t *domain;
+    fclaw_map_context_t* map;
     fclaw3dx_clawpatch_options_t opts;
 
     QuadDomain(){
@@ -127,8 +125,8 @@ struct QuadDomain {
         int size;
         sc_MPI_Comm_rank(sc_MPI_COMM_WORLD, &rank);
         sc_MPI_Comm_size(sc_MPI_COMM_WORLD, &size);
-        glob = fclaw2d_global_new_comm(sc_MPI_COMM_WORLD, rank, size);
-        fclaw2d_vtables_initialize(glob);
+        glob = fclaw_global_new_comm(sc_MPI_COMM_WORLD, rank, size);
+        fclaw_vtables_initialize(glob);
         fclaw3dx_clawpatch_vtable_initialize(glob, 4);
         memset(&fopts, 0, sizeof(fopts));
         fopts.mi=1;
@@ -142,12 +140,12 @@ struct QuadDomain {
         fopts.compute_error = true;
         fopts.subcycle = true;
 
-        domain = fclaw2d_domain_new_unitsquare(glob->mpicomm, fopts.minlevel);
-        map = fclaw2d_map_new_nomap();
-        fclaw2d_global_store_domain(glob, domain);
-        fclaw2d_global_store_map(glob, map);
+        domain = fclaw_domain_new_unitsquare(glob->mpicomm, fopts.minlevel);
+        map = fclaw_map_new_nomap();
+        fclaw_global_store_domain(glob, domain);
+        fclaw_map_store(glob, map);
 
-        fclaw2d_options_store(glob, &fopts);
+        fclaw_options_store(glob, &fopts);
 
         memset(&opts, 0, sizeof(opts));
         opts.mx   = 5;
@@ -158,29 +156,27 @@ struct QuadDomain {
         opts.maux = 1;
         opts.rhs_fields = 1;
         fclaw3dx_clawpatch_options_store(glob, &opts);
-
-        fclaw2d_domain_data_new(glob->domain);
     }
     void setup(){
-        fclaw2d_build_mode_t build_mode = FCLAW2D_BUILD_FOR_UPDATE;
-        fclaw2d_patch_build(glob, &domain->blocks[0].patches[0], 0, 0, &build_mode);
-        fclaw2d_patch_build(glob, &domain->blocks[0].patches[1], 0, 1, &build_mode);
-        fclaw2d_patch_build(glob, &domain->blocks[0].patches[2], 0, 2, &build_mode);
-        fclaw2d_patch_build(glob, &domain->blocks[0].patches[3], 0, 3, &build_mode);
+        fclaw_build_mode_t build_mode = FCLAW_BUILD_FOR_UPDATE;
+        fclaw_patch_build(glob, &domain->blocks[0].patches[0], 0, 0, &build_mode);
+        fclaw_patch_build(glob, &domain->blocks[0].patches[1], 0, 1, &build_mode);
+        fclaw_patch_build(glob, &domain->blocks[0].patches[2], 0, 2, &build_mode);
+        fclaw_patch_build(glob, &domain->blocks[0].patches[3], 0, 3, &build_mode);
     }
     ~QuadDomain(){
-        fclaw2d_patch_data_delete(glob, &domain->blocks[0].patches[0]);
-        fclaw2d_patch_data_delete(glob, &domain->blocks[0].patches[1]);
-        fclaw2d_patch_data_delete(glob, &domain->blocks[0].patches[2]);
-        fclaw2d_patch_data_delete(glob, &domain->blocks[0].patches[3]);
-        fclaw2d_global_destroy(glob);
+        fclaw_patch_data_delete(glob, &domain->blocks[0].patches[0]);
+        fclaw_patch_data_delete(glob, &domain->blocks[0].patches[1]);
+        fclaw_patch_data_delete(glob, &domain->blocks[0].patches[2]);
+        fclaw_patch_data_delete(glob, &domain->blocks[0].patches[3]);
+        fclaw_global_destroy(glob);
     }
 };
 }
 TEST_CASE("fclaw3dx_clawpatch_vtable_initialize")
 {
-    fclaw2d_global_t* glob = fclaw2d_global_new();
-    fclaw2d_vtables_initialize(glob);
+    fclaw_global_t* glob = fclaw_global_new();
+    fclaw_vtables_initialize(glob);
 
     fclaw3dx_clawpatch_vtable_initialize(glob, 4);
 
@@ -226,7 +222,7 @@ TEST_CASE("fclaw3dx_clawpatch_vtable_initialize")
 
     CHECK(clawpatch_vt->is_set                      == 1);
 
-    fclaw2d_patch_vtable_t * patch_vt = fclaw2d_patch_vt(glob);
+    fclaw_patch_vtable_t * patch_vt = fclaw_patch_vt(glob);
     //create delete build
     //TODO document patch_vt and expose these as part to public api
     CHECK(patch_vt->patch_new                      != NULL);
@@ -234,7 +230,7 @@ TEST_CASE("fclaw3dx_clawpatch_vtable_initialize")
     CHECK(patch_vt->build                          != NULL);
     CHECK(patch_vt->build_from_fine                != NULL);
     CHECK(patch_vt->setup                          == NULL);
-    fclaw2d_global_destroy(glob);
+    fclaw_global_destroy(glob);
 }
 TEST_CASE("fclaw3dx_clawpatch patch_build")
 {
@@ -247,15 +243,15 @@ TEST_CASE("fclaw3dx_clawpatch patch_build")
     for(const int& meqn : {1,2})
     for(const int& maux : {0,2})
     for(const int& rhs_fields : {0,2})
-    for(fclaw2d_build_mode_t build_mode : {FCLAW2D_BUILD_FOR_GHOST_AREA_COMPUTED, FCLAW2D_BUILD_FOR_UPDATE})
+    for(fclaw_build_mode_t build_mode : {FCLAW_BUILD_FOR_GHOST_AREA_COMPUTED, FCLAW_BUILD_FOR_UPDATE})
     {
         int rank;
         int size;
         sc_MPI_Comm_rank(sc_MPI_COMM_WORLD, &rank);
         sc_MPI_Comm_size(sc_MPI_COMM_WORLD, &size);
-        fclaw2d_global_t* glob = fclaw2d_global_new_comm(sc_MPI_COMM_WORLD, rank, size);
+        fclaw_global_t* glob = fclaw_global_new_comm(sc_MPI_COMM_WORLD, rank, size);
 
-        fclaw2d_vtables_initialize(glob);
+        fclaw_vtables_initialize(glob);
 
         fclaw3dx_clawpatch_vtable_initialize(glob, 4);
 
@@ -271,11 +267,11 @@ TEST_CASE("fclaw3dx_clawpatch patch_build")
         fopts.compute_error = compute_error;
         fopts.subcycle = subcycle;
 
-        fclaw2d_domain_t *domain = fclaw2d_domain_new_unitsquare(glob->mpicomm, fopts.minlevel);
-        fclaw2d_map_context_t* map = fclaw2d_map_new_nomap();
-        fclaw2d_global_store_domain(glob, domain);
-        fclaw2d_global_store_map(glob, map);
-        fclaw2d_options_store(glob, &fopts);
+        fclaw_domain_t *domain = fclaw_domain_new_unitsquare(glob->mpicomm, fopts.minlevel);
+        fclaw_map_context_t* map = fclaw_map_new_nomap();
+        fclaw_global_store_domain(glob, domain);
+        fclaw_map_store(glob, map);
+        fclaw_options_store(glob, &fopts);
 
         fclaw3dx_clawpatch_options_t opts;
         memset(&opts, 0, sizeof(opts));
@@ -288,9 +284,8 @@ TEST_CASE("fclaw3dx_clawpatch patch_build")
         opts.rhs_fields = rhs_fields;
         fclaw3dx_clawpatch_options_store(glob, &opts);
 
-        fclaw2d_domain_data_new(glob->domain);
         CHECK(domain->blocks[0].patches[0].user == nullptr);
-        fclaw2d_patch_build(glob, &domain->blocks[0].patches[0], 0, 0, &build_mode);
+        fclaw_patch_build(glob, &domain->blocks[0].patches[0], 0, 0, &build_mode);
         CHECK(domain->blocks[0].patches[0].user != nullptr);
 
         fclaw3dx_clawpatch_t* cp = fclaw3dx_clawpatch_get_clawpatch(&domain->blocks[0].patches[0]);
@@ -317,7 +312,7 @@ TEST_CASE("fclaw3dx_clawpatch patch_build")
         //BOX DIEMSIONS
 
         CHECK_BOX_DIMENSIONS(cp->griddata, opts.mbc, opts.mx, opts.my, opts.mz, opts.meqn);
-        if(build_mode == FCLAW2D_BUILD_FOR_UPDATE){
+        if(build_mode == FCLAW_BUILD_FOR_UPDATE){
             CHECK_BOX_DIMENSIONS(cp->griddata_last, opts.mbc, opts.mx, opts.my, opts.mz, opts.meqn);
             CHECK_BOX_DIMENSIONS(cp->griddata_save, opts.mbc, opts.mx, opts.my, opts.mz, opts.meqn);
         }else{
@@ -349,8 +344,8 @@ TEST_CASE("fclaw3dx_clawpatch patch_build")
             CHECK_BOX_DIMENSIONS(cp->elliptic_soln, opts.mbc, opts.mx, opts.my, opts.mz, opts.rhs_fields);
         }
 
-        fclaw2d_patch_data_delete(glob, &domain->blocks[0].patches[0]);
-        fclaw2d_global_destroy(glob);
+        fclaw_patch_data_delete(glob, &domain->blocks[0].patches[0]);
+        fclaw_global_destroy(glob);
     }
 }
 
@@ -361,7 +356,7 @@ TEST_CASE("fclaw3dx_clawpatch save_step")
 
     fclaw3dx_clawpatch_t* cp = fclaw3dx_clawpatch_get_clawpatch(&test_data.domain->blocks[0].patches[0]);
     cp->griddata.dataPtr()[0] = 1234;
-    fclaw2d_patch_save_step(test_data.glob,&test_data.domain->blocks[0].patches[0]);
+    fclaw_patch_save_step(test_data.glob,&test_data.domain->blocks[0].patches[0]);
     CHECK(cp->griddata_save.dataPtr()[0] == 1234);
 }
 
@@ -385,7 +380,7 @@ TEST_CASE("fclaw3dx_clawpatch restore_step")
     //CHECK
     fclaw3dx_clawpatch_t* cp = fclaw3dx_clawpatch_get_clawpatch(&test_data.domain->blocks[0].patches[0]);
     cp->griddata_save.dataPtr()[0] = 1234;
-    fclaw2d_patch_restore_step(test_data.glob,&test_data.domain->blocks[0].patches[0]);
+    fclaw_patch_restore_step(test_data.glob,&test_data.domain->blocks[0].patches[0]);
     CHECK(cp->griddata.dataPtr()[0] == 1234);
 }
 
@@ -814,7 +809,7 @@ TEST_CASE("fclaw3dx_clawpatch setup_timeinterp")
         CHECK(*alpha == timeinterp_alpha);
     };
 
-    fclaw2d_patch_setup_timeinterp(test_data.glob, &test_data.domain->blocks[0].patches[0], 
+    fclaw_patch_setup_timeinterp(test_data.glob, &test_data.domain->blocks[0].patches[0], 
                                    timeinterp_alpha);
 }
 namespace{
@@ -864,7 +859,7 @@ TEST_CASE("fclaw3dx_clawpatch tag4refinement")
             *tag_patch = t4r_tag_patch;
         };
 
-        CHECK(fclaw2d_patch_tag4refinement(test_data.glob, &test_data.domain->blocks[0].patches[0], 0, 0, t4r_init_flag) == t4r_tag_patch);
+        CHECK(fclaw_patch_tag4refinement(test_data.glob, &test_data.domain->blocks[0].patches[0], 0, 0, t4r_init_flag) == t4r_tag_patch);
     }
 }
 TEST_CASE("fclaw3dx_clawpatch tag4refinement negative refine threshold")
@@ -877,7 +872,7 @@ TEST_CASE("fclaw3dx_clawpatch tag4refinement negative refine threshold")
 
         t4r_init_flag = init_flag;
 
-        CHECK(fclaw2d_patch_tag4refinement(test_data.glob, &test_data.domain->blocks[0].patches[0], 0, 0, t4r_init_flag) == true);
+        CHECK(fclaw_patch_tag4refinement(test_data.glob, &test_data.domain->blocks[0].patches[0], 0, 0, t4r_init_flag) == true);
     }
 }
 namespace{
@@ -938,7 +933,7 @@ TEST_CASE("fclaw3dx_clawpatch tag4coarsening")
                 *tag_patch = t4c_tag_patch;
             };
 
-            CHECK(fclaw2d_patch_tag4coarsening(test_data.glob, &test_data.domain->blocks[0].patches[0], 0, 0, t4c_init_flag) == t4c_tag_patch);
+            CHECK(fclaw_patch_tag4coarsening(test_data.glob, &test_data.domain->blocks[0].patches[0], 0, 0, t4c_init_flag) == t4c_tag_patch);
         }
     }
 }
@@ -952,7 +947,7 @@ TEST_CASE("fclaw3dx_clawpatch tag4coarsening negative coarsen threshold")
         test_data.fopts.coarsen_threshold = -0.90210;
         test_data.setup();
 
-        CHECK(fclaw2d_patch_tag4coarsening(test_data.glob, &test_data.domain->blocks[0].patches[0], 0, 0, t4c_init_flag) == false);
+        CHECK(fclaw_patch_tag4coarsening(test_data.glob, &test_data.domain->blocks[0].patches[0], 0, 0, t4c_init_flag) == false);
     }
 }
 namespace{
@@ -1021,7 +1016,7 @@ TEST_CASE("fclaw3dx_clawpatch interpolate2fine")
         CHECK(*manifold == i2f_manifold);
     };
 
-    fclaw2d_patch_interpolate2fine(coarse_test_data.glob,
+    fclaw_patch_interpolate2fine(coarse_test_data.glob,
                                    &coarse_test_data.domain->blocks[0].patches[0],
                                    &fine_test_data.domain->blocks[0].patches[0],
                                    0, 0, 0);

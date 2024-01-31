@@ -25,8 +25,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <test.hpp>
 
-#include <fclaw2d_forestclaw.h>
-#include <fclaw2d_global.h>
+#include <fclaw_forestclaw.h>
+#include <fclaw_global.h>
 
 #include <fclaw2d_clawpatch.h>
 #include <fclaw2d_clawpatch_options.h>
@@ -65,9 +65,9 @@ TEST_CASE("FCLAW2D_CLAWPATCH_EXCEEDS_THRESHOLD calls user function")
     global_exceeds_test_parameters = exceeds_test_parameters();
     exceeds_test_parameters& params = global_exceeds_test_parameters;
 
-	fclaw2d_global_t* glob = fclaw2d_global_new();
+	fclaw_global_t* glob = fclaw_global_new();
 
-    fclaw2d_vtables_initialize(glob);
+    fclaw_vtables_initialize(glob);
     fclaw2d_clawpatch_vtable_initialize(glob, 4);
 
     fclaw2d_clawpatch_vt(glob)->fort_user_exceeds_threshold = 
@@ -108,7 +108,7 @@ TEST_CASE("FCLAW2D_CLAWPATCH_EXCEEDS_THRESHOLD calls user function")
     opts.refinement_criteria = FCLAW_REFINE_CRITERIA_USER;
     fclaw2d_clawpatch_options_store(glob, &opts);
 
-    fclaw2d_global_set_global(glob);
+    fclaw_global_set_static(glob);
     int ret = FCLAW2D_CLAWPATCH_TAG_CRITERIA(params.blockno,
                                                   params.qval,
                                                   params.qmin,
@@ -121,20 +121,20 @@ TEST_CASE("FCLAW2D_CLAWPATCH_EXCEEDS_THRESHOLD calls user function")
                                                   params.tag_threshold,
                                                   params.init_flag,
                                                   params.is_ghost);
-    fclaw2d_global_unset_global();
+    fclaw_global_clear_static();
 
     CHECK_EQ(ret, params.return_value);
 
-    fclaw2d_global_destroy(glob);
+    fclaw_global_destroy(glob);
 }
 TEST_CASE("FCLAW3DX_CLAWPATCH_EXCEEDS_THRESHOLD calls user function")
 {
     global_exceeds_test_parameters = exceeds_test_parameters();
     exceeds_test_parameters& params = global_exceeds_test_parameters;
 
-	fclaw2d_global_t* glob = fclaw2d_global_new();
+	fclaw_global_t* glob = fclaw_global_new();
 
-    fclaw2d_vtables_initialize(glob);
+    fclaw_vtables_initialize(glob);
     fclaw3dx_clawpatch_vtable_initialize(glob, 4);
 
     fclaw3dx_clawpatch_vt(glob)->fort_user_exceeds_threshold = 
@@ -179,7 +179,7 @@ TEST_CASE("FCLAW3DX_CLAWPATCH_EXCEEDS_THRESHOLD calls user function")
     opts.refinement_criteria = FCLAW_REFINE_CRITERIA_USER;
     fclaw3dx_clawpatch_options_store(glob, &opts);
 
-    fclaw2d_global_set_global(glob);
+    fclaw_global_set_static(glob);
     int ret = FCLAW3DX_CLAWPATCH_TAG_CRITERIA(params.blockno,
                                                    params.qval,
                                                    params.qmin,
@@ -194,9 +194,9 @@ TEST_CASE("FCLAW3DX_CLAWPATCH_EXCEEDS_THRESHOLD calls user function")
                                                    params.tag_threshold,
                                                    params.init_flag,
                                                    params.is_ghost);
-    fclaw2d_global_unset_global();
+    fclaw_global_clear_static();
 
     CHECK_EQ(ret, params.return_value);
 
-    fclaw2d_global_destroy(glob);
+    fclaw_global_destroy(glob);
 }

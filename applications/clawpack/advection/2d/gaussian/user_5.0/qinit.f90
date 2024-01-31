@@ -20,7 +20,7 @@ SUBROUTINE clawpack5_qinit(meqn,mbc,mx,my,xlower,ylower,dx,dy,q,maux,aux)
         yc = ylower + (j-0.5d0)*dy
      DO i = 1-mbc,mx+mbc
         xc = xlower + (i-0.5d0)*dx
-        CALL fclaw2d_map_c2m(cont, &
+        CALL fclaw_map_2d_c2m(cont, &
              blockno,xc,yc,xp,yp,zp)
         q(1,i,j) = gaussian_sum(xp,yp,zp)
      ENDDO

@@ -101,14 +101,14 @@ c           # x-face - upper vertex
             yc = ylower + j*dy
 
 c           # Map the brick to a unit square      
-            call fclaw2d_map_brick2c(cont, blockno,xc,yc,xc1,yc1,zc1)
+            call fclaw_map_2d_brick2c(cont, blockno,xc,yc,xc1,yc1,zc1)
 
 c           # x-face - lower vertex
             xc = xlower + (i-1)*dx
             yc = ylower + (j-1)*dy
 
 c           # Map the brick to a unit square      
-            call fclaw2d_map_brick2c(cont, blockno,xc,yc,xc2,yc2,zc2)
+            call fclaw_map_2d_brick2c(cont, blockno,xc,yc,xc2,yc2,zc2)
 
 c           # [x;y] = a*e1 + b*e1 = L*[a;b]            
             call swirl_transform_coordinates(xc1,yc1,x1,y1,mapping)
@@ -127,12 +127,12 @@ c           # Map (xc,yc,blockno) to [0,1]x[0,1]
 c           # y-face - right vertex
             xc = xlower + i*dx
             yc = ylower + (j-1)*dy
-            call fclaw2d_map_brick2c(cont,blockno,xc,yc,xc1,yc1,zc1)
+            call fclaw_map_2d_brick2c(cont,blockno,xc,yc,xc1,yc1,zc1)
 
 c           # y-face - left vertex
             xc = xlower + (i-1)*dx
             yc = ylower + (j-1)*dy
-            call fclaw2d_map_brick2c(cont,blockno,xc,yc,xc2,yc2,zc2)
+            call fclaw_map_2d_brick2c(cont,blockno,xc,yc,xc2,yc2,zc2)
 
             call swirl_transform_coordinates(xc1,yc1,x1,y1,mapping)
             call swirl_transform_coordinates(xc2,yc2,x2,y2,mapping)
@@ -186,7 +186,7 @@ c     # Cell-centered velocities : entries (4,5,6)
 
 c           # This is not the swirl mapping, but rather maps the brick to
 c           # a unit square      
-            call fclaw2d_map_brick2c(cont,blockno,xc,yc,xc1,yc1,zc1)
+            call fclaw_map_2d_brick2c(cont,blockno,xc,yc,xc1,yc1,zc1)
 
             call swirl_transform_coordinates(xc1,yc1,x,y,mapping)
             call swirl_center_velocity(x,y,vel)

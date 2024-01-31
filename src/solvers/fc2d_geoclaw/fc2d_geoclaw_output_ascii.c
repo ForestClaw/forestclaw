@@ -32,23 +32,23 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_clawpatch.h>  /* Include patch, domain declarations */
 #include <fclaw2d_clawpatch_options.h>  /* Include patch, domain declarations */
 
-#include <fclaw2d_patch.h>
-#include <fclaw2d_global.h>
+#include <fclaw_patch.h>
+#include <fclaw_global.h>
 
 static
-void cb_geoclaw_output_ascii(fclaw2d_domain_t *domain,
-                             fclaw2d_patch_t *patch,
+void cb_geoclaw_output_ascii(fclaw_domain_t *domain,
+                             fclaw_patch_t *patch,
                              int blockno, int patchno,
                              void *user)
 {
-    fclaw2d_global_iterate_t* s = (fclaw2d_global_iterate_t*) user;
-    fclaw2d_global_t *glob = (fclaw2d_global_t*) s->glob;
+    fclaw_global_iterate_t* s = (fclaw_global_iterate_t*) user;
+    fclaw_global_t *glob = (fclaw_global_t*) s->glob;
 
     int iframe = *((int *) s->user);    
 
     /* Get info not readily available to user */
     int local_num, global_num, level;
-    fclaw2d_patch_get_info(glob->domain,patch,
+    fclaw_patch_get_info(glob->domain,patch,
                            blockno,patchno,
                            &global_num, 
                            &local_num,&level);
@@ -72,7 +72,7 @@ void cb_geoclaw_output_ascii(fclaw2d_domain_t *domain,
 }
 
 static
-void geoclaw_header_ascii(fclaw2d_global_t* glob,int iframe)
+void geoclaw_header_ascii(fclaw_global_t* glob,int iframe)
 {
     double time = glob->curr_time;
     int ngrids = glob->domain->global_num_patches;
@@ -88,22 +88,22 @@ void geoclaw_header_ascii(fclaw2d_global_t* glob,int iframe)
 	Public interface
    ------------------------------------------------------------ */
 
-void fc2d_geoclaw_output_ascii(fclaw2d_global_t* glob,int iframe)
+void fc2d_geoclaw_output_ascii(fclaw_global_t* glob,int iframe)
 {
-    fclaw2d_domain_t *domain = glob->domain;
+    fclaw_domain_t *domain = glob->domain;
 
     /* BEGIN NON-SCALABLE CODE */
     /* Write the file contents in serial.
        Use only for small numbers of processors. */
-    fclaw2d_domain_serialization_enter (domain);
+    fclaw_domain_serialization_enter (domain);
 
     if (domain->mpirank == 0)
         geoclaw_header_ascii(glob,iframe);
 
     /* Write out each patch to fort.qXXXX */
-    fclaw2d_global_iterate_patches (glob, cb_geoclaw_output_ascii, &iframe);
+    fclaw_global_iterate_patches (glob, cb_geoclaw_output_ascii, &iframe);
 
-    fclaw2d_domain_serialization_leave (domain);
+    fclaw_domain_serialization_leave (domain);
     /* END OF NON-SCALABLE CODE */
 }
 

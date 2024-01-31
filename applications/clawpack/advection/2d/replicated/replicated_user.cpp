@@ -27,7 +27,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "replicated_user.h"
 
 static
-void replicated_problem_setup(fclaw2d_global_t* glob)
+void replicated_problem_setup(fclaw_global_t* glob)
 {
     const user_options_t* user = replicated_get_options(glob);
 
@@ -42,14 +42,14 @@ void replicated_problem_setup(fclaw2d_global_t* glob)
     }
 
     /* Make sure that node 0 has written `setprob.data` before proceeding */
-    fclaw2d_domain_barrier(glob->domain);
+    fclaw_domain_barrier(glob->domain);
 
     SETPROB();  /* Reads file created above */
 }
 
-void replicated_link_solvers(fclaw2d_global_t *glob)
+void replicated_link_solvers(fclaw_global_t *glob)
 {
-    fclaw2d_vtable_t *vt = fclaw2d_vt(glob);
+    fclaw_vtable_t *vt = fclaw_vt(glob);
     vt->problem_setup = &replicated_problem_setup; 
 
     const user_options_t* user = replicated_get_options(glob);

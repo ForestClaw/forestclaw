@@ -14,7 +14,7 @@ subroutine fclaw3dx_clawpatch46_fort_conservation_check(mx,my,mz, &
     integer :: i,j,k,m
     double precision :: t, y, area_ij, vol_ij
     integer*8 :: cont, fclaw_map_get_context
-    logical :: fclaw2d_map_is_used
+    logical :: fclaw_map_is_used
 
     logical :: use_kahan
 
@@ -27,7 +27,7 @@ subroutine fclaw3dx_clawpatch46_fort_conservation_check(mx,my,mz, &
         do k = 1,mz
             do j = 1,my
                 do i = 1,mx
-                    if (fclaw2d_map_is_used(cont)) then
+                    if (fclaw_map_is_used(cont)) then
                         area_ij = area(i,j)  !! Area varies
                     endif
                     vol_ij = area_ij*dz
@@ -56,12 +56,12 @@ double precision function fclaw3dx_clawpatch46_fort_compute_patch_area( &
 
     integer :: i,j
     integer*8 :: cont, fclaw_map_get_context
-    logical :: fclaw2d_map_is_used
+    logical :: fclaw_map_is_used
     double precision :: sum
 
     cont = fclaw_map_get_context()
 
-    if (fclaw2d_map_is_used(cont)) then
+    if (fclaw_map_is_used(cont)) then
         sum = 0       
         do j = 1,my
             do i = 1,mx
@@ -91,14 +91,14 @@ subroutine fclaw3dx_clawpatch46_fort_compute_error_norm( &
     double precision :: dxdydz, eij, vol_ij
 
     integer*8 :: cont, fclaw_map_get_context
-    logical :: fclaw2d_map_is_used
+    logical :: fclaw_map_is_used
 
     cont = fclaw_map_get_context()
 
     !! # error_norm(:) comes in with values;  do not initialize it here!
     dxdydz = dx*dy*dz
     do m = 1,mfields
-       if (fclaw2d_map_is_used(cont)) then
+       if (fclaw_map_is_used(cont)) then
             do k = 1,mz
                 do j = 1,my
                     do i = 1,mx

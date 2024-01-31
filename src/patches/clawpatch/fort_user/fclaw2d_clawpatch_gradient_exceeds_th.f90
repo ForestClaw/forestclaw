@@ -37,7 +37,7 @@ integer function fclaw2d_clawpatch_gradient_exceeds_th(blockno, meqn, &
 
 
     integer*8 :: cont, fclaw_map_get_context
-    integer :: fclaw2d_map_is_used
+    integer :: fclaw_map_is_used
 
     double precision :: clawpatch_gradient_dot
     integer :: refine
@@ -61,16 +61,16 @@ integer function fclaw2d_clawpatch_gradient_exceeds_th(blockno, meqn, &
 
 
     refine = 0
-    if (fclaw2d_map_is_used(cont) .ne. 0) THEN
-        CALL fclaw2d_map_c2m(cont,blockno,xc,yc,xp,yp,zp)
-        CALL fclaw2d_map_c2m(cont,blockno,xc+dx,yc,xpp,ypp,zpp)
-        CALL fclaw2d_map_c2m(cont,blockno,xc-dx,yc,xpm,ypm,zpm)
+    if (fclaw_map_is_used(cont) .ne. 0) THEN
+        CALL fclaw_map_2d_c2m(cont,blockno,xc,yc,xp,yp,zp)
+        CALL fclaw_map_2d_c2m(cont,blockno,xc+dx,yc,xpp,ypp,zpp)
+        CALL fclaw_map_2d_c2m(cont,blockno,xc-dx,yc,xpm,ypm,zpm)
         t1(1) = (xpp - xpm)/dx2
         t1(2) = (ypp - ypm)/dx2
         t1(3) = (zpp - zpm)/dx2
 
-        CALL fclaw2d_map_c2m(cont,blockno,xc,yc+dy,xpp,ypp,zpp)
-        CALL fclaw2d_map_c2m(cont,blockno,xc,yc-dy,xpm,ypm,zpm)
+        CALL fclaw_map_2d_c2m(cont,blockno,xc,yc+dy,xpp,ypp,zpp)
+        CALL fclaw_map_2d_c2m(cont,blockno,xc,yc-dy,xpm,ypm,zpm)
         t2(1) = (xpp - xpm)/dy2
         t2(2) = (ypp - ypm)/dy2
         t2(3) = (zpp - zpm)/dy2

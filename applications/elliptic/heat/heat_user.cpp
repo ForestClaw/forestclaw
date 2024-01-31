@@ -28,7 +28,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "heat_options.h"
 #include "heat_diagnostics.h"
 
-#include <fclaw2d_include_all.h>
+#include <fclaw_include_all.h>
 
 #include <fclaw2d_clawpatch.h>
 #include <fclaw2d_clawpatch_options.h>
@@ -41,14 +41,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fc2d_thunderegg_starpatch.h>
 #include <fc2d_thunderegg_fivepoint.h>
 
-#include <fclaw2d_elliptic_solver.h>
+#include <fclaw_elliptic_solver.h>
 
 
-#include <fclaw2d_farraybox.hpp>
+#include <fclaw_farraybox.hpp>
 
 
 static
-void heat_problem_setup(fclaw2d_global_t *glob)
+void heat_problem_setup(fclaw_global_t *glob)
 {
     if (glob->mpirank == 0)
     {
@@ -88,13 +88,13 @@ void heat_problem_setup(fclaw2d_global_t *glob)
 
         fclose(f);
     }
-    fclaw2d_domain_barrier (glob->domain);
+    fclaw_domain_barrier (glob->domain);
     HEAT_SETPROB(); /* This file reads the file just created above */
 }
 
 static
-void heat_initialize(fclaw2d_global_t *glob,
-                     fclaw2d_patch_t *patch,
+void heat_initialize(fclaw_global_t *glob,
+                     fclaw_patch_t *patch,
                      int blockno,
                      int patchno)
 {
@@ -116,8 +116,8 @@ void heat_initialize(fclaw2d_global_t *glob,
 
 
 static
-void heat_rhs(fclaw2d_global_t *glob,
-                fclaw2d_patch_t *patch,
+void heat_rhs(fclaw_global_t *glob,
+                fclaw_patch_t *patch,
                 int blockno,
                 int patchno)
 {
@@ -152,8 +152,8 @@ void heat_rhs(fclaw2d_global_t *glob,
 
 
 static
-void heat_compute_error(fclaw2d_global_t *glob,
-                          fclaw2d_patch_t *patch,
+void heat_compute_error(fclaw_global_t *glob,
+                          fclaw_patch_t *patch,
                           int blockno,
                           int patchno,
                           void *user)
@@ -204,7 +204,7 @@ void heat_compute_error(fclaw2d_global_t *glob,
 
 
 static
-void heat_time_header_ascii(fclaw2d_global_t* glob, int iframe)
+void heat_time_header_ascii(fclaw_global_t* glob, int iframe)
 {
     const fclaw2d_clawpatch_options_t *clawpatch_opt = 
                 fclaw2d_clawpatch_get_options(glob);
@@ -244,19 +244,19 @@ void heat_time_header_ascii(fclaw2d_global_t* glob, int iframe)
 
 
 static
-void cb_heat_output_ascii(fclaw2d_domain_t * domain,
-                            fclaw2d_patch_t * patch,
+void cb_heat_output_ascii(fclaw_domain_t * domain,
+                            fclaw_patch_t * patch,
                             int blockno, int patchno,
                             void *user)
 {
-    fclaw2d_global_iterate_t* s = (fclaw2d_global_iterate_t*) user;
-    fclaw2d_global_t *glob = (fclaw2d_global_t*) s->glob;
+    fclaw_global_iterate_t* s = (fclaw_global_iterate_t*) user;
+    fclaw_global_t *glob = (fclaw_global_t*) s->glob;
     int iframe = *((int *) s->user);
 
     /* Get info not readily available to user */
     int global_num, local_num;
     int level;
-    fclaw2d_patch_get_info(glob->domain,patch,
+    fclaw_patch_get_info(glob->domain,patch,
                            blockno,patchno,
                            &global_num,&local_num, &level);
     
@@ -273,7 +273,7 @@ void cb_heat_output_ascii(fclaw2d_domain_t * domain,
     double *soln  = fclaw2d_clawpatch_get_exactsoln(glob,patch);
 
     char fname[BUFSIZ];
-    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+    const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
     snprintf (fname, BUFSIZ, "%s.q%04d", fclaw_opt->prefix, iframe);
 
     /* The fort routine is defined by a clawpack solver and handles 
@@ -289,14 +289,14 @@ void cb_heat_output_ascii(fclaw2d_domain_t * domain,
 }
 
 
-int heat_tag4refinement(fclaw2d_global_t *glob,
-                        fclaw2d_patch_t *this_patch,
+int heat_tag4refinement(fclaw_global_t *glob,
+                        fclaw_patch_t *this_patch,
                         int blockno, int patchno,
                         int initflag)
 {
     fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt(glob);
 
-    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+    const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
 
     int tag_patch;
     double refine_threshold;
@@ -321,15 +321,15 @@ int heat_tag4refinement(fclaw2d_global_t *glob,
 }
 
 static
-int heat_tag4coarsening(fclaw2d_global_t *glob,
-                        fclaw2d_patch_t *fine_patches,
+int heat_tag4coarsening(fclaw_global_t *glob,
+                        fclaw_patch_t *fine_patches,
                         int blockno,
                         int patchno,
                         int initflag)
 {
-    fclaw2d_patch_t *patch0 = &fine_patches[0];
+    fclaw_patch_t *patch0 = &fine_patches[0];
 
-    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+    const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
     double coarsen_threshold = fclaw_opt->coarsen_threshold;
 
     int mx,my,mbc;
@@ -354,8 +354,8 @@ int heat_tag4coarsening(fclaw2d_global_t *glob,
 }
 
 static
-void heat_bc2(fclaw2d_global_t *glob,
-              fclaw2d_patch_t *patch,
+void heat_bc2(fclaw_global_t *glob,
+              fclaw_patch_t *patch,
               int block_idx,
               int patch_idx,
               double t,
@@ -379,7 +379,7 @@ void heat_bc2(fclaw2d_global_t *glob,
 }
 
 
-void heat_link_solvers(fclaw2d_global_t *glob)
+void heat_link_solvers(fclaw_global_t *glob)
 {
 #if 0 
     /* These are listed here for reference */
@@ -388,11 +388,11 @@ void heat_link_solvers(fclaw2d_global_t *glob)
     fclaw2d_patch_vtable_t* patch_vt = fclaw2d_patch_vt(glob);
 #endif
     /* ForestClaw vtable */
-    fclaw2d_vtable_t *fclaw_vt = fclaw2d_vt(glob);
-    fclaw_vt->problem_setup = &heat_problem_setup;  
+    fclaw_vtable_t *fc_vt = fclaw_vt(glob);
+    fc_vt->problem_setup = &heat_problem_setup;  
 
     /* Patch : RHS function */
-    fclaw2d_patch_vtable_t* patch_vt = fclaw2d_patch_vt(glob);
+    fclaw_patch_vtable_t* patch_vt = fclaw_patch_vt(glob);
     patch_vt->physical_bc = heat_bc2;     
     patch_vt->rhs = heat_rhs;          /* Overwrites default */
     patch_vt->initialize = heat_initialize;   /* Get an initial refinement */

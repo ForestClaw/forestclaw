@@ -28,7 +28,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 static
-void poisson_problem_setup(fclaw2d_global_t *glob)
+void poisson_problem_setup(fclaw_global_t *glob)
 {
     if (glob->mpirank == 0)
     {
@@ -68,14 +68,14 @@ void poisson_problem_setup(fclaw2d_global_t *glob)
 
         fclose(f);
     }
-    fclaw2d_domain_barrier (glob->domain);
+    fclaw_domain_barrier (glob->domain);
     POISSON_SETPROB(); /* This file reads the file just created above */
 }
 
 
 static
-void poisson_rhs(fclaw2d_global_t *glob,
-                fclaw2d_patch_t *patch,
+void poisson_rhs(fclaw_global_t *glob,
+                fclaw_patch_t *patch,
                 int blockno,
                 int patchno)
 {
@@ -97,8 +97,8 @@ void poisson_rhs(fclaw2d_global_t *glob,
     mg_vt->fort_rhs(&blockno,&mbc,&mx,&my,&mfields, &xlower,&ylower,&dx,&dy,rhs);
 }
 
-static void poisson_patch_setup(struct fclaw2d_global *glob,
-                                struct fclaw2d_patch *patch,
+static void poisson_patch_setup(struct fclaw_global *glob,
+                                struct fclaw_patch *patch,
                                 int blockno,
                                 int patchno)
 {
@@ -106,8 +106,8 @@ static void poisson_patch_setup(struct fclaw2d_global *glob,
 }
 
 static
-void poisson_compute_error(fclaw2d_global_t *glob,
-                          fclaw2d_patch_t *patch,
+void poisson_compute_error(fclaw_global_t *glob,
+                          fclaw_patch_t *patch,
                           int blockno,
                           int patchno,
                           void *user)
@@ -151,8 +151,8 @@ void poisson_compute_error(fclaw2d_global_t *glob,
 
 
 static
-void poisson_conservation_check(fclaw2d_global_t *glob,
-                               fclaw2d_patch_t *patch,
+void poisson_conservation_check(fclaw_global_t *glob,
+                               fclaw_patch_t *patch,
                                int blockno,
                                int patchno,
                                void *user)
@@ -181,7 +181,7 @@ void poisson_conservation_check(fclaw2d_global_t *glob,
     fc2d_thunderegg_vtable_t*  mg_vt = fc2d_thunderegg_vt(glob);
 
     int intersects_bc[4];
-    fclaw2d_physical_get_bc(glob,blockno,patchno,intersects_bc);
+    fclaw_physical_get_bc(glob,blockno,patchno,intersects_bc);
 
     double t = glob->curr_time;
     int cons_check = 1;
@@ -195,7 +195,7 @@ void poisson_conservation_check(fclaw2d_global_t *glob,
 
 
 static
-void poisson_time_header_ascii(fclaw2d_global_t* glob, int iframe)
+void poisson_time_header_ascii(fclaw_global_t* glob, int iframe)
 {
     const fclaw2d_clawpatch_options_t *clawpatch_opt = 
                 fclaw2d_clawpatch_get_options(glob);
@@ -234,19 +234,19 @@ void poisson_time_header_ascii(fclaw2d_global_t* glob, int iframe)
 
 
 static
-void cb_poisson_output_ascii(fclaw2d_domain_t * domain,
-                            fclaw2d_patch_t * patch,
+void cb_poisson_output_ascii(fclaw_domain_t * domain,
+                            fclaw_patch_t * patch,
                             int blockno, int patchno,
                             void *user)
 {
-    fclaw2d_global_iterate_t* s = (fclaw2d_global_iterate_t*) user;
-    fclaw2d_global_t *glob = (fclaw2d_global_t*) s->glob;
+    fclaw_global_iterate_t* s = (fclaw_global_iterate_t*) user;
+    fclaw_global_t *glob = (fclaw_global_t*) s->glob;
     int iframe = *((int *) s->user);
 
     /* Get info not readily available to user */
     int global_num, local_num;
     int level;
-    fclaw2d_patch_get_info(glob->domain,patch,
+    fclaw_patch_get_info(glob->domain,patch,
                            blockno,patchno,
                            &global_num,&local_num, &level);
     
@@ -266,7 +266,7 @@ void cb_poisson_output_ascii(fclaw2d_domain_t * domain,
     fclaw2d_clawpatch_elliptic_soln_data(glob,patch,&soln,&mfields);
 
     char fname[BUFSIZ];
-    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+    const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
     snprintf (fname, BUFSIZ, "%s.q%04d", fclaw_opt->prefix, iframe);
 
     /* The fort routine is defined by a clawpack solver and handles 
@@ -282,14 +282,14 @@ void cb_poisson_output_ascii(fclaw2d_domain_t * domain,
 }
 
 
-int poisson_tag4refinement(fclaw2d_global_t *glob,
-                             fclaw2d_patch_t *this_patch,
+int poisson_tag4refinement(fclaw_global_t *glob,
+                             fclaw_patch_t *this_patch,
                              int blockno, int patchno,
                              int initflag)
 {
     fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt(glob);
 
-    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+    const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
 
     int tag_patch;
     double refine_threshold;
@@ -306,24 +306,24 @@ int poisson_tag4refinement(fclaw2d_global_t *glob,
     fclaw2d_clawpatch_rhs_data(glob,this_patch,&rhs,&mfields);
 
     tag_patch = 0;
-    fclaw2d_global_set_global(glob);
+    fclaw_global_set_static(glob);
     clawpatch_vt->fort_tag4refinement(&mx,&my,&mbc,&mfields,&xlower,&ylower,&dx,&dy,
                                       &blockno, rhs,&refine_threshold,
                                       &initflag,&tag_patch);
-    fclaw2d_global_unset_global();
+    fclaw_global_clear_static();
     return tag_patch;
 }
 
 static
-int poisson_tag4coarsening(fclaw2d_global_t *glob,
-                             fclaw2d_patch_t *fine_patches,
+int poisson_tag4coarsening(fclaw_global_t *glob,
+                             fclaw_patch_t *fine_patches,
                              int blockno,
                              int patchno,
                              int initflag)
 {
-    fclaw2d_patch_t *patch0 = &fine_patches[0];
+    fclaw_patch_t *patch0 = &fine_patches[0];
 
-    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+    const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
     double coarsen_threshold = fclaw_opt->coarsen_threshold;
 
     int mx,my,mbc;
@@ -341,23 +341,23 @@ int poisson_tag4coarsening(fclaw2d_global_t *glob,
     fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt(glob);
 
     int tag_patch = 0;
-    fclaw2d_global_set_global(glob);
+    fclaw_global_set_static(glob);
     clawpatch_vt->fort_tag4coarsening(&mx,&my,&mbc,&mfields,&xlower,&ylower,&dx,&dy,
                                       &blockno, rhs[0],rhs[1],rhs[2],rhs[3],
                                       &coarsen_threshold,&initflag,&tag_patch);
-    fclaw2d_global_unset_global();
+    fclaw_global_clear_static();
     return tag_patch == 1;
 }
 
 
-void poisson_link_solvers(fclaw2d_global_t *glob)
+void poisson_link_solvers(fclaw_global_t *glob)
 {
     /* ForestClaw vtable */
-    fclaw2d_vtable_t *fclaw_vt = fclaw2d_vt(glob);
-    fclaw_vt->problem_setup = &poisson_problem_setup;  
+    fclaw_vtable_t *fc_vt = fclaw_vt(glob);
+    fc_vt->problem_setup = &poisson_problem_setup;  
 
     /* Patch : RHS function */
-    fclaw2d_patch_vtable_t* patch_vt = fclaw2d_patch_vt(glob);
+    fclaw_patch_vtable_t* patch_vt = fclaw_patch_vt(glob);
     patch_vt->rhs = poisson_rhs;          /* Overwrites default */
     patch_vt->initialize = poisson_rhs;   /* Get an initial refinement */
 
@@ -388,7 +388,7 @@ void poisson_link_solvers(fclaw2d_global_t *glob)
 
     // Output routines
 
-    fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+    fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
     if (fclaw_opt->compute_error) 
     {
         clawpatch_vt->time_header_ascii = poisson_time_header_ascii;
@@ -407,7 +407,7 @@ void poisson_link_solvers(fclaw2d_global_t *glob)
        used for the elliptic problem then for the hyperbolic problem */
     clawpatch_vt->conservation_check = poisson_conservation_check;        
 
-    fclaw2d_diagnostics_vtable_t *diag_vt = fclaw2d_diagnostics_vt(glob);
+    fclaw_diagnostics_vtable_t *diag_vt = fclaw_diagnostics_vt(glob);
     diag_vt->patch_init_diagnostics     = poisson_diagnostics_initialize;
     diag_vt->patch_reset_diagnostics    = poisson_diagnostics_reset;
     diag_vt->patch_compute_diagnostics  = poisson_diagnostics_compute;

@@ -1,8 +1,8 @@
 #include "../fc2d_cudaclaw5.h"
 #include "cudaclaw5_allocate.h"
 
-#include <fclaw2d_patch.h>
-#include <fclaw2d_global.h>
+#include <fclaw_patch.h>
+#include <fclaw_global.h>
 #include <fclaw2d_clawpatch.h>
 
 #include "../fc2d_cudaclaw5_options.h"
@@ -74,8 +74,8 @@ double cudaclaw5_compute_cfl(int idir, int mx, int my, int mbc, int mwaves,
 	return cflgrid;
 }
 
-double cudaclaw5_step2(fclaw2d_global_t *glob,
-                       fclaw2d_patch_t *this_patch,
+double cudaclaw5_step2(fclaw_global_t *glob,
+                       fclaw_patch_t *this_patch,
                        int this_block_idx,
                        int this_patch_idx,
                        double t,
@@ -97,7 +97,7 @@ double cudaclaw5_step2(fclaw2d_global_t *glob,
     fc2d_cudaclaw5_options_t* cuda_opt = fc2d_cudaclaw5_get_options(glob);
 
     cudaclaw5_fluxes_t *fluxes = (cudaclaw5_fluxes_t*) 
-               fclaw2d_patch_get_user_data(glob,this_patch);
+               fclaw_patch_get_user_data(glob,this_patch);
 
     FCLAW_ASSERT(fluxes != NULL);
 
@@ -121,7 +121,7 @@ double cudaclaw5_step2(fclaw2d_global_t *glob,
     int ierror = 0;
     // cudaclaw5_fort_flux2_t flux2 = CUDACLAW5_FLUX2;
 
-    int* block_corner_count = fclaw2d_patch_block_corner_count(glob,this_patch);
+    int* block_corner_count = fclaw_patch_block_corner_count(glob,this_patch);
 
     size_t size = fclaw2d_clawpatch_size(glob);
 

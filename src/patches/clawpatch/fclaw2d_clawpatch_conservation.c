@@ -32,12 +32,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define PATCH_DIM 2
 #endif
 
-#include <fclaw2d_time_sync.h>
+#include <fclaw_time_sync.h>
 
-#include <fclaw2d_patch.h>
-#include <fclaw2d_options.h>
+#include <fclaw_patch.h>
+#include <fclaw_options.h>
 
-#include <fclaw2d_global.h>
+#include <fclaw_global.h>
 #include <fclaw_math.h>
 
 #if REFINE_DIM == 2 && PATCH_DIM == 2
@@ -71,8 +71,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 
-void fclaw2d_clawpatch_time_sync_new (fclaw2d_global_t* glob,
-                                      fclaw2d_patch_t* this_patch,
+void fclaw2d_clawpatch_time_sync_new (fclaw_global_t* glob,
+                                      fclaw_patch_t* this_patch,
                                       int blockno,int patchno,
                                       fclaw2d_clawpatch_registers_t **registers)
 {
@@ -109,8 +109,8 @@ void fclaw2d_clawpatch_time_sync_new (fclaw2d_global_t* glob,
 	}
 }
 
-void fclaw2d_clawpatch_time_sync_pack_registers(fclaw2d_global_t *glob,
-                                                fclaw2d_patch_t *this_patch,
+void fclaw2d_clawpatch_time_sync_pack_registers(fclaw_global_t *glob,
+                                                fclaw_patch_t *this_patch,
                                                 double *qpack,
                                                 int frsize, 
                                                 fclaw_clawpatch_packmode_t packmode, 
@@ -204,8 +204,8 @@ void fclaw2d_clawpatch_time_sync_pack_registers(fclaw2d_global_t *glob,
 
 
 
-void fclaw2d_clawpatch_time_sync_reset(fclaw2d_global_t *glob,
-                                       fclaw2d_patch_t *this_patch, 
+void fclaw2d_clawpatch_time_sync_reset(fclaw_global_t *glob,
+                                       fclaw_patch_t *this_patch, 
                                        int coarse_level,
                                        int reset_mode)
 {
@@ -219,7 +219,7 @@ void fclaw2d_clawpatch_time_sync_reset(fclaw2d_global_t *glob,
 	my = clawpatch_opt->my;
 	meqn = clawpatch_opt->meqn;
 
-	fclaw2d_patch_data_t* pdata = fclaw2d_patch_get_patch_data(this_patch);
+	fclaw_patch_data_t* pdata = fclaw_patch_get_patch_data(this_patch);
 
 	int fine_level = coarse_level+1;
 	int reset_flux;
@@ -228,27 +228,27 @@ void fclaw2d_clawpatch_time_sync_reset(fclaw2d_global_t *glob,
 	{
 		idir = k/2;
 		reset_flux = 0;
-		if (reset_mode == FCLAW2D_TIME_SYNC_RESET_F2C)
+		if (reset_mode == FCLAW_TIME_SYNC_RESET_F2C)
 		{
 			/* Reset registers at interface between levels 
 			   'coarse_level' and 'fine_level' */
-			int is_coarse = (pdata->face_neighbors[k] == FCLAW2D_PATCH_HALFSIZE)
+			int is_coarse = (pdata->face_neighbors[k] == FCLAW_PATCH_HALFSIZE)
           			&& (this_patch->level == coarse_level);
-		    int is_fine = (pdata->face_neighbors[k] == FCLAW2D_PATCH_DOUBLESIZE) &&
+		    int is_fine = (pdata->face_neighbors[k] == FCLAW_PATCH_DOUBLESIZE) &&
 		          (this_patch->level == fine_level);
 		    reset_flux = is_coarse || is_fine;
 		}
-		else if (reset_mode == FCLAW2D_TIME_SYNC_RESET_SAMESIZE)
+		else if (reset_mode == FCLAW_TIME_SYNC_RESET_SAMESIZE)
 		{
 			/* Reset registers at interfaces between same size grids on coarse level */
-			reset_flux = (pdata->face_neighbors[k] == FCLAW2D_PATCH_SAMESIZE) &&   
+			reset_flux = (pdata->face_neighbors[k] == FCLAW_PATCH_SAMESIZE) &&   
 			      (this_patch->level == coarse_level);
 		}
-		else if (reset_mode == FCLAW2D_TIME_SYNC_RESET_PHYS)
+		else if (reset_mode == FCLAW_TIME_SYNC_RESET_PHYS)
 		{
 			/* Reset flux registers at physical boundaries (not actually used, 
 			   but they are accumulated, so should be cleared out) */
-			reset_flux = pdata->face_neighbors[k] == FCLAW2D_PATCH_BOUNDARY;
+			reset_flux = pdata->face_neighbors[k] == FCLAW_PATCH_BOUNDARY;
 		}
 
 		if (reset_flux)
@@ -309,8 +309,8 @@ void fclaw2d_clawpatch_time_sync_delete (fclaw2d_clawpatch_registers_t **registe
 }
 
 
-void fclaw2d_clawpatch_time_sync_setup(fclaw2d_global_t* glob,
-                                       fclaw2d_patch_t* this_patch,
+void fclaw2d_clawpatch_time_sync_setup(fclaw_global_t* glob,
+                                       fclaw_patch_t* this_patch,
                                        int blockno,int patchno)
 {
 #if PATCH_DIM == 2
@@ -319,7 +319,7 @@ void fclaw2d_clawpatch_time_sync_setup(fclaw2d_global_t* glob,
 	fclaw2d_clawpatch_registers_t *cr = 
 	                       fclaw2d_clawpatch_get_registers(glob,this_patch);
 
-	const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+	const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
 
 
     int mx,my,mbc;
@@ -348,16 +348,16 @@ void fclaw2d_clawpatch_time_sync_setup(fclaw2d_global_t* glob,
 
 
 /* This is a patch call-back */
-void fclaw2d_clawpatch_time_sync_f2c(fclaw2d_global_t* glob,
-                                     fclaw2d_patch_t* coarse_patch,
-                                     fclaw2d_patch_t* fine_patch,
+void fclaw2d_clawpatch_time_sync_f2c(fclaw_global_t* glob,
+                                     fclaw_patch_t* coarse_patch,
+                                     fclaw_patch_t* fine_patch,
                                      int coarse_blockno, int fine_blockno,
                                      int coarse_patchno, 
                                      int idir,
                                      int igrid,
                                      int iface_coarse,
                                      int time_interp,
-                                     fclaw2d_patch_transform_data_t
+                                     fclaw_patch_transform_data_t
                                      *transform_data)
 {
 	/* We don't correct time interpolated grids, since we assume that the time 
@@ -389,7 +389,7 @@ void fclaw2d_clawpatch_time_sync_f2c(fclaw2d_global_t* glob,
   	/* create dummy fine grid to handle indexing between blocks */
 	double *qneighbor_dummy = FCLAW_ALLOC_ZERO(double,meqn*(mx+4*mbc)*(my+4*mbc));
 
-	int normal_match = fclaw2d_patch_normal_match(glob->domain, coarse_blockno, 
+	int normal_match = fclaw_patch_normal_match(glob->domain, coarse_blockno, 
 	                                              coarse_patchno, iface_coarse);
 
     fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt(glob);
@@ -424,11 +424,11 @@ void fclaw2d_clawpatch_time_sync_f2c(fclaw2d_global_t* glob,
 }
 
 
-void fclaw2d_clawpatch_time_sync_samesize (struct fclaw2d_global* glob,
-                                           struct fclaw2d_patch* this_patch,
-                                           struct fclaw2d_patch* neighbor_patch,
+void fclaw2d_clawpatch_time_sync_samesize (struct fclaw_global* glob,
+                                           struct fclaw_patch* this_patch,
+                                           struct fclaw_patch* neighbor_patch,
                                            int this_iface,int idir,
-                                           fclaw2d_patch_transform_data_t
+                                           fclaw_patch_transform_data_t
                                            *transform_data)
 {
 	/* We don't correct time interpolated grids, since we assume that the time 
@@ -460,10 +460,10 @@ void fclaw2d_clawpatch_time_sync_samesize (struct fclaw2d_global* glob,
 	/* Include this for debugging */
 	int this_blockno, this_patchno,globnum,level;
 	int neighbor_blockno, neighbor_patchno;
-	fclaw2d_patch_get_info2(glob->domain,this_patch,&this_blockno, &this_patchno,
+	fclaw_patch_get_info2(glob->domain,this_patch,&this_blockno, &this_patchno,
 							&globnum,&level);
 
-	fclaw2d_patch_get_info2(glob->domain,neighbor_patch,&neighbor_blockno, 
+	fclaw_patch_get_info2(glob->domain,neighbor_patch,&neighbor_blockno, 
 							&neighbor_patchno,&globnum,&level);
 
     /* This function is defined in fc2d_clawpack4.6 and fc2d_clawpack5  */

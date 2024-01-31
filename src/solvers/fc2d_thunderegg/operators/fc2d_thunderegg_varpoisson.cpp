@@ -29,22 +29,24 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "fc2d_thunderegg_options.h"
 #include "fc2d_thunderegg_vector.hpp"
 
-#include <fclaw2d_elliptic_solver.h>
+#include <fclaw_elliptic_solver.h>
 
 #include <fclaw2d_clawpatch.h>
 #include <fclaw2d_clawpatch_options.h>
 #include <fclaw2d_clawpatch_output_ascii.h>
 #include <fclaw2d_clawpatch_output_vtk.h>
 
-#include <fclaw2d_global.h>
-#include <fclaw2d_map.h>
-#include <fclaw2d_map_brick.h>
-#include <fclaw2d_options.h>
-#include <fclaw2d_patch.h>
-#include <fclaw2d_vtable.h>
+#include <fclaw_global.h>
+#include <fclaw_map.h>
+#include <fclaw_map_brick.h>
+#include <fclaw_options.h>
+#include <fclaw_patch.h>
+#include <fclaw_vtable.h>
 
 #include <p4est_bits.h>
 #include <p4est_wrap.h>
+
+#include <forestclaw2d.h>
 
 #include <ThunderEgg.h>
 
@@ -327,12 +329,12 @@ Vector<2> varpoisson_restrict_beta_vec(const Vector<2>& prev_beta_vec,
 
 /* Public interface - this function is virtualized */
 
-void fc2d_thunderegg_varpoisson_solve(fclaw2d_global_t *glob) 
+void fc2d_thunderegg_varpoisson_solve(fclaw_global_t *glob) 
 {
     // get needed options
     fclaw2d_clawpatch_options_t *clawpatch_opt =
                         fclaw2d_clawpatch_get_options(glob);
-    fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+    fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
     fc2d_thunderegg_options_t *mg_opt = fc2d_thunderegg_get_options(glob);
 
     GhostFillingType fill_type = GhostFillingType::Faces;
@@ -345,15 +347,15 @@ void fc2d_thunderegg_varpoisson_solve(fclaw2d_global_t *glob)
     int mbc = clawpatch_opt->mbc;
 
     // get p4est structure
-    fclaw2d_domain_t *domain = glob->domain;
-    p4est_wrap_t *wrap = (p4est_wrap_t *)domain->pp;
+    fclaw_domain_t *domain = glob->domain;
+    p4est_wrap_t *wrap = (p4est_wrap_t *)domain->d2->pp;
 
     // create map function
     P4estDomainGenerator::BlockMapFunc bmf = [&](int block_no, double unit_x,      
                                         double unit_y, double &x, double &y) 
     {
         double x1,y1,z1;
-        FCLAW2D_MAP_BRICK2C(&glob->cont,&block_no,&unit_x, &unit_y, &x1, &y1, &z1);
+        FCLAW_MAP_2D_BRICK2C(&glob->cont,&block_no,&unit_x, &unit_y, &x1, &y1, &z1);
         x = fclaw_opt->ax + (fclaw_opt->bx - fclaw_opt->ax) * x1;
         y = fclaw_opt->ay + (fclaw_opt->by - fclaw_opt->ay) * y1;
     };

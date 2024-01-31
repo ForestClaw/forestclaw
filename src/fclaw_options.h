@@ -250,8 +250,14 @@ struct fclaw_options
     const char * regression_check; /**< filename of regression check values */
 };
 
+struct fclaw_global;
+
+void fclaw_options_store (struct fclaw_global *glob, struct fclaw_options* fclaw_opt);
+
+fclaw_options_t* fclaw_get_options(struct fclaw_global *glob);
+
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* !FCLAW2D_OPTIONS_H */
+#endif /* !FCLAW_OPTIONS_H */

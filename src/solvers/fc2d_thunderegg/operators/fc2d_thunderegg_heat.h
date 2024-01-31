@@ -38,10 +38,10 @@ extern "C"
     /* fix syntax highlighting */
 #endif    
 
-struct fclaw2d_global;
+struct fclaw_global;
 
 
-void fc2d_thunderegg_heat_solve(struct fclaw2d_global *glob);
+void fc2d_thunderegg_heat_solve(struct fclaw_global *glob);
 
 void fc2d_thunderegg_heat_set_lambda(double lambda);
 

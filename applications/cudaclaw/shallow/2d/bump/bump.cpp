@@ -28,34 +28,29 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fc2d_cuda_profiler.h>
 
 static
-void create_domain(fclaw2d_global_t* glob)
+void create_domain(fclaw_global_t* glob)
 {
-	fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
+	fclaw_options_t* fclaw_opt = fclaw_get_options(glob);
 	fclaw_opt->manifold = 0;
 
-	fclaw2d_domain_t *domain = fclaw2d_domain_new_unitsquare(glob->mpicomm, fclaw_opt->minlevel);
+	fclaw_domain_t *domain = fclaw_domain_new_unitsquare(glob->mpicomm, fclaw_opt->minlevel);
 
-	fclaw2d_map_context_t *cont = fclaw2d_map_new_nomap();
+	fclaw_map_context_t *cont = fclaw_map_new_nomap();
 
-	fclaw2d_global_store_domain(glob, domain);
-	fclaw2d_global_store_map(glob, cont);
+	fclaw_global_store_domain(glob, domain);
+	fclaw_map_store(glob, cont);
 
-	fclaw2d_domain_list_levels(domain, FCLAW_VERBOSITY_ESSENTIAL);
-	fclaw2d_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);  
+	fclaw_domain_list_levels(domain, FCLAW_VERBOSITY_ESSENTIAL);
+	fclaw_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);  
 }
 
 static
-void run_program(fclaw2d_global_t* glob)
+void run_program(fclaw_global_t* glob)
 {
-    /* ---------------------------------------------------------------
-       Set domain data.
-       --------------------------------------------------------------- */
-    fclaw2d_domain_data_new(glob->domain);
-
     user_options_t* user_opt = bump_get_options(glob);
 
     /* Initialize virtual table for ForestClaw */
-    fclaw2d_vtables_initialize(glob);
+    fclaw_vtables_initialize(glob);
 
     /* Initialize virtual tables for solvers */
     fc2d_cudaclaw_options_t *clawopt = fc2d_cudaclaw_get_options(glob);
@@ -79,13 +74,13 @@ void run_program(fclaw2d_global_t* glob)
     PROFILE_CUDA_GROUP("Allocate GPU and GPU buffers",1);
     fc2d_cudaclaw_allocate_buffers(glob);
 
-    fclaw2d_initialize(glob);
-    fclaw2d_run(glob);
+    fclaw_initialize(glob);
+    fclaw_run(glob);
 
     PROFILE_CUDA_GROUP("De-allocate GPU and GPU buffers",1);
     fc2d_cudaclaw_deallocate_buffers(glob);
     
-    fclaw2d_finalize(glob);
+    fclaw_finalize(glob);
 }
 
 
@@ -121,10 +116,10 @@ main (int argc, char **argv)
         sc_MPI_Comm mpicomm = fclaw_app_get_mpi_size_rank (app, &size, &rank);
     
         /* Create global structure which stores the domain, timers, etc */
-        fclaw2d_global_t *glob = fclaw2d_global_new_comm(mpicomm, size, rank);
+        fclaw_global_t *glob = fclaw_global_new_comm(mpicomm, size, rank);
 
         /* Store option packages in glob */
-        fclaw2d_options_store           (glob, fclaw_opt);
+        fclaw_options_store           (glob, fclaw_opt);
         fclaw2d_clawpatch_options_store (glob, clawpatch_opt);
         fc2d_cudaclaw_options_store     (glob, cuclaw_opt);
         bump_options_store              (glob, user_opt);
@@ -133,7 +128,7 @@ main (int argc, char **argv)
 
         run_program(glob);
         
-        fclaw2d_global_destroy(glob);
+        fclaw_global_destroy(glob);
     }
     
     fclaw_app_destroy (app);

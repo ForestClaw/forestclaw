@@ -27,9 +27,9 @@
 #define FC3D_CLAWPACK5_H
 
 #include <fclaw_clawpatch3.h>
-#include <fclaw2d_vtable.h>
+#include <fclaw_vtable.h>
 #include <fclaw_package.h>
-#include <fclaw2d_global.h>
+#include <fclaw_global.h>
 
 #include "fc3d_clawpack5_options.h"
 
@@ -387,56 +387,56 @@ void fc3d_clawpack5_register_vtable (fclaw_package_container_t *
 /* -------------------------------------------------------------------------
    New routines
    ------------------------------------------------------------------------- */
-void fc3d_clawpack5_aux_data(fclaw2d_global_t *glob,
-                              fclaw2d_patch_t *this_patch,
+void fc3d_clawpack5_aux_data(fclaw_global_t *glob,
+                              fclaw_patch_t *this_patch,
                               double **aux, int* maux);
 
 // void fc3d_clawpack5_register (fclaw_app_t* app, const char *configfile, fclaw2d_global_t* glob);
-void fc3d_clawpack5_set_options (fclaw2d_global_t* glob, fc3d_clawpack5_options_t* clawopt);
+void fc3d_clawpack5_set_options (fclaw_global_t* glob, fc3d_clawpack5_options_t* clawopt);
 
 void fc3d_clawpack5_package_register(fclaw_app_t* app,
                                       fc3d_clawpack5_options_t* clawopt);
 
-void fc3d_clawpack5_output_header_ascii(fclaw2d_global_t* glob,
+void fc3d_clawpack5_output_header_ascii(fclaw_global_t* glob,
                                         int iframe);
 
-fc3d_clawpack5_options_t* fc3d_clawpack5_get_options(fclaw2d_global_t *glob);
+fc3d_clawpack5_options_t* fc3d_clawpack5_get_options(fclaw_global_t *glob);
 
 /* -------------------------------------------------------------------------
    Routines that won't change
    ------------------------------------------------------------------------- */
 void
-    fc3d_clawpack5_setprob(fclaw2d_global_t* glob);
+    fc3d_clawpack5_setprob(fclaw_global_t* glob);
 
 void
-    fc3d_clawpack5_setaux(fclaw2d_global_t *glob,
-                           fclaw2d_patch_t *this_patch,
+    fc3d_clawpack5_setaux(fclaw_global_t *glob,
+                           fclaw_patch_t *this_patch,
                            int this_block_idx,
                            int this_patch_idx);
 
 void
-    fc3d_clawpack5_set_capacity(fclaw2d_global_t *glob,
-                                 fclaw2d_patch_t *this_patch,
+    fc3d_clawpack5_set_capacity(fclaw_global_t *glob,
+                                 fclaw_patch_t *this_patch,
                                  int this_block_idx,
                                  int this_patch_idx);
 
 void
-    fc3d_clawpack5_qinit(fclaw2d_global_t *glob,
-                          fclaw2d_patch_t *this_patch,
+    fc3d_clawpack5_qinit(fclaw_global_t *glob,
+                          fclaw_patch_t *this_patch,
                           int this_block_idx,
                           int this_patch_idx);
 
 void
-    fc3d_clawpack5_b4step2(fclaw2d_global_t *glob,
-                            fclaw2d_patch_t *this_patch,
+    fc3d_clawpack5_b4step2(fclaw_global_t *glob,
+                            fclaw_patch_t *this_patch,
                             int this_block_idx,
                             int this_patch_idx,
                             double t,
                             double dt);
 
 void
-    fc3d_clawpack5_bc2(fclaw2d_global_t *glob,
-                        fclaw2d_patch_t *this_patch,
+    fc3d_clawpack5_bc2(fclaw_global_t *glob,
+                        fclaw_patch_t *this_patch,
                         int this_block_idx,
                         int this_patch_idx,
                         double t,
@@ -445,8 +445,8 @@ void
                         fclaw_bool time_interp);
 
 void
-    fc3d_clawpack5_src2(fclaw2d_global_t *glob,
-                         fclaw2d_patch_t *this_patch,
+    fc3d_clawpack5_src2(fclaw_global_t *glob,
+                         fclaw_patch_t *this_patch,
                          int this_block_idx,
                          int this_patch_idx,
                          double t,
@@ -455,8 +455,8 @@ void
 
 /* A single step method that advances the solution a single step on a single grid
    using a time step dt determined by the subcycle manager */
-double fc3d_clawpack5_step2(fclaw2d_global_t *glob,
-                            fclaw2d_patch_t *this_patch,
+double fc3d_clawpack5_step2(fclaw_global_t *glob,
+                            fclaw_patch_t *this_patch,
                             int this_block_idx,
                             int this_patch_idx,
                             double t,
@@ -464,15 +464,15 @@ double fc3d_clawpack5_step2(fclaw2d_global_t *glob,
 
 /* Use this ro return only the right hand side of the clawpack algorithm */
 double
-    fc3d_clawpack5_step2_rhs(fclaw2d_global_t *glob,
-                              fclaw2d_patch_t *this_patch,
+    fc3d_clawpack5_step2_rhs(fclaw_global_t *glob,
+                              fclaw_patch_t *this_patch,
                               int this_block_idx,
                               int this_patch_idx,
                               double t,
                               double *rhs);
 
-double fc3d_clawpack5_update(fclaw2d_global_t *glob,
-                             fclaw2d_patch_t *this_patch,
+double fc3d_clawpack5_update(fclaw_global_t *glob,
+                             fclaw_patch_t *this_patch,
                              int this_block_idx,
                              int this_patch_idx,
                              double t,

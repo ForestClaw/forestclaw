@@ -29,7 +29,7 @@
 #endif
 #endif
 
-#include <fclaw2d_global.h>
+#include <fclaw_global.h>
 
 #include "../fclaw3dx_clawpatch.h"
 
@@ -57,7 +57,7 @@ int FCLAW3DX_CLAWPATCH_TAG_CRITERIA(const int* blockno,
                                         const int* init_flag,
                                         const int* is_ghost)
 {
-    struct fclaw2d_global* glob = fclaw2d_global_get_global();
+    struct fclaw_global* glob = fclaw_global_get_static_global();
     fclaw3dx_clawpatch_vtable_t* clawpatch_vt = fclaw3dx_clawpatch_vt(glob);
     fclaw3dx_clawpatch_fort_exceeds_threshold_t user_exceeds_threshold = 
                                 clawpatch_vt->fort_user_exceeds_threshold;

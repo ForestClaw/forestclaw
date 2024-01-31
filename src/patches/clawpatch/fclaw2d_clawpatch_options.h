@@ -56,7 +56,7 @@ extern "C"
 #define  FCLAW_REFINE_CRITERIA_USER           4
 
 
-struct fclaw2d_global;
+struct fclaw_global;
 
 /** Typedef for fclaw2d_clwaptch_opitons structure */
 typedef struct fclaw2d_clawpatch_options fclaw2d_clawpatch_options_t;
@@ -110,7 +110,7 @@ fclaw2d_clawpatch_options_register(fclaw_app_t* app, const char* name, const cha
  * @param glob the global context
  * @param clawpatch_options the options
  */
-void fclaw2d_clawpatch_options_store (struct fclaw2d_global *glob, 
+void fclaw2d_clawpatch_options_store (struct fclaw_global *glob, 
                                       fclaw2d_clawpatch_options_t* clawpatch_options);
 
 /**
@@ -119,7 +119,7 @@ void fclaw2d_clawpatch_options_store (struct fclaw2d_global *glob,
  * @param glob the global context
  * @return fclaw2d_clawpatch_options_t* the options
  */
-fclaw2d_clawpatch_options_t* fclaw2d_clawpatch_get_options(struct fclaw2d_global* glob);
+fclaw2d_clawpatch_options_t* fclaw2d_clawpatch_get_options(struct fclaw_global* glob);
 
 /**
  * @brief Get the packing vtable for fclaw2d_clawpatch_options_t

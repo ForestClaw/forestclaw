@@ -25,7 +25,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "bump_user.h"
 
-#include <fclaw2d_include_all.h>
+#include <fclaw_include_all.h>
 
 #include <fclaw2d_clawpatch_options.h>
 #include <fclaw2d_clawpatch.h>
@@ -37,39 +37,34 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fc2d_clawpack5.h>
 
 static
-void create_domain(fclaw2d_global_t *glob)
+void create_domain(fclaw_global_t *glob)
 {
-    const fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
+    const fclaw_options_t* fclaw_opt = fclaw_get_options(glob);
 
-    fclaw2d_domain_t *domain = 
-        fclaw2d_domain_new_unitsquare (glob->mpicomm, 
+    fclaw_domain_t *domain = 
+        fclaw_domain_new_unitsquare (glob->mpicomm, 
                                        fclaw_opt->minlevel);
 
-    fclaw2d_map_context_t *cont = fclaw2d_map_new_nomap();
+    fclaw_map_context_t *cont = fclaw_map_new_nomap();
 
     /* Store mapping in the glob */
-    fclaw2d_global_store_map (glob, cont);            
+    fclaw_map_store (glob, cont);            
 
     /* Store the domain in the glob */
-    fclaw2d_global_store_domain(glob, domain);
+    fclaw_global_store_domain(glob, domain);
 
     /* print out some info */
-    fclaw2d_domain_list_levels (domain, FCLAW_VERBOSITY_ESSENTIAL);
-    fclaw2d_domain_list_neighbors (domain, FCLAW_VERBOSITY_DEBUG);
+    fclaw_domain_list_levels (domain, FCLAW_VERBOSITY_ESSENTIAL);
+    fclaw_domain_list_neighbors (domain, FCLAW_VERBOSITY_DEBUG);
 }
 
 static
-void run_program(fclaw2d_global_t* glob)
+void run_program(fclaw_global_t* glob)
 {
-    /* ---------------------------------------------------------------
-       Set domain data.
-       --------------------------------------------------------------- */
-    fclaw2d_domain_data_new(glob->domain);
-
     user_options_t* user_opt = bump_get_options(glob);
 
     /* Initialize virtual table for ForestClaw */
-    fclaw2d_vtables_initialize(glob);
+    fclaw_vtables_initialize(glob);
 
     /* Initialize virtual tables for solvers */
     if (user_opt->claw_version == 4)
@@ -86,9 +81,9 @@ void run_program(fclaw2d_global_t* glob)
     /* ---------------------------------------------------------------
        Run
        --------------------------------------------------------------- */
-    fclaw2d_initialize(glob);
-    fclaw2d_run(glob);
-    fclaw2d_finalize(glob);
+    fclaw_initialize(glob);
+    fclaw_run(glob);
+    fclaw_finalize(glob);
 }
 
 
@@ -126,10 +121,10 @@ main (int argc, char **argv)
         /* Create global structure which stores the domain, timers, etc */
         int size, rank;
         sc_MPI_Comm mpicomm = fclaw_app_get_mpi_size_rank (app, &size, &rank);
-        fclaw2d_global_t *glob = fclaw2d_global_new_comm (mpicomm, size, rank);
+        fclaw_global_t *glob = fclaw_global_new_comm (mpicomm, size, rank);
 
         /* Store option packages in glob */
-        fclaw2d_options_store           (glob, fclaw_opt);
+        fclaw_options_store           (glob, fclaw_opt);
         fclaw2d_clawpatch_options_store (glob, clawpatch_opt);
         fc2d_clawpack46_options_store   (glob, claw46_opt);
         fc2d_clawpack5_options_store    (glob, claw5_opt);
@@ -140,7 +135,7 @@ main (int argc, char **argv)
 
         run_program(glob);
 
-        fclaw2d_global_destroy(glob);
+        fclaw_global_destroy(glob);
     }
 
     fclaw_app_destroy (app);

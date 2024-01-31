@@ -148,14 +148,14 @@ user_options_t* replicated_options_register (fclaw_app_t * app,
     return user;
 }
 
-void replicated_options_store (fclaw2d_global_t* glob, user_options_t* user)
+void replicated_options_store (fclaw_global_t* glob, user_options_t* user)
 {
-    fclaw2d_global_options_store(glob, "user", user);
+    fclaw_global_options_store(glob, "user", user);
 }
 
-const user_options_t* replicated_get_options(fclaw2d_global_t* glob)
+const user_options_t* replicated_get_options(fclaw_global_t* glob)
 {
-    return (user_options_t*) fclaw2d_global_get_options(glob, "user");
+    return (user_options_t*) fclaw_global_get_options(glob, "user");
 }
 
 void replicated_global_post_process(fclaw_options_t *fclaw_opt, 

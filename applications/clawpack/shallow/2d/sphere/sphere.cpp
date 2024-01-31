@@ -25,11 +25,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "sphere_user.h"
 
-#include <fclaw2d_forestclaw.h>
+#include <fclaw_forestclaw.h>
 #include <fclaw2d_clawpatch.hpp>
 
-#include <fclaw2d_map.h>
-#include <fclaw2d_map_query.h>
+#include <fclaw_map.h>
+#include <fclaw_map_query.h>
 #include <p4est_connectivity.h>
 
 #include <fc2d_clawpack46.h>
@@ -136,8 +136,8 @@ void run_program(fclaw_app_t* app)
 
     /* Mapped, multi-block domain */
     p4est_connectivity_t     *conn = NULL;
-    fclaw2d_domain_t	     *domain;
-    fclaw2d_map_context_t    *cont = NULL, *brick = NULL;
+    fclaw_domain_t	     *domain;
+    fclaw_map_context_t    *cont = NULL, *brick = NULL;
 
     fclaw_options_t   *gparms;
     user_options_t  *user;
@@ -183,21 +183,21 @@ void run_program(fclaw_app_t* app)
 
     domain = fclaw2d_domain_new_conn_map (mpicomm, gparms->minlevel, conn, cont);
 
-    fclaw2d_domain_list_levels(domain, FCLAW_VERBOSITY_ESSENTIAL);
-    fclaw2d_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);
+    fclaw_domain_list_levels(domain, FCLAW_VERBOSITY_ESSENTIAL);
+    fclaw_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);
 
     /* ---------------------------------------------------------------
        Set domain data.
        --------------------------------------------------------------- */
     fclaw2d_domain_set_app (domain,app);
 
-    fclaw2d_domain_data_new(domain);
+    you_can_safely_remove_this_call(domain);
 
     sphere_link_solvers(domain);
 
-    fclaw2d_initialize(&domain);
-    fclaw2d_run(&domain);
-    fclaw2d_finalize(&domain);
+    fclaw_initialize(&domain);
+    fclaw_run(&domain);
+    fclaw_finalize(&domain);
 }
 
 int

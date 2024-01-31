@@ -26,34 +26,28 @@
 #include "slosh_user.h"
 
 static
-void create_domain(fclaw2d_global_t* glob)
+void create_domain(fclaw_global_t* glob)
 {
-    fclaw_options_t *fclaw_opts = fclaw2d_get_options(glob);
+    fclaw_options_t *fclaw_opts = fclaw_get_options(glob);
 
     /* Size is set by [ax,bx] x [ay, by], set in .ini file */
-    fclaw2d_domain_t *domain = 
-        fclaw2d_domain_new_unitsquare(glob->mpicomm, fclaw_opts->minlevel);
-    fclaw2d_map_context_t* cont = fclaw2d_map_new_nomap();
+    fclaw_domain_t *domain = 
+        fclaw_domain_new_unitsquare(glob->mpicomm, fclaw_opts->minlevel);
+    fclaw_map_context_t* cont = fclaw_map_new_nomap();
 
     /* store domain and map in glob */
-    fclaw2d_global_store_domain(glob, domain);
-    fclaw2d_global_store_map(glob, cont);
+    fclaw_global_store_domain(glob, domain);
+    fclaw_map_store(glob, cont);
 
-    fclaw2d_domain_list_levels(domain, FCLAW_VERBOSITY_ESSENTIAL);
-    fclaw2d_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);
+    fclaw_domain_list_levels(domain, FCLAW_VERBOSITY_ESSENTIAL);
+    fclaw_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);
 }
 
 static
-void run_program(fclaw2d_global_t* glob)
+void run_program(fclaw_global_t* glob)
 {
-
-    /* ---------------------------------------------------------------
-       Set domain data.
-       --------------------------------------------------------------- */
-    fclaw2d_domain_data_new(glob->domain);
-
     /* Initialize virtual table for ForestClaw */
-    fclaw2d_vtables_initialize(glob);
+    fclaw_vtables_initialize(glob);
 
     fc2d_geoclaw_solver_initialize(glob);
 
@@ -65,10 +59,10 @@ void run_program(fclaw2d_global_t* glob)
     fc2d_geoclaw_module_setup(glob);
 
 
-    fclaw2d_initialize(glob);
+    fclaw_initialize(glob);
     fc2d_geoclaw_run(glob);
 
-    fclaw2d_finalize(glob);
+    fclaw_finalize(glob);
 }
 
 int
@@ -101,10 +95,10 @@ main (int argc, char **argv)
         sc_MPI_Comm mpicomm = fclaw_app_get_mpi_size_rank (app, &size, &rank);
     
         /* Create global structure which stores the domain, timers, etc */
-        fclaw2d_global_t *glob = fclaw2d_global_new_comm(mpicomm, size, rank);
+        fclaw_global_t *glob = fclaw_global_new_comm(mpicomm, size, rank);
 
         /* Store option packages in glob */
-        fclaw2d_options_store           (glob, fclaw_opt);
+        fclaw_options_store           (glob, fclaw_opt);
         fclaw2d_clawpatch_options_store (glob, clawpatch_opt);
         fc2d_geoclaw_options_store      (glob, geo_opt);
         slosh_options_store             (glob, user_opt);
@@ -113,7 +107,7 @@ main (int argc, char **argv)
 
         run_program(glob);
         
-        fclaw2d_global_destroy(glob);
+        fclaw_global_destroy(glob);
     }
     
     fclaw_app_destroy (app);

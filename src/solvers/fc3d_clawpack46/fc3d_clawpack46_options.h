@@ -36,7 +36,7 @@ extern "C"
 #endif
 #endif
 
-struct fclaw2d_global;
+struct fclaw_global;
 typedef struct fc3d_clawpack46_options fc3d_clawpack46_options_t;
 
 struct fc3d_clawpack46_options
@@ -86,12 +86,12 @@ fc3d_clawpack46_options_t*  fc3d_clawpack46_options_register (fclaw_app_t * app,
 void fc3d_clawpack46_package_register(fclaw_app_t* app,
                                       fc3d_clawpack46_options_t* clawopt);
 
-fc3d_clawpack46_options_t* fc3d_clawpack46_get_options(struct fclaw2d_global *glob);
+fc3d_clawpack46_options_t* fc3d_clawpack46_get_options(struct fclaw_global *glob);
 
-void fc3d_clawpack46_options_store (struct fclaw2d_global* glob, 
+void fc3d_clawpack46_options_store (struct fclaw_global* glob, 
                                     fc3d_clawpack46_options_t* clawopt);
 
-void fc3d_clawpack46_output(struct fclaw2d_global *glob, int iframe);
+void fc3d_clawpack46_output(struct fclaw_global *glob, int iframe);
 
 
 #ifdef __cplusplus

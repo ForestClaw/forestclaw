@@ -26,7 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "square_user.h"
 
 static
-void square_problem_setup(fclaw2d_global_t* glob)
+void square_problem_setup(fclaw_global_t* glob)
 {
     const user_options_t* user = square_get_options(glob);
 
@@ -43,14 +43,14 @@ void square_problem_setup(fclaw2d_global_t* glob)
         fprintf(f,  "%-24.6f   %s",user->velocity[1],"\% v\n");
         fclose(f);
     }
-    fclaw2d_domain_barrier (glob->domain);
+    fclaw_domain_barrier (glob->domain);
     SETPROB();
 
 
 }
 
-void square_patch_setup_manifold(fclaw2d_global_t *glob,
-                                    fclaw2d_patch_t *patch,
+void square_patch_setup_manifold(fclaw_global_t *glob,
+                                    fclaw_patch_t *patch,
                                     int blockno,
                                     int patchno)
 {
@@ -68,21 +68,21 @@ void square_patch_setup_manifold(fclaw2d_global_t *glob,
 }
 
 static
-void cb_square_output_ascii (fclaw2d_domain_t * domain,
-                            fclaw2d_patch_t * patch,
+void cb_square_output_ascii (fclaw_domain_t * domain,
+                            fclaw_patch_t * patch,
                             int blockno, int patchno,
                             void *user)
 {
-    fclaw2d_global_iterate_t* s = (fclaw2d_global_iterate_t*) user;
-    fclaw2d_global_t  *glob = (fclaw2d_global_t*) s->glob;
-    const fclaw_options_t  *fclaw_opt = fclaw2d_get_options(glob);
+    fclaw_global_iterate_t* s = (fclaw_global_iterate_t*) user;
+    fclaw_global_t  *glob = (fclaw_global_t*) s->glob;
+    const fclaw_options_t  *fclaw_opt = fclaw_get_options(glob);
 
     int iframe = *((int *) s->user);
     double time = glob->curr_time;
 
     /* Get info not readily available to user */
     int level, patch_num, global_num;
-    fclaw2d_patch_get_info(glob->domain,patch,
+    fclaw_patch_get_info(glob->domain,patch,
                            blockno,patchno,
                            &global_num, &patch_num,&level);
     
@@ -119,13 +119,13 @@ void cb_square_output_ascii (fclaw2d_domain_t * domain,
 
 
 
-void square_link_solvers(fclaw2d_global_t *glob)
+void square_link_solvers(fclaw_global_t *glob)
 {
     /* ForestClaw core functions */
-    fclaw2d_vtable_t *vt = fclaw2d_vt(glob);
+    fclaw_vtable_t *vt = fclaw_vt(glob);
     vt->problem_setup = &square_problem_setup;  /* Version-independent */
 
-    fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt(glob);
+    fclaw_patch_vtable_t *patch_vt = fclaw_patch_vt(glob);
     patch_vt->setup = &square_patch_setup_manifold;
 
     fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt(glob);
@@ -154,7 +154,7 @@ void square_link_solvers(fclaw2d_global_t *glob)
     }
 
     /* Include error in output files */
-    const fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
+    const fclaw_options_t* fclaw_opt = fclaw_get_options(glob);
     if (fclaw_opt->compute_error)
     {
         if (user->claw_version == 4)

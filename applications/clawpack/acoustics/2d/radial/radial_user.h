@@ -26,7 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef RADIAL_USER_H
 #define RADIAL_USER_H
 
-#include <fclaw2d_include_all.h>
+#include <fclaw_include_all.h>
 
 #include <fclaw2d_clawpatch.h>
 #include <fclaw2d_clawpatch_options.h>
@@ -66,15 +66,15 @@ typedef struct user_options
 
 } user_options_t;
 
-void radial_link_solvers(fclaw2d_global_t *glob);
+void radial_link_solvers(fclaw_global_t *glob);
 
 /* --------------------------------- Options ------------------------------------- */
 
 user_options_t* radial_options_register (fclaw_app_t * app, const char *configfile);
 
-void radial_options_store (fclaw2d_global_t* glob, user_options_t* user);
+void radial_options_store (fclaw_global_t* glob, user_options_t* user);
 
-user_options_t* radial_get_options(fclaw2d_global_t* glob);
+user_options_t* radial_get_options(fclaw_global_t* glob);
 
 void radial_global_post_process(fclaw_options_t *fclaw_opt,
                                 fclaw2d_clawpatch_options_t *clawpatch_opt,
@@ -109,12 +109,12 @@ void CLAWPACK5_SETAUX_MANIFOLD(const int* mbc,
 
 /* -------------------------------- Mappings ------------------------------------- */
 
-fclaw2d_map_context_t* fclaw2d_map_new_pillowdisk5(const double scale[],
+fclaw_map_context_t* fclaw2d_map_new_pillowdisk5(const double scale[],
                                                    const double shift[],
                                                    const double rotate[],
                                                    const double alpha);
 
-fclaw2d_map_context_t* fclaw2d_map_new_pillowdisk(const double scale[],
+fclaw_map_context_t* fclaw2d_map_new_pillowdisk(const double scale[],
                                                   const double shift[],
                                                   const double rotate[]);
 

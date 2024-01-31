@@ -28,6 +28,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_options.h>
 #include <fclaw_timer.h>
 #include <fclaw_mpi.h>
+#include <fclaw_global.h>
 
 /* Get whatever definitions exist already */
 #ifdef FCLAW_HAVE_FENV_H
@@ -745,3 +746,16 @@ void fclaw_options_destroy_array(void* array)
     FCLAW_FREE (array);
 }
 
+/* ---------------------------------------------------------
+   Public interface to ForestClaw options
+   --------------------------------------------------------- */
+
+void fclaw_options_store (fclaw_global_t *glob, fclaw_options_t* gparms)
+{
+    fclaw_global_options_store(glob, "fclaw2d", gparms);
+}
+
+fclaw_options_t* fclaw_get_options(fclaw_global_t* glob)
+{
+    return (fclaw_options_t*) fclaw_global_get_options(glob, "fclaw2d");
+}

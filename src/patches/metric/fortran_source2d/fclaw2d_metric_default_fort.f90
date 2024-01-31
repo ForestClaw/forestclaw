@@ -43,7 +43,7 @@ subroutine fclaw2d_metric_fort_compute_mesh(mx,my,mbc, &
             yc = ylower + (j-1)*dyf
 
 
-            call fclaw2d_map_c2m(map_context_ptr, & 
+            call fclaw_map_2d_c2m(map_context_ptr, & 
                                blockno,xc,yc,xd1,yd1,zd1)
 
             if (abs(mod(i,2)) .eq. 1) then
@@ -156,7 +156,7 @@ subroutine fclaw2d_metric_fort_compute_area_general(mx,my,mbc, &
                     xef = xe + ii*dxf
                     yef = ye + jj*dyf
 
-                    call fclaw2d_map_c2m(cont, & 
+                    call fclaw_map_2d_c2m(cont, & 
                         blockno,xef,yef,xp1,yp1,zp1)
 
                     quadstore(ii,jj,1) = xp1
@@ -236,7 +236,7 @@ subroutine fclaw2d_metric_fort_compute_area_affine(mx,my,mbc,dx,dy, &
                 do jcell = 0,1
                     xcorner = xe + icell*dx
                     ycorner = ye + jcell*dy
-                    call fclaw2d_map_c2m(map_context_ptr, & 
+                    call fclaw_map_2d_c2m(map_context_ptr, & 
                         blockno,xcorner,ycorner,xp1,yp1,zp1)
                     quad(icell,jcell,1) = xp1
                     quad(icell,jcell,2) = yp1

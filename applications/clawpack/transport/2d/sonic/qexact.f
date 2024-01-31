@@ -105,7 +105,7 @@ c     # Initial position traced back from (xc1,yc1)
       yc0 = sigma(2)
 
 c     # Map to [-1,1]x[-1,1]      
-      call mapc2m_cart(blockno,xc0,yc0,xc1,yc1,zp)
+      call fclaw_map_2d_c2m_cart(blockno,xc0,yc0,xc1,yc1,zp)
 
 c     # Map to [0,1]x[0,1]      
 c      xp = (1 + xc0)/2.d0

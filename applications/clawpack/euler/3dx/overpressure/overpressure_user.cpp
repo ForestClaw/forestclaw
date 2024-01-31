@@ -27,7 +27,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "../all/euler3d_user.h"
 
-#include <fclaw2d_include_all.h>
+#include <fclaw_include_all.h>
 
 #include <fclaw3dx_clawpatch.h>
 #include <fclaw3dx_clawpatch_fort.h>
@@ -39,10 +39,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw3d_metric.h>
 
 
-void overpressure_problem_setup(fclaw2d_global_t* glob)
+void overpressure_problem_setup(fclaw_global_t* glob)
 {
     const user_options_t* user = overpressure_get_options(glob);
-    fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
+    fclaw_options_t* fclaw_opt = fclaw_get_options(glob);
     fc3d_clawpack46_options_t *clawopt = fc3d_clawpack46_get_options(glob);
 
     if (glob->mpirank == 0)
@@ -83,13 +83,13 @@ void overpressure_problem_setup(fclaw2d_global_t* glob)
     }
 
     /* We want to make sure node 0 gets here before proceeding */
-    fclaw2d_domain_barrier (glob->domain);  /* redundant?  */
+    fclaw_domain_barrier (glob->domain);  /* redundant?  */
     SETPROB();
 }
 
 static
-void overpressure_patch_setup(fclaw2d_global_t *glob,
-                              fclaw2d_patch_t *patch,
+void overpressure_patch_setup(fclaw_global_t *glob,
+                              fclaw_patch_t *patch,
                               int blockno,
                               int patchno)
 {
@@ -123,14 +123,14 @@ void overpressure_patch_setup(fclaw2d_global_t *glob,
 
 
 
-void overpressure_link_solvers(fclaw2d_global_t *glob)
+void overpressure_link_solvers(fclaw_global_t *glob)
 {
     const user_options_t* user = overpressure_get_options(glob);
-    fclaw2d_vtable_t *fclaw_vt = fclaw2d_vt(glob);
+    fclaw_vtable_t *fc_vt = fclaw_vt(glob);
 
-    fclaw_vt->problem_setup = &overpressure_problem_setup;
+    fc_vt->problem_setup = &overpressure_problem_setup;
 
-    fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt(glob);
+    fclaw_patch_vtable_t *patch_vt = fclaw_patch_vt(glob);
 
     if (user->claw_version == 4)
     {
@@ -144,7 +144,7 @@ void overpressure_link_solvers(fclaw2d_global_t *glob)
         fclaw3dx_clawpatch_vtable_t *clawpatch_vt = fclaw3dx_clawpatch_vt(glob);
         clawpatch_vt->fort_user_exceeds_threshold = &EULER3D_PRESSURE_EXCEEDS_TH;
 
-        fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+        fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
         if (fclaw_opt->manifold)
         {
             /* This calls a manifold version of setaux */

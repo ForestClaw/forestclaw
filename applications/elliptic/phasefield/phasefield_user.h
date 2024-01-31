@@ -26,7 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef PHASEFIELD_USER_H
 #define PHASEFIELD_USER_H
 
-#include <fclaw2d_include_all.h>
+#include <fclaw_include_all.h>
 
 #include <fc2d_thunderegg.h>
 
@@ -44,9 +44,9 @@ extern "C"
 
 /* --------------------------- Problem dependent functions -----------------------------*/
 
-void phasefield_link_solvers(fclaw2d_global_t *glob);
+void phasefield_link_solvers(fclaw_global_t *glob);
 
-void phasefield_run(fclaw2d_global_t *glob);
+void phasefield_run(fclaw_global_t *glob);
 
 
 /* --------------------------- Fortran functions ---------------------------------------*/

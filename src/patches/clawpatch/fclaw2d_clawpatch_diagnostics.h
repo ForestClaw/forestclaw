@@ -39,8 +39,8 @@ extern "C"
 #endif
 #endif
 
-struct fclaw2d_global;
-struct fclaw2d_patch;
+struct fclaw_global;
+struct fclaw_patch;
 
 /**
  * @brief Data structure for default diagnostic routines
@@ -64,7 +64,7 @@ typedef struct {
  * @param glob the global context
  * @param patch_acc the data structure
  */
-void fclaw2d_clawpatch_diagnostics_initialize(struct fclaw2d_global *glob,
+void fclaw2d_clawpatch_diagnostics_initialize(struct fclaw_global *glob,
                                               void** patch_acc);
 
 /**
@@ -73,7 +73,7 @@ void fclaw2d_clawpatch_diagnostics_initialize(struct fclaw2d_global *glob,
  * @param glob the global context
  * @param patch_acc the user defined data structure
  */
-void fclaw2d_clawpatch_diagnostics_compute(struct fclaw2d_global *glob,
+void fclaw2d_clawpatch_diagnostics_compute(struct fclaw_global *glob,
                                            void* patch_acc);
 
 /**
@@ -83,7 +83,7 @@ void fclaw2d_clawpatch_diagnostics_compute(struct fclaw2d_global *glob,
  * @param patch_acc the user defined data structure
  * @param init_flag true if in init stage
  */
-void fclaw2d_clawpatch_diagnostics_gather(struct fclaw2d_global *glob,
+void fclaw2d_clawpatch_diagnostics_gather(struct fclaw_global *glob,
                                           void* patch_acc, int init_flag);
 
 /**
@@ -92,7 +92,7 @@ void fclaw2d_clawpatch_diagnostics_gather(struct fclaw2d_global *glob,
  * @param glob the global context
  * @param patch_acc the user defined data structure
  */
-void fclaw2d_clawpatch_diagnostics_reset(struct fclaw2d_global *glob,
+void fclaw2d_clawpatch_diagnostics_reset(struct fclaw_global *glob,
                                          void* patch_acc);
 
 /**
@@ -101,7 +101,7 @@ void fclaw2d_clawpatch_diagnostics_reset(struct fclaw2d_global *glob,
  * @param glob the global context
  * @param patch_acc the user defined data structure
  */
-void fclaw2d_clawpatch_diagnostics_finalize(struct fclaw2d_global *glob,
+void fclaw2d_clawpatch_diagnostics_finalize(struct fclaw_global *glob,
                                             void** patch_acc);
 
 /**
@@ -111,7 +111,7 @@ void fclaw2d_clawpatch_diagnostics_finalize(struct fclaw2d_global *glob,
  * 
  * @param glob the global context
  */
-void fclaw2d_clawpatch_diagnostics_vtable_initialize(struct fclaw2d_global* glob);
+void fclaw2d_clawpatch_diagnostics_vtable_initialize(struct fclaw_global* glob);
 
 /**
  * @brief Calls the function in fclaw2d_clawpatch_vtable.fort_conservation_check
@@ -122,8 +122,8 @@ void fclaw2d_clawpatch_diagnostics_vtable_initialize(struct fclaw2d_global* glob
  * @param patchno the patch number
  * @param error_data user data pointer
  */
-void fclaw2d_clawpatch_diagnostics_cons_default(struct fclaw2d_global *glob,
-                                                struct fclaw2d_patch *patch,
+void fclaw2d_clawpatch_diagnostics_cons_default(struct fclaw_global *glob,
+                                                struct fclaw_patch *patch,
                                                 int blockno,
                                                 int patchno,
                                                 void *error_data);
@@ -137,8 +137,8 @@ void fclaw2d_clawpatch_diagnostics_cons_default(struct fclaw2d_global *glob,
  * @param patchno the patch number
  * @param error_data user data pointer
  */
-void fclaw2d_clawpatch_diagnostics_error_default(struct fclaw2d_global *glob,
-                                                 struct fclaw2d_patch *patch,
+void fclaw2d_clawpatch_diagnostics_error_default(struct fclaw_global *glob,
+                                                 struct fclaw_patch *patch,
                                                  int blockno,
                                                  int patchno,
                                                  void *error_data);

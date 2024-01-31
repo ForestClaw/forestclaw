@@ -23,58 +23,58 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <fclaw2d_global.h>
+#include <fclaw_global.h>
 #include <fc2d_thunderegg.h>
-#include <fclaw2d_forestclaw.h>
+#include <fclaw_forestclaw.h>
 #include <test.hpp>
 
 TEST_CASE("fc2d_thunderegg_solver_initialize stores two seperate vtables in two seperate globs")
 {
-	fclaw2d_global_t* glob1 = fclaw2d_global_new();
-	fclaw2d_global_t* glob2 = fclaw2d_global_new();
+	fclaw_global_t* glob1 = fclaw_global_new();
+	fclaw_global_t* glob2 = fclaw_global_new();
 
-	fclaw2d_vtables_initialize(glob1);
+	fclaw_vtables_initialize(glob1);
 	fc2d_thunderegg_solver_initialize(glob1);
 
-	fclaw2d_vtables_initialize(glob2);
+	fclaw_vtables_initialize(glob2);
 	fc2d_thunderegg_solver_initialize(glob2);
 
 	CHECK_NE(fc2d_thunderegg_vt(glob1), fc2d_thunderegg_vt(glob2));
 
-	fclaw2d_global_destroy(glob1);
-	fclaw2d_global_destroy(glob2);
+	fclaw_global_destroy(glob1);
+	fclaw_global_destroy(glob2);
 }
 
 TEST_CASE("fc2d_thunderegg_solver_initialize sets is_set flag")
 {
-	fclaw2d_global_t* glob = fclaw2d_global_new();
+	fclaw_global_t* glob = fclaw_global_new();
 
-	fclaw2d_vtables_initialize(glob);
+	fclaw_vtables_initialize(glob);
 	fc2d_thunderegg_solver_initialize(glob);
 
 
 	CHECK_UNARY(fc2d_thunderegg_vt(glob)->is_set);
 
-	fclaw2d_global_destroy(glob);
+	fclaw_global_destroy(glob);
 }
 
 #ifdef FCLAW_ENABLE_DEBUG
 
 TEST_CASE("fc2d_thunderegg_vtable_initialize fails if called twice on a glob")
 {
-	fclaw2d_global_t* glob1 = fclaw2d_global_new();
-	fclaw2d_global_t* glob2 = fclaw2d_global_new();
+	fclaw_global_t* glob1 = fclaw_global_new();
+	fclaw_global_t* glob2 = fclaw_global_new();
 
-	fclaw2d_vtables_initialize(glob1);
+	fclaw_vtables_initialize(glob1);
 	fc2d_thunderegg_solver_initialize(glob1);
 	CHECK_SC_ABORTED(fc2d_thunderegg_solver_initialize(glob1));
 
-	fclaw2d_vtables_initialize(glob2);
+	fclaw_vtables_initialize(glob2);
 	fc2d_thunderegg_solver_initialize(glob2);
 	CHECK_SC_ABORTED(fc2d_thunderegg_solver_initialize(glob2));
 
-	fclaw2d_global_destroy(glob1);
-	fclaw2d_global_destroy(glob2);
+	fclaw_global_destroy(glob1);
+	fclaw_global_destroy(glob2);
 }
 
 #endif

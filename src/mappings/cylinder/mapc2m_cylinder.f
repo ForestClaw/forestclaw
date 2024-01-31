@@ -1,4 +1,4 @@
-      subroutine mapc2m_torus(xc,yc,xp,yp,zp,alpha, beta)
+      subroutine fclaw_map_2d_c2m_torus(xc,yc,xp,yp,zp,alpha, beta)
       implicit none
 
       double precision xc,yc,xp,yp,zp

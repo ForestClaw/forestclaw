@@ -26,12 +26,12 @@
 #include "heat/heat_user.h"
 #include "phasefield/phasefield_user.h"
     
-#include <fclaw2d_include_all.h>
+#include <fclaw_include_all.h>
 
-#include <fclaw2d_output.h>
-#include <fclaw2d_diagnostics.h>
+#include <fclaw_output.h>
+#include <fclaw_diagnostics.h>
 
-#include <fclaw2d_elliptic_solver.h>
+#include <fclaw_elliptic_solver.h>
 
 #include <fclaw2d_clawpatch_options.h>
 #include <fclaw2d_clawpatch.h>
@@ -80,10 +80,10 @@ main (int argc, char **argv)
         sc_MPI_Comm mpicomm = fclaw_app_get_mpi_size_rank (app, &size, &rank);
     
         /* Create global structure which stores the domain, timers, etc */
-        fclaw2d_global_t *heat_glob = fclaw2d_global_new_comm(mpicomm, size, rank);
+        fclaw_global_t *heat_glob = fclaw_global_new_comm(mpicomm, size, rank);
 
         /* Store option packages in glob */
-        fclaw2d_options_store           (heat_glob, heat_fclaw_opt);
+        fclaw_options_store           (heat_glob, heat_fclaw_opt);
         fclaw2d_clawpatch_options_store (heat_glob, heat_clawpatch_opt);
         fc2d_thunderegg_options_store    (heat_glob, heat_mg_opt);
         heat_options_store            (heat_glob, heat_user_opt);
@@ -92,14 +92,14 @@ main (int argc, char **argv)
 
         heat_run_program(heat_glob);
 
-        fclaw2d_global_destroy(heat_glob);        
+        fclaw_global_destroy(heat_glob);        
 
     
         /* Create global structure which stores the domain, timers, etc */
-        fclaw2d_global_t *phasefield_glob = fclaw2d_global_new_comm(mpicomm, size, rank);
+        fclaw_global_t *phasefield_glob = fclaw_global_new_comm(mpicomm, size, rank);
 
         /* Store option packages in glob */
-        fclaw2d_options_store           (phasefield_glob, phasefield_fclaw_opt);
+        fclaw_options_store           (phasefield_glob, phasefield_fclaw_opt);
         fclaw2d_clawpatch_options_store (phasefield_glob, phasefield_clawpatch_opt);
         fc2d_thunderegg_options_store    (phasefield_glob, phasefield_mg_opt);
         phasefield_options_store            (phasefield_glob, phasefield_user_opt);
@@ -108,7 +108,7 @@ main (int argc, char **argv)
 
         phasefield_run_program(phasefield_glob);
 
-        fclaw2d_global_destroy(phasefield_glob); 
+        fclaw_global_destroy(phasefield_glob); 
     }
     
     fclaw_app_destroy (app);
