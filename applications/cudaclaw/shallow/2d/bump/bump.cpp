@@ -93,13 +93,13 @@ main (int argc, char **argv)
     /* Options */
     user_options_t              *user_opt;
     fclaw_options_t             *fclaw_opt;
-    fclaw2d_clawpatch_options_t *clawpatch_opt;
+    fclaw_clawpatch_options_t *clawpatch_opt;
     fc2d_cudaclaw_options_t     *cuclaw_opt;
 
 
     /* Create new options packages */
     fclaw_opt =                   fclaw_options_register(app,  NULL,       "fclaw_options.ini");
-    clawpatch_opt =   fclaw2d_clawpatch_options_register(app, "clawpatch", "fclaw_options.ini");
+    clawpatch_opt =   fclaw_clawpatch_2d_options_register(app, "clawpatch", "fclaw_options.ini");
     cuclaw_opt =          fc2d_cudaclaw_options_register(app, "cudaclaw",  "fclaw_options.ini");
     user_opt =                     bump_options_register(app,              "fclaw_options.ini");  
 
@@ -120,7 +120,7 @@ main (int argc, char **argv)
 
         /* Store option packages in glob */
         fclaw_options_store           (glob, fclaw_opt);
-        fclaw2d_clawpatch_options_store (glob, clawpatch_opt);
+        fclaw_clawpatch_options_store (glob, clawpatch_opt);
         fc2d_cudaclaw_options_store     (glob, cuclaw_opt);
         bump_options_store              (glob, user_opt);
 

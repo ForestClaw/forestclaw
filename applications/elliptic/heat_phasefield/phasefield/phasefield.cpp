@@ -36,8 +36,8 @@
 
 #include <fclaw_elliptic_solver.h>
 
-#include <fclaw2d_clawpatch_options.h>
-#include <fclaw2d_clawpatch.h>
+#include <fclaw_clawpatch_options.h>
+#include <fclaw_clawpatch.h>
 
 #include <fc2d_thunderegg.h>
 #include <fc2d_thunderegg_options.h>

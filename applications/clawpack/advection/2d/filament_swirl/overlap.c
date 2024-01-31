@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_global.h>
 #include <fclaw_domain.h>
 #include <fclaw_patch.h>    
-#include <fclaw2d_clawpatch.h>
+#include <fclaw_clawpatch.h>
 
 
 void apply_consumer_mapping (overlap_point_t * op)
@@ -63,7 +63,7 @@ void add_cell_centers (fclaw_domain_t * domain, fclaw_patch_t * patch,
     FCLAW_ASSERT (c->query_points != NULL);
 
     /* create one query point for every cell in the patch */
-    fclaw2d_clawpatch_grid_data (c->glob, patch, &mx, &my, &mbc,
+    fclaw_clawpatch_2d_grid_data (c->glob, patch, &mx, &my, &mbc,
                                  &xlower, &ylower, &dx, &dy);
     for (i = 0; i < mx; i++)
     {

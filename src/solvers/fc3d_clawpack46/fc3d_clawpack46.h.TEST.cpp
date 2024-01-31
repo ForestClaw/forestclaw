@@ -27,7 +27,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fc3d_clawpack46.h>
 #include <fc3d_clawpack46_options.h>
 #include <fclaw_forestclaw.h>
-#include <fclaw3dx_clawpatch_options.h>
+#include <fclaw_convenience.h>
+#include <fclaw_clawpatch_options.h>
 #include <test.hpp>
 
 TEST_CASE("fc3d_clawpack46_solver_initialize stores two seperate vtables in two seperate globs")
@@ -35,11 +36,18 @@ TEST_CASE("fc3d_clawpack46_solver_initialize stores two seperate vtables in two 
 	fclaw_global_t* glob1 = fclaw_global_new();
 	fclaw_global_t* glob2 = fclaw_global_new();
 
+	fclaw_domain_t* domain = fclaw_domain_new_unitsquare(sc_MPI_COMM_WORLD, 0);
+	fclaw_global_store_domain(glob1, domain);
+	fclaw_global_store_domain(glob2, domain);
+
+	fclaw_clawpatch_options_t* opts1 = fclaw_clawpatch_options_new(3);
+	fclaw_clawpatch_options_t* opts2 = fclaw_clawpatch_options_new(3);
+
 	/* create some empty options structures */
-	fclaw3dx_clawpatch_options_store(glob1, FCLAW_ALLOC_ZERO(fclaw3dx_clawpatch_options_t,1));
+	fclaw_clawpatch_options_store(glob1, opts1);
 	fc3d_clawpack46_options_store(glob1, FCLAW_ALLOC_ZERO(fc3d_clawpack46_options_t,1));
 
-	fclaw3dx_clawpatch_options_store(glob2, FCLAW_ALLOC_ZERO(fclaw3dx_clawpatch_options_t,1));
+	fclaw_clawpatch_options_store(glob2, opts2);
 	fc3d_clawpack46_options_store(glob2, FCLAW_ALLOC_ZERO(fc3d_clawpack46_options_t,1));
 
 	fclaw_vtables_initialize(glob1);
@@ -50,16 +58,23 @@ TEST_CASE("fc3d_clawpack46_solver_initialize stores two seperate vtables in two 
 
 	CHECK_NE(fc3d_clawpack46_vt(glob1), fc3d_clawpack46_vt(glob2));
 
+	fclaw_clawpatch_options_destroy(opts1);
+	fclaw_clawpatch_options_destroy(opts2);
+	fclaw_domain_destroy(domain);
 	fclaw_global_destroy(glob1);
 	fclaw_global_destroy(glob2);
 }
 
 TEST_CASE("fc3d_clawpack46_solver_initialize sets is_set flag")
 {
+	fclaw_domain_t* domain = fclaw_domain_new_unitsquare(sc_MPI_COMM_WORLD, 0);
 	fclaw_global_t* glob = fclaw_global_new();
+	fclaw_global_store_domain(glob, domain);
+
+	fclaw_clawpatch_options_t* opts = fclaw_clawpatch_options_new(3);
 
 	/* create some empty options structures */
-	fclaw3dx_clawpatch_options_store(glob, FCLAW_ALLOC_ZERO(fclaw3dx_clawpatch_options_t,1));
+	fclaw_clawpatch_options_store(glob, opts);
 	fc3d_clawpack46_options_store(glob, FCLAW_ALLOC_ZERO(fc3d_clawpack46_options_t,1));
 
 	fclaw_vtables_initialize(glob);
@@ -68,6 +83,8 @@ TEST_CASE("fc3d_clawpack46_solver_initialize sets is_set flag")
 
 	CHECK_UNARY(fc3d_clawpack46_vt(glob)->is_set);
 
+	fclaw_clawpatch_options_destroy(opts);
+	fclaw_domain_destroy(domain);
 	fclaw_global_destroy(glob);
 }
 
@@ -78,10 +95,15 @@ TEST_CASE("fc3d_clawpack46_vt fails if not intialized")
 	fclaw_global_t* glob1 = fclaw_global_new();
 	fclaw_global_t* glob2 = fclaw_global_new();
 
+	fclaw_domain_t* domain = fclaw_domain_new_unitsquare(sc_MPI_COMM_WORLD, 0);
+	fclaw_global_store_domain(glob1, domain);
+	fclaw_global_store_domain(glob2, domain);
+
 	CHECK_SC_ABORTED(fc3d_clawpack46_vt(glob1));
 
 	CHECK_SC_ABORTED(fc3d_clawpack46_vt(glob2));
 
+	fclaw_domain_destroy(domain);
 	fclaw_global_destroy(glob1);
 	fclaw_global_destroy(glob2);
 }
@@ -91,11 +113,18 @@ TEST_CASE("fc3d_clawpack46_vtable_initialize fails if called twice on a glob")
 	fclaw_global_t* glob1 = fclaw_global_new();
 	fclaw_global_t* glob2 = fclaw_global_new();
 
+	fclaw_domain_t* domain = fclaw_domain_new_unitsquare(sc_MPI_COMM_WORLD, 0);
+	fclaw_global_store_domain(glob1, domain);
+	fclaw_global_store_domain(glob2, domain);
+
+	fclaw_clawpatch_options_t* opts1 = fclaw_clawpatch_options_new(3);
+	fclaw_clawpatch_options_t* opts2 = fclaw_clawpatch_options_new(3);
+
 	/* create some empty options structures */
-	fclaw3dx_clawpatch_options_store(glob1, FCLAW_ALLOC_ZERO(fclaw3dx_clawpatch_options_t,1));
+	fclaw_clawpatch_options_store(glob1, opts1);
 	fc3d_clawpack46_options_store(glob1, FCLAW_ALLOC_ZERO(fc3d_clawpack46_options_t,1));
 
-	fclaw3dx_clawpatch_options_store(glob2, FCLAW_ALLOC_ZERO(fclaw3dx_clawpatch_options_t,1));
+	fclaw_clawpatch_options_store(glob2, opts2);
 	fc3d_clawpack46_options_store(glob2, FCLAW_ALLOC_ZERO(fc3d_clawpack46_options_t,1));
 
 	fclaw_vtables_initialize(glob1);
@@ -106,6 +135,9 @@ TEST_CASE("fc3d_clawpack46_vtable_initialize fails if called twice on a glob")
 	fc3d_clawpack46_solver_initialize(glob2);
 	CHECK_SC_ABORTED(fc3d_clawpack46_solver_initialize(glob2));
 
+	fclaw_clawpatch_options_destroy(opts1);
+	fclaw_clawpatch_options_destroy(opts2);
+	fclaw_domain_destroy(domain);
 	fclaw_global_destroy(glob1);
 	fclaw_global_destroy(glob2);
 }

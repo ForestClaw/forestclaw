@@ -35,22 +35,22 @@ void transport_b4step2_manifold(fclaw_global_t *glob,
 {
     int mx,my,mbc;
     double xlower,ylower,dx,dy;
-    fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mbc,
+    fclaw_clawpatch_2d_grid_data(glob,patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
     double *xnormals,*ynormals,*xtangents,*ytangents,*surfnormals;
-    fclaw2d_clawpatch_metric_vector(glob,patch,
+    fclaw_clawpatch_2d_metric_vector(glob,patch,
                                     &xnormals, &ynormals,
                                     &xtangents, &ytangents,
                                     &surfnormals);
 
     double *xp, *yp, *zp, *xd, *yd, *zd, *area;
-    fclaw2d_clawpatch_metric_data(glob,patch,&xp,&yp,&zp,
+    fclaw_clawpatch_2d_metric_data(glob,patch,&xp,&yp,&zp,
                                   &xd,&yd,&zd,&area);
 
     double *aux;
     int maux;
-    fclaw2d_clawpatch_aux_data(glob,patch,&aux,&maux);
+    fclaw_clawpatch_aux_data(glob,patch,&aux,&maux);
 
     // const user_options_t* user_opt = sphere_get_options(glob);
     if (claw_version == 4)

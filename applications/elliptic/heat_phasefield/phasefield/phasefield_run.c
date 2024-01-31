@@ -26,7 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "phasefield_user.h"
 #include "phasefield_operator.h"
 
-#include <fclaw2d_clawpatch.h>
+#include <fclaw_clawpatch.h>
 #include <fclaw_patch.h>
 
 #include <fclaw_forestclaw.h>
@@ -61,16 +61,16 @@ void update_q(fclaw_domain_t *domain,
 
     int mx,my,mbc;
     double xlower,ylower,dx,dy;
-    fclaw2d_clawpatch_grid_data(g->glob,patch,&mx,&my,&mbc,
+    fclaw_clawpatch_2d_grid_data(g->glob,patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
     double* rhs;
     int mfields;
-    fclaw2d_clawpatch_rhs_data(g->glob, patch, &rhs, &mfields);
+    fclaw_clawpatch_rhs_data(g->glob, patch, &rhs, &mfields);
 
     double* q;
     int meqn;
-    fclaw2d_clawpatch_soln_data(g->glob, patch, &q, &meqn);
+    fclaw_clawpatch_soln_data(g->glob, patch, &q, &meqn);
 
     FCLAW_ASSERT(mfields==meqn);
 

@@ -25,7 +25,7 @@
 
 #include "radialdam_user.h"
 
-#include <fclaw2d_clawpatch.h>
+#include <fclaw_clawpatch.h>
 
 #include <fc2d_clawpack46.h>
 #include <fc2d_clawpack5.h>
@@ -77,7 +77,7 @@ void radialdam_link_solvers(fclaw_global_t *glob)
 			}
 			else if (user->example == 1)
 			{
-				fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt(glob);
+				fclaw_clawpatch_vtable_t *clawpatch_vt = fclaw_clawpatch_vt(glob);
 				fclaw_patch_vtable_t         *patch_vt = fclaw_patch_vt(glob);
 
 				patch_vt->setup = &radialdam_patch_setup;
@@ -125,19 +125,19 @@ void radialdam_patch_setup(fclaw_global_t *glob,
 		return;
 	}
 
-	fclaw2d_clawpatch_grid_data(glob,this_patch,&mx,&my,&mbc,
+	fclaw_clawpatch_2d_grid_data(glob,this_patch,&mx,&my,&mbc,
 			&xlower,&ylower,&dx,&dy);
 
-	fclaw2d_clawpatch_metric_data(glob,this_patch,&xp,&yp,&zp,
+	fclaw_clawpatch_2d_metric_data(glob,this_patch,&xp,&yp,&zp,
 			&xd,&yd,&zd,&area);
 
-	fclaw2d_clawpatch_metric_data2(glob,this_patch,
+	fclaw_clawpatch_2d_metric_data2(glob,this_patch,
 			&xnormals,&ynormals,
 			&xtangents,&ytangents,
 			&surfnormals,&edgelengths,
 			&curvature);
 
-	fclaw2d_clawpatch_aux_data(glob,this_patch,&aux,&maux);
+	fclaw_clawpatch_aux_data(glob,this_patch,&aux,&maux);
 
 	USER5_SETAUX_MANIFOLD(&mbc,&mx,&my,&xlower,&ylower,
 			&dx,&dy,&maux,aux,

@@ -100,7 +100,7 @@ subroutine fclaw3dx_clawpatch46_fort_interpolate_face &
                     do jc = 1,mx
                         i1 = ic
                         j1 = jc
-                        call fclaw3dx_clawpatch_transform_face_half(i1,j1,i2,j2,transform_ptr)
+                        call fclaw2d_clawpatch_transform_face_half(i1,j1,i2,j2,transform_ptr)
                         skip_this_grid = .false.
                         do m = 0,r2-1
                             if (.not. fclaw2d_clawpatch_is_valid_interp(i2(m),j2(m),mx,my,mbc)) then
@@ -145,7 +145,7 @@ subroutine fclaw3dx_clawpatch46_fort_interpolate_face &
                     do ic = 1,mx
                         i1 = ic
                         j1 = jc
-                        call fclaw3dx_clawpatch_transform_face_half(i1,j1,i2,j2, transform_ptr)
+                        call fclaw2d_clawpatch_transform_face_half(i1,j1,i2,j2, transform_ptr)
                         !! # ---------------------------------------------
                         !! # Two 'half-size' neighbors will be passed into
                         !! # this routine.  Only half of the coarse grid ghost
@@ -265,7 +265,7 @@ subroutine fclaw3dx_clawpatch46_fort_interpolate_corner &
             !! # Interpolate coarse grid corners to fine grid corner ghost cells
             i1 = ic
             j1 = jc
-            call fclaw3dx_clawpatch_transform_corner_half(i1,j1,i2,j2, transform_ptr)
+            call fclaw2d_clawpatch_transform_corner_half(i1,j1,i2,j2, transform_ptr)
 
             mq_loop : do mq = 1,meqn
                 k_loop : do k = 1,mz

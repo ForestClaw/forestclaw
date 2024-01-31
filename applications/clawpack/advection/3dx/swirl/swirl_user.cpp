@@ -57,12 +57,12 @@ void swirl_patch_setup(fclaw_global_t *glob,
 {
     int mx,my,mz, mbc;
     double xlower,ylower,zlower, dx,dy, dz;
-    fclaw3dx_clawpatch_grid_data(glob,patch,&mx,&my,&mz, &mbc,
+    fclaw_clawpatch_3d_grid_data(glob,patch,&mx,&my,&mz, &mbc,
                                 &xlower,&ylower,&zlower, &dx,&dy, &dz);
 
     double *xd,*yd,*zd,*volume,*faceareas;
     double *xp,*yp,*zp;
-    fclaw3d_clawpatch_mesh_data(glob,patch,&xp,&yp,&zp,
+    fclaw_clawpatch_3d_mesh_data(glob,patch,&xp,&yp,&zp,
                                 &xd,&yd,&zd,&volume,&faceareas);
 
     double *xrot, *yrot, *zrot;
@@ -70,7 +70,7 @@ void swirl_patch_setup(fclaw_global_t *glob,
 
     int maux;
     double *aux;
-    fclaw3dx_clawpatch_aux_data(glob,patch,&aux,&maux);
+    fclaw_clawpatch_aux_data(glob,patch,&aux,&maux);
 
     SWIRL_SETAUX_MANIFOLD(&mbc,&mx,&my,&mz, &xlower,&ylower,&zlower,
                           &dx,&dy,&dz,&maux,aux,&blockno,
@@ -84,8 +84,8 @@ void swirl_link_solvers(fclaw_global_t *glob)
     fc_vt->problem_setup = swirl_problem_setup;
 
     /* example of how to set up a user defined criteria */
-    fclaw3dx_clawpatch_vtable_t *clawpatch_vt = fclaw3dx_clawpatch_vt(glob);
-    clawpatch_vt->fort_user_exceeds_threshold = &FCLAW3DX_USER_EXCEEDS_TH;
+    fclaw_clawpatch_vtable_t *clawpatch_vt = fclaw_clawpatch_vt(glob);
+    clawpatch_vt->d3->fort_user_exceeds_threshold = &FCLAW3D_USER_EXCEEDS_TH;
 
     fclaw_options_t* fclaw_opt = fclaw_get_options(glob);
 

@@ -26,7 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "fc2d_clawpack5_options.h"
 #include "fclaw_base.h"
 
-#include <fclaw2d_clawpatch_options.h>
+#include <fclaw_clawpatch_options.h>
 #include <fclaw_global.h>
 #include <fclaw_options.h>
 #include <fclaw_pointer_map.h>

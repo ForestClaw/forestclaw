@@ -31,10 +31,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw_elliptic_solver.h>
 
-#include <fclaw2d_clawpatch.h>
-#include <fclaw2d_clawpatch_options.h>
-#include <fclaw2d_clawpatch_output_ascii.h>
-#include <fclaw2d_clawpatch_output_vtk.h>
+#include <fclaw_clawpatch.h>
+#include <fclaw_clawpatch_options.h>
+#include <fclaw_clawpatch_output_ascii.h>
+#include <fclaw_clawpatch_output_vtk.h>
 
 #include <fclaw_global.h>
 #include <fclaw_map.h>
@@ -267,8 +267,8 @@ void fivePoint::modifyRHSForInternalBoundaryConditions(const PatchInfo<2>& pinfo
 void fc2d_thunderegg_fivepoint_solve(fclaw_global_t *glob) 
 {
     // get needed options
-    fclaw2d_clawpatch_options_t *clawpatch_opt =
-    fclaw2d_clawpatch_get_options(glob);
+    fclaw_clawpatch_options_t *clawpatch_opt =
+    fclaw_clawpatch_get_options(glob);
     fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
     fc2d_thunderegg_options_t *mg_opt = fc2d_thunderegg_get_options(glob);
   

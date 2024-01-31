@@ -31,7 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fc2d_clawpack46_options.h>
 #include <clawpack46_user_fort.h>    /* Headers for user defined fortran files */
 
-#include <fclaw2d_clawpatch.h>
+#include <fclaw_clawpatch.h>
 #include <fclaw2d_clawpatch_fort.h>  /* headers for tag2refinement, tag4coarsening  */
 
 #include "../all/advection_user_fort.h"  
@@ -47,7 +47,7 @@ void swirlcons_link_solvers(fclaw_global_t *glob)
 {
     fclaw_vtable_t                     *vt = fclaw_vt(glob);
     fclaw_patch_vtable_t         *patch_vt = fclaw_patch_vt(glob);
-    fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt(glob);
+    fclaw_clawpatch_vtable_t *clawpatch_vt = fclaw_clawpatch_vt(glob);
     fc2d_clawpack46_vtable_t  *clawpack46_vt = fc2d_clawpack46_vt(glob);
 
     fc2d_clawpack46_options_t  *clawopt = fc2d_clawpack46_get_options(glob);
@@ -172,27 +172,27 @@ void swirlcons_patch_setup_manifold(fclaw_global_t *glob,
 
     int mx,my,mbc;
     double xlower,ylower,dx,dy;
-    fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mbc,
+    fclaw_clawpatch_2d_grid_data(glob,patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
 
     double *xp, *yp, *zp, *xd, *yd, *zd, *area;
-    fclaw2d_clawpatch_metric_data(glob,patch,&xp,&yp,&zp,
+    fclaw_clawpatch_2d_metric_data(glob,patch,&xp,&yp,&zp,
                                   &xd,&yd,&zd,&area);
 
     double *edgelengths, *curvature;
-    fclaw2d_clawpatch_metric_scalar(glob, patch, &area,&edgelengths,
+    fclaw_clawpatch_2d_metric_scalar(glob, patch, &area,&edgelengths,
                                     &curvature);
 
     double *xnormals,*ynormals,*xtangents,*ytangents,*surfnormals;
-    fclaw2d_clawpatch_metric_vector(glob,patch,
+    fclaw_clawpatch_2d_metric_vector(glob,patch,
                                     &xnormals, &ynormals,
                                     &xtangents, &ytangents,
                                     &surfnormals);
 
     double *aux;
     int maux;
-    fclaw2d_clawpatch_aux_data(glob,patch,&aux,&maux);
+    fclaw_clawpatch_aux_data(glob,patch,&aux,&maux);
 
     switch(user->mapping)
     {
@@ -238,16 +238,16 @@ void cb_swirl_output_ascii (fclaw_domain_t * domain,
     
     int mx,my,mbc;
     double xlower, ylower, dx, dy;
-    fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mbc,
+    fclaw_clawpatch_2d_grid_data(glob,patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
     double *q;
     int meqn;
-    fclaw2d_clawpatch_soln_data(glob,patch,&q,&meqn);
+    fclaw_clawpatch_soln_data(glob,patch,&q,&meqn);
 
 
-    double* error = fclaw2d_clawpatch_get_error(glob,patch);
-    double* soln = fclaw2d_clawpatch_get_exactsoln(glob,patch);
+    double* error = fclaw_clawpatch_get_error(glob,patch);
+    double* soln = fclaw_clawpatch_get_exactsoln(glob,patch);
 
     const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
     char fname[BUFSIZ];

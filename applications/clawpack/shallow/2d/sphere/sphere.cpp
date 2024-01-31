@@ -26,7 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "sphere_user.h"
 
 #include <fclaw_forestclaw.h>
-#include <fclaw2d_clawpatch.hpp>
+#include <fclaw_clawpatch.hpp>
 
 #include <fclaw_map.h>
 #include <fclaw_map_query.h>

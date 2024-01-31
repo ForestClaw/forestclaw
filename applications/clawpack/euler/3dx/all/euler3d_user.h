@@ -30,9 +30,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 /* Headers for both Clawpack 4.6 and  Clawpack 5.0 */
-#include <fclaw3dx_clawpatch.h>
-#include <fclaw3dx_clawpatch_options.h>
-#include <fclaw3dx_clawpatch_fort.h>
+#include <fclaw_clawpatch.h>
+#include <fclaw_clawpatch_options.h>
+#include <fclaw3d_clawpatch_fort.h>
 
 
 /* Clawpack 4.6 headers */  
@@ -40,7 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fc3d_clawpack46_options.h>
 #include <fc3d_clawpack46_fort.h>  
 #include <fc3d_clawpack46_user_fort.h>  
-#include <fclaw3dx_clawpatch46_fort.h>
+#include <fclaw3d_clawpatch46_fort.h>
 
 #if 0
 /* Clawpack 5.0 headers */

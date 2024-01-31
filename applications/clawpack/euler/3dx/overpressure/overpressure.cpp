@@ -49,7 +49,7 @@ void create_domain(fclaw_global_t *glob)
     fclaw_domain_t         *domain;
     fclaw_map_context_t    *cont = NULL, *brick = NULL;
 
-    fclaw3dx_clawpatch_options_t *clawpatch_opt = fclaw3dx_clawpatch_get_options(glob);
+    fclaw_clawpatch_options_t *clawpatch_opt = fclaw_clawpatch_get_options(glob);
     fc3d_clawpack46_options_t *claw3_opt = fc3d_clawpack46_get_options(glob);
 
     /* Use [ax,bx]x[ay,by] */
@@ -178,13 +178,13 @@ main (int argc, char **argv)
 
     /* Options */
     fclaw_options_t               *fclaw_opt;
-    fclaw3dx_clawpatch_options_t  *clawpatch_opt;
+    fclaw_clawpatch_options_t  *clawpatch_opt;
     fc3d_clawpack46_options_t     *claw46_opt;
     user_options_t                *user_opt;
 
     /* Create new options packages */
     fclaw_opt =                   fclaw_options_register(app,  NULL,        "fclaw_options.ini");
-    clawpatch_opt =   fclaw3dx_clawpatch_options_register(app, "clawpatch",  "fclaw_options.ini");
+    clawpatch_opt =   fclaw_clawpatch_3d_options_register(app, "clawpatch",  "fclaw_options.ini");
     claw46_opt =        fc3d_clawpack46_options_register(app, "claw3", "fclaw_options.ini");
     user_opt =              overpressure_options_register(app,"fclaw_options.ini");  
 
@@ -202,7 +202,7 @@ main (int argc, char **argv)
 
         /* Store option packages in glob */
         fclaw_options_store           (glob, fclaw_opt);
-        fclaw3dx_clawpatch_options_store(glob, clawpatch_opt);
+        fclaw_clawpatch_options_store(glob, clawpatch_opt);
         fc3d_clawpack46_options_store   (glob, claw46_opt);
         overpressure_options_store       (glob, user_opt);
 

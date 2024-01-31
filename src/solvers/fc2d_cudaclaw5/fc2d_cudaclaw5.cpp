@@ -31,11 +31,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cuda_source/cudaclaw5_allocate.h"
 
-#include <fclaw2d_clawpatch.h>
-#include <fclaw2d_clawpatch.hpp>
+#include <fclaw_clawpatch.h>
+#include <fclaw_clawpatch.hpp>
 
-#include <fclaw2d_clawpatch_output_ascii.h>
-#include <fclaw2d_clawpatch_output_vtk.h>
+#include <fclaw_clawpatch_output_ascii.h>
+#include <fclaw_clawpatch_output_vtk.h>
 
 
 #include <fclaw_patch.h>
@@ -83,9 +83,9 @@ void cudaclaw5_setaux(fclaw_global_t *glob,
     double *aux;
 
 
-    fclaw2d_clawpatch_grid_data(glob,this_patch, &mx,&my,&mbc,
+    fclaw_clawpatch_2d_grid_data(glob,this_patch, &mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
-    fclaw2d_clawpatch_aux_data(glob,this_patch,&aux,&maux);
+    fclaw_clawpatch_aux_data(glob,this_patch,&aux,&maux);
 
     CUDACLAW5_SET_BLOCK(&this_block_idx);
     cuclaw5_vt->fort_setaux(&mbc,&mx,&my,&xlower,&ylower,&dx,&dy,
@@ -106,11 +106,11 @@ void cudaclaw5_qinit(fclaw_global_t *glob,
     double dx,dy,xlower,ylower;
     double *q, *aux;
 
-    fclaw2d_clawpatch_grid_data(glob,this_patch,&mx,&my,&mbc,
+    fclaw_clawpatch_2d_grid_data(glob,this_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
-    fclaw2d_clawpatch_soln_data(glob,this_patch,&q,&meqn);
-    fclaw2d_clawpatch_aux_data(glob,this_patch,&aux,&maux);
+    fclaw_clawpatch_soln_data(glob,this_patch,&q,&meqn);
+    fclaw_clawpatch_aux_data(glob,this_patch,&aux,&maux);
 
     /* Call to classic Clawpack 'qinit' routine.  This must be user defined */
     CUDACLAW5_SET_BLOCK(&this_block_idx);
@@ -138,11 +138,11 @@ void cudaclaw5_b4step2(fclaw_global_t *glob,
     double xlower,ylower,dx,dy;
     double *aux,*q;
 
-    fclaw2d_clawpatch_grid_data(glob,this_patch, &mx,&my,&mbc,
+    fclaw_clawpatch_2d_grid_data(glob,this_patch, &mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
-    fclaw2d_clawpatch_soln_data(glob,this_patch,&q,&meqn);
-    fclaw2d_clawpatch_aux_data(glob,this_patch,&aux,&maux);
+    fclaw_clawpatch_soln_data(glob,this_patch,&q,&meqn);
+    fclaw_clawpatch_aux_data(glob,this_patch,&aux,&maux);
 
     CUDACLAW5_SET_BLOCK(&this_block_idx);
     cuclaw5_vt->fort_b4step2(&mbc,&mx,&my,&meqn,q,&xlower,&ylower,
@@ -169,11 +169,11 @@ void cudaclaw5_src2(fclaw_global_t *glob,
     double xlower,ylower,dx,dy;
     double *aux,*q;
 
-    fclaw2d_clawpatch_grid_data(glob,this_patch, &mx,&my,&mbc,
+    fclaw_clawpatch_2d_grid_data(glob,this_patch, &mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
-    fclaw2d_clawpatch_soln_data(glob,this_patch,&q,&meqn);
-    fclaw2d_clawpatch_aux_data(glob,this_patch,&aux,&maux);
+    fclaw_clawpatch_soln_data(glob,this_patch,&q,&meqn);
+    fclaw_clawpatch_aux_data(glob,this_patch,&aux,&maux);
 
     CUDACLAW5_SET_BLOCK(&this_block_idx);
     cuclaw5_vt->fort_src2(&meqn,&mbc,&mx,&my,&xlower,&ylower,
@@ -201,10 +201,10 @@ void cudaclaw5_bc2(fclaw_global_t *glob,
     double xlower,ylower,dx,dy;
     double *aux,*q;
 
-    fclaw2d_clawpatch_grid_data(glob,this_patch, &mx,&my,&mbc,
+    fclaw_clawpatch_2d_grid_data(glob,this_patch, &mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
-    fclaw2d_clawpatch_aux_data(glob,this_patch,&aux,&maux);
+    fclaw_clawpatch_aux_data(glob,this_patch,&aux,&maux);
 
     int *block_mthbc = clawopt->mthbc;
 
@@ -228,7 +228,7 @@ void cudaclaw5_bc2(fclaw_global_t *glob,
       In this case, this boundary condition won't be used to update
       anything
     */
-    fclaw2d_clawpatch_timesync_data(glob,this_patch,time_interp,&q,&meqn);
+    fclaw_clawpatch_timesync_data(glob,this_patch,time_interp,&q,&meqn);
 
     CUDACLAW5_SET_BLOCK(&this_block_idx);
     cuclaw5_vt->fort_bc2(&meqn,&mbc,&mx,&my,&xlower,&ylower,
@@ -288,12 +288,12 @@ void cudaclaw5_output(fclaw_global_t *glob, int iframe)
 
     if (cudaclaw_options->ascii_out != 0)
     {
-        fclaw2d_clawpatch_output_ascii(glob,iframe);
+        fclaw_clawpatch_output_ascii(glob,iframe);
     }
 
     if (cudaclaw_options->vtk_out != 0)
     {
-        fclaw2d_clawpatch_output_vtk(glob,iframe);
+        fclaw_clawpatch_output_vtk(glob,iframe);
     }
 
 }
@@ -316,7 +316,7 @@ void fc2d_cudaclaw5_solver_initialize()
     //fc2d_clawpack46_solver_initialize(glob);
     
     int claw_version = 5;
-    fclaw2d_clawpatch_vtable_initialize(claw_version);
+    fclaw_clawpatch_vtable_initialize(claw_version);
 
     fclaw_vtable_t*          fclaw_vt = fclaw_vt(glob);
     fclaw_patch_vtable_t*    patch_vt = fclaw_patch_vt(glob);
@@ -395,12 +395,12 @@ void fc2d_cudaclaw5_set_capacity(fclaw_global_t *glob,
     clawopt = fc2d_cudaclaw5_get_options(glob);
     mcapa = clawopt->mcapa;
 
-    fclaw2d_clawpatch_grid_data(glob,this_patch, &mx,&my,&mbc,
+    fclaw_clawpatch_2d_grid_data(glob,this_patch, &mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
-    area = fclaw2d_clawpatch_get_area(glob,this_patch);
+    area = fclaw_clawpatch_get_2d_area(glob,this_patch);
 
-    fclaw2d_clawpatch_aux_data(glob,this_patch,&aux,&maux);
+    fclaw_clawpatch_aux_data(glob,this_patch,&aux,&maux);
     FCLAW_ASSERT(maux >= mcapa && mcapa > 0);
 
     CUDACLAW5_SET_CAPACITY(&mx,&my,&mbc,&dx,&dy,area,&mcapa,

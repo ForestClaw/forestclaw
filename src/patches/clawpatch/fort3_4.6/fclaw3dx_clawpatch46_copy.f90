@@ -117,7 +117,7 @@ subroutine fclaw3dx_clawpatch46_fort_copy_corner(mx,my,mz,mbc,meqn, &
 
                     !! # this routine is not yet complete, but the complete one
                     !! # can now be dropped in.
-                    call fclaw3dx_clawpatch_transform_corner(i1,j1,i2,j2, transform_ptr)
+                    call fclaw2d_clawpatch_transform_corner(i1,j1,i2,j2, transform_ptr)
                     qthis(i1,j1,k,mq) = qneighbor(i2,j2,k,mq)
                 end do
             end do

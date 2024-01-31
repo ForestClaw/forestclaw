@@ -32,8 +32,8 @@
 
 #include <fclaw_include_all.h>
 
-#include <fclaw2d_clawpatch.h>
-#include <fclaw2d_clawpatch_options.h>
+#include <fclaw_clawpatch.h>
+#include <fclaw_clawpatch_options.h>
 
 #ifdef __cplusplus
 extern "C"
