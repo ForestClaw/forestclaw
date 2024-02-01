@@ -62,14 +62,22 @@ fclaw2d_map_query_nomap_brick (fclaw_map_context_t * cont, int query_identifier)
 
 
 void
-    fclaw_map_2d_c2m_nomap_brick(fclaw_map_context_t * cont, int blockno,
-                                double xc, double yc,
-                                double *xp, double *yp, double *zp)
+fclaw_map_2d_c2m_nomap_brick(fclaw_map_context_t * cont, int blockno,
+                             double xc, double yc,
+                             double *xp, double *yp, double *zp)
 {
     /* Brick mapping to computational coordinates [0,1]x[0,1] */
     FCLAW_MAP_2D_BRICK2C(&cont,&blockno,&xc,&yc,xp,yp,zp);    
 }
 
+void 
+fclaw_map_3d_c2m_nomap_brick(fclaw_map_context_t * cont, int blockno,
+                             double xc, double yc, double zc,
+                             double *xp, double *yp, double *zp)
+{
+    /* Brick mapping to computational coordinates [0,1]x[0,1]x[0,1] */
+    FCLAW_MAP_3D_BRICK2C(&cont,&blockno,&xc,&yc,&zc,xp,yp,zp);    
+}
 
 /* This shouldn't be called */
 static void

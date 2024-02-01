@@ -247,9 +247,37 @@ void FCLAW_MAP_3D_BRICK2C (fclaw_map_context_t ** cont, int *blockno,
 void fclaw_map_destroy (fclaw_map_context_t * cont);
 
 fclaw_map_context_t* fclaw_map_new_nomap_brick(fclaw_map_context_t* brick);
+
+/**
+ * Maps the coordinates (xc, yc) from within a block to the entire brick
+ *
+ * @param cont The map context.
+ * @param blockno The block number.
+ * @param xc The x-coordinate in the block
+ * @param yc The y-coordinate in the block
+ * @param xp Pointer to store the x-coordinate in the brick
+ * @param yp Pointer to store the y-coordinate in the brick
+ * @param zp Pointer to store the z-coordinate in the brick
+ */
 void fclaw_map_2d_c2m_nomap_brick(fclaw_map_context_t * cont, int blockno,
-                                 double xc, double yc,
-                                 double *xp, double* yp, double *zp);
+                                  double xc, double yc,
+                                  double *xp, double* yp, double *zp);
+
+/**
+ * Maps the coordinates (xc, yc, zc) from within a block to the entire brick
+ *
+ * @param cont The map context.
+ * @param blockno The block number.
+ * @param xc The x-coordinate in the block
+ * @param yc The y-coordinate in the block
+ * @param zc The z-coordinate in the block
+ * @param xp Pointer to store the x-coordinate in the brick
+ * @param yp Pointer to store the y-coordinate in the brick
+ * @param zp Pointer to store the z-coordinate in the brick
+ */
+void fclaw_map_3d_c2m_nomap_brick(fclaw_map_context_t * cont, int blockno,
+                                  double xc, double yc, double zc,
+                                  double *xp, double* yp, double *zp);
 
 
 /* ----------------------------------------------------------------------------------
