@@ -104,7 +104,7 @@ add_subdirectory(clawpack/shallow/2d/bump)
 ## Euler
 add_subdirectory(clawpack/euler/2d/shockbubble)
 add_subdirectory(clawpack/euler/2d/quadrants)
-
+add_subdirectory(clawpack/euler/2d/triple)
 
 ## --------------------- Miscellaneous ---------------------------- 
 ## Example : Don't using the 'app' for configuring options;  
