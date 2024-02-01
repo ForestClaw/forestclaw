@@ -207,8 +207,8 @@ void FCLAW_MAP_3D_C2M_BASIS (fclaw_map_context_t ** cont,
 /** Map brick to computational coordinates in [0,1]x[0,1]
  * \param [in] cont     Mapping context with matching callback functions.
  * \param [in] blockno  Number of the block to be transformed.
- * \param [in] cx       X-coordinate in [block->xlower, block->xupper].
- * \param [in] cy       Y-coordinate in [block->ylower, block->yupper].
+ * \param [in] xc       X-coordinate in [block->xlower, block->xupper].
+ * \param [in] yc       Y-coordinate in [block->ylower, block->yupper].
  * \param [out] mx      Transformed x-coordinate.
  * \param [out] my      Transformed y-coordinate.
  * \param [out] mz      Transformed z-coordinate.
@@ -219,6 +219,23 @@ void FCLAW_MAP_3D_C2M_BASIS (fclaw_map_context_t ** cont,
 void FCLAW_MAP_2D_BRICK2C (fclaw_map_context_t ** cont, int *blockno,
                           const double *xc, const double *yc,
                           double *xp, double *yp, double *zp);
+
+/** Map brick to computational coordinates in [0,1]x[0,1]x[0,1]
+ * \param [in] cont     Mapping context with matching callback functions.
+ * \param [in] blockno  Number of the block to be transformed.
+ * \param [in] xc       X-coordinate in [block->xlower, block->xupper].
+ * \param [in] yc       Y-coordinate in [block->ylower, block->yupper].
+ * \param [in] zc       Z-coordinate in [block->zlower, block->zupper].
+ * \param [out] mx      Transformed x-coordinate.
+ * \param [out] my      Transformed y-coordinate.
+ * \param [out] mz      Transformed z-coordinate.
+ */
+#define FCLAW_MAP_3D_BRICK2C FCLAW_F77_FUNC_(fclaw_map_3d_brick2c, \
+                                            FCLAW_MAP_3D_BRICK2C)
+void FCLAW_MAP_3D_BRICK2C (fclaw_map_context_t ** cont, int *blockno,
+                          const double *xc, const double *yc, const double *zc,
+                          double *xp, double *yp, double *zp);
+
 
 
 /** Deallocate a mapping context.
