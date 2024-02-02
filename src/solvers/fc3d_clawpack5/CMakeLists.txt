@@ -34,14 +34,11 @@ install(FILES
 	fc3d_clawpack5.h
 	clawpack5_user_fort.h
 	fc3d_clawpack5_options.h
-	DESTINATION include
+	TYPE INCLUDE
 )
 
 install(TARGETS clawpack5_3d
-  EXPORT ${PROJECT_NAME}-targets
-  ARCHIVE DESTINATION lib
-  LIBRARY DESTINATION lib
-	RUNTIME DESTINATION bin)
+  EXPORT ${PROJECT_NAME}-targets)
 
 # imported target, for use from FetchContent
 add_library(FORESTCLAW::CLAWPACK5_3D INTERFACE IMPORTED GLOBAL)
