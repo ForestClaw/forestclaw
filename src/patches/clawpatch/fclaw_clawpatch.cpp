@@ -246,14 +246,7 @@ void clawpatch_define(fclaw_global_t* glob,
 
     fclaw_map_context_t* cont = fclaw_map_get(glob);
 
-    int is_brick;
-    if(glob->domain->refine_dim == 2)
-    {
-        is_brick = FCLAW_MAP_IS_BRICK(&cont);
-    }else {
-        //TODO mappings
-        is_brick = (fclaw_opt->mi > 1) || (fclaw_opt->mj > 1) || (fclaw_opt->mk > 1);
-    }
+    int is_brick = FCLAW_MAP_IS_BRICK(&cont);
 
     cp->manifold = fclaw_opt->manifold;
     if (cp->manifold)
@@ -296,21 +289,8 @@ void clawpatch_define(fclaw_global_t* glob,
             }
             else 
             {
-                //TODO fclaw3d_map_c2m_nomap_brick
-                //hardcoded for now
-                fclaw_block_t *block = &glob->domain->blocks[blockno];
-
-                //map in [0,1] for entire brick
-                double block_xlower = block->vertices[0];
-                double block_ylower = block->vertices[1];
-                double block_zlower = block->vertices[2];
-
-                xlower = (block_xlower + xl)/(double)fclaw_opt->mi;
-                xupper = (block_xlower + xu)/(double)fclaw_opt->mi;
-                ylower = (block_ylower + yl)/(double)fclaw_opt->mj;
-                yupper = (block_ylower + yu)/(double)fclaw_opt->mj;
-                zlower = (block_zlower + zl)/(double)fclaw_opt->mk;
-                zupper = (block_zlower + zu)/(double)fclaw_opt->mk;
+                fclaw_map_3d_c2m_nomap_brick(cont,cp->blockno,xl,yl,zl,&xlower,&ylower,&zlower);
+                fclaw_map_3d_c2m_nomap_brick(cont,cp->blockno,xu,yu,zu,&xupper,&yupper,&zupper);
             }
         }
         else

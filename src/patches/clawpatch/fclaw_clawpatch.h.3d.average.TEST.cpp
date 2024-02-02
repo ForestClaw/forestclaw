@@ -83,6 +83,7 @@ struct CubeDomain {
 
         //map = fclaw3d_map_new_nomap();
         //fclaw_global_store_map_3d(glob, map);
+        fclaw_map_store(glob, fclaw_map_new_nomap());
 
         fclaw_vtables_initialize(glob);
         fclaw_clawpatch_vtable_initialize(glob, 4);
