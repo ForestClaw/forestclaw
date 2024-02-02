@@ -40,14 +40,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_domain.h>
 #include <fclaw_patch.h>
 
-typedef struct tag4f_user
-{
-    int domain_init;
-    int num_patches_refined;
-    int num_patches_to_refine;
-} tag4f_user_t;
-
-
 /* This is also called from fclaw2d_initialize, so is not made static */
 void cb_fclaw_regrid_tag4refinement(fclaw_domain_t *domain,
 									  fclaw_patch_t *this_patch,
@@ -59,7 +51,7 @@ void cb_fclaw_regrid_tag4refinement(fclaw_domain_t *domain,
     const fclaw_options_t* fclaw_opt;
 
     fclaw_global_iterate_t* g = (fclaw_global_iterate_t*) user;
-    tag4f_user_t *tag_user = ((tag4f_user_t*) g->user);
+    fclaw_tag4f_user_t *tag_user = ((fclaw_tag4f_user_t*) g->user);
 
     fclaw_opt = fclaw_get_options(g->glob);
 
@@ -249,10 +241,10 @@ void fclaw_regrid(fclaw_global_t *glob)
     fclaw_global_iterate_families(glob, cb_regrid_tag4coarsening,
                                     (void *) &domain_init);
 
-    tag4f_user_t refine_user;
+    fclaw_tag4f_user_t refine_user;
     refine_user.domain_init = domain_init;
     refine_user.num_patches_refined = 0;
-    refine_user.num_patches_to_refine = 4;
+    refine_user.num_patches_to_refine = 0;
 
     fclaw_global_iterate_patches(glob, cb_fclaw_regrid_tag4refinement,
                                    (void *) &refine_user);
