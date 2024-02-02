@@ -88,6 +88,7 @@ void patch_data_new(fclaw_global_t* glob,
 
 	++glob->domain->count_set_patch; //this is now in cb_fclaw2d_regrid_repopulate 
 	pdata->neighbors_set = 0;
+	pdata->considered_for_refinement = 0;
 }
 
 void fclaw_patch_reset_data(fclaw_global_t* glob,
@@ -1151,4 +1152,19 @@ fclaw_patch_relation_t fclaw_patch_get_edge_type(fclaw_patch_t* patch,
     FCLAW_ASSERT(pdata->neighbors_set != 0);
     FCLAW_ASSERT(0 <= iedge && iedge < FCLAW3D_NUMEDGES);
     return pdata->edge_neighbors[iedge];
+}
+
+void fclaw_patch_considered_for_refinement_set(struct fclaw_global *glob,
+                                               struct fclaw_patch* patch)
+{
+    fclaw_patch_data_t *pdata = get_patch_data(patch);
+	FCLAW_ASSERT(pdata->considered_for_refinement == 0);
+	pdata->considered_for_refinement = 1;
+}
+
+void fclaw_patch_considered_for_refinement_clear(struct fclaw_global *glob,
+                                                 struct fclaw_patch* patch)
+{
+    fclaw_patch_data_t *pdata = get_patch_data(patch);
+	pdata->considered_for_refinement = 0;
 }

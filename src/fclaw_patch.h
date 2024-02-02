@@ -100,6 +100,9 @@ struct fclaw_patch_data
     /** Block index */
     int block_idx;
 
+    /** True if patch has been considered for refinement */
+    int considered_for_refinement;
+
     /** User defined patch structure */
     void *user_patch;
     /** Additional user data */
@@ -2004,6 +2007,22 @@ void fclaw_patch_set_block_corner_count(struct fclaw_global *glob,
                                           struct fclaw_patch* this_patch,
                                           int icorner, int block_corner_count);
 
+/**
+ * @brief Set that this patch has been considered for refinement
+ * 
+ * @param glob the global context
+ * @param patch the patch context
+ */
+void fclaw_patch_considered_for_refinement_set(struct fclaw_global *glob,
+                                               struct fclaw_patch* patch);
+/**
+ * @brief Clear the flag that this patch has been considered for refinement
+ * 
+ * @param glob the global context
+ * @param patch the patch context
+ */
+void fclaw_patch_considered_for_refinement_clear(struct fclaw_global *glob,
+                                                 struct fclaw_patch* patch);
 ///@}
 
 #ifdef __cplusplus

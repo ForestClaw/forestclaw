@@ -64,6 +64,10 @@ void cb_fclaw_regrid_tag4refinement(fclaw_domain_t *domain,
         refine_patch  =
             fclaw_patch_tag4refinement(g->glob,this_patch,this_block_idx,
                                          this_patch_idx, tag_user->domain_init);
+        if(!tag_user->domain_init)
+        {
+            fclaw_patch_considered_for_refinement_set(g->glob, this_patch);
+        }
         if (refine_patch == 1)
         {
             tag_user->num_patches_refined++;
@@ -157,6 +161,8 @@ void cb_fclaw_regrid_repopulate(fclaw_domain_t * old_domain,
             {
                 fclaw_patch_initialize(g->glob,fine_patch,blockno,fine_patchno);//new_domain
             }
+            /* don't try to refine this patch in the next round of refinement */
+            fclaw_patch_considered_for_refinement_set(g->glob, fine_patch);
         }
 
         if (!domain_init)
