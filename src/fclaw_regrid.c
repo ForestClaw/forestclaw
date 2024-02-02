@@ -58,13 +58,15 @@ void cb_fclaw_regrid_tag4refinement(fclaw_domain_t *domain,
     maxlevel = fclaw_opt->maxlevel;
     level = this_patch->level;
 
-    if (level < maxlevel)
+    if (level < maxlevel && 
+         (tag_user->num_patches_to_refine == 0 || tag_user->num_patches_refined < tag_user->num_patches_to_refine))
     {
         refine_patch  =
             fclaw_patch_tag4refinement(g->glob,this_patch,this_block_idx,
                                          this_patch_idx, tag_user->domain_init);
         if (refine_patch == 1)
         {
+            tag_user->num_patches_refined++;
             fclaw_patch_mark_refine(domain, this_block_idx, this_patch_idx);
         }
     }
