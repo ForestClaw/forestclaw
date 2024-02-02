@@ -92,7 +92,7 @@ void patch_data_new(fclaw_global_t* glob,
 }
 
 static 
-int patch_data_packsize()
+size_t patch_data_packsize()
 {
 	return sizeof(int);
 }
