@@ -53,7 +53,7 @@ struct CubeDomain {
     fclaw_clawpatch_options_t* opts;
 
     CubeDomain(int minlevel, int maxlevel){
-        glob = fclaw_global_new();
+        glob = fclaw_global_new_comm(sc_MPI_COMM_WORLD, 1,0);
         opts = fclaw_clawpatch_options_new(3);
         memset(&fopts, 0, sizeof(fopts));
         fopts.mi=1;
