@@ -365,7 +365,7 @@ void fclaw_regrid(fclaw_global_t *glob)
         all_patches_considered = fclaw_patch_all_considered_for_refinement(glob);
         if(!all_patches_considered)
         {
-            fclaw_global_productionf("Max number of patches to refine reached. Repartitioning and doing another round of refinement.\n");
+            fclaw_global_productionf("Max number of patches to refine reached. Repartitioning and continuing refinement.\n");
         }
         fclaw_timer_stop (&glob->timers[FCLAW_TIMER_REGRID]);
     }
