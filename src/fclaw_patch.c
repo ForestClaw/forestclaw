@@ -91,6 +91,32 @@ void patch_data_new(fclaw_global_t* glob,
 	pdata->considered_for_refinement = 0;
 }
 
+static 
+int patch_data_packsize()
+{
+	return sizeof(int);
+}
+
+static
+void patch_data_pack(fclaw_global_t* glob,
+					 fclaw_patch_t* this_patch,
+					 void* pack_data_here)
+{
+	fclaw_patch_data_t *pdata = get_patch_data(this_patch);
+	int *int_ptr = (int*) pack_data_here;
+	*int_ptr = pdata->considered_for_refinement;
+}
+
+static
+void patch_data_unpack(fclaw_global_t* glob,
+					   fclaw_patch_t* this_patch,
+					   void* unpack_data_from_here)
+{
+	fclaw_patch_data_t *pdata = get_patch_data(this_patch);
+	int *int_ptr = (int*) unpack_data_from_here;
+	pdata->considered_for_refinement = *int_ptr;
+}
+
 void fclaw_patch_reset_data(fclaw_global_t* glob,
 							  fclaw_patch_t* old_patch,
 							  fclaw_patch_t* new_patch,
@@ -728,7 +754,7 @@ size_t fclaw_patch_partition_packsize(fclaw_global_t* glob)
 	fclaw_patch_vtable_t *patch_vt = fclaw_patch_vt(glob);
 	FCLAW_ASSERT(patch_vt->partition_packsize != NULL);
 
-	return patch_vt->partition_packsize(glob);
+	return patch_data_packsize() + patch_vt->partition_packsize(glob);
 }
 
 void fclaw_patch_partition_pack(fclaw_global_t *glob,
@@ -737,14 +763,18 @@ void fclaw_patch_partition_pack(fclaw_global_t *glob,
 								  int this_patch_idx,
 								  void* pack_data_here)
 {
+	patch_data_pack(glob,this_patch,pack_data_here);
+
 	fclaw_patch_vtable_t *patch_vt = fclaw_patch_vt(glob);
 	FCLAW_ASSERT(patch_vt->partition_pack != NULL);
+
+	void* patch_pack_data_here = (void*) ((char*) pack_data_here + patch_data_packsize());
 
 	patch_vt->partition_pack(glob,
 							 this_patch,
 							 this_block_idx,
 							 this_patch_idx,
-							 pack_data_here);
+							 patch_pack_data_here);
 }
 
 
@@ -762,15 +792,19 @@ void fclaw_patch_partition_unpack(fclaw_global_t *glob,
 	fclaw_patch_build(glob,this_patch,this_block_idx,
 						this_patch_idx,(void*) &build_mode);
 
+	patch_data_unpack(glob,this_patch,unpack_data_from_here);
+
 	/* This copied q data from memory */
 	FCLAW_ASSERT(patch_vt->partition_unpack != NULL);
+
+	void* patch_unpack_data_from_here = (void*) ((char*) unpack_data_from_here + patch_data_packsize());
 
 	patch_vt->partition_unpack(glob,  /* contains old domain */
 							   new_domain,
 							   this_patch,
 							   this_block_idx,
 							   this_patch_idx,
-							   unpack_data_from_here);
+							   patch_unpack_data_from_here);
 }
 
 /* ----------------------------- Conservative updates --------------------------------- */
@@ -1158,7 +1192,7 @@ void fclaw_patch_considered_for_refinement_set(struct fclaw_global *glob,
                                                struct fclaw_patch* patch)
 {
     fclaw_patch_data_t *pdata = get_patch_data(patch);
-	FCLAW_ASSERT(pdata->considered_for_refinement == 0);
+	//FCLAW_ASSERT(pdata->considered_for_refinement == 0);
 	pdata->considered_for_refinement = 1;
 }
 
