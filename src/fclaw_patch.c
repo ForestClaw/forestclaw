@@ -1202,3 +1202,48 @@ void fclaw_patch_considered_for_refinement_clear(struct fclaw_global *glob,
     fclaw_patch_data_t *pdata = get_patch_data(patch);
 	pdata->considered_for_refinement = 0;
 }
+
+int fclaw_patch_considered_for_refinement(struct fclaw_global *glob,
+										 struct fclaw_patch* patch)
+{
+	fclaw_patch_data_t *pdata = get_patch_data(patch);
+	return pdata->considered_for_refinement;
+}
+
+static
+void considred_for_refinement_cb(fclaw_domain_t *domain,
+								 fclaw_patch_t *patch,
+								 int blockno, int patchno,
+								 void *user)
+{
+	fclaw_patch_data_t *pdata = get_patch_data(patch);
+	int *all_patches_considered = (int*) user;
+	if (!pdata->considered_for_refinement)
+	{
+		*all_patches_considered = 0;
+	}
+}
+
+int fclaw_patch_all_considered_for_refinement(struct fclaw_global *glob)
+{
+	int local_all_patches_considered = 1;
+	fclaw_domain_iterate_patches(glob->domain, considred_for_refinement_cb, &local_all_patches_considered);
+	int all_patches_considered;
+	sc_MPI_Allreduce(&local_all_patches_considered, &all_patches_considered, 1, sc_MPI_INT, sc_MPI_LAND, glob->mpicomm);
+	return all_patches_considered;
+}
+
+static
+void clear_considred_for_refinement_cb(fclaw_domain_t *domain,
+								       fclaw_patch_t *patch,
+								       int blockno, int patchno,
+								       void *user)
+{
+	fclaw_patch_data_t *pdata = get_patch_data(patch);
+	pdata->considered_for_refinement = 0;
+}
+
+void fclaw_patch_clear_all_considered_for_refinement(struct fclaw_global *glob)
+{
+	fclaw_domain_iterate_patches(glob->domain, clear_considred_for_refinement_cb, NULL);
+}

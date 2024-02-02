@@ -2023,6 +2023,32 @@ void fclaw_patch_considered_for_refinement_set(struct fclaw_global *glob,
  */
 void fclaw_patch_considered_for_refinement_clear(struct fclaw_global *glob,
                                                  struct fclaw_patch* patch);
+
+/**
+ * @brief Returns true if a patch has been considered for refinement
+ * 
+ * @param glob the global context
+ * @param patch the patch context
+ * @return int true if a patch has been considered for refinement
+ */
+int fclaw_patch_considered_for_refinement(struct fclaw_global *glob,
+                                          struct fclaw_patch* patch);
+/**
+ * @brief returns true if all patches have been considered for refinement in the domain
+ *
+ * This is a collective call.
+ * 
+ * @param glob the global context
+ */
+int fclaw_patch_all_considered_for_refinement(struct fclaw_global *glob);
+
+/**
+ * @brief Clear the considered for refinement flag for all patches
+ * 
+ * @param glob the global context
+ */
+void fclaw_patch_clear_all_considered_for_refinement(struct fclaw_global *glob);
+
 ///@}
 
 #ifdef __cplusplus

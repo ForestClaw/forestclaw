@@ -58,16 +58,24 @@ void cb_fclaw_regrid_tag4refinement(fclaw_domain_t *domain,
     maxlevel = fclaw_opt->maxlevel;
     level = this_patch->level;
 
-    if (level < maxlevel && 
-         (tag_user->num_patches_to_refine == 0 || tag_user->num_patches_refined < tag_user->num_patches_to_refine))
+    if(fclaw_patch_considered_for_refinement(g->glob, this_patch))
+    {
+        return;
+    }
+
+    if(tag_user->num_patches_to_refine > 0 
+       && tag_user->num_patches_refined == tag_user->num_patches_to_refine)
+    {
+        return;
+    }
+
+    fclaw_patch_considered_for_refinement_set(g->glob, this_patch);
+
+    if (level < maxlevel)
     {
         refine_patch  =
             fclaw_patch_tag4refinement(g->glob,this_patch,this_block_idx,
                                          this_patch_idx, tag_user->domain_init);
-        if(!tag_user->domain_init)
-        {
-            fclaw_patch_considered_for_refinement_set(g->glob, this_patch);
-        }
         if (refine_patch == 1)
         {
             tag_user->num_patches_refined++;
@@ -239,99 +247,121 @@ void cb_fclaw_regrid_repopulate(fclaw_domain_t * old_domain,
 void fclaw_regrid(fclaw_global_t *glob)
 {
     fclaw_domain_t** domain = &glob->domain;
+
+    fclaw_patch_clear_all_considered_for_refinement(glob);
+    int tagged4coarsening = 0;
+    int all_patches_considered = 0;
+    int has_been_refined = 0;
+    while(!all_patches_considered)
+    {
+        fclaw_timer_start (&glob->timers[FCLAW_TIMER_REGRID]);
+
+        fclaw_global_infof("Regridding domain\n");
+
+        fclaw_timer_start (&glob->timers[FCLAW_TIMER_REGRID_TAGGING]);
+        /* First determine which families should be coarsened. */
+        int domain_init = 0;
+        if(!tagged4coarsening)
+        {
+            fclaw_global_iterate_families(glob, cb_regrid_tag4coarsening,
+                                            (void *) &domain_init);
+            tagged4coarsening = 1;
+        }
+
+        fclaw_tag4f_user_t refine_user;
+        refine_user.domain_init = domain_init;
+        refine_user.num_patches_refined = 0;
+        refine_user.num_patches_to_refine = 1;
+
+        fclaw_global_iterate_patches(glob, cb_fclaw_regrid_tag4refinement,
+                                       (void *) &refine_user);
+
+        fclaw_infof("Regrid : num_patches_refined = %d\n",refine_user.num_patches_refined);
+
+        fclaw_timer_stop (&glob->timers[FCLAW_TIMER_REGRID_TAGGING]);
+
+        /* Rebuild domain if necessary */
+        /* Will return be NULL if no refining was done */
+
+        fclaw_timer_stop (&glob->timers[FCLAW_TIMER_REGRID]);
+        fclaw_timer_start (&glob->timers[FCLAW_TIMER_ADAPT_COMM]);
+        fclaw_domain_t *new_domain = fclaw_domain_adapt(*domain);
+
+        int have_new_refinement = new_domain != NULL;
+
+        if (have_new_refinement)
+        {
+            has_been_refined = 1;
+            /* allocate memory for user patch data and user domain data in the new
+               domain;  copy data from the old to new the domain. */
+            fclaw_domain_setup(glob, new_domain);
+        }
+
+        /* Stop the new timer (copied from old timer) */
+        fclaw_timer_stop (&glob->timers[FCLAW_TIMER_ADAPT_COMM]);
+        fclaw_timer_start (&glob->timers[FCLAW_TIMER_REGRID]);
+
+        if (have_new_refinement)
+        {
+            fclaw_global_infof(" -- Have new refinement\n");
+
+            /* Average to new coarse grids and interpolate to new fine grids */
+            fclaw_timer_start (&glob->timers[FCLAW_TIMER_REGRID_BUILD]);
+            fclaw_global_iterate_adapted(glob, new_domain,
+                                           cb_fclaw_regrid_repopulate,
+                                           (void *) &domain_init);
+            fclaw_timer_stop (&glob->timers[FCLAW_TIMER_REGRID_BUILD]);
+
+            /* free memory associated with old domain */
+            fclaw_domain_reset(glob);
+            *domain = new_domain;
+            new_domain = NULL;
+
+            /* Repartition for load balancing.  Second arg (mode) for vtk output */
+            fclaw_partition_domain(glob,FCLAW_TIMER_REGRID);
+
+            /* Set up ghost patches. Communication happens for indirect ghost exchanges. */
+
+
+            /* This includes timers for building patches and (exclusive) communication */
+            fclaw_exchange_setup(glob,FCLAW_TIMER_REGRID);
+
+            /* Get new neighbor information.  This is used to short circuit
+               ghost filling procedures in some cases */
+            fclaw_regrid_set_neighbor_types(glob);
+
+            /* Update ghost cells.  This is needed because we have new coarse or fine
+               patches without valid ghost cells.   Time_interp = 0, since we only
+               only regrid when all levels are time synchronized. */
+            int minlevel = (*domain)->global_minlevel;
+            int maxlevel = (*domain)->global_maxlevel;
+            int time_interp = 0;
+            double sync_time = glob->curr_time;
+            fclaw_ghost_update(glob,
+                                 minlevel,
+                                 maxlevel,
+                                 sync_time,
+                                 time_interp,
+                                 FCLAW_TIMER_REGRID);
+
+            ++glob->count_amr_new_domain;
+        }
+        else
+        {
+            /* We updated all the ghost cells when leaving advance, so don't need to do
+               it here */
+        }
+        all_patches_considered = fclaw_patch_all_considered_for_refinement(glob);
+        if(!all_patches_considered)
+        {
+            fclaw_global_productionf("Max number of patches to refine reached. Repartitioning and doing another round of refinement.\n");
+        }
+        fclaw_timer_stop (&glob->timers[FCLAW_TIMER_REGRID]);
+    }
+
     fclaw_timer_start (&glob->timers[FCLAW_TIMER_REGRID]);
-
-    fclaw_global_infof("Regridding domain\n");
-
-    fclaw_timer_start (&glob->timers[FCLAW_TIMER_REGRID_TAGGING]);
-    /* First determine which families should be coarsened. */
-    int domain_init = 0;
-    fclaw_global_iterate_families(glob, cb_regrid_tag4coarsening,
-                                    (void *) &domain_init);
-
-    fclaw_tag4f_user_t refine_user;
-    refine_user.domain_init = domain_init;
-    refine_user.num_patches_refined = 0;
-    refine_user.num_patches_to_refine = 0;
-
-    fclaw_global_iterate_patches(glob, cb_fclaw_regrid_tag4refinement,
-                                   (void *) &refine_user);
-
-    fclaw_timer_stop (&glob->timers[FCLAW_TIMER_REGRID_TAGGING]);
-
-    /* Rebuild domain if necessary */
-    /* Will return be NULL if no refining was done */
-
-    fclaw_timer_stop (&glob->timers[FCLAW_TIMER_REGRID]);
-    fclaw_timer_start (&glob->timers[FCLAW_TIMER_ADAPT_COMM]);
-    fclaw_domain_t *new_domain = fclaw_domain_adapt(*domain);
-
-    int have_new_refinement = new_domain != NULL;
-
-    if (have_new_refinement)
-    {
-        /* allocate memory for user patch data and user domain data in the new
-           domain;  copy data from the old to new the domain. */
-        fclaw_domain_setup(glob, new_domain);
-    }
-
-    /* Stop the new timer (copied from old timer) */
-    fclaw_timer_stop (&glob->timers[FCLAW_TIMER_ADAPT_COMM]);
-    fclaw_timer_start (&glob->timers[FCLAW_TIMER_REGRID]);
-
-    if (have_new_refinement)
-    {
-        fclaw_global_infof(" -- Have new refinement\n");
-
-        /* Average to new coarse grids and interpolate to new fine grids */
-        fclaw_timer_start (&glob->timers[FCLAW_TIMER_REGRID_BUILD]);
-        fclaw_global_iterate_adapted(glob, new_domain,
-                                       cb_fclaw_regrid_repopulate,
-                                       (void *) &domain_init);
-        fclaw_timer_stop (&glob->timers[FCLAW_TIMER_REGRID_BUILD]);
-
-        /* free memory associated with old domain */
-        fclaw_domain_reset(glob);
-        *domain = new_domain;
-        new_domain = NULL;
-
-        /* Repartition for load balancing.  Second arg (mode) for vtk output */
-        fclaw_partition_domain(glob,FCLAW_TIMER_REGRID);
-
-        /* Set up ghost patches. Communication happens for indirect ghost exchanges. */
-
-
-        /* This includes timers for building patches and (exclusive) communication */
-        fclaw_exchange_setup(glob,FCLAW_TIMER_REGRID);
-
-        /* Get new neighbor information.  This is used to short circuit
-           ghost filling procedures in some cases */
-        fclaw_regrid_set_neighbor_types(glob);
-
-        /* Update ghost cells.  This is needed because we have new coarse or fine
-           patches without valid ghost cells.   Time_interp = 0, since we only
-           only regrid when all levels are time synchronized. */
-        int minlevel = (*domain)->global_minlevel;
-        int maxlevel = (*domain)->global_maxlevel;
-        int time_interp = 0;
-        double sync_time = glob->curr_time;
-        fclaw_ghost_update(glob,
-                             minlevel,
-                             maxlevel,
-                             sync_time,
-                             time_interp,
-                             FCLAW_TIMER_REGRID);
-
-        ++glob->count_amr_new_domain;
-    }
-    else
-    {
-        /* We updated all the ghost cells when leaving advance, so don't need to do
-           it here */
-    }
-
     /* User defined */
-    fclaw_after_regrid(glob, have_new_refinement);
+    fclaw_after_regrid(glob, has_been_refined);
 
     /* Only if gauges count > 0 */
     fclaw_locate_gauges(glob);
