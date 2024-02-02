@@ -28,6 +28,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_patch.h>
 #include <fclaw_global.h>
 #include <fclaw_domain.h>
+#include <fclaw_packing.h>
 
 #include <fclaw2d_defs.h>
 #include <fclaw3d_defs.h>
@@ -103,8 +104,7 @@ void patch_data_pack(fclaw_global_t* glob,
 					 void* pack_data_here)
 {
 	fclaw_patch_data_t *pdata = get_patch_data(this_patch);
-	int *int_ptr = (int*) pack_data_here;
-	*int_ptr = pdata->considered_for_refinement;
+	fclaw_pack_int(pdata->considered_for_refinement, (char*) pack_data_here);
 }
 
 static
@@ -113,8 +113,7 @@ void patch_data_unpack(fclaw_global_t* glob,
 					   void* unpack_data_from_here)
 {
 	fclaw_patch_data_t *pdata = get_patch_data(this_patch);
-	int *int_ptr = (int*) unpack_data_from_here;
-	pdata->considered_for_refinement = *int_ptr;
+	fclaw_unpack_int((char*) unpack_data_from_here, &pdata->considered_for_refinement);
 }
 
 void fclaw_patch_reset_data(fclaw_global_t* glob,
@@ -763,18 +762,20 @@ void fclaw_patch_partition_pack(fclaw_global_t *glob,
 								  int this_patch_idx,
 								  void* pack_data_here)
 {
-	patch_data_pack(glob,this_patch,pack_data_here);
 
 	fclaw_patch_vtable_t *patch_vt = fclaw_patch_vt(glob);
 	FCLAW_ASSERT(patch_vt->partition_pack != NULL);
 
-	void* patch_pack_data_here = (void*) ((char*) pack_data_here + patch_data_packsize());
 
 	patch_vt->partition_pack(glob,
 							 this_patch,
 							 this_block_idx,
 							 this_patch_idx,
-							 patch_pack_data_here);
+							 pack_data_here);
+
+	FCLAW_ASSERT(patch_vt->partition_packsize != NULL);
+	void* pdata_pack_data_here = (void*) ((char*) pack_data_here + patch_vt->partition_packsize(glob));
+	patch_data_pack(glob,this_patch,pdata_pack_data_here);
 }
 
 
@@ -792,19 +793,19 @@ void fclaw_patch_partition_unpack(fclaw_global_t *glob,
 	fclaw_patch_build(glob,this_patch,this_block_idx,
 						this_patch_idx,(void*) &build_mode);
 
-	patch_data_unpack(glob,this_patch,unpack_data_from_here);
-
 	/* This copied q data from memory */
 	FCLAW_ASSERT(patch_vt->partition_unpack != NULL);
-
-	void* patch_unpack_data_from_here = (void*) ((char*) unpack_data_from_here + patch_data_packsize());
 
 	patch_vt->partition_unpack(glob,  /* contains old domain */
 							   new_domain,
 							   this_patch,
 							   this_block_idx,
 							   this_patch_idx,
-							   patch_unpack_data_from_here);
+							   unpack_data_from_here);
+
+	FCLAW_ASSERT(patch_vt->partition_packsize != NULL);
+	void* pdata_unpack_data_from_here = (void*) ((char*) unpack_data_from_here + patch_vt->partition_packsize(glob));
+	patch_data_unpack(glob,this_patch,pdata_unpack_data_from_here);
 }
 
 /* ----------------------------- Conservative updates --------------------------------- */
