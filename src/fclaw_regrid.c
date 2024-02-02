@@ -58,7 +58,7 @@ void cb_fclaw_regrid_tag4refinement(fclaw_domain_t *domain,
     maxlevel = fclaw_opt->maxlevel;
     level = this_patch->level;
 
-    if(fclaw_patch_considered_for_refinement(g->glob, this_patch))
+    if(!tag_user->domain_init && fclaw_patch_considered_for_refinement(g->glob, this_patch))
     {
         return;
     }
@@ -232,6 +232,8 @@ void cb_fclaw_regrid_repopulate(fclaw_domain_t * old_domain,
             /* used to pass in old_domain */
             fclaw_patch_data_delete(g->glob,fine_patch);
         }
+        /* don't try to refine this patch in the next round of refinement */
+        fclaw_patch_considered_for_refinement_set(g->glob, coarse_patch);
     }
     else
     {
@@ -247,6 +249,7 @@ void cb_fclaw_regrid_repopulate(fclaw_domain_t * old_domain,
 void fclaw_regrid(fclaw_global_t *glob)
 {
     fclaw_domain_t** domain = &glob->domain;
+    fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
 
     fclaw_patch_clear_all_considered_for_refinement(glob);
     int tagged4coarsening = 0;
@@ -271,7 +274,15 @@ void fclaw_regrid(fclaw_global_t *glob)
         fclaw_tag4f_user_t refine_user;
         refine_user.domain_init = domain_init;
         refine_user.num_patches_refined = 0;
-        refine_user.num_patches_to_refine = 1;
+        if(fclaw_opt->max_refinement_ratio == 1.0)
+        {
+            refine_user.num_patches_to_refine = 0;
+        }
+        else 
+        {
+            double num_patches_to_refine = fclaw_opt->max_refinement_ratio * (*domain)->local_num_patches;
+            refine_user.num_patches_to_refine = (int) ceil(num_patches_to_refine);
+        }
 
         fclaw_global_iterate_patches(glob, cb_fclaw_regrid_tag4refinement,
                                        (void *) &refine_user);
