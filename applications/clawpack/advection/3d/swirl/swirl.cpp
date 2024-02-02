@@ -77,17 +77,15 @@ void create_domain(fclaw_global_t *glob)
                                        mi, mj, mk, a, b, c,
                                        fclaw_opt->minlevel);
 
-        //TODO 3d brick mapping
-        //brick = fclaw2d_map_new_brick(domain,mi,mj,a,b);
+        brick = fclaw_map_new_3d_brick(domain,mi,mj,mk,a,b,c);
 
+        cont = fclaw_map_new_nomap_brick(brick);
         /* Square in [-1,1]x[-1,1], scaled/shifted to [0,1]x[0,1] */
 #if 0
         cont = fclaw2d_map_new_cart(brick,
                                     fclaw_opt->scale,
                                     fclaw_opt->shift);
 #endif
-        cont = NULL; //set 3d brick mapping to NULL until implemented
-
         break;
     case 2:
         fclaw_abortf("Not implemented\n");
