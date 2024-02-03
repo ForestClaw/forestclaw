@@ -122,15 +122,28 @@ void clawpack46_bc3(fclaw_global_t *glob,
 
 	/* Set a local copy of mthbc that can be used for a patch. */
 	int mthbc[6];
-	for(int i = 0; i < 6; i++)
+	if(glob->domain->refine_dim == 2)
 	{
-		if (i < 4)			
+		for(int i = 0; i < 6; i++)
+		{
+			if (i < 4)			
+				if (intersects_phys_bdry[i])
+					mthbc[i] = block_mthbc[i];
+				else
+					mthbc[i] = -1;
+			else
+				mthbc[i] = block_mthbc[i];
+		}
+	}
+	else 
+	{
+		for(int i = 0; i < 6; i++)
+		{
 			if (intersects_phys_bdry[i])
 				mthbc[i] = block_mthbc[i];
 			else
 				mthbc[i] = -1;
-		else
-			mthbc[i] = block_mthbc[i];
+		}
 	}
 
 	/*
@@ -260,7 +273,7 @@ double clawpack46_step3(fclaw_global_t *glob,
 						double t,
 						double dt)
 {
-	// const fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
+	// const fclaw_options_t* fclaw_opt = fclaw_get_options(glob);
 
 	fc3d_clawpack46_vtable_t*  claw46_vt = fc3d_clawpack46_vt(glob);
 	FCLAW_ASSERT(claw46_vt->fort_rpn3 != NULL);
@@ -484,6 +497,11 @@ void fc3d_clawpack46_solver_initialize(fclaw_global_t* glob)
 	fclaw_clawpatch_options_t* clawpatch_opt = fclaw_clawpatch_get_options(glob);
 	fc3d_clawpack46_options_t* clawopt = fc3d_clawpack46_get_options(glob);
 
+	if(clawpatch_opt->patch_dim != 3)
+	{
+		fclaw_abortf("Clawpatch dimension set to 2d. fc3d_clawpack46 is only for 3d.");
+	}
+
     clawopt->method[6] = clawpatch_opt->maux;
 
     if (clawpatch_opt->maux == 0 && clawopt->mcapa > 0)
@@ -494,7 +512,7 @@ void fc3d_clawpack46_solver_initialize(fclaw_global_t* glob)
 
 	int claw_version = 4;
 	fclaw_clawpatch_vtable_initialize(glob, claw_version);
-    //fclaw3dx_clawpatch_vtable_t*      clawpatch_vt = fclaw3dx_clawpatch_vt();
+    //fclaw_clawpatch_vtable_t*      clawpatch_vt = fclaw_clawpatch_vt();
 
 	fclaw_vtable_t*                fc_vt = fclaw_vt(glob);
 	fclaw_patch_vtable_t*          patch_vt = fclaw_patch_vt(glob);  
