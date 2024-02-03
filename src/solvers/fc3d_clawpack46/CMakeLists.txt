@@ -38,14 +38,11 @@ install(FILES
   fc3d_clawpack46_fort.h
 	fc3d_clawpack46_options.h
   fc3d_clawpack46_user_fort.h
-DESTINATION include
+TYPE INCLUDE
 )
 
 install(TARGETS clawpack3_46
-  EXPORT ${PROJECT_NAME}-targets
-  ARCHIVE DESTINATION lib
-  LIBRARY DESTINATION lib
-  RUNTIME DESTINATION bin)
+  EXPORT ${PROJECT_NAME}-targets)
 
 
 # -- imported target, for use from FetchContent
