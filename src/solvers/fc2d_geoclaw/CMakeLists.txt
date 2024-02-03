@@ -84,7 +84,7 @@ install(FILES
   fc2d_geoclaw_options.h
   fc2d_geoclaw_fort.h
   fc2d_geoclaw_gauges_default.h
-  DESTINATION include
+  TYPE INCLUDE
 )
 install(FILES
   ${CMAKE_CURRENT_BINARY_DIR}/include/amr_module.mod
@@ -99,14 +99,11 @@ install(FILES
   ${CMAKE_CURRENT_BINARY_DIR}/include/storm_module.mod
   ${CMAKE_CURRENT_BINARY_DIR}/include/topo_module.mod
   ${CMAKE_CURRENT_BINARY_DIR}/include/utility_module.mod
-  DESTINATION include
+  TYPE INCLUDE
 )
 
 install(TARGETS geoclaw
-  EXPORT ${PROJECT_NAME}-targets
-  ARCHIVE DESTINATION lib
-  LIBRARY DESTINATION lib
-  RUNTIME DESTINATION bin)
+  EXPORT ${PROJECT_NAME}-targets)
 
 
 # imported target, for use from FetchContent

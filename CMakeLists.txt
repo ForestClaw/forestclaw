@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.13...3.20)
+cmake_minimum_required(VERSION 3.14...3.28)
 
 include(cmake/GitVersionGen.cmake)
 
@@ -159,3 +159,8 @@ if(applications)
 endif(applications)
 
 include(cmake/documentation.cmake)
+
+# --- auto-ignore build directory
+if(NOT CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
+  file(GENERATE OUTPUT .gitignore CONTENT "*")
+endif()

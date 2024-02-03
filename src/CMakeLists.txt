@@ -7,8 +7,8 @@ add_library(forestclaw_c OBJECT
   fclaw_base.c 
   fclaw_options.c 
   fclaw_filesystem.cpp
-  fclaw_gauges.c 
-  fclaw_package.c 
+  fclaw_gauges.c
+  fclaw_package.c
   fclaw_packing.c
   fclaw_pointer_map.c
   fclaw_math.c
@@ -168,10 +168,7 @@ install(FILES
 )
 
 install(TARGETS forestclaw
-  EXPORT ${PROJECT_NAME}-targets
-  ARCHIVE DESTINATION lib
-  LIBRARY DESTINATION lib
-  RUNTIME DESTINATION bin)
+  EXPORT ${PROJECT_NAME}-targets)
 
 if(BUILD_TESTING)
   add_executable(forestclaw.TEST
