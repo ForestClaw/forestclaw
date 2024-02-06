@@ -3498,7 +3498,7 @@ fclaw2d_file_open_read (const char *filename, char *user_string,
     p4est_gloidx_t *read_gfq;
     fclaw2d_file_context_p4est_v1_t *p4est_fc;
 #if 0
-    fclaw2d_file_context_t *partition_fc;
+    fclaw2d_file_context_p4est_v1_t *partition_fc;
 #endif
     fclaw2d_file_context_t *fclaw_fc;
     p4est_connectivity_t *conn;
@@ -3642,6 +3642,14 @@ fclaw2d_file_open_read (const char *filename, char *user_string,
 
     /* create domain from p4est */
     *domain = fclaw2d_domain_new_p4est (p4est);
+
+    /* Store gfp pointer in the p4est file context.
+     * This is required since we opened the file with open_read_ext_v1 and
+     * therefore the global first quadrant pointer of the p4est file context
+     * is set to NULL and this triggers the usage of uniform partition.
+     * However, we want to use the read partition if there is one.
+     */
+    p4est_fc->global_first_quadrant = p4est->global_first_quadrant;
 
     /* allocate and set fclaw file context */
     fclaw_fc = FCLAW_ALLOC (fclaw2d_file_context_t, 1);
