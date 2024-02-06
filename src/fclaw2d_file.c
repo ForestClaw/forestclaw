@@ -2606,7 +2606,7 @@ fclaw2d_file_data_to_p4est (sc_MPI_Comm mpicomm, int mpisize,
     return ptemp;
 }
 
-/** Read a p4est to an opened file using the MPI communicator of \a fc.
+/** Read a p4est from an opened file using the MPI communicator of \a fc.
  *
  * \param [in,out] fc         Context previously created by \ref
  *                            fclaw2d_file_open_read_v1 (_ext).  It keeps track
@@ -2758,7 +2758,10 @@ fclaw2d_file_read_p4est_v1 (fclaw2d_file_context_p4est_v1_t * fc,
         {
             *errcode = FCLAW2D_FILE_ERR_P4EST_V1;
             /* clean up local variables and open file context */
-            FCLAW_FREE (gfq);
+            if (gfq_in == NULL)
+            {
+                FCLAW_FREE (gfq);
+            }
             sc_array_reset (&pertree_arr);
             sc_array_reset (&quadrants);
             FCLAW2D_FILE_CHECK_NULL_V1 (*errcode, fc,
@@ -2825,7 +2828,10 @@ fclaw2d_file_read_p4est_v1 (fclaw2d_file_context_p4est_v1_t * fc,
     if (*errcode != FCLAW2D_FILE_ERR_SUCCESS_V1)
     {
         /* clean up local variables and open file context */
-        FCLAW_FREE (gfq);
+        if (gfq_in == NULL)
+        {
+            FCLAW_FREE (gfq);
+        }
         sc_array_reset (&pertree_arr);
         sc_array_reset (&quadrants);
         sc_array_reset (&quad_data);
@@ -2836,7 +2842,10 @@ fclaw2d_file_read_p4est_v1 (fclaw2d_file_context_p4est_v1_t * fc,
 
     /* clean up und return */
   p4est_read_file_p4est_end:
-    FCLAW_FREE (gfq);
+    if (gfq_in == NULL)
+    {
+        FCLAW_FREE (gfq);
+    }
     sc_array_reset (&pertree_arr);
     sc_array_reset (&quadrants);
     sc_array_reset (&quad_data);
@@ -3580,6 +3589,7 @@ fclaw2d_file_open_read (const char *filename, char *user_string,
             if (*errcode != FCLAW2D_FILE_ERR_SUCCESS)
             {
                 FCLAW_ASSERT (partition_fc == NULL);
+                FCLAW_FREE (read_gfq);
                 return NULL;
             }
 
@@ -3598,6 +3608,7 @@ fclaw2d_file_open_read (const char *filename, char *user_string,
         if (*errcode != FCLAW2D_FILE_ERR_SUCCESS)
         {
             FCLAW_EXECUTE_ASSERT_TRUE (retval != 0);
+            FCLAW_FREE (read_gfq);
             return NULL;
         }
     }
@@ -3611,6 +3622,7 @@ fclaw2d_file_open_read (const char *filename, char *user_string,
     if (*errcode != FCLAW2D_FILE_ERR_SUCCESS)
     {
         FCLAW_ASSERT (p4est_fc == NULL);
+        FCLAW_FREE (read_gfq);
         return NULL;
     }
 
@@ -3619,6 +3631,8 @@ fclaw2d_file_open_read (const char *filename, char *user_string,
         fclaw2d_file_read_p4est_v1 (p4est_fc, conn, 0, &p4est, read_gfq,
                                     read_user_string, read_user_string,
                                     &errcode_internal);
+    /* read_gfq was copied or the previous function call failed */
+    FCLAW_FREE (read_gfq);
     fclaw2d_file_translate_error_code_v1 (errcode_internal, errcode);
     if (*errcode != FCLAW2D_FILE_ERR_SUCCESS)
     {
