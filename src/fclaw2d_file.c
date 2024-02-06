@@ -3533,9 +3533,23 @@ fclaw2d_file_open_read (const char *filename, char *user_string,
 #if 0
     if (par_filename != NULL)
     {
+        /* check length of the partition file name */
+        file_len = strlen (par_filename) + strlen ("." FCLAW2D_PFILE_EXT) + 1;
+        if (file_len > FCLAW2D_FILE_NAME_BYTES)
+        {
+            /* filename is too long */
+            *errcode = FCLAW2D_FILE_ERR_BAD_FILE;
+            /* TODO: clean up the fclaw fc */
+            return NULL;
+        }
+
+        /* get file path */
+        sc_strcopy (buf, file_len, par_filename);
+        strcat (buf, "." FCLAW2D_PFILE_EXT);
+
         /* open the partition file */
         partition_fc =
-            fclaw2d_file_open_read_ext_v1 (mpicomm, par_filename, user_string,
+            fclaw2d_file_open_read_ext_v1 (mpicomm, buf, user_string,
                                            &par_global_num_quadrants,
                                            &errcode_internal);
         /* TODO: How to handle the errors related to this file context? */
