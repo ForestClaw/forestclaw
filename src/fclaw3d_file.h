@@ -315,6 +315,9 @@ fclaw3d_file_context_t *fclaw3d_file_write_array (fclaw3d_file_context_t *
  *                            and stored in the returned \b domain. If the MPI
  *                            size and the partition size do not coincide a
  *                            partition for the current MPI size is computed.
+ *                            The number of global patches of the read
+ *                            partititon must coincide with the number of global
+ *                            patches of the read domain.
  *                            The function call results in an error if there
  *                            is no partition to read.
  *                            Currently, this parameter does not have any effect.
