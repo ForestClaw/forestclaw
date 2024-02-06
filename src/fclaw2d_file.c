@@ -3049,7 +3049,6 @@ typedef struct fclaw2d_file_context
 {
     fclaw2d_domain_t *domain;
     fclaw2d_file_context_p4est_v1_t *fc;
-    char basename[FCLAW2D_FILE_NAME_BYTES];
 }
 fclaw2d_file_context_t;
 
@@ -3303,7 +3302,6 @@ fclaw2d_file_open_write (const char *filename,
     fclaw_fc = FCLAW_ALLOC (fclaw2d_file_context_t, 1);
     fclaw_fc->fc = fc;
     fclaw_fc->domain = domain;
-    sc_strcopy (fclaw_fc->basename, strlen (filename) + 1, filename);
 
     return fclaw_fc;
 }
@@ -3655,7 +3653,6 @@ fclaw2d_file_open_read (const char *filename, char *user_string,
     fclaw_fc = FCLAW_ALLOC (fclaw2d_file_context_t, 1);
     fclaw_fc->fc = p4est_fc;
     fclaw_fc->domain = *domain;
-    sc_strcopy (fclaw_fc->basename, strlen (filename) + 1, filename);
 
     return fclaw_fc;
 }
