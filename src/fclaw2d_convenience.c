@@ -330,25 +330,18 @@ fclaw2d_domain_new_p4est (p4est_t * p4est)
     FCLAW_ASSERT (p4est->user_pointer == NULL);
 
     p4est_wrap_t *wrap;
-    p4est_mesh_params_t params;
+    p4est_wrap_params_t params;
 
-    /* create p4est_wrap from the given p4est */
-    wrap = p4est_wrap_new_p4est (p4est, 1, P4EST_CONNECT_FULL, NULL, NULL);
-
-    /* fill the hollow wrap and using mesh_new_params for mesh creation with
-     * edgehanging corner neighbors */
-    wrap->hollow = 0;
-    wrap->flags = P4EST_ALLOC_ZERO (uint8_t, p4est->local_num_quadrants);
-    wrap->ghost = p4est_ghost_new (p4est, wrap->btype);
-    p4est_mesh_params_init (&params);
-    params.compute_level_lists = 1;
-    params.compute_tree_index = 1;
-    params.btype = wrap->btype;
+    /* wrap the p4est with edgehanging corners neighbors enabled in the mesh */
+    p4est_wrap_params_init (&params);
+    params.hollow = 0;
+    params.mesh_params.btype = P4EST_CONNECT_FULL;
+    params.mesh_params.compute_level_lists = 1;
+    params.mesh_params.compute_tree_index = 1;
 #ifdef P4_TO_P8
-    params.edgehanging_corners = 1;
+    params.mesh_params.edgehanging_corners = 1;
 #endif
-    wrap->mesh = p4est_mesh_new_params (p4est, wrap->ghost, &params);
-
+    wrap = p4est_wrap_new_p4est_params (p4est, &params);
     FCLAW_ASSERT (wrap->p4est->data_size == 0);
 
     /* attributes of the created domain is initialized by sc_keyvalue_new */
@@ -447,7 +440,6 @@ fclaw2d_domain_new_conn (sc_MPI_Comm mpicomm, int initial_level,
     /* Wrap the connectivity. This does the same as p4est_wrap_new_conn,
      * except for setting edgehanging_corners to 1. */
     p4est_wrap_params_init (&params);
-    params.initial_level = initial_level;
     params.hollow = 0;
     params.mesh_params.btype = P4EST_CONNECT_FULL;
     params.mesh_params.compute_level_lists = 1;
@@ -455,7 +447,7 @@ fclaw2d_domain_new_conn (sc_MPI_Comm mpicomm, int initial_level,
 #ifdef P4_TO_P8
     params.mesh_params.edgehanging_corners = 1;
 #endif
-    wrap = p4est_wrap_new_params (mpicomm, conn, &params);
+    wrap = p4est_wrap_new_params (mpicomm, conn, initial_level, &params);
 
     return fclaw2d_domain_new (wrap, NULL);
 }
