@@ -29,8 +29,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * @brief c interface to c++ std::map<std::string,void*>
  * 
  */
-#ifndef FCLAW_POINTER_MAP
-#define FCLAW_POINTER_MAP
+#ifndef FCLAW_POINTER_MAP_H
+#define FCLAW_POINTER_MAP_H
 
 #ifdef __cplusplus
 extern "C"

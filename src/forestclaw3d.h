@@ -577,7 +577,8 @@ void fclaw3d_patch_transform_face2 (fclaw3d_patch_t * ipatch,
                         then 4 parallel to y axis, then 4 parallel to z.
  * \param [out] rproc   Processor number of neighbor patch.
  * \param [out] rblockno        Neighbor block number.
- * \param [out] rpatchno        Neighbor patch number relative to the block.
+ * \param [out] rpatchno        Neighbor patch number of up to 2 neighbors.
+    `                           The patch number is relative to its block.
  *                              If the neighbor is off-processor, this is not
  *                              a patch number but in [0, num_ghosts_patches[.
  * \param [out] redge           Number of the edge from the other neighbor.
@@ -587,7 +588,7 @@ void fclaw3d_patch_transform_face2 (fclaw3d_patch_t * ipatch,
  */
 int fclaw3d_patch_edge_neighbors (fclaw3d_domain_t * domain,
                                   int blockno, int patchno, int edgeno,
-                                  int *rproc, int *rblockno, int *rpatchno,
+                                  int rproc[2], int *rblockno, int rpatchno[2],
                                   int *redge,
                                   fclaw3d_patch_relation_t * neighbor_size);
 

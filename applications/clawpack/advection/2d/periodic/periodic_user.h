@@ -46,15 +46,15 @@ typedef struct user_options
 
 } user_options_t;
 
-void periodic_link_solvers(fclaw2d_global_t *glob);
+void periodic_link_solvers(fclaw_global_t *glob);
 
 /* ------------------------------------- Options ---------------------------------------*/
 user_options_t* periodic_options_register (fclaw_app_t * app,
                                         const char *configfile);
 
-void periodic_options_store (fclaw2d_global_t* glob, user_options_t* user);
+void periodic_options_store (fclaw_global_t* glob, user_options_t* user);
 
-const user_options_t* periodic_get_options(fclaw2d_global_t* glob);
+const user_options_t* periodic_get_options(fclaw_global_t* glob);
 
 
 

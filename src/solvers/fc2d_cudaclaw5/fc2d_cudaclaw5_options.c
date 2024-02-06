@@ -25,8 +25,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "fc2d_cudaclaw5_options.h"
 
-#include <fclaw2d_clawpatch_options.h>
-#include <fclaw2d_global.h>
+#include <fclaw_clawpatch_options.h>
+#include <fclaw_global.h>
 #include <fclaw_options.h>
 
 static void*
@@ -83,7 +83,7 @@ cudaclaw5_postprocess (fc2d_cudaclaw5_options_t * clawopt)
 
 fclaw_exit_type_t
 cudaclaw5_check (fc2d_cudaclaw5_options_t * clawopt, 
-                 fclaw2d_clawpatch_options_t *clawpatch_opt)
+                 fclaw_clawpatch_options_t *clawpatch_opt)
 {
     clawopt->method[0] = 0;  /* Time stepping is controlled outside of cudaclaw */
 
@@ -174,7 +174,7 @@ static fclaw_exit_type_t
 options_check (fclaw_app_t * app, void *package, void *registered)
 {
     fc2d_cudaclaw5_options_t *clawopt;
-    fclaw2d_clawpatch_options_t *clawpatch_opt;
+    fclaw_clawpatch_options_t *clawpatch_opt;
 
     FCLAW_ASSERT (app != NULL);
     FCLAW_ASSERT (package != NULL);
@@ -183,7 +183,7 @@ options_check (fclaw_app_t * app, void *package, void *registered)
     clawopt = (fc2d_cudaclaw5_options_t*) package;
     FCLAW_ASSERT (clawopt->is_registered);
 
-    clawpatch_opt = (fclaw2d_clawpatch_options_t *)
+    clawpatch_opt = (fclaw_clawpatch_options_t *)
         fclaw_app_get_attribute(app,"clawpatch",NULL);
     FCLAW_ASSERT(clawpatch_opt->is_registered);
 
@@ -231,12 +231,12 @@ fc2d_cudaclaw5_options_t*  fc2d_cudaclaw5_options_register (fclaw_app_t * app,
     return clawopt;
 }
 
-fc2d_cudaclaw5_options_t* fc2d_cudaclaw5_get_options(fclaw2d_global_t *glob)
+fc2d_cudaclaw5_options_t* fc2d_cudaclaw5_get_options(fclaw_global_t *glob)
 {
-    return (fc2d_cudaclaw5_options_t*) fclaw2d_global_get_options(glob, "cudaclaw5");
+    return (fc2d_cudaclaw5_options_t*) fclaw_global_get_options(glob, "cudaclaw5");
 }
 
-void fc2d_cudaclaw5_options_store (fclaw2d_global_t* glob, fc2d_cudaclaw5_options_t* clawopt)
+void fc2d_cudaclaw5_options_store (fclaw_global_t* glob, fc2d_cudaclaw5_options_t* clawopt)
 {
-    fclaw2d_global_options_store(glob, "cudaclaw5", clawopt);
+    fclaw_global_options_store(glob, "cudaclaw5", clawopt);
 }

@@ -34,8 +34,8 @@ extern "C"
 #endif
 #endif
 
-struct fclaw2d_global;
-struct fclaw2d_patch;
+struct fclaw_global;
+struct fclaw_patch;
 
 typedef  struct fc2d_thunderegg_vtable  fc2d_thunderegg_vtable_t;
 
@@ -68,7 +68,7 @@ typedef void (*fc2d_thunderegg_fort_apply_bc_t)(const int* blockno, const  int* 
                                                double rhs[], fc2d_thunderegg_fort_eval_bc_t g_bc, 
                                                int* cons_check, double flux_sum[]);
 
-typedef void (*fc2d_thunderegg_operator_t)(struct fclaw2d_global *glob);
+typedef void (*fc2d_thunderegg_operator_t)(struct fclaw_global *glob);
 
 /* -------------------------- Solver and utilities ------------------------------------ */
 
@@ -97,7 +97,7 @@ struct fc2d_thunderegg_vtable
  * 
  * @param global the global context
  */
-void fc2d_thunderegg_solver_initialize(struct fclaw2d_global* glob);
+void fc2d_thunderegg_solver_initialize(struct fclaw_global* glob);
 
 /**
  * @brief Get the thunderegg vtable
@@ -105,16 +105,16 @@ void fc2d_thunderegg_solver_initialize(struct fclaw2d_global* glob);
  * @param global the global context
  * @return fc2d_thunderegg_vtable_t* the vtable
  */
-fc2d_thunderegg_vtable_t* fc2d_thunderegg_vt(struct fclaw2d_global* glob);
+fc2d_thunderegg_vtable_t* fc2d_thunderegg_vt(struct fclaw_global* glob);
 
 
 /* ----------------------------- User access to solver functions ---------------------- */
 
-void fc2d_thunderegg_setprob(struct fclaw2d_global* glob);
+void fc2d_thunderegg_setprob(struct fclaw_global* glob);
 
 
-void fc2d_thunderegg_rhs(struct fclaw2d_global* glob,
-                        struct fclaw2d_patch *patch,
+void fc2d_thunderegg_rhs(struct fclaw_global* glob,
+                        struct fclaw_patch *patch,
                         int blockno,
                         int patchno);
 

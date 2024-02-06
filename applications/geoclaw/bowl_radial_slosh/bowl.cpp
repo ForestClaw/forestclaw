@@ -26,10 +26,10 @@
 #include "radial/radial_user.h"
 #include "slosh/slosh_user.h"
 
-#include <fclaw2d_include_all.h>
+#include <fclaw_include_all.h>
 
-#include <fclaw2d_clawpatch.h>
-#include <fclaw2d_clawpatch_options.h>
+#include <fclaw_clawpatch.h>
+#include <fclaw_clawpatch_options.h>
 
 #include <fc2d_geoclaw.h>
 #include <fc2d_geoclaw_options.h>
@@ -44,22 +44,22 @@ main (int argc, char **argv)
 
     radial_user_options_t       *radial_user_opt;
     fclaw_options_t             *radial_gparms;
-    fclaw2d_clawpatch_options_t *radial_clawpatchopt;
+    fclaw_clawpatch_options_t *radial_clawpatchopt;
     fc2d_geoclaw_options_t      *radial_geoclawopt;
 
     slosh_user_options_t        *slosh_user_opt;
     fclaw_options_t             *slosh_fclaw_opt;
-    fclaw2d_clawpatch_options_t *sloshclawpatch_opt;
+    fclaw_clawpatch_options_t *sloshclawpatch_opt;
     fc2d_geoclaw_options_t      *slosh_geo_opt;
 
 
     radial_gparms                   = fclaw_options_register(app, "radial",           "fclaw_options.ini");
-    radial_clawpatchopt = fclaw2d_clawpatch_options_register(app, "radial-clawpatch", "fclaw_options.ini");
+    radial_clawpatchopt = fclaw_clawpatch_2d_options_register(app, "radial-clawpatch", "fclaw_options.ini");
     radial_geoclawopt        = fc2d_geoclaw_options_register(app, "radial-geoclaw",   "fclaw_options.ini");
     radial_user_opt =                radial_options_register(app, "radial-user",      "fclaw_options.ini");  
 
     slosh_fclaw_opt =                   fclaw_options_register(app, "slosh",           "fclaw_options.ini");
-    sloshclawpatch_opt =    fclaw2d_clawpatch_options_register(app, "slosh-clawpatch", "fclaw_options.ini");
+    sloshclawpatch_opt =    fclaw_clawpatch_2d_options_register(app, "slosh-clawpatch", "fclaw_options.ini");
     slosh_geo_opt =              fc2d_geoclaw_options_register(app, "slosh-geoclaw",   "fclaw_options.ini");
     slosh_user_opt =                    slosh_options_register(app, "slosh-user",      "fclaw_options.ini");  
 
@@ -73,10 +73,10 @@ main (int argc, char **argv)
         int size, rank;
         sc_MPI_Comm mpicomm = fclaw_app_get_mpi_size_rank (app, &size, &rank);
     
-        fclaw2d_global_t *radial_glob = fclaw2d_global_new_comm(mpicomm, size, rank);
+        fclaw_global_t *radial_glob = fclaw_global_new_comm(mpicomm, size, rank);
 
-        fclaw2d_options_store           (radial_glob, radial_gparms);
-        fclaw2d_clawpatch_options_store (radial_glob, radial_clawpatchopt);
+        fclaw_options_store           (radial_glob, radial_gparms);
+        fclaw_clawpatch_options_store (radial_glob, radial_clawpatchopt);
         fc2d_geoclaw_options_store      (radial_glob, radial_geoclawopt);
         radial_options_store            (radial_glob, radial_user_opt);
 
@@ -85,15 +85,15 @@ main (int argc, char **argv)
         /* Run the program */
         radial_run_program(radial_glob);
 
-        fclaw2d_global_destroy(radial_glob);
+        fclaw_global_destroy(radial_glob);
 
     
         /* Create global structure which stores the domain, timers, etc */
-        fclaw2d_global_t *slosh_glob = fclaw2d_global_new_comm(mpicomm, size, rank);
+        fclaw_global_t *slosh_glob = fclaw_global_new_comm(mpicomm, size, rank);
 
         /* Store option packages in glob */
-        fclaw2d_options_store           (slosh_glob, slosh_fclaw_opt);
-        fclaw2d_clawpatch_options_store (slosh_glob, sloshclawpatch_opt);
+        fclaw_options_store           (slosh_glob, slosh_fclaw_opt);
+        fclaw_clawpatch_options_store (slosh_glob, sloshclawpatch_opt);
         fc2d_geoclaw_options_store      (slosh_glob, slosh_geo_opt);
         slosh_options_store             (slosh_glob, slosh_user_opt);
 
@@ -101,7 +101,7 @@ main (int argc, char **argv)
 
         slosh_run_program(slosh_glob);
         
-        fclaw2d_global_destroy(slosh_glob);
+        fclaw_global_destroy(slosh_glob);
     
     }
 

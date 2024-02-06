@@ -93,13 +93,13 @@ slosh_user_options_t* slosh_options_register (fclaw_app_t * app,
     return user;
 }
 
-void slosh_options_store (fclaw2d_global_t* glob, slosh_user_options_t* user)
+void slosh_options_store (fclaw_global_t* glob, slosh_user_options_t* user)
 {
-    fclaw2d_global_options_store(glob, "slosh-user", user);
+    fclaw_global_options_store(glob, "slosh-user", user);
 }
 
-slosh_user_options_t* slosh_get_options(fclaw2d_global_t* glob)
+slosh_user_options_t* slosh_get_options(fclaw_global_t* glob)
 {
-    return (slosh_user_options_t*) fclaw2d_global_get_options(glob, "slosh-user");
+    return (slosh_user_options_t*) fclaw_global_get_options(glob, "slosh-user");
 }
 

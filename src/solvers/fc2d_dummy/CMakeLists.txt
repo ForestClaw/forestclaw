@@ -15,13 +15,11 @@ target_include_directories(dummy
 # -- install
 install(FILES
 	fc2d_dummy.h
+  TYPE INCLUDE
 )
 
 install(TARGETS dummy
-  EXPORT ${PROJECT_NAME}-targets
-  ARCHIVE DESTINATION lib
-  LIBRARY DESTINATION lib
-  RUNTIME DESTINATION bin)
+  EXPORT ${PROJECT_NAME}-targets)
 
 # imported target, for use from FetchContent
 add_library(FORESTCLAW::DUMMY INTERFACE IMPORTED GLOBAL)

@@ -25,7 +25,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "bump_user.h"
 
-#include <fclaw2d_clawpatch.h>
+#include <fclaw_clawpatch.h>
 
 #include <fc2d_clawpack46.h>
 #include <fc2d_clawpack5.h>
@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "../rp/shallow_user_fort.h"
 
 
-void bump_problem_setup(fclaw2d_global_t* glob)
+void bump_problem_setup(fclaw_global_t* glob)
 {
     const user_options_t* user = bump_get_options(glob);
 
@@ -46,13 +46,13 @@ void bump_problem_setup(fclaw2d_global_t* glob)
     }
 
     /* We want to make sure node 0 gets here before proceeding */
-    fclaw2d_domain_barrier (glob->domain);  /* redundant?  */
+    fclaw_domain_barrier (glob->domain);  /* redundant?  */
     SETPROB();
 }
 
-void bump_link_solvers(fclaw2d_global_t *glob)
+void bump_link_solvers(fclaw_global_t *glob)
 {
-    fclaw2d_vtable_t *vt = fclaw2d_vt(glob);
+    fclaw_vtable_t *vt = fclaw_vt(glob);
 
     vt->problem_setup = &bump_problem_setup;  /* Version-independent */
 

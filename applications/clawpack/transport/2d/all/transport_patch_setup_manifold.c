@@ -26,23 +26,23 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "transport_user.h"
 
 
-void transport_patch_setup_manifold(fclaw2d_global_t *glob,
-                                    fclaw2d_patch_t *patch,
+void transport_patch_setup_manifold(fclaw_global_t *glob,
+                                    fclaw_patch_t *patch,
                                     int blockno,
                                     int patchno,
                                     int claw_version)
 {
     int mx,my,mbc;
     double xlower,ylower,dx,dy;
-    fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mbc,
+    fclaw_clawpatch_2d_grid_data(glob,patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
     double *area, *edgelengths,*curvature;
-    fclaw2d_clawpatch_metric_scalar(glob, patch,&area,&edgelengths,
+    fclaw_clawpatch_2d_metric_scalar(glob, patch,&area,&edgelengths,
                                     &curvature);
     int maux;
     double *aux;
-    fclaw2d_clawpatch_aux_data(glob,patch,&aux,&maux);
+    fclaw_clawpatch_aux_data(glob,patch,&aux,&maux);
 
     //const user_options_t* user_opt = sphere_get_options(glob);
     FCLAW_ASSERT(maux == 7);

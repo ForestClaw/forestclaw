@@ -8,7 +8,7 @@
       common /example_comm/ example
 
       integer*8 cont, fclaw_map_get_context
-      logical fclaw2d_map_is_used
+      logical fclaw_map_is_used
 
       double precision xp, yp, zp
 
@@ -17,8 +17,8 @@
 
       cont = fclaw_map_get_context()
 
-      if (fclaw2d_map_is_used(cont)) then
-         call fclaw2d_map_c2m(cont,
+      if (fclaw_map_is_used(cont)) then
+         call fclaw_map_2d_c2m(cont,
      &         blockno,xc,yc,xp,yp,zp)
       else
          xp = xc

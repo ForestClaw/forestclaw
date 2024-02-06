@@ -26,10 +26,10 @@
 #ifndef SHOCKBUBBLE_USER_H
 #define SHOCKBUBBLE_USER_H
 
-#include <fclaw2d_include_all.h>
+#include <fclaw_include_all.h>
 
 
-#include <fclaw2d_include_all.h>
+#include <fclaw_include_all.h>
 
 #include <fc2d_cudaclaw.h>
 #include <cudaclaw_user_fort.h>
@@ -37,8 +37,8 @@
 #include <fc2d_cudaclaw_cuda.h>
 #include <fc2d_cudaclaw_options.h>
 
-#include <fclaw2d_clawpatch.h>
-#include <fclaw2d_clawpatch_options.h>
+#include <fclaw_clawpatch.h>
+#include <fclaw_clawpatch_options.h>
 
 #include <cudaclaw_user_fort.h>
 
@@ -64,14 +64,14 @@ typedef struct user_options
 } user_options_t;
 
 
-void shockbubble_link_solvers(fclaw2d_global_t *glob);
+void shockbubble_link_solvers(fclaw_global_t *glob);
 
 user_options_t* shockbubble_options_register (fclaw_app_t * app,
                                           const char *configfile);
 
-void shockbubble_options_store (fclaw2d_global_t* glob, user_options_t* user);
+void shockbubble_options_store (fclaw_global_t* glob, user_options_t* user);
 
-user_options_t* shockbubble_get_options(fclaw2d_global_t* glob);
+user_options_t* shockbubble_get_options(fclaw_global_t* glob);
 
 /* ------------------------------- Fortran code --------------------------------------- */
 

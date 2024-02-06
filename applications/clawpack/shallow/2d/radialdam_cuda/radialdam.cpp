@@ -25,10 +25,10 @@
 
 #include "radialdam_user.h"
 
-#include <fclaw2d_include_all.h>
+#include <fclaw_include_all.h>
 
-#include <fclaw2d_clawpatch_options.h>
-#include <fclaw2d_clawpatch.h>
+#include <fclaw_clawpatch_options.h>
+#include <fclaw_clawpatch.h>
 
 #include <fc2d_clawpack46_options.h>
 #include <fc2d_clawpack5_options.h>
@@ -41,14 +41,14 @@
 #include <fc2d_cuda_profiler.h>
 
 static
-fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, 
+fclaw_domain_t* create_domain(sc_MPI_Comm mpicomm, 
 		fclaw_options_t* fclaw_opt,
 		user_options_t* user)
 {
 	/* Mapped, multi-block domain */
 	p4est_connectivity_t     *conn = NULL;
-	fclaw2d_domain_t         *domain;
-	fclaw2d_map_context_t    *cont = NULL;
+	fclaw_domain_t         *domain;
+	fclaw_map_context_t    *cont = NULL;
 
 	/* Local variables */
 	double rotate[2];
@@ -61,7 +61,7 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm,
 		case 0:
 			/* Use [ax,bx]x[ay,by] */
 			conn = p4est_connectivity_new_unitsquare();
-			cont = fclaw2d_map_new_nomap();
+			cont = fclaw_map_new_nomap();
 			break;
 		case 1:
 			conn = p4est_connectivity_new_unitsquare();
@@ -72,25 +72,25 @@ fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm,
 	}
 
 	domain = fclaw2d_domain_new_conn_map (mpicomm, fclaw_opt->minlevel, conn, cont);
-	fclaw2d_domain_list_levels(domain, FCLAW_VERBOSITY_ESSENTIAL);
-	fclaw2d_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);  
+	fclaw_domain_list_levels(domain, FCLAW_VERBOSITY_ESSENTIAL);
+	fclaw_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);  
 	return domain;
 }
 
 static
-void run_program(fclaw2d_global_t* glob)
+void run_program(fclaw_global_t* glob)
 {
 	const user_options_t           *user_opt;
 
 	/* ---------------------------------------------------------------
 	   Set domain data.
 	   --------------------------------------------------------------- */
-	fclaw2d_domain_data_new(glob->domain);
+	you_can_safely_remove_this_call(glob->domain);
 
 	user_opt = radialdam_get_options(glob);
 
 	/* Initialize virtual table for ForestClaw */
-	fclaw2d_vtables_initialize(glob);
+	fclaw_vtables_initialize(glob);
 
 	/* Initialize virtual tables for solvers */
 	if(user_opt->cuda)
@@ -127,8 +127,8 @@ void run_program(fclaw2d_global_t* glob)
         fc2d_cudaclaw_allocate_buffers(glob);
     }
 
-    fclaw2d_initialize(glob);
-    fclaw2d_run(glob);
+    fclaw_initialize(glob);
+    fclaw_run(glob);
 
     if (user_opt->cuda == 1)
     {
@@ -136,7 +136,7 @@ void run_program(fclaw2d_global_t* glob)
         fc2d_cudaclaw_deallocate_buffers(glob);
     }
 
-	fclaw2d_finalize(glob);
+	fclaw_finalize(glob);
 }
 
 
@@ -150,13 +150,13 @@ main (int argc, char **argv)
 	/* Options */
 	user_options_t              *user_opt;
 	fclaw_options_t             *fclaw_opt;
-	fclaw2d_clawpatch_options_t *clawpatch_opt;
+	fclaw_clawpatch_options_t *clawpatch_opt;
 	fc2d_clawpack46_options_t   *claw46_opt;
 	fc2d_clawpack5_options_t    *claw5_opt;
 	fc2d_cudaclaw_options_t     *cuclaw5_opt;
 
-	fclaw2d_global_t            *glob;
-	fclaw2d_domain_t            *domain;
+	fclaw_global_t            *glob;
+	fclaw_domain_t            *domain;
 	sc_MPI_Comm mpicomm;
 
 	/* Initialize application */
@@ -164,7 +164,7 @@ main (int argc, char **argv)
 
 	/* Create new options packages */
 	fclaw_opt =                   fclaw_options_register(app,  NULL,        "fclaw_options.ini");
-	clawpatch_opt =   fclaw2d_clawpatch_options_register(app, "clawpatch",  "fclaw_options.ini");
+	clawpatch_opt =   fclaw_clawpatch_2d_options_register(app, "clawpatch",  "fclaw_options.ini");
 	claw46_opt =        fc2d_clawpack46_options_register(app, "clawpack46", "fclaw_options.ini");
 	claw5_opt =          fc2d_clawpack5_options_register(app, "clawpack5",  "fclaw_options.ini");
 	cuclaw5_opt =         fc2d_cudaclaw_options_register(app,               "fclaw_options.ini");
@@ -182,12 +182,12 @@ main (int argc, char **argv)
 		domain = create_domain(mpicomm, fclaw_opt,user_opt);
 
 		/* Create global structure which stores the domain, timers, etc */
-		glob = fclaw2d_global_new();
-		fclaw2d_global_store_domain(glob, domain);
+		glob = fclaw_global_new();
+		fclaw_global_store_domain(glob, domain);
 
 		/* Store option packages in glob */
-		fclaw2d_options_store           (glob, fclaw_opt);
-		fclaw2d_clawpatch_options_store (glob, clawpatch_opt);
+		fclaw_options_store           (glob, fclaw_opt);
+		fclaw_clawpatch_options_store (glob, clawpatch_opt);
 		fc2d_clawpack46_options_store   (glob, claw46_opt);
 		fc2d_clawpack5_options_store    (glob, claw5_opt);
 		fc2d_cudaclaw_options_store     (glob, cuclaw5_opt);
@@ -195,7 +195,7 @@ main (int argc, char **argv)
 
 		run_program(glob);
 
-		fclaw2d_global_destroy(glob);
+		fclaw_global_destroy(glob);
 	}
 
 	fclaw_app_destroy (app);

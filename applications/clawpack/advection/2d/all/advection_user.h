@@ -26,13 +26,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef ADVECTION_USER_2D_H
 #define ADVECTION_USER_2D_H
 
-#include <fclaw2d_include_all.h>
+#include <fclaw_include_all.h>
 
-#include <fclaw2d_clawpatch_pillow.h>
+#include <fclaw_clawpatch_pillow.h>
 
 /* Headers for both Clawpack 4.6 and  Clawpack 5.0 */
-#include <fclaw2d_clawpatch.h>
-#include <fclaw2d_clawpatch_options.h>
+#include <fclaw_clawpatch.h>
+#include <fclaw_clawpatch_options.h>
 #include <fclaw2d_clawpatch_fort.h>
 
 
@@ -65,14 +65,14 @@ extern "C"
 /* Common patch setup - this calls a common SETAUX routine that sets 
    velocities based on a streamfunction */
 
-void advection_patch_setup_manifold(fclaw2d_global_t *glob,
-                                    fclaw2d_patch_t *patch,
+void advection_patch_setup_manifold(fclaw_global_t *glob,
+                                    fclaw_patch_t *patch,
                                     int block,
                                     int patchno,
                                     int claw_version);
 
-void advection_b4step2_manifold(fclaw2d_global_t *glob,
-                                fclaw2d_patch_t *patch,
+void advection_b4step2_manifold(fclaw_global_t *glob,
+                                fclaw_patch_t *patch,
                                 int blockno,
                                 int patchno,
                                 double t,

@@ -59,13 +59,13 @@ typedef struct user_options
 user_options_t* filament_options_register (fclaw_app_t * app,
                                            const char *configfile);
 
-void filament_options_store (fclaw2d_global_t* glob, user_options_t* user);
+void filament_options_store (fclaw_global_t* glob, user_options_t* user);
 
-const user_options_t* filament_get_options(fclaw2d_global_t* glob);
+const user_options_t* filament_get_options(fclaw_global_t* glob);
 
-void filament_link_solvers(fclaw2d_global_t *glob);
+void filament_link_solvers(fclaw_global_t *glob);
 
-void filament_map_extrude(fclaw2d_map_context_t* cont,
+void filament_map_extrude(fclaw_map_context_t* cont,
                           const double maxelev);
 
 

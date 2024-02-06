@@ -25,10 +25,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "latlong_user.h"
 
-void latlong_problem_setup(fclaw2d_global_t *glob)
+void latlong_problem_setup(fclaw_global_t *glob)
 {
     const user_options_t* user = latlong_get_options(glob);
-    fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
+    fclaw_options_t* fclaw_opt = fclaw_get_options(glob);
     if (glob->mpirank == 0)
     {
         FILE *f = fopen("setprob.data","w");
@@ -41,14 +41,14 @@ void latlong_problem_setup(fclaw2d_global_t *glob)
         fprintf(f,  "%-24.6f %s",user->latitude[1],"\% latitude[1]\n");
         fclose(f);
     }
-    fclaw2d_domain_barrier (glob->domain);
+    fclaw_domain_barrier (glob->domain);
     SETPROB();
 }
 
 
 static
-void latlong_patch_setup(fclaw2d_global_t *glob,
-                         fclaw2d_patch_t *patch,
+void latlong_patch_setup(fclaw_global_t *glob,
+                         fclaw_patch_t *patch,
                          int blockno,
                          int patchno)
 {
@@ -57,12 +57,12 @@ void latlong_patch_setup(fclaw2d_global_t *glob,
                                    user->claw_version);
 }
 
-void latlong_link_solvers(fclaw2d_global_t *glob)
+void latlong_link_solvers(fclaw_global_t *glob)
 {
-    fclaw2d_vtable_t *fclaw_vt = fclaw2d_vt(glob);
-    fclaw_vt->problem_setup = latlong_problem_setup;
+    fclaw_vtable_t *fc_vt = fclaw_vt(glob);
+    fc_vt->problem_setup = latlong_problem_setup;
     
-    fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt(glob);
+    fclaw_patch_vtable_t *patch_vt = fclaw_patch_vt(glob);
     patch_vt->setup = &latlong_patch_setup;
 
     const user_options_t   *user = latlong_get_options(glob);

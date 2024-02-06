@@ -30,7 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW2D_METRIC_HPP
 #define FCLAW2D_METRIC_HPP
 
-#include <fclaw2d_farraybox.hpp>     /* Needed for FArray box used to store metric data */
+#include <fclaw_farraybox.hpp>     /* Needed for FArray box used to store metric data */
 
 /**
  * @brief Struct for patch metric data

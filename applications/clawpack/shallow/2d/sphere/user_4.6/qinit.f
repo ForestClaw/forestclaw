@@ -22,7 +22,7 @@
          do i = 1-mbc,mx+mbc
             x = xlower + (i-1)*dx
             y = ylower + (j-1)*dy
-            call fclaw2d_map_c2m(cont,blockno,x,y,xp,yp,zp)
+            call fclaw_map_2d_c2m(cont,blockno,x,y,xp,yp,zp)
             q(i,j,1) = gaussian_sum(xp,yp,zp) + 0.2d0
             q(i,j,2) = 0
             q(i,j,3) = 0

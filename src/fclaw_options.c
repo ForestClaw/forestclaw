@@ -28,6 +28,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_options.h>
 #include <fclaw_timer.h>
 #include <fclaw_mpi.h>
+#include <fclaw_global.h>
 
 /* Get whatever definitions exist already */
 #ifdef FCLAW_HAVE_FENV_H
@@ -306,11 +307,17 @@ fclaw_register (fclaw_options_t* fclaw_opt, sc_options_t * opt)
     sc_options_add_int (opt, 0, "mj", &fclaw_opt->mj, 1,
                         "Number of blocks in y direction  [1]");
 
+    sc_options_add_int (opt, 0, "mk", &fclaw_opt->mk, 1,
+                        "Number of blocks in z direction  [1]");
+
     sc_options_add_bool (opt, 0, "periodic_x", &fclaw_opt->periodic_x, 0,
                         "Periodic in x direction [F]");
 
     sc_options_add_bool (opt, 0, "periodic_y", &fclaw_opt->periodic_y, 0,
                         "Periodic in y direction  [F]");
+
+    sc_options_add_bool (opt, 0, "periodic_z", &fclaw_opt->periodic_z, 0,
+                        "Periodic in z direction  [F]");
 
     fclaw_options_add_double_array (opt,0, "scale",
                                     &fclaw_opt->scale_string, "1 1 1",
@@ -745,3 +752,16 @@ void fclaw_options_destroy_array(void* array)
     FCLAW_FREE (array);
 }
 
+/* ---------------------------------------------------------
+   Public interface to ForestClaw options
+   --------------------------------------------------------- */
+
+void fclaw_options_store (fclaw_global_t *glob, fclaw_options_t* gparms)
+{
+    fclaw_global_options_store(glob, "fclaw2d", gparms);
+}
+
+fclaw_options_t* fclaw_get_options(fclaw_global_t* glob)
+{
+    return (fclaw_options_t*) fclaw_global_get_options(glob, "fclaw2d");
+}

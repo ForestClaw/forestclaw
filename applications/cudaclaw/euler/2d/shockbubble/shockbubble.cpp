@@ -28,10 +28,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fc2d_cuda_profiler.h>
 
 static
-void create_domain(fclaw2d_global_t* glob)
+void create_domain(fclaw_global_t* glob)
 {
     /* Mapped, multi-block domain */
-    fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
+    fclaw_options_t* fclaw_opt = fclaw_get_options(glob);
 
     int mi,mj,a,b;
     mi = fclaw_opt->mi;
@@ -39,35 +39,30 @@ void create_domain(fclaw2d_global_t* glob)
     a = fclaw_opt->periodic_x;
     b = fclaw_opt->periodic_y;
 
-    fclaw2d_domain_t* domain = 
-        fclaw2d_domain_new_brick(glob->mpicomm, mi, mj, a, b, fclaw_opt->minlevel);
+    fclaw_domain_t* domain = 
+        fclaw_domain_new_2d_brick(glob->mpicomm, mi, mj, a, b, fclaw_opt->minlevel);
 
     /* Use [ax,bx]x[ay,by] */
-    fclaw2d_map_context_t    *cont = NULL, *brick = NULL;
-    brick = fclaw2d_map_new_brick (domain, mi, mj, a, b);
-    cont = fclaw2d_map_new_nomap_brick(brick);
+    fclaw_map_context_t    *cont = NULL, *brick = NULL;
+    brick = fclaw_map_new_2d_brick (domain, mi, mj, a, b);
+    cont = fclaw_map_new_nomap_brick(brick);
 
-    fclaw2d_global_store_domain(glob, domain);
-    fclaw2d_global_store_map(glob, cont);
+    fclaw_global_store_domain(glob, domain);
+    fclaw_map_store(glob, cont);
 
-    fclaw2d_domain_list_levels(domain, FCLAW_VERBOSITY_ESSENTIAL);
-    fclaw2d_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);  
+    fclaw_domain_list_levels(domain, FCLAW_VERBOSITY_ESSENTIAL);
+    fclaw_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);  
 }
 
 static
-void run_program(fclaw2d_global_t* glob)
+void run_program(fclaw_global_t* glob)
 {
     const user_options_t  *user_opt;
-
-    /* ---------------------------------------------------------------
-       Set domain data.
-       --------------------------------------------------------------- */
-    fclaw2d_domain_data_new(glob->domain);
 
     user_opt = shockbubble_get_options(glob);
 
     /* Initialize virtual table for ForestClaw */
-    fclaw2d_vtables_initialize(glob);
+    fclaw_vtables_initialize(glob);
 
     fc2d_cudaclaw_options_t *clawopt = fc2d_cudaclaw_get_options(glob);
 
@@ -86,13 +81,13 @@ void run_program(fclaw2d_global_t* glob)
     PROFILE_CUDA_GROUP("Allocate GPU and GPU buffers",1);
     fc2d_cudaclaw_allocate_buffers(glob);
 
-    fclaw2d_initialize(glob);
-    fclaw2d_run(glob);
+    fclaw_initialize(glob);
+    fclaw_run(glob);
 
     PROFILE_CUDA_GROUP("De-allocate GPU and GPU buffers",1);
     fc2d_cudaclaw_deallocate_buffers(glob);
 
-    fclaw2d_finalize(glob);
+    fclaw_finalize(glob);
 }
 
 int
@@ -104,12 +99,12 @@ main (int argc, char **argv)
     /* Options */
     user_options_t              *user_opt;
     fclaw_options_t             *fclaw_opt;
-    fclaw2d_clawpatch_options_t *clawpatch_opt;
+    fclaw_clawpatch_options_t *clawpatch_opt;
     fc2d_cudaclaw_options_t     *cuclaw_opt;
 
     /* Create new options packages */
     fclaw_opt =                   fclaw_options_register(app,  NULL,       "fclaw_options.ini");
-    clawpatch_opt =   fclaw2d_clawpatch_options_register(app, "clawpatch", "fclaw_options.ini");
+    clawpatch_opt =   fclaw_clawpatch_2d_options_register(app, "clawpatch", "fclaw_options.ini");
     cuclaw_opt =          fc2d_cudaclaw_options_register(app, "cudaclaw",  "fclaw_options.ini");
     user_opt =              shockbubble_options_register(app,              "fclaw_options.ini");  
 
@@ -125,11 +120,11 @@ main (int argc, char **argv)
         sc_MPI_Comm mpicomm = fclaw_app_get_mpi_size_rank (app, &size, &rank);
     
         /* Create global structure which stores the domain, timers, etc */
-        fclaw2d_global_t *glob = fclaw2d_global_new_comm(mpicomm, size, rank);
+        fclaw_global_t *glob = fclaw_global_new_comm(mpicomm, size, rank);
 
         /* Store option packages in glob */
-        fclaw2d_options_store           (glob, fclaw_opt);
-        fclaw2d_clawpatch_options_store (glob, clawpatch_opt);
+        fclaw_options_store           (glob, fclaw_opt);
+        fclaw_clawpatch_options_store (glob, clawpatch_opt);
         fc2d_cudaclaw_options_store     (glob, cuclaw_opt);
         shockbubble_options_store       (glob, user_opt);
 
@@ -138,7 +133,7 @@ main (int argc, char **argv)
         /* Run the program */
         run_program(glob);
         
-        fclaw2d_global_destroy(glob);
+        fclaw_global_destroy(glob);
     }
     
     fclaw_app_destroy (app);

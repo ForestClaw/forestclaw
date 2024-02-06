@@ -30,10 +30,10 @@
 #include <fc2d_cudaclaw_options.h>
 #include <cudaclaw_user_fort.h>
 
-#include <fclaw2d_include_all.h>
+#include <fclaw_include_all.h>
 
-#include <fclaw2d_clawpatch.h>
-#include <fclaw2d_clawpatch_options.h>
+#include <fclaw_clawpatch.h>
+#include <fclaw_clawpatch_options.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -68,14 +68,14 @@ void bump_assign_speeds(cudaclaw_cuda_speeds_t *speeds);
 
 void setprob_cuda();
 
-void bump_link_solvers(fclaw2d_global_t *glob);
+void bump_link_solvers(fclaw_global_t *glob);
 
 user_options_t* bump_options_register (fclaw_app_t * app,
                                        const char *configfile);
 
-void bump_options_store (fclaw2d_global_t* glob, user_options_t* user);
+void bump_options_store (fclaw_global_t* glob, user_options_t* user);
 
-user_options_t* bump_get_options(fclaw2d_global_t* glob);
+user_options_t* bump_get_options(fclaw_global_t* glob);
 
 
 /* --------------------------------------- non-Cuda ----------------------------------------*/

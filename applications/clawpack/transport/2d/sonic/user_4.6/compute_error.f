@@ -28,7 +28,7 @@ c     # Assume a single field variable only
             if (t .eq. 0) then
                soln(i,j,1) = q(i,j,1)
             else
-               call fclaw2d_map_brick2c(cont,blockno,xc,yc,xc1,yc1,zc1)
+               call fclaw_map_2d_brick2c(cont,blockno,xc,yc,xc1,yc1,zc1)
                call swirl_transform_coordinates(xc1,yc1,x,y,mapping)
                soln(i,j,1) = qexact(blockno,x,y,t)
             endif

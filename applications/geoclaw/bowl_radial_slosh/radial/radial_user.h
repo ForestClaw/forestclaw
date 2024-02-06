@@ -26,7 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef BOWL_USER_H
 #define BOWL_USER_H
 
-#include <fclaw2d_include_all.h>
+#include <fclaw_include_all.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -41,19 +41,19 @@ typedef struct radial_user_options
   int is_registered;
 } radial_user_options_t;
 
-void radial_link_solvers(fclaw2d_global_t *glob);
+void radial_link_solvers(fclaw_global_t *glob);
 
 radial_user_options_t* radial_options_register (fclaw_app_t * app,
                                         const char *section,
                                         const char *configfile);
 
-void radial_options_store (fclaw2d_global_t* glob, radial_user_options_t* user);
+void radial_options_store (fclaw_global_t* glob, radial_user_options_t* user);
 
-radial_user_options_t* radial_get_options(fclaw2d_global_t* glob);
+radial_user_options_t* radial_get_options(fclaw_global_t* glob);
 
-void radial_create_domain(fclaw2d_global_t* glob);
+void radial_create_domain(fclaw_global_t* glob);
 
-void radial_run_program(fclaw2d_global_t* glob);
+void radial_run_program(fclaw_global_t* glob);
 
 #ifdef __cplusplus
 #if 0

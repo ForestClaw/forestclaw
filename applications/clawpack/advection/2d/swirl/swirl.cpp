@@ -27,47 +27,72 @@
 #include <fclaw2d_file.h>
 
 #include "../all/advection_user.h"
+#include <p4est_wrap.h>         /* just temporary for testing */
+#include <fclaw2d_convenience.h>
 
 #define FCLAW_SWIRL_IO_DEMO 0
 
 static
-void create_domain(fclaw2d_global_t *glob)
+void create_domain(fclaw_global_t *glob)
 {
-    const fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
+    const fclaw_options_t* fclaw_opt = fclaw_get_options(glob);
 
     /* Mapped, multi-block domain */
-    fclaw2d_domain_t *domain = 
-          fclaw2d_domain_new_unitsquare(glob->mpicomm, 
+    fclaw_domain_t *domain = 
+          fclaw_domain_new_unitsquare(glob->mpicomm, 
                                         fclaw_opt->minlevel);
     /* Create "empty" mapping */
-    fclaw2d_map_context_t* cont = fclaw2d_map_new_nomap();
+    fclaw_map_context_t* cont = fclaw_map_new_nomap();
 
     /* Store domain in the glob */
-    fclaw2d_global_store_domain(glob, domain);
+    fclaw_global_store_domain(glob, domain);
 
     /* Map unit square to disk using mapc2m_disk.f */
-    fclaw2d_global_store_map (glob, cont);
+    fclaw_map_store (glob, cont);
 
     /* Print out some info */
-    fclaw2d_domain_list_levels(domain, FCLAW_VERBOSITY_ESSENTIAL);
-    fclaw2d_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);
+    fclaw_domain_list_levels(domain, FCLAW_VERBOSITY_ESSENTIAL);
+    fclaw_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);
 }
 
-static
-void run_program(fclaw2d_global_t* glob)
-{
 #if FCLAW_SWIRL_IO_DEMO
-    int errcode;
-    fclaw2d_file_context_t *fc;
+static void
+check_fclaw2d_file_error_code (int errcode, const char *str)
+{
+    int reslen, retval;
+    char err_str[sc_MPI_MAX_ERROR_STRING];
+
+    if (errcode != FCLAW2D_FILE_ERR_SUCCESS)
+    {
+        /* In case of a not successful fclaw2d_file function call we always
+         * close the file if applicable and deallocate the file context.
+         */
+        /* examine the error code */
+        retval = fclaw2d_file_error_string (errcode, err_str, &reslen);
+        /* check for error in the error string function */
+        SC_CHECK_ABORTF (!retval, "%s: error string function not successful",
+                         str);
+        SC_ABORTF ("%s: %*.*s", str, reslen, reslen, err_str);
+    }
+}
 #endif
 
-    /* ---------------------------------------------------------------
-       Set domain data.
-       --------------------------------------------------------------- */
-    fclaw2d_domain_data_new(glob->domain);
+static
+void run_program(fclaw_global_t* glob)
+{
+#if FCLAW_SWIRL_IO_DEMO
+    int i;
+    int errcode, retval;
+    fclaw2d_file_context_t *fc;
+    char read_user_string[FCLAW2D_FILE_USER_STRING_BYTES + 1];
+    sc_array_t block_arr, field_arr, read_arr, *current_arr;
+    int64_t test_int = 12;
+    char *data, *local_arr_data;
+    fclaw2d_domain_t *read_domain;
+#endif
 
     /* Initialize virtual table for ForestClaw */
-    fclaw2d_vtables_initialize(glob);
+    fclaw_vtables_initialize(glob);
 
     /* Initialize virtual tables for solvers */
     const user_options_t *user_opt = swirl_get_options(glob);
@@ -85,8 +110,8 @@ void run_program(fclaw2d_global_t* glob)
     /* ---------------------------------------------------------------
        Run
        --------------------------------------------------------------- */
-    fclaw2d_initialize(glob);
-    fclaw2d_run(glob);
+    fclaw_initialize(glob);
+    fclaw_run(glob);
 
 #if FCLAW_SWIRL_IO_DEMO
     /* Example usage of forestclaw file functions. This is just for
@@ -94,16 +119,132 @@ void run_program(fclaw2d_global_t* glob)
      * the workflow must be extended by providing buffers with the required
      * data and the functions may be called at a more suitable place.
      */
-    /** WARNING: This is work in progress and currently not a valid example
-     * workflow.
-    */
-    fc = fclaw2d_file_open_write ("swirl_io_test", "ForestClaw data file", 0,
-                                  glob->domain, &errcode);
+    /* create a file, which is open for further writing */
+    /* the passed domain is written to the file */
+    fc = fclaw2d_file_open_write ("swirl_io_test", "ForestClaw data file",
+                                  glob->domain->d2, &errcode);
+    check_fclaw2d_file_error_code (errcode, "file open write");
 
-    fclaw2d_file_close (fc, &errcode);
+#if 0
+    retval = fclaw2d_file_write_partition ("swirl_io_test_partition",
+                                           "Test partition write",
+                                           glob->domain->d2, &errcode);
+    check_fclaw2d_file_error_code (errcode, "file write partition");
 #endif
 
-    fclaw2d_finalize(glob);
+    /* write a block to the file */
+    /* Initialize a sc_array with one element and the element size equals
+     * to the number of bytes of the block section.  */
+    sc_array_init_data (&block_arr, &test_int, sizeof (int64_t), 1);
+    fc = fclaw2d_file_write_block (fc, "Test block", block_arr.elem_size,
+                                   &block_arr, &errcode);
+    check_fclaw2d_file_error_code (errcode, "file write block");
+
+    /* write an array associated to the domain to the file */
+    /* we write non-contiguous data to demonstrate how to assemble the array */
+    /* To this end, we initialize a sc_array with the number of local patches
+     * of the domain passed to \ref fclaw2d_file_open_write and sizeof (sc_array_t)
+     * as element size.
+     */
+    sc_array_init_size (&field_arr, sizeof (sc_array_t),
+                        glob->domain->local_num_patches);
+
+    for (i = 0; i < glob->domain->local_num_patches; ++i)
+    {
+        /* Each sc_array in field_array represents one data entity
+         * associated to a patch. That means we write the data
+         * associated to the i-th local patch below.
+         */
+        current_arr = (sc_array_t *) sc_array_index (&field_arr, i);
+        /* To not allocate data but point to already allocated data
+         * use \ref sc_array_init_data.
+         */
+        sc_array_init_size (current_arr, 3 * sizeof (char), 1);
+        data = (char *) sc_array_index (current_arr, 0);
+        data[0] = 'a';
+        data[1] = 'b';
+        data[2] = 'c';
+    }
+
+    fc = fclaw2d_file_write_array (fc, "Test array", 3 * sizeof (char),
+                                   &field_arr, &errcode);
+    check_fclaw2d_file_error_code (errcode, "file write array");
+    /* free the local array data */
+    for (i = 0; i < glob->domain->local_num_patches; ++i)
+    {
+        current_arr = (sc_array_t *) sc_array_index (&field_arr, i);
+        sc_array_reset (current_arr);
+    }
+    sc_array_reset (&field_arr);
+    retval = fclaw2d_file_close (fc, &errcode);
+    check_fclaw2d_file_error_code (errcode, "file close 1");
+    FCLAW_EXECUTE_ASSERT_FALSE (retval);
+
+    /* open the file for reading */
+    /* the domain stored in the file is read to read_domain */
+    fc = fclaw2d_file_open_read ("swirl_io_test", read_user_string,
+                                 glob->domain->mpicomm, NULL, &read_domain,
+                                 &errcode);
+    check_fclaw2d_file_error_code (errcode, "file open read");
+    fclaw_global_productionf ("Opened file with user string: %s\n",
+                              read_user_string);
+
+    /* read a block from the file */
+    test_int = -1;
+    fc = fclaw2d_file_read_block (fc, read_user_string, sizeof (int64_t),
+                                  &block_arr, &errcode);
+    check_fclaw2d_file_error_code (errcode, "file read block");
+    fclaw_global_productionf ("Read block with user string: %s\n",
+                              read_user_string);
+    FCLAW_ASSERT (test_int == 12);
+
+    /* read an array from the file */
+    /* For reading array data we need to pass a sc_array with element
+     * equals to sizeof (sc_array_t). The sc_array will be resized by
+     * \ref fclaw2d_file_read_array. Each entry of the output sc_array
+     * is an sc_array with one element and element size equals to the
+     * patch data size.
+     */
+    sc_array_init (&read_arr, sizeof (sc_array_t));
+    fc = fclaw2d_file_read_array (fc, read_user_string, 3 * sizeof (char),
+                                  &read_arr, &errcode);
+    check_fclaw2d_file_error_code (errcode, "file write array");
+    fclaw_global_productionf ("Read array with user string: %s\n",
+                              read_user_string);
+    /* check read array */
+    for (i = 0; i < read_domain->local_num_patches; ++i)
+    {
+        current_arr = (sc_array_t *) sc_array_index_int (&read_arr, i);
+        /* local_arr_data is the pointer to the actual data of the
+         * i-th array entry
+         */
+        local_arr_data = (char *) sc_array_index (current_arr, 0);
+        /* check array entry */
+        FCLAW_ASSERT (local_arr_data[0] == 'a');
+        FCLAW_ASSERT (local_arr_data[1] == 'b');
+        FCLAW_ASSERT (local_arr_data[2] == 'c');
+    }
+    for (i = 0; i < read_domain->local_num_patches; ++i)
+    {
+        current_arr = (sc_array_t *) sc_array_index (&read_arr, i);
+        sc_array_reset (current_arr);
+    }
+    sc_array_reset (&read_arr);
+
+    /* sanity check of read domain */
+    FCLAW_ASSERT (p4est_checksum (((p4est_wrap_t *) read_domain->pp)->p4est)
+                  ==
+                  p4est_checksum (((p4est_wrap_t *) glob->domain->d2->pp)->
+                                  p4est));
+
+    fclaw2d_domain_destroy (read_domain);
+
+    retval = fclaw2d_file_close (fc, &errcode);
+    check_fclaw2d_file_error_code (errcode, "file close 2");
+    FCLAW_EXECUTE_ASSERT_FALSE (retval);
+#endif
+
+    fclaw_finalize(glob);
 }
 
 int
@@ -115,13 +256,13 @@ main (int argc, char **argv)
     /* Options */
     user_options_t              *user_opt;
     fclaw_options_t             *fclaw_opt;
-    fclaw2d_clawpatch_options_t *clawpatch_opt;
+    fclaw_clawpatch_options_t *clawpatch_opt;
     fc2d_clawpack46_options_t   *claw46_opt;
     fc2d_clawpack5_options_t    *claw5_opt;
 
     /* Create new options packages */
     fclaw_opt =                   fclaw_options_register(app,  NULL,        "fclaw_options.ini");
-    clawpatch_opt =   fclaw2d_clawpatch_options_register(app, "clawpatch",  "fclaw_options.ini");
+    clawpatch_opt =   fclaw_clawpatch_2d_options_register(app, "clawpatch",  "fclaw_options.ini");
     claw46_opt =        fc2d_clawpack46_options_register(app, "clawpack46", "fclaw_options.ini");
     claw5_opt =          fc2d_clawpack5_options_register(app, "clawpack5",  "fclaw_options.ini");
     user_opt =                    swirl_options_register(app,               "fclaw_options.ini");
@@ -137,11 +278,11 @@ main (int argc, char **argv)
         /* Create global structure which stores the domain, timers, etc */
         int size, rank;
         sc_MPI_Comm mpicomm = fclaw_app_get_mpi_size_rank (app, &size, &rank);
-        fclaw2d_global_t *glob = fclaw2d_global_new_comm (mpicomm, size, rank);
+        fclaw_global_t *glob = fclaw_global_new_comm (mpicomm, size, rank);
 
         /* Store option packages in glob */
-        fclaw2d_options_store           (glob, fclaw_opt);
-        fclaw2d_clawpatch_options_store (glob, clawpatch_opt);
+        fclaw_options_store           (glob, fclaw_opt);
+        fclaw_clawpatch_options_store (glob, clawpatch_opt);
         fc2d_clawpack46_options_store   (glob, claw46_opt);
         fc2d_clawpack5_options_store    (glob, claw5_opt);
         swirl_options_store             (glob, user_opt);
@@ -156,7 +297,7 @@ main (int argc, char **argv)
 
         run_program(glob);
 
-        fclaw2d_global_destroy(glob);
+        fclaw_global_destroy(glob);
         //fclaw2d_global_destroy(glob2);
     }
 

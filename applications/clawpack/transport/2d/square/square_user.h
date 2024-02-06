@@ -59,16 +59,16 @@ typedef struct user_options
 
 } user_options_t;
 
-struct fclaw2d_global;
-struct fclaw2d_patch;
+struct fclaw_global;
+struct fclaw_patch;
 
-void square_link_solvers(struct fclaw2d_global *glob);
+void square_link_solvers(struct fclaw_global *glob);
 
 /* ---------------------------------- Options ----------------------------------------- */
 
-const user_options_t* square_get_options(struct fclaw2d_global* glob);
+const user_options_t* square_get_options(struct fclaw_global* glob);
 
-void square_options_store (fclaw2d_global_t* glob, user_options_t* user);
+void square_options_store (fclaw_global_t* glob, user_options_t* user);
 
 
 user_options_t* square_options_register (fclaw_app_t * app,

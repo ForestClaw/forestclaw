@@ -1,34 +1,11 @@
 /* # check to see if value exceeds threshold */
 
-#ifndef REFINE_DIM
-#define REFINE_DIM 2
-#endif
+#include<fclaw_global.h>
 
-#ifndef PATCH_DIM
-#define PATCH_DIM 2
-#endif
+#include "../fclaw_clawpatch.h"
 
-
-#include<fclaw2d_global.h>
-
-#if REFINE_DIM == 2 && PATCH_DIM == 2
-
-#include "../fclaw2d_clawpatch.h"
-
-#include "../fclaw2d_clawpatch_options.h"
+#include "../fclaw_clawpatch_options.h"
 #include "../fclaw2d_clawpatch_fort.h"
-
-#elif REFINE_DIM == 2 && PATCH_DIM == 3
-
-#include "../fclaw3dx_clawpatch.h"
-
-#include "../fclaw3dx_clawpatch_options.h"
-#include "../fclaw2d_clawpatch_fort.h"
-#include "../fclaw3dx_clawpatch_fort.h"
-
-#include <_fclaw2d_to_fclaw3dx.h>
-
-#endif
 
 
 /* ------------------------------------------------------------------------------------ */
@@ -51,18 +28,18 @@ int FCLAW2D_CLAWPATCH_TAG_CRITERIA(const int* blockno,
                                         const int* init_flag,
                                         const int* is_ghost)
 {
-    struct fclaw2d_global* glob = fclaw2d_global_get_global();
-    fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt(glob);
+    struct fclaw_global* glob = fclaw_global_get_static_global();
+    fclaw_clawpatch_vtable_t* clawpatch_vt = fclaw_clawpatch_vt(glob);
 
     clawpatch_fort_exceeds_threshold_t user_exceeds_threshold = 
-                                clawpatch_vt->fort_user_exceeds_threshold;
+                                clawpatch_vt->d2->fort_user_exceeds_threshold;
 
-    fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
+    fclaw_clawpatch_options_t *clawpatch_opt = fclaw_clawpatch_get_options(glob);
     int meqn_val = clawpatch_opt->meqn, *meqn = &meqn_val;
     int ivar_val = clawpatch_opt->threshold_variable, *ivar_threshold=&ivar_val;
 
     int exceeds_th = 1;
-    int refinement_criteria = fclaw2d_clawpatch_get_options(glob)->refinement_criteria;
+    int refinement_criteria = fclaw_clawpatch_get_options(glob)->refinement_criteria;
     switch(refinement_criteria)
     {
         case FCLAW_REFINE_CRITERIA_VALUE:

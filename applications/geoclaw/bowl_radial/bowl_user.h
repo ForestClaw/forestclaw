@@ -26,7 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef BOWL_USER_H
 #define BOWL_USER_H
 
-#include <fclaw2d_include_all.h>
+#include <fclaw_include_all.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -36,7 +36,7 @@ extern "C"
 #endif
 #endif
 
-void bowl_link_solvers(fclaw2d_global_t *glob);
+void bowl_link_solvers(fclaw_global_t *glob);
 
 #ifdef __cplusplus
 #if 0

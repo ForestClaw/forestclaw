@@ -26,7 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef PWCONST_USER_H
 #define PWCONST_USER_H
 
-#include <fclaw2d_include_all.h>
+#include <fclaw_include_all.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -46,13 +46,13 @@ typedef struct user_options
 user_options_t* pwconst_options_register (fclaw_app_t * app,
                                           const char *configfile);
 
-void pwconst_options_store (fclaw2d_global_t* glob, user_options_t* user);
+void pwconst_options_store (fclaw_global_t* glob, user_options_t* user);
 
-const user_options_t* pwconst_get_options(fclaw2d_global_t* glob);
+const user_options_t* pwconst_get_options(fclaw_global_t* glob);
 
-void pwconst_link_solvers(fclaw2d_global_t *glob);
+void pwconst_link_solvers(fclaw_global_t *glob);
 
-fclaw2d_map_context_t* fclaw2d_map_new_nomap();
+fclaw_map_context_t* fclaw_map_new_nomap();
 
 #ifdef __cplusplus
 #if 0

@@ -29,7 +29,7 @@ c     # ------------------------------------------------------------
 
 c     # Compute covariant derivatives only
       flag = 1
-      call fclaw2d_map_c2m_basis(cont, 
+      call fclaw_map_2d_c2m_basis(cont, 
      &                 x,y, t, tinv, tderivs, flag)
 
       do k = 1,3
@@ -53,7 +53,7 @@ c     # Compute covariant derivatives only
       cont = fclaw_map_get_context()
 
       flag = 3
-      call fclaw2d_map_c2m_basis(cont, x,y, t, tinv,tderivs, flag)
+      call fclaw_map_2d_c2m_basis(cont, x,y, t, tinv,tderivs, flag)
                                           
 
       do k = 1,3
@@ -86,7 +86,7 @@ c     # Compute covariant derivatives only
 
 c     # Compute covariant and derivatives
       flag = 7
-      call fclaw2d_map_c2m_basis(cont, x,y, t,tinv,tderivs,flag)
+      call fclaw_map_2d_c2m_basis(cont, x,y, t,tinv,tderivs,flag)
                                           
 
       do k = 1,3
@@ -223,7 +223,7 @@ c     # Contravariant vectors
       cont = fclaw_map_get_context()
 
       flag = 7
-      call fclaw2d_map_c2m_basis(cont,x,y,t,tinv, tderivs,flag)
+      call fclaw_map_2d_c2m_basis(cont,x,y,t,tinv, tderivs,flag)
 
       do k = 1,3
           t1(k) = t(k,1)
