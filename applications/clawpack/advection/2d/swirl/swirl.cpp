@@ -84,7 +84,7 @@ void run_program(fclaw2d_global_t* glob)
     int errcode, retval;
     fclaw2d_file_context_t *fc;
     char read_user_string[FCLAW2D_FILE_USER_STRING_BYTES + 1];
-    sc_array_t block_arr, field_arr, read_arr, *current_arr;
+    sc_array_t block_arr, field_arr, read_arr, *current_arr, partition;
     int64_t test_int = 12;
     char *data, *local_arr_data;
     fclaw2d_domain_t *read_domain;
@@ -129,11 +129,12 @@ void run_program(fclaw2d_global_t* glob)
                                   glob->domain, &errcode);
     check_fclaw2d_file_error_code (errcode, "file open write");
 
-#if 0
+#if 1
     retval = fclaw2d_file_write_partition ("swirl_io_test_partition",
                                            "Test partition write",
                                            glob->domain, &errcode);
     check_fclaw2d_file_error_code (errcode, "file write partition");
+    FCLAW_EXECUTE_ASSERT_FALSE (retval);
 #endif
 
     /* write a block to the file */
@@ -184,14 +185,23 @@ void run_program(fclaw2d_global_t* glob)
     check_fclaw2d_file_error_code (errcode, "file close 1");
     FCLAW_EXECUTE_ASSERT_FALSE (retval);
 
+    /* read the partition file */
+    sc_array_init (&partition, sizeof (p4est_gloidx_t));
+    retval = fclaw2d_file_read_partition ("swirl_io_test_partition", read_user_string,
+                                          glob->domain->mpicomm, &partition, &errcode);
+    check_fclaw2d_file_error_code (errcode, "read partition file");
+    FCLAW_EXECUTE_ASSERT_FALSE (retval);
+
+
     /* open the file for reading */
     /* the domain stored in the file is read to read_domain */
     fc = fclaw2d_file_open_read ("swirl_io_test", read_user_string,
-                                 glob->domain->mpicomm, NULL, &read_domain,
+                                 glob->domain->mpicomm, &partition, &read_domain,
                                  &errcode);
     check_fclaw2d_file_error_code (errcode, "file open read");
     fclaw_global_productionf ("Opened file with user string: %s\n",
                               read_user_string);
+    sc_array_reset (&partition);
 
     /* read a block from the file */
     test_int = -1;
