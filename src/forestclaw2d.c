@@ -1397,6 +1397,15 @@ fclaw2d_domain_set_refinement (fclaw2d_domain_t * domain,
 }
 
 void
+fclaw2d_domain_set_partitioning (fclaw2d_domain_t * domain,
+                                 int partition_for_coarsening)
+{
+    p4est_wrap_t *wrap = (p4est_wrap_t *) domain->pp;
+
+    p4est_wrap_set_partitioning (wrap, partition_for_coarsening);
+}
+
+void
 fclaw2d_patch_mark_refine (fclaw2d_domain_t * domain, int blockno,
                            int patchno)
 {
