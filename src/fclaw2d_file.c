@@ -3566,13 +3566,13 @@ fclaw2d_file_read_partition (const char *filename, char *user_string,
     }
 
     /* read the partition */
-    sc_array_init_size (partition,
-                        sizeof (p4est_gloidx_t) * ((size_t) partition_size +
-                                                   1), 1);
+    sc_array_resize (partition, (size_t) partition_size + 1);
+    sc_array_init_reshape (&arr, partition, sizeof (p4est_gloidx_t) *
+                           ((size_t) partition_size + 1), 1);
     p4est_fc =
         fclaw2d_file_read_block_v1 (p4est_fc,
                                     sizeof (p4est_gloidx_t) *
-                                    (partition_size + 1), partition,
+                                    (partition_size + 1), &arr,
                                     read_user_string, &errcode_internal);
     fclaw2d_file_translate_error_code_v1 (errcode_internal, errcode);
     if (*errcode != FCLAW2D_FILE_ERR_SUCCESS)
@@ -3601,10 +3601,6 @@ fclaw2d_file_read_partition (const char *filename, char *user_string,
         *errcode = FCLAW2D_FILE_ERR_PART;
         return -1;
     }
-
-    /* reshape output */
-    sc_array_reshape (partition, sizeof (p4est_gloidx_t),
-                      (size_t) partition_size + 1);
 
     /* successfully read a valid partition */
     return 0;
