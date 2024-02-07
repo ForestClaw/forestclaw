@@ -76,6 +76,7 @@ typedef enum fclaw2d_file_error
                                  classified as a format error */
     FCLAW2D_FILE_ERR_DIM, /**< file has wrong dimension */
     FCLAW2D_FILE_ERR_UNKNOWN, /**< unknown error */
+    FCLAW2D_FILE_ERR_PART, /**< invalid partition data */
     FCLAW2D_FILE_ERR_NOT_IMPLEMENTED, /**< functionality is not implemented */
     FCLAW2D_FILE_ERR_LASTCODE /**< to define own error codes for
                                   a higher level application
@@ -126,7 +127,7 @@ fclaw2d_file_context_t *fclaw2d_file_open_write (const char *filename,
                                                  fclaw2d_domain_t * domain,
                                                  int *errcode);
 
-#if 0
+#if 1
 /** Write the partition of the domain associated with \b fc to disk.
  *
  * This function derives the partition filename from the base filename 'fn' of
@@ -276,6 +277,10 @@ fclaw2d_file_context_t *fclaw2d_file_write_array (fclaw2d_file_context_t *
                                                   sc_array_t * patch_data,
                                                   int *errcode);
 
+int fclaw2d_file_read_partition (const char *filename, char *user_string,
+                                 sc_MPI_Comm mpicomm, sc_array_t * partition,
+                                 int *errcode);
+
 /** Open a file for reading and read the stored domain.
  * The user string is broadcasted to all ranks after reading.
  * The file must exist and be at least of the size of the file header.
@@ -307,7 +312,7 @@ fclaw2d_file_context_t *fclaw2d_file_write_array (fclaw2d_file_context_t *
  * \param [in]  mpicomm       MPI communicator that is used to read the file and
  *                            is used for potential other reading operations of
  *                            MPI communicator dependent objects.
- * \param [in]  par_filename  The path to the base name file that is used to
+ * \param [in]  par_filename  TODO: The path to the base name file that is used to
  *                            load the parititon. If \b par_filename is NULL,
  *                            a uniform parititon with respect to the patch
  *                            count is computed and used. If the partition is
@@ -331,7 +336,7 @@ fclaw2d_file_context_t *fclaw2d_file_write_array (fclaw2d_file_context_t *
 fclaw2d_file_context_t *fclaw2d_file_open_read (const char *filename,
                                                 char *user_string,
                                                 sc_MPI_Comm mpicomm,
-                                                const char *par_filename,
+                                                const sc_array_t * partition,
                                                 fclaw2d_domain_t ** domain,
                                                 int *errcode);
 
