@@ -3582,7 +3582,7 @@ fclaw2d_file_read_partition (const char *filename, char *user_string,
         return -1;
     }
 
-    /* close the partiton file */
+    /* close the partition file */
     retval = fclaw2d_file_close_v1 (p4est_fc, &errcode_internal);
     fclaw2d_file_translate_error_code_v1 (errcode_internal, errcode);
     if (*errcode != FCLAW2D_FILE_ERR_SUCCESS)
@@ -3626,20 +3626,11 @@ fclaw2d_file_open_read (const char *filename, char *user_string,
     char buf[FCLAW2D_FILE_NAME_BYTES];
     char read_user_string[FCLAW2D_FILE_USER_STRING_BYTES_V1 + 1];
     p4est_gloidx_t global_num_quadrants;
-#if 0
-    p4est_gloidx_t par_global_num_quadrants;
-#endif
     p4est_gloidx_t *read_gfq, *gfq;
     fclaw2d_file_context_p4est_v1_t *p4est_fc;
-#if 0
-    fclaw2d_file_context_p4est_v1_t *partition_fc;
-#endif
     fclaw2d_file_context_t *fclaw_fc;
     p4est_connectivity_t *conn;
     p4est_t *p4est;
-#if 0
-    sc_array_t arr;
-#endif
 
     /* default gfq */
     read_gfq = NULL;
