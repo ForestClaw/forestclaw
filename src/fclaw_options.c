@@ -218,6 +218,10 @@ fclaw_register (fclaw_options_t* fclaw_opt, sc_options_t * opt)
                            &fclaw_opt->refine_threshold,
                            0.5, "Refinement threshold [0.5]");
 
+    sc_options_add_bool(opt, 0, "partition-for-coarsening",
+                        &fclaw_opt->partition_for_coarsening, 1,
+                        "Partition for coarsening [T]");
+
     sc_options_add_double (opt, 0, "coarsen_threshold", 
                            &fclaw_opt->coarsen_threshold,
                            0.1, "Coarsening threshold [0.1]");
