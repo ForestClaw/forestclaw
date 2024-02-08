@@ -28,6 +28,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_patch.h>
 #include <fclaw_global.h>
 #include <fclaw_domain.h>
+#include <fclaw_packing.h>
 
 #include <fclaw2d_defs.h>
 #include <fclaw3d_defs.h>
@@ -88,6 +89,31 @@ void patch_data_new(fclaw_global_t* glob,
 
 	++glob->domain->count_set_patch; //this is now in cb_fclaw2d_regrid_repopulate 
 	pdata->neighbors_set = 0;
+	pdata->considered_for_refinement = 0;
+}
+
+static 
+size_t patch_data_packsize()
+{
+	return sizeof(int);
+}
+
+static
+void patch_data_pack(fclaw_global_t* glob,
+					 fclaw_patch_t* this_patch,
+					 void* pack_data_here)
+{
+	fclaw_patch_data_t *pdata = get_patch_data(this_patch);
+	fclaw_pack_int(pdata->considered_for_refinement, (char*) pack_data_here);
+}
+
+static
+void patch_data_unpack(fclaw_global_t* glob,
+					   fclaw_patch_t* this_patch,
+					   void* unpack_data_from_here)
+{
+	fclaw_patch_data_t *pdata = get_patch_data(this_patch);
+	fclaw_unpack_int((char*) unpack_data_from_here, &pdata->considered_for_refinement);
 }
 
 void fclaw_patch_reset_data(fclaw_global_t* glob,
@@ -727,7 +753,7 @@ size_t fclaw_patch_partition_packsize(fclaw_global_t* glob)
 	fclaw_patch_vtable_t *patch_vt = fclaw_patch_vt(glob);
 	FCLAW_ASSERT(patch_vt->partition_packsize != NULL);
 
-	return patch_vt->partition_packsize(glob);
+	return patch_data_packsize() + patch_vt->partition_packsize(glob);
 }
 
 void fclaw_patch_partition_pack(fclaw_global_t *glob,
@@ -736,14 +762,20 @@ void fclaw_patch_partition_pack(fclaw_global_t *glob,
 								  int this_patch_idx,
 								  void* pack_data_here)
 {
+
 	fclaw_patch_vtable_t *patch_vt = fclaw_patch_vt(glob);
 	FCLAW_ASSERT(patch_vt->partition_pack != NULL);
+
 
 	patch_vt->partition_pack(glob,
 							 this_patch,
 							 this_block_idx,
 							 this_patch_idx,
 							 pack_data_here);
+
+	FCLAW_ASSERT(patch_vt->partition_packsize != NULL);
+	void* pdata_pack_data_here = (void*) ((char*) pack_data_here + patch_vt->partition_packsize(glob));
+	patch_data_pack(glob,this_patch,pdata_pack_data_here);
 }
 
 
@@ -770,6 +802,10 @@ void fclaw_patch_partition_unpack(fclaw_global_t *glob,
 							   this_block_idx,
 							   this_patch_idx,
 							   unpack_data_from_here);
+
+	FCLAW_ASSERT(patch_vt->partition_packsize != NULL);
+	void* pdata_unpack_data_from_here = (void*) ((char*) unpack_data_from_here + patch_vt->partition_packsize(glob));
+	patch_data_unpack(glob,this_patch,pdata_unpack_data_from_here);
 }
 
 /* ----------------------------- Conservative updates --------------------------------- */
@@ -1151,4 +1187,64 @@ fclaw_patch_relation_t fclaw_patch_get_edge_type(fclaw_patch_t* patch,
     FCLAW_ASSERT(pdata->neighbors_set != 0);
     FCLAW_ASSERT(0 <= iedge && iedge < FCLAW3D_NUMEDGES);
     return pdata->edge_neighbors[iedge];
+}
+
+void fclaw_patch_considered_for_refinement_set(struct fclaw_global *glob,
+                                               struct fclaw_patch* patch)
+{
+    fclaw_patch_data_t *pdata = get_patch_data(patch);
+	//FCLAW_ASSERT(pdata->considered_for_refinement == 0);
+	pdata->considered_for_refinement = 1;
+}
+
+void fclaw_patch_considered_for_refinement_clear(struct fclaw_global *glob,
+                                                 struct fclaw_patch* patch)
+{
+    fclaw_patch_data_t *pdata = get_patch_data(patch);
+	pdata->considered_for_refinement = 0;
+}
+
+int fclaw_patch_considered_for_refinement(struct fclaw_global *glob,
+										 struct fclaw_patch* patch)
+{
+	fclaw_patch_data_t *pdata = get_patch_data(patch);
+	return pdata->considered_for_refinement;
+}
+
+static
+void considred_for_refinement_cb(fclaw_domain_t *domain,
+								 fclaw_patch_t *patch,
+								 int blockno, int patchno,
+								 void *user)
+{
+	fclaw_patch_data_t *pdata = get_patch_data(patch);
+	int *all_patches_considered = (int*) user;
+	if (!pdata->considered_for_refinement)
+	{
+		*all_patches_considered = 0;
+	}
+}
+
+int fclaw_patch_all_considered_for_refinement(struct fclaw_global *glob)
+{
+	int local_all_patches_considered = 1;
+	fclaw_domain_iterate_patches(glob->domain, considred_for_refinement_cb, &local_all_patches_considered);
+	int all_patches_considered;
+	sc_MPI_Allreduce(&local_all_patches_considered, &all_patches_considered, 1, sc_MPI_INT, sc_MPI_LAND, glob->mpicomm);
+	return all_patches_considered;
+}
+
+static
+void clear_considred_for_refinement_cb(fclaw_domain_t *domain,
+								       fclaw_patch_t *patch,
+								       int blockno, int patchno,
+								       void *user)
+{
+	fclaw_patch_data_t *pdata = get_patch_data(patch);
+	pdata->considered_for_refinement = 0;
+}
+
+void fclaw_patch_clear_all_considered_for_refinement(struct fclaw_global *glob)
+{
+	fclaw_domain_iterate_patches(glob->domain, clear_considred_for_refinement_cb, NULL);
 }

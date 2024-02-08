@@ -169,8 +169,12 @@ void fclaw_initialize(fclaw_global_t *glob)
             fclaw_global_iterate_families(glob, cb_regrid_tag4coarsening,
                                             (void*) &domain_init);
 
+            fclaw_tag4f_user_t tag_user;
+            tag_user.domain_init = domain_init;
+            tag_user.num_patches_refined = 0;
+            tag_user.num_patches_to_refine = 0;
             fclaw_global_iterate_patches(glob,cb_fclaw_regrid_tag4refinement,
-                                         &domain_init);
+                                         &tag_user);
             
             fclaw_timer_stop (&glob->timers[FCLAW_TIMER_REGRID_TAGGING]);
 

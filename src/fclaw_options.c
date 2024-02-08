@@ -351,6 +351,9 @@ fclaw_register (fclaw_options_t* fclaw_opt, sc_options_t * opt)
                            &fclaw_opt->regression_check, 
                            "","filename of expected regresssion values [NULL]");    
 
+    sc_options_add_double(opt, 0, "max-refinement-ratio",
+                          &fclaw_opt->max_refinement_ratio, 1.0,
+                          "Ratio of patches to refine before paritioning and continuing refinement. [1.0]");
     fclaw_opt->is_registered = 1;
     fclaw_opt->is_unpacked = 0;
 

@@ -40,6 +40,29 @@ struct fclaw_global;
 struct fclaw_domain;
 struct fclaw_patch;
 
+/**
+ * @brief Passed to cb_fclaw_regrid_tag4refinement as user data.
+ */
+typedef struct fclaw_tag4f_user
+{
+    /** True if in domain initialization phase */
+    int domain_init;
+    /** 
+     * @Brief A running counter of how many patches have been initialized.
+     * 
+     * This MUST be initalized to zero.
+     */
+    int num_patches_refined;
+    /**
+     * @brief Number of patches to refine.
+     *
+     * Set to zero to have no limit. If not zero, cb_fclaw_regrid_tag4refinement
+     * Will only tag this many patches for refinement.
+     */
+    int num_patches_to_refine;
+} fclaw_tag4f_user_t;
+
+
 /* Called from both fclaw2d_initialize and fclaw2d_regrid */
 void cb_fclaw_regrid_tag4refinement(struct fclaw_domain *domain,
                                       struct fclaw_patch *this_patch,

@@ -249,6 +249,8 @@ struct fclaw_options
     const char * logging_prefix; /**< prefix presented in logging ie. [prefix] */
 
     const char * regression_check; /**< filename of regression check values */
+
+    double max_refinement_ratio; /**< Maximum refinment ratio before partitioning and continuing refinement. */
 };
 
 struct fclaw_global;
