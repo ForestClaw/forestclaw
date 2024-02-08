@@ -698,6 +698,23 @@ fclaw_domain_set_refinement (fclaw_domain_t * domain,
 }
 
 void
+fclaw_domain_set_partitioning(fclaw_domain_t *domain, int partition_for_coarsening)
+{
+    if(domain->refine_dim == 2)
+    {
+        fclaw2d_domain_set_partitioning(domain->d2,partition_for_coarsening);
+    }
+    else if (domain->refine_dim == 3)
+    {
+        fclaw3d_domain_set_partitioning(domain->d3,partition_for_coarsening);
+    }
+    else
+    {
+        SC_ABORT_NOT_REACHED();
+    }
+}
+
+void
 fclaw_patch_mark_refine(fclaw_domain_t *domain, int blockno, int patchno)
 {
     if(domain->refine_dim == 2)
