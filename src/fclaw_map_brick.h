@@ -60,16 +60,48 @@ void WRITE_BRICK_DATA(int* n,
 typedef struct fclaw_block_ll
 {
     int nb;
-    int mi, mj;
+    int mi, mj, mk; /**< Number of blocks in each direction */
     double *xv;
     double *yv;
+    double *zv;
 }
 fclaw_block_ll_t;
 
+/**
+ * @brief Creates a new 2D brick map context.
+ *
+ * @param domain The domain to which the map context belongs.
+ * @param mi The number of cells in the x-direction of the brick.
+ * @param mj The number of cells in the y-direction of the brick.
+ * @param periodic_i Flag indicating whether the x-direction is periodic.
+ * @param periodic_j Flag indicating whether the y-direction is periodic.
+ * @return A pointer to the newly created map context.
+ */
 struct fclaw_map_context*
 fclaw_map_new_2d_brick (fclaw_domain_t *domain,
                        int mi, int mj, int periodic_i, int periodic_j);
 
+/**
+ * @brief Creates a new 2D brick map context.
+ *
+ * @param domain The domain to which the map context belongs.
+ * @param mi The number of cells in the x-direction of the brick.
+ * @param mj The number of cells in the y-direction of the brick.
+ * @param periodic_i Flag indicating whether the x-direction is periodic.
+ * @param periodic_j Flag indicating whether the y-direction is periodic.
+ * @return A pointer to the newly created map context.
+ */
+struct fclaw_map_context*
+fclaw_map_new_3d_brick (fclaw_domain_t *domain,
+                       int mi, int mj, int mk,
+                       int periodic_i, int periodic_j, int periodic_k);
+
+
+/**
+ * @brief Destroys a brick mapping context.
+ *
+ * @param cont The fclaw_map_context to destroy
+ */
 void fclaw_map_destroy_brick (struct fclaw_map_context *cont);
 
 #ifdef __cplusplus
