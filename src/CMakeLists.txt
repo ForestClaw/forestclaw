@@ -102,7 +102,7 @@ target_include_directories(forestclaw
   $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
   $<INSTALL_INTERFACE:include>)
 
-# imported target, for use from FetchContent
+# imported target, for use from parent project
 add_library(FORESTCLAW::FORESTCLAW INTERFACE IMPORTED GLOBAL)
 target_link_libraries(FORESTCLAW::FORESTCLAW INTERFACE forestclaw)
 

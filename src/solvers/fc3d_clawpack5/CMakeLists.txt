@@ -39,6 +39,6 @@ install(FILES
 
 install(TARGETS clawpack5_3d EXPORT ${PROJECT_NAME}-targets)
 
-# imported target, for use from FetchContent
+# imported target, for use from parent project
 add_library(FORESTCLAW::CLAWPACK5_3D INTERFACE IMPORTED GLOBAL)
 target_link_libraries(FORESTCLAW::CLAWPACK5_3D INTERFACE clawpack5_3d)

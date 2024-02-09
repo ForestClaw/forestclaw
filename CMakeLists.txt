@@ -17,8 +17,6 @@ project(FORESTCLAW
 
 include(CTest)
 
-include(FetchContent)
-
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/Modules)
 
 file(GENERATE OUTPUT .gitignore CONTENT "*")

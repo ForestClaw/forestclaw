@@ -102,7 +102,7 @@ install(FILES
 install(TARGETS geoclaw EXPORT ${PROJECT_NAME}-targets)
 
 
-# imported target, for use from FetchContent
+# imported target, for use from parent project
 add_library(FORESTCLAW::GEOCLAW INTERFACE IMPORTED GLOBAL)
 target_link_libraries(FORESTCLAW::GEOCLAW INTERFACE geoclaw)
 
