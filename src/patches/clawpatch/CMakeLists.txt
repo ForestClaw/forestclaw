@@ -136,6 +136,8 @@ install(FILES
   ${metric}/fclaw3d_metric.h
   ${metric}/fclaw3d_metric.hpp
   ${metric}/fclaw3d_metric_default_fort.h
+
+  ${CMAKE_CURRENT_BINARY_DIR}/include/fclaw3d_clawpatch_utils.mod
   TYPE INCLUDE
 )
 
