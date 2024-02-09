@@ -118,6 +118,27 @@ void FCLAW_MAP_2D_BRICK2C (fclaw_map_context_t ** pcont, int *blockno,
     }
 }
 
+void FCLAW_MAP_3D_BRICK2C (fclaw_map_context_t ** pcont, int *blockno,
+                          const double *xc, const double *yc, const double *zc,
+                          double *xp, double *yp, double *zp)
+{
+    fclaw_map_context_t *cont = *pcont;
+
+    if (cont->brick != NULL)
+    {
+        fclaw_map_context_t *brick = cont->brick;  
+        brick->mapc2m_3d (brick, *blockno, *xc, *yc, *zc, xp, yp, zp);
+    }
+    else
+    {
+        /* We only have one tree */
+        FCLAW_ASSERT(blockno == 0);
+        *xp = *xc;
+        *yp = *yc;
+        *zp = *zc;
+    }
+}
+
 /* This function is expected to be called from C or C++. */
 void
 fclaw_map_destroy (fclaw_map_context_t * cont)

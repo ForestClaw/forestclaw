@@ -94,8 +94,7 @@ struct SinglePatchDomain {
         domain = fclaw_domain_new_unitcube(sc_MPI_COMM_WORLD, 0);
         fclaw_global_store_domain(glob, domain);
 
-        //map = fclaw2d_map_new_nomap();
-        //fclaw2d_map_store(glob, map);
+        fclaw_map_store(glob, fclaw_map_new_nomap());
 
         fclaw_vtables_initialize(glob);
         fclaw_clawpatch_vtable_initialize(glob, 4);
@@ -149,6 +148,7 @@ struct OctDomain {
 
         //map = fclaw3d_map_new_nomap();
         //fclaw_global_store_map_3d(glob, map);
+        fclaw_map_store(glob, fclaw_map_new_nomap());
 
         fclaw_vtables_initialize(glob);
         fclaw_clawpatch_vtable_initialize(glob, 4);

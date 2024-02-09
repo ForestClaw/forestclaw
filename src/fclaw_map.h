@@ -207,8 +207,8 @@ void FCLAW_MAP_3D_C2M_BASIS (fclaw_map_context_t ** cont,
 /** Map brick to computational coordinates in [0,1]x[0,1]
  * \param [in] cont     Mapping context with matching callback functions.
  * \param [in] blockno  Number of the block to be transformed.
- * \param [in] cx       X-coordinate in [block->xlower, block->xupper].
- * \param [in] cy       Y-coordinate in [block->ylower, block->yupper].
+ * \param [in] xc       X-coordinate in [block->xlower, block->xupper].
+ * \param [in] yc       Y-coordinate in [block->ylower, block->yupper].
  * \param [out] mx      Transformed x-coordinate.
  * \param [out] my      Transformed y-coordinate.
  * \param [out] mz      Transformed z-coordinate.
@@ -220,6 +220,23 @@ void FCLAW_MAP_2D_BRICK2C (fclaw_map_context_t ** cont, int *blockno,
                           const double *xc, const double *yc,
                           double *xp, double *yp, double *zp);
 
+/** Map brick to computational coordinates in [0,1]x[0,1]x[0,1]
+ * \param [in] cont     Mapping context with matching callback functions.
+ * \param [in] blockno  Number of the block to be transformed.
+ * \param [in] xc       X-coordinate in [block->xlower, block->xupper].
+ * \param [in] yc       Y-coordinate in [block->ylower, block->yupper].
+ * \param [in] zc       Z-coordinate in [block->zlower, block->zupper].
+ * \param [out] mx      Transformed x-coordinate.
+ * \param [out] my      Transformed y-coordinate.
+ * \param [out] mz      Transformed z-coordinate.
+ */
+#define FCLAW_MAP_3D_BRICK2C FCLAW_F77_FUNC_(fclaw_map_3d_brick2c, \
+                                            FCLAW_MAP_3D_BRICK2C)
+void FCLAW_MAP_3D_BRICK2C (fclaw_map_context_t ** cont, int *blockno,
+                          const double *xc, const double *yc, const double *zc,
+                          double *xp, double *yp, double *zp);
+
+
 
 /** Deallocate a mapping context.
  * If the \a destroy member is not NULL, it is called on the context.
@@ -230,9 +247,37 @@ void FCLAW_MAP_2D_BRICK2C (fclaw_map_context_t ** cont, int *blockno,
 void fclaw_map_destroy (fclaw_map_context_t * cont);
 
 fclaw_map_context_t* fclaw_map_new_nomap_brick(fclaw_map_context_t* brick);
+
+/**
+ * Maps the coordinates (xc, yc) from within a block to the entire brick
+ *
+ * @param cont The map context.
+ * @param blockno The block number.
+ * @param xc The x-coordinate in the block
+ * @param yc The y-coordinate in the block
+ * @param xp Pointer to store the x-coordinate in the brick
+ * @param yp Pointer to store the y-coordinate in the brick
+ * @param zp Pointer to store the z-coordinate in the brick
+ */
 void fclaw_map_2d_c2m_nomap_brick(fclaw_map_context_t * cont, int blockno,
-                                 double xc, double yc,
-                                 double *xp, double* yp, double *zp);
+                                  double xc, double yc,
+                                  double *xp, double* yp, double *zp);
+
+/**
+ * Maps the coordinates (xc, yc, zc) from within a block to the entire brick
+ *
+ * @param cont The map context.
+ * @param blockno The block number.
+ * @param xc The x-coordinate in the block
+ * @param yc The y-coordinate in the block
+ * @param zc The z-coordinate in the block
+ * @param xp Pointer to store the x-coordinate in the brick
+ * @param yp Pointer to store the y-coordinate in the brick
+ * @param zp Pointer to store the z-coordinate in the brick
+ */
+void fclaw_map_3d_c2m_nomap_brick(fclaw_map_context_t * cont, int blockno,
+                                  double xc, double yc, double zc,
+                                  double *xp, double* yp, double *zp);
 
 
 /* ----------------------------------------------------------------------------------
