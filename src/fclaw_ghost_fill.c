@@ -216,7 +216,7 @@ void average2ghost(fclaw_global_t *glob,
     fclaw_global_iterate_level(glob, coarse_level, cb_interface_wrap,
                    (void *) &parallel_mode);
 
-	if (read_parallel_patches)
+	//if (read_parallel_patches)
 	{
 		/* Second pass : average from local fine grids to remote coarse grids. These
 		   coarse grids might be needed for interpolation later. */
@@ -229,14 +229,18 @@ void average2ghost(fclaw_global_t *glob,
 		fclaw_global_iterate_level(glob, fine_level,
 									 cb_interface_wrap, (void *) &parallel_mode);
 
-		/* Corner average :
-		   We can skip the corner update, since we don't need the corner ghost cell
-		   values for doing interpolation (at least not yet) */
-#if 0
-		parallel_mode.cb_fill = cb_corner_fill;
-		fclaw2d_domain_iterate_level(domain, fine_level, cb_corner_wrap,
+		if(glob->domain->refine_dim == 3)
+	    {
+	        /* Interpolate to edges at parallel boundaries from coarse grid
+	           ghost patches */
+	        parallel_mode.cb_fill = fclaw_edge_fill_cb;
+	        fclaw_global_iterate_level(glob, fine_level, cb_interface_wrap,
+	                                     (void *) &parallel_mode);
+	    }
+
+		parallel_mode.cb_fill = fclaw_corner_fill_cb;
+		fclaw_global_iterate_level(glob, fine_level, cb_interface_wrap,
 									 (void *) &parallel_mode);
-#endif
 	}
 }
 
@@ -244,7 +248,7 @@ static
 void interpolate2ghost(fclaw_global_t *glob,
 					   int coarse_level,
 					   int time_interp,
-					   int read_parallal_patches,
+					   int read_parallel_patches,
 					   fclaw_ghost_fill_parallel_mode_t ghost_mode)
 {
 	struct fclaw2d_ghost_fill_wrap_info parallel_mode;
@@ -262,7 +266,7 @@ void interpolate2ghost(fclaw_global_t *glob,
        ---------------------------------------------------------- */
 
     e_info.grid_type = FCLAW_IS_COARSE;
-    e_info.read_parallel_patches = read_parallal_patches;
+    e_info.read_parallel_patches = read_parallel_patches;
 
     parallel_mode.ghost_mode = ghost_mode;
     parallel_mode.user = (void*) &e_info;
@@ -284,36 +288,38 @@ void interpolate2ghost(fclaw_global_t *glob,
     parallel_mode.cb_fill = fclaw_corner_fill_cb;
     fclaw_global_iterate_level(glob,coarse_level, cb_interface_wrap,
                   (void *) &parallel_mode);
-    /* -----------------------------------------------------
-       Second pass - Iterate over local fine grids, looking
-       for remote coarse grids we can use to fill in BCs at
-       fine grid ghost cells along the parallel boundary
-       ----------------------------------------------------- */
 
-    e_info.grid_type = FCLAW_IS_FINE;
-
-    /* Interpolate to faces at parallel boundaries from coarse grid ghost
-       patches */
-    int fine_level = coarse_level + 1;
-
-    parallel_mode.cb_fill = fclaw_face_fill_cb;
-    fclaw_global_iterate_level(glob, fine_level, cb_interface_wrap,
-                                 (void *) &parallel_mode);
-
-	if(glob->domain->refine_dim == 3)
+    if (read_parallel_patches)
     {
-        /* Interpolate to edges at parallel boundaries from coarse grid
-           ghost patches */
-        parallel_mode.cb_fill = fclaw_edge_fill_cb;
-        fclaw_global_iterate_level(glob, fine_level, cb_interface_wrap,
-                                     (void *) &parallel_mode);
-    }
+        /* -----------------------------------------------------
+           Second pass - Iterate over local fine grids, looking
+           for remote coarse grids we can use to fill in BCs at
+           fine grid ghost cells along the parallel boundary
+           ----------------------------------------------------- */
 
-    /* Interpolate to corners at parallel boundaries from coarse grid
-       ghost patches */
-    parallel_mode.cb_fill = fclaw_corner_fill_cb;
-    fclaw_global_iterate_level(glob, fine_level, cb_interface_wrap,
-                                 (void *) &parallel_mode);
+        e_info.grid_type = FCLAW_IS_FINE;
+
+        /* Interpolate to faces at parallel boundaries from coarse grid ghost
+           patches */
+        int fine_level = coarse_level + 1;
+
+        parallel_mode.cb_fill = fclaw_face_fill_cb;
+        fclaw_global_iterate_level(glob, fine_level, cb_interface_wrap,
+                                   (void *) &parallel_mode);
+
+		if(glob->domain->refine_dim == 3)
+	    {
+	        parallel_mode.cb_fill = fclaw_edge_fill_cb;
+	        fclaw_global_iterate_level(glob, fine_level, cb_interface_wrap,
+	                                     (void *) &parallel_mode);
+	    }
+
+        /* Interpolate to corners at parallel boundaries from coarse grid
+           ghost patches */
+        parallel_mode.cb_fill = fclaw_corner_fill_cb;
+        fclaw_global_iterate_level(glob, fine_level, cb_interface_wrap,
+                                   (void *) &parallel_mode);
+    }
 }
 
 

@@ -579,7 +579,7 @@ void fclaw_corner_fill_cb(fclaw_domain_t *domain,
             }
 
             int remote_neighbor = fclaw_patch_is_ghost(tdata.neighbor_patch);
-            if (is_coarse && ((read_parallel_patches && remote_neighbor) || !remote_neighbor))
+            if (is_coarse)
             {
                 if (tdata.neighbor_type == FCLAW_PATCH_HALFSIZE)
                 {
@@ -621,6 +621,23 @@ void fclaw_corner_fill_cb(fclaw_domain_t *domain,
                                             tdata.icorner, 
                                             time_interp,
                                             &tdata);
+                    
+                    /* We also need to copy _to_ the remote neighbor; switch contexts, but
+                       use ClawPatches that are only in scope here, to avoid
+                       conflicts with above uses of the same variables. This is needed
+                       in case we want to interpolate to adjacent corners on fine grids.*/
+                    if (remote_neighbor)
+                    {
+                        fclaw_patch_copy_corner(s->glob,
+                                                tdata_fine.this_patch,
+                                                tdata_fine.neighbor_patch,
+                                                tdata_fine.this_blockno,
+                                                tdata_fine.neighbor_blockno,
+                                                tdata_fine.is_block_corner,
+                                                tdata_fine.icorner, 
+                                                time_interp,
+                                                &tdata_fine);                            
+                    }
                 }
 
             }  /* End of non-parallel patch case */
@@ -630,8 +647,22 @@ void fclaw_corner_fill_cb(fclaw_domain_t *domain,
                 /* The coarse grid is now the remote patch;  swap contexts and 
                 call same routines above, but with remote patch as the "coarse" 
                 grid */
-                
-                if (interpolate_to_neighbor)
+                if (average_from_neighbor)
+                {
+                    /* Average from local fine grid to remote coarse ghost, since interpolation
+                    stencil may need corner coarse grid values */
+                    fclaw_patch_average_corner(s->glob,
+                                               tdata_fine.this_patch,
+                                               tdata_fine.neighbor_patch,
+                                               tdata_fine.this_blockno,
+                                               tdata_fine.neighbor_blockno,
+                                               tdata_fine.is_block_corner,
+                                               tdata_fine.icorner,
+                                               time_interp,
+                                               &tdata_fine);                        
+
+                }
+                else if (interpolate_to_neighbor) 
                 {
                     /* Interpolate from remote coarse grid patch (coarse grid) to
                        local fine grid patch.  We do not need to average to the 

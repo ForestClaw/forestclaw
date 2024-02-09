@@ -515,7 +515,7 @@ void fclaw_face_neighbor_ghost(fclaw_global_t* glob,
 
 			/* We are only looking for faces between two ghost patches
 			   from different processors, since these will not have
-			   exchange face data before being thrown over proc fence.
+			   exchanged face data before being thrown over proc fence.
 			*/
 			fclaw_patch_relation_t neighbor_type =
 				fclaw_domain_indirect_face_neighbors(domain,
