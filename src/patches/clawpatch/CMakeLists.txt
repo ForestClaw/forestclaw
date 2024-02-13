@@ -157,6 +157,7 @@ if(BUILD_TESTING)
       fclaw_clawpatch.h.3dx.TEST.cpp
       fclaw_clawpatch.h.3d.TEST.cpp
       fclaw_clawpatch.h.3d.ghostfill.TEST.cpp
+      fclaw_clawpatch.h.2d.ghostfill.TEST.cpp
       fclaw_clawpatch.h.3d.interpolate.TEST.cpp
       fclaw_clawpatch.h.3d.average.TEST.cpp
       fclaw_clawpatch_options.h.TEST.cpp

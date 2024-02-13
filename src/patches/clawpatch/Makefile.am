@@ -140,6 +140,7 @@ src_patches_clawpatch_clawpatch_TEST_SOURCES = \
 	src/patches/clawpatch/fclaw_clawpatch.h.3dx.TEST.cpp \
 	src/patches/clawpatch/fclaw_clawpatch.h.3d.TEST.cpp \
 	src/patches/clawpatch/fclaw_clawpatch.h.3d.ghostfill.TEST.cpp \
+	src/patches/clawpatch/fclaw_clawpatch.h.2d.ghostfill.TEST.cpp \
     src/patches/clawpatch/fclaw_clawpatch_options.h.TEST.cpp \
     src/patches/clawpatch/fclaw_clawpatch_diagnostics.h.TEST.cpp \
     src/patches/clawpatch/fclaw2d_clawpatch_fort.h.TEST.cpp \
