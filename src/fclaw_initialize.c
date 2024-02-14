@@ -80,6 +80,9 @@ void fclaw_initialize(fclaw_global_t *glob)
     int time_interp = 0;
     const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
 
+    /* set partitioning */
+    fclaw_domain_set_partitioning(*domain,  fclaw_opt->partition_for_coarsening);
+
 	/* This mapping context is needed by fortran mapping functions */
 	fclaw_map_context_t *cont = glob->cont;
 	FCLAW_MAP_SET_CONTEXT(&cont);
