@@ -3471,6 +3471,17 @@ fclaw2d_file_write_array (fclaw2d_file_context_t *
     return fc;
 }
 
+/** Check global first quadrant/patch array.
+ *
+ * This function checks if the given gfq array has 0 as first entry and
+ * is non-decreasing.
+ *
+ * \param [in]   gfq   The global first quadrant/patch array.
+ * \param [in]   size  The number of entries of \b gfq. In particular,
+ *                     size must be the number of MPI ranks + 1.
+ * \return             -1 for an invalid gfq array,
+ *                      0 otherwise.
+ */
 static int
 fclaw2d_file_check_gfq (const p4est_gloidx_t * gfq, int size)
 {
