@@ -3633,6 +3633,7 @@ fclaw2d_file_open_read (const char *filename, char *user_string,
 
     if (partition != NULL)
     {
+        FCLAW_ASSERT (partition->elem_size == sizeof (p4est_gloidx_t));
         gfq = (p4est_gloidx_t *) partition->array;
         /* check the partition */
         if (fclaw2d_file_check_gfq (gfq, (int) partition->elem_count) == -1)
