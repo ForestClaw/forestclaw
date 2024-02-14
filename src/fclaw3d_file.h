@@ -312,20 +312,22 @@ int fclaw3d_file_read_partition (const char *filename, char *user_string,
  * \param [in]  mpicomm       MPI communicator that is used to read the file and
  *                            is used for potential other reading operations of
  *                            MPI communicator dependent objects.
- * \param [in]  par_filename  TODO: The path to the base name file that is used to
- *                            load the parititon. If \b par_filename is NULL,
- *                            a uniform parititon with respect to the patch
- *                            count is computed and used. If the partition is
- *                            read, it is used for the parallel I/O operations
- *                            and stored in the returned \b domain. If the MPI
- *                            size and the partition size do not coincide a
- *                            partition for the current MPI size is computed.
- *                            The number of global patches of the read
- *                            partititon must coincide with the number of global
- *                            patches of the read domain.
- *                            The function call results in an error if there
- *                            is no partition to read.
- *                            Currently, this parameter does not have any effect.
+ * \param [in]  partition     A sc_array of the size of number of MPI ranks + 1
+ *                            with sizeof (p4est_gloidx_t) as element size
+ *                            or NULL.
+ *                            The sc_array must contain a valid partition, i.e.
+ *                            the first element is 0, the array is
+ *                            non-decreasing and the last array entry equals
+ *                            the number of global patches of the domain in
+ *                            the file pointed to by \b filename.
+ *                            If any of these conditions is violated, the
+ *                            function returns NULL and set \b errcode to
+ *                            \ref FCLAW3D_FILE_ERR_PART.
+ *                            The user can pass NULL for using the uniform
+ *                            partition with respect to the quadrant count.
+ *                            In both cases the respective partition, either
+ *                            read or computed, is used for the parallel I/O
+ *                            operations and stored in the returned \b domain.
  * \param [out] domain        Newly allocated domain that is read from the file.
  * \param [out] errcode       An errcode that can be interpreted by
  *                            \ref fclaw3d_file_error_string.
