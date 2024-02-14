@@ -637,7 +637,7 @@ void fclaw_corner_fill_cb(fclaw_domain_t *domain,
                                                        time_interp,
                                                        &tdata);
                     }
-                    else if (average_from_neighbor)
+                    else if (average_from_neighbor && (!remote_neighbor || read_parallel_patches))
                     {
                         /* Average even if neighbor is a remote neighbor */
                         fclaw_patch_average_corner(s->glob,

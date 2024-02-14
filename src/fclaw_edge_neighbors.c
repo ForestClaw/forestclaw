@@ -455,7 +455,7 @@ void fclaw_edge_fill_cb(fclaw_domain_t *domain,
                                                          time_interp,
                                                          &tdata);
                         }
-                        else if (average_from_neighbor)
+                        else if (average_from_neighbor && (!remote_neighbor || read_parallel_patches))
                         {
                             /* average from igrid */
                             fclaw_patch_average_edge(s->glob,
