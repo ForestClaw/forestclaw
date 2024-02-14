@@ -77,6 +77,7 @@ void copy_block(fclaw_block_t* block, fclaw2d_block_t* block_2d)
     block->num_patches_before = block_2d->num_patches_before;
 
     block->vertices = block_2d->vertices;
+    block->is_boundary = block_2d->is_boundary;
 
     block->patches = FCLAW_ALLOC_ZERO(fclaw_patch_t, block->num_patches);
     for(int patchno = 0; patchno < block->num_patches; patchno++)

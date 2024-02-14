@@ -104,6 +104,7 @@ typedef struct fclaw_block
     int num_patches_before;     /**< in all previous blocks */
     double* vertices;     /**< for each block corner, the xyz coordinates
                                      of the connectivity structure */
+    int* is_boundary;         /**< physical boundary flag */
     fclaw_patch_t *patches;           /**< The patches for this block */
     void *user;                       /**< User pointer */
 } fclaw_block_t;
