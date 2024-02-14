@@ -7,10 +7,16 @@
 #include <csetjmp>
 
 static bool output_vtk=false;
+static bool test_indirect_flag = false;
 
 bool test_output_vtk()
 {
     return output_vtk;
+}
+
+bool test_indirect()
+{
+    return test_indirect_flag;
 }
 
 static bool has_aborted=true;
@@ -56,6 +62,14 @@ int main(int argc, char *argv[])
         }
     }
     for (int i = 0; i < argc; i++) {
+        test_indirect_flag = strcmp(argv[i], "--indirect") == 0;
+        if (test_indirect_flag)
+        {
+            std::cout << "using stencil to test indirect ghostfill" << std::endl;
+            break;
+        }
+    }
+    for (int i = 0; i < argc; i++) {
         listing = strcmp(argv[i], "--list-test-cases") == 0;
         if (listing)
             break;
@@ -94,7 +108,7 @@ int main(int argc, char *argv[])
 	    result = context.run();
 
 	    // global clean-up...
-	    //fclaw_mpi_finalize();
+	    sc_MPI_Finalize();
 
 	    return result;
     } 

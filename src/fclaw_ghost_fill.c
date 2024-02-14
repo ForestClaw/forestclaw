@@ -216,7 +216,7 @@ void average2ghost(fclaw_global_t *glob,
     fclaw_global_iterate_level(glob, coarse_level, cb_interface_wrap,
                    (void *) &parallel_mode);
 
-	//if (read_parallel_patches)
+	if (read_parallel_patches)
 	{
 		/* Second pass : average from local fine grids to remote coarse grids. These
 		   coarse grids might be needed for interpolation later. */

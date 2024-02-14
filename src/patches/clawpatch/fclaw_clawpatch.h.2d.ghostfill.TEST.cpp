@@ -58,7 +58,11 @@ struct TestData {
     fclaw_clawpatch_vtable_t * clawpatch_vt;
 
     TestData(fclaw_domain_t* domain, fclaw_map_context_t* map, int minlevel, int maxlevel){
-        glob = fclaw_global_new();
+        int size;
+        int rank;
+        sc_MPI_Comm_size(sc_MPI_COMM_WORLD, &size);
+        sc_MPI_Comm_rank(sc_MPI_COMM_WORLD, &rank);
+        glob = fclaw_global_new_comm(sc_MPI_COMM_WORLD, size, rank);
         opts = fclaw_clawpatch_options_new(2);
         memset(&fopts, 0, sizeof(fopts));
         fopts.mi=1;
@@ -107,6 +111,12 @@ struct TestData {
     }
     void setup(){
         fclaw_initialize(glob);
+        if(test_indirect())
+        {
+            fclaw_clawpatch_vtable_t *vt = fclaw_clawpatch_vt(glob);
+            vt->d2->fort_interpolate_face = TEST_2D_CLAWPATCH46_FORT_INTERPOLATE_FACE;
+            vt->d2->fort_interpolate_corner = TEST_2D_CLAWPATCH46_FORT_INTERPOLATE_CORNER;
+        }
     }
     ~TestData(){
         fclaw_clawpatch_options_destroy(opts);
@@ -427,7 +437,7 @@ TEST_CASE("2d clawpatch ghost fill on uniform square")
         
         char test_no_str[5];
         snprintf(test_no_str, 5, "%04d", test_no);
-        std::string filename = "2d_clawpatch_ghost_fill_on_uniform_cube_"+std::string(test_no_str);
+        std::string filename = "2d_clawpatch_ghost_fill_on_uniform_square_"+std::string(test_no_str);
 
         test_ghost_fill(test_data, test_data_out, filename);
 
@@ -528,7 +538,7 @@ TEST_CASE("2d clawpatch ghost fill on square with refinement")
 
         char test_no_str[5];
         snprintf(test_no_str, 5, "%04d", test_no);
-        std::string filename = "2d_clawpatch_ghost_fill_on_cube_with_refinement_"+std::string(test_no_str);
+        std::string filename = "2d_clawpatch_ghost_fill_on_square_with_refinement_"+std::string(test_no_str);
 
         test_ghost_fill(test_data, test_data_out, filename);
 
@@ -628,7 +638,7 @@ TEST_CASE("2d clawpatch ghost fill on square with refinement coarse interior")
 
         char test_no_str[5];
         snprintf(test_no_str, 5, "%04d", test_no);
-        std::string filename = "2d_clawpatch_ghost_fill_on_cube_with_refinement_coarse_interior_"+std::string(test_no_str);
+        std::string filename = "2d_clawpatch_ghost_fill_on_square_with_refinement_coarse_interior_"+std::string(test_no_str);
 
         test_ghost_fill(test_data, test_data_out, filename);
 
@@ -680,7 +690,7 @@ TEST_CASE("2d clawpatch ghost fill on uniform brick")
         
         char test_no_str[5];
         snprintf(test_no_str, 5, "%04d", test_no);
-        std::string filename = "2d_clawpatch_ghost_fill_on_uniform_2x2x2_brick_" + std::string(test_no_str);
+        std::string filename = "2d_clawpatch_ghost_fill_on_uniform_2x2_brick_" + std::string(test_no_str);
 
         test_ghost_fill(test_data, test_data_out, filename);
 
@@ -756,7 +766,7 @@ TEST_CASE("2d clawpatch ghost fill on 2x2 brick with refinement on one block")
         CHECK_EQ(test_data.glob->domain->global_num_patches, (4*4));
         test_data.setup();
         CHECK_EQ(test_data.glob->domain->global_num_patches, (4*3 + 4*4));
-        domain = fclaw_domain_new_unitcube(sc_MPI_COMM_WORLD, minlevel);
+        domain = fclaw_domain_new_unitsquare(sc_MPI_COMM_WORLD, minlevel);
 
         //create output domain with bigger size, so that we can see ghost cells
         //in the vtk output
@@ -783,7 +793,7 @@ TEST_CASE("2d clawpatch ghost fill on 2x2 brick with refinement on one block")
 
         char test_no_str[5];
         snprintf(test_no_str, 5, "%04d", test_no);
-        std::string filename = "2d_clawpatch_ghost_fill_on_2x2x2_brick_with_refinement_on_one_block_"+std::string(test_no_str);
+        std::string filename = "2d_clawpatch_ghost_fill_on_2x2_brick_with_refinement_on_one_block_"+std::string(test_no_str);
 
         test_ghost_fill(test_data, test_data_out, filename);
 
@@ -860,7 +870,7 @@ TEST_CASE("2d clawpatch ghost fill on 2x2 brick with refinement on all but one b
         CHECK_EQ(test_data.glob->domain->global_num_patches, 4*4);
         test_data.setup();
         CHECK_EQ(test_data.glob->domain->global_num_patches, 4*1 + 4*4*3);
-        domain = fclaw_domain_new_unitcube(sc_MPI_COMM_WORLD, minlevel);
+        domain = fclaw_domain_new_unitsquare(sc_MPI_COMM_WORLD, minlevel);
 
         //create output domain with bigger size, so that we can see ghost cells
         //in the vtk output
@@ -887,7 +897,7 @@ TEST_CASE("2d clawpatch ghost fill on 2x2 brick with refinement on all but one b
 
         char test_no_str[5];
         snprintf(test_no_str, 5, "%04d", test_no);
-        std::string filename = "2d_clawpatch_ghost_fill_on_2x2x2_brick_with_refinement_on_all_but_one_block_"+std::string(test_no_str);
+        std::string filename = "2d_clawpatch_ghost_fill_on_2x2_brick_with_refinement_on_all_but_one_block_"+std::string(test_no_str);
 
         test_ghost_fill(test_data, test_data_out, filename);
 
@@ -968,7 +978,7 @@ TEST_CASE("2d clawpatch ghost fill on 2x2 brick with refinement coarse interior"
         CHECK_EQ(test_data.glob->domain->global_num_patches, 4*4);
         test_data.setup();
         CHECK_EQ(test_data.glob->domain->global_num_patches, 61);
-        domain = fclaw_domain_new_unitcube(sc_MPI_COMM_WORLD, minlevel);
+        domain = fclaw_domain_new_unitsquare(sc_MPI_COMM_WORLD, minlevel);
 
         //create output domain with bigger size, so that we can see ghost cells
         //in the vtk output
@@ -996,7 +1006,7 @@ TEST_CASE("2d clawpatch ghost fill on 2x2 brick with refinement coarse interior"
 
         char test_no_str[5];
         snprintf(test_no_str, 5, "%04d", test_no);
-        std::string filename = "2d_clawpatch_ghost_fill_on_2x2x2_brick_with_refinement_coarse_interior_"+std::string(test_no_str);
+        std::string filename = "2d_clawpatch_ghost_fill_on_2x2_brick_with_refinement_coarse_interior_"+std::string(test_no_str);
 
         test_ghost_fill(test_data, test_data_out, filename);
 
@@ -1077,7 +1087,7 @@ TEST_CASE("2d clawpatch ghost fill on 2x2 brick with refinement 2")
         CHECK_EQ(test_data.glob->domain->global_num_patches, 16);
         test_data.setup();
         CHECK_EQ(test_data.glob->domain->global_num_patches, 25);
-        domain = fclaw_domain_new_unitcube(sc_MPI_COMM_WORLD, minlevel);
+        domain = fclaw_domain_new_unitsquare(sc_MPI_COMM_WORLD, minlevel);
 
         //create output domain with bigger size, so that we can see ghost cells
         //in the vtk output
@@ -1104,7 +1114,7 @@ TEST_CASE("2d clawpatch ghost fill on 2x2 brick with refinement 2")
 
         char test_no_str[5];
         snprintf(test_no_str, 5, "%04d", test_no);
-        std::string filename = "2d_clawpatch_ghost_fill_on_2x2x2_brick_with_refinement_2_"+std::string(test_no_str);
+        std::string filename = "2d_clawpatch_ghost_fill_on_2x2_brick_with_refinement_2_"+std::string(test_no_str);
 
         test_ghost_fill(test_data, test_data_out, filename);
 

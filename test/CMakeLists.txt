@@ -1,5 +1,10 @@
-
 add_library(testutils test.cpp)
+
+if(clawpatch)
+  add_library(testutils_f OBJECT fort/test_2d_clawpatch46_interpolate.f)
+  target_sources(testutils PUBLIC $<TARGET_OBJECTS:testutils_f>)
+  target_link_libraries(testutils PUBLIC FORESTCLAW::CLAWPATCH)
+endif()
 
 if(TARGET ThunderEgg::ThunderEgg)
     target_sources(testutils PRIVATE utils/DomainReader.cpp)

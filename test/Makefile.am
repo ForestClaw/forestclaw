@@ -17,7 +17,8 @@ AM_LOG_FLAGS =
 TEST_SRC_DIR = @top_srcdir@
 
 test_libtestutils_la_SOURCES = \
-	test/test.cpp
+	test/test.cpp \
+	test/fort/test_2d_clawpatch46_interpolate.f
 
 if FCLAW_ENABLE_THUNDEREGG
 test_libtestutils_la_SOURCES += \
