@@ -221,7 +221,8 @@ void get_corner_type(fclaw_global_t* glob,
    ------------------------------------------------------ */
 
 static
-void get_corner_neighbor(fclaw_global_t *glob,
+void get_corner_neighbor(int indirect, 
+                         fclaw_global_t *glob,
                          int icorner,
                          int *is_valid_neighbor,
                          int *block_corner_count,
@@ -242,16 +243,33 @@ void get_corner_neighbor(fclaw_global_t *glob,
     }
 
     fclaw_timer_start (&glob->timers[FCLAW_TIMER_NEIGHBOR_SEARCH]);
-    int has_corner_neighbor =
-        fclaw_patch_corner_neighbors(domain,
-                                     tdata->this_blockno,
-                                     tdata->this_patchno,
-                                     icorner,
-                                     &rproc_corner,
-                                     &tdata->neighbor_blockno,
-                                     &tdata->neighbor_patchno,
-                                     &tdata_fine->icorner,
-                                     &tdata->neighbor_type);
+    int has_corner_neighbor = 0;
+    if(indirect)
+    {
+        tdata->neighbor_type =
+            fclaw_domain_indirect_corner_neighbor(domain,
+                                                  domain->indirect,
+                                                  tdata->this_patchno,
+                                                  icorner,
+                                                  &rproc_corner,
+                                                  &tdata->neighbor_blockno,
+                                                  &tdata->neighbor_patchno,
+                                                  &tdata_fine->icorner);
+        has_corner_neighbor = tdata->neighbor_type != FCLAW_PATCH_BOUNDARY;
+    }
+    else
+    {
+        has_corner_neighbor =
+            fclaw_patch_corner_neighbors(domain,
+                                         tdata->this_blockno,
+                                         tdata->this_patchno,
+                                         icorner,
+                                         &rproc_corner,
+                                         &tdata->neighbor_blockno,
+                                         &tdata->neighbor_patchno,
+                                         &tdata_fine->icorner,
+                                         &tdata->neighbor_type);
+    }
 
     fclaw_timer_stop (&glob->timers[FCLAW_TIMER_NEIGHBOR_SEARCH]);    
 
@@ -318,16 +336,30 @@ void get_corner_neighbor(fclaw_global_t *glob,
         int rproc[4]; // overallocate for 3d
         int rpatchno[4];
         int rblockno;  /* Should equal *corner_block_idx, above. */
-        fclaw_patch_face_neighbors(domain,
-                                   tdata->this_blockno,
-                                   tdata->this_patchno,
-                                   tdata->block_iface,
-                                   rproc,
-                                   &rblockno,
-                                   rpatchno,
-                                   &rfaceno);
+        if(indirect)
+        {
+            fclaw_domain_indirect_face_neighbors(domain, 
+                                                domain->indirect, 
+                                                tdata->this_patchno, 
+                                                tdata->block_iface, 
+                                                rproc, 
+                                                &rblockno, 
+                                                rpatchno,
+                                                &rfaceno);
+        }
+        else 
+        {
+            fclaw_patch_face_neighbors(domain,
+                                       tdata->this_blockno,
+                                       tdata->this_patchno,
+                                       tdata->block_iface,
+                                       rproc,
+                                       &rblockno,
+                                       rpatchno,
+                                       &rfaceno);
+            FCLAW_ASSERT(rblockno == tdata->neighbor_blockno);
+        }
 
-        FCLAW_ASSERT(rblockno == tdata->neighbor_blockno);
 
         /* Get encoding of transforming a neighbor coordinate across a face */
         fclaw_patch_transform_blockface (glob, tdata->block_iface, rfaceno, tdata->transform);
@@ -354,8 +386,7 @@ void get_corner_neighbor(fclaw_global_t *glob,
                a default transform.  This could be the case for periodic boundaries. */
             *block_corner_count = 4;  /* assume four for now */
             fclaw_patch_transform_blockface_intra (glob, tdata->transform);
-            fclaw_patch_transform_blockface_intra
-                (glob, tdata_fine->transform);
+            fclaw_patch_transform_blockface_intra (glob, tdata_fine->transform);
 
         }
         else
@@ -368,7 +399,15 @@ void get_corner_neighbor(fclaw_global_t *glob,
         }
     }
     else if (!has_corner_neighbor && tdata->is_block_corner)
-    {
+    {   
+        /* not needed for indirect */
+        if(indirect)
+        {
+            *block_corner_count = 0;
+            *is_valid_neighbor = 0;
+            return;
+        }
+
         /* Case 4 : In 2d: Pillow sphere case or cubed sphere
            In 3D: not yet supported */
         if(domain->refine_dim == 3)
@@ -557,7 +596,9 @@ void fclaw_corner_fill_cb(fclaw_domain_t *domain,
 
             int is_valid_neighbor;
 
-            get_corner_neighbor(s->glob,
+            int indirect = 0;
+            get_corner_neighbor(indirect,
+                                s->glob,
                                 icorner,
                                 &is_valid_neighbor,
                                 &block_corner_count,
@@ -682,4 +723,149 @@ void fclaw_corner_fill_cb(fclaw_domain_t *domain,
             } /* End of parallel case */
         }  /* End of 'interior_corner' */
     }  /* End of icorner loop */
+}
+
+void fclaw_corner_neighbor_indirect(struct fclaw_global* glob,
+                                    int minlevel,
+                                    int maxlevel,
+                                    int time_interp)
+{
+    const int num_faces = fclaw_domain_num_faces(glob->domain);
+    const int num_corners = fclaw_domain_num_corners(glob->domain);
+
+    for(int i = 0; i < glob->domain->num_ghost_patches; i++)
+    {
+        fclaw_patch_t* this_patch = &glob->domain->ghost_patches[i];
+        int level = this_patch->level;
+        if (level < minlevel)
+        {
+            /* We don't need to worry about ghost patches that are at
+               coarser levels than we are currently working on */
+            continue;
+        }
+
+        int this_blockno = fclaw_patch_get_ghost_block(this_patch);
+
+        int intersects_block[num_faces];
+        fclaw_block_get_block_boundary(glob, this_patch, intersects_block);
+
+        int intersects_bdry[num_faces];
+        for(int iface = 0; iface < num_faces; iface++)
+        {
+            intersects_bdry[iface] = intersects_block[iface] && glob->domain->blocks[this_blockno].is_boundary[iface];
+        }
+
+        /* Transform data needed at multi-block boundaries */
+        fclaw_patch_transform_data_t tdata;
+
+        tdata.glob = glob;
+        tdata.based = 1;   // cell-centered data in this routine.
+        tdata.this_patch = this_patch;
+        tdata.this_blockno = this_blockno;
+        tdata.this_patchno = i;
+        tdata.neighbor_patch = NULL;  // gets filled in below.
+
+        fclaw_patch_transform_init_data(glob,this_patch,
+                                        this_blockno,
+                                        i,
+                                        &tdata);
+
+
+        fclaw_patch_transform_data_t tdata_fine;
+
+        tdata_fine.glob = glob;
+        tdata_fine.neighbor_patch = this_patch;
+        tdata_fine.neighbor_blockno = this_blockno;
+        tdata_fine.neighbor_patchno = i;
+        tdata_fine.based = 1;   // cell-centered data in this routine.
+
+        fclaw_patch_transform_init_data(glob,this_patch,
+                                        this_blockno,
+                                        i,
+                                        &tdata_fine);
+        for (int icorner = 0; icorner < num_corners; icorner++)
+        {
+            int block_corner_count = 0;
+            // get corner type and initialize is_block_* values in transform_data and transform_data_finegrid
+            // block_i* values will be initialized for transform_data
+            // block_i* values will be initialized to -1 for transform_data_finegrid
+            int is_interior_in_domain;
+            get_corner_type(glob,icorner,
+                            intersects_bdry,
+                            intersects_block,
+                            &is_interior_in_domain,
+                            &tdata,
+                            &tdata_fine);
+
+            /* Sets block_corner_count to 0 */
+            fclaw_patch_set_block_corner_count(glob, this_patch,
+                                               icorner,block_corner_count);
+
+            if (is_interior_in_domain)
+            {
+                /* Is an interior patch corner;  may also be a block corner */
+
+                int is_valid_neighbor;
+
+                int indirect = 1;
+                get_corner_neighbor(indirect,
+                                    glob,
+                                    icorner,
+                                    &is_valid_neighbor,
+                                    &block_corner_count,
+                                    &tdata,
+                                    &tdata_fine);
+
+                if (!is_valid_neighbor)
+                {
+                    /* No corner neighbor.  Either :
+                       -- Hanging node
+                       -- Cubed sphere
+                    */
+                    continue;
+                }
+
+                if (tdata.neighbor_type == FCLAW_PATCH_SAMESIZE)
+                {
+                    /* Copy from same size neighbor */
+                       fclaw_patch_copy_corner(glob,
+                                               tdata.this_patch,
+                                               tdata.neighbor_patch,
+                                               tdata.this_blockno,
+                                               tdata.neighbor_blockno,
+                                               tdata.is_block_corner,
+                                               tdata.icorner, 
+                                               time_interp,
+                                               &tdata);
+                    ++glob->count_multiproc_corner;
+                }
+                else if (tdata.neighbor_type == FCLAW_PATCH_HALFSIZE)
+                {
+                    /* Average from fine grid neighbor */
+                       fclaw_patch_average_corner(glob,
+                                                  tdata.this_patch,
+                                                  tdata.neighbor_patch,
+                                                  tdata.this_blockno,
+                                                  tdata.neighbor_blockno,
+                                                  tdata.is_block_corner,
+                                                  tdata.icorner,
+                                                  time_interp,
+                                                  &tdata);                        
+                    ++glob->count_multiproc_corner;
+                }
+                else if (tdata.neighbor_type == FCLAW_PATCH_DOUBLESIZE)
+                {
+                    /* Don't do anything; we don't need fine grid ghost cells
+                       on ghost patches.  Proof : Consider the corners of the fine
+                       patch at either end of the face shared by the coarse and
+                       fine patch. Well-balancing assures that at neither of these
+                       corners is the fine grid a "coarse grid" to a corner adjacent
+                       patch.  So the fine grid will never be needed for interpolation
+                       at any grid adjacent to either of these two corners, and so
+                       it does not need valid ghost cells along the face shared with the
+                       coarse grid. */
+                }
+            }
+        }  /* End of icorner loop */
+    }
 }

@@ -47,6 +47,11 @@ void fclaw_corner_fill_cb(struct fclaw_domain *domain,
                           int this_patch_idx,
                           void *user);
 
+void fclaw_corner_neighbor_indirect(struct fclaw_global* glob,
+                                    int minlevel,
+                                    int maxlevel,
+                                    int time_interp);
+
 #ifdef __cplusplus
 #if 0
 {

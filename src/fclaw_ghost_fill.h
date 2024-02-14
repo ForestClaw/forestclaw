@@ -134,10 +134,6 @@ void fclaw_ghost_update_nonasync(struct fclaw_global* glob,
  *   the logic here is considerably simpler than for the partial
  *   update used in intermediate steps in the subcycled case.
  **/
-void fclaw_face_neighbor_ghost(struct fclaw_global* glob,
-								 int minlevel,
-								 int maxlevel,
-								 int time_interp);
 
 #ifdef __cplusplus
 #if 0
