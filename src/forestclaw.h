@@ -1157,6 +1157,34 @@ fclaw_domain_indirect_face_neighbors (fclaw_domain_t * domain,
                                       int *rblockno, int rpatchno[],
                                       int *rfaceno);
 
+/** Call this analogously to \ref fclaw_patch_corner_neighbors.
+ * Return an indirect corner neighbor patch:  It is defined as a ghost patch
+ * that is corner neighbor to the calling ghost patch and belongs to a process
+ * that is neither the owner of that ghost patch nor our own process.
+ * \param [in] domain           Must be the same domain used in begin and end.
+ * \param [in] ind              Must have been initialized by \ref
+ *                              fclaw_domain_indirect_end.
+ * \param [in] ghostno          Number of the ghost patch whose neighbor we seek.
+ * \param [in] cornerno         Number of the ghost patch's corner to look across.
+ * \param [out] rproc           Processor number of neighbor patch.
+ *                              Exception: For non-indirect patches, set it to -1.
+ * \param [out] rblockno        The number of the neighbor block.
+ * \param [out] rpatchno        Only for indirect ghost patches, we store
+ *                              the number relative to our ghost patch array.
+ *                              For all other patches, this is -1.
+ * \param [out] rcornerno       The corner number of the neighbor.
+ * \return                      Only for indirect ghost patches, the size of the
+ *                              neighbor.  For all others, we set this to
+ *                              \ref FCLAW2D_PATCH_BOUNDARY.
+ */
+fclaw_patch_relation_t
+fclaw_domain_indirect_corner_neighbor (fclaw_domain_t * domain,
+                                         fclaw_domain_indirect_t * ind,
+                                         int ghostno, int cornerno, int *rproc,
+                                         int *rblockno, int *rpatchno,
+                                         int *rcornerno);
+
+
 /** Destroy all context data for indirect ghost neighbor patches.
  * \param [in] domain           Must be the same domain used in begin and end.
  * \param [in,out] ind          Memory will be freed.

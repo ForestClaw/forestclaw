@@ -1006,6 +1006,33 @@ fclaw_domain_indirect_face_neighbors (fclaw_domain_t * domain,
     }
 }
 
+fclaw_patch_relation_t
+fclaw_domain_indirect_corner_neighbor(fclaw_domain_t *domain, 
+                                      fclaw_domain_indirect_t *ind, 
+                                      int ghostno, int cornerno, int *rproc, 
+                                      int *rblockno, int *rpatchno, 
+                                      int *rcornerno)
+{
+    if(domain->refine_dim == 2)
+    {
+        return (fclaw_patch_relation_t) fclaw2d_domain_indirect_corner_neighbor(domain->d2,
+                                                                               (fclaw2d_domain_indirect_t*)ind,
+                                                                               ghostno,cornerno,rproc,rblockno,
+                                                                               rpatchno,rcornerno);
+    }
+    else if (domain->refine_dim == 3)
+    {
+        return (fclaw_patch_relation_t) fclaw3d_domain_indirect_corner_neighbor(domain->d3,
+                                                                               (fclaw3d_domain_indirect_t*)ind,
+                                                                               ghostno,cornerno,rproc,rblockno,
+                                                                               rpatchno,rcornerno);
+    }
+    else
+    {
+        SC_ABORT_NOT_REACHED();
+    }
+}
+
 void fclaw_domain_indirect_destroy (fclaw_domain_t * domain,
                                     fclaw_domain_indirect_t * indirect)
 {
