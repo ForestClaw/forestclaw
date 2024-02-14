@@ -150,6 +150,7 @@ struct fclaw_options
     int smooth_refine;
     int smooth_level;
     double refine_threshold;
+    int partition_for_coarsening; /**< True if domain will be partitioned for coarsening */
 
     /* Conservation */
     int time_sync;

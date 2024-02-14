@@ -856,6 +856,18 @@ void fclaw_domain_set_refinement (fclaw_domain_t * domain,
                                   int smooth_refine, int smooth_level,
                                   int coarsen_delay);
 
+/** Set parameters of partitioning strategy in a domain.
+ * This function only needs to be called once, and only for the first domain
+ * created in the program.  The values of the parameters are automatically
+ * transferred on adaptation and partitioning.
+ * \param [in,out] domain       This domain's partitioning strategy is set.
+ * \param [in] partition_for_coarsening Boolean:  If true, all future partitions
+ *                              of the domain allow one level of coarsening.
+ *                              Suggested default: 1.
+ */
+void fclaw_domain_set_partitioning (fclaw_domain_t * domain,
+                                    int partition_for_coarsening);
+
 /** Mark a patch for refinement.
  * This must ONLY be called for local patches.
  * It is safe to call this function from an iterator callback except
