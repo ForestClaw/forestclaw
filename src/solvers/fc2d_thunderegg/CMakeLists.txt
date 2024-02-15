@@ -48,11 +48,10 @@ install(FILES
   TYPE INCLUDE
 )
 
-install(TARGETS fc2d_thunderegg
-  EXPORT ${PROJECT_NAME}-targets)
+install(TARGETS fc2d_thunderegg EXPORT ${PROJECT_NAME}-targets)
 
 
-# imported target, for use from FetchContent
+# imported target, for use from parent project
 add_library(FORESTCLAW::FC2D_THUNDEREGG INTERFACE IMPORTED GLOBAL)
 target_link_libraries(FORESTCLAW::FC2D_THUNDEREGG INTERFACE fc2d_thunderegg)
 

@@ -84,9 +84,6 @@ install(FILES
   fc2d_geoclaw_options.h
   fc2d_geoclaw_fort.h
   fc2d_geoclaw_gauges_default.h
-  TYPE INCLUDE
-)
-install(FILES
   ${CMAKE_CURRENT_BINARY_DIR}/include/amr_module.mod
   ${CMAKE_CURRENT_BINARY_DIR}/include/data_storm_module.mod
   ${CMAKE_CURRENT_BINARY_DIR}/include/fixedgrids_module.mod
@@ -102,11 +99,10 @@ install(FILES
   TYPE INCLUDE
 )
 
-install(TARGETS geoclaw
-  EXPORT ${PROJECT_NAME}-targets)
+install(TARGETS geoclaw EXPORT ${PROJECT_NAME}-targets)
 
 
-# imported target, for use from FetchContent
+# imported target, for use from parent project
 add_library(FORESTCLAW::GEOCLAW INTERFACE IMPORTED GLOBAL)
 target_link_libraries(FORESTCLAW::GEOCLAW INTERFACE geoclaw)
 

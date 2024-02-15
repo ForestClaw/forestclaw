@@ -1,13 +1,10 @@
 [submodule "sc"]
 	path = sc
-        url = https://github.com/cburstedde/libsc.git
-	# url = git@github.com:cburstedde/libsc.git
+	url = https://github.com/cburstedde/libsc.git
 	ignore = dirty
-
 [submodule "p4est"]
 	path = p4est
-        url = https://github.com/cburstedde/p4est.git
-	# url = git@github.com:cburstedde/p4est.git
+	url = https://github.com/cburstedde/p4est.git
 	ignore = dirty
 [submodule "src/solvers/fc3d_ash3d"]
 	path = src/solvers/fc3d_ash3d
@@ -15,3 +12,6 @@
 [submodule "cub"]
 	path = cub
 	url = ./cub
+[submodule "thunderegg"]
+	path = thunderegg
+	url = https://github.com/scivision/thunderegg

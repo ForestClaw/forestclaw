@@ -39,22 +39,22 @@ function(ForestClawExternalProject_GetTarget)
 
   add_library(SC::SC STATIC IMPORTED GLOBAL)
   list(APPEND FCLAW_IMPORTED_LIBARIES SC::SC)
-  set_target_properties(SC::SC PROPERTIES 
+  set_target_properties(SC::SC PROPERTIES
     IMPORTED_LOCATION ${FCLAW_ROOT}/lib/${FCLAW_LIBRARY_PREFIX}sc${FCLAW_LIBRARY_SUFFIX})
   target_include_directories(SC::SC INTERFACE ${FCLAW_ROOT}/include)
 
   add_library(P4EST::P4EST STATIC IMPORTED GLOBAL)
   list(APPEND FCLAW_IMPORTED_LIBARIES P4EST::P4EST)
-  set_target_properties(P4EST::P4EST PROPERTIES 
+  set_target_properties(P4EST::P4EST PROPERTIES
     IMPORTED_LOCATION ${FCLAW_ROOT}/lib/${FCLAW_LIBRARY_PREFIX}p4est${FCLAW_LIBRARY_SUFFIX})
   target_include_directories(P4EST::P4EST INTERFACE ${FCLAW_ROOT}/include)
   find_package(ZLIB REQUIRED)
   target_link_libraries(P4EST::P4EST INTERFACE SC::SC ZLIB::ZLIB)
 
-  #FORESTCLAW 
+  #FORESTCLAW
   add_library(FORESTCLAW::FORESTCLAW STATIC IMPORTED GLOBAL)
   list(APPEND FCLAW_IMPORTED_LIBARIES FORESTCLAW::FORESTCLAW)
-  set_target_properties(FORESTCLAW::FORESTCLAW PROPERTIES 
+  set_target_properties(FORESTCLAW::FORESTCLAW PROPERTIES
     IMPORTED_LOCATION ${FCLAW_ROOT}/lib/${FCLAW_LIBRARY_PREFIX}forestclaw${FCLAW_LIBRARY_SUFFIX}
     IMPORTED_LINK_INTERFACE_LANGUAGES  "C;CXX;Fortran")
   target_include_directories(FORESTCLAW::FORESTCLAW INTERFACE ${FCLAW_ROOT}/include)
@@ -66,10 +66,10 @@ function(ForestClawExternalProject_GetTarget)
   endif()
 
 
-  #CLAWPATCH 
+  #CLAWPATCH
   add_library(FORESTCLAW::CLAWPATCH STATIC IMPORTED GLOBAL)
   list(APPEND FCLAW_IMPORTED_LIBARIES FORESTCLAW::CLAWPATCH)
-  set_target_properties(FORESTCLAW::CLAWPATCH PROPERTIES 
+  set_target_properties(FORESTCLAW::CLAWPATCH PROPERTIES
     IMPORTED_LOCATION ${FCLAW_ROOT}/lib/${FCLAW_LIBRARY_PREFIX}clawpatch${FCLAW_LIBRARY_SUFFIX}
     IMPORTED_LINK_INTERFACE_LANGUAGES  "C;CXX;Fortran")
   target_include_directories(FORESTCLAW::CLAWPATCH INTERFACE ${FCLAW_ROOT}/include)
@@ -81,7 +81,7 @@ function(ForestClawExternalProject_GetTarget)
     #CLAWPACK4.6
     add_library(FORESTCLAW::CLAWPACK4.6 STATIC IMPORTED GLOBAL)
     list(APPEND FCLAW_IMPORTED_LIBARIES FORESTCLAW::CLAWPACK4.6)
-    set_target_properties(FORESTCLAW::CLAWPACK4.6 PROPERTIES 
+    set_target_properties(FORESTCLAW::CLAWPACK4.6 PROPERTIES
       IMPORTED_LOCATION ${FCLAW_ROOT}/lib/${FCLAW_LIBRARY_PREFIX}clawpack4.6${FCLAW_LIBRARY_SUFFIX}
       IMPORTED_LINK_INTERFACE_LANGUAGES  "C;CXX;Fortran")
     target_include_directories(FORESTCLAW::CLAWPACK4.6 INTERFACE ${FCLAW_ROOT}/include)
@@ -92,7 +92,7 @@ function(ForestClawExternalProject_GetTarget)
     #CLAWPACK5
     add_library(FORESTCLAW::CLAWPACK5 STATIC IMPORTED GLOBAL)
     list(APPEND FCLAW_IMPORTED_LIBARIES FORESTCLAW::CLAWPACK5)
-    set_target_properties(FORESTCLAW::CLAWPACK5 PROPERTIES 
+    set_target_properties(FORESTCLAW::CLAWPACK5 PROPERTIES
       IMPORTED_LOCATION ${FCLAW_ROOT}/lib/${FCLAW_LIBRARY_PREFIX}clawpack5${FCLAW_LIBRARY_SUFFIX}
       IMPORTED_LINK_INTERFACE_LANGUAGES  "C;CXX;Fortran")
     target_include_directories(FORESTCLAW::CLAWPACK5 INTERFACE ${FCLAW_ROOT}/include)
@@ -103,7 +103,7 @@ function(ForestClawExternalProject_GetTarget)
     #CLAWPACK3_46
     add_library(FORESTCLAW::CLAWPACK3_46 STATIC IMPORTED GLOBAL)
     list(APPEND FCLAW_IMPORTED_LIBARIES FORESTCLAW::CLAWPACK3_46)
-    set_target_properties(FORESTCLAW::CLAWPACK3_46 PROPERTIES 
+    set_target_properties(FORESTCLAW::CLAWPACK3_46 PROPERTIES
       IMPORTED_LOCATION ${FCLAW_ROOT}/lib/${FCLAW_LIBRARY_PREFIX}clawpack3_46${FCLAW_LIBRARY_SUFFIX}
       IMPORTED_LINK_INTERFACE_LANGUAGES  "C;CXX;Fortran")
     target_include_directories(FORESTCLAW::CLAWPACK3_46 INTERFACE ${FCLAW_ROOT}/include)
@@ -116,7 +116,7 @@ function(ForestClawExternalProject_GetTarget)
     #FC2D_THUNDEREGG
     add_library(FORESTCLAW::FC2D_THUNDEREGG STATIC IMPORTED GLOBAL)
     list(APPEND FCLAW_IMPORTED_LIBARIES FORESTCLAW::FC2D_THUNDEREGG)
-    set_target_properties(FORESTCLAW::FC2D_THUNDEREGG PROPERTIES 
+    set_target_properties(FORESTCLAW::FC2D_THUNDEREGG PROPERTIES
       IMPORTED_LOCATION ${FCLAW_ROOT}/lib/${FCLAW_LIBRARY_PREFIX}fc2d_thunderegg${FCLAW_LIBRARY_SUFFIX}
       IMPORTED_LINK_INTERFACE_LANGUAGES  "C;CXX;Fortran")
     target_include_directories(FORESTCLAW::FC2D_THUNDEREGG INTERFACE ${FCLAW_ROOT}/include)
@@ -126,7 +126,7 @@ function(ForestClawExternalProject_GetTarget)
       include(ThunderEggExternalProject)
       ThunderEggExternalProject_GetTarget(COMPONENTS P4EST OPTIONAL_COMPONENTS FFTW)
       list(APPEND FCLAW_IMPORTED_LIBARIES ThunderEgg::ThunderEgg)
-      
+
     endif()
 
     target_link_libraries(FORESTCLAW::FC2D_THUNDEREGG INTERFACE FORESTCLAW::FORESTCLAW FORESTCLAW::CLAWPATCH ThunderEgg::ThunderEgg)
@@ -137,7 +137,7 @@ function(ForestClawExternalProject_GetTarget)
     #GEOCLAW
     add_library(FORESTCLAW::GEOCLAW STATIC IMPORTED GLOBAL)
     list(APPEND FCLAW_IMPORTED_LIBARIES FORESTCLAW::GEOCLAW)
-    set_target_properties(FORESTCLAW::GEOCLAW PROPERTIES 
+    set_target_properties(FORESTCLAW::GEOCLAW PROPERTIES
       IMPORTED_LOCATION                  ${FCLAW_ROOT}/lib/${FCLAW_LIBRARY_PREFIX}geoclaw${FCLAW_LIBRARY_SUFFIX}
       IMPORTED_LINK_INTERFACE_LANGUAGES  "C;CXX;Fortran")
     target_include_directories(FORESTCLAW::GEOCLAW INTERFACE ${FCLAW_ROOT}/include)
@@ -150,7 +150,7 @@ function(ForestClawExternalProject_GetTarget)
 
     add_library(FORESTCLAW::CUDACLAW STATIC IMPORTED GLOBAL)
     list(APPEND FCLAW_IMPORTED_LIBARIES FORESTCLAW::CUDACLAW)
-    set_target_properties(FORESTCLAW::CUDACLAW PROPERTIES 
+    set_target_properties(FORESTCLAW::CUDACLAW PROPERTIES
       IMPORTED_LOCATION                  ${FCLAW_ROOT}/lib/${FCLAW_LIBRARY_PREFIX}cudaclaw${FCLAW_LIBRARY_SUFFIX}
       IMPORTED_LINK_INTERFACE_LANGUAGES  "C;CXX;Fortran;CUDA"
       CUDA_SEPARABLE_COMPILATION ON)
@@ -195,7 +195,7 @@ endfunction(ForestClawExternalProject_GetTarget)
 #
 function(ForestClawExternalProject)
   include(ExternalProject)
-  
+
   set(options "")
   set(one_value_args REPOSITORY TAG)
   set(multi_value_args COMPONENTS)
@@ -224,7 +224,7 @@ function(ForestClawExternalProject)
 
   set(FCLAW_INCLUDE_DIRS ${FCLAW_ROOT}/include)
 
-  set(FCLAW_CONFIGURE_ARGS -DBUILD_TESTING=OFF -DCMAKE_INSTALL_PREFIX=${FCLAW_ROOT} -Dapplications=OFF)
+  set(FCLAW_CONFIGURE_ARGS -DBUILD_TESTING=OFF -DCMAKE_INSTALL_PREFIX=${FCLAW_ROOT} -Dfclaw_applications=OFF)
 
   # --- optional dependent libraries
   if("mpi" IN_LIST FCLAW_COMPONENTS OR "thunderegg" IN_LIST FCLAW_COMPONENTS)

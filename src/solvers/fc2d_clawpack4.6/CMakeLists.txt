@@ -41,11 +41,10 @@ install(FILES
   TYPE INCLUDE
 )
 
-install(TARGETS clawpack4.6
-  EXPORT ${PROJECT_NAME}-targets)
+install(TARGETS clawpack4.6 EXPORT ${PROJECT_NAME}-targets)
 
 
-# -- imported target, for use from FetchContent
+# -- imported target, for use from parent project
 add_library(FORESTCLAW::CLAWPACK4.6 INTERFACE IMPORTED GLOBAL)
 target_link_libraries(FORESTCLAW::CLAWPACK4.6 INTERFACE clawpack4.6)
 

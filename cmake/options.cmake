@@ -1,6 +1,5 @@
-option(mpi "use MPI library")
 option(openmp "use OpenMP")
-option(applications "build applications" ON)
+option(fclaw_applications "build applications" off)
 
 option(clawpatch "build Clawpatch")
 option(clawpack "build Clawpack")
@@ -8,15 +7,21 @@ option(geoclaw "build Geoclaw")
 option(cudaclaw "build CudaClaw")
 option(thunderegg "build ThunderEgg")
 
-option(thunderegg_external "force build of ThunderEgg")
-option(p4est_external "force build of p4est")
-option(sc_external "force build of libsc")
+set(mpi true)
+# needed by ThunderEgg, P4EST, Libsc
 
-option(CMAKE_TLS_VERIFY "verify HTTPS certs" on)
+option(CMAKE_TLS_VERIFY "verify TLS cert" on)
 
 # --- default install directory under build/local
 # users can specify like "cmake -B build -DCMAKE_INSTALL_PREFIX=~/mydir"
-if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT AND PROJECT_IS_TOP_LEVEL)
+if(CMAKE_VERSION VERSION_LESS 3.21)
+  get_property(_not_top DIRECTORY PROPERTY PARENT_DIRECTORY)
+  if(NOT _not_top)
+    set(FORESTCLAW_IS_TOP_LEVEL true)
+  endif()
+endif()
+
+if(FORESTCLAW_IS_TOP_LEVEL AND CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
   # will not take effect without FORCE
   set(CMAKE_INSTALL_PREFIX "${PROJECT_BINARY_DIR}/local" CACHE PATH "Install top-level directory" FORCE)
 endif()

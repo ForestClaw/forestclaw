@@ -139,13 +139,12 @@ install(FILES
   TYPE INCLUDE
 )
 
-install(TARGETS clawpatch
-  EXPORT ${PROJECT_NAME}-targets)
+install(TARGETS clawpatch EXPORT ${PROJECT_NAME}-targets)
 
 # -- export name
-set_target_properties(clawpatch PROPERTIES EXPORT_NAME CLAWPATCH)
+set_property(TARGET clawpatch PROPERTY EXPORT_NAME CLAWPATCH)
 
-# -- imported target, for use from FetchContent
+# -- imported target, for use from parent project
 add_library(FORESTCLAW::CLAWPATCH INTERFACE IMPORTED GLOBAL)
 target_link_libraries(FORESTCLAW::CLAWPATCH INTERFACE clawpatch)
 

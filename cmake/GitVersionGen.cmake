@@ -53,7 +53,7 @@ string(REGEX REPLACE "^v" "" FORESTCLAW_FULL_VERSION "${FORESTCLAW_FULL_VERSION}
 # Parse the version string into major, minor, and patch variables
 string(REGEX MATCHALL "[0-9]+" FORESTCLAW_VERSION_PARTS "${FORESTCLAW_FULL_VERSION}")
 
-# if list size is less than 3, set all verison numbers to 0
+# if list size is less than 3, set all version numbers to 0
 list(LENGTH FORESTCLAW_VERSION_PARTS FORESTCLAW_VERSION_PARTS_LENGTH)
 if(FORESTCLAW_VERSION_PARTS_LENGTH LESS 3)
   set(FORESTCLAW_VERSION_PARTS 0 0 0)

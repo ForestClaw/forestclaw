@@ -64,8 +64,8 @@ function(ThunderEggExternalProject_GetTarget)
   endif()
 
   if("P4EST" IN_LIST THUNDEREGG_COMPONENTS OR "P4EST" IN_LIST THUNDEREGG_OPTIONAL_COMPONENTS)
-    find_package(P4EST)
-    find_package(SC)
+    find_package(P4EST CONFIG)
+    find_package(SC CONFIG)
   endif()
 
   if(TARGET P4EST::P4EST)
@@ -109,7 +109,7 @@ function(ThunderEggExternalProject_GetTarget)
   # avoid race condition
 
   add_library(ThunderEgg::ThunderEgg STATIC IMPORTED GLOBAL)
-  set_target_properties(ThunderEgg::ThunderEgg PROPERTIES 
+  set_target_properties(ThunderEgg::ThunderEgg PROPERTIES
     IMPORTED_LOCATION ${THUNDEREGG_LIBRARIES}
     INTERFACE_INCLUDE_DIRECTORIES ${THUNDEREGG_INCLUDE_DIRS}
     INTERFACE_LINK_LIBRARIES "${THUNDEREGG_DEP_LIBS}"
@@ -148,7 +148,7 @@ endfunction(ThunderEggExternalProject_GetTarget)
 #
 function(ThunderEggExternalProject)
   include(ExternalProject)
-  
+
   set(one_value_args REPOSITORY TAG)
   set(multi_value_args COMPONENTS OPTIONAL_COMPONENTS)
   cmake_parse_arguments(THUNDEREGG "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN} )
