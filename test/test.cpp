@@ -114,7 +114,9 @@ int main(int argc, char *argv[])
     } else {
 	    // global setup...
 	    fclaw_mpi_init(nullptr, nullptr, sc_MPI_COMM_WORLD, SC_LP_PRODUCTION);
+#ifdef FCLAW_HAVE_FEENABLEEXCEPT
         feenableexcept(FE_INVALID | FE_DIVBYZERO | FE_OVERFLOW);
+#endif
 
         sc_set_abort_handler(throw_exception);
 	    result = context.run();
