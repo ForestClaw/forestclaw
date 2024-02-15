@@ -598,6 +598,10 @@ void fclaw_ghost_update_nonasync(fclaw_global_t* glob,
 		Indirect neighbor exchange
 	------------------------------------------------------------- */
 	fclaw_face_neighbor_ghost(glob,minlevel,maxlevel,time_interp);
+	if(glob->domain->refine_dim == 3)
+	{
+		fclaw_edge_neighbor_indirect(glob,minlevel,maxlevel, time_interp);
+	}
 	fclaw_corner_neighbor_indirect(glob,minlevel,maxlevel, time_interp);
 
 
@@ -803,6 +807,10 @@ void fclaw_ghost_update_async(fclaw_global_t* glob,
 		show that ghostfill-(step1+step2+step3+comm) << 1
 	------------------------------------------------------------- */
 	fclaw_face_neighbor_ghost(glob,minlevel,maxlevel,time_interp);
+	if(glob->domain->refine_dim == 3)
+	{
+		fclaw_edge_neighbor_indirect(glob,minlevel,maxlevel, time_interp);
+	}
 	fclaw_corner_neighbor_indirect(glob,minlevel,maxlevel, time_interp);
 
 	/* -------------------------------------------------------------

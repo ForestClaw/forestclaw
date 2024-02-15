@@ -358,7 +358,7 @@ void fclaw_face_fill_cb(fclaw_domain_t *domain,
 														   refratio,time_interp,igrid,
 														   &transform_data);
 						}
-						else if (average_from_neighbor)
+						else if (average_from_neighbor && (!remote_neighbor || read_parallel_patches))
 						{
 							/* average from igrid */
 							fclaw_patch_average_face(s->glob,coarse_patch,fine_patch,idir,

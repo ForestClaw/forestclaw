@@ -171,7 +171,8 @@ typedef struct get_edge_neighbors_return
 
 static
 edge_neighbors_t
-get_edge_neighbors(fclaw_global_t *glob,
+get_edge_neighbors(int indirect,
+                   fclaw_global_t *glob,
                    fclaw_patch_transform_data_t* tdata,
                    fclaw_patch_transform_data_t* tdata_nbr)
 {
@@ -191,16 +192,33 @@ get_edge_neighbors(fclaw_global_t *glob,
 
     /* See what p4est thinks we have for edges, and consider four cases */
     int rproc_edge[2];
-    int has_edge_neighbor =
-        fclaw_patch_edge_neighbors(domain,
-                                   tdata->this_blockno,
-                                   tdata->this_patchno,
-                                   tdata->iedge,
-                                   rproc_edge,
-                                   &tdata->neighbor_blockno,
-                                   retval.patchnos,
-                                   &tdata_nbr->iedge,
-                                   &tdata->neighbor_type);
+    int has_edge_neighbor = 0;
+    if(indirect)
+    {
+        tdata->neighbor_type = 
+            fclaw_domain_indirect_edge_neighbors(domain,
+                                       domain->indirect,
+                                       tdata->this_patchno,
+                                       tdata->iedge,
+                                       rproc_edge,
+                                       &tdata->neighbor_blockno,
+                                       retval.patchnos,
+                                       &tdata_nbr->iedge);
+        has_edge_neighbor = tdata->neighbor_type != FCLAW_PATCH_BOUNDARY;
+    }
+    else
+    {
+        has_edge_neighbor = 
+            fclaw_patch_edge_neighbors(domain,
+                                       tdata->this_blockno,
+                                       tdata->this_patchno,
+                                       tdata->iedge,
+                                       rproc_edge,
+                                       &tdata->neighbor_blockno,
+                                       retval.patchnos,
+                                       &tdata_nbr->iedge,
+                                       &tdata->neighbor_type);
+    }
 
     fclaw_timer_stop (&glob->timers[FCLAW_TIMER_NEIGHBOR_SEARCH]);    
 
@@ -227,15 +245,28 @@ get_edge_neighbors(fclaw_global_t *glob,
         int rproc[num_face_neighbors];
         int rpatchno[num_face_neighbors];
         int rblockno;  /* Should equal *corner_block_idx, above. */
-        fclaw_patch_face_neighbors(domain,
-                                   tdata->this_blockno,
-                                   tdata->this_patchno,
-                                   tdata->block_iface,
-                                   rproc,
-                                   &rblockno,
-                                   rpatchno,
-                                   &rfaceno);
-
+        if(indirect)
+        {
+            fclaw_domain_indirect_face_neighbors(domain, 
+                                                domain->indirect, 
+                                                tdata->this_patchno, 
+                                                tdata->block_iface, 
+                                                rproc, 
+                                                &rblockno, 
+                                                rpatchno,
+                                                &rfaceno);
+        }
+        else 
+        {
+            fclaw_patch_face_neighbors(domain,
+                                       tdata->this_blockno,
+                                       tdata->this_patchno,
+                                       tdata->block_iface,
+                                       rproc,
+                                       &rblockno,
+                                       rpatchno,
+                                       &rfaceno);
+        }
         FCLAW_ASSERT(rblockno == tdata->neighbor_blockno);
 
         /* Get encoding of transforming a neighbor coordinate across a face */
@@ -307,14 +338,21 @@ get_edge_neighbors(fclaw_global_t *glob,
 
     for(int i=0; i < num_neighbors; i++)
     {
-        if (domain->mpirank != rproc_edge[i])
+        if(retval.patchnos[i] != -1)
         {
-            retval.patches[i] = &domain->ghost_patches[retval.patchnos[i]];
+            if (domain->mpirank != rproc_edge[i])
+            {
+                retval.patches[i] = &domain->ghost_patches[retval.patchnos[i]];
+            }
+            else
+            {
+                fclaw_block_t *neighbor_block = &domain->blocks[tdata->neighbor_blockno];
+                retval.patches[i] = &neighbor_block->patches[retval.patchnos[i]];
+            }
         }
-        else
+        else 
         {
-            fclaw_block_t *neighbor_block = &domain->blocks[tdata->neighbor_blockno];
-            retval.patches[i] = &neighbor_block->patches[retval.patchnos[i]];
+            retval.patches[i] = NULL;
         }
     }
 
@@ -390,11 +428,11 @@ void fclaw_edge_fill_cb(fclaw_domain_t *domain,
     {
         int is_interior_in_domain;
         get_edge_type(s->glob,iedge,
-                        intersects_bdry,
-                        intersects_block,
-                        &is_interior_in_domain,
-                        &tdata,
-                        &tdata_nbr);
+                      intersects_bdry,
+                      intersects_block,
+                      &is_interior_in_domain,
+                      &tdata,
+                      &tdata_nbr);
 
         /* Sets block_corner_count to 0 */
         // TODO is this necessary?
@@ -405,8 +443,10 @@ void fclaw_edge_fill_cb(fclaw_domain_t *domain,
         {
             /* Is an interior patch edge;  may also be a block edge */
 
+            int indirect = 0;
             edge_neighbors_t edge_neighbors =
-                get_edge_neighbors(s->glob,
+                get_edge_neighbors(indirect,
+                                   s->glob,
                                    &tdata,
                                    &tdata_nbr);
 
@@ -533,4 +573,148 @@ void fclaw_edge_fill_cb(fclaw_domain_t *domain,
             }
         }  /* End of 'interior_edge' */
     }  /* End of iedge loop */
+}
+
+void fclaw_edge_neighbor_indirect(struct fclaw_global* glob,
+                                  int minlevel,
+                                  int maxlevel,
+                                  int time_interp)
+{
+    const int num_faces = fclaw_domain_num_faces(glob->domain);
+    const int num_edges = fclaw_domain_num_edges(glob->domain);
+
+    for(int i = 0; i < glob->domain->num_ghost_patches; i++)
+    {
+        fclaw_patch_t* this_patch = &glob->domain->ghost_patches[i];
+        int level = this_patch->level;
+        if (level < minlevel)
+        {
+            /* We don't need to worry about ghost patches that are at
+               coarser levels than we are currently working on */
+            continue;
+        }
+
+        int this_blockno = fclaw_patch_get_ghost_block(this_patch);
+
+        int intersects_block[num_faces];
+        fclaw_block_get_block_boundary(glob, this_patch, intersects_block);
+
+        int intersects_bdry[num_faces];
+        for(int iface = 0; iface < num_faces; iface++)
+        {
+            intersects_bdry[iface] = intersects_block[iface] && glob->domain->blocks[this_blockno].is_boundary[iface];
+        }
+
+        /* Transform data needed at multi-block boundaries */
+        fclaw_patch_transform_data_t tdata;
+
+        tdata.glob = glob;
+        tdata.based = 1;   // cell-centered data in this routine.
+        tdata.this_patch = this_patch;
+        tdata.this_blockno = this_blockno;
+        tdata.this_patchno = i;
+        tdata.neighbor_patch = NULL;  // gets filled in below.
+
+        fclaw_patch_transform_init_data(glob,this_patch,
+                                        this_blockno,
+                                        i,
+                                        &tdata);
+
+
+        fclaw_patch_transform_data_t tdata_nbr;
+
+        tdata_nbr.glob = glob;
+        tdata_nbr.neighbor_patch = this_patch;
+        tdata_nbr.neighbor_blockno = this_blockno;
+        tdata_nbr.neighbor_patchno = i;
+        tdata_nbr.based = 1;   // cell-centered data in this routine.
+
+        fclaw_patch_transform_init_data(glob,this_patch,
+                                        this_blockno,
+                                        i,
+                                        &tdata_nbr);
+        for (int iedge = 0; iedge < num_edges; iedge++)
+        {
+            // get edge type and initialize is_block_* values in transform_data and transform_data_finegrid
+            // block_i* values will be initialized for transform_data
+            // block_i* values will be initialized to -1 for transform_data_finegrid
+            int is_interior_in_domain;
+            get_edge_type(glob,iedge,
+                            intersects_bdry,
+                            intersects_block,
+                            &is_interior_in_domain,
+                            &tdata,
+                            &tdata_nbr);
+
+            if (is_interior_in_domain)
+            {
+                /* Is an interior patch edge;  may also be a block edge */
+
+                int indirect = 1;
+                edge_neighbors_t edge_neighbors =
+                get_edge_neighbors(indirect,
+                                   glob,
+                                   &tdata,
+                                   &tdata_nbr);
+
+                if (!edge_neighbors.is_valid_neighbor)
+                {
+                    /* No edge neighbor.  Either :
+                       -- Hanging node
+                       -- Cubed sphere
+                    */
+                    continue;
+                }
+
+                if (tdata.neighbor_type == FCLAW_PATCH_SAMESIZE)
+                {
+                    tdata.neighbor_patch = edge_neighbors.patches[0];
+                    tdata.neighbor_patchno = edge_neighbors.patchnos[0];
+                    /* Copy from same size neighbor */
+                       fclaw_patch_copy_edge(glob,
+                                             tdata.this_patch,
+                                             tdata.neighbor_patch,
+                                             tdata.this_blockno,
+                                             tdata.neighbor_blockno,
+                                             tdata.iedge,
+                                             time_interp, 
+                                             &tdata);
+                    ++glob->count_multiproc_corner;
+                }
+                else if (tdata.neighbor_type == FCLAW_PATCH_HALFSIZE)
+                {
+                    /* Average from fine grid neighbors */
+                    for (int igrid = 0; igrid < 2; igrid++)
+                    {
+                        tdata.neighbor_patch = edge_neighbors.patches[igrid];
+                        tdata.neighbor_patchno = edge_neighbors.patchnos[igrid];
+
+                        if(tdata.neighbor_patchno != -1)
+                        {
+                            /* average from igrid */
+                            fclaw_patch_average_edge(glob,
+                                                     tdata.this_patch,
+                                                     tdata.neighbor_patch,
+                                                     tdata.iedge,
+                                                     time_interp,
+                                                     &tdata);
+                        }
+                    }
+                    ++glob->count_multiproc_corner;
+                }
+                else if (tdata.neighbor_type == FCLAW_PATCH_DOUBLESIZE)
+                {
+                    /* Don't do anything; we don't need fine grid ghost cells
+                       on ghost patches.  Proof : Consider the edges of the fine
+                       patch at either end of the face shared by the coarse and
+                       fine patch. Well-balancing assures that at neither of these
+                       edges is the fine grid a "coarse grid" to a edge adjacent
+                       patch.  So the fine grid will never be needed for interpolation
+                       at any grid adjacent to either of these two edges, and so
+                       it does not need valid ghost cells along the face shared with the
+                       coarse grid. */
+                }
+            }
+        }  /* End of iedge loop */
+    }
 }
