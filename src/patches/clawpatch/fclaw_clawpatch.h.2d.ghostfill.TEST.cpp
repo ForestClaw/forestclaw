@@ -80,6 +80,7 @@ struct TestData {
 
         opts->mx   = 5;
         opts->my   = 6;
+        opts->mz   = 1;
         opts->mbc  = 2;
         opts->meqn = 1;
         opts->maux = 1;
@@ -209,7 +210,7 @@ void init_patch(fclaw_global_t* glob, fclaw_patch_t* patch)
         intersects_bc[i] = type == FCLAW_PATCH_BOUNDARY;
     }
 
-    //zero out bounds with ghost
+    //NAN out bounds with ghost
     int i_start, i_stop, j_start, j_stop;
     get_bounds_with_ghost(clawpatch, intersects_bc,&i_start,&i_stop,&j_start,&j_stop);
     for(int m = 0; m < opts->meqn; m++)
@@ -217,7 +218,7 @@ void init_patch(fclaw_global_t* glob, fclaw_patch_t* patch)
     for(int i = i_start; i < i_stop; i++)
     {
         int idx = clawpatch_idx(clawpatch, i,j,m);
-        q[idx]=0;
+        q[idx]=NAN;
     }
 
     //fill interior
@@ -228,6 +229,26 @@ void init_patch(fclaw_global_t* glob, fclaw_patch_t* patch)
         int idx = clawpatch_idx(clawpatch, i,j,m);
         //fill with some different linear functions
         q[idx] = fill_function(clawpatch, i, j, m);
+    }
+}
+void set_ghosts_to_nan(fclaw_global_t* glob)
+{
+    for(int i = 0; i < glob->domain->num_ghost_patches; i++)
+    {
+        fclaw_patch_t* patch = &glob->domain->ghost_patches[i];
+        fclaw_clawpatch_t* clawpatch = fclaw_clawpatch_get_clawpatch(patch);
+        fclaw_clawpatch_options_t* opts = fclaw_clawpatch_get_options(glob);
+        // clear q
+        double* q = fclaw_clawpatch_get_q(glob, patch);
+        //fill entire patch
+        for(int m = 0; m < opts->meqn; m++)
+        for(int j = -opts->mbc; j < opts->my+opts->mbc; j++)
+        for(int i = -opts->mbc; i < opts->mx+opts->mbc; i++)
+        {
+            int idx = clawpatch_idx(clawpatch, i,j,m);
+            q[idx]=NAN;
+        }
+
     }
 }
 void test_ghost_fill(TestData& tdata, TestData& tdata_out, std::string output_filename)
@@ -243,6 +264,8 @@ void test_ghost_fill(TestData& tdata, TestData& tdata_out, std::string output_fi
         }, 
         nullptr
     );
+    //set ghost patches to NAN
+    set_ghosts_to_nan(tdata.glob);
 
     fclaw_ghost_update(tdata.glob, tdata.fopts.minlevel, tdata.fopts.maxlevel, 0, 0, FCLAW_TIMER_NONE);
 
