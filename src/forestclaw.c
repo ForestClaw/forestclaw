@@ -1024,6 +1024,20 @@ fclaw_domain_indirect_face_neighbors (fclaw_domain_t * domain,
 }
 
 fclaw_patch_relation_t
+fclaw_domain_indirect_edge_neighbors (fclaw_domain_t * domain,
+                                      fclaw_domain_indirect_t * ind,
+                                      int ghostno, int edgeno, int rproc[2],
+                                      int *rblockno, int rpatchno[2],
+                                      int *edgeeno)
+{
+    FCLAW_ASSERT(domain->refine_dim == 3);
+    return (fclaw_patch_relation_t) fclaw3d_domain_indirect_edge_neighbors(domain->d3,
+                                                                           (fclaw3d_domain_indirect_t*)ind,
+                                                                           ghostno,edgeno,rproc,rblockno,
+                                                                           rpatchno,edgeeno);
+}
+
+fclaw_patch_relation_t
 fclaw_domain_indirect_corner_neighbor(fclaw_domain_t *domain, 
                                       fclaw_domain_indirect_t *ind, 
                                       int ghostno, int cornerno, int *rproc, 

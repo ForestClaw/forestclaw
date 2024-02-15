@@ -1170,6 +1170,33 @@ fclaw_domain_indirect_face_neighbors (fclaw_domain_t * domain,
                                       int *rblockno, int rpatchno[],
                                       int *rfaceno);
 
+/** Call this analogously to \ref fclaw_patch_edge_neighbors.
+ * We only return an indirect ghost neighbor patch:  This is defined as a ghost
+ * patch that is neighbor to the calling ghost patch and belongs to a processor
+ * that is neither the owner of that ghost patch nor our own processor.
+ * \param [in] domain           Must be the same domain used in begin and end.
+ * \param [in] ind              Must have been initialized by \ref
+ *                              fclaw_domain_indirect_end.
+ * \param [in] ghostno          Number of the ghost patch whose neighbors we seek.
+ * \param [in] edgeno           Number of the ghost patch's edge to look across.
+ * \param [out] rproc           Processor number of neighbor patches. 
+ *                              For non-indirect patches, set it to -1.
+ * \param [out] rblockno        The number of the neighbor block.
+ * \param [out] rpatchno        Only for indirect ghost patches, we store
+ *                              the number relative to our ghost patch array.
+ *                              For all other patches, this is -1.
+ * \param [out] redgeno         The edge number and orientation of the neighbor(s).
+ * \return                      Only for indirect ghost patches, the size of the
+ *                              neighbor(s).  For all others, we set this to
+ *                              \ref fclaw_PATCH_BOUNDARY.
+ */
+fclaw_patch_relation_t
+fclaw_domain_indirect_edge_neighbors (fclaw_domain_t * domain,
+                                      fclaw_domain_indirect_t * ind,
+                                      int ghostno, int edgeno, int rproc[2],
+                                      int *rblockno, int rpatchno[2],
+                                      int *edgeeno);
+
 /** Call this analogously to \ref fclaw_patch_corner_neighbors.
  * Return an indirect corner neighbor patch:  It is defined as a ghost patch
  * that is corner neighbor to the calling ghost patch and belongs to a process
