@@ -1875,6 +1875,23 @@ indirect_match_face (int *pi,
     *rfaceno = pi + P4EST_HALF + 1 + P4EST_HALF;
 }
 
+#ifdef P4_TO_P8
+static void
+indirect_match_edge (int *pi,
+                     int **rproc, int **rblockno, int **rpatchno,
+                     int **rfaceno)
+{
+    FCLAW_ASSERT (pi != NULL);
+    FCLAW_ASSERT (rproc != NULL && rblockno != NULL);
+    FCLAW_ASSERT (rpatchno != NULL && rfaceno != NULL);
+
+    *rproc = pi;
+    *rblockno = pi + 2;
+    *rpatchno = pi + 2 + 1;
+    *rfaceno = pi + 2 + 1 + 2;
+}
+#endif
+
 static void
 indirect_match_corner (int *pi,
                        int **rproc, int **rblockno, int **rpatchno,
@@ -1896,10 +1913,19 @@ fclaw2d_domain_indirect_begin (fclaw2d_domain_t * domain)
     int num_exc;
     int neall, nb, ne, np;
     int face, corner;
+#ifdef P4_TO_P8
+    int edge;
+#endif
     int *pbdata, *pi;
     int *rproc, *rblockno, *rpatchno, *rfaceno, *rcornerno;
+#ifdef P4_TO_P8
+    int *redgeno;
+#endif
     int has_corner;
     int face_info_size, corner_info_size, info_size;
+#ifdef P4_TO_P8
+    int edge_info_size;
+#endif
     size_t data_size;
     int sf;
     fclaw2d_block_t *block;
@@ -1910,9 +1936,15 @@ fclaw2d_domain_indirect_begin (fclaw2d_domain_t * domain)
 
     num_exc = domain->num_exchange_patches;
     face_info_size = 2 + 2 * P4EST_HALF;
+#ifdef P4_TO_P8
+    edge_info_size = 2 + 2 * 2;
+#endif
     corner_info_size = 4;
     info_size =
         P4EST_FACES * face_info_size + P4EST_CHILDREN * corner_info_size;
+#ifdef P4_TO_P8
+    info_size += P8EST_EDGES * edge_info_size;
+#endif
     data_size = info_size * sizeof (int);
 
     /* allocate internal state for this operation */
@@ -1991,6 +2023,43 @@ fclaw2d_domain_indirect_begin (fclaw2d_domain_t * domain)
                 }
                 pi += corner_info_size;
             }
+
+#ifdef P4_TO_P8
+            for(edge = 0; edge < P8EST_EDGES; ++edge)
+            {
+                indirect_match_edge (pi, &rproc, &rblockno, &rpatchno,
+                                     &redgeno);
+
+                fclaw3d_patch_edge_neighbors (domain, nb, np, edge, rproc,
+                                              rblockno, rpatchno,
+                                              redgeno, &prel);
+
+                if(prel != FCLAW2D_PATCH_BOUNDARY)
+                {
+                    /* obtain proper ghost patch numbers for the receiver */
+                    indirect_encode (ghost, domain->mpirank,
+                                     &rproc[0], &rpatchno[0]);
+                    if (prel == FCLAW2D_PATCH_HALFSIZE)
+                    {
+                        indirect_encode
+                            (ghost, domain->mpirank, &rproc[1],
+                             &rpatchno[1]);
+                        *redgeno |= 1 << 26;
+                    }
+                    else if (prel == FCLAW2D_PATCH_DOUBLESIZE)
+                    {
+                        *redgeno |= 1 << 27;
+                    }
+                }
+                else
+                {
+                    rproc[0] = rpatchno[0] = -1;
+                    rproc[1] = rpatchno[1] = -1;
+                    *redgeno = edge;        /* rcornerno == -1 messes with & operator */
+                }
+                pi += edge_info_size;
+            }
+#endif 
         }
     }
     FCLAW_ASSERT ((int) (pi - pbdata) == neall * info_size);
@@ -2098,6 +2167,11 @@ fclaw2d_domain_indirect_end (fclaw2d_domain_t * domain,
     int *pi;
     int face_info_size, corner_info_size;
     int sf;
+#ifdef P4_TO_P8
+    int edge;
+    int *redgeno;
+    int edge_info_size;
+#endif
     uint64_t *pli_keys, *plik;
     sc_hash_t *pli_hash;
     p4est_wrap_t *wrap = (p4est_wrap_t *) domain->pp;
@@ -2139,6 +2213,9 @@ fclaw2d_domain_indirect_end (fclaw2d_domain_t * domain,
     /* go through ghosts a second time, now working on received data */
     face_info_size = 2 + 2 * P4EST_HALF;
     corner_info_size = 4;
+#ifdef P4_TO_P8
+    edge_info_size = 2 + 2 * 2;
+#endif
     for (ng = 0, p = 0; p < domain->mpisize; ++p)
     {
         for (; ng < (int) ghost->proc_offsets[p + 1]; ++ng)
@@ -2219,6 +2296,49 @@ fclaw2d_domain_indirect_end (fclaw2d_domain_t * domain,
                 /* move to the next face data item */
                 pi += corner_info_size;
             }
+
+#ifdef P4_TO_P8
+            /* go through edge neighbor patches of this ghost */
+            for (edge = 0; edge < P8EST_EDGES; ++edge)
+            {
+                /* access values that were shipped with the ghost */
+                indirect_match_edge (pi, &rproc, &rblockno, &rpatchno,
+                                     &redgeno);
+
+                /* check first edge neighbor */
+                FCLAW_ASSERT (rproc[0] != p);
+                good = indirect_decode (pli_hash, pli_keys,
+                                        domain->mpisize, domain->mpirank,
+                                        &rproc[0], &rpatchno[0]);
+                FCLAW_ASSERT ((rproc[0] == -1 && rpatchno[0] == -1) ||
+                              (0 <= rpatchno[0] && rpatchno[0] < ndgp));
+                if (*redgeno & (1 << 26))
+                {
+                    /* check other halfsize neighbor */
+                    FCLAW_ASSERT (rproc[1] != p);
+                    good2 = indirect_decode (pli_hash, pli_keys,
+                                             domain->mpisize,
+                                             domain->mpirank, &rproc[1],
+                                             &rpatchno[1]);
+                    good = good || good2;
+                    FCLAW_ASSERT ((rproc[1] == -1 && rpatchno[1] == -1)
+                                  || (0 <= rpatchno[1]
+                                      && rpatchno[1] < ndgp));
+                }
+
+                /* no match on this edge; we pretend a boundary situation */
+                if (!good)
+                {
+                    FCLAW_ASSERT (rproc[0] == -1);
+                    FCLAW_ASSERT (rpatchno[0] == -1);
+                    rproc[1] = rpatchno[1] = -1;
+                    *redgeno &= ~(3 << 26);
+                }
+
+                /* move to the next edge data item */
+                pi += edge_info_size;
+            }
+#endif
         }
     }
     FCLAW_ASSERT (ng == domain->num_ghost_patches);
