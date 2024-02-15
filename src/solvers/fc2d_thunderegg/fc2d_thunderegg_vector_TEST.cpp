@@ -139,6 +139,7 @@ struct QuadDomainBrick {
 
         opts->mx     = 5;
         opts->my     = 6;
+        opts->mz     = 1;
         opts->mbc        = 2;
         opts->meqn       = 1;
         opts->maux       = 1;
@@ -185,6 +186,7 @@ TEST_CASE("fclaw2d_thunderegg_get_vector")
         QuadDomain test_data;
         test_data.opts->mx = mx;
         test_data.opts->my = my;
+        test_data.opts->mz = 1;
         test_data.opts->mbc    = mbc;
         if(data_choice == RHS){
             test_data.opts->rhs_fields = meqn;
@@ -257,6 +259,7 @@ TEST_CASE("fclaw2d_thunderegg_store_vector")
         QuadDomain test_data;
         test_data.opts->mx   = mx;
         test_data.opts->my   = my;
+        test_data.opts->mz = 1;
         test_data.opts->mbc  = mbc;
         if(data_choice == RHS){
             test_data.opts->rhs_fields = meqn;
@@ -315,6 +318,7 @@ TEST_CASE("fclaw2d_thunderegg_get_vector multiblock")
         QuadDomainBrick test_data;
         test_data.opts->mx   = mx;
         test_data.opts->my   = my;
+        test_data.opts->mz = 1;
         test_data.opts->mbc  = mbc;
         if(data_choice == RHS){
             test_data.opts->rhs_fields = meqn;
@@ -391,6 +395,7 @@ TEST_CASE("fclaw2d_thunderegg_store_vector multiblock")
         QuadDomainBrick test_data;
         test_data.opts->mx = mx;
         test_data.opts->my = my;
+        test_data.opts->mz = 1;
         test_data.opts->mbc    = mbc;
         if(data_choice == RHS){
             test_data.opts->rhs_fields = meqn;
