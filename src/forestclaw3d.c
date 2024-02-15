@@ -100,6 +100,7 @@ fclaw3d_patch_edge_neighbors (fclaw2d_domain_t * domain,
                 num_neighbors = 0;
                 *neighbor_size = FCLAW2D_PATCH_BOUNDARY;
                 *redge = -1;
+                *rblockno = blockno;
             }
             else
             {
@@ -148,6 +149,7 @@ fclaw3d_patch_edge_neighbors (fclaw2d_domain_t * domain,
         num_neighbors = 0;
         *neighbor_size = FCLAW2D_PATCH_BOUNDARY;
         *redge = -1;
+        *rblockno = blockno;
     }
 
     /* get rproc and rpatchno for each neighbor */

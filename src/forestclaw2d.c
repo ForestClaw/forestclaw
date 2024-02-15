@@ -2033,6 +2033,7 @@ fclaw2d_domain_indirect_begin (fclaw2d_domain_t * domain)
                 fclaw3d_patch_edge_neighbors (domain, nb, np, edge, rproc,
                                               rblockno, rpatchno,
                                               redgeno, &prel);
+                FCLAW_ASSERT (0 <= *rblockno && *rblockno < domain->num_blocks);
 
                 if(prel != FCLAW2D_PATCH_BOUNDARY)
                 {
@@ -2526,23 +2527,28 @@ fclaw3d_domain_indirect_edge_neighbors (fclaw3d_domain_t * domain,
     int *pi;
     int *grproc, *grblockno, *grpatchno, *gredgeno;
     int se;
-    int face_info_size;
+    int face_info_size, corner_info_size, edge_info_size;
     fclaw3d_patch_relation_t prel;
 
     FCLAW_ASSERT (ind != NULL && ind->ready);
     FCLAW_ASSERT (domain == ind->domain);
 
     FCLAW_ASSERT (0 <= ghostno && ghostno < domain->num_ghost_patches);
-    FCLAW_ASSERT (0 <= faceno && faceno < P4EST_FACES);
+    FCLAW_ASSERT (0 <= edgeno && edgeno < P8EST_EDGES);
 
     /* check the type of neighbor situation */
-    face_info_size = 2 + 2 * P4EST_HALF;
-    pi = (int *) ind->e->ghost_data[ghostno] + face_info_size * edgeno;
-    indirect_match_face (pi, &grproc, &grblockno, &grpatchno, &gredgeno);
+    face_info_size = 2 + 2 * P8EST_HALF;
+    corner_info_size = 4;
+    edge_info_size = 2 + 2 * 2;
+    pi = (int *) ind->e->ghost_data[ghostno] 
+                    + face_info_size * P8EST_FACES
+                    + corner_info_size * P8EST_CHILDREN
+                    + edge_info_size * edgeno;
+    indirect_match_edge (pi, &grproc, &grblockno, &grpatchno, &gredgeno);
     *rblockno = *grblockno;
     FCLAW_ASSERT (0 <= *rblockno && *rblockno < domain->num_blocks);
     *redgeno = *gredgeno & ~(3 << 26);
-    FCLAW_ASSERT (0 <= *rfaceno && *rfaceno < P4EST_FACES * P4EST_HALF);
+    FCLAW_ASSERT (0 <= *redgeno && *redgeno < P8EST_EDGES);
     if (!(*gredgeno & (3 << 26)))
     {
         if (grproc[0] == -1)
@@ -2564,12 +2570,12 @@ fclaw3d_domain_indirect_edge_neighbors (fclaw3d_domain_t * domain,
     {
         if (*gredgeno & (1 << 26))
         {
-            FCLAW_ASSERT (!(*grfaceno & (1 << 27)));
+            FCLAW_ASSERT (!(*gredgeno & (1 << 27)));
             prel = FCLAW3D_PATCH_HALFSIZE;
         }
         else
         {
-            FCLAW_ASSERT (*grfaceno & (1 << 27));
+            FCLAW_ASSERT (*gredgeno & (1 << 27));
             prel = FCLAW3D_PATCH_DOUBLESIZE;
         }
     }
@@ -2588,7 +2594,7 @@ fclaw3d_domain_indirect_edge_neighbors (fclaw3d_domain_t * domain,
         FCLAW_ASSERT (0 <= rpatchno[0] &&
                       rpatchno[0] < domain->num_ghost_patches);
     }
-    if (prel == fclaw3d_PATCH_HALFSIZE && rproc[1] != -1)
+    if (prel == FCLAW3D_PATCH_HALFSIZE && rproc[1] != -1)
     {
         FCLAW_ASSERT (0 <= rproc[1] && rproc[1] < domain->mpisize);
         FCLAW_ASSERT (rproc[1] != domain->mpirank);
