@@ -1,6 +1,19 @@
 #include <atomic>
 #include <fclaw_mpi.h>
 
+/* Get whatever definitions exist already */
+#ifdef FCLAW_HAVE_FENV_H
+#ifndef __USE_GNU
+#define __USE_GNU
+#endif
+#include <fenv.h>
+#endif
+
+/* Use as an alternate to GNU feenableexcept */
+#ifndef FCLAW_HAVE_FEENABLEEXCEPT
+#include <fp_exception_glibc_extension.h>
+#endif
+
 #define DOCTEST_CONFIG_IMPLEMENT
 #include <test.hpp>
 #include <exception>
@@ -57,7 +70,6 @@ int main(int argc, char *argv[])
         output_vtk = strcmp(argv[i], "--vtk") == 0;
         if (output_vtk)
         {
-            std::cout << "outputting vtk files" << std::endl;
             break;
         }
     }
@@ -65,7 +77,6 @@ int main(int argc, char *argv[])
         test_indirect_flag = strcmp(argv[i], "--indirect") == 0;
         if (test_indirect_flag)
         {
-            std::cout << "using stencil to test indirect ghostfill" << std::endl;
             break;
         }
     }
@@ -103,6 +114,7 @@ int main(int argc, char *argv[])
     } else {
 	    // global setup...
 	    fclaw_mpi_init(nullptr, nullptr, sc_MPI_COMM_WORLD, SC_LP_PRODUCTION);
+        feenableexcept(FE_INVALID | FE_DIVBYZERO | FE_OVERFLOW);
 
         sc_set_abort_handler(throw_exception);
 	    result = context.run();
