@@ -106,7 +106,7 @@ target_include_directories(clawpatch
 )
 
 target_link_libraries(clawpatch PUBLIC forestclaw)
-target_link_libraries(clawpatch PRIVATE hdf5::hdf5 hdf5::hdf5_hl)
+target_link_libraries(clawpatch PRIVATE HDF5::HDF5)
 
 # -- install
 
