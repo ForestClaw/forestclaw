@@ -274,9 +274,11 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
         ys = (2*mbc + mx)*xs;
         zs = (2*mbc + my)*xs*ys;
 
+#if 0
         ifaces_x = mx + 2*mbc-1;
         ifaces_y = my + 2*mbc-1;
         num_ifaces = ifaces_x*ifaces_y;
+#endif        
 
     }
    
@@ -287,6 +289,15 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
 #if 1
     if (b4step2 != NULL)
     {
+        // Sweep over every cell
+        if (threadIdx.x == 0)
+        {
+            ifaces_x = mx + 2*mbc-1;
+            ifaces_y = my + 2*mbc-1;
+            num_ifaces = ifaces_x*ifaces_y;
+        }
+        __syncthreads();
+ 
         for(int thread_index = threadIdx.x; thread_index < num_ifaces; thread_index += blockDim.x)
         {
             int ix = thread_index % ifaces_x;
@@ -330,6 +341,16 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
 
     /* -------------------------- Compute fluctuations -------------------------------- */
 
+    if (threadIdx.x == 0)
+    {
+        ifaces_x = mx + 2*mbc-1;
+        ifaces_y = my + 2*mbc-1;
+        num_ifaces = ifaces_x*ifaces_y;
+    }
+    __syncthreads();
+
+    double *const qr     = start;                 /* meqn        */
+    double *const auxr   = qr      + meqn;         /* maux        */
     for(int thread_index = threadIdx.x; thread_index < num_ifaces; thread_index += blockDim.x)
     {
         int ix = thread_index % ifaces_x;
@@ -337,14 +358,12 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
 
         int I = (iy + 1)*ys + (ix + 1);  /* Start one cell from left/bottom edge */
 
-        double *const qr     = start;                 /* meqn        */
         for(int mq = 0; mq < meqn; mq++)
         {
             int I_q = I + mq*zs;
             qr[mq] = qold[I_q];        /* Right */
         }
 
-        double *const auxr   = qr      + meqn;         /* maux        */
         for(int m = 0; m < maux; m++)
         {
             int I_aux = I + m*zs;
@@ -468,8 +487,8 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
     if (order[0] == 2)
     {
         if (threadIdx.x == 0){
-            ifaces_x = mx + 1;  
-            ifaces_y = my + 2;
+            ifaces_x = mx + 2;  
+            ifaces_y = my + 3;
             num_ifaces = ifaces_x*ifaces_y;
         }
         __syncthreads();
@@ -639,9 +658,10 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
 
     /* ------------------------ Transverse Propagation : X-faces ---------------------- */
 
-    if (threadIdx.x == 0){
+    if (threadIdx.x == 0)
+    {
         ifaces_x = mx + 1;   /* Visit x - edges of all non-ghost cells */
-        ifaces_y = my + 2;
+        ifaces_y = my + 2;                                  
         num_ifaces = ifaces_x*ifaces_y;
     }
     __syncthreads();
@@ -666,6 +686,7 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
         int iy = thread_index/ifaces_x;
 
         int I =  (iy + mbc-1)*ys + (ix + mbc);  /* (ix,iy) = (0,0) maps to first non-ghost value */
+
 
         double *const qr     = start;          /* meqn   */
         double *const ql     = qr + meqn;      /* meqn   */
@@ -734,7 +755,7 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
             |     |     |
     
     */              
-  
+
     for(int thread_index = threadIdx.x; thread_index < num_ifaces; thread_index += blockDim.x)
     { 
         int ix = thread_index % ifaces_x;
@@ -951,7 +972,8 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
                  |     |     
         */                        
 
-    if (threadIdx.x == 0){
+    if (threadIdx.x == 0)
+    {
         ifaces_x = mx + 2;   /* Visit edges of all non-ghost cells */
         ifaces_y = my + 1;
         num_ifaces = ifaces_x*ifaces_y;
@@ -982,7 +1004,7 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
             qd[mq] = qold[I_q - ys];
 
             bmdq[mq] = bmdq_trans[I_q];
-            // bpdq[mq] = bpdq_trans[I_q];
+            //bpdq[mq] = bpdq_trans[I_q];
         }            
 
         for(int imp = 0; imp < 2; imp++)

@@ -3,7 +3,6 @@ set(allclaw ${PROJECT_SOURCE_DIR}/clawpack/advection/2d/all)
 
 add_library(swirl_cpu_f OBJECT 
   setprob.f
-  user_4.6/qinit.f 
   user_4.6/b4step2.f  
   # fclaw2d_clawpatch46_output_ascii.f
   ${allclaw}/clawpack46_setaux.f
