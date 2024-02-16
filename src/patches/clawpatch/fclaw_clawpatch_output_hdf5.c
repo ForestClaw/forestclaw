@@ -31,7 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_global.h>
 
 #include <fclaw_options.h>
-#include <fclaw2d_map.h>
+#include <fclaw_map.h>
 #include <hdf5_hl.h>
 #include <hdf5.h>
 
@@ -62,7 +62,7 @@ write_patch_points (fclaw_global_t * glob,
                                     &xlower,&ylower,&zlower, &dx,&dy, &dz);
     }
 
-    fclaw2d_map_context_t* cont = fclaw2d_map_get(glob);
+    fclaw_map_context_t* cont = fclaw_map_get(glob);
     /* Enumerate point coordinates in the patch */
     int i, j, k;
     double xpp,ypp,zpp;
@@ -77,14 +77,14 @@ write_patch_points (fclaw_global_t * glob,
                 const double x = xlower + i * dx;
                 if (clawpatch_opt->patch_dim == 2 && fclaw_opt->manifold)
                 {
-                    FCLAW2D_MAP_C2M(&cont,&blockno,&x,&y,&xpp,&ypp,&zpp);
+                    FCLAW_MAP_2D_C2M(&cont,&blockno,&x,&y,&xpp,&ypp,&zpp);
                     *points++ = xpp;
                     *points++ = ypp;
                     *points++ = zpp;
                 }
                 else if (clawpatch_opt->patch_dim == 3 && fclaw_opt->manifold)
                 {
-                    FCLAW3D_MAP_C2M(&cont,&blockno,&x,&y,&z,&xpp,&ypp,&zpp);
+                    FCLAW_MAP_3D_C2M(&cont,&blockno,&x,&y,&z,&xpp,&ypp,&zpp);
                     *points++ = xpp;
                     *points++ = ypp;
                     *points++ = zpp;
