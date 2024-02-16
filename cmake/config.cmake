@@ -65,6 +65,9 @@ check_include_file(unistd.h FCLAW_HAVE_UNISTD_H)
 
 set(FCLAW_PACKAGE \"${PROJECT_NAME}\")
 
+if(TARGET HDF5::HDF5)
+  set(FCLAW_ENABLE_HDF5 1)
+endif()
 
 configure_file(${CMAKE_CURRENT_LIST_DIR}/fclaw_config.h.in ${PROJECT_BINARY_DIR}/include/fclaw_config.h)
 install(FILES ${PROJECT_BINARY_DIR}/include/fclaw_config.h TYPE INCLUDE)
