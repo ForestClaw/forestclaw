@@ -783,7 +783,7 @@ void fclaw_clawpatch_output_hdf5 (fclaw_global_t * glob, int iframe)
     const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
 
     char basename[BUFSIZ];
-    snprintf (basename, BUFSIZ, "%s_frame_%04d.hdf", fclaw_opt->prefix, iframe);
+    snprintf (basename, BUFSIZ, "%s_frame_%04d.vtkhdf", fclaw_opt->prefix, iframe);
 
     fclaw_clawpatch_output_hdf5_to_file(glob,basename);
 }
