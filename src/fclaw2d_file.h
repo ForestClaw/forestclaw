@@ -127,28 +127,16 @@ fclaw2d_file_context_t *fclaw2d_file_open_write (const char *filename,
                                                  fclaw2d_domain_t * domain,
                                                  int *errcode);
 
-#if 1
-/** Write the partition of the domain associated with \b fc to disk.
+/** Write the partition of a domain to a partition file.
  *
- * This function derives the partition filename from the base filename 'fn' of
- * the given file context \b fc such that the function creates a file named
- * 'fn_partition.f2d' that will contain the partition of the domain that is
- * associated with the given file context \b fc.
+ * This function writes the partition of the passed \b domain to a partition
+ * file. The user can read the partition to an array using \ref
+ * fclaw2d_file_read_partition and then pass the read array to \ref
+ * fclaw2d_file_open_read to use the read partition.
  *
- * This means in particular that the given \b fc stays unchanged and that the
- * internally creates a new file context that will be freed and deallocated at
- * the end of the function in any case. This is important to notice since the
- * \b errcode output parameter of this function refers to this internally created
- * file context and not to the \b fc.
+ * The function and all its parameters are collective.
  *
- * \note In contrast to the not-partition-related writing functions this
- * function always returns the passed \b fc, which stays unchanged, even if an
- * error occurred since this error then relates to the internal file context
- * for writing the separate partition file.
- * \b errcode always relates to the internal file context and not to the passed
- * \b fc.
- *
- * This function does not abort on MPI I/O errors but returns NULL.
+ * This function does not abort on MPI I/O errors but returns -1.
  * Without MPI I/O the function may abort on file system dependent
  * errors.
  *
@@ -164,19 +152,13 @@ fclaw2d_file_context_t *fclaw2d_file_open_write (const char *filename,
  *                              Too long user strings result in an error with the
  *                              error code \ref FCLAW2D_FILE_ERR_IN_DATA.
  * \param [out]    errcode      An errcode that can be interpreted by
- *                              \ref fclaw2d_file_error_string. \b errcode
- *                              does not refer to the passed \b fc but it refers
- *                              to the internal file context used for for the
- *                              partition file.
+ *                              \ref fclaw2d_file_error_string.
  * \return                      0 for a successful write of the partition file.
- *                              -1 in case of an error. See also \b errcode
- *                              to examine the error of the partition file
- *                              I/O process.
+ *                              -1 in case of an error.
  */
 int fclaw2d_file_write_partition (const char *filename,
                                   const char *user_string,
                                   fclaw2d_domain_t * domain, int *errcode);
-#endif
 
 /** Write a serial data block to an opened parallel file.
  *
@@ -290,6 +272,10 @@ fclaw2d_file_context_t *fclaw2d_file_write_array (fclaw2d_file_context_t *
  *
  * The function and all its parameters are collective.
  *
+ * This function does not abort on MPI I/O errors but returns -1.
+ * Without MPI I/O the function may abort on file system dependent
+ * errors.
+ *
  * \param [in]      filename    The basename of the path to the partition
  *                              file, i.e. without the terminating '.fp2d'.
  * \param [out]     user_string At least \ref FCLAW2D_FILE_USER_STRING_BYTES
@@ -369,6 +355,8 @@ int fclaw2d_file_read_partition (const char *filename, char *user_string,
  *                            In both cases the respective partition, either
  *                            read or computed, is used for the parallel I/O
  *                            operations and stored in the returned \b domain.
+ *                            The user can use \ref fclaw2d_file_read_partition
+ *                            to read a partition array from file.
  * \param [out] domain        Newly allocated domain that is read from the file.
  * \param [out] errcode       An errcode that can be interpreted by
  *                            \ref fclaw2d_file_error_string.

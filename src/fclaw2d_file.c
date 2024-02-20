@@ -3306,7 +3306,6 @@ fclaw2d_file_open_write (const char *filename,
     return fclaw_fc;
 }
 
-#if 1
 int
 fclaw2d_file_write_partition (const char *filename, const char *user_string,
                               fclaw2d_domain_t * domain, int *errcode)
@@ -3395,7 +3394,6 @@ fclaw2d_file_write_partition (const char *filename, const char *user_string,
     *errcode = FCLAW2D_FILE_ERR_SUCCESS;
     return sc_MPI_SUCCESS;
 }
-#endif
 
 fclaw2d_file_context_t *
 fclaw2d_file_write_block (fclaw2d_file_context_t *
