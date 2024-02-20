@@ -129,13 +129,12 @@ void run_program(fclaw2d_global_t* glob)
                                   glob->domain, &errcode);
     check_fclaw2d_file_error_code (errcode, "file open write");
 
-#if 1
+    /* Write the partition of domain to a separate partition file. */
     retval = fclaw2d_file_write_partition ("swirl_io_test_partition",
                                            "Test partition write",
                                            glob->domain, &errcode);
     check_fclaw2d_file_error_code (errcode, "file write partition");
     FCLAW_EXECUTE_ASSERT_FALSE (retval);
-#endif
 
     /* write a block to the file */
     /* Initialize a sc_array with one element and the element size equals
@@ -187,14 +186,18 @@ void run_program(fclaw2d_global_t* glob)
 
     /* read the partition file */
     sc_array_init (&partition, sizeof (p4est_gloidx_t));
-    retval = fclaw2d_file_read_partition ("swirl_io_test_partition", read_user_string,
-                                          glob->domain->mpicomm, &partition, &errcode);
+    retval = fclaw2d_file_read_partition ("swirl_io_test_partition",
+                                          read_user_string,
+                                          glob->domain->mpicomm, &partition,
+                                          &errcode);
     check_fclaw2d_file_error_code (errcode, "read partition file");
     FCLAW_EXECUTE_ASSERT_FALSE (retval);
 
 
     /* open the file for reading */
     /* the domain stored in the file is read to read_domain */
+    /* The data is read using the passed partition array and the read
+     * domain stores the passed partition data. */
     fc = fclaw2d_file_open_read ("swirl_io_test", read_user_string,
                                  glob->domain->mpicomm, &partition, &read_domain,
                                  &errcode);
