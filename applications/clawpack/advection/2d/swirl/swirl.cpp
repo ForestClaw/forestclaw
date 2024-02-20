@@ -130,6 +130,7 @@ void run_program(fclaw2d_global_t* glob)
     check_fclaw2d_file_error_code (errcode, "file open write");
 
     /* Write the partition of domain to a separate partition file. */
+    /* A partition file is not necessary to read a domain. */
     retval = fclaw2d_file_write_partition ("swirl_io_test_partition",
                                            "Test partition write",
                                            glob->domain, &errcode);
@@ -197,7 +198,10 @@ void run_program(fclaw2d_global_t* glob)
     /* open the file for reading */
     /* the domain stored in the file is read to read_domain */
     /* The data is read using the passed partition array and the read
-     * domain stores the passed partition data. */
+     * domain stores the passed partition data. This is optional and one could
+     * pass NULL instead of &partition to use the uniform partition with respect
+     * to the patch count.
+     */
     fc = fclaw2d_file_open_read ("swirl_io_test", read_user_string,
                                  glob->domain->mpicomm, &partition, &read_domain,
                                  &errcode);
