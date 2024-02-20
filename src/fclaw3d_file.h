@@ -379,7 +379,7 @@ int fclaw3d_file_read_partition (const char *filename, char *user_string,
 fclaw3d_file_context_t *fclaw3d_file_open_read (const char *filename,
                                                 char *user_string,
                                                 sc_MPI_Comm mpicomm,
-                                                const sc_array_t * partition,
+                                                sc_array_t * partition,
                                                 fclaw3d_domain_t ** domain,
                                                 int *errcode);
 
