@@ -277,6 +277,47 @@ fclaw2d_file_context_t *fclaw2d_file_write_array (fclaw2d_file_context_t *
                                                   sc_array_t * patch_data,
                                                   int *errcode);
 
+/** Read a partition array from file.
+ *
+ * This function reads the partition array, i.e. the global first patch
+ * array from a partition file that was written using
+ * \ref fclaw2d_file_write_partition. The read partition can be passed to
+ * \ref fclaw2d_file_open_read.
+ *
+ * This function guarantees that on successful output the read partition
+ * is valid in the sense that the partition array has 0 as first entry and is
+ * non-decreasing.
+ *
+ * The function and all its parameters are collective.
+ *
+ * \param [in]      filename    The basename of the path to the partition
+ *                              file, i.e. without the terminating '.fp2d'.
+ * \param [out]     user_string At least \ref FCLAW2D_FILE_USER_STRING_BYTES
+ *                              bytes. The user string is written
+ *                              to the passed array including padding spaces
+ *                              and a trailing NUL-termination.
+ * \param [in]      mpicomm     The MPI communicator is required to synchronize
+ *                              the \b errcode and the output array \b partition.
+ *                              It is important to notice that \b partition is
+ *                              only available on MPI ranks that are part of the
+ *                              passed \b mpicomm. Therefore, \b mpicomm should
+ *                              coincide with the mpicomm parameter of \ref
+ *                              fclaw2d_file_open_read to ensure that the
+ *                              partition parameter of \ref
+ *                              fclaw2d_file_open_read is collectivly available.
+ * \param [out]     partition   A sc_array with element size equals to
+ *                              sizeof (p4est_gloidx_t). On successful output
+ *                              the array is filled with the read partition.
+ *                              In case of an error, the function does not
+ *                              guarantee that \b partition stays untouched
+ *                              but it is guaranteed that the user is not
+ *                              required to call \ref sc_array_reset on
+ *                              \b partition.
+ * \param [out]     errcode     An errcode that can be interpreted by
+ *                              \ref fclaw2d_file_error_string.
+ * \return                      0 for a successful read of the partition file.
+ *                              -1 in case of an error.
+ */
 int fclaw2d_file_read_partition (const char *filename, char *user_string,
                                  sc_MPI_Comm mpicomm, sc_array_t * partition,
                                  int *errcode);
