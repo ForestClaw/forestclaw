@@ -40,15 +40,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 #define FCLAW2D_FILE_NAME_BYTES BUFSIZ /**< maximal number of filename bytes */
-#ifndef P4_TO_P8
-#define FCLAW2D_FILE_EXT "f2d" /**< file extension of fclaw2d data files */
-#define FCLAW2D_PFILE_EXT "fp2d" /**< file extension of fclaw2d partition files */
-#else
-#define FCLAW2D_FILE_EXT    FCLAW3D_FILE_EXT
-#define FCLAW2D_PFILE_EXT   FCLAW3D_PFILE_EXT
-#define FCLAW3D_FILE_EXT "f3d" /**< file extension of fclaw3d data files */
-#define FCLAW3D_PFILE_EXT "fp3d" /**< file extension of fclaw3d partition files */
-#endif
 
 /* For legacy and compatibility reasons we provide here the first version
  * of the file format that was originally implemented in p4est in p4est_io.c.
@@ -3249,9 +3240,8 @@ fclaw2d_file_open_write (const char *filename,
     p4est_t *p4est;
     fclaw2d_file_context_p4est_v1_t *fc;
     fclaw2d_file_context_t *fclaw_fc;
-    char buf[FCLAW2D_FILE_NAME_BYTES];
 
-    file_len = strlen (filename) + strlen ("." FCLAW2D_FILE_EXT) + 1;
+    file_len = strlen (filename) + 1;
     if (file_len > FCLAW2D_FILE_NAME_BYTES)
     {
         /* filename too long */
@@ -3265,9 +3255,7 @@ fclaw2d_file_open_write (const char *filename,
     FCLAW_ASSERT (p4est_is_valid (p4est));
 
     /* create the file */
-    sc_strcopy (buf, file_len, filename);
-    strcat (buf, "." FCLAW2D_FILE_EXT);
-    fc = fclaw2d_file_open_create_v1 (p4est, buf, user_string,
+    fc = fclaw2d_file_open_create_v1 (p4est, filename, user_string,
                                       &errcode_internal);
     fclaw2d_file_translate_error_code_v1 (errcode_internal, errcode);
     if (*errcode != FCLAW2D_FILE_ERR_SUCCESS)
@@ -3319,12 +3307,11 @@ fclaw2d_file_write_partition (const char *filename, const char *user_string,
     int mpisize;
     int64_t written_partition_size;
     size_t file_len;
-    char buf[FCLAW2D_FILE_NAME_BYTES];
     p4est_t *p4est;
     fclaw2d_file_context_p4est_v1_t *fc_p4est;
     sc_array_t arr;
 
-    file_len = strlen (filename) + strlen ("." FCLAW2D_PFILE_EXT) + 1;
+    file_len = strlen (filename) + 1;
     if (file_len > FCLAW2D_FILE_NAME_BYTES)
     {
         /* filename too long */
@@ -3332,15 +3319,11 @@ fclaw2d_file_write_partition (const char *filename, const char *user_string,
         return -1;
     }
 
-    /* get file path */
-    sc_strcopy (buf, file_len, filename);
-    strcat (buf, "." FCLAW2D_PFILE_EXT);
-
     /* get the underlying p4est */
     p4est = ((p4est_wrap_t *) domain->pp)->p4est;
 
     /* create a new file */
-    fc_p4est = fclaw2d_file_open_create_v1 (p4est, buf, "Partition file",
+    fc_p4est = fclaw2d_file_open_create_v1 (p4est, filename, "Partition file",
                                             &errcode_internal);
     fclaw2d_file_translate_error_code_v1 (errcode_internal, errcode);
     if (*errcode != FCLAW2D_FILE_ERR_SUCCESS)
@@ -3520,13 +3503,12 @@ fclaw2d_file_read_partition (const char *filename, char *user_string,
     int64_t partition_size;
     size_t file_len;
     p4est_gloidx_t global_num_quadrants;
-    char buf[FCLAW2D_FILE_NAME_BYTES];
     char read_user_string[FCLAW2D_FILE_USER_STRING_BYTES_V1 + 1];
     fclaw2d_file_context_p4est_v1_t *p4est_fc;
     sc_array_t arr;
 
     /* check length of the path */
-    file_len = strlen (filename) + strlen ("." FCLAW2D_PFILE_EXT) + 1;
+    file_len = strlen (filename) + 1;
     if (file_len > FCLAW2D_FILE_NAME_BYTES)
     {
         /* filename is too long */
@@ -3534,12 +3516,8 @@ fclaw2d_file_read_partition (const char *filename, char *user_string,
         return -1;
     }
 
-    /* get file path */
-    sc_strcopy (buf, file_len, filename);
-    strcat (buf, "." FCLAW2D_PFILE_EXT);
-
     /* open the partition file */
-    p4est_fc = fclaw2d_file_open_read_ext_v1 (mpicomm, buf, user_string,
+    p4est_fc = fclaw2d_file_open_read_ext_v1 (mpicomm, filename, user_string,
                                               &global_num_quadrants,
                                               &errcode_internal);
     fclaw2d_file_translate_error_code_v1 (errcode_internal, errcode);
@@ -3628,7 +3606,6 @@ fclaw2d_file_open_read (const char *filename, char *user_string,
     int errcode_internal;
     int mpiret, mpisize, retval;
     size_t file_len;
-    char buf[FCLAW2D_FILE_NAME_BYTES];
     char read_user_string[FCLAW2D_FILE_USER_STRING_BYTES_V1 + 1];
     p4est_gloidx_t global_num_quadrants;
     p4est_gloidx_t *read_gfq, *gfq;
@@ -3665,7 +3642,7 @@ fclaw2d_file_open_read (const char *filename, char *user_string,
         read_gfq = gfq;
     }
 
-    file_len = strlen (filename) + strlen ("." FCLAW2D_FILE_EXT) + 1;
+    file_len = strlen (filename) + 1;
     if (file_len > FCLAW2D_FILE_NAME_BYTES)
     {
         /* filename is too long */
@@ -3675,9 +3652,7 @@ fclaw2d_file_open_read (const char *filename, char *user_string,
 
     /* WARNING: Currently, we do not handle wrong endianness. */
     /* open the given file */
-    sc_strcopy (buf, file_len, filename);
-    strcat (buf, "." FCLAW2D_FILE_EXT);
-    p4est_fc = fclaw2d_file_open_read_ext_v1 (mpicomm, buf, user_string,
+    p4est_fc = fclaw2d_file_open_read_ext_v1 (mpicomm, filename, user_string,
                                               &global_num_quadrants,
                                               &errcode_internal);
     fclaw2d_file_translate_error_code_v1 (errcode_internal, errcode);

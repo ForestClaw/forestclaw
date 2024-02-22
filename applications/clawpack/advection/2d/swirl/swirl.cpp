@@ -125,13 +125,15 @@ void run_program(fclaw2d_global_t* glob)
      */
     /* create a file, which is open for further writing */
     /* the passed domain is written to the file */
-    fc = fclaw2d_file_open_write ("swirl_io_test", "ForestClaw data file",
+    /* The file extension is the user's choice. */
+    fc = fclaw2d_file_open_write ("swirl_io_test.f2d", "ForestClaw data file",
                                   glob->domain, &errcode);
     check_fclaw2d_file_error_code (errcode, "file open write");
 
     /* Write the partition of domain to a separate partition file. */
     /* A partition file is not necessary to read a domain. */
-    retval = fclaw2d_file_write_partition ("swirl_io_test_partition",
+    /* The file extension is the user's choice. */
+    retval = fclaw2d_file_write_partition ("swirl_io_test_partition.fp2d",
                                            "Test partition write",
                                            glob->domain, &errcode);
     check_fclaw2d_file_error_code (errcode, "file write partition");

@@ -104,10 +104,7 @@ typedef struct fclaw3d_file_context fclaw3d_file_context_t;
  * Without MPI I/O the function may abort on file system dependent
  * errors.
  *
- * \param [in] filename    Path to parallel file base name that is to be created.
- *                         This means that the user shall not pass the file
- *                         extension since the file extension is specified by
- *                         fclaw3d_file to '.f3d'.
+ * \param [in] filename    Path to parallel file that is to be created.
  * \param [in] user_string A NUL-terminated user string that is written to the
  *                         file header having FCLAW3D_FILE_USER_STRING_BYTES
  *                         bytes including the NUL-termination. Shorter
@@ -140,10 +137,7 @@ fclaw3d_file_context_t *fclaw3d_file_open_write (const char *filename,
  * Without MPI I/O the function may abort on file system dependent
  * errors.
  *
- * \param [in]     filename     Path to partition file base name that is to be
- *                              created. This means that the user shall not pass
- *                              the file extension since the partition file
- *                              extension is specified by fclaw3d_file as '.fp3d'.
+ * \param [in]     filename     Path to partition file that is to be created.
  * \param [in]     user_string  A NUL-terminated user string that is written to
  *                              the partition file header having \ref
  *                              FCLAW3D_FILE_USER_STRING_BYTES bytes including
@@ -276,8 +270,7 @@ fclaw3d_file_context_t *fclaw3d_file_write_array (fclaw3d_file_context_t *
  * Without MPI I/O the function may abort on file system dependent
  * errors.
  *
- * \param [in]      filename    The basename of the path to the partition
- *                              file, i.e. without the terminating '.fp3d'.
+ * \param [in]      filename    The path to the partition file.
  * \param [out]     user_string At least \ref FCLAW3D_FILE_USER_STRING_BYTES
  *                              bytes. The user string is written
  *                              to the passed array including padding spaces
@@ -328,10 +321,7 @@ int fclaw3d_file_read_partition (const char *filename, char *user_string,
  * Without MPI I/O the function may abort on file system dependent
  * errors.
  *
- * \param [in]  filename      The path to the base name file that is opened.
- *                            This means that the user shall not pass the file
- *                            extension since the extension ('f3d') is added by
- *                            fclaw3d_file.
+ * \param [in]  filename      The path to the file that is opened.
  * \param [out] user_string   At least \ref FCLAW3D_FILE_USER_STRING_BYTES
  *                            bytes. The user string is written
  *                            to the passed array including padding spaces
