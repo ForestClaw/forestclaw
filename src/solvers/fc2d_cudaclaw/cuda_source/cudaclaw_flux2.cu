@@ -85,6 +85,7 @@ void cudaclaw_compute_speeds(const int mx,   const int my,
 
     __shared__ double dtdx, dtdy;
     __shared__ int xs,ys,zs;
+    __shared__ int ifaces_x, ifaces_y, num_ifaces;
     if (threadIdx.x == 0)
     {
         dtdx = dt/dx;
@@ -95,11 +96,13 @@ void cudaclaw_compute_speeds(const int mx,   const int my,
         ys = (2*mbc + mx)*xs;
         zs = (2*mbc + my)*xs*ys;
     }
-    
-    __shared__ int ifaces_x, ifaces_y, num_ifaces;
-    ifaces_x = mx + 2*mbc-1;
-    ifaces_y = my + 2*mbc-1;
-    num_ifaces = ifaces_x*ifaces_y;
+
+    if (threadIdx.x == 0)
+    {
+        ifaces_x = mx + 2*mbc-1;
+        ifaces_y = my + 2*mbc-1;
+        num_ifaces = ifaces_x*ifaces_y;        
+    }
 
     __syncthreads();
 
@@ -227,7 +230,11 @@ void cudaclaw_compute_speeds(const int mx,   const int my,
         }
     }
 
-    maxcflblocks[blockIdx.z] = BlockReduce(temp_storage).Reduce(maxcfl,cub::Max());
+    double aggregate = BlockReduce(temp_storage).Reduce(maxcfl,cub::Max());
+    if (threadIdx.x == 0)
+    {
+        maxcflblocks[blockIdx.z] = aggregate;
+    }
 }
 
 static
@@ -355,10 +362,26 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
     double maxcfl = 0;
     for(int thread_index = threadIdx.x; thread_index < num_ifaces; thread_index += blockDim.x)
     {
+
+        /* 
+        0 <= ix < ifaces_x
+        0 <= iy < ifaces_y
+
+        ---> 0 <= ix < mx + 2*mbc - 1
+        ---> 0 <= iy < mx + 2*mbc - 2
+        ---> ys+1 <= I < (mx+2*mbc-1)*ys + (mx+2*mbc-2)
+        ---> ys+1 <= I <= (mx+2*mbc-2)*ys + (mx+2*mbc-3)
+
+        Example : mbc=2; mx=8; (ix=0,iy=0) --> I = 13  (i=0,j=0)
+                               (ix=mx+2,iy=mx+1) --> I=10*12 + 9 = 129
+                               (i=mx+2,j=my+1)
+        */
+
         int ix = thread_index % ifaces_x;
         int iy = thread_index/ifaces_x;
 
-        int I = (iy + 1)*ys + (ix + 1);  /* Start one cell from left/bottom edge */
+        int iadd = mbc-1;  // Shift from corner by 1 in each direction
+        int I = (iy + iadd)*ys + (ix + iadd); 
 
         double *const qr     = start;                 /* meqn        */
         double *const auxr   = qr      + meqn;         /* maux        */
@@ -413,8 +436,6 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
         for(int mw = 0; mw < mwaves; mw++)
         {
             maxcfl = max(maxcfl,fabs(s[mw])*dtdx);
-//            printf("%5d %5d %5d %5d %5d %16.8f\n",threadIdx.x,thread_index,
-//                   ix,iy,I,s[mw]);
 
             if (order[0] == 2)
             {                    
@@ -443,10 +464,25 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
 
     for(int thread_index = threadIdx.x; thread_index < num_ifaces; thread_index += blockDim.x)
     {
+        /* 
+        0 <= ix < ifaces_x
+        0 <= iy < ifaces_y
+
+        ---> 0 <= ix < mx + 2*mbc - 2
+        ---> 0 <= iy < mx + 2*mbc - 1
+        ---> ys+1 <= I <  (mx+2*mbc-1)*ys + (mx+2*mbc-2)
+        ---> ys+1 <= I <= (mx+2*mbc-2)*ys + (mx+2*mbc-3)
+
+        Example : mbc=2; mx=8; (ix=0,iy=0) --> I = 13  (i=0,j=0)
+                               (ix=mx+1,iy=mx+2) --> I = 142
+                               (i=mx+1,j=my+2)
+        */
+
         int ix = thread_index % ifaces_x;
         int iy = thread_index/ifaces_x;
 
-        int I = (iy + 1)*ys + (ix + 1);  /* Start one cell from left/bottom edge */
+        int iadd = mbc-1;  // Shift from corner by 1 in each direction
+        int I = (iy + iadd)*ys + (ix + iadd);  /* Start one cell from left/bottom edge */
 
         double *const qr     = start;                 /* meqn        */
         double *const auxr   = qr     + meqn;         /* maux        */
@@ -529,8 +565,8 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
     {
         if (threadIdx.x == 0)
         {
-            ifaces_x = mx + 2;  
-            ifaces_y = my + 3;
+            ifaces_x = mx + 2*mbc - 1; 
+            ifaces_y = mx + 2*mbc - 2; 
             num_ifaces = ifaces_x*ifaces_y;
         }
         __syncthreads();
@@ -540,8 +576,8 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
             int ix = thread_index % ifaces_x;
             int iy = thread_index/ifaces_x;
 
-            /* Start at first non-ghost interior cell */
-            int I = (iy + mbc-1)*ys + (ix + mbc);
+            int iadd = mbc-1;  // Shift from corner by 1 in each direction
+            int I = (iy + iadd)*ys + (ix + iadd);
 
             /* ------------------------------- X-directions --------------------------- */
 
@@ -615,7 +651,8 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
             int iy = thread_index/ifaces_x;
 
             /* Start at first non-ghost interior cell */
-            int I = (iy + mbc)*ys + ix + mbc - 1;
+            int iadd = mbc-1;  // Shift from corner by 1 in each direction
+            int I = (iy + iadd)*ys + ix + iadd
 
             double *const s = start;
             double *const wave = s + mwaves;
@@ -684,7 +721,8 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
             int ix = thread_index % mx;
             int iy = thread_index/mx;
 
-            int I = (ix + mbc) + (iy + mbc)*ys;
+            int iadd = mbc;  // Only update interior cells
+            int I = (iy + iadd)*ys + (ix + iadd);
 
             for(int mq = 0; mq < meqn; mq++)
             {
@@ -702,8 +740,8 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
 
     if (threadIdx.x == 0)
     {
-        ifaces_x = mx + 1;   /* Visit x - edges of all non-ghost cells */
-        ifaces_y = my + 2;                                  
+        ifaces_x = mx + 2*mbc-1;   /* Visit x - edges of all non-ghost cells */
+        ifaces_y = my + 2*mbc-2;                                  
         num_ifaces = ifaces_x*ifaces_y;
     }
     __syncthreads();
@@ -727,7 +765,8 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
         int ix = thread_index % ifaces_x;
         int iy = thread_index/ifaces_x;
 
-        int I =  (iy + mbc-1)*ys + (ix + mbc);  /* (ix,iy) = (0,0) maps to first non-ghost value */
+        int iadd = mbc-1;
+        int I =  (iy + iadd)*ys + (ix + iadd);  /* (ix,iy) = (0,0) maps to first non-ghost value */
 
 
         double *const qr     = start;          /* meqn   */
@@ -771,14 +810,6 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
             gm[I_q - 1] -= gupdate;       
             gp[I_q - 1] -= gupdate;   
 
-            /* up and down update (left hand side) */
-            // double gupdate = 0.5*dtdx*bmasdq[mq];
-            // atomicAdd(&gm[I_q-1],-gupdate);
-            // atomicAdd(&gp[I_q-1],-gupdate);
- 
-            // gupdate = 0.5*dtdx*bpasdq[mq];
-            // atomicAdd(&gm[I_q - 1 + ys],-gupdate);
-            // atomicAdd(&gp[I_q - 1 + ys],-gupdate);
         }            
     }
 
@@ -803,7 +834,8 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
         int ix = thread_index % ifaces_x;
         int iy = thread_index/ifaces_x;
 
-        int I =  (iy + mbc-1)*ys + (ix + mbc);  /* (ix,iy) = (0,0) maps to first non-ghost value */
+        int iadd = mbc-1;
+        int I =  (iy + iadd)*ys + (ix + iadd);  /* (ix,iy) = (0,0) maps to first non-ghost value */
 
         double *const qr     = start;          /* meqn   */
         double *const ql     = qr + meqn;      /* meqn   */
@@ -869,7 +901,8 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
         int ix = thread_index % ifaces_x;
         int iy = thread_index/ifaces_x;
 
-        int I =  (iy + mbc-1)*ys + (ix + mbc);  /* (ix,iy) = (0,0) maps to first non-ghost value */
+        int iadd = mbc-1;
+        int I =  (iy + iadd)*ys + (ix + iadd);  /* (ix,iy) = (0,0) maps to first non-ghost value */
 
         double *const qr     = start;          /* meqn   */
         double *const ql     = qr + meqn;      /* meqn   */
@@ -912,15 +945,6 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
             double gupdate = 0.5*dtdx*bmasdq[mq];
             gm[I_q] -= gupdate;       
             gp[I_q] -= gupdate;
-
-            /* up and down update (right hand side) */
-            // atomicAdd(&gm[I_q],-gupdate);       
-            // atomicAdd(&gp[I_q],-gupdate);
-
-            // gupdate = 0.5*dtdx*bpasdq[mq];
-            // atomicAdd(&gm[I_q + ys],-gupdate);
-            // atomicAdd(&gp[I_q + ys],-gupdate);
-
         }
     }
 
@@ -945,7 +969,8 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
         int ix = thread_index % ifaces_x;
         int iy = thread_index/ifaces_x;
 
-        int I =  (iy + mbc-1)*ys + (ix + mbc);  /* (ix,iy) = (0,0) maps to first non-ghost value */
+        int iadd = mbc-1;
+        int I =  (iy + iadd)*ys + (ix + iadd);  /* (ix,iy) = (0,0) maps to first non-ghost value */
 
         double *const qr     = start;          /* meqn   */
         double *const ql     = qr + meqn;      /* meqn   */
@@ -1016,8 +1041,8 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
 
     if (threadIdx.x == 0)
     {
-        ifaces_x = mx + 2;   /* Visit edges of all non-ghost cells */
-        ifaces_y = my + 1;
+        ifaces_x = mx + 2*mbc-2;   /* Visit edges of all non-ghost cells */
+        ifaces_y = my + 2*mbc-1;
         num_ifaces = ifaces_x*ifaces_y;
     }
     __syncthreads();
@@ -1027,7 +1052,8 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
         int ix = thread_index % ifaces_x;
         int iy = thread_index/ifaces_x;
 
-        int I =  (iy + mbc)*ys + (ix + mbc-1);
+        int iadd = mbc-1;  // Shift from corner by 1 in each direction
+        int I =  (iy + iadd)*ys + (ix + iadd);
 
         double *const qr     = start;          /* meqn   */
         double *const qd     = qr + meqn;      /* meqn   */
@@ -1070,13 +1096,6 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
             fm[I_q - ys] -= gupdate;        
             fp[I_q - ys] -= gupdate;
 
-            /* left and right update down */
-            // atomicAdd(&fm[I_q - ys],-gupdate);        
-            // atomicAdd(&fp[I_q - ys],-gupdate);
-
-            // gupdate = 0.5*dtdy*bpasdq[mq];
-            // atomicAdd(&fm[I_q - ys + 1],-gupdate);
-            // atomicAdd(&fp[I_q - ys + 1],-gupdate);   
         }
 
     }
@@ -1101,7 +1120,8 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
         int ix = thread_index % ifaces_x;
         int iy = thread_index/ifaces_x;
 
-        int I =  (iy + mbc)*ys + (ix + mbc-1);
+        int iadd = mbc-1;
+        int I =  (iy + iadd)*ys + (ix + iadd);
 
 
         double *const qr     = start;          /* meqn   */
@@ -1168,7 +1188,8 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
         int ix = thread_index % ifaces_x;
         int iy = thread_index/ifaces_x;
 
-        int I =  (iy + mbc)*ys + (ix + mbc-1);
+        int iadd = mbc-1;
+        int I =  (iy + iadd)*ys + (ix + iadd);
 
 
         double *const qr     = start;          /* meqn   */
@@ -1209,16 +1230,6 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
             double gupdate = 0.5*dtdy*bmasdq[mq];
             fm[I_q] -= gupdate;        
             fp[I_q] -= gupdate;
-
-            /* left and right update up */
-            // // atomicAdd(&fm[I_q], -gupdate);        
-            // // atomicAdd(&fp[I_q], -gupdate);
-
-            // gupdate = 0.5*dtdy*bpasdq[mq];
-            // // atomicAdd(&fm[I_q + 1],-gupdate);
-            // // atomicAdd(&fp[I_q + 1],-gupdate);
-            // fm[I_q+1] -= gupdate;        
-            // fp[I_q+1] -= gupdate;
         }
     }
 
@@ -1244,7 +1255,8 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
         int ix = thread_index % ifaces_x;
         int iy = thread_index/ifaces_x;
 
-        int I =  (iy + mbc)*ys + (ix + mbc-1);
+        int iadd = mbc-1;
+        int I =  (iy + iadd)*ys + (ix + iadd);
 
 
         double *const qr     = start;          /* meqn   */
@@ -1298,7 +1310,8 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
         int ix = thread_index % mx;
         int iy = thread_index/my;
 
-        int I = (ix + mbc)*xs + (iy + mbc)*ys;
+        int iadd = mbc;
+        int I = (iy + iadd)*ys + (ix + iadd);
 
         for(int mq = 0; mq < meqn; mq++)
         {
