@@ -159,36 +159,40 @@ void cudaclaw_bc2(fclaw2d_global_t *glob,
 
 static
 void cudaclaw_b4step2(fclaw2d_global_t *glob,
-                        fclaw2d_patch_t *this_patch,
-                        int this_block_idx,
-                        int this_patch_idx,
+                        fclaw2d_patch_t *patch,
+                        int blockno,
+                        int patchno,
                         double t, double dt)
 
 {
     PROFILE_CUDA_GROUP("cudaclaw_b4step2",1);
     fc2d_cudaclaw_vtable_t*  cudaclaw_vt = fc2d_cudaclaw_vt(glob);
 
-    int mx,my,mbc,meqn, maux,maxmx,maxmy;
-    double xlower,ylower,dx,dy;
-    double *aux,*q;
-
     if (cudaclaw_vt->fort_b4step2 == NULL)
     {
         return;
     }
 
-    fclaw2d_clawpatch_grid_data(glob,this_patch, &mx,&my,&mbc,
+    int mx,my,mbc;
+    double xlower,ylower,dx,dy;
+    fclaw2d_clawpatch_grid_data(glob,patch, &mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
-    fclaw2d_clawpatch_soln_data(glob,this_patch,&q,&meqn);
-    fclaw2d_clawpatch_aux_data(glob,this_patch,&aux,&maux);
+    int meqn;
+    double *q;
+    fclaw2d_clawpatch_soln_data(glob,patch,&q,&meqn);
 
-    maxmx = mx;
-    maxmy = my;
+    int maux;
+    double *aux;
+    fclaw2d_clawpatch_aux_data(glob,patch,&aux,&maux);
 
-    CUDACLAW_SET_BLOCK(&this_block_idx);
-    cudaclaw_vt->fort_b4step2(&maxmx,&maxmy,&mbc,&mx,&my,&meqn,q,&xlower,&ylower,
-                            &dx,&dy,&t,&dt,&maux,aux);
+    int maxmx = mx;
+    int maxmy = my;
+
+    CUDACLAW_SET_BLOCK(&blockno);
+    cudaclaw_vt->fort_b4step2(&maxmx,&maxmy,&mbc,&mx,&my,&meqn,q,
+                              &xlower,&ylower,&dx,&dy,
+                              &t,&dt,&maux,aux);
     CUDACLAW_UNSET_BLOCK();
 }
 
@@ -287,7 +291,6 @@ double cudaclaw_update(fclaw2d_global_t *glob,
     double maxcfl;
 
     /* ------------------------------- Call b4step2 ----------------------------------- */
-#if 1
     if (cudaclaw_vt->b4step2 != NULL)
     {
         fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_ADVANCE_B4STEP2]);       
@@ -297,7 +300,6 @@ double cudaclaw_update(fclaw2d_global_t *glob,
                            this_patch_idx,t,dt);
         fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_ADVANCE_B4STEP2]);       
     }
-#endif
 
     /* -------------------------------- Main update ----------------------------------- */
     fclaw2d_timer_start_threadsafe (&glob->timers[FCLAW2D_TIMER_ADVANCE_STEP2]);  

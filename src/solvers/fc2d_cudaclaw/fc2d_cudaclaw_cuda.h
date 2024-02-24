@@ -39,6 +39,7 @@ extern "C"
 #define FC2D_CUDACLAW_BLOCK_SIZE 128
 #endif    
 
+
 #define FC2D_CUDACLAW_MWAVES  10           /* Used to set shared memory (checked) */ 
 
 
