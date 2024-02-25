@@ -379,6 +379,7 @@ make_dataset_numerical(hid_t loc_id,
     {
         if(H5Pset_chunk(prop_id, rank, chunk_dims) < 0)
             return -1;
+        H5Pset_shuffle(prop_id);
         if(H5Pset_deflate(prop_id, 5) < 0)
             return -1;
     }
