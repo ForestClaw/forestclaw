@@ -22,119 +22,47 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-/**
+/** 
  * @file
- * Dimension-independent wrapper of a forestclaw domain.
+ * Domain structures and routines
  */
 
 #ifndef FCLAW_DOMAIN_H
 #define FCLAW_DOMAIN_H
 
-/*
- * Domain-independent header file should not include domain-specific headers.
- * The corresponding source file include the 2d and 3d domain-specific headers.
- */
-#include <fclaw_patch.h>
+#include <forestclaw.h>  /* Needed for domain_exchange/domain_indirect info */
 
-typedef struct fclaw_domain_user
+#ifdef __cplusplus
+extern "C"
 {
-    /* Debug counters and timers */
-    int count_set_patch;
-    int count_delete_patch;
-}
-fclaw_domain_user_t;
-
-typedef struct fclaw_domain
-{
-    /* store dimension-specific domain structures */
-    int dim;
-    union
-    {
-        struct
-        {
-            /* avoid including dimension-specific files */
-            int dmagic2;
-            struct fclaw2d_domain *domain2;
-            struct fclaw2d_domain_exchange *exchange2;
-            struct fclaw2d_domain_indirect *indirect2;
-
-        }
-        d2;
-        struct
-        {
-            int dmagic3;
-            struct fclaw3d_domain *domain3;
 #if 0
-            struct fclaw3d_domain_exchange *exchange3;
-            struct fclaw3d_domain_indirect *indirect3;
+}                               /* need this because indent is dumb */
 #endif
-        }
-        d3;
-    }
-    d;
-    sc_mstamp_t pstamp;     /**< internal: quickly allocate same-size patches */
+#endif
 
-    fclaw_domain_user_t du;
+/* CB: chicken and egg -- should global include domain or vice versa?
+       Believe removing any dependence on global from domain will work.
+       Setting a global timer in domain_setup may likely be refactored.
+       Deleting patch and exchange data in domain_reset might go into a
+       toplevel algorithmic function quite naturally outside of domain.
+ */
+struct fclaw_global;
+
+void fclaw_domain_setup(struct fclaw_global* glob,
+                          struct fclaw_domain* new_domain);
+
+void fclaw_domain_reset(struct fclaw_global* glob);
+
+/* OpenMP iterator (not part of forestclaw2d.h */
+void fclaw_domain_iterate_level_mthread (struct fclaw_domain * domain, int level,
+                                           fclaw_patch_callback_t pcb, void *user);
+
+
+#ifdef __cplusplus
+#if 0
+{                               /* need this because indent is dumb */
+#endif
 }
-fclaw_domain_t;
+#endif
 
-/** Dimension-independent callback prototype for the patch iterators.
- * We iterate over local patches only.
- * \param [in] domain	Dimension-independent domain structure.
- * \param [in] patch	The local patch currently processed by the iterator.
- * \param [in] blockno  Block number of processed patch.
- * \param [in] patchno  Patch number within block of processed patch.
- * \param [in,out] user	Data that was passed into the iterator functions.
- */
-typedef void (*fclaw_domain_callback_t)
-    (fclaw_domain_t * domain, fclaw_patch_t * patch,
-     int blockno, int patchno, void *user);
-
-typedef struct fclaw_domain_iterate
-{
-    fclaw_domain_t *d;
-    fclaw_domain_callback_t iter;
-    void *user;
-}
-fclaw_domain_iterate_t;
-
-/* Verify that dimension and domain object are set correctly.
- * \param [in] domain           Dimension-independent domain.
- * \return                      True if dimension and magic valid and a
- *                              non-NULL dimension-specific domain assigned.
- */
-int fclaw_domain_is_valid (fclaw_domain_t * domain);
-
-/** Destruct a dimension-specific domain and its patch data.
- * \param [in,out] domain       Initialized, valid domain structure.
- *                              On output, the pointer is invalidated.
- * \param [in] dele             This callback is pointed to an existing
- *                              fclaw_patch whose data it is supposed to
- *                              delete.  This includes deleting
- *                              the patch user pointer, which the
- *                              callback can do using the third
- *                              parameter to this function, \a user.
- *                              Just do not delete the patch itself!
- * \param [in,out] user         Pointer passed through to \a init.
- */
-void fclaw_domain_destroy (fclaw_domain_t * domain,
-                           fclaw_domain_callback_t dele, void *user);
-
-/** Iterate over all local patches.
- * \param [in] domain	Dimension-independent domain structure.
- * \param [in] iter     Function called for each patch of matching level.
- * \param [in,out] user	Data is passed to the \a iter callback.
- */
-void fclaw_domain_iterate_patches (fclaw_domain_t * domain,
-                                   fclaw_domain_callback_t iter, void *user);
-
-/** Iterate over all local patches on a given level.
- * \param [in] domain	Dimension-independent domain structure.
- * \param [in] level	Level to iterate.  Ignore patches of other levels.
- * \param [in] iter     Function called for each patch of matching level.
- * \param [in,out] user	Data is passed to the \a iter callback.
- */
-void fclaw_domain_iterate_level (fclaw_domain_t * domain, int level,
-                                 fclaw_domain_callback_t iter, void *user);
-
-#endif /* !FCLAW_DOMAIN_H */
+#endif /* FCLAW2D_DOMAIN_H */

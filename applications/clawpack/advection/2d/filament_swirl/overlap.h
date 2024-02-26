@@ -27,11 +27,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef OVERLAP_H
 #define OVERLAP_H
 
-#include <fclaw2d_options.h>
+#include <fclaw_options.h>
 
-#include <fclaw2d_domain.h>
-#include <fclaw2d_patch.h>
-#include <fclaw2d_global.h>
+#include <fclaw_domain.h>
+#include <fclaw_patch.h>
+#include <fclaw_global.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -55,8 +55,8 @@ overlap_point_t;
 
 typedef struct overlap_consumer
 {
-  fclaw2d_global_t   *glob;
-  fclaw2d_domain_t   *domain;
+  fclaw_global_t   *glob;
+  fclaw_domain_t   *domain;
   sc_array_t         *query_points;
   size_t              cell_idx;
   int                 num_cells_in_patch;
@@ -67,7 +67,7 @@ overlap_consumer_t;
 typedef struct overlap_geometry
 {
     fclaw_options_t *fclaw_opt;
-    fclaw2d_block_t *blocks;
+    fclaw_block_t *blocks;
 }
 overlap_geometry_t;
 
@@ -79,13 +79,13 @@ void create_query_points (overlap_consumer_t * c);
 int apply_inverse_producer_mapping (overlap_point_t * op, double xy[3],
                                     int blockno, overlap_geometry_t * geo);
 
-int overlap_interpolate (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
+int overlap_interpolate (fclaw_domain_t * domain, fclaw_patch_t * patch,
                          int blockno, int patchno, void *point, void *user);
 
 void output_query_points (overlap_consumer_t * c);
 
 
-void add_cell_centers (fclaw2d_domain_t * domain, fclaw2d_patch_t * patch,
+void add_cell_centers (fclaw_domain_t * domain, fclaw_patch_t * patch,
                        int blockno, int patchno, void *user);
 
 

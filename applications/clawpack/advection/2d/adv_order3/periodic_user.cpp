@@ -25,7 +25,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "periodic_user.h"
 
-#include <fclaw2d_include_all.h>
+#include <fclaw_include_all.h>
 
 /* Two versions of Clawpack */
 #include <fc2d_clawpack46.h>
@@ -34,11 +34,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <clawpack46_user_fort.h>
 
-#include <fclaw2d_clawpatch.h>
+#include <fclaw_clawpatch.h>
 #include <fclaw2d_clawpatch_fort.h>
 
 static
-void periodic_problem_setup(fclaw2d_global_t* glob)
+void periodic_problem_setup(fclaw_global_t* glob)
 {
     const user_options_t* user = periodic_get_options(glob);
 
@@ -51,14 +51,14 @@ void periodic_problem_setup(fclaw2d_global_t* glob)
         fprintf(f, "%20.16f    %s",user->vbar,"\% vbar\n");
         fclose(f);
     }
-    fclaw2d_domain_barrier (glob->domain);
+    fclaw_domain_barrier (glob->domain);
     PERIODIC_SETPROB();
 }
 
 
 static
-void cb_periodic_output_ascii (fclaw2d_domain_t * domain,
-                            fclaw2d_patch_t * this_patch,
+void cb_periodic_output_ascii (fclaw_domain_t * domain,
+                            fclaw_patch_t * this_patch,
                             int this_block_idx, int this_patch_idx,
                             void *user)
 {
@@ -69,11 +69,11 @@ void cb_periodic_output_ascii (fclaw2d_domain_t * domain,
     double *q, *error, *soln;
     int iframe;
 
-    fclaw2d_global_iterate_t* s = (fclaw2d_global_iterate_t*) user;
-    fclaw2d_global_t      *glob = (fclaw2d_global_t*) s->glob;
+    fclaw_global_iterate_t* s = (fclaw_global_iterate_t*) user;
+    fclaw_global_t      *glob = (fclaw_global_t*) s->glob;
 
     //fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt(glob);
-    const fclaw_options_t         *fclaw_opt = fclaw2d_get_options(glob);
+    const fclaw_options_t         *fclaw_opt = fclaw_get_options(glob);
     const user_options_t  *user_opt =  periodic_get_options(glob);
 
 
@@ -83,16 +83,16 @@ void cb_periodic_output_ascii (fclaw2d_domain_t * domain,
 
 
     /* Get info not readily available to user */
-    fclaw2d_patch_get_info(glob->domain,this_patch,
+    fclaw_patch_get_info(glob->domain,this_patch,
                            this_block_idx,this_patch_idx,
                            &patch_num,&level);
     
-    fclaw2d_clawpatch_grid_data(glob,this_patch,&mx,&my,&mbc,
+    fclaw_clawpatch_2d_grid_data(glob,this_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
-    fclaw2d_clawpatch_soln_data(glob,this_patch,&q,&meqn);
-    error = fclaw2d_clawpatch_get_error(glob,this_patch);
-    soln = fclaw2d_clawpatch_get_exactsoln(glob,this_patch);
+    fclaw_clawpatch_soln_data(glob,this_patch,&q,&meqn);
+    error = fclaw_clawpatch_get_error(glob,this_patch);
+    soln = fclaw_clawpatch_get_exactsoln(glob,this_patch);
 
     char fname[BUFSIZ];
     snprintf (fname, BUFSIZ, "%s.q%04d", fclaw_opt->prefix, iframe);
@@ -113,9 +113,9 @@ void cb_periodic_output_ascii (fclaw2d_domain_t * domain,
 
 
 
-void periodic_link_solvers(fclaw2d_global_t *glob)
+void periodic_link_solvers(fclaw_global_t *glob)
 {
-    fclaw2d_vtable_t *vt = fclaw2d_vt(glob);
+    fclaw_vtable_t *vt = fclaw_vt(glob);
 
 
     vt->problem_setup = &periodic_problem_setup;  /* Version-independent */
@@ -130,11 +130,11 @@ void periodic_link_solvers(fclaw2d_global_t *glob)
         clawpack46_vt->fort_rpt2      = &CLAWPACK46_RPT2;
         clawpack46_vt->fort_rpn2_cons = &RPN2CONS_UPDATE;
 
-        fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt(glob);
+        fclaw_clawpatch_vtable_t *clawpatch_vt = fclaw_clawpatch_vt(glob);
         clawpatch_vt->fort_tag4coarsening = &TAG4COARSENING;
         clawpatch_vt->fort_tag4refinement = &TAG4REFINEMENT;
 
-        const fclaw_options_t  *fclaw_opt = fclaw2d_get_options(glob);
+        const fclaw_options_t  *fclaw_opt = fclaw_get_options(glob);
         if (fclaw_opt->compute_error)
         {
             clawpatch_vt->fort_compute_patch_error = &PERIODIC_COMPUTE_ERROR;

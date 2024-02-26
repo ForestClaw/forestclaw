@@ -3,10 +3,10 @@
 
 #include <fc2d_cudaclaw_options.h>
 
-#include <fclaw2d_global.h>
-#include <fclaw2d_patch.h>
-#include <fclaw2d_clawpatch.h>
-#include <fclaw2d_clawpatch_options.h>
+#include <fclaw_global.h>
+#include <fclaw_patch.h>
+#include <fclaw_clawpatch.h>
+#include <fclaw_clawpatch_options.h>
 
 #include <fc2d_cuda_profiler.h>
 
@@ -18,8 +18,8 @@ static double* s_membuffer;
 static double* s_membuffer_dev;
 static cudaclaw_fluxes_t* s_array_fluxes_struct_dev;
 
-void cudaclaw_allocate_fluxes(fclaw2d_global_t *glob,
-                              fclaw2d_patch_t *patch)
+void cudaclaw_allocate_fluxes(fclaw_global_t *glob,
+                              fclaw_patch_t *patch)
 {
     PROFILE_CUDA_GROUP("Allocate patch data in memory device",4);       
     int mx,my,mbc;
@@ -28,12 +28,12 @@ void cudaclaw_allocate_fluxes(fclaw2d_global_t *glob,
 
     cudaclaw_fluxes_t *fluxes = FCLAW_ALLOC(cudaclaw_fluxes,1);
 
-    const fclaw2d_clawpatch_options_t *claw_opt = fclaw2d_clawpatch_get_options(glob);
+    const fclaw_clawpatch_options_t *claw_opt = fclaw_clawpatch_get_options(glob);
     int meqn = claw_opt->meqn;
     int maux = claw_opt->maux;
 
     /* Set values needed in batch node */
-    fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mbc,
+    fclaw_clawpatch_2d_grid_data(glob,patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
     fluxes->dx = dx;
@@ -78,15 +78,15 @@ void cudaclaw_allocate_fluxes(fclaw2d_global_t *glob,
     value = 0;
     CHECK(cudaMemset((void*)fluxes->speeds_dev, value, fluxes->num_bytes_speeds));
 
-    fclaw2d_patch_set_user_data(glob,patch,fluxes);
+    fclaw_patch_set_user_data(glob,patch,fluxes);
 }
 
-void cudaclaw_deallocate_fluxes(fclaw2d_global_t *glob,
-                                     fclaw2d_patch_t *patch)
+void cudaclaw_deallocate_fluxes(fclaw_global_t *glob,
+                                     fclaw_patch_t *patch)
 {
     PROFILE_CUDA_GROUP("De-allocate patch device memory",4);       
     cudaclaw_fluxes_t *fluxes = (cudaclaw_fluxes_t*) 
-               fclaw2d_patch_get_user_data(glob,patch);
+               fclaw_patch_get_user_data(glob,patch);
 
     FCLAW_ASSERT(fluxes != NULL);
 
@@ -109,9 +109,9 @@ void cudaclaw_deallocate_fluxes(fclaw2d_global_t *glob,
 
 
 
-void fc2d_cudaclaw_allocate_buffers(fclaw2d_global_t *glob)
+void fc2d_cudaclaw_allocate_buffers(fclaw_global_t *glob)
 {
-    fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
+    fclaw_clawpatch_options_t *clawpatch_opt = fclaw_clawpatch_get_options(glob);
     int mx = clawpatch_opt->mx;
     int my = clawpatch_opt->my;
     int mbc = clawpatch_opt->mbc;
@@ -131,7 +131,7 @@ void fc2d_cudaclaw_allocate_buffers(fclaw2d_global_t *glob)
                      batch_size*sizeof(cudaclaw_fluxes_t)));
 }
 
-void fc2d_cudaclaw_deallocate_buffers(fclaw2d_global_t *glob)
+void fc2d_cudaclaw_deallocate_buffers(fclaw_global_t *glob)
 {
     cudaFreeHost(s_membuffer);
     cudaFree(s_membuffer_dev);

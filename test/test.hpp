@@ -3,6 +3,8 @@
 #include <doctest.h>
 #include <csetjmp>
 
+bool test_output_vtk();
+
 void fclaw_test_expect_abort();
 void fclaw_test_clear_expect_abort();
 

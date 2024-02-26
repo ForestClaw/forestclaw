@@ -26,10 +26,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "filament_user.h"
 
 
-void filament_problem_setup(fclaw2d_global_t *glob)
+void filament_problem_setup(fclaw_global_t *glob)
 {
     const user_options_t* user = filament_get_options(glob);
-    fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
+    fclaw_options_t* fclaw_opt = fclaw_get_options(glob);
     if (glob->mpirank == 0)
     {
         FILE *f = fopen("setprob.data","w");
@@ -41,13 +41,13 @@ void filament_problem_setup(fclaw2d_global_t *glob)
         fprintf(f,  "%-24.4f   %s",user->maxelev,"\% max_elevation\n");
         fclose(f);
     }
-    fclaw2d_domain_barrier (glob->domain);
+    fclaw_domain_barrier (glob->domain);
     SETPROB();
 }
 
 static
-void filament_patch_setup(fclaw2d_global_t *glob,
-                          fclaw2d_patch_t *patch,
+void filament_patch_setup(fclaw_global_t *glob,
+                          fclaw_patch_t *patch,
                           int blockno,
                           int patchno)
 {
@@ -57,17 +57,17 @@ void filament_patch_setup(fclaw2d_global_t *glob,
 }
 
 
-void filament_link_solvers(fclaw2d_global_t *glob)
+void filament_link_solvers(fclaw_global_t *glob)
 {
-    fclaw2d_vtable_t *fclaw_vt = fclaw2d_vt(glob);
-    fclaw_vt->problem_setup = filament_problem_setup;
+    fclaw_vtable_t *fc_vt = fclaw_vt(glob);
+    fc_vt->problem_setup = filament_problem_setup;
 
-    fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
+    fclaw_options_t* fclaw_opt = fclaw_get_options(glob);
     const user_options_t* user = filament_get_options(glob);
 
     /* example of how to set up a user defined criteria */
-    fclaw3dx_clawpatch_vtable_t *clawpatch_vt = fclaw3dx_clawpatch_vt(glob);
-    clawpatch_vt->fort_user_exceeds_threshold = &FCLAW3DX_USER_EXCEEDS_TH;
+    fclaw_clawpatch_vtable_t *clawpatch_vt = fclaw_clawpatch_vt(glob);
+    clawpatch_vt->d3->fort_user_exceeds_threshold = &FCLAW3D_USER_EXCEEDS_TH;
     
     if (user->claw_version == 4)
     {        
@@ -86,7 +86,7 @@ void filament_link_solvers(fclaw2d_global_t *glob)
             {
                 /* This calls a manifold version of setaux */
                 FCLAW_ASSERT(clawopt->mcapa != 0);
-                fclaw2d_patch_vtable_t *patch_vt = fclaw2d_patch_vt(glob);
+                fclaw_patch_vtable_t *patch_vt = fclaw_patch_vt(glob);
                 patch_vt->setup = filament_patch_setup;
             }
             else

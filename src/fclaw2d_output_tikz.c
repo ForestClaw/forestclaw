@@ -23,17 +23,17 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <fclaw2d_output.h>
+#include <fclaw_output.h>
 #include <fclaw_base.h>   /* Needed for MPI declarations */
 
-#include <fclaw2d_map_brick.h>
-#include <fclaw2d_map_query.h>
-#include <fclaw2d_map.h>
+#include <fclaw_map_brick.h>
+#include <fclaw_map_query.h>
+#include <fclaw_map.h>
 
-#include <fclaw2d_domain.h>
-#include <fclaw2d_global.h>
+#include <fclaw_domain.h>
+#include <fclaw_global.h>
 
-#include <fclaw2d_options.h>
+#include <fclaw_options.h>
 #include <fclaw_math.h>
 
 typedef struct
@@ -49,14 +49,14 @@ typedef struct
 } fclaw2d_tikz_info_t;
 
 static
-void convert_brick(fclaw2d_global_t *glob, 
-                   fclaw2d_patch_t *this_patch, 
+void convert_brick(fclaw_global_t *glob, 
+                   fclaw_patch_t *this_patch, 
                    int blockno, 
                    double* xlower, double* ylower)
 {
-    fclaw2d_map_context_t* cont = glob->cont;
+    fclaw_map_context_t* cont = glob->cont;
 
-    int is_brick = FCLAW2D_MAP_IS_BRICK(&cont);
+    int is_brick = FCLAW_MAP_IS_BRICK(&cont);
 
     double xl = this_patch->xlower;
     double yl = this_patch->ylower;
@@ -67,7 +67,7 @@ void convert_brick(fclaw2d_global_t *glob,
     {
         double z;
             /* Scale to [0,1]x[0,1], based on blockno */
-        fclaw2d_map_c2m_nomap_brick(cont,blockno,xl,yl,&xlow,&ylow,&z);
+        fclaw_map_2d_c2m_nomap_brick(cont,blockno,xl,yl,&xlow,&ylow,&z);
     }
     else
     {
@@ -93,12 +93,12 @@ void convert_brick(fclaw2d_global_t *glob,
 
 
 static void
-cb_tikz_output (fclaw2d_domain_t * domain,
-                fclaw2d_patch_t * this_patch,
+cb_tikz_output (fclaw_domain_t * domain,
+                fclaw_patch_t * this_patch,
                 int this_block_idx, int this_patch_idx,
                 void *user)
 {
-    fclaw2d_global_iterate_t *s = (fclaw2d_global_iterate_t *) user;
+    fclaw_global_iterate_t *s = (fclaw_global_iterate_t *) user;
     fclaw2d_tikz_info_t *s_tikz = (fclaw2d_tikz_info_t*) s->user;
 
     int mx, my, mi, mj, level, lmax, mxf, myf;
@@ -107,9 +107,9 @@ cb_tikz_output (fclaw2d_domain_t * domain,
     const char* indent = "    ";
 
     FILE *fp = s_tikz->fp;
-    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(s->glob);
+    const fclaw_options_t *fclaw_opt = fclaw_get_options(s->glob);
 
-    fclaw2d_block_t *this_block = &domain->blocks[this_block_idx];
+    fclaw_block_t *this_block = &domain->blocks[this_block_idx];
     int64_t patch_num = domain->global_num_patches_before +
         (int64_t) (this_block->num_patches_before + this_patch_idx);
 
@@ -156,15 +156,15 @@ cb_tikz_output (fclaw2d_domain_t * domain,
 #endif    
 }
 
-void fclaw2d_output_frame_tikz(fclaw2d_global_t* glob, int iframe)
+void fclaw2d_output_frame_tikz(fclaw_global_t* glob, int iframe)
 {
-    fclaw2d_domain_t *domain = glob->domain;
+    fclaw_domain_t *domain = glob->domain;
     fclaw2d_tikz_info_t s_tikz;
 
     char fname[20];
 
     /* Should be in fclaw_opt */
-    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+    const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
     
     double figsize[2];
     figsize[0] = fclaw_opt->tikz_figsize[0];   /* Inches */
@@ -237,9 +237,9 @@ void fclaw2d_output_frame_tikz(fclaw2d_global_t* glob, int iframe)
     fp = fopen(fname,"a"); 
     s_tikz.fp = fp;
 
-    fclaw2d_domain_serialization_enter (domain);
-    fclaw2d_global_iterate_patches (glob, cb_tikz_output, (void *) &s_tikz);
-    fclaw2d_domain_serialization_leave (domain);
+    fclaw_domain_serialization_enter (domain);
+    fclaw_global_iterate_patches (glob, cb_tikz_output, (void *) &s_tikz);
+    fclaw_domain_serialization_leave (domain);
 
     fclose(fp);
 

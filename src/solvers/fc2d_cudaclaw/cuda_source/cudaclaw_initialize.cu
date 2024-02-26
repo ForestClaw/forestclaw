@@ -28,13 +28,13 @@
 #include "../fc2d_cudaclaw_cuda.h"
 #include "../fc2d_cudaclaw_check.h"
 
-#include <fclaw2d_global.h>
+#include <fclaw_global.h>
 #if defined(FCLAW_ENABLE_MPI)  
 #endif
 
 #include <fclaw_mpi.h>
 
-void fc2d_cudaclaw_initialize_GPUs(fclaw2d_global_t *glob)
+void fc2d_cudaclaw_initialize_GPUs(fclaw_global_t *glob)
 {
     cudaDeviceProp  prop;
 

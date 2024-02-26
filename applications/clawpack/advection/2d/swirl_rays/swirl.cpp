@@ -24,7 +24,7 @@
 */
 
 #include "swirl_user.h"
-#include <fclaw2d_rays.h>
+#include <fclaw_rays.h>
 
 #include "../all/advection_user.h"
 
@@ -77,8 +77,8 @@ const int swirl_nlines = 3;
 
 /* Virtual function for setting rays */
 static void
-swirl_allocate_and_define_rays (fclaw2d_global_t * glob,
-                                fclaw2d_ray_t ** rays, int *num_rays)
+swirl_allocate_and_define_rays (fclaw_global_t * glob,
+                                fclaw_ray_t ** rays, int *num_rays)
 {
     int i;
 
@@ -88,8 +88,8 @@ swirl_allocate_and_define_rays (fclaw2d_global_t * glob,
        generic ray type is left opaque. This is destroy in matching FREE,
        below. */
 
-    *rays = fclaw2d_ray_allocate_rays(*num_rays);
-    fclaw2d_ray_t *ray_vec = *rays;
+    *rays = fclaw_ray_allocate_rays(*num_rays);
+    fclaw_ray_t *ray_vec = *rays;
     for (i = 0; i < swirl_nlines; ++i)
     {
 #ifndef STAR_OF_RAYS
@@ -131,31 +131,31 @@ swirl_allocate_and_define_rays (fclaw2d_global_t * glob,
                      sr->r.line.parallel == sr->r.line.dominant);
 
         /* Assign ray to diagnostics item */
-        fclaw2d_ray_t *ray = &ray_vec[i];
-        fclaw2d_ray_set_ray (ray, i + 1, sr);
+        fclaw_ray_t *ray = &ray_vec[i];
+        fclaw_ray_set_ray (ray, i + 1, sr);
     }
 }
 
 static
-void swirl_deallocate_rays(fclaw2d_global_t *glob,
-                           fclaw2d_ray_t** rays,
+void swirl_deallocate_rays(fclaw_global_t *glob,
+                           fclaw_ray_t** rays,
                            int* num_rays)
 {
     int i;
-    fclaw2d_ray_t *ray_vec = *rays;
+    fclaw_ray_t *ray_vec = *rays;
 
     for(i = 0; i < *num_rays; i++)
     {
         /* Retrieve rays set above and deallocate them */
         int id;
-        fclaw2d_ray_t *ray = &ray_vec[i];
-        swirl_ray_t *rs = (swirl_ray_t*) fclaw2d_ray_get_ray(ray, &id);
+        fclaw_ray_t *ray = &ray_vec[i];
+        swirl_ray_t *rs = (swirl_ray_t*) fclaw_ray_get_ray(ray, &id);
         FCLAW_ASSERT (rs != NULL);
         FCLAW_FREE (rs);
         rs = NULL;
     }
     /* Match FCLAW_ALLOC, above */
-    *num_rays = fclaw2d_ray_deallocate_rays(rays);
+    *num_rays = fclaw_ray_deallocate_rays(rays);
 }
 
 /** This function checks if a linear ray intersects a patch.
@@ -166,7 +166,7 @@ void swirl_deallocate_rays(fclaw2d_global_t *glob,
  * the patch-boundary in the search dimension i.
  */
 static int
-intersect_patch (fclaw2d_patch_t *patch, swirl_ray_t *swirl_ray,
+intersect_patch (fclaw_patch_t *patch, swirl_ray_t *swirl_ray,
                  int i, int *untrustworthy, double *dt, double rayni[2])
 {
     int ni, j, isleft, iscenter;
@@ -233,7 +233,7 @@ intersect_patch (fclaw2d_patch_t *patch, swirl_ray_t *swirl_ray,
 }
 
 static int
-swirl_intersect_ray (fclaw2d_domain_t *domain, fclaw2d_patch_t *patch,
+swirl_intersect_ray (fclaw_domain_t *domain, fclaw_patch_t *patch,
                      int blockno, int patchno, void *ray, double *integral,
                      void *user)
 {
@@ -241,9 +241,9 @@ swirl_intersect_ray (fclaw2d_domain_t *domain, fclaw2d_patch_t *patch,
     double dt, rayni[2];
 
     /* assert that ray is a valid swirl_ray_t */
-    fclaw2d_ray_t *fclaw_ray = (fclaw2d_ray_t *) ray;
+    fclaw_ray_t *fclaw_ray = (fclaw_ray_t *) ray;
 
-    swirl_ray_t *swirl_ray = (swirl_ray_t*) fclaw2d_ray_get_ray(fclaw_ray,&id);
+    swirl_ray_t *swirl_ray = (swirl_ray_t*) fclaw_ray_get_ray(fclaw_ray,&id);
     FCLAW_ASSERT(swirl_ray != NULL);
     FCLAW_ASSERT(swirl_ray->rtype == SWIRL_RAY_LINE); /* Circles not there yet. */
     FCLAW_ASSERT (integral != NULL && *integral == 0.); /* documented precondition */
@@ -277,13 +277,13 @@ swirl_intersect_ray (fclaw2d_domain_t *domain, fclaw2d_patch_t *patch,
         int mx, my, mbc, meqn, sol_rows, j, k, klower, kupper, k_current;
         double xlower, ylower, dx, dy, *sol, tstep,
                nilower, niupper, raynilower, rayniupper;
-        fclaw2d_global_t *glob = (fclaw2d_global_t *) user;
+        fclaw_global_t *glob = (fclaw_global_t *) user;
         FCLAW_ASSERT(glob != NULL);
 
         /* Obtain cell indices of the hits. */
-        fclaw2d_clawpatch_grid_data(glob, patch, &mx, &my, &mbc,
+        fclaw_clawpatch_2d_grid_data(glob, patch, &mx, &my, &mbc,
                                     &xlower, &ylower, &dx, &dy);
-        fclaw2d_clawpatch_soln_data(glob, patch, &sol, &meqn);
+        fclaw_clawpatch_soln_data(glob, patch, &sol, &meqn);
         sol_rows = mx + 2 * mbc;
 
         /* Make mx, my, dx, dy indexable. */
@@ -361,10 +361,10 @@ swirl_intersect_ray (fclaw2d_domain_t *domain, fclaw2d_patch_t *patch,
     }
 }
 
-void swirl_initialize_rays(fclaw2d_global_t* glob)
+void swirl_initialize_rays(fclaw_global_t* glob)
 {
     /* Set up rays */
-    fclaw2d_ray_vtable_t* rays_vt = fclaw2d_ray_vt(glob);
+    fclaw_ray_vtable_t* rays_vt = fclaw_ray_vt(glob);
 
     rays_vt->allocate_and_define = swirl_allocate_and_define_rays;
     rays_vt->deallocate = swirl_deallocate_rays;
@@ -373,37 +373,32 @@ void swirl_initialize_rays(fclaw2d_global_t* glob)
 }
 
 static
-void create_domain(fclaw2d_global_t * glob)
+void create_domain(fclaw_global_t * glob)
 {
-    fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+    fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
 
     fclaw_opt->manifold = 0;
 
-    fclaw2d_domain_t *domain = fclaw2d_domain_new_unitsquare(glob->mpicomm,
+    fclaw_domain_t *domain = fclaw_domain_new_unitsquare(glob->mpicomm,
                                                              fclaw_opt->minlevel);
-    fclaw2d_map_context_t *cont = fclaw2d_map_new_nomap();
+    fclaw_map_context_t *cont = fclaw_map_new_nomap();
 
-    fclaw2d_global_store_domain(glob, domain);
-    fclaw2d_global_store_map(glob, cont);
+    fclaw_global_store_domain(glob, domain);
+    fclaw_map_store(glob, cont);
 
-    fclaw2d_domain_list_levels(domain, FCLAW_VERBOSITY_ESSENTIAL);
-    fclaw2d_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);
+    fclaw_domain_list_levels(domain, FCLAW_VERBOSITY_ESSENTIAL);
+    fclaw_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);
 }
 
 static
-void run_program(fclaw2d_global_t* glob)
+void run_program(fclaw_global_t* glob)
 {
     const user_options_t           *user_opt;
-
-    /* ---------------------------------------------------------------
-       Set domain data.
-       --------------------------------------------------------------- */
-    fclaw2d_domain_data_new(glob->domain);
 
     user_opt = swirl_get_options(glob);
 
     /* Initialize virtual table for ForestClaw */
-    fclaw2d_vtables_initialize(glob);
+    fclaw_vtables_initialize(glob);
 
     /* Initialize virtual tables for solvers */
     if (user_opt->claw_version == 4)
@@ -421,10 +416,10 @@ void run_program(fclaw2d_global_t* glob)
     /* ---------------------------------------------------------------
        Run
        --------------------------------------------------------------- */
-    fclaw2d_initialize(glob);
-    fclaw2d_run(glob);
+    fclaw_initialize(glob);
+    fclaw_run(glob);
 
-    fclaw2d_finalize(glob);
+    fclaw_finalize(glob);
 }
 
 int
@@ -436,14 +431,14 @@ main (int argc, char **argv)
     /* Options */
     user_options_t              *user_opt;
     fclaw_options_t             *fclaw_opt;
-    fclaw2d_clawpatch_options_t *clawpatch_opt;
+    fclaw_clawpatch_options_t *clawpatch_opt;
     fc2d_clawpack46_options_t   *claw46_opt;
     fc2d_clawpack5_options_t    *claw5_opt;
 
 
     /* Create new options packages */
     fclaw_opt =                   fclaw_options_register(app,  NULL,        "fclaw_options.ini");
-    clawpatch_opt =   fclaw2d_clawpatch_options_register(app, "clawpatch",  "fclaw_options.ini");
+    clawpatch_opt =   fclaw_clawpatch_2d_options_register(app, "clawpatch",  "fclaw_options.ini");
     claw46_opt =        fc2d_clawpack46_options_register(app, "clawpack46", "fclaw_options.ini");
     claw5_opt =          fc2d_clawpack5_options_register(app, "clawpack5",  "fclaw_options.ini");
     user_opt =                    swirl_options_register(app,               "fclaw_options.ini");
@@ -461,11 +456,11 @@ main (int argc, char **argv)
         sc_MPI_Comm mpicomm = fclaw_app_get_mpi_size_rank (app, &size, &rank);
 
         /* Create global structure which stores the domain, timers, etc */
-        fclaw2d_global_t *glob = fclaw2d_global_new_comm(mpicomm, size, rank);
+        fclaw_global_t *glob = fclaw_global_new_comm(mpicomm, size, rank);
 
         /* Store option packages in glob */
-        fclaw2d_options_store           (glob, fclaw_opt);
-        fclaw2d_clawpatch_options_store (glob, clawpatch_opt);
+        fclaw_options_store           (glob, fclaw_opt);
+        fclaw_clawpatch_options_store (glob, clawpatch_opt);
         fc2d_clawpack46_options_store   (glob, claw46_opt);
         fc2d_clawpack5_options_store    (glob, claw5_opt);
         swirl_options_store             (glob, user_opt);
@@ -474,7 +469,7 @@ main (int argc, char **argv)
 
         run_program(glob);
 
-        fclaw2d_global_destroy(glob);
+        fclaw_global_destroy(glob);
     }
 
     fclaw_app_destroy (app);

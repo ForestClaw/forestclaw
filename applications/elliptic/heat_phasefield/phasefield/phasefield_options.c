@@ -186,12 +186,12 @@ phasefield_options_t* phasefield_options_register (fclaw_app_t * app,
     return user;
 }
 
-void phasefield_options_store (fclaw2d_global_t* glob, phasefield_options_t* user)
+void phasefield_options_store (fclaw_global_t* glob, phasefield_options_t* user)
 {
-    fclaw2d_global_options_store(glob, "user", user);
+    fclaw_global_options_store(glob, "user", user);
 }
 
-const phasefield_options_t* phasefield_get_options(fclaw2d_global_t* glob)
+const phasefield_options_t* phasefield_get_options(fclaw_global_t* glob)
 {
-    return (phasefield_options_t*) fclaw2d_global_get_options(glob, "user");
+    return (phasefield_options_t*) fclaw_global_get_options(glob, "user");
 }

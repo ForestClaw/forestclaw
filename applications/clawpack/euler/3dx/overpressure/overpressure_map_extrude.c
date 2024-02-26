@@ -29,12 +29,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /* For 2d mappings */
 #include "../all/euler3d_user.h"
 
-#include <fclaw2d_map.h>
+#include <fclaw_map.h>
 
 
 /* User defined extruded mesh mapping */
 static void
-overpressure_map_3dx(fclaw2d_map_context_t * cont, int blockno,
+overpressure_map_3dx(fclaw_map_context_t * cont, int blockno,
                double xc, double yc, double zc,
                double *xp, double *yp, double *zp)
 {
@@ -44,13 +44,13 @@ overpressure_map_3dx(fclaw2d_map_context_t * cont, int blockno,
     cont->mapc2m(cont,blockno,xc,yc,&xp1,&yp1,&zp1);
 
     /* In extruded case, no transformations are applied to the 2d mapping */
-    int mapping = cont->user_int_3dx[0];
+    int mapping = cont->user_int_3d[0];
 
-    double maxelev    = cont->user_double_3dx[0];  
-    double minz       = cont->user_double_3dx[1];  
-    double maxz       = cont->user_double_3dx[2];  
-    double midz       = cont->user_double_3dx[3];  
-    double scale_bump = cont->user_double_3dx[4];
+    double maxelev    = cont->user_double_3d[0];  
+    double minz       = cont->user_double_3d[1];  
+    double maxz       = cont->user_double_3d[2];  
+    double midz       = cont->user_double_3d[3];  
+    double scale_bump = cont->user_double_3d[4];
 
     if (mapping == 1)
     {
@@ -111,7 +111,7 @@ overpressure_map_3dx(fclaw2d_map_context_t * cont, int blockno,
 }
 
 
-void overpressure_map_extrude(fclaw2d_map_context_t* cont,
+void overpressure_map_extrude(fclaw_map_context_t* cont,
                          const double maxelev,
                          const int mapping,
                          const double minz,
@@ -121,16 +121,16 @@ void overpressure_map_extrude(fclaw2d_map_context_t* cont,
 
 {
     /* May be needed to get more general mappings */
-    cont->mapc2m_3dx = overpressure_map_3dx;
+    cont->mapc2m_3d = overpressure_map_3dx;
 
     /* Store parameters for use in routine above */
-    cont->user_double_3dx[0] = maxelev;
-    cont->user_double_3dx[1] = minz;
-    cont->user_double_3dx[2] = maxz;
-    cont->user_double_3dx[3] = midz;
-    cont->user_double_3dx[4] = scale_bump;
+    cont->user_double_3d[0] = maxelev;
+    cont->user_double_3d[1] = minz;
+    cont->user_double_3d[2] = maxz;
+    cont->user_double_3d[3] = midz;
+    cont->user_double_3d[4] = scale_bump;
 
-    cont->user_int_3dx[0] = mapping;
+    cont->user_int_3d[0] = mapping;
 
     /* This is checked in 2d mappings.  If `is_extruded=1`, then the 2d mapping
        will not be scaled, shifted or rotated

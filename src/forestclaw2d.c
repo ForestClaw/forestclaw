@@ -1052,7 +1052,7 @@ fclaw2d_patch_corner_neighbors (fclaw2d_domain_t * domain,
             *rcorner = cornerno ^ (P4EST_CHILDREN - 1);
         }
     }
-
+ 
     if (qid < 0)
     {
         /* The value -1 is expected for a corner on the physical boundary */
@@ -1394,6 +1394,15 @@ fclaw2d_domain_set_refinement (fclaw2d_domain_t * domain,
     domain->p.smooth_refine = smooth_refine;
     domain->p.smooth_level = smooth_level;
     p4est_wrap_set_coarsen_delay (wrap, coarsen_delay, 0);
+}
+
+void
+fclaw2d_domain_set_partitioning (fclaw2d_domain_t * domain,
+                                 int partition_for_coarsening)
+{
+    p4est_wrap_t *wrap = (p4est_wrap_t *) domain->pp;
+
+    p4est_wrap_set_partitioning (wrap, partition_for_coarsening);
 }
 
 void

@@ -1,6 +1,6 @@
 !! # check to see if value exceeds threshold
 
-integer function fclaw3dx_user_exceeds_th(blockno,& 
+integer function fclaw3d_user_exceeds_th(blockno,& 
                                   qval,qmin,qmax,quad, & 
                                   dx,dy,dz,xc,yc,zc,threshold, &
                                   init_flag, is_ghost)
@@ -14,14 +14,14 @@ integer function fclaw3dx_user_exceeds_th(blockno,&
     integer :: refine
 
     integer*8 cont, fclaw_map_get_context
-    integer fclaw2d_map_is_used
+    integer fclaw_map_is_used
 
     double precision xp, yp, zp
 
     cont = fclaw_map_get_context()
 
-    if (fclaw2d_map_is_used(cont) .ne. 0) then
-        call fclaw3d_map_c2m(cont,blockno,xc,yc,zc,xp,yp,zp)
+    if (fclaw_map_is_used(cont) .ne. 0) then
+        call fclaw_map_3d_c2m(cont,blockno,xc,yc,zc,xp,yp,zp)
     else
         xp = xc
         yp = yc
@@ -33,7 +33,7 @@ integer function fclaw3dx_user_exceeds_th(blockno,&
     !! would fail tagging criteria
     if (is_ghost) then
         !! Don't use this result
-        fclaw3dx_user_exceeds_th = -1
+        fclaw3d_user_exceeds_th = -1
         return
     endif
 
@@ -44,6 +44,6 @@ integer function fclaw3dx_user_exceeds_th(blockno,&
         refine = 0
     endif
 
-    fclaw3dx_user_exceeds_th = refine
+    fclaw3d_user_exceeds_th = refine
 
-end function fclaw3dx_user_exceeds_th
+end function fclaw3d_user_exceeds_th

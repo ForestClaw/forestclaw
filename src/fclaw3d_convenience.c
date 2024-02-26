@@ -25,3 +25,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw2d_to_3d.h>
 #include "fclaw2d_convenience.c"
+
+fclaw2d_domain_t *
+fclaw3d_domain_new_unitcube (sc_MPI_Comm mpicomm, int initial_level)
+{
+    return fclaw2d_domain_new_conn (mpicomm, initial_level,
+                                    p8est_connectivity_new_unitcube ());
+}

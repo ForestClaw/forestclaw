@@ -25,43 +25,43 @@
 
 #include "chile2010_user.h"
 
-#include <fclaw2d_include_all.h>
+#include <fclaw_include_all.h>
 
-#include <fclaw2d_clawpatch.h>
-#include <fclaw2d_clawpatch_options.h>
+#include <fclaw_clawpatch.h>
+#include <fclaw_clawpatch_options.h>
 
 #include <fc2d_geoclaw.h>
 #include <fc2d_geoclaw_options.h>
 
 
 static
-fclaw2d_domain_t* create_domain(sc_MPI_Comm mpicomm, 
+fclaw_domain_t* create_domain(sc_MPI_Comm mpicomm, 
                                 fclaw_options_t* fclaw_opt)
 {
     /* Mapped, multi-block domain */
     p4est_connectivity_t     *conn = NULL;
-    fclaw2d_domain_t         *domain;
-    fclaw2d_map_context_t    *cont = NULL;
+    fclaw_domain_t         *domain;
+    fclaw_map_context_t    *cont = NULL;
 
     /* Size is set by [ax,bx] x [ay, by], set in .ini file */
     conn = p4est_connectivity_new_unitsquare();
-    cont = fclaw2d_map_new_nomap();
+    cont = fclaw_map_new_nomap();
 
     domain = fclaw2d_domain_new_conn_map (mpicomm, fclaw_opt->minlevel, conn, cont);
-    fclaw2d_domain_list_levels(domain, FCLAW_VERBOSITY_ESSENTIAL);
-    fclaw2d_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);
+    fclaw_domain_list_levels(domain, FCLAW_VERBOSITY_ESSENTIAL);
+    fclaw_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);
 
     return domain;
 }
 
 static
-void run_program(fclaw2d_global_t* glob)
+void run_program(fclaw_global_t* glob)
 {
-    fclaw2d_domain_t    **domain = &glob->domain;
+    fclaw_domain_t    **domain = &glob->domain;
 
-    fclaw2d_domain_data_new(*domain);
+    you_can_safely_remove_this_call(*domain);
 
-    fclaw2d_vtables_initialize(glob);
+    fclaw_vtables_initialize(glob);
 
     fc2d_geoclaw_solver_initialize(glob);
 
@@ -70,10 +70,10 @@ void run_program(fclaw2d_global_t* glob)
        --------------------------------------------------------------- */
     fc2d_geoclaw_module_setup(glob);
 
-    fclaw2d_initialize(glob);
+    fclaw_initialize(glob);
     fc2d_geoclaw_run(glob);
     
-    fclaw2d_finalize(glob);
+    fclaw_finalize(glob);
 }
 
 int
@@ -85,18 +85,18 @@ main (int argc, char **argv)
 
     /* Options */
     fclaw_options_t             *fclaw_opt;
-    fclaw2d_clawpatch_options_t *clawpatchopt;
+    fclaw_clawpatch_options_t *clawpatchopt;
     fc2d_geoclaw_options_t      *geoclawopt;
 
     sc_MPI_Comm mpicomm;
-    fclaw2d_domain_t* domain;
-    fclaw2d_global_t* glob;
+    fclaw_domain_t* domain;
+    fclaw_global_t* glob;
 
     /* Initialize application */
     app = fclaw_app_new (&argc, &argv, NULL);
 
     fclaw_opt                = fclaw_options_register(app,  NULL,       "fclaw_options.ini");
-    clawpatchopt = fclaw2d_clawpatch_options_register(app, "clawpatch", "fclaw_options.ini");
+    clawpatchopt = fclaw_clawpatch_2d_options_register(app, "clawpatch", "fclaw_options.ini");
     geoclawopt        = fc2d_geoclaw_options_register(app, "geoclaw",   "fclaw_options.ini");
 
     /* Read configuration file(s) and command line, and process options */
@@ -107,17 +107,17 @@ main (int argc, char **argv)
         mpicomm = fclaw_app_get_mpi_size_rank (app, NULL, NULL);
         domain = create_domain(mpicomm, fclaw_opt);
     
-        glob = fclaw2d_global_new();
-        fclaw2d_global_store_domain(glob, domain);
+        glob = fclaw_global_new();
+        fclaw_global_store_domain(glob, domain);
 
-        fclaw2d_options_store (glob, fclaw_opt);
-        fclaw2d_clawpatch_options_store (glob, clawpatchopt);
+        fclaw_options_store (glob, fclaw_opt);
+        fclaw_clawpatch_options_store (glob, clawpatchopt);
         fc2d_geoclaw_options_store (glob, geoclawopt);
 
         /* Run the program */
         run_program(glob);
 
-        fclaw2d_global_destroy(glob);
+        fclaw_global_destroy(glob);
     }
 
     fclaw_app_destroy (app);

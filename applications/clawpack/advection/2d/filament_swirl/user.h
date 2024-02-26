@@ -31,8 +31,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_filesystem.h>
 #include <fclaw_base.h>
 
-#include <fclaw2d_forestclaw.h>
-#include <fclaw2d_global.h>
+#include <fclaw_forestclaw.h>
+#include <fclaw_global.h>
 
 
 #ifdef __cplusplus
@@ -41,9 +41,9 @@ extern "C"
 #endif
 
 // Why is this here?
-typedef struct fclaw2d_global fclaw2d_global_t;
+typedef struct fclaw_global fclaw_global_t;
 
-void user_run(fclaw2d_global_t *globs[],int nglobs);
+void user_run(fclaw_global_t *globs[],int nglobs);
 
 #ifdef __cplusplus
 }

@@ -165,7 +165,7 @@ c     # ----------------------------------------------------------------
 
       cont = fclaw_map_get_context()
 
-      call fclaw2d_map_brick2c(cont,blockno,xc,yc,xc1,yc1,zc1)
+      call fclaw_map_2d_brick2c(cont,blockno,xc,yc,xc1,yc1,zc1)
 
 
       end

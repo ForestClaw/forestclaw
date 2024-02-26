@@ -42,8 +42,8 @@ extern "C"
 #define FC2D_CUDACLAW_MWAVES  10           /* Used to set shared memory (checked) */ 
 
 
-struct fclaw2d_global;
-struct fclaw2d_patch;
+struct fclaw_global;
+struct fclaw_patch;
 struct cudaclaw_fluxes;
 
 
@@ -75,19 +75,19 @@ typedef void (*cudaclaw_cuda_speeds_t)(int idir, int meqn, int mwaves, int maux,
 
 /* ------------------------------------- Function headers ------------------------------*/
 
-void cudaclaw_allocate_fluxes(struct fclaw2d_global *glob,
-                              struct fclaw2d_patch *patch);
+void cudaclaw_allocate_fluxes(struct fclaw_global *glob,
+                              struct fclaw_patch *patch);
     
-void cudaclaw_deallocate_fluxes(struct fclaw2d_global *glob,
-                                struct fclaw2d_patch *patch);
+void cudaclaw_deallocate_fluxes(struct fclaw_global *glob,
+                                struct fclaw_patch *patch);
 
 
-double cudaclaw_step2_batch(struct fclaw2d_global* glob,
+double cudaclaw_step2_batch(struct fclaw_global* glob,
                             struct cudaclaw_fluxes* fluxes_array,
                             int patch_buffer_len, double t, double dt);
 
-void cudaclaw_store_buffer(struct fclaw2d_global* glob,
-                           struct fclaw2d_patch *this_patch,
+void cudaclaw_store_buffer(struct fclaw_global* glob,
+                           struct fclaw_patch *this_patch,
                            int this_atch_idx,
                            int count, int iter, 
                            struct cudaclaw_fluxes* flux_array);
@@ -100,11 +100,11 @@ struct cudaclaw_fluxes* cudaclaw_get_flux_buffer();
 
 /* --------------------------- Function headers (used outside) -------------------------*/
 
-void fc2d_cudaclaw_allocate_buffers(struct fclaw2d_global *glob);  /* Done once */
+void fc2d_cudaclaw_allocate_buffers(struct fclaw_global *glob);  /* Done once */
 
-void fc2d_cudaclaw_deallocate_buffers(struct fclaw2d_global *glob);
+void fc2d_cudaclaw_deallocate_buffers(struct fclaw_global *glob);
 
-void fc2d_cudaclaw_initialize_GPUs(struct fclaw2d_global *glob);
+void fc2d_cudaclaw_initialize_GPUs(struct fclaw_global *glob);
 
 
 void  cudaclaw_get_method_parameters(int** order, int** mthlim);

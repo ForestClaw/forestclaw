@@ -41,21 +41,21 @@ typedef struct swirl_options
 
 } swirl_options_t;
 
-void swirl_link_solvers(fclaw2d_global_t *glob);
+void swirl_link_solvers(fclaw_global_t *glob);
 
 /* ------------------------------------- Options ---------------------------------------*/
 swirl_options_t* swirl_options_register (fclaw_app_t * app,
                                         const char *section,
                                         const char *configfile);
 
-void swirl_options_store (fclaw2d_global_t* glob, swirl_options_t* user);
+void swirl_options_store (fclaw_global_t* glob, swirl_options_t* user);
 
-const swirl_options_t* swirl_get_options(fclaw2d_global_t* glob);
+const swirl_options_t* swirl_get_options(fclaw_global_t* glob);
 
 /* Swirl */
-void swirl_create_domain(fclaw2d_global_t *glob);
-void swirl_initialize(fclaw2d_global_t* glob);
-void swirl_finalize(fclaw2d_global_t* glob);
+void swirl_create_domain(fclaw_global_t *glob);
+void swirl_initialize(fclaw_global_t* glob);
+void swirl_finalize(fclaw_global_t* glob);
 
 
 #ifdef __cplusplus

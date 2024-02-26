@@ -28,10 +28,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "heat_options.h"
 #include "heat_diagnostics.h"
 
-#include <fclaw2d_include_all.h>
+#include <fclaw_include_all.h>
 
-#include <fclaw2d_clawpatch.h>
-#include <fclaw2d_clawpatch_options.h>
+#include <fclaw_clawpatch.h>
+#include <fclaw_clawpatch_options.h>
 #include <fclaw2d_clawpatch_fort.h>
 
 #include <fc2d_thunderegg.h>
@@ -41,14 +41,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fc2d_thunderegg_starpatch.h>
 #include <fc2d_thunderegg_fivepoint.h>
 
-#include <fclaw2d_elliptic_solver.h>
+#include <fclaw_elliptic_solver.h>
 
+#include <forestclaw.h>
 
-#include <fclaw2d_farraybox.hpp>
+#include <fclaw_farraybox.hpp>
 
 
 static
-void heat_problem_setup(fclaw2d_global_t *glob)
+void heat_problem_setup(fclaw_global_t *glob)
 {
     if (glob->mpirank == 0)
     {
@@ -88,25 +89,25 @@ void heat_problem_setup(fclaw2d_global_t *glob)
 
         fclose(f);
     }
-    fclaw2d_domain_barrier (glob->domain);
+    fclaw_domain_barrier (glob->domain);
     HEAT_SETPROB(); /* This file reads the file just created above */
 }
 
 static
-void heat_initialize(fclaw2d_global_t *glob,
-                     fclaw2d_patch_t *patch,
+void heat_initialize(fclaw_global_t *glob,
+                     fclaw_patch_t *patch,
                      int blockno,
                      int patchno)
 {
 
     int mx,my,mbc;
     double dx,dy,xlower,ylower;
-    fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mbc,
+    fclaw_clawpatch_2d_grid_data(glob,patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
     int meqn;
     double *q;
-    fclaw2d_clawpatch_soln_data(glob,patch,&q,&meqn);
+    fclaw_clawpatch_soln_data(glob,patch,&q,&meqn);
 
     /* This function supplies an analytic right hand side. */
     HEAT_INIT(&blockno, &mbc, &mx, &my, &meqn, 
@@ -116,24 +117,24 @@ void heat_initialize(fclaw2d_global_t *glob,
 
 
 static
-void heat_rhs(fclaw2d_global_t *glob,
-                fclaw2d_patch_t *patch,
+void heat_rhs(fclaw_global_t *glob,
+                fclaw_patch_t *patch,
                 int blockno,
                 int patchno)
 {
 
     int mx,my,mbc;
     double dx,dy,xlower,ylower;
-    fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mbc,
+    fclaw_clawpatch_2d_grid_data(glob,patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
     int mfields;
     double *rhs;
-    fclaw2d_clawpatch_rhs_data(glob,patch,&rhs,&mfields);
+    fclaw_clawpatch_rhs_data(glob,patch,&rhs,&mfields);
 
     int meqn;
     double *q;
-    fclaw2d_clawpatch_soln_data(glob,patch,&q,&meqn);
+    fclaw_clawpatch_soln_data(glob,patch,&q,&meqn);
 
     /* This function supplies an analytic right hand side. */
     int method = 1;
@@ -152,8 +153,8 @@ void heat_rhs(fclaw2d_global_t *glob,
 
 
 static
-void heat_compute_error(fclaw2d_global_t *glob,
-                          fclaw2d_patch_t *patch,
+void heat_compute_error(fclaw_global_t *glob,
+                          fclaw_patch_t *patch,
                           int blockno,
                           int patchno,
                           void *user)
@@ -161,24 +162,24 @@ void heat_compute_error(fclaw2d_global_t *glob,
     heat_error_info_t* error_data = (heat_error_info_t*) user;
     //const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
 
-    fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt(glob);
+    fclaw_clawpatch_vtable_t *clawpatch_vt = fclaw_clawpatch_vt(glob);
 
-    if (clawpatch_vt->fort_compute_patch_error != NULL)
+    if (clawpatch_vt->d2->fort_compute_patch_error != NULL)
     {
         int mx, my, mbc;
         double xlower,ylower,dx,dy;
-        fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mbc,&xlower,
+        fclaw_clawpatch_2d_grid_data(glob,patch,&mx,&my,&mbc,&xlower,
                                     &ylower,&dx,&dy);
 
-        double *area = fclaw2d_clawpatch_get_area(glob,patch);  /* Might be null */
+        double *area = fclaw_clawpatch_get_2d_area(glob,patch);  /* Might be null */
 
         /* Solution is stored in the RHS */
         double *q;
         int meqn;
-        fclaw2d_clawpatch_soln_data(glob,patch,&q,&meqn);
+        fclaw_clawpatch_soln_data(glob,patch,&q,&meqn);
 
-        double *err = fclaw2d_clawpatch_get_error(glob,patch);
-        double *soln  = fclaw2d_clawpatch_get_exactsoln(glob,patch);
+        double *err = fclaw_clawpatch_get_error(glob,patch);
+        double *soln  = fclaw_clawpatch_get_exactsoln(glob,patch);
 
 #if 0
         fclaw2d_clawpatch_elliptic_error_data(glob,patch,&err,&mfields);
@@ -187,16 +188,16 @@ void heat_compute_error(fclaw2d_global_t *glob,
 
         double t = glob->curr_time;
 
-        clawpatch_vt->fort_compute_patch_error(&blockno, &mx,&my,&mbc,
-                                               &meqn,&dx,&dy,
-                                               &xlower,&ylower, &t, q, err, soln);
+        clawpatch_vt->d2->fort_compute_patch_error(&blockno, &mx,&my,&mbc,
+                                                   &meqn,&dx,&dy,
+                                                   &xlower,&ylower, &t, q, err, soln);
 
         /* Accumulate sums and maximums needed to compute error norms */
 
-        FCLAW_ASSERT(clawpatch_vt->fort_compute_error_norm != NULL);
-        clawpatch_vt->fort_compute_error_norm(&blockno, &mx, &my, &mbc, &meqn, 
-                                              &dx,&dy, area, err,
-                                              error_data->local_error);
+        FCLAW_ASSERT(clawpatch_vt->d2->fort_compute_error_norm != NULL);
+        clawpatch_vt->d2->fort_compute_error_norm(&blockno, &mx, &my, &mbc, &meqn, 
+                                                  &dx,&dy, area, err,
+                                                  error_data->local_error);
 
     }
 }
@@ -204,10 +205,10 @@ void heat_compute_error(fclaw2d_global_t *glob,
 
 
 static
-void heat_time_header_ascii(fclaw2d_global_t* glob, int iframe)
+void heat_time_header_ascii(fclaw_global_t* glob, int iframe)
 {
-    const fclaw2d_clawpatch_options_t *clawpatch_opt = 
-                fclaw2d_clawpatch_get_options(glob);
+    const fclaw_clawpatch_options_t *clawpatch_opt = 
+                fclaw_clawpatch_get_options(glob);
     char matname1[20];
     sprintf(matname1,"fort.q%04d",iframe);
 
@@ -244,36 +245,36 @@ void heat_time_header_ascii(fclaw2d_global_t* glob, int iframe)
 
 
 static
-void cb_heat_output_ascii(fclaw2d_domain_t * domain,
-                            fclaw2d_patch_t * patch,
+void cb_heat_output_ascii(fclaw_domain_t * domain,
+                            fclaw_patch_t * patch,
                             int blockno, int patchno,
                             void *user)
 {
-    fclaw2d_global_iterate_t* s = (fclaw2d_global_iterate_t*) user;
-    fclaw2d_global_t *glob = (fclaw2d_global_t*) s->glob;
+    fclaw_global_iterate_t* s = (fclaw_global_iterate_t*) user;
+    fclaw_global_t *glob = (fclaw_global_t*) s->glob;
     int iframe = *((int *) s->user);
 
     /* Get info not readily available to user */
     int global_num, local_num;
     int level;
-    fclaw2d_patch_get_info(glob->domain,patch,
+    fclaw_patch_get_info(glob->domain,patch,
                            blockno,patchno,
                            &global_num,&local_num, &level);
     
     int mx,my,mbc;
     double xlower,ylower,dx,dy;
-    fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mbc,
+    fclaw_clawpatch_2d_grid_data(glob,patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
     double *q;
     int meqn;
-    fclaw2d_clawpatch_soln_data(glob,patch,&q,&meqn);
+    fclaw_clawpatch_soln_data(glob,patch,&q,&meqn);
 
-    double *error = fclaw2d_clawpatch_get_error(glob,patch);
-    double *soln  = fclaw2d_clawpatch_get_exactsoln(glob,patch);
+    double *error = fclaw_clawpatch_get_error(glob,patch);
+    double *soln  = fclaw_clawpatch_get_exactsoln(glob,patch);
 
     char fname[BUFSIZ];
-    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+    const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
     snprintf (fname, BUFSIZ, "%s.q%04d", fclaw_opt->prefix, iframe);
 
     /* The fort routine is defined by a clawpack solver and handles 
@@ -289,14 +290,14 @@ void cb_heat_output_ascii(fclaw2d_domain_t * domain,
 }
 
 
-int heat_tag4refinement(fclaw2d_global_t *glob,
-                        fclaw2d_patch_t *this_patch,
+int heat_tag4refinement(fclaw_global_t *glob,
+                        fclaw_patch_t *this_patch,
                         int blockno, int patchno,
                         int initflag)
 {
-    fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt(glob);
+    fclaw_clawpatch_vtable_t* clawpatch_vt = fclaw_clawpatch_vt(glob);
 
-    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+    const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
 
     int tag_patch;
     double refine_threshold;
@@ -305,57 +306,57 @@ int heat_tag4refinement(fclaw2d_global_t *glob,
 
     int mx,my,mbc;
     double xlower,ylower,dx,dy;
-    fclaw2d_clawpatch_grid_data(glob,this_patch,&mx,&my,&mbc,
+    fclaw_clawpatch_2d_grid_data(glob,this_patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
     double *q;
     int meqn;
-    fclaw2d_clawpatch_soln_data(glob,this_patch,&q,&meqn);
+    fclaw_clawpatch_soln_data(glob,this_patch,&q,&meqn);
 
     tag_patch = 0;
-    clawpatch_vt->fort_tag4refinement(&mx,&my,&mbc,&meqn,
-                                      &xlower,&ylower,&dx,&dy,
-                                      &blockno, q,&refine_threshold,
-                                      &initflag,&tag_patch);
+    clawpatch_vt->d2->fort_tag4refinement(&mx,&my,&mbc,&meqn,
+                                          &xlower,&ylower,&dx,&dy,
+                                          &blockno, q,&refine_threshold,
+                                          &initflag,&tag_patch);
     return tag_patch;
 }
 
 static
-int heat_tag4coarsening(fclaw2d_global_t *glob,
-                        fclaw2d_patch_t *fine_patches,
+int heat_tag4coarsening(fclaw_global_t *glob,
+                        fclaw_patch_t *fine_patches,
                         int blockno,
                         int patchno,
                         int initflag)
 {
-    fclaw2d_patch_t *patch0 = &fine_patches[0];
+    fclaw_patch_t *patch0 = &fine_patches[0];
 
-    const fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+    const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
     double coarsen_threshold = fclaw_opt->coarsen_threshold;
 
     int mx,my,mbc;
     double xlower,ylower,dx,dy;
-    fclaw2d_clawpatch_grid_data(glob,patch0,&mx,&my,&mbc,
+    fclaw_clawpatch_2d_grid_data(glob,patch0,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
     double *q[4];
     int meqn;
     for (int igrid = 0; igrid < 4; igrid++)
     {
-        fclaw2d_clawpatch_soln_data(glob,&fine_patches[igrid],&q[igrid],&meqn);
+        fclaw_clawpatch_soln_data(glob,&fine_patches[igrid],&q[igrid],&meqn);
     }
 
-    fclaw2d_clawpatch_vtable_t* clawpatch_vt = fclaw2d_clawpatch_vt(glob);
+    fclaw_clawpatch_vtable_t* clawpatch_vt = fclaw_clawpatch_vt(glob);
 
     int tag_patch = 0;
-    clawpatch_vt->fort_tag4coarsening(&mx,&my,&mbc,&meqn,&xlower,&ylower,&dx,&dy,
-                                      &blockno, q[0],q[1],q[2],q[3],
-                                      &coarsen_threshold,&initflag,&tag_patch);
+    clawpatch_vt->d2->fort_tag4coarsening(&mx,&my,&mbc,&meqn,&xlower,&ylower,&dx,&dy,
+                                          &blockno, q[0],q[1],q[2],q[3],
+                                          &coarsen_threshold,&initflag,&tag_patch);
     return tag_patch == 1;
 }
 
 static
-void heat_bc2(fclaw2d_global_t *glob,
-              fclaw2d_patch_t *patch,
+void heat_bc2(fclaw_global_t *glob,
+              fclaw_patch_t *patch,
               int block_idx,
               int patch_idx,
               double t,
@@ -367,19 +368,19 @@ void heat_bc2(fclaw2d_global_t *glob,
 
     int mx,my,mbc;
     double xlower,ylower,dx,dy;
-    fclaw2d_clawpatch_grid_data(glob,patch, &mx,&my,&mbc,
+    fclaw_clawpatch_2d_grid_data(glob,patch, &mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
     double *q;
     int meqn;
-    fclaw2d_clawpatch_soln_data(glob,patch,&q,&meqn);
+    fclaw_clawpatch_soln_data(glob,patch,&q,&meqn);
 
     HEAT_FORT_BC2(&meqn,&mbc,&mx,&my,&xlower,&ylower,
                   &dx,&dy,q,&t,&dt,intersects_bc);
 }
 
 
-void heat_link_solvers(fclaw2d_global_t *glob)
+void heat_link_solvers(fclaw_global_t *glob)
 {
 #if 0 
     /* These are listed here for reference */
@@ -388,11 +389,11 @@ void heat_link_solvers(fclaw2d_global_t *glob)
     fclaw2d_patch_vtable_t* patch_vt = fclaw2d_patch_vt(glob);
 #endif
     /* ForestClaw vtable */
-    fclaw2d_vtable_t *fclaw_vt = fclaw2d_vt(glob);
-    fclaw_vt->problem_setup = &heat_problem_setup;  
+    fclaw_vtable_t *fc_vt = fclaw_vt(glob);
+    fc_vt->problem_setup = &heat_problem_setup;  
 
     /* Patch : RHS function */
-    fclaw2d_patch_vtable_t* patch_vt = fclaw2d_patch_vt(glob);
+    fclaw_patch_vtable_t* patch_vt = fclaw_patch_vt(glob);
     patch_vt->physical_bc = heat_bc2;     
     patch_vt->rhs = heat_rhs;          /* Overwrites default */
     patch_vt->initialize = heat_initialize;   /* Get an initial refinement */
@@ -406,15 +407,15 @@ void heat_link_solvers(fclaw2d_global_t *glob)
     mg_vt->fort_eval_bc  = &HEAT_NEUMANN;   // For non-homogeneous BCs
 
     /* Clawpatch : Compute the error */
-    fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt(glob);
+    fclaw_clawpatch_vtable_t *clawpatch_vt = fclaw_clawpatch_vt(glob);
     clawpatch_vt->compute_error = heat_compute_error;
-    clawpatch_vt->fort_compute_patch_error = &HEAT_COMPUTE_ERROR;
+    clawpatch_vt->d2->fort_compute_patch_error = &HEAT_COMPUTE_ERROR;
 
     // tagging routines
     patch_vt->tag4refinement       = heat_tag4refinement;
     patch_vt->tag4coarsening       = heat_tag4coarsening;
-    clawpatch_vt->fort_tag4refinement = &HEAT_TAG4REFINEMENT;
-    clawpatch_vt->fort_tag4coarsening = &HEAT_TAG4COARSENING;
+    clawpatch_vt->d2->fort_tag4refinement = &HEAT_TAG4REFINEMENT;
+    clawpatch_vt->d2->fort_tag4coarsening = &HEAT_TAG4COARSENING;
 
     // Output routines
     clawpatch_vt->time_header_ascii = heat_time_header_ascii;

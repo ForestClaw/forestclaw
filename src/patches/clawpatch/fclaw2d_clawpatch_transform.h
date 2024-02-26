@@ -42,10 +42,10 @@ extern "C"
 #endif
 #endif
 
-struct fclaw2d_global;
-struct fclaw2d_patch;  /* fclaw2d_patch.h includes this file */
+struct fclaw_global;
+struct fclaw_patch;  /* fclaw2d_patch.h includes this file */
 /** Struture to store a patch's transform data */
-struct fclaw2d_patch_transform_data;
+struct fclaw_patch_transform_data;
 
 /**
  * @brief Initialize the patch's tranform data
@@ -56,10 +56,10 @@ struct fclaw2d_patch_transform_data;
  * @param[in] patchno the patch number
  * @param[in,out] transform the transform data
  */
-void fclaw2d_clawpatch_transform_init_data(struct fclaw2d_global* glob, 
-                                           struct fclaw2d_patch* this_patch,
+void fclaw2d_clawpatch_transform_init_data(struct fclaw_global* glob, 
+                                           struct fclaw_patch* this_patch,
                                            int blockno, int patchno,
-                                           struct fclaw2d_patch_transform_data* transform);
+                                           struct fclaw_patch_transform_data* transform);
 
 /** @copydoc fclaw2d_patch_face_transformation() */
 void fclaw2d_clawpatch_face_transformation (int faceno, int rfaceno, int ftransform[]);
@@ -82,7 +82,7 @@ void fclaw2d_clawpatch_face_transformation_intra (int ftransform[]);
  */
 void FCLAW2D_CLAWPATCH_TRANSFORM_FACE (const int *i1, const int *j1,
                                        int *i2, int *j2,
-                                       struct fclaw2d_patch_transform_data** ptdata);
+                                       struct fclaw_patch_transform_data** ptdata);
 
 /** Fortran subroutine name */
 #define FCLAW2D_CLAWPATCH_TRANSFORM_FACE_HALF FCLAW_F77_FUNC_(fclaw2d_clawpatch_transform_face_half, \
@@ -96,7 +96,7 @@ void FCLAW2D_CLAWPATCH_TRANSFORM_FACE (const int *i1, const int *j1,
  */
 void FCLAW2D_CLAWPATCH_TRANSFORM_FACE_HALF (const int *i1, const int *j1,
                                             int i2[], int j2[],
-                                            struct fclaw2d_patch_transform_data** ptdata);
+                                            struct fclaw_patch_transform_data** ptdata);
 
 /** Fortran subroutine name */
 #define FCLAW2D_CLAWPATCH_TRANSFORM_CORNER FCLAW_F77_FUNC_(fclaw2d_clawpatch_transform_corner, \
@@ -110,7 +110,7 @@ void FCLAW2D_CLAWPATCH_TRANSFORM_FACE_HALF (const int *i1, const int *j1,
  */
 void FCLAW2D_CLAWPATCH_TRANSFORM_CORNER (const int *i1, const int *j1,
                                          int *i2, int *j2,
-                                         struct fclaw2d_patch_transform_data** ptdata);
+                                         struct fclaw_patch_transform_data** ptdata);
 
 /** Fortran subroutine name */
 #define FCLAW2D_CLAWPATCH_TRANSFORM_CORNER_HALF FCLAW_F77_FUNC_(fclaw2d_clawpatch_transform_corner_half, \
@@ -125,7 +125,7 @@ void FCLAW2D_CLAWPATCH_TRANSFORM_CORNER (const int *i1, const int *j1,
  */
 void FCLAW2D_CLAWPATCH_TRANSFORM_CORNER_HALF (const int *i1, const int *j1,
                                               int i2[], int j2[],
-                                              struct fclaw2d_patch_transform_data** ptdata);
+                                              struct fclaw_patch_transform_data** ptdata);
 
 #ifdef __cplusplus
 #if 0

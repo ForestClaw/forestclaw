@@ -16,7 +16,7 @@
       pi = 4.0*atan(1.0)
       pi2 = 2*pi
 
-      call fclaw2d_map_c2m(cont,
+      call fclaw_map_2d_c2m(cont,
      &      blockno,xc,yc,xp,yp,zp)
 
 c     # Torus or annulus

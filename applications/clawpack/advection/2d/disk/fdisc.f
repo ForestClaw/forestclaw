@@ -9,7 +9,7 @@
 
       cont = fclaw_map_get_context()
 
-      call fclaw2d_map_c2m(cont,
+      call fclaw_map_2d_c2m(cont,
      &      blockno,xc,yc,xp,yp,zp)
 
       r = sqrt((xp-0.5d0)**2 + (yp-1.d0)**2)

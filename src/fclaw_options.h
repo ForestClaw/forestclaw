@@ -150,6 +150,7 @@ struct fclaw_options
     int smooth_refine;
     int smooth_level;
     double refine_threshold;
+    int partition_for_coarsening; /**< True if domain will be partitioned for coarsening */
 
     /* Conservation */
     int time_sync;
@@ -164,8 +165,10 @@ struct fclaw_options
     int manifold;
     int mi;
     int mj;
+    int mk;
     int periodic_x;
     int periodic_y;
+    int periodic_z;
 
     /* Advanced options */
     int flux_correction;
@@ -201,9 +204,8 @@ struct fclaw_options
     double bx;   /**< Only for the single block, unmapped case */
     double ay;   /**< Only for the single block, unmapped case */
     double by;   /**< Only for the single block, unmapped case */
-    // TODO 
-    double az;
-    double bz;
+    double az;   /**< Only for the single block, unmapped case */
+    double bz;   /**< Only for the single block, unmapped case */
 
     /* Diagnostics */
     int run_user_diagnostics;
@@ -248,10 +250,18 @@ struct fclaw_options
     const char * logging_prefix; /**< prefix presented in logging ie. [prefix] */
 
     const char * regression_check; /**< filename of regression check values */
+
+    double max_refinement_ratio; /**< Maximum refinment ratio before partitioning and continuing refinement. */
 };
+
+struct fclaw_global;
+
+void fclaw_options_store (struct fclaw_global *glob, struct fclaw_options* fclaw_opt);
+
+fclaw_options_t* fclaw_get_options(struct fclaw_global *glob);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* !FCLAW2D_OPTIONS_H */
+#endif /* !FCLAW_OPTIONS_H */

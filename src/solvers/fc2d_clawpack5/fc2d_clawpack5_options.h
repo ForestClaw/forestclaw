@@ -36,7 +36,7 @@ extern "C"
 #endif
 #endif
 
-struct fclaw2d_global;
+struct fclaw_global;
 
 typedef struct fc2d_clawpack5_options fc2d_clawpack5_options_t;
 
@@ -80,12 +80,12 @@ fc2d_clawpack5_options_t *fc2d_clawpack5_options_register (fclaw_app_t *app,
                                                            const char *section,
                                                            const char *configfile);
 
-void fc2d_clawpack5_options_store (struct fclaw2d_global* glob, 
+void fc2d_clawpack5_options_store (struct fclaw_global* glob, 
                                    fc2d_clawpack5_options_t* clawopt);
 
-fc2d_clawpack5_options_t* fc2d_clawpack5_get_options(struct fclaw2d_global *glob);
+fc2d_clawpack5_options_t* fc2d_clawpack5_get_options(struct fclaw_global *glob);
 
-void fc2d_clawpack5_output(struct fclaw2d_global *glob, int iframe);
+void fc2d_clawpack5_output(struct fclaw_global *glob, int iframe);
 
 
 #define CLAWPACK5_SET_AMR_MODULE FCLAW_F77_FUNC(clawpack5_set_amr_module, \

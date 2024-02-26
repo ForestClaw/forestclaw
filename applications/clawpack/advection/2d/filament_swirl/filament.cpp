@@ -32,11 +32,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "filament/filament_user.h"
 
-void filament_create_domain(fclaw2d_global_t *glob)
+void filament_create_domain(fclaw_global_t *glob)
 {
-    fclaw2d_set_global_context(glob);    
+    fclaw_set_global_context(glob);    
 
-    const fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
+    const fclaw_options_t* fclaw_opt = fclaw_get_options(glob);
 
     int mi = fclaw_opt->mi;
     int mj = fclaw_opt->mj;
@@ -44,39 +44,34 @@ void filament_create_domain(fclaw2d_global_t *glob)
     int b = fclaw_opt->periodic_y;
 
     /* Square brick domain */
-    fclaw2d_domain_t *domain =
-        fclaw2d_domain_new_brick (glob->mpicomm, mi, mj, a, b,
+    fclaw_domain_t *domain =
+        fclaw_domain_new_2d_brick (glob->mpicomm, mi, mj, a, b,
                                       fclaw_opt->minlevel);
-    fclaw2d_map_context_t* brick = 
-        fclaw2d_map_new_brick (domain, mi, mj, a, b);
+    fclaw_map_context_t* brick = 
+        fclaw_map_new_2d_brick (domain, mi, mj, a, b);
         
     /* Square in [-1,1]x[-1,1], shifted by (1,1,0) */
-    fclaw2d_map_context_t *cont  = 
+    fclaw_map_context_t *cont  = 
         fclaw2d_map_new_cart(brick,
                              fclaw_opt->scale,
                              fclaw_opt->shift);
 
     /* Store domain in the glob */
-    fclaw2d_global_store_domain(glob, domain);
+    fclaw_global_store_domain(glob, domain);
 
-    fclaw2d_global_store_map (glob, cont);
+    fclaw_map_store (glob, cont);
 
-    fclaw2d_clear_global_context(glob);    
+    fclaw_clear_global_context(glob);    
 }
 
-void filament_initialize(fclaw2d_global_t* glob)
+void filament_initialize(fclaw_global_t* glob)
 {
-    fclaw2d_set_global_context(glob);
+    fclaw_set_global_context(glob);
 
     const filament_options_t *user = filament_get_options(glob);
 
-    /* ---------------------------------------------------------------
-       Set domain data.
-       --------------------------------------------------------------- */
-    fclaw2d_domain_data_new(glob->domain);
-
     /* Initialize virtual table for ForestClaw */
-    fclaw2d_vtables_initialize(glob);
+    fclaw_vtables_initialize(glob);
 
     if (user->claw_version == 4)
     {
@@ -88,18 +83,18 @@ void filament_initialize(fclaw2d_global_t* glob)
     }
 
     filament_link_solvers(glob);
-    fclaw2d_initialize(glob);
+    fclaw_initialize(glob);
 
-    fclaw2d_clear_global_context(glob);
+    fclaw_clear_global_context(glob);
 }
 
-void filament_finalize(fclaw2d_global_t* glob)
+void filament_finalize(fclaw_global_t* glob)
 {
-    fclaw2d_set_global_context(glob);
+    fclaw_set_global_context(glob);
 
-    fclaw2d_problem_setup(glob);
-    fclaw2d_finalize(glob);
+    fclaw_problem_setup(glob);
+    fclaw_finalize(glob);
 
-    fclaw2d_clear_global_context(glob);
+    fclaw_clear_global_context(glob);
 }
 

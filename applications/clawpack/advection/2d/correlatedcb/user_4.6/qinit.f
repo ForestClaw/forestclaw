@@ -26,7 +26,7 @@
          yc = ylower + (j-0.5d0)*dy
          do i = 1-mbc,mx+mbc
             xc = xlower + (i-0.5d0)*dx
-            call fclaw2d_map_c2m(cont,
+            call fclaw_map_2d_c2m(cont,
      &            blockno,xc,yc,xp,yp,zp)
             q(i,j,1) = cosine_bell_sum(xp,yp,zp)
             if (meqn .eq. 2) then

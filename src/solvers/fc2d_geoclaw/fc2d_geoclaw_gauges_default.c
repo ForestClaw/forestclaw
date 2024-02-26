@@ -30,11 +30,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "fc2d_geoclaw_options.h"
 
-#include <fclaw2d_clawpatch.h>
-#include <fclaw2d_clawpatch_options.h>
+#include <fclaw_clawpatch.h>
+#include <fclaw_clawpatch_options.h>
 
-#include <fclaw2d_options.h>
-#include <fclaw2d_global.h>
+#include <fclaw_options.h>
+#include <fclaw_global.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -53,7 +53,7 @@ typedef struct geoclaw_user
 } geoclaw_user_t;
 
 
-void geoclaw_read_gauges_data_default(fclaw2d_global_t *glob, 
+void geoclaw_read_gauges_data_default(fclaw_global_t *glob, 
                                       fclaw_gauge_t **gauges,
                                       int *num_gauges)
 {
@@ -169,7 +169,7 @@ void geoclaw_read_gauges_data_default(fclaw2d_global_t *glob,
 /* This function can be virtualized so the user can specify their 
    gauge output */
 
-void geoclaw_create_gauge_files_default(fclaw2d_global_t *glob, 
+void geoclaw_create_gauge_files_default(fclaw_global_t *glob, 
                                         fclaw_gauge_t *gauges,
                                         int num_gauges)
 {
@@ -199,8 +199,8 @@ void geoclaw_create_gauge_files_default(fclaw2d_global_t *glob,
     }
 }
 
-void geoclaw_gauge_normalize_coordinates(fclaw2d_global_t *glob, 
-                                        fclaw2d_block_t *block,
+void geoclaw_gauge_normalize_coordinates(fclaw_global_t *glob, 
+                                        fclaw_block_t *block,
                                         int blockno, 
                                         fclaw_gauge_t *g,
                                         double *xc, double *yc)
@@ -213,7 +213,7 @@ void geoclaw_gauge_normalize_coordinates(fclaw2d_global_t *glob,
        Return normalized (xc,yc) coordinates for gauge.
     */
 
-    fclaw_options_t *fclaw_opt = fclaw2d_get_options(glob);
+    fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
     double ax,bx,ay,by;
 
     ax = fclaw_opt->ax;
@@ -227,9 +227,9 @@ void geoclaw_gauge_normalize_coordinates(fclaw2d_global_t *glob,
 }
 
 
-void geoclaw_gauge_update_default(fclaw2d_global_t* 
-                                  glob, fclaw2d_block_t* block,
-                                  fclaw2d_patch_t* patch, 
+void geoclaw_gauge_update_default(fclaw_global_t* 
+                                  glob, fclaw_block_t* block,
+                                  fclaw_patch_t* patch, 
                                   int blockno, int patchno,
                                   double tcurr, fclaw_gauge_t *g)
 {
@@ -242,7 +242,7 @@ void geoclaw_gauge_update_default(fclaw2d_global_t*
 
     int m;
 
-    fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mbc,
+    fclaw_clawpatch_2d_grid_data(glob,patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
     fclaw_gauge_get_data(glob,g,&num, &xc, &yc, &t1, &t2);
@@ -250,8 +250,8 @@ void geoclaw_gauge_update_default(fclaw2d_global_t*
     FCLAW_ASSERT(xc >= xlower && xc <= xlower + mx*dx);
     FCLAW_ASSERT(yc >= ylower && yc <= ylower + my*dy);
 
-    fclaw2d_clawpatch_soln_data(glob,patch,&q,&meqn);
-    fclaw2d_clawpatch_aux_data(glob,patch,&aux,&maux);
+    fclaw_clawpatch_soln_data(glob,patch,&q,&meqn);
+    fclaw_clawpatch_aux_data(glob,patch,&aux,&maux);
 
     /* Interpolate q variables and aux variables (bathy only for now)
        to gauge location */
@@ -272,7 +272,7 @@ void geoclaw_gauge_update_default(fclaw2d_global_t*
     fclaw_gauge_set_buffer_entry(glob,g,guser);
 }
 
-void geoclaw_print_gauges_default(fclaw2d_global_t *glob, 
+void geoclaw_print_gauges_default(fclaw_global_t *glob, 
                                   fclaw_gauge_t *gauge) 
 {
     int k, kmax, id;

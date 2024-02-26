@@ -7,7 +7,7 @@
 
       cont = fclaw_map_get_context()
 
-      call fclaw2d_map_c2m(cont,
+      call fclaw_map_2d_c2m(cont,
      &      blockno,xc,yc,xp,yp,zp)
 
 

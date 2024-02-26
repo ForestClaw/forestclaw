@@ -24,99 +24,105 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include <fclaw_domain.h>
-#include <fclaw2d_domain.h>
-#include <fclaw3d_domain.h>
+#include <fclaw_convenience.h>  /* Contains domain_destroy and others */
+#include <fclaw_patch.h>
+#include <fclaw_exchange.h>
+#include <fclaw_global.h>
 
-int
-fclaw_domain_is_valid (fclaw_domain_t * domain)
+/* dimension-independent helper functions first */
+
+#if 0
+
+static fclaw2d_domain_t *
+fclaw_domain_get_domain (fclaw_domain_t *d)
 {
-    if (domain == NULL)
-        return 0;
-    if (domain->dim == 2)
-    {
-        if (domain->d.d2.dmagic2 != FCLAW2D_DOMAIN_MAGIC)
-            return 0;
-        if (domain->d.d2.domain2 == NULL)
-            return 0;
-        if (domain->d.d2.domain2->mpisize <= 0)
-            return 0;
-    }
-    else
-    {
-        if (domain->dim != 3)
-            return 0;
-        if (domain->d.d3.dmagic3 != FCLAW3D_DOMAIN_MAGIC)
-            return 0;
-        if (domain->d.d3.domain3 == NULL)
-            return 0;
-        if (domain->d.d3.domain3->mpisize <= 0)
-            return 0;
-    }
-    return 1;
+#ifndef P4_TO_P8
+    return d->d.d2.domain2;
+#else
+    return d->d.d3.domain3;
+#endif
 }
 
-void
-fclaw_domain_destroy (fclaw_domain_t * domain,
-                      fclaw_domain_callback_t dele, void *user)
+#endif
+
+void fclaw_domain_setup(fclaw_global_t* glob,
+                          fclaw_domain_t* new_domain)
 {
-    FCLAW_ASSERT (fclaw_domain_is_valid (domain));
-    if (domain->dim == 2)
+    fclaw_domain_t *old_domain = glob->domain;
+    double t;
+
+    if (old_domain == new_domain)
     {
-        fclaw_domain_destroy2d (domain, dele, user);
+        fclaw_global_infof("Building initial domain\n");
+        t = 0;
+        glob->curr_time = t;//new_domain        
     }
     else
     {
-        FCLAW_ASSERT (domain->dim == 3);
-        fclaw_domain_destroy3d (domain, dele, user);
+        fclaw_global_infof("Rebuilding  domain\n");
     }
+    fclaw_global_infof("Done\n");
 }
 
-void
-fclaw_domain_iterate_patches (fclaw_domain_t * domain,
-                              fclaw_domain_callback_t iter, void *user)
+void fclaw_domain_reset(fclaw_global_t* glob)
 {
-    fclaw_domain_iterate_t di;
+    fclaw_domain_t** domain = &glob->domain;
+    int i, j;
 
-    FCLAW_ASSERT (fclaw_domain_is_valid (domain));
-
-    di.d = domain;
-    di.iter = iter;
-    di.user = user;
-
-    if (domain->dim == 2)
+    for(i = 0; i < (*domain)->num_blocks; i++)
     {
-        fclaw2d_domain_iterate_patches (domain->d.d2.domain2,
-                                        fclaw2d_domain_iterate_cb, &di);
+        fclaw_block_t *block = (*domain)->blocks + i;
+
+        for(j = 0; j < block->num_patches; j++)
+        {
+            /* This is here to delete any patches created during
+               initialization, and not through regridding */
+            fclaw_patch_t *patch = block->patches + j;
+            fclaw_patch_data_delete(glob,patch);
+        }
+        block->user = NULL;
     }
-    else
+
+    if ((*domain)->exchange != NULL)
     {
-        FCLAW_ASSERT (domain->dim == 3);
-        fclaw3d_domain_iterate_patches (domain->d.d3.domain3,
-                                        fclaw3d_domain_iterate_cb, &di);
+        /* TO DO: translate fclaw2d_exchange files */
+        fclaw_exchange_delete(glob);
     }
+
+    /* Output memory discrepancy for the ClawPatch */
+    if ((*domain)->count_set_patch != (*domain)->count_delete_patch)
+    {
+        printf ("[%d] This domain had Clawpatch set %d and deleted %d times\n",
+                (*domain)->mpirank,
+                (*domain)->count_set_patch, (*domain)->count_delete_patch);
+    }
+
+    fclaw_domain_destroy(*domain);
+    *domain = NULL;
 }
 
-void
-fclaw_domain_iterate_level (fclaw_domain_t * domain, int level,
-                            fclaw_domain_callback_t iter, void *user)
+void fclaw_domain_iterate_level_mthread (fclaw_domain_t * domain, int level,
+                                           fclaw_patch_callback_t pcb, void *user)
 {
-    fclaw_domain_iterate_t di;
+#if (_OPENMP)
+    int i, j;
+    fclaw_block_t *block;
+    fclaw_patch_t *patch;
 
-    FCLAW_ASSERT (fclaw_domain_is_valid (domain));
-
-    di.d = domain;
-    di.iter = iter;
-    di.user = user;
-
-    if (domain->dim == 2)
+    for (i = 0; i < domain->num_blocks; i++)
     {
-        fclaw2d_domain_iterate_level (domain->d.d2.domain2, level,
-                                      fclaw2d_domain_iterate_cb, &di);
+        block = domain->blocks + i;
+#pragma omp parallel for private(patch,j)
+        for (j = 0; j < block->num_patches; j++)
+        {
+            patch = block->patches + j;
+            if (patch->level == level)
+            {
+                pcb (domain, patch, i, j, user);
+            }
+        }
     }
-    else
-    {
-        FCLAW_ASSERT (domain->dim == 3);
-        fclaw3d_domain_iterate_level (domain->d.d3.domain3, level,
-                                      fclaw3d_domain_iterate_cb, &di);
-    }
+#else
+    fclaw_global_essentialf("fclaw2d_patch_iterator_mthread: We should not be here\n");
+#endif
 }

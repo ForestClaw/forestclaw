@@ -25,9 +25,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "quadrants_user.h"
 
-#include <fclaw2d_include_all.h>
+#include <fclaw_include_all.h>
 
-#include <fclaw2d_clawpatch.h>
+#include <fclaw_clawpatch.h>
 #include <fclaw2d_clawpatch46_fort.h>
 #include <fclaw2d_clawpatch5_fort.h>
 
@@ -37,7 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "../rp/euler_user_fort.h"
 
 static
-void quadrants_problem_setup(fclaw2d_global_t* glob)
+void quadrants_problem_setup(fclaw_global_t* glob)
 {
     const user_options_t* user = quadrants_get_options(glob);
 
@@ -49,16 +49,16 @@ void quadrants_problem_setup(fclaw2d_global_t* glob)
     }
 
     /* We want to make sure node 0 gets here before proceeding */
-    fclaw2d_domain_barrier (glob->domain);  /* redundant?  */
+    fclaw_domain_barrier (glob->domain);  /* redundant?  */
     SETPROB();
 }
 
-void quadrants_link_solvers(fclaw2d_global_t *glob)
+void quadrants_link_solvers(fclaw_global_t *glob)
 {
     user_options_t *user =  quadrants_get_options(glob);
-    fclaw2d_vtable_t *fclaw_vt = fclaw2d_vt(glob);
+    fclaw_vtable_t *fc_vt = fclaw_vt(glob);
 
-    fclaw_vt->problem_setup = &quadrants_problem_setup;
+    fc_vt->problem_setup = &quadrants_problem_setup;
 
     if (user->claw_version == 4)
     {

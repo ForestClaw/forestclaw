@@ -31,7 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /* User defined extruded mesh mapping */
 static void
-sphere_map_3dx(fclaw2d_map_context_t * cont, int blockno,
+sphere_map_3dx(fclaw_map_context_t * cont, int blockno,
                double xc, double yc, double zc,
                double *xp, double *yp, double *zp)
 {
@@ -53,7 +53,7 @@ sphere_map_3dx(fclaw2d_map_context_t * cont, int blockno,
     double rp = sqrt(pow(xp1,2) + pow(yp1,2) + pow(zp1,2));
 
     /* Extrude in z direction to constant height maxelev. */
-    double maxelev = cont->user_double_3dx[0];  
+    double maxelev = cont->user_double_3d[0];  
     double R = rp + maxelev*zc;  
     *xp = R*cos(phi)*cos(theta);
     *yp = R*cos(phi)*sin(theta);
@@ -63,14 +63,14 @@ sphere_map_3dx(fclaw2d_map_context_t * cont, int blockno,
 }
 
 
-void sphere_map_extrude(fclaw2d_map_context_t* cont,
+void sphere_map_extrude(fclaw_map_context_t* cont,
                          const double maxelev)
 
 {
     /* May be needed to get more general mappings */
-    cont->mapc2m_3dx = sphere_map_3dx;
+    cont->mapc2m_3d = sphere_map_3dx;
     
-    cont->user_double_3dx[0] = maxelev;
+    cont->user_double_3d[0] = maxelev;
 
     cont->is_extruded = 1;
 

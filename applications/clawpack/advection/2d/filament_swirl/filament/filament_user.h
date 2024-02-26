@@ -56,16 +56,16 @@ filament_options_t* filament_options_register (fclaw_app_t * app,
                                                const char *section,
                                                const char *configfile);
 
-void filament_options_store (fclaw2d_global_t* glob, filament_options_t* user);
+void filament_options_store (fclaw_global_t* glob, filament_options_t* user);
 
-const filament_options_t* filament_get_options(fclaw2d_global_t* glob);
+const filament_options_t* filament_get_options(fclaw_global_t* glob);
 
-void filament_link_solvers(fclaw2d_global_t *glob);
+void filament_link_solvers(fclaw_global_t *glob);
 
 /* Filament */
-void filament_create_domain(fclaw2d_global_t *glob);
-void filament_initialize(fclaw2d_global_t* glob);
-void filament_finalize(fclaw2d_global_t* glob);
+void filament_create_domain(fclaw_global_t *glob);
+void filament_initialize(fclaw_global_t* glob);
+void filament_finalize(fclaw_global_t* glob);
 
 
 #ifdef __cplusplus

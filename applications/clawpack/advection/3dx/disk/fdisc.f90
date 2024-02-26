@@ -9,7 +9,7 @@ double precision function  fdisc(blockno,xc,yc,zc)
 
     cont = fclaw_map_get_context()
 
-    call fclaw3d_map_c2m(cont,blockno,xc,yc,zc,xp,yp,zp)
+    call fclaw_map_3d_c2m(cont,blockno,xc,yc,zc,xp,yp,zp)
 
     r = sqrt((xp-0.5d0)**2 + (yp-1.d0)**2)
 

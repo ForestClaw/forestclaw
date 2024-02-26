@@ -23,16 +23,16 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <fclaw2d_global.h>
-#include <fclaw2d_options.h>
+#include <fclaw_global.h>
+#include <fclaw_options.h>
 #include <fclaw_math.h>
 
 #include "fclaw2d_metric.h"
 #include "fclaw2d_metric_default_fort.h"
 
 
-void fclaw2d_metric_compute_mesh_default(fclaw2d_global_t *glob,
-                                         fclaw2d_patch_t* patch,
+void fclaw2d_metric_compute_mesh_default(fclaw_global_t *glob,
+                                         fclaw_patch_t* patch,
                                          int blockno,
                                          int patchno)
 {
@@ -56,8 +56,8 @@ void fclaw2d_metric_compute_mesh_default(fclaw2d_global_t *glob,
 }
 
 
-void fclaw2d_metric_compute_basis_default(fclaw2d_global_t *glob,
-                                            fclaw2d_patch_t *patch,
+void fclaw2d_metric_compute_basis_default(fclaw_global_t *glob,
+                                            fclaw_patch_t *patch,
                                             int blockno,
                                             int patchno)
 {
@@ -107,8 +107,8 @@ void fclaw2d_metric_compute_basis_default(fclaw2d_global_t *glob,
 }
 
 
-void fclaw2d_metric_compute_area_default(fclaw2d_global_t *glob,
-                                         fclaw2d_patch_t *patch,
+void fclaw2d_metric_compute_area_default(fclaw_global_t *glob,
+                                         fclaw_patch_t *patch,
                                          int blockno,
                                          int patchno)
 {
@@ -119,7 +119,7 @@ void fclaw2d_metric_compute_area_default(fclaw2d_global_t *glob,
 
     double *area = fclaw2d_metric_patch_get_area(glob, patch);
 
-    const fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
+    const fclaw_options_t* fclaw_opt = fclaw_get_options(glob);
     int level = patch->level;
     int maxlevel = fclaw_opt->maxlevel;
     int refratio = fclaw_opt->refratio;
@@ -134,8 +134,8 @@ void fclaw2d_metric_compute_area_default(fclaw2d_global_t *glob,
     FCLAW_FREE(quadstore);
 }
 
-void fclaw2d_metric_compute_area_ghost_default(fclaw2d_global_t* glob,
-                                               fclaw2d_patch_t* patch,
+void fclaw2d_metric_compute_area_ghost_default(fclaw_global_t* glob,
+                                               fclaw_patch_t* patch,
                                                int blockno,
                                                int patchno)
 {
@@ -148,7 +148,7 @@ void fclaw2d_metric_compute_area_ghost_default(fclaw2d_global_t* glob,
     double *area = fclaw2d_metric_patch_get_area(glob, patch);
 
     /* Set area in ghost cells not set above */
-    const fclaw_options_t* fclaw_opt = fclaw2d_get_options(glob);
+    const fclaw_options_t* fclaw_opt = fclaw_get_options(glob);
     int level = patch->level;
     int maxlevel = fclaw_opt->maxlevel;
     int refratio = fclaw_opt->refratio;
