@@ -76,6 +76,7 @@ typedef enum fclaw2d_file_error
                                  classified as a format error */
     FCLAW2D_FILE_ERR_DIM, /**< file has wrong dimension */
     FCLAW2D_FILE_ERR_UNKNOWN, /**< unknown error */
+    FCLAW2D_FILE_ERR_PART, /**< invalid partition data */
     FCLAW2D_FILE_ERR_NOT_IMPLEMENTED, /**< functionality is not implemented */
     FCLAW2D_FILE_ERR_LASTCODE /**< to define own error codes for
                                   a higher level application
@@ -103,10 +104,7 @@ typedef struct fclaw2d_file_context fclaw2d_file_context_t;
  * Without MPI I/O the function may abort on file system dependent
  * errors.
  *
- * \param [in] filename    Path to parallel file base name that is to be created.
- *                         This means that the user shall not pass the file
- *                         extension since the file extension is specified by
- *                         fclaw2d_file to '.f2d'.
+ * \param [in] filename    Path to parallel file that is to be created.
  * \param [in] user_string A NUL-terminated user string that is written to the
  *                         file header having FCLAW2D_FILE_USER_STRING_BYTES
  *                         bytes including the NUL-termination. Shorter
@@ -126,35 +124,20 @@ fclaw2d_file_context_t *fclaw2d_file_open_write (const char *filename,
                                                  fclaw2d_domain_t * domain,
                                                  int *errcode);
 
-#if 0
-/** Write the partition of the domain associated with \b fc to disk.
+/** Write the partition of a domain to a partition file.
  *
- * This function derives the partition filename from the base filename 'fn' of
- * the given file context \b fc such that the function creates a file named
- * 'fn_partition.f2d' that will contain the partition of the domain that is
- * associated with the given file context \b fc.
+ * This function writes the partition of the passed \b domain to a partition
+ * file. The user can read the partition to an array using \ref
+ * fclaw2d_file_read_partition and then pass the read array to \ref
+ * fclaw2d_file_open_read to use the read partition.
  *
- * This means in particular that the given \b fc stays unchanged and that the
- * internally creates a new file context that will be freed and deallocated at
- * the end of the function in any case. This is important to notice since the
- * \b errcode output parameter of this function refers to this internally created
- * file context and not to the \b fc.
+ * The function and all its parameters are collective.
  *
- * \note In contrast to the not-partition-related writing functions this
- * function always returns the passed \b fc, which stays unchanged, even if an
- * error occurred since this error then relates to the internal file context
- * for writing the separate partition file.
- * \b errcode always relates to the internal file context and not to the passed
- * \b fc.
- *
- * This function does not abort on MPI I/O errors but returns NULL.
+ * This function does not abort on MPI I/O errors but returns -1.
  * Without MPI I/O the function may abort on file system dependent
  * errors.
  *
- * \param [in]     filename     Path to partition file base name that is to be
- *                              created. This means that the user shall not pass
- *                              the file extension since the partition file
- *                              extension is specified by fclaw2d_file as '.fp2d'.
+ * \param [in]     filename     Path to partition file that is to be created.
  * \param [in]     user_string  A NUL-terminated user string that is written to
  *                              the partition file header having \ref
  *                              FCLAW2D_FILE_USER_STRING_BYTES bytes including
@@ -163,19 +146,13 @@ fclaw2d_file_context_t *fclaw2d_file_open_write (const char *filename,
  *                              Too long user strings result in an error with the
  *                              error code \ref FCLAW2D_FILE_ERR_IN_DATA.
  * \param [out]    errcode      An errcode that can be interpreted by
- *                              \ref fclaw2d_file_error_string. \b errcode
- *                              does not refer to the passed \b fc but it refers
- *                              to the internal file context used for for the
- *                              partition file.
+ *                              \ref fclaw2d_file_error_string.
  * \return                      0 for a successful write of the partition file.
- *                              -1 in case of an error. See also \b errcode
- *                              to examine the error of the partition file
- *                              I/O process.
+ *                              -1 in case of an error.
  */
 int fclaw2d_file_write_partition (const char *filename,
                                   const char *user_string,
                                   fclaw2d_domain_t * domain, int *errcode);
-#endif
 
 /** Write a serial data block to an opened parallel file.
  *
@@ -276,6 +253,54 @@ fclaw2d_file_context_t *fclaw2d_file_write_array (fclaw2d_file_context_t *
                                                   sc_array_t * patch_data,
                                                   int *errcode);
 
+/** Read a partition array from file.
+ *
+ * This function reads the partition array, i.e. the global first patch
+ * array from a partition file that was written using
+ * \ref fclaw2d_file_write_partition. The read partition can be passed to
+ * \ref fclaw2d_file_open_read.
+ *
+ * This function guarantees that on successful output the read partition
+ * is valid in the sense that the partition array has 0 as first entry and is
+ * non-decreasing.
+ *
+ * The function and all its parameters are collective.
+ *
+ * This function does not abort on MPI I/O errors but returns -1.
+ * Without MPI I/O the function may abort on file system dependent
+ * errors.
+ *
+ * \param [in]      filename    The path to the partition file.
+ * \param [out]     user_string At least \ref FCLAW2D_FILE_USER_STRING_BYTES
+ *                              bytes. The user string is written
+ *                              to the passed array including padding spaces
+ *                              and a trailing NUL-termination.
+ * \param [in]      mpicomm     The MPI communicator is required to synchronize
+ *                              the \b errcode and the output array \b partition.
+ *                              It is important to notice that \b partition is
+ *                              only available on MPI ranks that are part of the
+ *                              passed \b mpicomm. Therefore, \b mpicomm should
+ *                              coincide with the mpicomm parameter of \ref
+ *                              fclaw2d_file_open_read to ensure that the
+ *                              partition parameter of \ref
+ *                              fclaw2d_file_open_read is collectivly available.
+ * \param [out]     partition   A sc_array with element size equals to
+ *                              sizeof (p4est_gloidx_t). On successful output
+ *                              the array is filled with the read partition.
+ *                              In case of an error, the function does not
+ *                              guarantee that \b partition stays untouched
+ *                              but it is guaranteed that the user is not
+ *                              required to call \ref sc_array_reset on
+ *                              \b partition.
+ * \param [out]     errcode     An errcode that can be interpreted by
+ *                              \ref fclaw2d_file_error_string.
+ * \return                      0 for a successful read of the partition file.
+ *                              -1 in case of an error.
+ */
+int fclaw2d_file_read_partition (const char *filename, char *user_string,
+                                 sc_MPI_Comm mpicomm, sc_array_t * partition,
+                                 int *errcode);
+
 /** Open a file for reading and read the stored domain.
  * The user string is broadcasted to all ranks after reading.
  * The file must exist and be at least of the size of the file header.
@@ -296,10 +321,7 @@ fclaw2d_file_context_t *fclaw2d_file_write_array (fclaw2d_file_context_t *
  * Without MPI I/O the function may abort on file system dependent
  * errors.
  *
- * \param [in]  filename      The path to the base name file that is opened.
- *                            This means that the user shall not pass the file
- *                            extension since the extension ('f2d') is added by
- *                            fclaw2d_file.
+ * \param [in]  filename      The path to the file that is opened.
  * \param [out] user_string   At least \ref FCLAW2D_FILE_USER_STRING_BYTES
  *                            bytes. The user string is written
  *                            to the passed array including padding spaces
@@ -307,17 +329,24 @@ fclaw2d_file_context_t *fclaw2d_file_write_array (fclaw2d_file_context_t *
  * \param [in]  mpicomm       MPI communicator that is used to read the file and
  *                            is used for potential other reading operations of
  *                            MPI communicator dependent objects.
- * \param [in]  par_filename  The path to the base name file that is used to
- *                            load the parititon. If \b par_filename is NULL,
- *                            a uniform parititon with respect to the patch
- *                            count is computed and used. If the partition is
- *                            read, it is used for the parallel I/O operations
- *                            and stored in the returned \b domain. If the MPI
- *                            size and the partition size do not coincide a
- *                            partition for the current MPI size is computed.
- *                            The function call results in an error if there
- *                            is no partition to read.
- *                            Currently, this parameter does not have any effect.
+ * \param [in]  partition     A sc_array of the size of number of MPI ranks + 1
+ *                            with sizeof (p4est_gloidx_t) as element size
+ *                            or NULL.
+ *                            The sc_array must contain a valid partition, i.e.
+ *                            the first element is 0, the array is
+ *                            non-decreasing and the last array entry equals
+ *                            the number of global patches of the domain in
+ *                            the file pointed to by \b filename.
+ *                            If any of these conditions is violated, the
+ *                            function returns NULL and set \b errcode to
+ *                            \ref FCLAW2D_FILE_ERR_PART.
+ *                            The user can pass NULL for using the uniform
+ *                            partition with respect to the quadrant count.
+ *                            In both cases the respective partition, either
+ *                            read or computed, is used for the parallel I/O
+ *                            operations and stored in the returned \b domain.
+ *                            The user can use \ref fclaw2d_file_read_partition
+ *                            to read a partition array from file.
  * \param [out] domain        Newly allocated domain that is read from the file.
  * \param [out] errcode       An errcode that can be interpreted by
  *                            \ref fclaw2d_file_error_string.
@@ -328,7 +357,7 @@ fclaw2d_file_context_t *fclaw2d_file_write_array (fclaw2d_file_context_t *
 fclaw2d_file_context_t *fclaw2d_file_open_read (const char *filename,
                                                 char *user_string,
                                                 sc_MPI_Comm mpicomm,
-                                                const char *par_filename,
+                                                sc_array_t * partition,
                                                 fclaw2d_domain_t ** domain,
                                                 int *errcode);
 
