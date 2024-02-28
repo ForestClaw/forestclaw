@@ -88,9 +88,12 @@ void shockbubble_assign_rpn2(cudaclaw_cuda_rpn2_t *rpn2);
 
 void shockbubble_assign_rpt2(cudaclaw_cuda_rpt2_t *rpt2);
 
+void shockbubble_assign_src2(cudaclaw_cuda_src2_t *src2);
+
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif
+

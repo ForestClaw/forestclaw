@@ -69,5 +69,8 @@ subroutine cudaclaw_qinit(maxmx,maxmy,meqn,mbc, &
         enddo
     enddo
 
+    write(6,*) "qinit : ", vinf
+    stop
+
     return
 end subroutine cudaclaw_qinit

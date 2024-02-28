@@ -59,5 +59,10 @@ subroutine setprob()
              sqrt( 0.5d0*((gamma+1)/gamma) * pinf + 0.5d0*gamma1/gamma )
     einf = 0.5d0*rinf*vinf*vinf + pinf/gamma1
 
+    write(6,*) 'setprob : rinf = ', rinf
+    write(6,*) 'setprob : vinf = ', vinf
+    write(6,*) 'setprob : einf = ', einf
+    stop
+
     return
 end subroutine setprob

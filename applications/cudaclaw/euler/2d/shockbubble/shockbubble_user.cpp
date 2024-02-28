@@ -53,11 +53,10 @@ void shockbubble_problem_setup(fclaw2d_global_t* glob)
 
     /* We want to make sure node 0 gets here before proceeding */
     fclaw2d_domain_barrier (glob->domain);  
-    if (user->cuda != 0)
-    {
-        /* Call CUDA setprob to set parameters needed for Riemann solvers */
-        setprob_cuda(); 
-    }
+
+    /* Call CUDA setprob to set parameters needed for Riemann solvers */
+    setprob_cuda(); 
+
     /* Call Fortran setprob to get parameters needed for qinit */
     SETPROB();
 }
@@ -85,16 +84,11 @@ void shockbubble_problem_setup(fclaw2d_global_t* glob)
 
 void shockbubble_link_solvers(fclaw2d_global_t *glob)
 {
-    // const user_options_t* user = shockbubble_get_options(glob);
-    // fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt(glob);
-
-    // fc2d_clawpack46_options_t *clawopt = fc2d_clawpack46_get_options(glob);
-
     fclaw2d_vtable_t *fclaw_vt = fclaw2d_vt(glob);
     const user_options_t* user = shockbubble_get_options(glob);
 
     fclaw_vt->problem_setup = &shockbubble_problem_setup;
-    fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt(glob);
+    //fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt(glob);
 
     if (user->cuda == 0)
     {
@@ -108,7 +102,7 @@ void shockbubble_link_solvers(fclaw2d_global_t *glob)
         // claw46_vt->fort_src2   = &CLAWPACK46_SRC2;  /* To simulate axis-symmetric */
         
         claw46_vt->fort_qinit  = &CUDACLAW_QINIT;
-        claw46_vt->fort_setaux = &CLAWPACK46_SETAUX;
+        //claw46_vt->fort_setaux = &CLAWPACK46_SETAUX;
         claw46_vt->fort_bc2    = &CUDACLAW_BC2;   /* Special  BCs at left edge */
         claw46_vt->fort_src2   = &CUDACLAW_SRC2;  /* To simulate axis-symmetric */
 
@@ -130,26 +124,21 @@ void shockbubble_link_solvers(fclaw2d_global_t *glob)
     }
     else
     {
-
         //fc2d_clawpack46_vtable_t *claw46_vt = fc2d_clawpack46_vt();
         fc2d_cudaclaw_vtable_t *cuclaw_vt   = fc2d_cudaclaw_vt(glob);
         cuclaw_vt->fort_qinit  = &CUDACLAW_QINIT;
         cuclaw_vt->fort_bc2    = &CUDACLAW_BC2;   /* Special  BCs at left edge */
-        // cuclaw_vt->fort_setaux = &CLAWPACK46_SETAUX;
-        cuclaw_vt->fort_src2   = &CUDACLAW_SRC2;  /* To simulate axis-symmetric */
-
+        //cuclaw_vt->fort_src2   = &CUDACLAW_SRC2;  /* To simulate axis-symmetric */
 
         shockbubble_assign_rpn2(&cuclaw_vt->cuda_rpn2);
         FCLAW_ASSERT(cuclaw_vt->cuda_rpn2 != NULL);
 
         shockbubble_assign_rpt2(&cuclaw_vt->cuda_rpt2);
         FCLAW_ASSERT(cuclaw_vt->cuda_rpt2 != NULL);
+
+        shockbubble_assign_src2(&cuclaw_vt->cuda_src2);
+        FCLAW_ASSERT(cuclaw_vt->cuda_src2 != NULL);
     }   
-#if 0
-    /* Use divided differences to tag grids */
-    clawpatch_vt->fort_tag4refinement = &CLAWPACK46_TAG4REFINEMENT;
-    clawpatch_vt->fort_tag4coarsening = &CLAWPACK46_TAG4COARSENING;
-#endif    
 }
 
 
