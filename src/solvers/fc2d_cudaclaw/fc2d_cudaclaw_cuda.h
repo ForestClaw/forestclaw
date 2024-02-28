@@ -56,6 +56,13 @@ typedef void (*cudaclaw_cuda_b4step2_t)(int mbc, int mx, int my, int meqn, doubl
                                         double time, double dt, int maux, 
                                         double aux[], int i, int j);
 
+typedef void (*cudaclaw_cuda_src2_t)(int meqn, int maux, 
+                                     double xlower, double ylower,
+                                     double dx, double dy, 
+                                     double q[], double aux[],
+                                     double time, double dt, 
+                                     int i, int j);
+
 typedef void (*cudaclaw_cuda_rpn2_t)(int idir, int meqn, int mwaves, int maux,
                                      double ql[], double qr[], 
                                      double auxl[], double auxr[],

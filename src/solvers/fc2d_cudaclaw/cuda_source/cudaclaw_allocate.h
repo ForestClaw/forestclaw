@@ -58,7 +58,9 @@ typedef struct cudaclaw_patch_data
     cudaclaw_fluxes_t *flux_array;
     int *blockno_array;
     int *patchno_array;
-}cudaclaw_patch_data_t;
+    double *t_array;
+    double *dt_array;
+} cudaclaw_patch_data_t;
 
 
 #ifdef __cplusplus

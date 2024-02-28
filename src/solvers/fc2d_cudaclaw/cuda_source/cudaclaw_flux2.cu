@@ -58,7 +58,7 @@ void cudaclaw_set_method_parameters(int *order_in, int *mthlim_in, int mwaves,
 /* Include this here so we don't include device code in fc2d_cudaclaw_cuda.h */
 __device__ double cudaclaw_limiter(int lim_choice, double r);
 
-
+#if 0
 static
 __device__
 void cudaclaw_compute_speeds(const int mx,   const int my, 
@@ -110,7 +110,6 @@ void cudaclaw_compute_speeds(const int mx,   const int my,
     double maxcfl = 0;
 
 
-#if 0
     if (b4step2 != NULL)
     {
         for(int thread_index = threadIdx.x; thread_index < num_ifaces; thread_index += blockDim.x)
@@ -152,7 +151,6 @@ void cudaclaw_compute_speeds(const int mx,   const int my,
         }      
         __syncthreads(); /* Needed to be sure all aux variables are available below */ 
     } 
-#endif    
 
     /* -------------------------- Compute speeds -------------------------------- */
 
@@ -236,6 +234,7 @@ void cudaclaw_compute_speeds(const int mx,   const int my,
         maxcflblocks[blockIdx.z] = aggregate;
     }
 }
+#endif
 
 static
 __device__
@@ -255,6 +254,7 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
                                cudaclaw_cuda_rpn2_t rpn2,
                                cudaclaw_cuda_rpt2_t rpt2,
                                cudaclaw_cuda_b4step2_t b4step2,
+                               cudaclaw_cuda_src2_t src2,
                                double t,double dt)
 {
     typedef cub::BlockReduce<double,FC2D_CUDACLAW_BLOCK_SIZE> BlockReduce;
@@ -285,6 +285,7 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
     __syncthreads();
 
 
+    /* ---------------------------- b4step2 -------------------------------- */
     if (b4step2 != NULL)
     {
         // Sweep over every cell
@@ -347,8 +348,9 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
         __syncthreads(); /* Needed to be sure all aux variables are available below */ 
     } 
 
-    /* -------------------------- Compute fluctuations -------------------------------- */
+    /* ---------------------------- X-sweeps -------------------------------- */
 
+    __syncthreads();
 
     /* x-sweep : Mimic limits set by step2 and the CFL calculation in flux2 */
     if (threadIdx.x == 0) 
@@ -405,7 +407,6 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
         }               
 
         
-        /* ------------------------ Normal solve in X direction ------------------- */
         for(int mq = 0; mq < meqn; mq++)
         {
             int I_q = I + mq*zs;
@@ -453,6 +454,7 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
 
     __syncthreads();
 
+
     if (threadIdx.x == 0)
     {
         ifaces_x = mx + 2*mbc - 2; 
@@ -460,7 +462,10 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
         num_ifaces = ifaces_x*ifaces_y;
     }
 
+    // Need to make sure thread 0 has set the values above before continuing
     __syncthreads();
+
+    /* ---------------------------- Y-sweeps -------------------------------- */
 
     for(int thread_index = threadIdx.x; thread_index < num_ifaces; thread_index += blockDim.x)
     {
@@ -506,7 +511,6 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
             auxr[m] = aux[I_aux];
         }               
 
-
         for(int mq = 0; mq < meqn; mq++)
         {
             int I_q = I + mq*zs;
@@ -550,6 +554,9 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
         }
     }
 
+
+    // Make sure all threads are done before computing CFL
+    __syncthreads();
 
     double aggregate = BlockReduce(temp_storage).Reduce(maxcfl,cub::Max());
     if (threadIdx.x == 0)
@@ -639,8 +646,8 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
     if (order[0] == 2)
     {
         if (threadIdx.x == 0){
-            ifaces_x = mx + 2;  
-            ifaces_y = my + 1;
+            ifaces_x = mx + 2*mbc - 2;  
+            ifaces_y = my + 2*mbc - 1;
             num_ifaces = ifaces_x*ifaces_y;
         }
         __syncthreads();
@@ -652,7 +659,7 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
 
             /* Start at first non-ghost interior cell */
             int iadd = mbc-1;  // Shift from corner by 1 in each direction
-            int I = (iy + iadd)*ys + ix + iadd
+            int I = (iy + iadd)*ys + ix + iadd;
 
             double *const s = start;
             double *const wave = s + mwaves;
@@ -738,12 +745,15 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
 
     /* ------------------------ Transverse Propagation : X-faces ---------------------- */
 
+    __syncthreads();
+
     if (threadIdx.x == 0)
     {
         ifaces_x = mx + 2*mbc-1;   /* Visit x - edges of all non-ghost cells */
         ifaces_y = my + 2*mbc-2;                                  
         num_ifaces = ifaces_x*ifaces_y;
     }
+
     __syncthreads();
 
     /*     transverse-x
@@ -786,7 +796,6 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
             qr[mq] = qold[I_q];
 
             amdq[mq] = amdq_trans[I_q];
-            // apdq[mq] = apdq_trans[I_q];
         }            
 
         for(int imp = 0; imp < 2; imp++)
@@ -809,7 +818,6 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
             double gupdate = 0.5*dtdx*bmasdq[mq];
             gm[I_q - 1] -= gupdate;       
             gp[I_q - 1] -= gupdate;   
-
         }            
     }
 
@@ -854,7 +862,6 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
             qr[mq] = qold[I_q];
 
             amdq[mq] = amdq_trans[I_q];
-            // apdq[mq] = apdq_trans[I_q];
         }            
 
         for(int imp = 0; imp < 2; imp++)
@@ -920,7 +927,6 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
             ql[mq] = qold[I_q-1];
             qr[mq] = qold[I_q];
 
-            // amdq[mq] = amdq_trans[I_q];
             apdq[mq] = apdq_trans[I_q];
         }            
 
@@ -988,7 +994,6 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
             ql[mq] = qold[I_q-1];
             qr[mq] = qold[I_q];
 
-            // amdq[mq] = amdq_trans[I_q];
             apdq[mq] = apdq_trans[I_q];
         }            
 
@@ -1016,8 +1021,6 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
         
     } 
 
-    /* May not the synchthreads(), below, since gm/gp updated above, but only fm/gp
-       updated below */
     __syncthreads();  
 
     
@@ -1038,6 +1041,8 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
             -----|-----|-----
                  |     |     
         */                        
+
+    __syncthreads();
 
     if (threadIdx.x == 0)
     {
@@ -1072,7 +1077,6 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
             qd[mq] = qold[I_q - ys];
 
             bmdq[mq] = bmdq_trans[I_q];
-            //bpdq[mq] = bpdq_trans[I_q];
         }            
 
         for(int imp = 0; imp < 2; imp++)
@@ -1100,6 +1104,7 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
 
     }
 
+    __syncthreads();
      /*  transverse-y
     
              |     |     
@@ -1307,6 +1312,7 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
 
     for(int thread_index = threadIdx.x; thread_index < mx*my; thread_index += blockDim.x)
     {
+        // Loop over interior cells only
         int ix = thread_index % mx;
         int iy = thread_index/my;
 
@@ -1318,9 +1324,38 @@ void cudaclaw_flux2_and_update(const int mx,   const int my,
             int I_q = I + mq*zs;
             qold[I_q] = qold[I_q] - dtdx * (fm[I_q + 1] - fp[I_q]) 
                                   - dtdy * (gm[I_q + ys] - gp[I_q]);
-        }        
-    }
 
+        }        
+        //__syncthreads();
+
+        if (src2 != NULL)
+        {
+            double *const qr = start;          /* meqn   */
+            for(int mq = 0; mq < meqn; mq++)
+            {
+                int I_q = I + mq*zs;
+                qr[mq] = qold[I_q];  
+            }
+            double *const auxr   = qr + meqn;         /* maux        */
+            for(int m = 0; m < maux; m++)
+            {
+                /* In case aux is already set */
+                int I_aux = I + m*zs;
+                auxr[m] = aux[I_aux];
+            }    
+
+            // First cell in non-ghost cells should be (1,1)
+            int i = ix+1;  
+            int j = iy+1;
+            src2(meqn,maux,xlower,ylower,dx,dy,qr,auxr,t,dt,i,j);
+
+            for(int mq = 0; mq < meqn; mq++)
+            {
+                int I_q = I + mq*zs;
+                qold[I_q] = qr[mq];  
+            }
+        }
+    }
 }
 
 
@@ -1337,7 +1372,8 @@ void cudaclaw_flux2_and_update_batch (const int mx,    const int my,
                                       double * maxcflblocks,
                                       cudaclaw_cuda_rpn2_t rpn2,
                                       cudaclaw_cuda_rpt2_t rpt2,
-                                      cudaclaw_cuda_b4step2_t b4step2)
+                                      cudaclaw_cuda_b4step2_t b4step2,
+                                      cudaclaw_cuda_src2_t src2)
     {
         cudaclaw_flux2_and_update(mx,my,meqn,mbc,maux,mwaves,mwork,
                                   array_fluxes_struct[blockIdx.z].xlower,
@@ -1357,10 +1393,10 @@ void cudaclaw_flux2_and_update_batch (const int mx,    const int my,
                                   array_fluxes_struct[blockIdx.z].waves_dev,
                                   array_fluxes_struct[blockIdx.z].speeds_dev, 
                                   maxcflblocks,
-                                  rpn2, rpt2, b4step2, t,dt);
+                                  rpn2, rpt2, b4step2, src2,t,dt);
 }
 
-
+#if 0
 __global__
 void cudaclaw_compute_speeds_batch (const int mx,    const int my, 
                                     const int meqn,  const int mbc, 
@@ -1381,5 +1417,6 @@ void cudaclaw_compute_speeds_batch (const int mx,    const int my,
                                   array_fluxes_struct[blockIdx.z].aux_dev,
                                   maxcflblocks, compute_speeds, b4step2, t, dt);
 }
+#endif
 
 
