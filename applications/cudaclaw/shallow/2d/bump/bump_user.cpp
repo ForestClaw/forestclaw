@@ -75,15 +75,15 @@ void bump_link_solvers(fclaw2d_global_t *glob)
     if(user->cuda == 0)
     {
         fc2d_clawpack46_vtable_t *claw46_vt = fc2d_clawpack46_vt(glob);
-        claw46_vt->fort_qinit     = &CUDACLAW_QINIT;
+        claw46_vt->fort_qinit     = &CLAWPACK46_QINIT;
         claw46_vt->fort_rpn2      = &CLAWPACK46_RPN2;
         claw46_vt->fort_rpt2      = &CLAWPACK46_RPT2;
-        claw46_vt->fort_rpn2_cons = &RPN2_CONS_UPDATE;
+        //claw46_vt->fort_rpn2_cons = &RPN2_CONS_UPDATE;
     }
     else
     {
         fc2d_cudaclaw_vtable_t *cuclaw_vt = fc2d_cudaclaw_vt(glob);
-        cuclaw_vt->fort_qinit  = &CUDACLAW_QINIT;
+        cuclaw_vt->fort_qinit  = &CLAWPACK46_QINIT;
 
         bump_assign_rpn2(&cuclaw_vt->cuda_rpn2);
         FCLAW_ASSERT(cuclaw_vt->cuda_rpn2 != NULL);
@@ -91,49 +91,10 @@ void bump_link_solvers(fclaw2d_global_t *glob)
         bump_assign_rpt2(&cuclaw_vt->cuda_rpt2);
         FCLAW_ASSERT(cuclaw_vt->cuda_rpt2 != NULL);
 
-        bump_assign_speeds(&cuclaw_vt->cuda_speeds);
-        FCLAW_ASSERT(cuclaw_vt->cuda_speeds != NULL);
+        //bump_assign_speeds(&cuclaw_vt->cuda_speeds);
+        //FCLAW_ASSERT(cuclaw_vt->cuda_speeds != NULL);
     }
 }
 
 
-#if 0
-void bump_patch_setup(fclaw2d_global_t *glob,
-                           fclaw2d_patch_t *this_patch,
-                           int this_block_idx,
-                           int this_patch_idx)
-{
-    int mx,my,mbc,maux;
-    double xlower,ylower,dx,dy;
-    double *aux,*xd,*yd,*zd,*area;
-    double *xp,*yp,*zp;
-    double *xnormals,*ynormals,*xtangents,*ytangents;
-    double *surfnormals,*edgelengths,*curvature;
 
-    if (fclaw2d_patch_is_ghost(this_patch))
-    {
-        /* Mapped info is needed only for an update */
-        return;
-    }
-
-    fclaw2d_clawpatch_grid_data(glob,this_patch,&mx,&my,&mbc,
-                                &xlower,&ylower,&dx,&dy);
-
-    fclaw2d_clawpatch_metric_data(glob,this_patch,&xp,&yp,&zp,
-                                  &xd,&yd,&zd,&area);
-
-    fclaw2d_clawpatch_metric_data2(glob,this_patch,
-                                   &xnormals,&ynormals,
-                                   &xtangents,&ytangents,
-                                   &surfnormals,&edgelengths,
-                                   &curvature);
-
-    fclaw2d_clawpatch_aux_data(glob,this_patch,&aux,&maux);
-    
-    USER5_SETAUX_MANIFOLD(&mbc,&mx,&my,&xlower,&ylower,
-                          &dx,&dy,&maux,aux,
-                          xnormals,xtangents,
-                          ynormals,ytangents,
-                          surfnormals,area);
-}
-#endif
