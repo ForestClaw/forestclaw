@@ -10,8 +10,8 @@ add_library(radialdam_f OBJECT
   user_4.6/setaux.f90
   user_5.0/qinit.f90 
   user_5.0/setaux.f90 
-  ${rp}/clawpack46_rpn2.f 
-  ${rp}/clawpack46_rpt2.f 
+  ${rp}/clawpack46_rpn2.f90 
+  ${rp}/clawpack46_rpt2.f90 
   ${rp}/clawpack46_rpn2_manifold.f90 
   ${rp}/clawpack46_rpt2_manifold.f90 
   ${rp}/clawpack5_rpn2.f90 
