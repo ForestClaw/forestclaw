@@ -1,4 +1,4 @@
-subroutine cudaclaw_qinit(maxmx,maxmy,meqn,mbc, & 
+subroutine clawpack46_qinit(maxmx,maxmy,meqn,mbc, & 
     mx,my,xlower,ylower,dx,dy,q,maux,aux)
     !! =====================================================
     !!
@@ -69,8 +69,5 @@ subroutine cudaclaw_qinit(maxmx,maxmy,meqn,mbc, &
         enddo
     enddo
 
-    write(6,*) "qinit : ", vinf
-    stop
-
     return
-end subroutine cudaclaw_qinit
+end subroutine clawpack46_qinit

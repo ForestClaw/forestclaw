@@ -7,9 +7,8 @@ subroutine setprob()
     double precision :: gamma, gamma1
     common /cparam/  gamma,gamma1
 
-    integer :: idisc
-    double precision :: x0, y0, alf, beta, r0
-    common/cdisc/ x0,y0,alf,beta,r0,idisc
+    double precision :: x0, y0, r0
+    common/cdisc/ x0,y0, r0
 
     double precision :: rinf, vinf, einf
     common /cominf/ rinf,vinf,einf
@@ -27,9 +26,6 @@ subroutine setprob()
     read(10,*) r0    
     read(10,*) rhoin 
     read(10,*) pinf  
-
-    !! # set idisc for cellave routines (see function fdisc)
-    read(10,*) idisc
 
     close(10)
 
@@ -58,11 +54,6 @@ subroutine setprob()
     vinf = (1.0d0/sqrt(gamma)) * (pinf - 1.d0)/ & 
              sqrt( 0.5d0*((gamma+1)/gamma) * pinf + 0.5d0*gamma1/gamma )
     einf = 0.5d0*rinf*vinf*vinf + pinf/gamma1
-
-    write(6,*) 'setprob : rinf = ', rinf
-    write(6,*) 'setprob : vinf = ', vinf
-    write(6,*) 'setprob : einf = ', einf
-    stop
 
     return
 end subroutine setprob

@@ -12,7 +12,7 @@ void setprob_cuda()
 {
     double gamma;
     FILE *f = fopen("setprob.data","r");
-    fscanf(f,"%lf",&gamma);
+    int count = fscanf(f,"%lf",&gamma);
     fclose(f);    
 
     double gamma1 = gamma - 1.0;

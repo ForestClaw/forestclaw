@@ -13,12 +13,12 @@ void setprob_cuda()
     int i = 0;
     char * line = NULL, *p = NULL, *eptr;
     size_t len = 0;
-    ssize_t read;
+    //ssize_t read;
     double arr[2];
     
     FILE *f =  fopen("setprob.data","r");
     
-    while ((read = getline(&line, &len, f)) != -1) 
+    while ((getline(&line, &len, f)) != -1) 
     {
         p =strtok(line, " "); // get first word
         arr[i] = strtod(p,&eptr);  // convert to double
