@@ -253,63 +253,38 @@ write_patch_connectivity (fclaw_global_t * glob,
 }
 
 static
-herr_t
-set_attribute_numerical(hid_t loc_id, const char *obj_name, const char *attr_name, size_t size,
+void
+set_attribute_numerical(hid_t loc_id, const char *obj_name, const char *attr_name, hsize_t size,
                         hid_t tid, const void *data)
 {
-
-    hid_t   obj_id, sid, attr_id;
-    hsize_t dim_size = size;
-    htri_t  has_attr;
-
-    /* check the arguments */
-    if (obj_name == NULL)
-        return -1;
-    if (attr_name == NULL)
-        return -1;
+    herr_t status = 0;
 
     /* Open the object */
-    if ((obj_id = H5Oopen(loc_id, obj_name, H5P_DEFAULT)) < 0)
-        return -1;
+    hid_t obj_id = H5Oopen(loc_id, obj_name, H5P_DEFAULT);
 
     /* Create the data space for the attribute. */
-    if ((sid = H5Screate_simple(1, &dim_size, NULL)) < 0)
-        goto out;
+    hid_t sid = H5Screate_simple(1, &size, NULL);
 
     /* Delete the attribute if it already exists */
-    if ((has_attr = H5Aexists(obj_id, attr_name)) < 0)
-        goto out;
-    if (has_attr > 0)
-        if (H5Adelete(obj_id, attr_name) < 0)
-            goto out;
+    if(H5Aexists(obj_id, attr_name))
+        status |= H5Adelete(obj_id, attr_name);
 
     /* Create the attribute. */
-    if ((attr_id = H5Acreate2(obj_id, attr_name, tid, sid, H5P_DEFAULT, H5P_DEFAULT)) < 0)
-        goto out;
+    hid_t attr_id = H5Acreate2(obj_id, attr_name, tid, sid, H5P_DEFAULT, H5P_DEFAULT);
 
     /* Write the attribute data. */
-    if (H5Awrite(attr_id, tid, data) < 0)
-        goto out;
+    status |= H5Awrite(attr_id, tid, data);
 
-    /* Close the attribute. */
-    if (H5Aclose(attr_id) < 0)
-        goto out;
+    status |= H5Aclose(attr_id);
+    status |= H5Sclose(sid);
+    status |= H5Oclose(obj_id);
 
-    /* Close the dataspace. */
-    if (H5Sclose(sid) < 0)
-        goto out;
-
-    /* Close the object */
-    if (H5Oclose(obj_id) < 0)
-        return -1;
-
-    return 0;
-
-out:
-    H5Oclose(obj_id);
-    return -1;
+    if(status != 0 || obj_id < 0 || sid < 0 || attr_id < 0)
+    {
+        printf("fclaw_clawpatch_output_hdf5.c Error in set_attribute_numerical\n");
+    }
 }
-static herr_t
+static void
 make_single_value_dataset_numerical(int mpirank,
                                     hid_t loc_id, 
                                     const char *dset_name, 
@@ -318,45 +293,32 @@ make_single_value_dataset_numerical(int mpirank,
                                     hid_t tid,
                                     const void *data)
 {
-    hid_t did = -1, sid = -1;
-
-    /* check the arguments */
-    if (dset_name == NULL)
-        return -1;
+    herr_t status = 0;
 
     /* Create the data space for the dataset. */
-    if ((sid = H5Screate_simple(rank, dims, NULL)) < 0)
-        return -1;
+    hid_t sid = H5Screate_simple(rank, dims, NULL);
 
     /* Create the dataset. */
-    if ((did = H5Dcreate2(loc_id, dset_name, tid, sid, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) < 0)
-        goto out;
+    hid_t did = H5Dcreate2(loc_id, dset_name, tid, sid, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
     /* Write the dataset only if there is data to write */
     if (data && mpirank == 0)
-        if (H5Dwrite(did, tid, H5S_ALL, H5S_ALL, H5P_DEFAULT, data) < 0)
-            goto out;
+    {
+        status |= H5Dwrite(did, tid, H5S_ALL, H5S_ALL, H5P_DEFAULT, data);
+    }
 
     /* End access to the dataset and release resources used by it. */
-    if (H5Dclose(did) < 0)
-        return -1;
+    status |= H5Dclose(did);
 
     /* Terminate access to the data space. */
-    if (H5Sclose(sid) < 0)
-        return -1;
+    status |= H5Sclose(sid);
 
-    return 0;
-
-out:
-    H5E_BEGIN_TRY
+    if(status != 0 || sid < 0 || did < 0)
     {
-        H5Dclose(did);
-        H5Sclose(sid);
+        printf("fclaw_clawpatch_output_hdf5.c Error in make_single_value_dataset_numerical\n");
     }
-    H5E_END_TRY
-    return -1;
 }
-static herr_t
+static void
 make_dataset_numerical(hid_t loc_id, 
                        const char *dset_name, 
                        int rank, 
@@ -367,150 +329,84 @@ make_dataset_numerical(hid_t loc_id,
                        hid_t tid,
                        const void *data)
 {
-    hid_t did = -1, sid = -1, prop_id = -1, plist_id = -1;
+    herr_t status = 0;
 
-    /* check the arguments */
-    if (dset_name == NULL)
-        return -1;
-    if((prop_id = H5Pcreate(H5P_DATASET_CREATE)) < 0)
-        return -1;
+    hid_t prop_id = H5Pcreate(H5P_DATASET_CREATE);
     
     if(chunk_dims != NULL)
     {
-        if(H5Pset_chunk(prop_id, rank, chunk_dims) < 0)
-            return -1;
-        H5Pset_shuffle(prop_id);
-        if(H5Pset_deflate(prop_id, 5) < 0)
-            return -1;
+        status |= H5Pset_chunk(prop_id, rank, chunk_dims);
+        status |= H5Pset_shuffle(prop_id);
+        status |= H5Pset_deflate(prop_id, 5);
     }
 
     
     /* Create the data space for the dataset. */
-    if ((sid = H5Screate_simple(rank, dims, NULL)) < 0)
-        return -1;
-
+    hid_t sid = H5Screate_simple(rank, dims, NULL);
 
     /* Create the dataset. */
-    if ((did = H5Dcreate2(loc_id, dset_name, tid, sid, H5P_DEFAULT, prop_id, H5P_DEFAULT)) < 0)
-        goto out;
+    hid_t did = H5Dcreate2(loc_id, dset_name, tid, sid, H5P_DEFAULT, prop_id, H5P_DEFAULT);
 
     hid_t memspace = H5Screate_simple(rank, slab_dims, NULL);
-    if(memspace < 0)
-        return -1;
 
     hid_t filespace = H5Dget_space(did);
-    if(filespace < 0)
-        return -1;
 
-    if (H5Sselect_hyperslab(filespace, H5S_SELECT_SET, slab_start, NULL, slab_dims, NULL) < 0)
-        return -1;
+    status |= H5Sselect_hyperslab(filespace, H5S_SELECT_SET, slab_start, NULL, slab_dims, NULL);
 
-    if((plist_id = H5Pcreate(H5P_DATASET_XFER)) < 0)
-        return -1;
+    hid_t plist_id = H5Pcreate(H5P_DATASET_XFER);
 
-    if(H5Pset_dxpl_mpio(plist_id, H5FD_MPIO_COLLECTIVE) < 0)
-       return -1;
+    status |= H5Pset_dxpl_mpio(plist_id, H5FD_MPIO_COLLECTIVE);
 
-    /* Write the dataset only if there is data to write */
-    if (data)
-        if (H5Dwrite(did, tid, memspace, filespace, plist_id, data) < 0)
-            goto out;
+    status |= H5Dwrite(did, tid, memspace, filespace, plist_id, data);
 
-    /* End access to the dataset and release resources used by it. */
-    if (H5Dclose(did) < 0)
-        return -1;
+    status |= H5Dclose(did);
+    status |= H5Sclose(sid);
+    status |= H5Pclose(prop_id);
 
-    /* Terminate access to the data space. */
-    if (H5Sclose(sid) < 0)
-        return -1;
-
-    if (H5Pclose(prop_id) < 0)
-        return -1;
-
-    return 0;
-
-out:
-    H5E_BEGIN_TRY
+    if(status != 0 || sid < 0 || did < 0 || memspace < 0 || filespace < 0 || plist_id < 0)
     {
-        H5Dclose(did);
-        H5Sclose(sid);
-        H5Sclose(prop_id);
+        printf("fclaw_clawpatch_output_hdf5.c Error in make_dataset_numerical\n");
     }
-    H5E_END_TRY
-    return -1;
 }
 //this is copied form hdf5lt needed to change to NULLPAD for VTK
-herr_t
+void
 set_attribute_string(hid_t loc_id, const char *obj_name, const char *attr_name, const char *attr_data)
 {
-    hid_t  attr_type;
-    hid_t  attr_space_id;
-    hid_t  attr_id;
-    hid_t  obj_id;
-    htri_t has_attr;
-    size_t attr_size;
-
-    /* check the arguments */
-    if (obj_name == NULL)
-        return -1;
-    if (attr_name == NULL)
-        return -1;
-    if (attr_data == NULL)
-        return -1;
+    herr_t status = 0;
 
     /* Open the object */
-    if ((obj_id = H5Oopen(loc_id, obj_name, H5P_DEFAULT)) < 0)
-        return -1;
+    hid_t obj_id = H5Oopen(loc_id, obj_name, H5P_DEFAULT);
 
-    /* Create the attribute */
-    if ((attr_type = H5Tcopy(H5T_C_S1)) < 0)
-        goto out;
+    hid_t attr_type = H5Tcopy(H5T_C_S1);
 
-    attr_size = strlen(attr_data);
+    hsize_t attr_size = strlen(attr_data);
 
-    if (H5Tset_size(attr_type, (size_t)attr_size) < 0)
-        goto out;
+    status |= H5Tset_size(attr_type, (size_t)attr_size);
+    status |= H5Tset_strpad(attr_type, H5T_STR_NULLPAD);
 
-    if (H5Tset_strpad(attr_type, H5T_STR_NULLPAD) < 0)
-        goto out;
-
-    if ((attr_space_id = H5Screate(H5S_SCALAR)) < 0)
-        goto out;
+    hid_t attr_space_id = H5Screate(H5S_SCALAR);
 
     /* Delete the attribute if it already exists */
-    if ((has_attr = H5Aexists(obj_id, attr_name)) < 0)
-        goto out;
+    hid_t has_attr = H5Aexists(obj_id, attr_name);
     if (has_attr > 0)
-        if (H5Adelete(obj_id, attr_name) < 0)
-            goto out;
+    {
+        status |= H5Adelete(obj_id, attr_name);
+    }
 
     /* Create and write the attribute */
 
-    if ((attr_id = H5Acreate2(obj_id, attr_name, attr_type, attr_space_id, H5P_DEFAULT, H5P_DEFAULT)) < 0)
-        goto out;
+    hid_t attr_id = H5Acreate2(obj_id, attr_name, attr_type, attr_space_id, H5P_DEFAULT, H5P_DEFAULT);
 
-    if (H5Awrite(attr_id, attr_type, attr_data) < 0)
-        goto out;
+    status |= H5Awrite(attr_id, attr_type, attr_data);
+    status |= H5Aclose(attr_id);
+    status |= H5Sclose(attr_space_id);
+    status |= H5Tclose(attr_type);
+    status |= H5Oclose(obj_id);
 
-    if (H5Aclose(attr_id) < 0)
-        goto out;
-
-    if (H5Sclose(attr_space_id) < 0)
-        goto out;
-
-    if (H5Tclose(attr_type) < 0)
-        goto out;
-
-    /* Close the object */
-    if (H5Oclose(obj_id) < 0)
-        return -1;
-
-    return 0;
-
-out:
-
-    H5Oclose(obj_id);
-    return -1;
+    if(status != 0 || obj_id < 0 || attr_type < 0 || attr_space_id < 0 || attr_id < 0)
+    {
+        printf("fclaw_clawpatch_output_hdf5.c Error in set_attribute_string\n");
+    }
 }
 static int
 fclaw_hdf5_write_file (fclaw_global_t * glob, const char *filename)
