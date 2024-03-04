@@ -101,62 +101,6 @@ get_coordinates (fclaw_global_t * glob,
     }
 }
 static void
-write_2d_patch_connectivity (fclaw_global_t * glob,
-                             fclaw_patch_t * patch,
-                             int blockno,
-                             int patchno,
-                             long num_points_before,
-                             long * conn)
-{
-    int mx,my,mbc;
-    double dx,dy, xlower,ylower;
-    fclaw_clawpatch_2d_grid_data(glob,patch,&mx,&my,&mbc,
-                                &xlower,&ylower, &dx,&dy);
-    for (int j = 0; j < my; ++j)
-    {
-        for (int i = 0; i < mx; ++i)
-        {
-            long l = num_points_before + i + j * (mx + 1);
-            *conn++ = l;
-            *conn++ = l + 1;
-            *conn++ = l + (mx + 2);
-            *conn++ = l + (mx + 1);
-        }
-    }
-}
-static void
-write_3d_patch_connectivity (fclaw_global_t * glob,
-                             fclaw_patch_t * patch,
-                             int blockno,
-                             int patchno,
-                             long num_points_before,
-                             long * conn)
-{
-    int mx,my,mz,mbc;
-    double dx,dy,dz,xlower,ylower,zlower;
-    fclaw_clawpatch_3d_grid_data(glob,patch,&mx,&my,&mz, &mbc,
-                                &xlower,&ylower,&zlower, &dx,&dy, &dz);
-    for (int k = 0; k < mz; ++k)
-    {
-        for (int j = 0; j < my; ++j)
-        {
-            for (int i = 0; i < mx; ++i)
-            {
-                long l = num_points_before + i + j * (mx + 1)
-                     + k * (my + 1) * (mx + 1);
-                *conn++ = l;
-                *conn++ = l + 1;
-                *conn++ = l + (mx + 2);
-                *conn++ = l + (mx + 1);
-                *conn++ = l + (mx + 1) * (my + 1);
-                *conn++ = l + (mx + 1) * (my + 1) + 1;
-                *conn++ = l + (mx + 1) * (my + 1) + (mx + 2);
-                *conn++ = l + (mx + 1) * (my + 1) + (mx + 1);
-            }
-        }
-    }
-}
-static void
 write_2d_patch_q (fclaw_global_t * glob,
                   fclaw_patch_t * patch,
                   int blockno,
@@ -239,17 +183,54 @@ write_patch_connectivity (fclaw_global_t * glob,
                           fclaw_patch_t * patch,
                           int blockno,
                           int patchno,
-                          int patch_dim,
-                          long num_points_before,
-                          long * connectivity)
+                          long * conn)
 {
-    if(patch_dim == 2)
+    long global_num_patches_before = glob->domain->global_num_patches_before + glob->domain->blocks[blockno].num_patches_before + patchno;
+    if(fclaw_clawpatch_dim(patch) == 2)
     {
-        write_2d_patch_connectivity(glob, patch, blockno, patchno, num_points_before, connectivity);
+        int mx,my,mbc;
+        double dx,dy, xlower,ylower;
+        fclaw_clawpatch_2d_grid_data(glob,patch,&mx,&my,&mbc,
+                                    &xlower,&ylower, &dx,&dy);
+        long num_points_before = global_num_patches_before * (mx + 1) * (my + 1);
+        for (int j = 0; j < my; ++j)
+        {
+            for (int i = 0; i < mx; ++i)
+            {
+                long l = num_points_before + i + j * (mx + 1);
+                *conn++ = l;
+                *conn++ = l + 1;
+                *conn++ = l + (mx + 2);
+                *conn++ = l + (mx + 1);
+            }
+        }
     }
     else
     {
-        write_3d_patch_connectivity(glob, patch, blockno, patchno, num_points_before, connectivity);
+        int mx,my,mz,mbc;
+        double dx,dy,dz,xlower,ylower,zlower;
+        fclaw_clawpatch_3d_grid_data(glob,patch,&mx,&my,&mz, &mbc,
+                                    &xlower,&ylower,&zlower, &dx,&dy, &dz);
+        long num_points_before = global_num_patches_before * (mx + 1) * (my + 1) * (mz + 1);
+        for (int k = 0; k < mz; ++k)
+        {
+            for (int j = 0; j < my; ++j)
+            {
+                for (int i = 0; i < mx; ++i)
+                {
+                    long l = num_points_before + i + j * (mx + 1)
+                         + k * (my + 1) * (mx + 1);
+                    *conn++ = l;
+                    *conn++ = l + 1;
+                    *conn++ = l + (mx + 2);
+                    *conn++ = l + (mx + 1);
+                    *conn++ = l + (mx + 1) * (my + 1);
+                    *conn++ = l + (mx + 1) * (my + 1) + 1;
+                    *conn++ = l + (mx + 1) * (my + 1) + (mx + 2);
+                    *conn++ = l + (mx + 1) * (my + 1) + (mx + 1);
+                }
+            }
+        }
     }
 }
 
@@ -417,7 +398,6 @@ fclaw_hdf5_write_file (fclaw_global_t * glob,
 {
     const fclaw_clawpatch_options_t* clawpatch_opt = fclaw_clawpatch_get_options(glob);
     //get mx, my, mz, meqn from clawpatch options
-    int patch_dim = clawpatch_opt->patch_dim;
     int mx   = clawpatch_opt->mx;
     int my   = clawpatch_opt->my;
     int mz   = clawpatch_opt->mz;
@@ -492,6 +472,7 @@ fclaw_hdf5_write_file (fclaw_global_t * glob,
     make_single_value_dataset_numerical(glob->mpirank, gid1, "NumberOfConnectivityIds", 1, dims, H5T_NATIVE_LONG, &number_of_connectivity_ids);
 
 
+    fclaw_timer_start(&glob->timers[FCLAW_TIMER_EXTRA1]);
 
     hsize_t chunk_dims[3] = {0,0,0};
     hsize_t slab_dims[3] = {0,0,0};
@@ -507,6 +488,7 @@ fclaw_hdf5_write_file (fclaw_global_t * glob,
     slab_start[0] = glob->domain->global_num_patches_before * num_cells_per_patch;
     slab_dims[0] = local_num_patches * num_cells_per_patch;
     make_dataset_numerical(gid1, "Types", 1, dims, chunk_dims, slab_start, slab_dims, H5T_NATIVE_UINT8, types);
+    fclaw_timer_stop(&glob->timers[FCLAW_TIMER_EXTRA1]);
 
 
 
@@ -551,6 +533,7 @@ fclaw_hdf5_write_file (fclaw_global_t * glob,
     make_dataset_numerical(gid1, "Points", 2, dims, chunk_dims, slab_start, slab_dims, H5T_NATIVE_DOUBLE, points);
     FCLAW_FREE(points);
 
+    fclaw_timer_start(&glob->timers[FCLAW_TIMER_EXTRA2]);
     long* connectivity = FCLAW_ALLOC(long, local_num_patches * num_cells_per_patch * num_points_per_cell);
 
     for(int blockno = 0; blockno < glob->domain->num_blocks; blockno++)
@@ -559,9 +542,8 @@ fclaw_hdf5_write_file (fclaw_global_t * glob,
         for(int patchno = 0; patchno < block->num_patches; patchno++)
         {
             fclaw_patch_t* patch = &block->patches[patchno];
-            long num_points_before = (glob->domain->global_num_patches_before + block->num_patches_before + patchno) * num_points_per_patch;
             long *patch_connectivity = &connectivity[(block->num_patches_before + patchno) * num_cells_per_patch * num_points_per_cell];
-            write_patch_connectivity(glob, patch, blockno, patchno, patch_dim, num_points_before, patch_connectivity);
+            write_patch_connectivity(glob, patch, blockno, patchno, patch_connectivity);
         }
     }
 
@@ -571,6 +553,7 @@ fclaw_hdf5_write_file (fclaw_global_t * glob,
     slab_dims[0] = local_num_patches * num_cells_per_patch * num_points_per_cell;
     make_dataset_numerical(gid1, "Connectivity", 1, dims, chunk_dims, slab_start, slab_dims, H5T_NATIVE_LONG, connectivity);
     FCLAW_FREE(connectivity);
+    fclaw_timer_stop(&glob->timers[FCLAW_TIMER_EXTRA2]);
 
     /* avoid resource leaks by closing */
     H5Gclose(gid1);
@@ -603,6 +586,7 @@ fclaw_hdf5_write_file (fclaw_global_t * glob,
     make_dataset_numerical(gid1, "meqn", 1, dims, chunk_dims, slab_start, slab_dims, H5T_NATIVE_DOUBLE, q);
     FCLAW_FREE(q);
 
+    fclaw_timer_start(&glob->timers[FCLAW_TIMER_EXTRA1]);
     // write blockno
     int *blockno_array = FCLAW_ALLOC(int, local_num_patches * num_cells_per_patch);
     for(int blockno = 0; blockno < glob->domain->num_blocks; blockno++)
@@ -662,6 +646,7 @@ fclaw_hdf5_write_file (fclaw_global_t * glob,
     slab_dims[0] = local_num_patches * num_cells_per_patch;
     make_dataset_numerical(gid1, "mpirank", 1, dims, chunk_dims, slab_start, slab_dims, H5T_NATIVE_INT, mpirank_array);
     FCLAW_FREE(mpirank_array);
+    fclaw_timer_stop(&glob->timers[FCLAW_TIMER_EXTRA1]);
     
     H5Gclose(gid1);
 
