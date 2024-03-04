@@ -36,12 +36,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <hdf5.h>
 
 static void
-write_patch_points (fclaw_global_t * glob,
-                    fclaw_patch_t * patch,
-                    int blockno,
-                    int patchno,
-                    double * points)
+get_coordinates (fclaw_global_t * glob,
+                 fclaw_patch_t * patch,
+                 int blockno,
+                 int patchno,
+                 char * buffer)
 {
+    double * points = (double *) buffer;
     const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
     const fclaw_clawpatch_options_t* clawpatch_opt = fclaw_clawpatch_get_options(glob);
 
@@ -217,14 +218,14 @@ write_3d_patch_q (fclaw_global_t * glob,
     }
 }
 static void
-write_patch_q (fclaw_global_t * glob,
-               fclaw_patch_t * patch,
-               int blockno,
-               int patchno,
-               int patch_dim,
-               double * q_out)
+get_data (fclaw_global_t * glob,
+          fclaw_patch_t * patch,
+          int blockno,
+          int patchno,
+          char * buffer)
 {
-    if (patch_dim == 2)
+    double * q_out = (double *) buffer;
+    if (fclaw_clawpatch_dim(patch) == 2)
     {
         write_2d_patch_q(glob, patch, blockno, patchno, q_out);
     }
@@ -409,7 +410,10 @@ set_attribute_string(hid_t loc_id, const char *obj_name, const char *attr_name, 
     }
 }
 static int
-fclaw_hdf5_write_file (fclaw_global_t * glob, const char *filename)
+fclaw_hdf5_write_file (fclaw_global_t * glob, 
+                       const char* filename,
+                       fclaw_vtk_patch_data_t coordinate_cb,
+                       fclaw_vtk_patch_data_t value_cb)
 {
     const fclaw_clawpatch_options_t* clawpatch_opt = fclaw_clawpatch_get_options(glob);
     //get mx, my, mz, meqn from clawpatch options
@@ -532,7 +536,7 @@ fclaw_hdf5_write_file (fclaw_global_t * glob, const char *filename)
         {
             fclaw_patch_t* patch = &block->patches[patchno];
             double *patch_points = &points[(block->num_patches_before + patchno) * num_points_per_patch * 3];
-            write_patch_points(glob, patch, blockno, patchno, patch_points);
+            coordinate_cb(glob, patch, blockno, patchno, (char*) patch_points);
         }
     }
 
@@ -585,7 +589,7 @@ fclaw_hdf5_write_file (fclaw_global_t * glob, const char *filename)
         {
             fclaw_patch_t* patch = &block->patches[patchno];
             double *patch_q = &q[(block->num_patches_before + patchno) * num_cells_per_patch * meqn];
-            write_patch_q(glob, patch, blockno, patchno, patch_dim, patch_q);
+            value_cb(glob, patch, blockno, patchno, (char*) patch_q);
         }
     }
     dims[0] = num_cells_per_patch*global_num_patches;
@@ -673,7 +677,7 @@ fclaw_hdf5_write_file (fclaw_global_t * glob, const char *filename)
 
 void fclaw_clawpatch_output_hdf5_to_file (fclaw_global_t * glob, const char* filename)
 {
-    fclaw_hdf5_write_file (glob, filename);
+    fclaw_hdf5_write_file (glob, filename, get_coordinates, get_data);
 }
 void fclaw_clawpatch_output_hdf5 (fclaw_global_t * glob, int iframe)
 {

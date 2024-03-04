@@ -26,6 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW_CLAWPATCH_OUTPUT_HDF5_H
 #define FCLAW_CLAWPATCH_OUTPUT_HDF5_H
 
+#include <fclaw_clawpatch_output_vtk.h>
 /** 
  * @file
  * Routines for hdf5 output 
