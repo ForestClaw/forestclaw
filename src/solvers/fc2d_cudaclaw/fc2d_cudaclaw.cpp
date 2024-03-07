@@ -68,9 +68,9 @@ void cudaclaw_setprob(fclaw2d_global_t *glob)
 
 static
 void cudaclaw_qinit(fclaw2d_global_t *glob,
-                      fclaw2d_patch_t *this_patch,
-                      int this_block_idx,
-                      int this_patch_idx)
+                      fclaw2d_patch_t *patch,
+                      int blockno,
+                      int patchno)
 {
     PROFILE_CUDA_GROUP("cudaclaw_qinit",1);
     fc2d_cudaclaw_vtable_t*  cudaclaw_vt = fc2d_cudaclaw_vt(glob);
@@ -80,17 +80,17 @@ void cudaclaw_qinit(fclaw2d_global_t *glob,
     double dx,dy,xlower,ylower;
     double *q, *aux;
 
-    fclaw2d_clawpatch_grid_data(glob,this_patch,&mx,&my,&mbc,
+    fclaw2d_clawpatch_grid_data(glob,patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
-    fclaw2d_clawpatch_soln_data(glob,this_patch,&q,&meqn);
-    fclaw2d_clawpatch_aux_data(glob,this_patch,&aux,&maux);
+    fclaw2d_clawpatch_soln_data(glob,patch,&q,&meqn);
+    fclaw2d_clawpatch_aux_data(glob,patch,&aux,&maux);
 
     maxmx = mx;
     maxmy = my;
 
     /* Call to classic Clawpack 'qinit' routine.  This must be user defined */
-    CUDACLAW_SET_BLOCK(&this_block_idx);
+    CUDACLAW_SET_BLOCK(&blockno);
     cudaclaw_vt->fort_qinit(&maxmx,&maxmy,&meqn,&mbc,&mx,&my,&xlower,&ylower,&dx,&dy,q,
                           &maux,aux);
     CUDACLAW_UNSET_BLOCK();
@@ -99,9 +99,9 @@ void cudaclaw_qinit(fclaw2d_global_t *glob,
 
 static
 void cudaclaw_bc2(fclaw2d_global_t *glob,
-                    fclaw2d_patch_t *this_patch,
-                    int this_block_idx,
-                    int this_patch_idx,
+                    fclaw2d_patch_t *patch,
+                    int blockno,
+                    int patchno,
                     double t,
                     double dt,
                     int intersects_phys_bdry[],
@@ -118,10 +118,10 @@ void cudaclaw_bc2(fclaw2d_global_t *glob,
     double xlower,ylower,dx,dy;
     double *aux,*q;
 
-    fclaw2d_clawpatch_grid_data(glob,this_patch, &mx,&my,&mbc,
+    fclaw2d_clawpatch_grid_data(glob,patch, &mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
-    fclaw2d_clawpatch_aux_data(glob,this_patch,&aux,&maux);
+    fclaw2d_clawpatch_aux_data(glob,patch,&aux,&maux);
 
     maxmx = mx;
     maxmy = my;
@@ -148,9 +148,9 @@ void cudaclaw_bc2(fclaw2d_global_t *glob,
       In this case, this boundary condition won't be used to update
       anything
     */
-    fclaw2d_clawpatch_timesync_data(glob,this_patch,time_interp,&q,&meqn);
+    fclaw2d_clawpatch_timesync_data(glob,patch,time_interp,&q,&meqn);
 
-    CUDACLAW_SET_BLOCK(&this_block_idx);
+    CUDACLAW_SET_BLOCK(&blockno);
     cudaclaw_vt->fort_bc2(&maxmx,&maxmy,&meqn,&mbc,&mx,&my,&xlower,&ylower,
                         &dx,&dy,q,&maux,aux,&t,&dt,mthbc);
     CUDACLAW_UNSET_BLOCK();
@@ -159,44 +159,48 @@ void cudaclaw_bc2(fclaw2d_global_t *glob,
 
 static
 void cudaclaw_b4step2(fclaw2d_global_t *glob,
-                        fclaw2d_patch_t *this_patch,
-                        int this_block_idx,
-                        int this_patch_idx,
+                        fclaw2d_patch_t *patch,
+                        int blockno,
+                        int patchno,
                         double t, double dt)
 
 {
     PROFILE_CUDA_GROUP("cudaclaw_b4step2",1);
     fc2d_cudaclaw_vtable_t*  cudaclaw_vt = fc2d_cudaclaw_vt(glob);
 
-    int mx,my,mbc,meqn, maux,maxmx,maxmy;
-    double xlower,ylower,dx,dy;
-    double *aux,*q;
-
     if (cudaclaw_vt->fort_b4step2 == NULL)
     {
         return;
     }
 
-    fclaw2d_clawpatch_grid_data(glob,this_patch, &mx,&my,&mbc,
+    int mx,my,mbc;
+    double xlower,ylower,dx,dy;
+    fclaw2d_clawpatch_grid_data(glob,patch, &mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
-    fclaw2d_clawpatch_soln_data(glob,this_patch,&q,&meqn);
-    fclaw2d_clawpatch_aux_data(glob,this_patch,&aux,&maux);
+    int meqn;
+    double *q;
+    fclaw2d_clawpatch_soln_data(glob,patch,&q,&meqn);
 
-    maxmx = mx;
-    maxmy = my;
+    int maux;
+    double *aux;
+    fclaw2d_clawpatch_aux_data(glob,patch,&aux,&maux);
 
-    CUDACLAW_SET_BLOCK(&this_block_idx);
-    cudaclaw_vt->fort_b4step2(&maxmx,&maxmy,&mbc,&mx,&my,&meqn,q,&xlower,&ylower,
-                            &dx,&dy,&t,&dt,&maux,aux);
+    int maxmx = mx;
+    int maxmy = my;
+
+    CUDACLAW_SET_BLOCK(&blockno);
+    cudaclaw_vt->fort_b4step2(&maxmx,&maxmy,&mbc,&mx,&my,&meqn,q,
+                              &xlower,&ylower,&dx,&dy,
+                              &t,&dt,&maux,aux);
     CUDACLAW_UNSET_BLOCK();
 }
 
 static
 void cudaclaw_src2(fclaw2d_global_t *glob,
-                     fclaw2d_patch_t *this_patch,
-                     int this_block_idx,
-                     int this_patch_idx,
+                     fclaw2d_patch_t *patch,
+                     int blockno,
+                     int patchno,
                      double t,
                      double dt)
 {
@@ -213,16 +217,16 @@ void cudaclaw_src2(fclaw2d_global_t *glob,
         return;
     }
 
-    fclaw2d_clawpatch_grid_data(glob,this_patch, &mx,&my,&mbc,
+    fclaw2d_clawpatch_grid_data(glob,patch, &mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
-    fclaw2d_clawpatch_soln_data(glob,this_patch,&q,&meqn);
-    fclaw2d_clawpatch_aux_data(glob,this_patch,&aux,&maux);
+    fclaw2d_clawpatch_soln_data(glob,patch,&q,&meqn);
+    fclaw2d_clawpatch_aux_data(glob,patch,&aux,&maux);
 
     maxmx = mx;
     maxmy = my;
 
-    CUDACLAW_SET_BLOCK(&this_block_idx);
+    CUDACLAW_SET_BLOCK(&blockno);
     cudaclaw_vt->fort_src2(&maxmx,&maxmy,&meqn,&mbc,&mx,&my,&xlower,&ylower,
                          &dx,&dy,q,&maux,aux,&t,&dt);
     CUDACLAW_UNSET_BLOCK();
@@ -232,9 +236,9 @@ void cudaclaw_src2(fclaw2d_global_t *glob,
 /* This can be used as a value for patch_vt->patch_setup */
 static
 void cudaclaw_setaux(fclaw2d_global_t *glob,
-                       fclaw2d_patch_t *this_patch,
-                       int this_block_idx,
-                       int this_patch_idx)
+                       fclaw2d_patch_t *patch,
+                       int blockno,
+                       int patchno)
 {
     PROFILE_CUDA_GROUP("cudaclaw_setaux",2);
     fc2d_cudaclaw_vtable_t*  cudaclaw_vt = fc2d_cudaclaw_vt(glob);
@@ -245,7 +249,7 @@ void cudaclaw_setaux(fclaw2d_global_t *glob,
         return;
     }
 
-    if (fclaw2d_patch_is_ghost(this_patch))
+    if (fclaw2d_patch_is_ghost(patch))
     {
         /* This is going to be removed at some point */
         return;
@@ -255,15 +259,15 @@ void cudaclaw_setaux(fclaw2d_global_t *glob,
     double xlower,ylower,dx,dy;
     double *aux;
 
-    fclaw2d_clawpatch_grid_data(glob,this_patch, &mx,&my,&mbc,
+    fclaw2d_clawpatch_grid_data(glob,patch, &mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
-    fclaw2d_clawpatch_aux_data(glob,this_patch,&aux,&maux);
+    fclaw2d_clawpatch_aux_data(glob,patch,&aux,&maux);
 
     maxmx = mx;
     maxmy = my;
 
-    CUDACLAW_SET_BLOCK(&this_block_idx);
+    CUDACLAW_SET_BLOCK(&blockno);
     cudaclaw_vt->fort_setaux(&maxmx,&maxmy,&mbc,&mx,&my,&xlower,&ylower,&dx,&dy,
                            &maux,aux);
     CUDACLAW_UNSET_BLOCK();
@@ -271,64 +275,74 @@ void cudaclaw_setaux(fclaw2d_global_t *glob,
 
 static
 double cudaclaw_update(fclaw2d_global_t *glob,
-                         fclaw2d_patch_t *this_patch,
-                         int this_block_idx,
-                         int this_patch_idx,
+                         fclaw2d_patch_t *patch,
+                         int blockno,
+                         int patchno,
                          double t,
                          double dt,
                          void* user)
 {
     PROFILE_CUDA_GROUP("cudaclaw_update",3);
     fc2d_cudaclaw_vtable_t*  cudaclaw_vt = fc2d_cudaclaw_vt(glob);
-    const fc2d_cudaclaw_options_t* cuclaw_opt;
 
-    int iter, total, patch_buffer_len;
-    size_t size, bytes;
-    double maxcfl;
 
     /* ------------------------------- Call b4step2 ----------------------------------- */
-#if 0
     if (cudaclaw_vt->b4step2 != NULL)
     {
         fclaw2d_timer_start (&glob->timers[FCLAW2D_TIMER_ADVANCE_B4STEP2]);       
         cudaclaw_vt->b4step2(glob,
-                           this_patch,
-                           this_block_idx,
-                           this_patch_idx,t,dt);
+                           patch,
+                           blockno,
+                           patchno,t,dt);
         fclaw2d_timer_stop (&glob->timers[FCLAW2D_TIMER_ADVANCE_B4STEP2]);       
     }
-#endif
 
     /* -------------------------------- Main update ----------------------------------- */
     fclaw2d_timer_start_threadsafe (&glob->timers[FCLAW2D_TIMER_ADVANCE_STEP2]);  
 
-    cuclaw_opt = fc2d_cudaclaw_get_options(glob);
-    maxcfl = 0.0;
+    const fc2d_cudaclaw_options_t* cuclaw_opt = fc2d_cudaclaw_get_options(glob);
+    double maxcfl = 0.0;
 
 
     fclaw2d_single_step_buffer_data_t *buffer_data = 
               (fclaw2d_single_step_buffer_data_t*) user;
 
-    patch_buffer_len = cuclaw_opt->buffer_len;
-    iter = buffer_data->iter;
-    total = buffer_data->total_count; 
+    int patch_buffer_len = cuclaw_opt->buffer_len;
+    int iter = buffer_data->iter;
+    int total = buffer_data->total_count; 
     
     /* Be sure to save current step! */
-    fclaw2d_clawpatch_save_current_step(glob, this_patch);
+    fclaw2d_clawpatch_save_current_step(glob, patch);
 
-
+    cudaclaw_patch_data_t* patch_data = (cudaclaw_patch_data_t*) buffer_data->user;
     maxcfl = 0;
     if (iter == 0)
     {
         /* Create array to store pointers to patch data */
-        size = (total < patch_buffer_len) ? total : patch_buffer_len;
-        bytes = size*sizeof(cudaclaw_fluxes_t);
-        buffer_data->user = FCLAW_ALLOC(cudaclaw_fluxes_t,bytes);
+        patch_data = (cudaclaw_patch_data_t*) FCLAW_ALLOC(cudaclaw_patch_data_t,1);
+        int size = (total < patch_buffer_len) ? total : patch_buffer_len;
+        //int bytes = size*sizeof(cudaclaw_fluxes_t);
+#if 1        
+        if (cuclaw_opt->src_term > 0 && cudaclaw_vt->src2 != NULL)
+        {
+            patch_data->patch_array = FCLAW_ALLOC(fclaw2d_patch_t*,size);
+            patch_data->patchno_array = FCLAW_ALLOC(int,size);
+            patch_data->blockno_array = FCLAW_ALLOC(int,size);
+        }
+#endif        
+
+        
+        patch_data->flux_array = FCLAW_ALLOC(cudaclaw_fluxes_t,size); // Is it bytes or size?
+        // buffer_data->user = FCLAW_ALLOC(cudaclaw_fluxes_t,bytes);
+        buffer_data->user = patch_data;
     } 
 
     /* Buffer pointer to fluxes */
-    cudaclaw_store_buffer(glob,this_patch,this_patch_idx,total,
-                          iter, (cudaclaw_fluxes_t*) buffer_data->user);
+    cudaclaw_store_buffer(glob,patch,patchno,blockno,total,iter,
+                            patch_data->flux_array,
+                            patch_data->patch_array,
+                            patch_data->patchno_array,
+                            patch_data->blockno_array);
 
     /* Update all patches in buffer if :
           (1) we have filled the buffer, or 
@@ -337,33 +351,67 @@ double cudaclaw_update(fclaw2d_global_t *glob,
     if ((iter+1) % patch_buffer_len == 0)
     {
         /* (1) We have filled the buffer */
-        maxcfl = cudaclaw_step2_batch(glob,(cudaclaw_fluxes_t*) buffer_data->user,
+        //printf("fc2d_cudaclaw : Processing full buffer; iter = %d\n",iter);        
+        maxcfl = cudaclaw_step2_batch(glob,
+                                      (cudaclaw_fluxes_t*) patch_data->flux_array,
                                       patch_buffer_len,t,dt);
     }
     else if ((iter+1) == total)
     {        
         /* (2) We have a partially filled buffer, but are done with all the patches 
             that need to be updated.  */
-        maxcfl = cudaclaw_step2_batch(glob,(cudaclaw_fluxes_t*) buffer_data->user,
-                                      total%patch_buffer_len,t,dt); 
-    }
+        int remaining_patches = total % patch_buffer_len;
+        //printf("fc2d_cudaclaw : Processing partial buffer;  iter = %d\n",iter);
+        maxcfl = cudaclaw_step2_batch(glob,
+                                      (cudaclaw_fluxes_t*) patch_data->flux_array,
+                                      remaining_patches,t,dt); 
+    }  
 
-    if (iter == total-1)
-    {
-        FCLAW_FREE(buffer_data->user);                                      
-    }
-
-    fclaw2d_timer_stop_threadsafe (&glob->timers[FCLAW2D_TIMER_ADVANCE_STEP2]);       
-
+    
     /* -------------------------------- Source term ----------------------------------- */
-    if (cuclaw_opt->src_term > 0)
+#if 1
+    // Check if we have stored all the patches in the buffer
+    if (((iter+1) % patch_buffer_len == 0) || ((iter+1) == total))
     {
-        FCLAW_ASSERT(cudaclaw_vt->src2 != NULL);
-        cudaclaw_vt->src2(glob,
-                        this_patch,
-                        this_block_idx,
-                        this_patch_idx,t,dt);
+        int remaining = (iter+1) % patch_buffer_len == 0 ? patch_buffer_len : 
+              total-iter;
+        //printf("fc2d_cudaclaw : Remaining : %d\n",remaining);
+        if (cuclaw_opt->src_term > 0 && cudaclaw_vt->src2 != NULL)
+        {   
+            //FCLAW_ASSERT(cudaclaw_vt->src2 != NULL);
+            // iterate over patches in buffer and call src2 to update them
+            for (int i = 0; i < remaining; i++)
+            {
+                //printf("-----> src2 on iter=%d; i =  %d\n",iter,i);
+                cudaclaw_vt->src2(glob,
+                                  patch_data->patch_array[i],
+                                  patch_data->blockno_array[i],
+                                  patch_data->patchno_array[i],
+                                  t, dt);
+            }
+        }
+    }   
+#endif    
+
+    if (iter+1 == total)
+    {
+        // FCLAW_FREE(patch_data->patch_array);
+        FCLAW_FREE(patch_data->flux_array);   
+        FCLAW_FREE(buffer_data->user);  
+
+#if 1
+        if (cuclaw_opt->src_term > 0 && cudaclaw_vt->src2 != NULL)
+        {
+            FCLAW_FREE(patch_data->patch_array);
+            FCLAW_FREE(patch_data->patchno_array);
+            FCLAW_FREE(patch_data->blockno_array);       
+        }
+#endif    
     }
+
+    fclaw2d_timer_stop_threadsafe (&glob->timers[FCLAW2D_TIMER_ADVANCE_STEP2]);    
+
+    //printf("fc2d_cudaclaw : (after) dt = %24.16e\n\n",dt);
     return maxcfl;
 }
 
@@ -481,9 +529,9 @@ fc2d_cudaclaw_vtable_t* fc2d_cudaclaw_vt(fclaw2d_global_t *glob)
 
 /* This should only be called when a new fclaw2d_clawpatch_t is created. */
 void fc2d_cudaclaw_set_capacity(fclaw2d_global_t *glob,
-                                  fclaw2d_patch_t *this_patch,
-                                  int this_block_idx,
-                                  int this_patch_idx)
+                                  fclaw2d_patch_t *patch,
+                                  int blockno,
+                                  int patchno)
 {
     int mx,my,mbc,maux,mcapa;
     double dx,dy,xlower,ylower;
@@ -493,12 +541,12 @@ void fc2d_cudaclaw_set_capacity(fclaw2d_global_t *glob,
     clawopt = fc2d_cudaclaw_get_options(glob);
     mcapa = clawopt->mcapa;
 
-    fclaw2d_clawpatch_grid_data(glob,this_patch, &mx,&my,&mbc,
+    fclaw2d_clawpatch_grid_data(glob,patch, &mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
-    area = fclaw2d_clawpatch_get_area(glob,this_patch);
+    area = fclaw2d_clawpatch_get_area(glob,patch);
 
-    fclaw2d_clawpatch_aux_data(glob,this_patch,&aux,&maux);
+    fclaw2d_clawpatch_aux_data(glob,patch,&aux,&maux);
     FCLAW_ASSERT(maux >= mcapa && mcapa > 0);
 
     CUDACLAW_SET_CAPACITY(&mx,&my,&mbc,&dx,&dy,area,&mcapa,
@@ -517,53 +565,53 @@ void fc2d_cudaclaw_setprob(fclaw2d_global_t *glob)
 
 /* This can be set to cudaclaw_vt->src2 */
 void fc2d_cudaclaw_src2(fclaw2d_global_t* glob,
-                          fclaw2d_patch_t *this_patch,
-                          int this_block_idx,
-                          int this_patch_idx,
+                          fclaw2d_patch_t *patch,
+                          int blockno,
+                          int patchno,
                           double t,
                           double dt)
 {
-    cudaclaw_src2(glob,this_patch,this_block_idx,this_block_idx,t,dt);
+    cudaclaw_src2(glob,patch,blockno,patchno,t,dt);
 }
 
 
 void fc2d_cudaclaw_setaux(fclaw2d_global_t *glob,
-                            fclaw2d_patch_t *this_patch,
-                            int this_block_idx,
-                            int this_patch_idx)
+                            fclaw2d_patch_t *patch,
+                            int blockno,
+                            int patchno)
 {
-    cudaclaw_setaux(glob,this_patch,this_block_idx,this_patch_idx);
+    cudaclaw_setaux(glob,patch,blockno,patchno);
 }
 
 
 void fc2d_cudaclaw_qinit(fclaw2d_global_t *glob,
-                           fclaw2d_patch_t *this_patch,
-                           int this_block_idx,
-                           int this_patch_idx)
+                           fclaw2d_patch_t *patch,
+                           int blockno,
+                           int patchno)
 {
-    cudaclaw_qinit(glob,this_patch,this_block_idx,this_patch_idx);
+    cudaclaw_qinit(glob,patch,blockno,patchno);
 }
 
 void fc2d_cudaclaw_b4step2(fclaw2d_global_t* glob,
-                             fclaw2d_patch_t *this_patch,
-                             int this_block_idx,
-                             int this_patch_idx,
+                             fclaw2d_patch_t *patch,
+                             int blockno,
+                             int patchno,
                              double t,
                              double dt)
 {
-    cudaclaw_b4step2(glob,this_patch,this_block_idx,this_patch_idx,t,dt);
+    cudaclaw_b4step2(glob,patch,blockno,patchno,t,dt);
 }
 
 void fc2d_cudaclaw_bc2(fclaw2d_global_t *glob,
-                         fclaw2d_patch_t *this_patch,
-                         int this_block_idx,
-                         int this_patch_idx,
+                         fclaw2d_patch_t *patch,
+                         int blockno,
+                         int patchno,
                          double t,
                          double dt,
                          int intersects_bc[],
                          int time_interp)
 {
-    cudaclaw_bc2(glob,this_patch,this_block_idx,this_block_idx,t,dt,
+    cudaclaw_bc2(glob,patch,blockno,patchno,t,dt,
                    intersects_bc,time_interp);
 }
 

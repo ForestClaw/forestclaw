@@ -11,14 +11,19 @@
 void cudaclaw_store_buffer(fclaw2d_global_t* glob,
                            fclaw2d_patch_t *this_patch,
                            int this_patch_idx,
+                           int this_block_idx,
                            int count, int iter, 
-                           cudaclaw_fluxes_t* flux_array)
+                           cudaclaw_fluxes_t* flux_array,
+                           fclaw2d_patch_t** patch_array,
+                           int* patchno_array,
+                           int* blockno_array)
 {
     PROFILE_CUDA_GROUP("fc2d_cudaclaw_store_buffer",4);
     double *qold, *aux;
     int meqn, maux;
 
     const fc2d_cudaclaw_options_t *cuclaw_opt = fc2d_cudaclaw_get_options(glob);
+    fc2d_cudaclaw_vtable_t*  cudaclaw_vt = fc2d_cudaclaw_vt(glob);
 
 
     cudaclaw_fluxes_t *fluxes = (cudaclaw_fluxes_t*) 
@@ -32,5 +37,15 @@ void cudaclaw_store_buffer(fclaw2d_global_t* glob,
     fluxes->qold = qold;
     fluxes->aux = aux;
 
-    flux_array[iter % cuclaw_opt->buffer_len] = *fluxes;
+    int n = iter % cuclaw_opt->buffer_len;
+    flux_array[n] = *fluxes;
+#if 1
+    if (cuclaw_opt->src_term > 0 && cudaclaw_vt->src2 != NULL)
+    {
+        patch_array[n] = this_patch;
+        patchno_array[n] = this_patch_idx;
+        blockno_array[n] = this_block_idx;
+    }
+#endif    
+        
 }

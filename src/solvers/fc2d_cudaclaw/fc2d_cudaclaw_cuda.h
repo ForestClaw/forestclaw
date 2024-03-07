@@ -39,6 +39,7 @@ extern "C"
 #define FC2D_CUDACLAW_BLOCK_SIZE 128
 #endif    
 
+
 #define FC2D_CUDACLAW_MWAVES  10           /* Used to set shared memory (checked) */ 
 
 
@@ -54,6 +55,13 @@ typedef void (*cudaclaw_cuda_b4step2_t)(int mbc, int mx, int my, int meqn, doubl
                                         double dx, double dy, 
                                         double time, double dt, int maux, 
                                         double aux[], int i, int j);
+
+typedef void (*cudaclaw_cuda_src2_t)(int meqn, int maux, 
+                                     double xlower, double ylower,
+                                     double dx, double dy, 
+                                     double q[], double aux[],
+                                     double time, double dt, 
+                                     int i, int j);
 
 typedef void (*cudaclaw_cuda_rpn2_t)(int idir, int meqn, int mwaves, int maux,
                                      double ql[], double qr[], 
@@ -88,9 +96,13 @@ double cudaclaw_step2_batch(struct fclaw2d_global* glob,
 
 void cudaclaw_store_buffer(struct fclaw2d_global* glob,
                            struct fclaw2d_patch *this_patch,
-                           int this_atch_idx,
-                           int count, int iter, 
-                           struct cudaclaw_fluxes* flux_array);
+                           int patchno, int blockno,
+                           int total, int iter,
+                           struct cudaclaw_fluxes* flux_array,
+                           struct fclaw2d_patch** patch_array,
+                           int* patchno_array,
+                           int* blockno_array);
+                          
 
 double *cudaclaw_get_cpu_membuffer();
 

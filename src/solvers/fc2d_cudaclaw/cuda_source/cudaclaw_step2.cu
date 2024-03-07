@@ -18,9 +18,6 @@
 #include <fc2d_cuda_profiler.h>
 #include <cub/cub.cuh>
 
-#define thread_count 224
-
-
 /* Put header here so it doesn't have to go in *.h file */
 __global__
 void cudaclaw_flux2_and_update_batch (const int mx,    const int my, 
@@ -32,7 +29,8 @@ void cudaclaw_flux2_and_update_batch (const int mx,    const int my,
                                       double * maxcflblocks,
                                       cudaclaw_cuda_rpn2_t rpn2,
                                       cudaclaw_cuda_rpt2_t rpt2,
-                                      cudaclaw_cuda_b4step2_t b4step2);
+                                      cudaclaw_cuda_b4step2_t b4step2,
+                                      cudaclaw_cuda_src2_t src2);
 
 __global__
 void cudaclaw_compute_speeds_batch (const int mx,    const int my, 
@@ -52,30 +50,12 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
 {
     PROFILE_CUDA_GROUP("cudaclaw_step2_batch",1);
 
-    size_t size, bytes, bytes_per_thread;
-    float bytes_kb;
-    int I_q, I_aux, mwork;
-    int i;
-
-    int mx,my,mbc,maux,meqn,mwaves;
-    double maxcfl;
-
-    double* maxcflblocks_dev;    
-
-    double *membuffer_cpu, *membuffer_dev;
-    cudaclaw_fluxes_t *array_fluxes_struct_dev;
-
-    cudaclaw_fluxes_t* fluxes;
-
-    /* To get patch-independent parameters */
-    fc2d_cudaclaw_options_t *clawopt;
-    fclaw2d_clawpatch_options_t *clawpatch_opt;
 
     /* ---------------------------------- start code ---------------------------------- */
     FCLAW_ASSERT(batch_size > 0);
 
-    clawopt = fc2d_cudaclaw_get_options(glob);
-    mwaves = clawopt->mwaves;
+    fc2d_cudaclaw_options_t *clawopt = fc2d_cudaclaw_get_options(glob);
+    int mwaves = clawopt->mwaves;
 
     fc2d_cudaclaw_vtable_t*  cuclaw_vt = fc2d_cudaclaw_vt(glob);
     FCLAW_ASSERT(cuclaw_vt->cuda_rpn2 != NULL);
@@ -84,34 +64,34 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
         FCLAW_ASSERT(cuclaw_vt->cuda_rpt2 != NULL);        
     }
 
-    clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
-    mx = clawpatch_opt->mx;
-    my = clawpatch_opt->my;
-    mbc = clawpatch_opt->mbc;
-    maux = clawpatch_opt->maux;
-    meqn = clawpatch_opt->meqn;  
+    fclaw2d_clawpatch_options_t *clawpatch_opt = fclaw2d_clawpatch_get_options(glob);
+    int mx = clawpatch_opt->mx;
+    int my = clawpatch_opt->my;
+    int mbc = clawpatch_opt->mbc;
+    int maux = clawpatch_opt->maux;
+    int meqn = clawpatch_opt->meqn;  
 
-    fluxes = &(array_fluxes_struct[0]);
-    size = batch_size*(fluxes->num + fluxes->num_aux);
-    bytes = size*sizeof(double);
+    cudaclaw_fluxes_t *fluxes = &(array_fluxes_struct[0]);
+    size_t size = batch_size*(fluxes->num + fluxes->num_aux);
+    size_t bytes = size*sizeof(double);
 
     /* ---------------------------------- Merge Memory ---------------------------------*/ 
-    membuffer_cpu = cudaclaw_get_cpu_membuffer();
-    membuffer_dev = cudaclaw_get_gpu_membuffer();
+    double *membuffer_cpu = cudaclaw_get_cpu_membuffer();
+    double *membuffer_dev = cudaclaw_get_gpu_membuffer();
     fclaw2d_timer_start_threadsafe (&glob->timers[FCLAW2D_TIMER_CUDA_MEMCOPY_H2H]);       
     {
         PROFILE_CUDA_GROUP("Copy data on patches to CPU memory buffer",5);    
-        for(i = 0; i < batch_size; i++)   
+        for(int i = 0; i < batch_size; i++)   
         {
             fluxes = &(array_fluxes_struct[i]);    
 
-            I_q = i*fluxes->num;
+            int I_q = i*fluxes->num;
             memcpy(&membuffer_cpu[I_q]  ,fluxes->qold ,fluxes->num_bytes);
             fluxes->qold_dev = &membuffer_dev[I_q];
 
             if (fluxes->num_aux > 0)
             {
-                I_aux = batch_size*fluxes->num + i*fluxes->num_aux;
+                int I_aux = batch_size*fluxes->num + i*fluxes->num_aux;
                 memcpy(&membuffer_cpu[I_aux],fluxes->aux  ,fluxes->num_bytes_aux);                
                 fluxes->aux_dev  = &membuffer_dev[I_aux];
             }
@@ -131,6 +111,7 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
 
     /* -------------------------------- Work with array --------------------------------*/ 
 
+    cudaclaw_fluxes_t *array_fluxes_struct_dev;
     {
         PROFILE_CUDA_GROUP("Copy fluxes to device memory",3);    
 
@@ -141,6 +122,7 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
                          cudaMemcpyHostToDevice));
     }        
 
+    double* maxcflblocks_dev;
     {
         PROFILE_CUDA_GROUP("Malloc for CFL computation",2);    
 
@@ -194,11 +176,11 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
 
         int mwork1 = 4*meqn + 2*maux + mwaves + meqn*mwaves;
         int mwork2 = 5*meqn + 6*maux;
-        mwork = (mwork1 > mwork2) ? mwork1 : mwork2;
-        bytes_per_thread = sizeof(double)*mwork;
-        bytes = bytes_per_thread*block_size;
+        int mwork = (mwork1 > mwork2) ? mwork1 : mwork2;
+        int bytes_per_thread = sizeof(double)*mwork;
+        int bytes = bytes_per_thread*block_size;
 
-        bytes_kb = bytes/1024.0;
+        //int bytes_kb = bytes/1024.0;
         //fclaw_global_essentialf("[fclaw] Shared memory  : %0.2f kb\n\n",bytes_kb);
 
         cudaclaw_flux2_and_update_batch<<<grid,block,bytes>>>(mx,my,meqn,mbc,maux,mwaves,
@@ -207,7 +189,8 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
                                                               maxcflblocks_dev,
                                                               cuclaw_vt->cuda_rpn2,
                                                               cuclaw_vt->cuda_rpt2,
-                                                              cuclaw_vt->cuda_b4step2);
+                                                              cuclaw_vt->cuda_b4step2,
+                                                              cuclaw_vt->cuda_src2);
         cudaDeviceSynchronize();
 
         
@@ -222,6 +205,7 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
     }
 
     /* -------------------------------- Finish CFL ------------------------------------*/ 
+    double maxcfl;
     {
         PROFILE_CUDA_GROUP("Finish CFL",2);
         void    *temp_storage_dev = NULL;
@@ -255,10 +239,10 @@ double cudaclaw_step2_batch(fclaw2d_global_t *glob,
     fclaw2d_timer_start_threadsafe (&glob->timers[FCLAW2D_TIMER_CUDA_MEMCOPY_H2H]);       
     {
         PROFILE_CUDA_GROUP("Copy CPU buffer back to patches",5);
-        for (i = 0; i < batch_size; ++i)    
+        for (int i = 0; i < batch_size; ++i)    
         {      
             fluxes = &(array_fluxes_struct[i]);
-            I_q = i*fluxes->num;
+            int I_q = i*fluxes->num;
 
             memcpy(fluxes->qold,&membuffer_cpu[I_q],fluxes->num_bytes);
         }        

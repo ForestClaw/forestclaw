@@ -52,6 +52,16 @@ typedef struct  cudaclaw_fluxes
     double ylower;
 } cudaclaw_fluxes_t;
 
+typedef struct cudaclaw_patch_data
+{
+    struct fclaw2d_patch **patch_array;
+    cudaclaw_fluxes_t *flux_array;
+    int *blockno_array;
+    int *patchno_array;
+    double *t_array;
+    double *dt_array;
+} cudaclaw_patch_data_t;
+
 
 #ifdef __cplusplus
 }

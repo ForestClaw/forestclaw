@@ -26,6 +26,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "radial_user.h"
 
 #include <fclaw_pointer_map.h>
+#include <fclaw2d_clawpatch.h>
+#include <fclaw2d_clawpatch_options.h>
+
 
 static void *
 radial_register (user_options_t *user, sc_options_t * opt)
@@ -42,6 +45,8 @@ radial_register (user_options_t *user, sc_options_t * opt)
 
     sc_options_add_int (opt, 0, "claw-version", &user->claw_version, 5,
                         "[user] Clawpack version (4 or 5) [5]");
+    sc_options_add_bool (opt, 0, "cuda", &user->cuda, 0,
+                           "Use cudaclaw [F]");
 
     user->is_registered = 1;
     return NULL;
@@ -62,6 +67,25 @@ radial_check (user_options_t *user)
     }
     return FCLAW_NOEXIT;
 }
+
+static fclaw_exit_type_t
+radial_check_cpu (user_options_t *user,
+             fclaw_options_t *fclaw_opt,
+             fclaw2d_clawpatch_options_t *clawpatch_opt)
+{
+    if (user->example < 0 || user->example > 2) {
+        fclaw_global_essentialf ("Option --user:example must be 0 or 1\n");
+        return FCLAW_EXIT_QUIET;
+    }
+    if (user->example > 0)
+        if (clawpatch_opt->mx*pow_int(2,fclaw_opt->minlevel) < 32)
+        {
+            fclaw_global_essentialf("The five patch mapping requires mx*2^minlevel >= 32\n");
+            return FCLAW_EXIT_QUIET;
+        }
+    return FCLAW_NOEXIT;
+}
+
 
 static void
 radial_destroy(user_options_t *user)
@@ -113,8 +137,20 @@ options_check(fclaw_app_t *app, void *package,void *registered)
     FCLAW_ASSERT(registered == NULL);
 
     user = (user_options_t*) package;
+    if(user->cuda == 0)
+    {
+        fclaw_options_t *fclaw_opt = 
+                (fclaw_options_t*) fclaw_app_get_attribute(app,"Options",NULL);
 
-    return radial_check(user);
+        fclaw2d_clawpatch_options_t *clawpatch_opt = 
+                    (fclaw2d_clawpatch_options_t*)  fclaw_app_get_attribute(app,"clawpatch",NULL);
+
+        return radial_check_cpu(user,fclaw_opt, clawpatch_opt);
+    }
+    else
+    {
+        return radial_check(user);
+    }
 }
 
 static void

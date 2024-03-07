@@ -1,13 +1,8 @@
 # -- fortran library
 add_library(cudaclaw_f OBJECT
-	fortran_source/cudaclaw_inlinelimiter.f
 	fortran_source/cudaclaw_set_capacity.f
 	fortran_source/cudaclaw_block.f
 	fortran_source/cudaclaw_bc2_default.f
-	fortran_source/cudaclaw_flux2.f
-	fortran_source/cudaclaw_flux2fw.f
-	fortran_source/cudaclaw_step2.f
-	fortran_source/cudaclaw_step2_wrap.f
 )
 
 set_target_properties(cudaclaw_f PROPERTIES Fortran_MODULE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/include)

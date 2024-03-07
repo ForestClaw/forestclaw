@@ -1,4 +1,4 @@
-      subroutine cudaclaw_bc2(maxmx,maxmy,meqn,mbc,
+      subroutine clawpack46_bc2(maxmx,maxmy,meqn,mbc,
      &      mx,my,xlower,ylower,
      &      dx,dy,q,maux,aux,t,dt,mthbc)
 c     =====================================================
@@ -26,12 +26,18 @@ c     #   (i, my+jbc)  for jbc = 1,mbc,  i = 1-mbc, mx+mbc
 c     #   (1-ibc, j)   for ibc = 1,mbc,  j = 1-mbc, my+mbc
 c     #   (mx+ibc, j)  for ibc = 1,mbc,  j = 1-mbc, my+mbc
 c
-      implicit double precision (a-h,o-z)
-      dimension q(1-mbc:maxmx+mbc, 1-mbc:maxmy+mbc, meqn)
-      dimension aux(1-mbc:maxmx+mbc, 1-mbc:maxmy+mbc, *)
-      dimension mthbc(4)
+      implicit none
 
+      integer maxmx, maxmy, meqn, mbc, mx,my,maux
+      double precision xlower, ylower, dx, dy, t, dt
+      double precision q(1-mbc:maxmx+mbc, 1-mbc:maxmy+mbc, meqn)
+      double precision aux(1-mbc:maxmx+mbc, 1-mbc:maxmy+mbc, *)
+      integer mthbc(4)
+
+      double precision rinf, vinf, einf
       common /cominf/ rinf,vinf,einf
+
+      integer ibc, jbc, i, j, m
 
 c
 c
@@ -44,45 +50,53 @@ c-------------------------------------------------------
 c
   100 continue
 c     # user-specified boundary conditions go here in place of error output
-      do 105 ibc=1,mbc
-         do 105 j=1-mbc,my+mbc
+      do ibc=1,mbc
+         do j=1-mbc,my+mbc
             q(1-ibc,j,1) = rinf
             q(1-ibc,j,2) = rinf*vinf
             q(1-ibc,j,3) = 0.d0
             q(1-ibc,j,4) = einf
-  105       continue
+         end do
+      end do
       go to 199
 c
   110 continue
 c     # zero-order extrapolation:
-      do 115 m=1,meqn
-         do 115 ibc=1,mbc
-            do 115 j = 1-mbc, my+mbc
+      do m=1,meqn
+         do ibc=1,mbc
+            do j = 1-mbc, my+mbc
                q(1-ibc,j,m) = q(1,j,m)
-  115       continue
+            end do
+         end do
+      end do
       go to 199
 
   120 continue
 c     # periodic:
-      do 125 m=1,meqn
-         do 125 ibc=1,mbc
-            do 125 j = 1-mbc, my+mbc
+      do m=1,meqn
+         do ibc=1,mbc
+            do j = 1-mbc, my+mbc
                q(1-ibc,j,m) = q(mx+1-ibc,j,m)
-  125       continue
+            end do
+         end do
+      end do
       go to 199
 
   130 continue
 c     # solid wall (assumes 2'nd component is velocity or momentum in x):
-      do 135 m=1,meqn
-         do 135 ibc=1,mbc
-            do 135 j = 1-mbc, my+mbc
+      do m=1,meqn
+         do ibc=1,mbc
+            do j = 1-mbc, my+mbc
                q(1-ibc,j,m) = q(ibc,j,m)
-  135       continue
+            end do
+         end do
+      end do
 c     # negate the normal velocity:
-      do 136 ibc=1,mbc
-         do 136 j = 1-mbc, my+mbc
+      do ibc=1,mbc
+         do j = 1-mbc, my+mbc
             q(1-ibc,j,2) = -q(ibc,j,2)
-  136    continue
+         end do
+      end do
       go to 199
 
   199 continue
@@ -101,34 +115,41 @@ c     # user-specified boundary conditions go here in place of error output
 
   210 continue
 c     # zero-order extrapolation:
-      do 215 m=1,meqn
-         do 215 ibc=1,mbc
-            do 215 j = 1-mbc, my+mbc
+      do m=1,meqn
+         do ibc=1,mbc
+            do j = 1-mbc, my+mbc
                q(mx+ibc,j,m) = q(mx,j,m)
-  215       continue
+            end do
+         end do
+      end do
       go to 299
 
   220 continue
 c     # periodic:
-      do 225 m=1,meqn
-         do 225 ibc=1,mbc
-            do 225 j = 1-mbc, my+mbc
+      do m=1,meqn
+         do ibc=1,mbc
+            do j = 1-mbc, my+mbc
                q(mx+ibc,j,m) = q(ibc,j,m)
-  225       continue
+            end do
+         end do
+      end do
       go to 299
 
   230 continue
 c     # solid wall (assumes 2'nd component is velocity or momentum in x):
-      do 235 m=1,meqn
-         do 235 ibc=1,mbc
-            do 235 j = 1-mbc, my+mbc
+      do m=1,meqn
+         do ibc=1,mbc
+            do j = 1-mbc, my+mbc
                q(mx+ibc,j,m) = q(mx+1-ibc,j,m)
-  235       continue
+            end do
+         end do
+      end do
 c     # negate the normal velocity:
-      do 236 ibc=1,mbc
-         do 236 j = 1-mbc, my+mbc
+      do ibc=1,mbc
+         do j = 1-mbc, my+mbc
             q(mx+ibc,j,2) = -q(mx+1-ibc,j,2)
-  236    continue
+         end do
+      end do
       go to 299
 
   299 continue
@@ -147,34 +168,41 @@ c     # user-specified boundary conditions go here in place of error output
 c
   310 continue
 c     # zero-order extrapolation:
-      do 315 m=1,meqn
-         do 315 jbc=1,mbc
-            do 315 i = 1-mbc, mx+mbc
+      do m=1,meqn
+         do jbc=1,mbc
+            do i = 1-mbc, mx+mbc
                q(i,1-jbc,m) = q(i,1,m)
-  315       continue
+            end do
+         end do
+      end do
       go to 399
 
   320 continue
 c     # periodic:
-      do 325 m=1,meqn
-         do 325 jbc=1,mbc
-            do 325 i = 1-mbc, mx+mbc
+      do m=1,meqn
+         do jbc=1,mbc
+            do i = 1-mbc, mx+mbc
                q(i,1-jbc,m) = q(i,my+1-jbc,m)
-  325       continue
+            end do
+         end do
+      end do
       go to 399
 
   330 continue
 c     # solid wall (assumes 3'rd component is velocity or momentum in y):
-      do 335 m=1,meqn
-         do 335 jbc=1,mbc
-            do 335 i = 1-mbc, mx+mbc
+      do m=1,meqn
+         do jbc=1,mbc
+            do i = 1-mbc, mx+mbc
                q(i,1-jbc,m) = q(i,jbc,m)
-  335       continue
+            end do
+         end do
+      end do
 c     # negate the normal velocity:
-      do 336 jbc=1,mbc
-         do 336 i = 1-mbc, mx+mbc
+      do jbc=1,mbc
+         do i = 1-mbc, mx+mbc
             q(i,1-jbc,3) = -q(i,jbc,3)
-  336    continue
+         end do
+      end do
       go to 399
 
   399 continue
@@ -193,34 +221,41 @@ c     # user-specified boundary conditions go here in place of error output
 
   410 continue
 c     # zero-order extrapolation:
-      do 415 m=1,meqn
-         do 415 jbc=1,mbc
-            do 415 i = 1-mbc, mx+mbc
+      do m=1,meqn
+         do jbc=1,mbc
+            do i = 1-mbc, mx+mbc
                q(i,my+jbc,m) = q(i,my,m)
-  415       continue
+            end do
+         end do
+      end do
       go to 499
 
   420 continue
 c     # periodic:
-      do 425 m=1,meqn
-         do 425 jbc=1,mbc
-            do 425 i = 1-mbc, mx+mbc
+      do m=1,meqn
+         do jbc=1,mbc
+            do i = 1-mbc, mx+mbc
                q(i,my+jbc,m) = q(i,jbc,m)
-  425       continue
+            end do
+         end do
+      end do
       go to 499
 
   430 continue
 c     # solid wall (assumes 3'rd component is velocity or momentum in y):
-      do 435 m=1,meqn
-         do 435 jbc=1,mbc
-            do 435 i = 1-mbc, mx+mbc
+      do m=1,meqn
+         do jbc=1,mbc
+            do i = 1-mbc, mx+mbc
                q(i,my+jbc,m) = q(i,my+1-jbc,m)
-  435       continue
+            end do
+         end do
+      end do
 c     # negate the normal velocity:
-      do 436 jbc=1,mbc
-         do 436 i = 1-mbc, mx+mbc
+      do jbc=1,mbc
+         do i = 1-mbc, mx+mbc
             q(i,my+jbc,3) = -q(i,my+1-jbc,3)
-  436    continue
+         end do
+      end do
       go to 499
 
   499 continue

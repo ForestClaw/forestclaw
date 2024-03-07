@@ -7,9 +7,8 @@ subroutine setprob()
     double precision :: gamma, gamma1
     common /cparam/  gamma,gamma1
 
-    integer :: idisc
-    double precision :: x0, y0, alf, beta, r0
-    common/cdisc/ x0,y0,alf,beta,r0,idisc
+    double precision :: x0, y0, r0
+    common/cdisc/ x0,y0, r0
 
     double precision :: rinf, vinf, einf
     common /cominf/ rinf,vinf,einf
@@ -17,7 +16,7 @@ subroutine setprob()
     double precision :: rhoin, rhoout, pout, pin, pinf
 
     open(10,file='setprob.data')
-
+       
     !! # These should be read in as options
     read(10,*) gamma
     gamma1 = gamma - 1.d0
@@ -27,9 +26,6 @@ subroutine setprob()
     read(10,*) r0    
     read(10,*) rhoin 
     read(10,*) pinf  
-
-    !! # set idisc for cellave routines (see function fdisc)
-    read(10,*) idisc
 
     close(10)
 

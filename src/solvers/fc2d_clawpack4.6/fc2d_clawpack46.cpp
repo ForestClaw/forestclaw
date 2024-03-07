@@ -175,7 +175,8 @@ void clawpack46_b4step2(fclaw2d_global_t *glob,
 	int maxmy = my;
 
 	CLAWPACK46_SET_BLOCK(&blockno);
-	claw46_vt->fort_b4step2(&maxmx,&maxmy,&mbc,&mx,&my,&meqn,q,&xlower,&ylower,
+	claw46_vt->fort_b4step2(&maxmx,&maxmy,&mbc,&mx,&my,&meqn,q,
+	                        &xlower,&ylower,
 							&dx,&dy,&t,&dt,&maux,aux);
 	CLAWPACK46_UNSET_BLOCK();
 }

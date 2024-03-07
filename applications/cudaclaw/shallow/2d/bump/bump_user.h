@@ -79,12 +79,10 @@ user_options_t* bump_get_options(fclaw2d_global_t* glob);
 
 
 /* --------------------------------------- non-Cuda ----------------------------------------*/
-
-#if 0
 #define BUMP_SETPROB FCLAW_F77_FUNC(bump_setprob, BUMP_SETPROB)
 void BUMP_SETPROB();
 
-
+#if 0
 #define USER5_SETAUX_MANIFOLD FCLAW_F77_FUNC(user5_setaux_manifold, \
                                              USER5_SETAUX_MANIFOLD)
 

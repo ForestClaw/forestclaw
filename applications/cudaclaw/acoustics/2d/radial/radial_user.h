@@ -37,6 +37,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fc2d_cudaclaw_options.h>
 #include <cudaclaw_user_fort.h>
 
+#include <fclaw2d_clawpatch_fort.h>
+
+#include <fc2d_clawpack46.h>
+#include <fc2d_clawpack46_options.h>
+#include <clawpack46_user_fort.h>
+
+#include <fc2d_clawpack5.h>
+#include <clawpack46_user_fort.h>
+
+#include "../../../../clawpack/acoustics/2d/rp/acoustics_user_fort.h"
+
 #ifdef __cplusplus
 extern "C"
 {
@@ -51,7 +62,8 @@ typedef struct user_options
     int example;
     double rho;
     double bulk;
-
+    double alpha;
+    int cuda;
     int claw_version;
     int is_registered;
 
@@ -74,6 +86,10 @@ void setprob_cuda();
 
 void radial_assign_rpn2(cudaclaw_cuda_rpn2_t *rpn2);
 void radial_assign_rpt2(cudaclaw_cuda_rpt2_t *rpt2);
+
+/* --------------------------------------- non-Cuda ----------------------------------------*/
+#define SETPROB FCLAW_F77_FUNC(setprob, SETPROB)
+void SETPROB();
 
 #ifdef __cplusplus
 }

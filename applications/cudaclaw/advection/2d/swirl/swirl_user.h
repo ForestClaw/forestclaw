@@ -26,6 +26,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef SWIRL_USER_H
 #define SWIRL_USER_H
 
+#include "../../../../clawpack/advection/2d/all/advection_user.h"
+
 #include <fclaw2d_include_all.h>
 
 #include <fc2d_cudaclaw.h>
@@ -73,10 +75,10 @@ void swirl_assign_rpn2(cudaclaw_cuda_rpn2_t *rpn2);
 void swirl_assign_rpt2(cudaclaw_cuda_rpt2_t *rpt2);
 void swirl_assign_b4step2(cudaclaw_cuda_b4step2_t *b4step2);
 
-void setprob();
+void setprob_cuda();
 
 /* ------------------------------------ Fortran ----------------------------------------*/
-#if 0
+#if 1
 #define SETPROB FCLAW_F77_FUNC(setprob, SETPROB)
 void SETPROB();
 #endif

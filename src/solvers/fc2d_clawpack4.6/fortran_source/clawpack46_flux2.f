@@ -128,7 +128,9 @@ c
 c     # compute maximum wave speed for checking Courant number:
       cfl1d = 0.d0
       do mw = 1,mwaves
-          do i = 1,mx+1
+c         !! We sweep over ghost cells so code will compare
+c         !! with cudaclaw         
+          do i = 2-mbc,mx+mbc
 c             # if s>0 use dtdx1d(i) to compute CFL,
 c             # if s<0 use dtdx1d(i-1) to compute CFL:
               cfl1d = dmax1(cfl1d, dtdx1d(i)*s(i,mw),

@@ -24,6 +24,12 @@
  */
 
 #include "swirl_user.h"
+#include <fc2d_clawpack46.h>  
+#include <fc2d_clawpack46_options.h>
+#include <fc2d_clawpack46_fort.h>  
+#include <clawpack46_user_fort.h>  
+#include <fclaw2d_clawpatch46_fort.h>
+#include "../../../../clawpack/advection/2d/all/advection_user.h"
 
 static
 void swirl_problem_setup(fclaw2d_global_t* glob)
@@ -39,8 +45,8 @@ void swirl_problem_setup(fclaw2d_global_t* glob)
 
     /* Make sure node 0 has written 'setprob.data' before proceeding */
     fclaw2d_domain_barrier (glob->domain);
-
-    setprob();
+    setprob_cuda();
+    SETPROB();
 }
 
 
@@ -51,23 +57,46 @@ void swirl_link_solvers(fclaw2d_global_t *glob)
 
 
 	vt->problem_setup = &swirl_problem_setup;  /* Version-independent */
-
+    fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt(glob); //added
+    //vt->problem_setup = &swirl_problem_setup;  /* Version-independent */
+    //fclaw2d_patch_vtable_t*  patch_vt = fclaw2d_patch_vt();  
 	const user_options_t* user = swirl_get_options(glob);
-	fc2d_cudaclaw_vtable_t *cudaclaw_vt = fc2d_cudaclaw_vt(glob);        
 
-	cudaclaw_vt->fort_qinit     = &CUDACLAW_QINIT;
-		
-	//cudaclaw_vt->fort_rpn2      = &CLAWPACK46_RPN2ADV;
-	swirl_assign_rpn2(&cudaclaw_vt->cuda_rpn2);
-	FCLAW_ASSERT(cudaclaw_vt->cuda_rpn2 != NULL);
+    if (user->cuda == 0)
+    {
+        fc2d_clawpack46_vtable_t *clawpack46_vt = fc2d_clawpack46_vt(glob);        
+        
+        clawpack46_vt->fort_qinit     = &CUDACLAW_QINIT;
+        clawpack46_vt->fort_rpn2      = &CLAWPACK46_RPN2ADV;
+        clawpack46_vt->fort_rpt2      = &CLAWPACK46_RPT2ADV;
 
-	// cudaclaw_vt->fort_b4step2   = &CUDACLAW_B4STEP2;
-	swirl_assign_b4step2(&cudaclaw_vt->cuda_b4step2);
-	FCLAW_ASSERT(cudaclaw_vt->cuda_b4step2 != NULL);
+        /* Velocity is set here rather than in setaux, because we have a 
+           time dependent velocity field */
+        clawpack46_vt->fort_b4step2   = &CLAWPACK46_B4STEP2;
+        
+    }
+    else
+    {
+        //fclaw2d_patch_vtable_t*  patch_vt = fclaw2d_patch_vt();  
 
-	//cudaclaw_vt->fort_rpt2      = &CLAWPACK46_RPT2ADV;
-	swirl_assign_rpt2(&cudaclaw_vt->cuda_rpt2);
-	FCLAW_ASSERT(cudaclaw_vt->cuda_rpt2 != NULL);
+        // const user_options_t* user = swirl_get_options(glob);
+        
+        fc2d_cudaclaw_vtable_t *cudaclaw_vt = fc2d_cudaclaw_vt(glob);        
+
+        cudaclaw_vt->fort_qinit     = &CUDACLAW_QINIT;
+            
+        //cudaclaw_vt->fort_rpn2      = &CLAWPACK46_RPN2ADV;
+        swirl_assign_rpn2(&cudaclaw_vt->cuda_rpn2);
+        FCLAW_ASSERT(cudaclaw_vt->cuda_rpn2 != NULL);
+
+        //cudaclaw_vt->fort_b4step2   = &CLAWPACK46_B4STEP2;
+        swirl_assign_b4step2(&cudaclaw_vt->cuda_b4step2);
+        FCLAW_ASSERT(cudaclaw_vt->cuda_b4step2 != NULL);
+
+        //cudaclaw_vt->fort_rpt2      = &CLAWPACK46_RPT2ADV;
+        swirl_assign_rpt2(&cudaclaw_vt->cuda_rpt2);
+        FCLAW_ASSERT(cudaclaw_vt->cuda_rpt2 != NULL);
+    }
 }
 
 

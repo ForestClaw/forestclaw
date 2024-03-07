@@ -28,9 +28,6 @@
 
 #include <fclaw2d_include_all.h>
 
-
-#include <fclaw2d_include_all.h>
-
 #include <fc2d_cudaclaw.h>
 #include <cudaclaw_user_fort.h>
 
@@ -49,14 +46,13 @@ extern "C"
 
 typedef struct user_options
 {
-    int idisc;
     double gamma;
     double x0;
     double y0;
     double r0;
     double rhoin;
     double pinf;
-
+    int idisc;
     int claw_version;
     int cuda;
 
@@ -75,11 +71,12 @@ user_options_t* shockbubble_get_options(fclaw2d_global_t* glob);
 
 /* ------------------------------- Fortran code --------------------------------------- */
 
-#if 0
+#if 1
 #define SETPROB FCLAW_F77_FUNC(setprob, SETPROB)
-void SETPROB(const double *gamma, const double* x0, const double* y0,
-                         const double* r0, const double* rhoin,
-                         const double* pinf, const int* idisc);
+void SETPROB();
+// void SETPROB(const double *gamma, const double* x0, const double* y0,
+                        //  const double* r0, const double* rhoin,
+                        //  const double* pinf, const int* idisc);
 #endif
 
 
@@ -91,9 +88,12 @@ void shockbubble_assign_rpn2(cudaclaw_cuda_rpn2_t *rpn2);
 
 void shockbubble_assign_rpt2(cudaclaw_cuda_rpt2_t *rpt2);
 
+void shockbubble_assign_src2(cudaclaw_cuda_src2_t *src2);
+
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif
+
