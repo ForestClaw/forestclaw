@@ -65,7 +65,7 @@ clawpack_register (fc3d_clawpack46_options_t* clawopt, sc_options_t * opt)
     sc_options_add_bool (opt, 0, "vtk-out", &clawopt->vtk_out, 0,
                            "Output VTK formatted data [F]");
 
-    sc_options_add_bool (opt, 0, "hdf-out", &clawopt->hdf_out, 0,
+    sc_options_add_bool (opt, 0, "hdf5-out", &clawopt->hdf5_out, 0,
                            "Output VTKHDF formatted data [F]");
 
     clawopt->is_registered = 1;
@@ -98,7 +98,7 @@ clawpack_check(fc3d_clawpack46_options_t *clawopt)
     clawopt->method[5] = clawopt->mcapa;
 
 #ifndef FCLAW_ENABLE_HDF5
-    if(clawopt->hdf_out)
+    if(clawopt->hdf5_out)
     {
         fclaw_global_errorf("fc3d_clawpack46: ERROR: ForestClaw built without HDF5, cannot output hdf5.\n");
         exit_code = FCLAW_EXIT_ERROR;

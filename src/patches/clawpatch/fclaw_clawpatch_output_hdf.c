@@ -23,7 +23,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <fclaw_clawpatch_output_hdf5.h>
+#include <fclaw_clawpatch_output_hdf.h>
 
 #include <fclaw_clawpatch.h>
 #include <fclaw_clawpatch_options.h>
@@ -393,8 +393,8 @@ set_attribute_string(hid_t loc_id, const char *obj_name, const char *attr_name, 
 static int
 fclaw_hdf_write_file (fclaw_global_t * glob, 
                       const char* filename,
-                      fclaw_hdf5_patch_data_t coordinate_cb,
-                      fclaw_hdf5_patch_data_t value_cb)
+                      fclaw_hdf_patch_data_t coordinate_cb,
+                      fclaw_hdf_patch_data_t value_cb)
 {
     const fclaw_clawpatch_options_t* clawpatch_opt = fclaw_clawpatch_get_options(glob);
     //get mx, my, mz, meqn from clawpatch options
@@ -662,8 +662,8 @@ fclaw_hdf_write_file (fclaw_global_t * glob,
 
 void fclaw_clawpatch_output_hdf5_to_file (struct fclaw_global* glob, 
                                          const char* filename,
-                                         fclaw_hdf5_patch_data_t coordinate_cb,
-                                         fclaw_hdf5_patch_data_t value_cb)
+                                         fclaw_hdf_patch_data_t coordinate_cb,
+                                         fclaw_hdf_patch_data_t value_cb)
 {
     fclaw_hdf_write_file (glob, 
                           filename, 

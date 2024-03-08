@@ -480,8 +480,8 @@ void clawpack46_output(fclaw_global_t *glob, int iframe)
 		fclaw_clawpatch_output_vtk(glob,iframe);
 
 #ifdef FCLAW_ENABLE_HDF5
-	if (clawpack_options->hdf_out != 0)
-		fclaw_clawpatch_output_hdf(glob,iframe);
+	if (clawpack_options->hdf5_out != 0)
+		fclaw_clawpatch_output_hdf5(glob,iframe);
 #endif
 }
 

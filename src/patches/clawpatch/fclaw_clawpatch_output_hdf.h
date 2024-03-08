@@ -55,10 +55,10 @@ struct fclaw_patch;
  *                     The vector index changes fastest, then mx, then my
  *                     slowest.
  */
-typedef void (*fclaw_hdf5_patch_data_t) (struct fclaw_global * glob,
-                                         struct fclaw_patch * this_patch,
-                                         int this_block_idx, int this_patch_idx,
-                                         char *a);
+typedef void (*fclaw_hdf_patch_data_t) (struct fclaw_global * glob,
+                                        struct fclaw_patch * this_patch,
+                                        int this_block_idx, int this_patch_idx,
+                                        char *a);
 	
 /**
  * @brief Output vtu file
@@ -69,9 +69,9 @@ typedef void (*fclaw_hdf5_patch_data_t) (struct fclaw_global * glob,
  * @param value_cb callback cell data, set to NULL for default callback
  */
 void fclaw_clawpatch_output_hdf5_to_file (struct fclaw_global* glob, 
-                                          const char* filename,
-                                          fclaw_hdf5_patch_data_t coordinate_cb,
-                                          fclaw_hdf5_patch_data_t value_cb);
+                                         const char* filename,
+                                         fclaw_hdf_patch_data_t coordinate_cb,
+                                         fclaw_hdf_patch_data_t value_cb);
 
 
 /**
