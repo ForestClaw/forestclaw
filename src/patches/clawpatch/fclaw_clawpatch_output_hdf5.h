@@ -23,10 +23,9 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef FCLAW_CLAWPATCH_OUTPUT_HDF5_H
-#define FCLAW_CLAWPATCH_OUTPUT_HDF5_H
+#ifndef FCLAW_CLAWPATCH_OUTPUT_HDF_H
+#define FCLAW_CLAWPATCH_OUTPUT_HDF_H
 
-#include <fclaw_clawpatch_output_vtk.h>
 /** 
  * @file
  * Routines for hdf5 output 
@@ -56,7 +55,7 @@ struct fclaw_patch;
  *                     The vector index changes fastest, then mx, then my
  *                     slowest.
  */
-typedef void (*fclaw_hdf5_patch_data_t) (struct fclaw_global * glob,
+typedef void (*fclaw_hdf_patch_data_t) (struct fclaw_global * glob,
                                         struct fclaw_patch * this_patch,
                                         int this_block_idx, int this_patch_idx,
                                         char *a);
@@ -66,8 +65,13 @@ typedef void (*fclaw_hdf5_patch_data_t) (struct fclaw_global * glob,
  * 
  * @param glob the global context
  * @param filename the filename to output to
+ * @param coordinate_cb callback for coordinate data, set to NULL for default callback
+ * @param value_cb callback cell data, set to NULL for default callback
  */
-void fclaw_clawpatch_output_hdf5_to_file (struct fclaw_global* glob, const char* filename);
+void fclaw_clawpatch_output_hdf_to_file (struct fclaw_global* glob, 
+                                         const char* filename,
+                                         fclaw_hdf_patch_data_t coordinate_cb,
+                                         fclaw_hdf_patch_data_t value_cb);
 
 
 /**
@@ -76,7 +80,7 @@ void fclaw_clawpatch_output_hdf5_to_file (struct fclaw_global* glob, const char*
  * @param glob the global context
  * @param iframe the the frame index
  */
-void fclaw_clawpatch_output_hdf5 (struct fclaw_global* glob, int iframe);
+void fclaw_clawpatch_output_hdf (struct fclaw_global* glob, int iframe);
 
 
 #ifdef __cplusplus

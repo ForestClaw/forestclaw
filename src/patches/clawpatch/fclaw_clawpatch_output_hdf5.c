@@ -391,10 +391,10 @@ set_attribute_string(hid_t loc_id, const char *obj_name, const char *attr_name, 
     }
 }
 static int
-fclaw_hdf5_write_file (fclaw_global_t * glob, 
-                       const char* filename,
-                       fclaw_vtk_patch_data_t coordinate_cb,
-                       fclaw_vtk_patch_data_t value_cb)
+fclaw_hdf_write_file (fclaw_global_t * glob, 
+                      const char* filename,
+                      fclaw_hdf_patch_data_t coordinate_cb,
+                      fclaw_hdf_patch_data_t value_cb)
 {
     const fclaw_clawpatch_options_t* clawpatch_opt = fclaw_clawpatch_get_options(glob);
     //get mx, my, mz, meqn from clawpatch options
@@ -660,18 +660,25 @@ fclaw_hdf5_write_file (fclaw_global_t * glob,
     Public interface
     --------------------------------------------------------------------------- */
 
-void fclaw_clawpatch_output_hdf5_to_file (fclaw_global_t * glob, const char* filename)
+void fclaw_clawpatch_output_hdf_to_file (struct fclaw_global* glob, 
+                                         const char* filename,
+                                         fclaw_hdf_patch_data_t coordinate_cb,
+                                         fclaw_hdf_patch_data_t value_cb)
 {
-    fclaw_hdf5_write_file (glob, filename, get_coordinates, get_data);
+    fclaw_hdf_write_file (glob, 
+                          filename, 
+                          coordinate_cb == NULL ? get_coordinates : coordinate_cb, 
+                          coordinate_cb == NULL ? get_data : value_cb);
 }
-void fclaw_clawpatch_output_hdf5 (fclaw_global_t * glob, int iframe)
+
+void fclaw_clawpatch_output_hdf (fclaw_global_t * glob, int iframe)
 {
     const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
 
     char basename[BUFSIZ];
     snprintf (basename, BUFSIZ, "%s_frame_%04d.vtkhdf", fclaw_opt->prefix, iframe);
 
-    fclaw_clawpatch_output_hdf5_to_file(glob,basename);
+    fclaw_clawpatch_output_hdf_to_file(glob,basename, NULL, NULL);
 }
 
 
