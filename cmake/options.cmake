@@ -1,6 +1,7 @@
 option(mpi "use MPI library")
 option(openmp "use OpenMP")
 option(applications "build applications" ON)
+option(hdf5 "use HDF5 library")
 
 option(clawpatch "build Clawpatch")
 option(clawpack "build Clawpack")

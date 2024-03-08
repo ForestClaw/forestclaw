@@ -72,9 +72,9 @@ if(cudaclaw)
 endif(cudaclaw)
 # --- configure
 
-#if(hdf5 AND NOT TARGET HDF5::HDF5)
+if(hdf5 AND NOT TARGET HDF5::HDF5)
   include(cmake/hdf5.cmake)
-#endif()
+endif()
 
 include(cmake/config.cmake)
 include(cmake/compilers.cmake)
