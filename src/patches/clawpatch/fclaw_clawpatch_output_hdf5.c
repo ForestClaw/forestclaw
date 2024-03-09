@@ -622,43 +622,74 @@ make_dataset_numerical(fclaw_global_t *glob,
     hid_t plist_id = H5Pcreate(H5P_DATASET_XFER);
 
     status |= H5Pset_dxpl_mpio(plist_id, H5FD_MPIO_COLLECTIVE);
+    //status |= H5Pset_dxpl_mpio_collective_opt(plist_id, H5FD_MPIO_INDIVIDUAL_IO);
 
-    for(int i = 0; i < glob->domain->local_max_patches; i++)
+    for(int local_patch_index = 0; 
+        local_patch_index < glob->domain->local_max_patches; 
+        local_patch_index += num_patches_to_buffer)
     {
-        int patchno, blockno;
-        get_patch_blockno(glob, i, &blockno, &patchno);
-
-        hsize_t slab_dims[rank];
-        hsize_t slab_start[rank];
-        hsize_t patch_slab_dims[rank];
-        hsize_t patch_slab_start[rank];
-        vt->get_slab_dims(glob, patchno, blockno, rank, patch_dims, patch_slab_start, patch_slab_dims);
-        for(int j = 0; j < rank; j++)
-        {
-            slab_dims[j] = patch_slab_dims[j];
-            slab_start[j] = patch_slab_start[j];
-        }
-        hid_t memspace = H5Screate_simple(rank, slab_dims, NULL);
-
-        hsize_t buffer_size = H5Sget_simple_extent_npoints(memspace) * H5Tget_size(tid);
-
-
-        char *buffer = NULL;
-        if(buffer_size > 0)
-        {
-            buffer = FCLAW_ALLOC(char, buffer_size);
-            fclaw_patch_t *patch = NULL;
-            if(patchno < glob->domain->blocks[blockno].num_patches)
-            {
-                patch = &glob->domain->blocks[blockno].patches[patchno];
-            }
-            patch_cb(glob, patch, blockno, patchno, buffer);
-        }
+        int num_able_to_buffer 
+            = SC_MIN(num_patches_to_buffer, glob->domain->local_max_patches - local_patch_index);
 
         hid_t filespace = H5Dget_space(did);
 
+        hsize_t slab_dims[rank];
+        hsize_t slab_start[rank];
+        hsize_t buffer_offsets[num_able_to_buffer];
+        hsize_t total_buffer_size = 0;
+        for(int j=0; j < num_able_to_buffer; j++)
+        {
+            int patchno, blockno;
+            get_patch_blockno(glob, local_patch_index+j, &blockno, &patchno);
+
+            hsize_t patch_slab_dims[rank];
+            hsize_t patch_slab_start[rank];
+            vt->get_slab_dims(glob, patchno, blockno, rank, patch_dims, patch_slab_start, patch_slab_dims);
+            buffer_offsets[j] = total_buffer_size;
+            hsize_t buffer_size = patch_slab_dims[0] * H5Tget_size(tid);
+            for(int k = 1; k < rank; k++)
+            {
+                buffer_size *= patch_slab_dims[k];
+            }
+            total_buffer_size += buffer_size;
+            if(j == 0)
+            {
+                for(int k = 0; k < rank; k++)
+                {
+                    slab_dims[k] = patch_slab_dims[k];
+                    slab_start[k] = patch_slab_start[k];
+                }
+            }
+            else
+            {
+                slab_dims[0] += patch_slab_dims[0];
+            }
+        }
+
         status |= H5Sselect_hyperslab(filespace, H5S_SELECT_SET, slab_start, NULL, slab_dims, NULL);
+        //create memspace
+        hid_t memspace = H5Screate_simple(rank, slab_dims, NULL);
+        FCLAW_ASSERT(H5Sget_select_npoints(filespace) == H5Sget_select_npoints(memspace));
+
+        char *buffer = FCLAW_ALLOC(char, total_buffer_size);
+        for(int j=0; j < num_able_to_buffer; j++)
+        {
+            int patchno, blockno;
+            get_patch_blockno(glob, local_patch_index+j, &blockno, &patchno);
+            if(buffer_offsets[j] < total_buffer_size)
+            {
+                fclaw_patch_t *patch = NULL;
+                if(patchno < glob->domain->blocks[blockno].num_patches)
+                {
+                    patch = &glob->domain->blocks[blockno].patches[patchno];
+                }
+                patch_cb(glob, patch, blockno, patchno, buffer + buffer_offsets[j]);
+            }
+        }
+
+        fclaw_timer_start(&glob->timers[FCLAW_TIMER_EXTRA4]);
         status |= H5Dwrite(did, tid, memspace, filespace, plist_id, buffer);
+        fclaw_timer_stop(&glob->timers[FCLAW_TIMER_EXTRA4]);
 
         status |= H5Sclose(memspace);
         status |= H5Sclose(filespace);
@@ -671,7 +702,7 @@ make_dataset_numerical(fclaw_global_t *glob,
 
     if(status != 0 || did < 0 || plist_id < 0)
     {
-        printf("fclaw_clawpatch_output_hdf5.c Error in make_dataset_numerical\n");
+        fclaw_abortf("fclaw_clawpatch_output_hdf5.c Error in make_dataset_numerical\n");
     }
 }
 
@@ -745,6 +776,7 @@ fclaw_hdf_write_file (fclaw_global_t * glob,
                       fclaw_hdf5_patch_data_t coordinate_cb,
                       fclaw_hdf5_patch_data_t value_cb)
 {
+    int num_patches_to_buffer = glob->domain->local_max_patches;
     const fclaw_clawpatch_options_t* clawpatch_opt = fclaw_clawpatch_get_options(glob);
     //get mx, my, mz, meqn from clawpatch options
     int mx   = clawpatch_opt->mx;
@@ -772,18 +804,25 @@ fclaw_hdf_write_file (fclaw_global_t * glob,
     char vtkhdf[8] = "/VTKHDF";
     char celldata[18] = "/VTKHDF/CellData";
     
+    herr_t status = 0;
     // Set up file access property list with parallel I/O access
-    hid_t plist_id = H5Pcreate(H5P_FILE_ACCESS);
-    if(H5Pset_fapl_mpio(plist_id, glob->mpicomm, MPI_INFO_NULL) < 0)
-        return -1;
+    hid_t fapl_id = H5Pcreate(H5P_FILE_ACCESS);
+    status |= H5Pset_fapl_mpio(fapl_id, glob->mpicomm, MPI_INFO_NULL);
+    status |= H5Pset_coll_metadata_write(fapl_id, 1);
+    status |= H5Pset_all_coll_metadata_ops(fapl_id, 1);
+    status |= H5Pset_libver_bounds(fapl_id, H5F_LIBVER_LATEST, H5F_LIBVER_LATEST);
+
+    hid_t fcpl_id = H5Pcreate(H5P_FILE_CREATE);
+    H5Pset_file_space_strategy(fcpl_id, H5F_FSPACE_STRATEGY_NONE, 0, 0);
 
     // Create a new file collectively and release property list identifier.
-    hid_t file_id = H5Fcreate(filename, H5F_ACC_TRUNC, H5P_DEFAULT, plist_id);
+    hid_t file_id = H5Fcreate(filename, H5F_ACC_TRUNC, fcpl_id, fapl_id);
 
     if(file_id < 0)
         return -1;
 
-    H5Pclose(plist_id);
+    H5Pclose(fapl_id);
+    H5Pclose(fcpl_id);
 
     hid_t gid1 = H5Gcreate2(file_id, vtkhdf, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
     
@@ -820,22 +859,22 @@ fclaw_hdf_write_file (fclaw_global_t * glob,
 
     hsize_t patch_dims[3] = {0,0,0};
     patch_dims[0] = num_cells_per_patch;
-    make_patch_dataset(glob, gid1, "Types", 1, patch_dims, 1, H5T_NATIVE_UINT8, types_cb);
+    make_patch_dataset(glob, gid1, "Types", 1, patch_dims, num_patches_to_buffer, H5T_NATIVE_UINT8, types_cb);
     fclaw_timer_stop(&glob->timers[FCLAW_TIMER_EXTRA3]);
 
     // write offsets
     fclaw_timer_start(&glob->timers[FCLAW_TIMER_EXTRA2]);
     patch_dims[0] = num_cells_per_patch;
-    make_offset_dataset(glob, gid1, "Offsets", 1, patch_dims, 1, H5T_NATIVE_INT32, get_offsets);
+    make_offset_dataset(glob, gid1, "Offsets", 1, patch_dims, num_patches_to_buffer, H5T_NATIVE_INT32, get_offsets);
 
 
     patch_dims[0] = num_points_per_patch;
     patch_dims[1] = 3;
-    make_patch_dataset(glob, gid1, "Points", 2, patch_dims, 1, H5T_NATIVE_DOUBLE, coordinate_cb);
+    make_patch_dataset(glob, gid1, "Points", 2, patch_dims, num_patches_to_buffer, H5T_NATIVE_DOUBLE, coordinate_cb);
 
 
     patch_dims[0] = num_cells_per_patch * num_points_per_cell;
-    make_patch_dataset(glob, gid1, "Connectivity", 1, patch_dims, 1, H5T_NATIVE_INT32, write_patch_connectivity);
+    make_patch_dataset(glob, gid1, "Connectivity", 1, patch_dims, num_patches_to_buffer, H5T_NATIVE_INT32, write_patch_connectivity);
 
     /* avoid resource leaks by closing */
     H5Gclose(gid1);
@@ -844,22 +883,22 @@ fclaw_hdf_write_file (fclaw_global_t * glob,
     gid1 = H5Gcreate2(file_id, celldata, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
     
     patch_dims[0] = num_cells_per_patch;
-    make_patch_dataset(glob, gid1, "meqn", 1, patch_dims, 1, H5T_NATIVE_DOUBLE, value_cb);
+    make_patch_dataset(glob, gid1, "meqn", 1, patch_dims, num_patches_to_buffer, H5T_NATIVE_DOUBLE, value_cb);
 
     fclaw_timer_stop(&glob->timers[FCLAW_TIMER_EXTRA2]);
     fclaw_timer_start(&glob->timers[FCLAW_TIMER_EXTRA1]);
 
     // write blockno
     patch_dims[0] = num_cells_per_patch;
-    make_patch_dataset(glob, gid1, "blockno", 1, patch_dims, 1, H5T_NATIVE_INT, blockno_cb);
+    make_patch_dataset(glob, gid1, "blockno", 1, patch_dims, num_patches_to_buffer, H5T_NATIVE_INT, blockno_cb);
 
     //write patchno
     patch_dims[0] = num_cells_per_patch;
-    make_patch_dataset(glob, gid1, "patchno", 1, patch_dims, 1, H5T_NATIVE_INT, patchno_cb);
+    make_patch_dataset(glob, gid1, "patchno", 1, patch_dims, num_patches_to_buffer, H5T_NATIVE_INT, patchno_cb);
 
     //write mpirank
     patch_dims[0] = num_cells_per_patch;
-    make_patch_dataset(glob, gid1, "mpirank", 1, patch_dims, 1, H5T_NATIVE_INT, mpirank_cb);
+    make_patch_dataset(glob, gid1, "mpirank", 1, patch_dims, num_patches_to_buffer, H5T_NATIVE_INT, mpirank_cb);
 
     fclaw_timer_stop(&glob->timers[FCLAW_TIMER_EXTRA1]);
     
