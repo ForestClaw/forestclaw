@@ -441,18 +441,22 @@ static void
 make_single_value_dataset_numerical(int mpirank,
                                     hid_t loc_id, 
                                     const char *dset_name, 
-                                    int rank, 
-                                    const hsize_t *dims, 
                                     hid_t tid,
                                     const void *data)
 {
     herr_t status = 0;
 
     /* Create the data space for the dataset. */
-    hid_t sid = H5Screate_simple(rank, dims, NULL);
+    hsize_t one = 1;
+    hid_t sid = H5Screate_simple(1, &one, NULL);
+
+    /* set to compact storage */
+    hid_t dcpl_id = H5Pcreate(H5P_DATASET_CREATE);
+    status |= H5Pset_layout(dcpl_id, H5D_COMPACT);
 
     /* Create the dataset. */
-    hid_t did = H5Dcreate2(loc_id, dset_name, tid, sid, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+    hid_t did = H5Dcreate2(loc_id, dset_name, tid, sid, H5P_DEFAULT, dcpl_id, H5P_DEFAULT);
+    status |= H5Pclose(dcpl_id);
 
     /* Write the dataset only if there is data to write */
     if (data && mpirank == 0)
@@ -834,25 +838,16 @@ fclaw_hdf_write_file (fclaw_global_t * glob,
     //const char* type = "UnstructuredGrid";
     //H5LTset_attribute(fid, vtkhdf, "Type", type);
     
-    // The idea here is to write a paritioned vtu, where each partition is a patch
-    // this will make processing easier in matlab
-
-    hsize_t dims[3] = {0,0,0};
-
     // write single value datasets for vtk
-
     long number_of_cells = global_num_patches * num_cells_per_patch;
-    dims[0] = 1;
-    make_single_value_dataset_numerical(glob->mpirank, gid1, "NumberOfCells", 1, dims, H5T_NATIVE_LONG, &number_of_cells);
+    make_single_value_dataset_numerical(glob->mpirank, gid1, "NumberOfCells", H5T_NATIVE_LONG, &number_of_cells);
 
     long number_of_points = global_num_patches * num_points_per_patch;
-    dims[0] = 1;
-    make_single_value_dataset_numerical(glob->mpirank, gid1, "NumberOfPoints", 1, dims, H5T_NATIVE_LONG, &number_of_points);
+    make_single_value_dataset_numerical(glob->mpirank, gid1, "NumberOfPoints", H5T_NATIVE_LONG, &number_of_points);
 
 
     long number_of_connectivity_ids = global_num_patches * num_cells_per_patch * num_points_per_cell;
-    dims[0] = 1;
-    make_single_value_dataset_numerical(glob->mpirank, gid1, "NumberOfConnectivityIds", 1, dims, H5T_NATIVE_LONG, &number_of_connectivity_ids);
+    make_single_value_dataset_numerical(glob->mpirank, gid1, "NumberOfConnectivityIds", H5T_NATIVE_LONG, &number_of_connectivity_ids);
 
 
     fclaw_timer_start(&glob->timers[FCLAW_TIMER_EXTRA3]);
