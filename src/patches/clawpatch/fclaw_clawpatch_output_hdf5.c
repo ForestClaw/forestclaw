@@ -154,57 +154,61 @@ types_cb (fclaw_global_t * glob,
         types[i] = type;
     }
 }
-static void
-get_offsets(fclaw_global_t * glob,
-            fclaw_patch_t * patch,
-            int blockno,
-            int patchno,
-            char * buffer)
-{
-    int32_t * offsets = (int32_t *) buffer;
-
-    int num_cells_before;
-    int mx,my,mz,mbc;
-    double dx,dy,dz,xlower,ylower,zlower;
-
-    int num_patches_before = glob->domain->global_num_patches_before + glob->domain->blocks[blockno].num_patches_before + patchno;
-    int num_points_per_cell;
-    if(fclaw_clawpatch_dim(patch) == 2)
-    {
-        fclaw_clawpatch_2d_grid_data(glob,patch,&mx,&my,&mbc,&xlower,&ylower,&dx,&dy);
-        mz = 1;
-        num_points_per_cell = 4;
-        num_cells_before = num_patches_before * mx * my;
-    }
-    else
-    {
-        fclaw_clawpatch_3d_grid_data(glob,patch,&mx,&my,&mz,&mbc,&xlower,&ylower,&zlower,&dx,&dy,&dz);
-        num_points_per_cell = 8;
-        num_cells_before = num_patches_before * mx * my * mz;
-    }
-
-    int curr_offset = num_cells_before * num_points_per_cell;
-
-    for(int k = 0; k < mz; k++)
-    {
-        for(int j = 0; j < my; j++)
-        {
-            for(int i = 0; i < mx; i++)
-            {
-                *offsets++ = curr_offset;
-                curr_offset += num_points_per_cell;
-            }
-        }
-    }
-
-    if(glob->mpirank == glob->mpisize - 1 
-       && blockno == glob->domain->num_blocks - 1 
-       && patchno == glob->domain->blocks[blockno].num_patches - 1)
-    {
-        // last patch on last rank has extra value
-       *offsets = curr_offset;
-    }
+#define GET_OFFSETS(TYPE) \
+static void \
+get_offsets_##TYPE(fclaw_global_t * glob, \
+            fclaw_patch_t * patch, \
+            int blockno, \
+            int patchno, \
+            char * buffer) \
+{ \
+    TYPE * offsets = (TYPE *) buffer; \
+\
+    int num_cells_before; \
+    int mx,my,mz,mbc; \
+    double dx,dy,dz,xlower,ylower,zlower; \
+\
+    int num_patches_before = glob->domain->global_num_patches_before + glob->domain->blocks[blockno].num_patches_before + patchno; \
+    int num_points_per_cell; \
+    if(fclaw_clawpatch_dim(patch) == 2) \
+    { \
+        fclaw_clawpatch_2d_grid_data(glob,patch,&mx,&my,&mbc,&xlower,&ylower,&dx,&dy); \
+        mz = 1; \
+        num_points_per_cell = 4; \
+        num_cells_before = num_patches_before * mx * my; \
+    } \
+    else \
+    { \
+        fclaw_clawpatch_3d_grid_data(glob,patch,&mx,&my,&mz,&mbc,&xlower,&ylower,&zlower,&dx,&dy,&dz); \
+        num_points_per_cell = 8; \
+        num_cells_before = num_patches_before * mx * my * mz; \
+    } \
+\
+    int curr_offset = num_cells_before * num_points_per_cell; \
+\
+    for(int k = 0; k < mz; k++) \
+    { \
+        for(int j = 0; j < my; j++) \
+        { \
+            for(int i = 0; i < mx; i++) \
+            { \
+                *offsets++ = curr_offset; \
+                curr_offset += num_points_per_cell; \
+            } \
+        } \
+    } \
+\
+    if(glob->mpirank == glob->mpisize - 1 \
+       && blockno == glob->domain->num_blocks - 1 \
+       && patchno == glob->domain->blocks[blockno].num_patches - 1) \
+    { \
+        /* last patch on last rank has extra value */ \
+       *offsets = curr_offset; \
+    } \
 }
+
+GET_OFFSETS(int32_t)
+GET_OFFSETS(int64_t)
 static void
 get_coordinates (fclaw_global_t * glob,
                  fclaw_patch_t * patch,
@@ -301,10 +305,10 @@ write_2d_patch_q (fclaw_global_t * glob,
 }
 static void
 write_3d_patch_q (fclaw_global_t * glob,
-               fclaw_patch_t * patch,
-               int blockno,
-               int patchno,
-               double * q_out)
+                  fclaw_patch_t * patch,
+                  int blockno,
+                  int patchno,
+                  double * q_out)
 {
     int mx,my,mz,mbc;
     double dx,dy,dz,xlower,ylower,zlower;
@@ -348,62 +352,66 @@ get_data (fclaw_global_t * glob,
         write_3d_patch_q(glob, patch, blockno, patchno, q_out);
     }
 }
-static void
-write_patch_connectivity (fclaw_global_t * glob,
-                          fclaw_patch_t * patch,
-                          int blockno,
-                          int patchno,
-                          char* buffer)
-{
-    int32_t * conn = (int32_t *) buffer;
-    int32_t global_num_patches_before = glob->domain->global_num_patches_before + glob->domain->blocks[blockno].num_patches_before + patchno;
-    if(fclaw_clawpatch_dim(patch) == 2)
-    {
-        int mx,my,mbc;
-        double dx,dy, xlower,ylower;
-        fclaw_clawpatch_2d_grid_data(glob,patch,&mx,&my,&mbc,
-                                    &xlower,&ylower, &dx,&dy);
-        int32_t num_points_before = global_num_patches_before * (mx + 1) * (my + 1);
-        for (int j = 0; j < my; ++j)
-        {
-            for (int i = 0; i < mx; ++i)
-            {
-                int32_t l = num_points_before + i + j * (mx + 1);
-                *conn++ = l;
-                *conn++ = l + 1;
-                *conn++ = l + (mx + 2);
-                *conn++ = l + (mx + 1);
-            }
-        }
-    }
-    else
-    {
-        int mx,my,mz,mbc;
-        double dx,dy,dz,xlower,ylower,zlower;
-        fclaw_clawpatch_3d_grid_data(glob,patch,&mx,&my,&mz, &mbc,
-                                    &xlower,&ylower,&zlower, &dx,&dy, &dz);
-        int32_t num_points_before = global_num_patches_before * (mx + 1) * (my + 1) * (mz + 1);
-        for (int k = 0; k < mz; ++k)
-        {
-            for (int j = 0; j < my; ++j)
-            {
-                for (int i = 0; i < mx; ++i)
-                {
-                    int32_t l = num_points_before + i + j * (mx + 1)
-                         + k * (my + 1) * (mx + 1);
-                    *conn++ = l;
-                    *conn++ = l + 1;
-                    *conn++ = l + (mx + 2);
-                    *conn++ = l + (mx + 1);
-                    *conn++ = l + (mx + 1) * (my + 1);
-                    *conn++ = l + (mx + 1) * (my + 1) + 1;
-                    *conn++ = l + (mx + 1) * (my + 1) + (mx + 2);
-                    *conn++ = l + (mx + 1) * (my + 1) + (mx + 1);
-                }
-            }
-        }
-    }
+#define WRITE_PATCH_CONNECTIVITY(TYPE) \
+static void \
+write_patch_connectivity_##TYPE (fclaw_global_t * glob, \
+                          fclaw_patch_t * patch, \
+                          int blockno, \
+                          int patchno, \
+                          char* buffer) \
+{ \
+    TYPE * conn = (TYPE *) buffer; \
+    TYPE global_num_patches_before = glob->domain->global_num_patches_before + glob->domain->blocks[blockno].num_patches_before + patchno; \
+    if(fclaw_clawpatch_dim(patch) == 2) \
+    { \
+        int mx,my,mbc; \
+        double dx,dy, xlower,ylower; \
+        fclaw_clawpatch_2d_grid_data(glob,patch,&mx,&my,&mbc, \
+                                    &xlower,&ylower, &dx,&dy); \
+        TYPE num_points_before = global_num_patches_before * (mx + 1) * (my + 1); \
+        for (int j = 0; j < my; ++j) \
+        { \
+            for (int i = 0; i < mx; ++i) \
+            { \
+                TYPE l = num_points_before + i + j * (mx + 1); \
+                *conn++ = l; \
+                *conn++ = l + 1; \
+                *conn++ = l + (mx + 2); \
+                *conn++ = l + (mx + 1); \
+            } \
+        } \
+    } \
+    else \
+    { \
+        int mx,my,mz,mbc; \
+        double dx,dy,dz,xlower,ylower,zlower; \
+        fclaw_clawpatch_3d_grid_data(glob,patch,&mx,&my,&mz, &mbc, \
+                                    &xlower,&ylower,&zlower, &dx,&dy, &dz); \
+        TYPE num_points_before = global_num_patches_before * (mx + 1) * (my + 1) * (mz + 1); \
+        for (int k = 0; k < mz; ++k) \
+        { \
+            for (int j = 0; j < my; ++j) \
+            { \
+                for (int i = 0; i < mx; ++i) \
+                { \
+                    TYPE l = num_points_before + i + j * (mx + 1) \
+                         + k * (my + 1) * (mx + 1); \
+                    *conn++ = l; \
+                    *conn++ = l + 1; \
+                    *conn++ = l + (mx + 2); \
+                    *conn++ = l + (mx + 1); \
+                    *conn++ = l + (mx + 1) * (my + 1); \
+                    *conn++ = l + (mx + 1) * (my + 1) + 1; \
+                    *conn++ = l + (mx + 1) * (my + 1) + (mx + 2); \
+                    *conn++ = l + (mx + 1) * (my + 1) + (mx + 1); \
+                } \
+            } \
+        } \
+    } \
 }
+
+WRITE_PATCH_CONNECTIVITY(int32_t)
+WRITE_PATCH_CONNECTIVITY(int64_t)
 
 static
 void
@@ -476,7 +484,8 @@ make_single_value_dataset_numerical(int mpirank,
     }
 }
 
-hid_t make_dataset(hid_t loc_id, 
+hid_t make_dataset(const fclaw_clawpatch_options_t *clawpatch_opts,
+                   hid_t loc_id, 
                    hid_t tid, 
                    const char *dset_name, 
                    int rank, 
@@ -489,11 +498,11 @@ hid_t make_dataset(hid_t loc_id,
 
     status |= H5Pset_fill_time(prop_id, H5D_FILL_TIME_NEVER);
     
-    if(chunk_dims != NULL)
+    if(chunk_dims != NULL && clawpatch_opts->hdf5_compression_level > 0)
     {
         status |= H5Pset_chunk(prop_id, rank, chunk_dims);
         status |= H5Pset_shuffle(prop_id);
-        status |= H5Pset_deflate(prop_id, 5);
+        status |= H5Pset_deflate(prop_id, clawpatch_opts->hdf5_compression_level);
     }
 
     
@@ -615,13 +624,15 @@ make_dataset_numerical(fclaw_global_t *glob,
                    fclaw_hdf5_patch_data_t patch_cb,
                    make_dataset_vtable_t *vt)
 {
+    const fclaw_clawpatch_options_t *clawpatch_opts = fclaw_clawpatch_get_options(glob);
+
     herr_t status = 0;
 
     hsize_t dataset_dims[rank];
     vt->get_dataset_dims(glob, rank, patch_dims, dataset_dims);
 
     /* Create the dataset. */
-    hid_t did = make_dataset(loc_id, tid, dset_name, rank, dataset_dims, patch_dims);
+    hid_t did = make_dataset(clawpatch_opts, loc_id, tid, dset_name, rank, dataset_dims, patch_dims);
 
     hid_t plist_id = H5Pcreate(H5P_DATASET_XFER);
 
@@ -782,7 +793,11 @@ fclaw_hdf_write_file (fclaw_global_t * glob,
 {
     const fclaw_clawpatch_options_t* clawpatch_opt = fclaw_clawpatch_get_options(glob);
 
-    int num_patches_to_buffer = glob->domain->local_max_patches;
+    int num_patches_to_buffer = clawpatch_opt->hdf5_patch_threshold;
+    if(clawpatch_opt->hdf5_patch_threshold == 0)
+    {
+        num_patches_to_buffer = glob->domain->local_max_patches;
+    }
 
     //get mx, my, mz, meqn from clawpatch options
     int mx   = clawpatch_opt->mx;
@@ -845,6 +860,9 @@ fclaw_hdf_write_file (fclaw_global_t * glob,
     make_single_value_dataset_numerical(glob->mpirank, vtkhdf_gid, "NumberOfConnectivityIds", H5T_NATIVE_LONG, &number_of_connectivity_ids);
 
 
+    int fits32 = number_of_points <= INT32_MAX
+        && number_of_connectivity_ids <= INT32_MAX;
+
     fclaw_timer_start(&glob->timers[FCLAW_TIMER_EXTRA3]);
 
     hsize_t patch_dims[3] = {0,0,0};
@@ -855,7 +873,13 @@ fclaw_hdf_write_file (fclaw_global_t * glob,
     // write offsets
     fclaw_timer_start(&glob->timers[FCLAW_TIMER_EXTRA2]);
     patch_dims[0] = num_cells_per_patch;
-    make_offset_dataset(glob, vtkhdf_gid, "Offsets", 1, patch_dims, num_patches_to_buffer, H5T_NATIVE_INT32, get_offsets);
+    make_offset_dataset(glob, 
+                        vtkhdf_gid, 
+                        "Offsets", 
+                        1, patch_dims, 
+                        num_patches_to_buffer, 
+                        fits32 ? H5T_NATIVE_INT32 : H5T_NATIVE_INT64,
+                        fits32 ? get_offsets_int32_t : get_offsets_int64_t);
 
 
     patch_dims[0] = num_points_per_patch;
@@ -864,7 +888,13 @@ fclaw_hdf_write_file (fclaw_global_t * glob,
 
 
     patch_dims[0] = num_cells_per_patch * num_points_per_cell;
-    make_patch_dataset(glob, vtkhdf_gid, "Connectivity", 1, patch_dims, num_patches_to_buffer, H5T_NATIVE_INT32, write_patch_connectivity);
+    make_patch_dataset(glob, 
+                       vtkhdf_gid, 
+                       "Connectivity", 
+                       1, patch_dims, 
+                       num_patches_to_buffer, 
+                       fits32 ? H5T_NATIVE_INT32 : H5T_NATIVE_INT64,
+                       fits32 ? write_patch_connectivity_int32_t : write_patch_connectivity_int64_t);
 
     /* avoid resource leaks by closing */
     status |= H5Gclose(vtkhdf_gid);

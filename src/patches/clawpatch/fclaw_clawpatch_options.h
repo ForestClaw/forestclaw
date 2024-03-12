@@ -89,6 +89,8 @@ struct fclaw_clawpatch_options
 
 
     int vtk_patch_threshold; /**< The buffer threshold for vtk output */
+    int hdf5_patch_threshold; /**< The buffer threshold for hdf5 output */
+    int hdf5_compression_level; /**< The compression level for hdf5 output */
 
     int is_registered; /**< true if options have been registered */
 
