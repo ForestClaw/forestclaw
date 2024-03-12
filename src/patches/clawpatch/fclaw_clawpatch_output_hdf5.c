@@ -908,7 +908,8 @@ fclaw_hdf_write_file (fclaw_global_t * glob,
     hid_t celldata_gid = H5Gcreate2(file_id, celldata, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
     
     patch_dims[0] = num_cells_per_patch;
-    make_patch_dataset(glob, celldata_gid, "meqn", 1, patch_dims, num_patches_to_buffer, H5T_NATIVE_DOUBLE, value_cb);
+    patch_dims[1] = clawpatch_opt->meqn;
+    make_patch_dataset(glob, celldata_gid, "meqn", 2, patch_dims, num_patches_to_buffer, H5T_NATIVE_DOUBLE, value_cb);
 
     fclaw_timer_stop(&glob->timers[FCLAW_TIMER_EXTRA2]);
     fclaw_timer_start(&glob->timers[FCLAW_TIMER_EXTRA1]);
