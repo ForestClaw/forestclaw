@@ -774,14 +774,16 @@ set_attribute_string(hid_t loc_id, const char *obj_name, const char *attr_name, 
         printf("fclaw_clawpatch_output_hdf5.c Error in set_attribute_string\n");
     }
 }
-static int
+static void
 fclaw_hdf_write_file (fclaw_global_t * glob, 
                       const char* filename,
                       fclaw_hdf5_patch_data_t coordinate_cb,
                       fclaw_hdf5_patch_data_t value_cb)
 {
-    int num_patches_to_buffer = glob->domain->local_max_patches;
     const fclaw_clawpatch_options_t* clawpatch_opt = fclaw_clawpatch_get_options(glob);
+
+    int num_patches_to_buffer = glob->domain->local_max_patches;
+
     //get mx, my, mz, meqn from clawpatch options
     int mx   = clawpatch_opt->mx;
     int my   = clawpatch_opt->my;
@@ -817,92 +819,89 @@ fclaw_hdf_write_file (fclaw_global_t * glob,
     status |= H5Pset_libver_bounds(fapl_id, H5F_LIBVER_LATEST, H5F_LIBVER_LATEST);
 
     hid_t fcpl_id = H5Pcreate(H5P_FILE_CREATE);
-    H5Pset_file_space_strategy(fcpl_id, H5F_FSPACE_STRATEGY_NONE, 0, 0);
+    status |= H5Pset_file_space_strategy(fcpl_id, H5F_FSPACE_STRATEGY_NONE, 0, 0);
 
     // Create a new file collectively and release property list identifier.
     hid_t file_id = H5Fcreate(filename, H5F_ACC_TRUNC, fcpl_id, fapl_id);
 
-    if(file_id < 0)
-        return -1;
+    status |= H5Pclose(fapl_id);
+    status |= H5Pclose(fcpl_id);
 
-    H5Pclose(fapl_id);
-    H5Pclose(fcpl_id);
-
-    hid_t gid1 = H5Gcreate2(file_id, vtkhdf, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+    hid_t vtkhdf_gid = H5Gcreate2(file_id, vtkhdf, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
     
     int vtk_version[2] = {1, 0};
     set_attribute_numerical(file_id, vtkhdf, "Version", 2, H5T_NATIVE_INT, vtk_version);
-    //hid_t attr_id = H5Acreate (gid1, "Units", H5T_STD_I32BE, dataspace_id, H5P_DEFAULT, H5P_DEFAULT);
-    //H5Aclose (attr_id);
     set_attribute_string(file_id, vtkhdf, "Type", "UnstructuredGrid");
-    //const char* type = "UnstructuredGrid";
-    //H5LTset_attribute(fid, vtkhdf, "Type", type);
     
     // write single value datasets for vtk
     long number_of_cells = global_num_patches * num_cells_per_patch;
-    make_single_value_dataset_numerical(glob->mpirank, gid1, "NumberOfCells", H5T_NATIVE_LONG, &number_of_cells);
+    make_single_value_dataset_numerical(glob->mpirank, vtkhdf_gid, "NumberOfCells", H5T_NATIVE_LONG, &number_of_cells);
 
     long number_of_points = global_num_patches * num_points_per_patch;
-    make_single_value_dataset_numerical(glob->mpirank, gid1, "NumberOfPoints", H5T_NATIVE_LONG, &number_of_points);
+    make_single_value_dataset_numerical(glob->mpirank, vtkhdf_gid, "NumberOfPoints", H5T_NATIVE_LONG, &number_of_points);
 
 
     long number_of_connectivity_ids = global_num_patches * num_cells_per_patch * num_points_per_cell;
-    make_single_value_dataset_numerical(glob->mpirank, gid1, "NumberOfConnectivityIds", H5T_NATIVE_LONG, &number_of_connectivity_ids);
+    make_single_value_dataset_numerical(glob->mpirank, vtkhdf_gid, "NumberOfConnectivityIds", H5T_NATIVE_LONG, &number_of_connectivity_ids);
 
 
     fclaw_timer_start(&glob->timers[FCLAW_TIMER_EXTRA3]);
 
     hsize_t patch_dims[3] = {0,0,0};
     patch_dims[0] = num_cells_per_patch;
-    make_patch_dataset(glob, gid1, "Types", 1, patch_dims, num_patches_to_buffer, H5T_NATIVE_UINT8, types_cb);
+    make_patch_dataset(glob, vtkhdf_gid, "Types", 1, patch_dims, num_patches_to_buffer, H5T_NATIVE_UINT8, types_cb);
     fclaw_timer_stop(&glob->timers[FCLAW_TIMER_EXTRA3]);
 
     // write offsets
     fclaw_timer_start(&glob->timers[FCLAW_TIMER_EXTRA2]);
     patch_dims[0] = num_cells_per_patch;
-    make_offset_dataset(glob, gid1, "Offsets", 1, patch_dims, num_patches_to_buffer, H5T_NATIVE_INT32, get_offsets);
+    make_offset_dataset(glob, vtkhdf_gid, "Offsets", 1, patch_dims, num_patches_to_buffer, H5T_NATIVE_INT32, get_offsets);
 
 
     patch_dims[0] = num_points_per_patch;
     patch_dims[1] = 3;
-    make_patch_dataset(glob, gid1, "Points", 2, patch_dims, num_patches_to_buffer, H5T_NATIVE_DOUBLE, coordinate_cb);
+    make_patch_dataset(glob, vtkhdf_gid, "Points", 2, patch_dims, num_patches_to_buffer, H5T_NATIVE_DOUBLE, coordinate_cb);
 
 
     patch_dims[0] = num_cells_per_patch * num_points_per_cell;
-    make_patch_dataset(glob, gid1, "Connectivity", 1, patch_dims, num_patches_to_buffer, H5T_NATIVE_INT32, write_patch_connectivity);
+    make_patch_dataset(glob, vtkhdf_gid, "Connectivity", 1, patch_dims, num_patches_to_buffer, H5T_NATIVE_INT32, write_patch_connectivity);
 
     /* avoid resource leaks by closing */
-    H5Gclose(gid1);
+    status |= H5Gclose(vtkhdf_gid);
 
 
-    gid1 = H5Gcreate2(file_id, celldata, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+    hid_t celldata_gid = H5Gcreate2(file_id, celldata, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
     
     patch_dims[0] = num_cells_per_patch;
-    make_patch_dataset(glob, gid1, "meqn", 1, patch_dims, num_patches_to_buffer, H5T_NATIVE_DOUBLE, value_cb);
+    make_patch_dataset(glob, celldata_gid, "meqn", 1, patch_dims, num_patches_to_buffer, H5T_NATIVE_DOUBLE, value_cb);
 
     fclaw_timer_stop(&glob->timers[FCLAW_TIMER_EXTRA2]);
     fclaw_timer_start(&glob->timers[FCLAW_TIMER_EXTRA1]);
 
     // write blockno
     patch_dims[0] = num_cells_per_patch;
-    make_patch_dataset(glob, gid1, "blockno", 1, patch_dims, num_patches_to_buffer, H5T_NATIVE_INT, blockno_cb);
+    make_patch_dataset(glob, celldata_gid, "blockno", 1, patch_dims, num_patches_to_buffer, H5T_NATIVE_INT, blockno_cb);
 
     //write patchno
     patch_dims[0] = num_cells_per_patch;
-    make_patch_dataset(glob, gid1, "patchno", 1, patch_dims, num_patches_to_buffer, H5T_NATIVE_INT, patchno_cb);
+    make_patch_dataset(glob, celldata_gid, "patchno", 1, patch_dims, num_patches_to_buffer, H5T_NATIVE_INT, patchno_cb);
 
     //write mpirank
     patch_dims[0] = num_cells_per_patch;
-    make_patch_dataset(glob, gid1, "mpirank", 1, patch_dims, num_patches_to_buffer, H5T_NATIVE_INT, mpirank_cb);
+    make_patch_dataset(glob, celldata_gid, "mpirank", 1, patch_dims, num_patches_to_buffer, H5T_NATIVE_INT, mpirank_cb);
 
     fclaw_timer_stop(&glob->timers[FCLAW_TIMER_EXTRA1]);
     
-    H5Gclose(gid1);
+    status |= H5Gclose(celldata_gid);
 
-    H5Fclose(file_id);
+    status |= H5Fclose(file_id);
     
     FCLAW_ASSERT(H5Fget_obj_count(H5F_OBJ_ALL, H5F_OBJ_ALL) == 0);
-    return EXIT_SUCCESS;
+
+    if(status != 0 || file_id < 0 || vtkhdf_gid < 0 || celldata_gid < 0)
+    {
+        fclaw_abortf("fclaw_clawpatch_output_hdf5.c Error in fclaw_hdf_write_file\n");
+    }
 }
 
 /*  ---------------------------------------------------------------------------
