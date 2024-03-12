@@ -449,22 +449,18 @@ static void
 make_single_value_dataset_numerical(int mpirank,
                                     hid_t loc_id, 
                                     const char *dset_name, 
+                                    int rank, 
+                                    const hsize_t *dims, 
                                     hid_t tid,
                                     const void *data)
 {
     herr_t status = 0;
 
     /* Create the data space for the dataset. */
-    hsize_t one = 1;
-    hid_t sid = H5Screate_simple(1, &one, NULL);
-
-    /* set to compact storage */
-    hid_t dcpl_id = H5Pcreate(H5P_DATASET_CREATE);
-    status |= H5Pset_layout(dcpl_id, H5D_COMPACT);
+    hid_t sid = H5Screate_simple(rank, dims, NULL);
 
     /* Create the dataset. */
-    hid_t did = H5Dcreate2(loc_id, dset_name, tid, sid, H5P_DEFAULT, dcpl_id, H5P_DEFAULT);
-    status |= H5Pclose(dcpl_id);
+    hid_t did = H5Dcreate2(loc_id, dset_name, tid, sid, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
     /* Write the dataset only if there is data to write */
     if (data && mpirank == 0)
@@ -848,16 +844,25 @@ fclaw_hdf_write_file (fclaw_global_t * glob,
     set_attribute_numerical(file_id, vtkhdf, "Version", 2, H5T_NATIVE_INT, vtk_version);
     set_attribute_string(file_id, vtkhdf, "Type", "UnstructuredGrid");
     
+    // The idea here is to write a paritioned vtu, where each partition is a patch
+    // this will make processing easier in matlab
+
+    hsize_t dims[3] = {0,0,0};
+
     // write single value datasets for vtk
+
     long number_of_cells = global_num_patches * num_cells_per_patch;
-    make_single_value_dataset_numerical(glob->mpirank, vtkhdf_gid, "NumberOfCells", H5T_NATIVE_LONG, &number_of_cells);
+    dims[0] = 1;
+    make_single_value_dataset_numerical(glob->mpirank, vtkhdf_gid, "NumberOfCells", 1, dims, H5T_NATIVE_LONG, &number_of_cells);
 
     long number_of_points = global_num_patches * num_points_per_patch;
-    make_single_value_dataset_numerical(glob->mpirank, vtkhdf_gid, "NumberOfPoints", H5T_NATIVE_LONG, &number_of_points);
+    dims[0] = 1;
+    make_single_value_dataset_numerical(glob->mpirank, vtkhdf_gid, "NumberOfPoints", 1, dims, H5T_NATIVE_LONG, &number_of_points);
 
 
     long number_of_connectivity_ids = global_num_patches * num_cells_per_patch * num_points_per_cell;
-    make_single_value_dataset_numerical(glob->mpirank, vtkhdf_gid, "NumberOfConnectivityIds", H5T_NATIVE_LONG, &number_of_connectivity_ids);
+    dims[0] = 1;
+    make_single_value_dataset_numerical(glob->mpirank, vtkhdf_gid, "NumberOfConnectivityIds", 1, dims, H5T_NATIVE_LONG, &number_of_connectivity_ids);
 
 
     int fits32 = number_of_points <= INT32_MAX
