@@ -1010,20 +1010,27 @@ fclaw_hdf_write_file (fclaw_global_t * glob,
                        point_index_cb);
 
     patch_dims[0] = glob->domain->global_num_patches;
-    hid_t src_space = H5Screate_simple(4, patch_dims, NULL);
+    hid_t src_space = H5Screate_simple(patch_dim+1, patch_dims, NULL);
     patch_dims[0] = glob->domain->global_num_patches * num_cells_per_patch * num_points_per_cell;
     hid_t virt_space = H5Screate_simple(1, patch_dims, NULL);
 
     hid_t dcpl_id = H5Pcreate(H5P_DATASET_CREATE);
-    hsize_t slab_starts[8][4] = {{0,0,0,0},{0,0,0,1},{0,0,1,1},{0,0,1,0},
-                                 {0,1,0,0},{0,1,0,1},{0,1,1,1},{0,1,1,0}};
-    for(hsize_t i=0; i < 8; i++)
+    hsize_t slab_starts_3d[8][4] = {{0,0,0,0},{0,0,0,1},{0,0,1,1},{0,0,1,0},
+                                    {0,1,0,0},{0,1,0,1},{0,1,1,1},{0,1,1,0}};
+    hsize_t slab_starts_2d[4][3] = {{0,0,0},{0,0,1},{0,1,1},{0,1,0}};
+    hsize_t block_dims_3d[4] = {1,mz,my,mx};
+    hsize_t block_dims_2d[3] = {1,my,mx};
+    for(hsize_t i=0; i < num_points_per_cell; i++)
     {
-        hsize_t block_dims[4] = {1,mz,my,mx};
         hsize_t block_count[4] = {global_num_patches,1,1,1};
-        status |= H5Sselect_hyperslab(src_space, H5S_SELECT_SET, slab_starts[i], NULL, block_count, block_dims);
+        status |= H5Sselect_hyperslab(src_space, 
+                                      H5S_SELECT_SET, 
+                                      patch_dim == 2 ? slab_starts_2d[i] : slab_starts_3d[i],
+                                      NULL, 
+                                      block_count, 
+                                      patch_dim == 2 ? block_dims_2d : block_dims_3d);
 
-        hsize_t stride = 8;
+        hsize_t stride = num_points_per_cell;
         hsize_t start = i;
         hsize_t count = number_of_cells;
         status |= H5Sselect_hyperslab(virt_space, H5S_SELECT_SET, &start, &stride, &count, NULL);
