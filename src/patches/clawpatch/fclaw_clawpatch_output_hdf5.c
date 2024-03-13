@@ -275,6 +275,51 @@ get_coordinates (fclaw_global_t * glob,
     }
 }
 static void
+point_index_cb (fclaw_global_t * glob,
+                fclaw_patch_t * patch,
+                int blockno,
+                int patchno,
+                char * buffer)
+{
+    int32_t * points = (int32_t *) buffer;
+    const fclaw_clawpatch_options_t* clawpatch_opt = fclaw_clawpatch_get_options(glob);
+
+    int mx,my,mz,mbc;
+    double dx,dy,dz,xlower,ylower,zlower;
+
+    int32_t num_points_before = glob->domain->global_num_patches_before + glob->domain->blocks[blockno].num_patches_before + patchno;
+    if(clawpatch_opt->patch_dim == 2)
+    {
+        fclaw_clawpatch_2d_grid_data(glob,patch,&mx,&my,&mbc,
+                                    &xlower,&ylower,&dx,&dy);
+        mz = 0;
+        dz = 0;
+        zlower = 0;
+        num_points_before *= (mx + 1) * (my + 1);
+    }
+    else 
+    {
+        fclaw_clawpatch_3d_grid_data(glob,patch,&mx,&my,&mz, &mbc,
+                                    &xlower,&ylower,&zlower, &dx,&dy, &dz);
+        num_points_before *= (mx + 1) * (my + 1) * (mz + 1);
+    }
+
+    /* Enumerate point coordinates in the patch */
+    int i, j, k;
+    for (k = 0; k <= mz; ++k)
+    {
+        for (j = 0; j <= my; ++j)
+        {
+            for (i = 0; i <= mx; ++i)
+            {
+                *points = num_points_before;
+                points++;
+                num_points_before++;
+            }
+        }
+    }
+}
+static void
 write_2d_patch_q (fclaw_global_t * glob,
                   fclaw_patch_t * patch,
                   int blockno,
@@ -352,66 +397,6 @@ get_data (fclaw_global_t * glob,
         write_3d_patch_q(glob, patch, blockno, patchno, q_out);
     }
 }
-#define WRITE_PATCH_CONNECTIVITY(TYPE) \
-static void \
-write_patch_connectivity_##TYPE (fclaw_global_t * glob, \
-                          fclaw_patch_t * patch, \
-                          int blockno, \
-                          int patchno, \
-                          char* buffer) \
-{ \
-    TYPE * conn = (TYPE *) buffer; \
-    TYPE global_num_patches_before = glob->domain->global_num_patches_before + glob->domain->blocks[blockno].num_patches_before + patchno; \
-    if(fclaw_clawpatch_dim(patch) == 2) \
-    { \
-        int mx,my,mbc; \
-        double dx,dy, xlower,ylower; \
-        fclaw_clawpatch_2d_grid_data(glob,patch,&mx,&my,&mbc, \
-                                    &xlower,&ylower, &dx,&dy); \
-        TYPE num_points_before = global_num_patches_before * (mx + 1) * (my + 1); \
-        for (int j = 0; j < my; ++j) \
-        { \
-            for (int i = 0; i < mx; ++i) \
-            { \
-                TYPE l = num_points_before + i + j * (mx + 1); \
-                *conn++ = l; \
-                *conn++ = l + 1; \
-                *conn++ = l + (mx + 2); \
-                *conn++ = l + (mx + 1); \
-            } \
-        } \
-    } \
-    else \
-    { \
-        int mx,my,mz,mbc; \
-        double dx,dy,dz,xlower,ylower,zlower; \
-        fclaw_clawpatch_3d_grid_data(glob,patch,&mx,&my,&mz, &mbc, \
-                                    &xlower,&ylower,&zlower, &dx,&dy, &dz); \
-        TYPE num_points_before = global_num_patches_before * (mx + 1) * (my + 1) * (mz + 1); \
-        for (int k = 0; k < mz; ++k) \
-        { \
-            for (int j = 0; j < my; ++j) \
-            { \
-                for (int i = 0; i < mx; ++i) \
-                { \
-                    TYPE l = num_points_before + i + j * (mx + 1) \
-                         + k * (my + 1) * (mx + 1); \
-                    *conn++ = l; \
-                    *conn++ = l + 1; \
-                    *conn++ = l + (mx + 2); \
-                    *conn++ = l + (mx + 1); \
-                    *conn++ = l + (mx + 1) * (my + 1); \
-                    *conn++ = l + (mx + 1) * (my + 1) + 1; \
-                    *conn++ = l + (mx + 1) * (my + 1) + (mx + 2); \
-                    *conn++ = l + (mx + 1) * (my + 1) + (mx + 1); \
-                } \
-            } \
-        } \
-    } \
-}
-
-WRITE_PATCH_CONNECTIVITY(int32_t)
-WRITE_PATCH_CONNECTIVITY(int64_t)
 
 static
 void
@@ -486,30 +471,56 @@ limit_chunk_size(hid_t tid,
                  const hsize_t *subdims,
                  int rank, 
                  const hsize_t *chunk_dims, 
-                 hsize_t *chunk_dims_under_4GB)
+                 hsize_t *chunk_dims_under_4GB,
+                 int limit_other_dims)
 {
     hsize_t max_chunk_size = 1 << 28; // 4*2^30 bytes, 4GB
     hsize_t type_size = H5Tget_size(tid);
-    //only first dimension is similar data,
-    //so chunk other dimensions for better compression
-    for(int i = 1; i < rank; i++)
+    hsize_t chunk_size = type_size;
+    if(limit_other_dims)
     {
-        chunk_dims_under_4GB[i] = 1;
+        //only first dimension is similar data,
+        //so chunk other dimensions for better compression
+        for(int i = 1; i < rank; i++)
+        {
+            chunk_dims_under_4GB[i] = 1;
+        }
+    }
+    else
+    {
+        for(int i = rank-1; i >= 1; i--)
+        {
+            chunk_size *= chunk_dims[i];
+            if(chunk_size > max_chunk_size)
+            {
+                chunk_dims_under_4GB[i] = 1;
+            }
+            else
+            {
+                chunk_dims_under_4GB[i] = chunk_dims[i];
+            }
+        }
     }
     // the subdims in forestclaw output are column-major
     // check that we aren't exceeding 4gb
-    hsize_t chunk_size = type_size;
-    chunk_dims_under_4GB[0] = 1;
-    for(int i = 0; i < subdims_rank; i++)
+    if(subdims_rank == 0)
     {
-        chunk_size *= subdims[i];
-        if(chunk_size > max_chunk_size)
+        chunk_dims_under_4GB[0] = 1;
+    }
+    else
+    {
+        chunk_dims_under_4GB[0] = 1;
+        for(int i = 0; i < subdims_rank; i++)
         {
-            break;
-        }
-        else
-        {
-            chunk_dims_under_4GB[0] *= subdims[i];
+            chunk_size *= subdims[i];
+            if(chunk_size > max_chunk_size)
+            {
+                break;
+            }
+            else
+            {
+                chunk_dims_under_4GB[0] *= subdims[i];
+            }
         }
     }
 }
@@ -532,9 +543,11 @@ hid_t make_dataset(const fclaw_clawpatch_options_t *clawpatch_opts,
     if(chunk_dims != NULL && clawpatch_opts->hdf5_compression_level > 0)
     {
         hsize_t limited_chunk_dims[rank];
+        int limit_other_dims = tid != H5T_NATIVE_INT32 && tid != H5T_NATIVE_INT64;
         limit_chunk_size(tid, 
                          subdims_rank, subdims,
-                         rank, chunk_dims, limited_chunk_dims);
+                         rank, chunk_dims, limited_chunk_dims,
+                         limit_other_dims);
         status |= H5Pset_chunk(prop_id, rank, limited_chunk_dims);
         if(tid == H5T_NATIVE_INT || tid == H5T_NATIVE_UINT8)
         {
@@ -654,7 +667,6 @@ static make_dataset_vtable_t offset_vtable =
     get_dataset_dims_offset,
     get_slab_dims_offset
 };
-
 static void
 make_dataset_numerical(fclaw_global_t *glob,
                    hid_t loc_id, 
@@ -893,7 +905,6 @@ fclaw_hdf_write_file (fclaw_global_t * glob,
     }
     hsize_t  num_cells_per_patch_subdims[3] = {mx, my, mz};
     hsize_t  num_points_per_patch_subdims[3] = {mx+1, my+1, mz+1};
-    hsize_t  connectivity_subdims[4] = {num_points_per_cell, mx, my, mz};
 
     char vtkhdf[8] = "/VTKHDF";
     char celldata[18] = "/VTKHDF/CellData";
@@ -947,7 +958,7 @@ fclaw_hdf_write_file (fclaw_global_t * glob,
 
     fclaw_timer_start(&glob->timers[FCLAW_TIMER_EXTRA3]);
 
-    hsize_t patch_dims[2] = {0,0};
+    hsize_t patch_dims[4] = {0,0,0,0};
     patch_dims[0] = num_cells_per_patch;
     make_patch_dataset(glob, 
                        vtkhdf_gid, 
@@ -983,16 +994,51 @@ fclaw_hdf_write_file (fclaw_global_t * glob,
                        H5T_NATIVE_DOUBLE, 
                        coordinate_cb);
 
-
-    patch_dims[0] = num_cells_per_patch * num_points_per_cell;
+    patch_dims[0] = 1;
+    if(patch_dim == 2)
+    {
+        patch_dims[1] = my+1;
+        patch_dims[2] = mx+1;
+    }
+    else
+    {
+        patch_dims[1] = mz+1;
+        patch_dims[2] = my+1;
+        patch_dims[3] = mx+1;
+    }
     make_patch_dataset(glob, 
                        vtkhdf_gid, 
-                       "Connectivity", 
-                       1+patch_dim, connectivity_subdims,
-                       1, patch_dims, 
+                       "PointIndexes", 
+                       0, NULL,
+                       patch_dim+1, patch_dims, 
                        num_patches_to_buffer, 
-                       fits32 ? H5T_NATIVE_INT32 : H5T_NATIVE_INT64,
-                       fits32 ? write_patch_connectivity_int32_t : write_patch_connectivity_int64_t);
+                       H5T_NATIVE_INT32, 
+                       point_index_cb);
+
+    patch_dims[0] = glob->domain->global_num_patches;
+    hid_t src_space = H5Screate_simple(4, patch_dims, NULL);
+    patch_dims[0] = glob->domain->global_num_patches * num_cells_per_patch * num_points_per_cell;
+    hid_t virt_space = H5Screate_simple(1, patch_dims, NULL);
+
+    hid_t dcpl_id = H5Pcreate(H5P_DATASET_CREATE);
+    hsize_t slab_starts[8][4] = {{0,0,0,0},{0,0,0,1},{0,0,1,1},{0,0,1,0},
+                                 {0,1,0,0},{0,1,0,1},{0,1,1,1},{0,1,1,0}};
+    for(hsize_t i=0; i < 8; i++)
+    {
+        hsize_t block_dims[4] = {1,mz,my,mx};
+        hsize_t block_count[4] = {global_num_patches,1,1,1};
+        status |= H5Sselect_hyperslab(src_space, H5S_SELECT_SET, slab_starts[i], NULL, block_count, block_dims);
+
+        hsize_t stride = 8;
+        hsize_t start = i;
+        hsize_t count = number_of_cells;
+        status |= H5Sselect_hyperslab(virt_space, H5S_SELECT_SET, &start, &stride, &count, NULL);
+        status |= H5Pset_virtual(dcpl_id, virt_space, ".", "/VTKHDF/PointIndexes", src_space);
+    }
+    hid_t virt_id = H5Dcreate2(vtkhdf_gid, "Connectivity", H5T_NATIVE_INT32, virt_space, H5P_DEFAULT, dcpl_id, H5P_DEFAULT);
+    status |= H5Dclose(virt_id);
+    status |= H5Sclose(src_space);
+    status |= H5Sclose(virt_space);
 
     /* avoid resource leaks by closing */
     status |= H5Gclose(vtkhdf_gid);
