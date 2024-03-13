@@ -763,9 +763,7 @@ make_dataset_numerical(fclaw_global_t *glob,
             }
         }
 
-        fclaw_timer_start(&glob->timers[FCLAW_TIMER_EXTRA4]);
         status |= H5Dwrite(did, tid, memspace, filespace, plist_id, buffer);
-        fclaw_timer_stop(&glob->timers[FCLAW_TIMER_EXTRA4]);
 
         status |= H5Sclose(memspace);
         status |= H5Sclose(filespace);
@@ -956,8 +954,6 @@ fclaw_hdf_write_file (fclaw_global_t * glob,
     int fits32 = number_of_points <= INT32_MAX
         && number_of_connectivity_ids <= INT32_MAX;
 
-    fclaw_timer_start(&glob->timers[FCLAW_TIMER_EXTRA3]);
-
     hsize_t patch_dims[4] = {0,0,0,0};
     patch_dims[0] = num_cells_per_patch;
     make_patch_dataset(glob, 
@@ -968,10 +964,8 @@ fclaw_hdf_write_file (fclaw_global_t * glob,
                        num_patches_to_buffer, 
                        H5T_NATIVE_UINT8, 
                        types_cb);
-    fclaw_timer_stop(&glob->timers[FCLAW_TIMER_EXTRA3]);
 
     // write offsets
-    fclaw_timer_start(&glob->timers[FCLAW_TIMER_EXTRA2]);
     patch_dims[0] = num_cells_per_patch;
     make_offset_dataset(glob, 
                         vtkhdf_gid, 
@@ -1057,9 +1051,6 @@ fclaw_hdf_write_file (fclaw_global_t * glob,
                        H5T_NATIVE_DOUBLE, 
                        value_cb);
 
-    fclaw_timer_stop(&glob->timers[FCLAW_TIMER_EXTRA2]);
-    fclaw_timer_start(&glob->timers[FCLAW_TIMER_EXTRA1]);
-
     // write blockno
     patch_dims[0] = num_cells_per_patch;
     make_patch_dataset(glob, 
@@ -1093,8 +1084,6 @@ fclaw_hdf_write_file (fclaw_global_t * glob,
                        H5T_NATIVE_INT, 
                        mpirank_cb);
 
-    fclaw_timer_stop(&glob->timers[FCLAW_TIMER_EXTRA1]);
-    
     status |= H5Gclose(celldata_gid);
 
     status |= H5Fclose(file_id);
