@@ -102,7 +102,7 @@ clawpatch_register(fclaw_clawpatch_options_t *clawpatch_options,
                        &clawpatch_options->hdf5_patch_threshold, 0,
                        "Number of patches to buffer before each write in hdf5 output. 0 means buffer all patches before writing [0]");
     sc_options_add_int(opt, 0, "hdf5-compression-level", 
-                       &clawpatch_options->hdf5_compression_level, 0,
+                       &clawpatch_options->hdf5_compression_level, 5,
                        "Compression level for hdf5 output. 0 is no compression, 9 is most compression. [5]");
 
     /* Set verbosity level for reporting timing */
