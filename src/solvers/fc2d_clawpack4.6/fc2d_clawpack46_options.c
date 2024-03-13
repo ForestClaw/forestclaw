@@ -67,6 +67,8 @@ clawpack46_register (fc2d_clawpack46_options_t* clawopt, sc_options_t * opt)
     sc_options_add_bool (opt, 0, "vtk-out", &clawopt->vtk_out, 0,
                            "Output VTK formatted data [F]");
 
+    sc_options_add_bool (opt, 0, "hdf5-out", &clawopt->hdf5_out, 0,
+                           "Output VTKHDF formatted data [F]");
 
     clawopt->is_registered = 1;
     clawopt->is_unpacked = 0;
@@ -90,6 +92,8 @@ clawpack46_postprocess (fc2d_clawpack46_options_t * clawopt)
 static fclaw_exit_type_t
 clawpack46_check(fc2d_clawpack46_options_t *clawopt)
 {
+    fclaw_exit_type_t exit_code = FCLAW_NOEXIT;
+
     clawopt->method[0] = 0;  /* Time stepping is controlled outside of clawpack */
 
     clawopt->method[1] = clawopt->order[0];
@@ -98,8 +102,16 @@ clawpack46_check(fc2d_clawpack46_options_t *clawopt)
     clawopt->method[4] = clawopt->src_term;
     clawopt->method[5] = clawopt->mcapa;
 
+#ifndef FCLAW_ENABLE_HDF5
+    if(clawopt->hdf5_out)
+    {
+        fclaw_global_errorf("fc2d_clawpack46: ERROR: ForestClaw built without HDF5, cannot output hdf5.\n");
+        exit_code = FCLAW_EXIT_ERROR;
+    }
+#endif
+
     /* Should also check mthbc, mthlim, etc. */
-    return FCLAW_NOEXIT;
+    return exit_code;
 }
 
 static
