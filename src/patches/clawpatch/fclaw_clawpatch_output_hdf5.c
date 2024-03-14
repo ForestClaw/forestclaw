@@ -697,8 +697,10 @@ make_dataset_numerical(fclaw_global_t *glob,
 
     hid_t plist_id = H5Pcreate(H5P_DATASET_XFER);
 
+#ifdef FCLAW_ENABLE_MPI
     status |= H5Pset_dxpl_mpio(plist_id, H5FD_MPIO_COLLECTIVE);
     //status |= H5Pset_dxpl_mpio_collective_opt(plist_id, H5FD_MPIO_INDIVIDUAL_IO);
+#endif
 
     for(int local_patch_index = 0; 
         local_patch_index < glob->domain->local_max_patches; 
@@ -910,9 +912,11 @@ fclaw_hdf_write_file (fclaw_global_t * glob,
     herr_t status = 0;
     // Set up file access property list with parallel I/O access
     hid_t fapl_id = H5Pcreate(H5P_FILE_ACCESS);
+#ifdef FCLAW_ENABLE_MPI
     status |= H5Pset_fapl_mpio(fapl_id, glob->mpicomm, MPI_INFO_NULL);
     status |= H5Pset_coll_metadata_write(fapl_id, 1);
     status |= H5Pset_all_coll_metadata_ops(fapl_id, 1);
+#endif
     status |= H5Pset_libver_bounds(fapl_id, H5F_LIBVER_LATEST, H5F_LIBVER_LATEST);
 
     hid_t fcpl_id = H5Pcreate(H5P_FILE_CREATE);

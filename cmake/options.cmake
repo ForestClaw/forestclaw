@@ -23,6 +23,10 @@ if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT AND PROJECT_IS_TOP_LEVEL)
 endif()
 
 # enable needed dependencies
+if(mpi AND hdf5)
+  set(hdf5_parallel ON)
+endif()
+
 if(clawpack)
   set(clawpatch ON)
   set(clawpack4.6 ON)

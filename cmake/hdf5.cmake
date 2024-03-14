@@ -8,8 +8,6 @@ include(${CMAKE_CURRENT_LIST_DIR}/zlib.cmake)
 if(NOT MPI_ROOT AND DEFINED ENV{MPI_ROOT})
   set(MPI_ROOT $ENV{MPI_ROOT})
 endif()
-#TODO remove this
-set(hdf5_parallel true)
 
 set(hdf5_cmake_args
 -DHDF5_ENABLE_Z_LIB_SUPPORT:BOOL=ON
