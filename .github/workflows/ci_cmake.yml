@@ -28,6 +28,10 @@ jobs:
         - name: "Serial With Clawpack"
           configure_flags: "-Dclawpack=ON"
           ubuntu_packages: ""
+        - name: "Serial With Clawpack and HDF"
+          configure_flags: "-Dclawpack=ON -Dhdf5=ON"
+          ubuntu_packages: ""
+          dont_test: true
         - name: "Serial With GeoClaw"
           configure_flags: "-Dgeoclaw=ON"
           ubuntu_packages: ""
@@ -35,18 +39,24 @@ jobs:
           configure_flags: "-Dcudaclaw=ON"
           ubuntu_packages: "nvidia-cuda-toolkit"
           cuda: true
+          dont_test: true
         - name: "Serial With CudaClaw (CUDA 11.3)"
           configure_flags: "-Dcudaclaw=ON"
           configure_environment: "CUDACXX=/usr/local/cuda/bin/nvcc"
           ubuntu_packages: ""
           cuda: true
           cuda_11_3: true
+          dont_test: true
         - name: "MPI Minimal"
           configure_flags: "-Dmpi=ON"
           ubuntu_packages: "libopenmpi-dev openmpi-bin"
         - name: "MPI With Clawpack"
           configure_flags: "-Dmpi=ON -Dclawpack=ON"
           ubuntu_packages: "libopenmpi-dev openmpi-bin"
+        - name: "MPI With Clawpack and HDF"
+          configure_flags: "-Dmpi=ON -Dclawpack=ON -Dhdf5=ON"
+          ubuntu_packages: "libopenmpi-dev openmpi-bin"
+          dont_test: true
         - name: "MPI With GeoClaw"
           configure_flags: "-Dmpi=ON -Dgeoclaw=ON"
           ubuntu_packages: "libopenmpi-dev openmpi-bin"
@@ -54,12 +64,14 @@ jobs:
           configure_flags: "-Dmpi=ON -Dcudaclaw=ON"
           ubuntu_packages: "libopenmpi-dev openmpi-bin nvidia-cuda-toolkit"
           cuda: true
+          dont_test: true
         - name: "MPI With CudaClaw (CUDA 11.3)"
           configure_flags: "-Dmpi=ON -Dcudaclaw=ON"
           configure_environment: "CUDACXX=/usr/local/cuda/bin/nvcc"
           ubuntu_packages: "libopenmpi-dev openmpi-bin"
           cuda: true
           cuda_11_3: true
+          dont_test: true
         - name: "MPI With ThunderEgg"
           configure_flags: "-Dmpi=ON -Dthunderegg=ON"
           ubuntu_packages: "libopenmpi-dev openmpi-bin libfftw3-dev"
@@ -90,7 +102,7 @@ jobs:
       run: cmake --build --preset ci
 
     - name: CMake test
-      if: ${{ !matrix.cuda }}
+      if: ${{ !matrix.dont_test }}
       run: ctest --parallel 2 --output-on-failure
       working-directory: build
 
