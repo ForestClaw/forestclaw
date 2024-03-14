@@ -1,11 +1,11 @@
 # we use auxiliary objects for each code language to avoid compiler option mingling
 
 # -- c library
-add_library(forestclaw_c OBJECT 
+add_library(forestclaw_c OBJECT
   forestclaw.c
   fclaw_convenience.c
-  fclaw_base.c 
-  fclaw_options.c 
+  fclaw_base.c
+  fclaw_options.c
   fclaw_filesystem.cpp
   fclaw_gauges.c
   fclaw_package.c
@@ -87,47 +87,24 @@ add_library(forestclaw_f OBJECT
   fortran_source2d/cellave3.f
 )
 
-# -- put together in final library
-
-add_library(forestclaw)
-set_target_properties(forestclaw PROPERTIES EXPORT_NAME FORESTCLAW)
-
-target_sources(forestclaw PRIVATE $<TARGET_OBJECTS:forestclaw_f> $<TARGET_OBJECTS:forestclaw_c>)
-
-target_link_libraries(forestclaw PRIVATE ZLIB::ZLIB)
-target_link_libraries(forestclaw PUBLIC P4EST::P4EST SC::SC)
-if(mpi)
-  target_link_libraries(forestclaw PUBLIC MPI::MPI_C INTERFACE MPI::MPI_CXX)
-endif(mpi)
-
-target_include_directories(forestclaw
-  INTERFACE
-  $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
-  $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
-  $<INSTALL_INTERFACE:include>)
-
-# imported target, for use from FetchContent
-add_library(FORESTCLAW::FORESTCLAW INTERFACE IMPORTED GLOBAL)
-target_link_libraries(FORESTCLAW::FORESTCLAW INTERFACE forestclaw)
-
 install(FILES
   forestclaw.h
   fclaw_convenience.h
-  fclaw_base.h 
-	fclaw_timer.h 
-	fclaw_package.h 
+  fclaw_base.h
+	fclaw_timer.h
+	fclaw_package.h
   fclaw_packing.h
-	fclaw_pointer_map.h 
-	fclaw_filesystem.h 
-	fclaw_options.h 
-	fclaw_gauges.h 
-	fclaw_mpi.h 
-	fclaw_math.h 
+	fclaw_pointer_map.h
+	fclaw_filesystem.h
+	fclaw_options.h
+	fclaw_gauges.h
+	fclaw_mpi.h
+	fclaw_math.h
   fclaw_wrap.h
-  fclaw_include_all.h 
-	fclaw_advance.h 
-	fclaw_elliptic_solver.h 
-	fclaw_farraybox.hpp 
+  fclaw_include_all.h
+	fclaw_advance.h
+	fclaw_elliptic_solver.h
+	fclaw_farraybox.hpp
 	fclaw_global.h
 	fclaw_forestclaw.h
 	fclaw_domain.h
@@ -152,10 +129,10 @@ install(FILES
 	fclaw_map_query.h
 	fclaw_map_query_defs.h
 	fclaw_diagnostics.h
-	forestclaw2d.h 
-	fp_exception_glibc_extension.h 
+	forestclaw2d.h
+	fp_exception_glibc_extension.h
   fclaw2d_convenience.h
-	fclaw2d_defs.h 
+	fclaw2d_defs.h
   fclaw2d_file.h
   fclaw2d_wrap.h
   fclaw2d_to_3d.h
@@ -164,11 +141,8 @@ install(FILES
   fclaw3d_defs.h
   fclaw3d_file.h
   fclaw3d_wrap.h
-  DESTINATION include
+  TYPE INCLUDE
 )
-
-install(TARGETS forestclaw
-  EXPORT ${PROJECT_NAME}-targets)
 
 if(BUILD_TESTING)
   add_executable(forestclaw.TEST
