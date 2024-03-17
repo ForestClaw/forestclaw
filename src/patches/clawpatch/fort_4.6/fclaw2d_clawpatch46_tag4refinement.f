@@ -8,18 +8,16 @@ c> Implementation for clawpack 4.6.
 c>
 c> @details @copydetails ::clawpatch_fort_tag4refinement_t
 c--------------------------------------------------------------------
-      subroutine fclaw2d_clawpatch46_fort_tag4refinement(blockno, mx,my,mbc,
-     &      meqn, maux, xlower,ylower,dx,dy, q, aux,
-     &      tag_threshold, init_flag, tag_patch)
+      subroutine fclaw2d_clawpatch46_fort_tag4refinement(mx,my,mbc,
+     &      meqn, xlower,ylower,dx,dy, blockno,
+     &      q, tag_threshold, init_flag, tag_patch)
       implicit none
 
-      integer mx,my, mbc, meqn, tag_patch, init_flag, maux
+      integer mx,my, mbc, meqn, tag_patch, init_flag
       integer blockno
-      double precision xlower, ylower, dx, dy
+      double precision xlower, ylower, dx, dy      
       double precision tag_threshold
-      integer :: ivar_theshold
       double precision q(1-mbc:mx+mbc,1-mbc:my+mbc,meqn)      
-      double precision aux(1-mbc:mx+mbc,1-mbc:my+mbc,maux)      
 
 
       integer i,j, mq

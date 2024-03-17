@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
+Copyright (c) 2012-2024 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -29,10 +29,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef __cplusplus
 extern "C"
 {
+#endif
+
 #if 0
-}
-#endif
-#endif
+/* Fix syntax highlighting */
+#endif    
 
 /**
  * @file
@@ -60,6 +61,7 @@ typedef struct fclaw_gauge
     /** @{ @brief Relative to [ax,ay]x[bx,by] set in fclaw2d_options */
     double xc;   
     double yc;
+    double zc;
     /** @} */
 
     /** @brief Tstart */
@@ -68,6 +70,9 @@ typedef struct fclaw_gauge
     double t2;
     /** @brief Gauge number */
     int num;
+
+    /** @brief Gauge dimension */
+    int dim;
 
     /* Control output times for gauges */
     /** @brief Output gauges this often */
@@ -100,7 +105,8 @@ struct fclaw_gauge;
  */
 typedef void (*fclaw_gauge_set_data_t)(struct fclaw_global *glob, 
                                        struct fclaw_gauge **gauges, 
-                                       int *num);
+                                       int *num,
+                                       int *dim);
 
 /**
  * @brief Creates files for each gauge
@@ -126,7 +132,7 @@ typedef void (*fclaw_gauge_normalize_t)(struct fclaw_global *glob,
                                        struct fclaw_block *block,
                                        int blockno, 
                                        struct fclaw_gauge *g,
-                                       double *xc, double *yc);
+                                       double *xc, double *yc, double *zc);
 
 /**
  * @brief Updates the current buffer entry for the gauge
@@ -208,9 +214,11 @@ fclaw_gauges_vtable_t* fclaw_gauges_vt(struct fclaw_global *glob);
  * @param gauges the array of gauges
  * @param num_gauges the number of gauges
  */
+#if 0
 void fclaw_set_gauge_data(struct fclaw_global* glob, 
                           struct fclaw_gauge **gauges, 
                           int *num_gauges);
+#endif
 
 /**
  * @brief Create files for each gauge
@@ -219,9 +227,11 @@ void fclaw_set_gauge_data(struct fclaw_global* glob,
  * @param[in] gauges the array of gauges
  * @param[in] num_gauges the number of gauges
  */
+#if 0
 void fclaw_create_gauge_files(struct fclaw_global* glob, 
                               struct fclaw_gauge *gauges, 
                               int num_gauges);
+#endif                              
 
 /**
  * @brief Map gauge to normalized coordinates in a global [0,1]x[0,1]  domain.
@@ -236,7 +246,7 @@ void fclaw_gauge_normalize_coordinates(struct fclaw_global *glob,
                                       struct fclaw_block *block,
                                       int blockno, 
                                       struct fclaw_gauge *g,
-                                      double *xc, double *yc);
+                                      double *xc, double *yc, double *zc);
 
 /**
  * @brief Update the current buffer entry for the gauge
@@ -278,7 +288,7 @@ void fclaw_gauge_allocate(struct fclaw_global *glob, int num_gauges,
                           struct fclaw_gauge **g);
 
 /**
- * @brief Set the data for a single gauge
+ * @brief Set the data for a single gauge in 2d
  * 
  * @param[in] glob the global context
  * @param[in,out] g the gauge
@@ -289,11 +299,12 @@ void fclaw_gauge_allocate(struct fclaw_global *glob, int num_gauges,
  * @param[in] min_time_increment How often to output the gauge
  */
 void fclaw_gauge_set_data(struct fclaw_global *glob, 
-                          struct fclaw_gauge *g,
-                          int num, 
-                          double xc, double yc, 
+                          struct fclaw_gauge *g,  
+                          int num, int dim,
+                          double xc, double yc, double zc,
                           double  t1, double t2,
                           double min_time_increment);
+
 
 /**
  * @brief Get the data for a single gauge
@@ -306,10 +317,10 @@ void fclaw_gauge_set_data(struct fclaw_global *glob,
  * @param[out] t2 Tend
  */
 void fclaw_gauge_get_data(struct fclaw_global *glob, 
-                          struct fclaw_gauge *g,                             
-                          int *num, 
-                          double *xc, double *yc, 
-                          double  *t1, double *t2);
+                             struct fclaw_gauge *g,                             
+                             int *num, int *dim,
+                             double *xc, double *yc, double *zc,
+                             double  *t1, double *t2);
 
 /**
  * @brief Get the gauge number (index the the guage array)
@@ -367,9 +378,6 @@ void* fclaw_gauge_get_user_data(struct fclaw_global *glob,
 
 
 #ifdef __cplusplus
-#if 0
-{
-#endif
 }
 #endif
 
