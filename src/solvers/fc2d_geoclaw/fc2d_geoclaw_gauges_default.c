@@ -39,10 +39,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef __cplusplus
 extern "C"
 {
+#endif
+
 #if 0
-}
-#endif
-#endif
+/* Fix syntax highlighting */
+#endif    
 
 typedef struct geoclaw_user
 {
@@ -55,7 +56,8 @@ typedef struct geoclaw_user
 
 void geoclaw_read_gauges_data_default(fclaw_global_t *glob, 
                                       fclaw_gauge_t **gauges,
-                                      int *num_gauges)
+                                      int *num_gauges,
+                                      int *dim)
 {
     /* Idea is that we may only need to change this file when updating to newer
        geoclaw code */
@@ -104,6 +106,12 @@ void geoclaw_read_gauges_data_default(fclaw_global_t *glob,
     fgets(line,max_line_len, f_gauges_data);
     *num_gauges = strtod(line,NULL);
 
+    /* 
+        In Geoclaw, the dim will always be 2, so we don't read
+        it in from the gauges.data file.
+    */
+    *dim = 2;
+
     if (*num_gauges == 0)
     {
         *gauges = NULL;
@@ -147,9 +155,10 @@ void geoclaw_read_gauges_data_default(fclaw_global_t *glob,
 
         for(i = 0; i < *num_gauges; i++)
         {
-            fclaw_gauge_set_data(glob,&g[i],num[i],
-                                        xc[i],yc[i],t1[i],t2[i],
-                                        min_time_increment[i]);
+            double zc = 0;
+            fclaw_gauge_set_data(glob,&g[i],num[i],*dim,
+                                 xc[i],yc[i],zc,t1[i],t2[i],
+                                 min_time_increment[i]);
         }
 
         FCLAW_FREE(num);
@@ -185,7 +194,9 @@ void geoclaw_create_gauge_files_default(fclaw_global_t *glob,
     int num_eqns = 4;  /* meqn + 1 (h, hu, hv, eta) */
     for (int i = 0; i < num_gauges; i++)
     {
-        fclaw_gauge_get_data(glob,&gauges[i],&num, &xc, &yc, &t1, &t2);
+        double zc;
+        int dim;
+        fclaw_gauge_get_data(glob,&gauges[i],&num, &dim, &xc, &yc, &zc, &t1, &t2);
 
         sprintf(filename,"gauge%05d.txt",num);
         fp = fopen(filename, "w");
@@ -203,7 +214,7 @@ void geoclaw_gauge_normalize_coordinates(fclaw_global_t *glob,
                                         fclaw_block_t *block,
                                         int blockno, 
                                         fclaw_gauge_t *g,
-                                        double *xc, double *yc)
+                                        double *xc, double *yc, double *zc)
 {
     /*  
        Map gauge to normalized coordinates in a global [0,1]x[0,1]  domain.
@@ -224,6 +235,9 @@ void geoclaw_gauge_normalize_coordinates(fclaw_global_t *glob,
     /* Map global gauge to global [0,1]x[0,1] space */
     *xc = (g->xc - ax)/(bx-ax);
     *yc = (g->yc - ay)/(by-ay);
+
+    /* Will not be used */
+    *zc = 0;
 }
 
 
@@ -245,7 +259,9 @@ void geoclaw_gauge_update_default(fclaw_global_t*
     fclaw_clawpatch_2d_grid_data(glob,patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
-    fclaw_gauge_get_data(glob,g,&num, &xc, &yc, &t1, &t2);
+    double zc;
+    int dim;
+    fclaw_gauge_get_data(glob,g,&num, &dim, &xc, &yc, &zc, &t1, &t2);
 
     FCLAW_ASSERT(xc >= xlower && xc <= xlower + mx*dx);
     FCLAW_ASSERT(yc >= ylower && yc <= ylower + my*dy);
@@ -305,9 +321,6 @@ void geoclaw_print_gauges_default(fclaw_global_t *glob,
 }
 
 #ifdef __cplusplus
-#if 0
-{
-#endif
 }
 #endif
 
