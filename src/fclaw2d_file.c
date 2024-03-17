@@ -40,15 +40,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 #define FCLAW2D_FILE_NAME_BYTES BUFSIZ /**< maximal number of filename bytes */
-#ifndef P4_TO_P8
-#define FCLAW2D_FILE_EXT "f2d" /**< file extension of fclaw2d data files */
-#define FCLAW2D_PFILE_EXT "fp2d" /**< file extension of fclaw2d partition files */
-#else
-#define FCLAW2D_FILE_EXT    FCLAW3D_FILE_EXT
-#define FCLAW2D_PFILE_EXT   FCLAW3D_PFILE_EXT
-#define FCLAW3D_FILE_EXT "f3d" /**< file extension of fclaw3d data files */
-#define FCLAW3D_PFILE_EXT "fp3d" /**< file extension of fclaw3d partition files */
-#endif
 
 /* For legacy and compatibility reasons we provide here the first version
  * of the file format that was originally implemented in p4est in p4est_io.c.
@@ -2606,7 +2597,7 @@ fclaw2d_file_data_to_p4est (sc_MPI_Comm mpicomm, int mpisize,
     return ptemp;
 }
 
-/** Read a p4est to an opened file using the MPI communicator of \a fc.
+/** Read a p4est from an opened file using the MPI communicator of \a fc.
  *
  * \param [in,out] fc         Context previously created by \ref
  *                            fclaw2d_file_open_read_v1 (_ext).  It keeps track
@@ -2758,7 +2749,10 @@ fclaw2d_file_read_p4est_v1 (fclaw2d_file_context_p4est_v1_t * fc,
         {
             *errcode = FCLAW2D_FILE_ERR_P4EST_V1;
             /* clean up local variables and open file context */
-            FCLAW_FREE (gfq);
+            if (gfq_in == NULL)
+            {
+                FCLAW_FREE (gfq);
+            }
             sc_array_reset (&pertree_arr);
             sc_array_reset (&quadrants);
             FCLAW2D_FILE_CHECK_NULL_V1 (*errcode, fc,
@@ -2825,7 +2819,10 @@ fclaw2d_file_read_p4est_v1 (fclaw2d_file_context_p4est_v1_t * fc,
     if (*errcode != FCLAW2D_FILE_ERR_SUCCESS_V1)
     {
         /* clean up local variables and open file context */
-        FCLAW_FREE (gfq);
+        if (gfq_in == NULL)
+        {
+            FCLAW_FREE (gfq);
+        }
         sc_array_reset (&pertree_arr);
         sc_array_reset (&quadrants);
         sc_array_reset (&quad_data);
@@ -2836,7 +2833,10 @@ fclaw2d_file_read_p4est_v1 (fclaw2d_file_context_p4est_v1_t * fc,
 
     /* clean up und return */
   p4est_read_file_p4est_end:
-    FCLAW_FREE (gfq);
+    if (gfq_in == NULL)
+    {
+        FCLAW_FREE (gfq);
+    }
     sc_array_reset (&pertree_arr);
     sc_array_reset (&quadrants);
     sc_array_reset (&quad_data);
@@ -3040,7 +3040,6 @@ typedef struct fclaw2d_file_context
 {
     fclaw2d_domain_t *domain;
     fclaw2d_file_context_p4est_v1_t *fc;
-    char basename[FCLAW2D_FILE_NAME_BYTES];
 }
 fclaw2d_file_context_t;
 
@@ -3241,9 +3240,8 @@ fclaw2d_file_open_write (const char *filename,
     p4est_t *p4est;
     fclaw2d_file_context_p4est_v1_t *fc;
     fclaw2d_file_context_t *fclaw_fc;
-    char buf[FCLAW2D_FILE_NAME_BYTES];
 
-    file_len = strlen (filename) + strlen ("." FCLAW2D_FILE_EXT) + 1;
+    file_len = strlen (filename) + 1;
     if (file_len > FCLAW2D_FILE_NAME_BYTES)
     {
         /* filename too long */
@@ -3257,9 +3255,7 @@ fclaw2d_file_open_write (const char *filename,
     FCLAW_ASSERT (p4est_is_valid (p4est));
 
     /* create the file */
-    sc_strcopy (buf, file_len, filename);
-    strcat (buf, "." FCLAW2D_FILE_EXT);
-    fc = fclaw2d_file_open_create_v1 (p4est, buf, user_string,
+    fc = fclaw2d_file_open_create_v1 (p4est, filename, user_string,
                                       &errcode_internal);
     fclaw2d_file_translate_error_code_v1 (errcode_internal, errcode);
     if (*errcode != FCLAW2D_FILE_ERR_SUCCESS)
@@ -3294,12 +3290,10 @@ fclaw2d_file_open_write (const char *filename,
     fclaw_fc = FCLAW_ALLOC (fclaw2d_file_context_t, 1);
     fclaw_fc->fc = fc;
     fclaw_fc->domain = domain;
-    sc_strcopy (fclaw_fc->basename, strlen (filename) + 1, filename);
 
     return fclaw_fc;
 }
 
-#if 0
 int
 fclaw2d_file_write_partition (const char *filename, const char *user_string,
                               fclaw2d_domain_t * domain, int *errcode)
@@ -3313,12 +3307,11 @@ fclaw2d_file_write_partition (const char *filename, const char *user_string,
     int mpisize;
     int64_t written_partition_size;
     size_t file_len;
-    char buf[FCLAW2D_FILE_NAME_BYTES];
     p4est_t *p4est;
     fclaw2d_file_context_p4est_v1_t *fc_p4est;
     sc_array_t arr;
 
-    file_len = strlen (filename) + strlen ("." FCLAW2D_PFILE_EXT) + 1;
+    file_len = strlen (filename) + 1;
     if (file_len > FCLAW2D_FILE_NAME_BYTES)
     {
         /* filename too long */
@@ -3326,15 +3319,11 @@ fclaw2d_file_write_partition (const char *filename, const char *user_string,
         return -1;
     }
 
-    /* get file path */
-    sc_strcopy (buf, file_len, filename);
-    strcat (buf, "." FCLAW2D_PFILE_EXT);
-
     /* get the underlying p4est */
     p4est = ((p4est_wrap_t *) domain->pp)->p4est;
 
     /* create a new file */
-    fc_p4est = fclaw2d_file_open_create_v1 (p4est, buf, "Partition file",
+    fc_p4est = fclaw2d_file_open_create_v1 (p4est, filename, "Partition file",
                                             &errcode_internal);
     fclaw2d_file_translate_error_code_v1 (errcode_internal, errcode);
     if (*errcode != FCLAW2D_FILE_ERR_SUCCESS)
@@ -3388,7 +3377,6 @@ fclaw2d_file_write_partition (const char *filename, const char *user_string,
     *errcode = FCLAW2D_FILE_ERR_SUCCESS;
     return sc_MPI_SUCCESS;
 }
-#endif
 
 fclaw2d_file_context_t *
 fclaw2d_file_write_block (fclaw2d_file_context_t *
@@ -3464,9 +3452,150 @@ fclaw2d_file_write_array (fclaw2d_file_context_t *
     return fc;
 }
 
+/** Check global first quadrant/patch array.
+ *
+ * This function checks if the given gfq array has 0 as first entry and
+ * is non-decreasing.
+ *
+ * \param [in]   gfq   The global first quadrant/patch array.
+ * \param [in]   size  The number of entries of \b gfq. In particular,
+ *                     size must be the number of MPI ranks + 1.
+ * \return             -1 for an invalid gfq array,
+ *                      0 otherwise.
+ */
+static int
+fclaw2d_file_check_gfq (const p4est_gloidx_t * gfq, int size)
+{
+    FCLAW_ASSERT (gfq != NULL);
+
+    int i;
+
+    if (gfq[0] != 0)
+    {
+        return -1;
+    }
+    for (i = 1; i < size; ++i)
+    {
+        if (gfq[i] < gfq[i - 1])
+        {
+            /* gfq must be montically increasing */
+            return -1;
+        }
+    }
+
+    return 0;
+}
+
+int
+fclaw2d_file_read_partition (const char *filename, char *user_string,
+                             sc_MPI_Comm mpicomm, sc_array_t * partition,
+                             int *errcode)
+{
+    FCLAW_ASSERT (filename != NULL);
+    FCLAW_ASSERT (user_string != NULL);
+    FCLAW_ASSERT (partition != NULL);
+    FCLAW_ASSERT (errcode != NULL);
+
+    FCLAW_ASSERT (partition->elem_size == sizeof (p4est_gloidx_t));
+
+    int errcode_internal;
+    int retval;
+    int64_t partition_size;
+    size_t file_len;
+    p4est_gloidx_t global_num_quadrants;
+    char read_user_string[FCLAW2D_FILE_USER_STRING_BYTES_V1 + 1];
+    fclaw2d_file_context_p4est_v1_t *p4est_fc;
+    sc_array_t arr;
+
+    /* check length of the path */
+    file_len = strlen (filename) + 1;
+    if (file_len > FCLAW2D_FILE_NAME_BYTES)
+    {
+        /* filename is too long */
+        *errcode = FCLAW2D_FILE_ERR_BAD_FILE;
+        return -1;
+    }
+
+    /* open the partition file */
+    p4est_fc = fclaw2d_file_open_read_ext_v1 (mpicomm, filename, user_string,
+                                              &global_num_quadrants,
+                                              &errcode_internal);
+    fclaw2d_file_translate_error_code_v1 (errcode_internal, errcode);
+    if (*errcode != FCLAW2D_FILE_ERR_SUCCESS)
+    {
+        FCLAW_ASSERT (p4est_fc == NULL);
+        return -1;
+    }
+
+    /* read the partition size */
+    sc_array_init_data (&arr, &partition_size, sizeof (int64_t), 1);
+    p4est_fc = fclaw2d_file_read_block_v1 (p4est_fc, sizeof (int64_t), &arr,
+                                           read_user_string,
+                                           &errcode_internal);
+    fclaw2d_file_translate_error_code_v1 (errcode_internal, errcode);
+    if (*errcode != FCLAW2D_FILE_ERR_SUCCESS)
+    {
+        FCLAW_ASSERT (p4est_fc == NULL);
+        return -1;
+    }
+
+    if (partition_size <= 0)
+    {
+        /* invalid partition size */
+        retval = fclaw2d_file_close_v1 (p4est_fc, &errcode_internal);
+        fclaw2d_file_translate_error_code_v1 (errcode_internal, errcode);
+        if (*errcode != FCLAW2D_FILE_ERR_SUCCESS)
+        {
+            FCLAW_EXECUTE_ASSERT_TRUE (retval != 0);
+            *errcode = FCLAW2D_FILE_ERR_PART;
+            return -1;
+        }
+    }
+
+    /* read the partition */
+    sc_array_resize (partition, (size_t) partition_size + 1);
+    sc_array_init_reshape (&arr, partition, sizeof (p4est_gloidx_t) *
+                           ((size_t) partition_size + 1), 1);
+    p4est_fc =
+        fclaw2d_file_read_block_v1 (p4est_fc,
+                                    sizeof (p4est_gloidx_t) *
+                                    (partition_size + 1), &arr,
+                                    read_user_string, &errcode_internal);
+    fclaw2d_file_translate_error_code_v1 (errcode_internal, errcode);
+    if (*errcode != FCLAW2D_FILE_ERR_SUCCESS)
+    {
+        FCLAW_ASSERT (p4est_fc == NULL);
+        sc_array_reset (partition);
+        return -1;
+    }
+
+    /* close the partition file */
+    retval = fclaw2d_file_close_v1 (p4est_fc, &errcode_internal);
+    fclaw2d_file_translate_error_code_v1 (errcode_internal, errcode);
+    if (*errcode != FCLAW2D_FILE_ERR_SUCCESS)
+    {
+        FCLAW_EXECUTE_ASSERT_TRUE (retval != 0);
+        sc_array_reset (partition);
+        return -1;
+    }
+
+    /* check the consistency of gfq */
+    if (fclaw2d_file_check_gfq
+        ((p4est_gloidx_t *) partition->array, partition_size) == -1)
+    {
+        /* invalid gfq */
+        sc_array_reset (partition);
+        *errcode = FCLAW2D_FILE_ERR_PART;
+        return -1;
+    }
+
+    /* successfully read a valid partition */
+    return 0;
+}
+
 fclaw2d_file_context_t *
 fclaw2d_file_open_read (const char *filename, char *user_string,
-                        sc_MPI_Comm mpicomm, const char *par_filename,
+                        sc_MPI_Comm mpicomm, sc_array_t *partition,
                         fclaw2d_domain_t ** domain, int *errcode)
 {
     FCLAW_ASSERT (filename != NULL);
@@ -3475,30 +3604,45 @@ fclaw2d_file_open_read (const char *filename, char *user_string,
     FCLAW_ASSERT (errcode != NULL);
 
     int errcode_internal;
-#if 0
     int mpiret, mpisize, retval;
-    int64_t partition_size;
-#endif
     size_t file_len;
-    char buf[FCLAW2D_FILE_NAME_BYTES];
     char read_user_string[FCLAW2D_FILE_USER_STRING_BYTES_V1 + 1];
     p4est_gloidx_t global_num_quadrants;
-#if 0
-    p4est_gloidx_t par_global_num_quadrants;
-#endif
-    p4est_gloidx_t *read_gfq;
+    p4est_gloidx_t *read_gfq, *gfq;
     fclaw2d_file_context_p4est_v1_t *p4est_fc;
-#if 0
-    fclaw2d_file_context_t *partition_fc;
-#endif
     fclaw2d_file_context_t *fclaw_fc;
     p4est_connectivity_t *conn;
     p4est_t *p4est;
-#if 0
-    sc_array_t arr;
-#endif
 
-    file_len = strlen (filename) + strlen ("." FCLAW2D_FILE_EXT) + 1;
+    /* default gfq */
+    read_gfq = NULL;
+
+    if (partition != NULL)
+    {
+        FCLAW_ASSERT (partition->elem_size == sizeof (p4est_gloidx_t));
+        gfq = (p4est_gloidx_t *) partition->array;
+        /* check the partition */
+        if (fclaw2d_file_check_gfq (gfq, (int) partition->elem_count) == -1)
+        {
+            /* invalid gfq */
+            *errcode = FCLAW2D_FILE_ERR_PART;
+            return NULL;
+        }
+
+        /* check the size of the passed partition */
+        mpiret = sc_MPI_Comm_size (mpicomm, &mpisize);
+        SC_CHECK_MPI (mpiret);
+        if ((int) partition->elem_count != mpisize + 1)
+        {
+            /* process count mismatch */
+            *errcode = FCLAW2D_FILE_ERR_PART;
+            return NULL;
+        }
+
+        read_gfq = gfq;
+    }
+
+    file_len = strlen (filename) + 1;
     if (file_len > FCLAW2D_FILE_NAME_BYTES)
     {
         /* filename is too long */
@@ -3508,9 +3652,7 @@ fclaw2d_file_open_read (const char *filename, char *user_string,
 
     /* WARNING: Currently, we do not handle wrong endianness. */
     /* open the given file */
-    sc_strcopy (buf, file_len, filename);
-    strcat (buf, "." FCLAW2D_FILE_EXT);
-    p4est_fc = fclaw2d_file_open_read_ext_v1 (mpicomm, buf, user_string,
+    p4est_fc = fclaw2d_file_open_read_ext_v1 (mpicomm, filename, user_string,
                                               &global_num_quadrants,
                                               &errcode_internal);
     fclaw2d_file_translate_error_code_v1 (errcode_internal, errcode);
@@ -3520,88 +3662,25 @@ fclaw2d_file_open_read (const char *filename, char *user_string,
         return NULL;
     }
 
-    /* default gfq */
-    read_gfq = NULL;
-
-#if 0
-    if (par_filename != NULL)
+    if (partition != NULL)
     {
-        /* open the partition file */
-        partition_fc =
-            fclaw2d_file_open_read_ext_v1 (mpicomm, par_filename, user_string,
-                                           &par_global_num_quadrants,
-                                           &errcode_internal);
-        /* TODO: How to handle the errors related to this file context? */
-        fclaw2d_file_translate_error_code_v1 (errcode_internal, errcode);
-        if (*errcode != FCLAW2D_FILE_ERR_SUCCESS)
+        /* check the number of global quadrants */
+        if (read_gfq[partition->elem_count - 1] != global_num_quadrants)
         {
-            FCLAW_ASSERT (partition_fc == NULL);
-            return NULL;
-        }
-        if (par_global_num_quadrants != global_num_quadrants)
-        {
-            /* number of global quadrants mismatch */
-            /* TODO: partition_fc was successfully opened, so we can close it properly */
-
-            /* TODO: close p4est_fc */
-            *errcode = FCLAW2D_FILE_ERR_P4EST;
-            return NULL;
-        }
-
-        /* read the partition size */
-        sc_array_init_data (&arr, &partition_size, sizeof (int64_t), 1);
-        partition_fc =
-            fclaw2d_file_read_block_v1 (partition_fc, sizeof (int64_t), &arr,
-                                        user_string, &errcode_internal);
-        fclaw2d_file_translate_error_code_v1 (errcode_internal, errcode);
-        if (*errcode != FCLAW2D_FILE_ERR_SUCCESS)
-        {
-            FCLAW_ASSERT (partition_fc == NULL);
-            return NULL;
-        }
-
-        /* get mpisize */
-        mpiret = sc_MPI_Comm_size (mpicomm, &mpisize);
-        SC_CHECK_MPI (mpiret);
-
-        if (partition_size == mpisize)
-        {
-            /* allocate space for the read gfq array */
-            read_gfq = FCLAW_ALLOC (p4est_gloidx_t, partition_size + 1);
-            /* read the gfq array */
-            sc_array_init_data (&arr, read_gfq, sizeof (p4est_gloidx_t) *
-                                (partition_size + 1), 1);
-            partition_fc = fclaw2d_file_read_block_v1 (partition_fc,
-                                                       sizeof (p4est_gloidx_t)
-                                                       * (partition_size + 1),
-                                                       &arr, user_string,
-                                                       &errcode_internal);
+            /* partition has different number of global quadrants */
+            /* close the file */
+            retval = fclaw2d_file_close_v1 (p4est_fc, &errcode_internal);
             fclaw2d_file_translate_error_code_v1 (errcode_internal, errcode);
             if (*errcode != FCLAW2D_FILE_ERR_SUCCESS)
             {
-                FCLAW_ASSERT (partition_fc == NULL);
+                FCLAW_EXECUTE_ASSERT_TRUE (retval);
+                /* close failed */
                 return NULL;
             }
-
-        }
-        else
-        {
-            /* the MPI count does not coincide with partition size */
-            /* we use a uniform partition */
-            /* TODO: Rescale given partition instead? */
-            read_gfq = NULL;
-        }
-
-        /* close the partition file */
-        retval = fclaw2d_file_close_v1 (partition_fc, &errcode_internal);
-        fclaw2d_file_translate_error_code_v1 (errcode_internal, errcode);
-        if (*errcode != FCLAW2D_FILE_ERR_SUCCESS)
-        {
-            FCLAW_EXECUTE_ASSERT_TRUE (retval != 0);
+            *errcode = FCLAW2D_FILE_ERR_PART;
             return NULL;
         }
     }
-#endif
 
     /* read the p4est connectivity */
     p4est_fc = fclaw2d_file_read_connectivity_v1 (p4est_fc, &conn,
@@ -3629,11 +3708,18 @@ fclaw2d_file_open_read (const char *filename, char *user_string,
     /* create domain from p4est */
     *domain = fclaw2d_domain_new_p4est (p4est);
 
+    /* Store gfp pointer in the p4est file context.
+     * This is required since we opened the file with open_read_ext_v1 and
+     * therefore the global first quadrant pointer of the p4est file context
+     * is set to NULL and this triggers the usage of uniform partition.
+     * However, we want to use the read partition if there is one.
+     */
+    p4est_fc->global_first_quadrant = p4est->global_first_quadrant;
+
     /* allocate and set fclaw file context */
     fclaw_fc = FCLAW_ALLOC (fclaw2d_file_context_t, 1);
     fclaw_fc->fc = p4est_fc;
     fclaw_fc->domain = *domain;
-    sc_strcopy (fclaw_fc->basename, strlen (filename) + 1, filename);
 
     return fclaw_fc;
 }
@@ -3765,6 +3851,10 @@ fclaw2d_file_error_string (int errcode, char *string, int *resultlen)
     {
     case FCLAW2D_FILE_ERR_NOT_IMPLEMENTED:
         tstr = "The functionality must be still implemented";
+        break;
+
+    case FCLAW2D_FILE_ERR_PART:
+        tstr = "The passed or read partition is invalid or not conforming";
         break;
 
     default:
