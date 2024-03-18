@@ -172,6 +172,7 @@ void gauge_initialize(fclaw_global_t* glob, void** acc)
         */
 
         double xll,yll,zll,xur,yur,zur;
+        int total_gauges_set = 0;
         for (int nb = 0; nb < num_blocks; nb++)
         {
             fclaw_block_t *block = &blocks[nb];
@@ -234,11 +235,12 @@ void gauge_initialize(fclaw_global_t* glob, void** acc)
                 double p[gauge_dim];
                 fclaw_gauge_normalize_coordinates(glob,block,nb,&gauges[i],&p[0],&p[1],&p[2]);
 
-                int gauge_in_block = xll <= p[0] && p[0] <= xur && 
-                                     yll <= p[1] && p[1] <= yur;
+
+                int gauge_in_block = (xll <= p[0] && p[0] < xur) && 
+                                     (yll <= p[1] && p[1] < yur);
                 if (gauge_dim == 3)
                 {                    
-                    gauge_in_block  &= (zll <= p[2] && p[2] <= zur);
+                    gauge_in_block  &= (zll <= p[2] && p[2] < zur);
                 }
 
                 if (gauge_in_block)
@@ -267,9 +269,19 @@ void gauge_initialize(fclaw_global_t* glob, void** acc)
 
             /* Set number of gauges for block nb */
             bo = (int*) sc_array_index_int(glob->gauge_info->block_offsets, nb+1);
-            bo[0] = number_of_gauges_set;        
+            bo[0] = number_of_gauges_set;  
+            total_gauges_set += number_of_gauges_set;
         }
     }
+#if 0    
+    /* Need a collective MPI call here to get total number of gauges.*/
+    if (number_of_gauges_set != num_gauges)
+    {
+        fclaw_global_essentialf("Incorrect gauge count.  Gauge file has %d gauges, but %d were set\n",num_gauges,number_of_gauges_set);
+        exit(0);
+    }
+#endif    
+
 }
 
 
@@ -291,6 +303,7 @@ void gauge_update(fclaw_global_t *glob, void* acc)
     int buffer_len = fclaw_opt->gauge_buffer_length;
     tcurr = glob->curr_time;
     num_gauges = gauge_acc->num_gauges;
+
 
     for (i = 0; i < num_gauges; i++)
     {
@@ -335,6 +348,7 @@ void fclaw_locate_gauges(fclaw_global_t *glob)
 {
     int i,index,num;
     fclaw_gauge_t *g;
+
 
     fclaw_gauge_acc_t* gauge_acc = 
               (fclaw_gauge_acc_t*) glob->acc->gauge_accumulator;
