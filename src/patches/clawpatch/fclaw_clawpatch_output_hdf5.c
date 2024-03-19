@@ -313,7 +313,7 @@ write_2d_patch_q (fclaw_global_t * glob,
                   fclaw_patch_t * patch,
                   int blockno,
                   int patchno,
-                  double * q_out)
+                  float * q_out)
 {
     int mx,my,mbc;
     double dx,dy,xlower,ylower;
@@ -342,7 +342,7 @@ write_3d_patch_q (fclaw_global_t * glob,
                   fclaw_patch_t * patch,
                   int blockno,
                   int patchno,
-                  double * q_out)
+                  float * q_out)
 {
     int mx,my,mz,mbc;
     double dx,dy,dz,xlower,ylower,zlower;
@@ -376,7 +376,7 @@ get_data (fclaw_global_t * glob,
           int patchno,
           char * buffer)
 {
-    double * q_out = (double *) buffer;
+    float * q_out = (float *) buffer;
     if (fclaw_clawpatch_dim(patch) == 2)
     {
         write_2d_patch_q(glob, patch, blockno, patchno, q_out);
@@ -1209,7 +1209,7 @@ fclaw_hdf_write_file (fclaw_global_t * glob,
                            patch_dim, num_cells_per_patch_subdims,
                            2, patch_dims, 
                            num_patches_to_buffer, 
-                           H5T_NATIVE_DOUBLE, 
+                           H5T_NATIVE_FLOAT, 
                            value_cb,
                            &default_vtable);
 
