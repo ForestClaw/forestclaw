@@ -35,6 +35,29 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <hdf5_hl.h>
 #include <hdf5.h>
 
+/*----------------------------------------------------------------------
+    Value Callbacks
+  ----------------------------------------------------------------------*/
+static int get_num_cells(fclaw_global_t * glob,
+                         fclaw_patch_t* patch)
+{
+    int mx,my,mz,mbc;
+    double dx,dy,dz,xlower,ylower,zlower;
+
+    int num_cells;
+    if(fclaw_clawpatch_dim(patch) == 2)
+    {
+        fclaw_clawpatch_2d_grid_data(glob,patch,&mx,&my,&mbc,&xlower,&ylower,&dx,&dy);
+        num_cells = mx * my;
+    }
+    else
+    {
+        fclaw_clawpatch_3d_grid_data(glob,patch,&mx,&my,&mz,&mbc,&xlower,&ylower,&zlower,&dx,&dy,&dz);
+        num_cells = mx * my * mz;
+    }
+    return num_cells;
+}
+
 static void 
 blockno_cb (fclaw_global_t * glob,
             fclaw_patch_t * patch,
@@ -44,26 +67,14 @@ blockno_cb (fclaw_global_t * glob,
 {
     int *blocknos = (int *) buffer;
 
-    int mx,my,mz,mbc;
-    double dx,dy,dz,xlower,ylower,zlower;
-
-    int num_cells;
-    if(fclaw_clawpatch_dim(patch) == 2)
-    {
-        fclaw_clawpatch_2d_grid_data(glob,patch,&mx,&my,&mbc,&xlower,&ylower,&dx,&dy);
-        num_cells = mx * my;
-    }
-    else
-    {
-        fclaw_clawpatch_3d_grid_data(glob,patch,&mx,&my,&mz,&mbc,&xlower,&ylower,&zlower,&dx,&dy,&dz);
-        num_cells = mx * my * mz;
-    }
+    int num_cells = get_num_cells(glob,patch);
 
     for(int i = 0; i < num_cells; i++)
     {
         blocknos[i] = blockno;
     }
 }
+
 static void 
 patchno_cb (fclaw_global_t * glob,
             fclaw_patch_t * patch,
@@ -73,26 +84,14 @@ patchno_cb (fclaw_global_t * glob,
 {
     int *patchnos = (int *) buffer;
 
-    int mx,my,mz,mbc;
-    double dx,dy,dz,xlower,ylower,zlower;
-
-    int num_cells;
-    if(fclaw_clawpatch_dim(patch) == 2)
-    {
-        fclaw_clawpatch_2d_grid_data(glob,patch,&mx,&my,&mbc,&xlower,&ylower,&dx,&dy);
-        num_cells = mx * my;
-    }
-    else
-    {
-        fclaw_clawpatch_3d_grid_data(glob,patch,&mx,&my,&mz,&mbc,&xlower,&ylower,&zlower,&dx,&dy,&dz);
-        num_cells = mx * my * mz;
-    }
+    int num_cells = get_num_cells(glob,patch);
 
     for(int i = 0; i < num_cells; i++)
     {
         patchnos[i] = patchno;
     }
 }
+
 static void 
 mpirank_cb (fclaw_global_t * glob,
             fclaw_patch_t * patch,
@@ -102,26 +101,14 @@ mpirank_cb (fclaw_global_t * glob,
 {
     int *mpiranks = (int *) buffer;
 
-    int mx,my,mz,mbc;
-    double dx,dy,dz,xlower,ylower,zlower;
-
-    int num_cells;
-    if(fclaw_clawpatch_dim(patch) == 2)
-    {
-        fclaw_clawpatch_2d_grid_data(glob,patch,&mx,&my,&mbc,&xlower,&ylower,&dx,&dy);
-        num_cells = mx * my;
-    }
-    else
-    {
-        fclaw_clawpatch_3d_grid_data(glob,patch,&mx,&my,&mz,&mbc,&xlower,&ylower,&zlower,&dx,&dy,&dz);
-        num_cells = mx * my * mz;
-    }
+    int num_cells = get_num_cells(glob,patch);
 
     for(int i = 0; i < num_cells; i++)
     {
         mpiranks[i] = glob->mpirank;
     }
 }
+
 static void 
 types_cb (fclaw_global_t * glob,
           fclaw_patch_t * patch,
@@ -131,21 +118,15 @@ types_cb (fclaw_global_t * glob,
 {
     uint8_t * types = (uint8_t *) buffer;
 
-    int mx,my,mz,mbc;
-    double dx,dy,dz,xlower,ylower,zlower;
+    int num_cells = get_num_cells(glob,patch);
 
-    int num_cells;
     uint8_t type;
     if(fclaw_clawpatch_dim(patch) == 2)
     {
-        fclaw_clawpatch_2d_grid_data(glob,patch,&mx,&my,&mbc,&xlower,&ylower,&dx,&dy);
-        num_cells = mx * my;
         type = 9;
     }
     else
     {
-        fclaw_clawpatch_3d_grid_data(glob,patch,&mx,&my,&mz,&mbc,&xlower,&ylower,&zlower,&dx,&dy,&dz);
-        num_cells = mx * my * mz;
         type = 12;
     }
 
@@ -154,61 +135,7 @@ types_cb (fclaw_global_t * glob,
         types[i] = type;
     }
 }
-#define GET_OFFSETS(TYPE) \
-static void \
-get_offsets_##TYPE(fclaw_global_t * glob, \
-            fclaw_patch_t * patch, \
-            int blockno, \
-            int patchno, \
-            char * buffer) \
-{ \
-    TYPE * offsets = (TYPE *) buffer; \
-\
-    int num_cells_before; \
-    int mx,my,mz,mbc; \
-    double dx,dy,dz,xlower,ylower,zlower; \
-\
-    int num_patches_before = glob->domain->global_num_patches_before + glob->domain->blocks[blockno].num_patches_before + patchno; \
-    int num_points_per_cell; \
-    if(fclaw_clawpatch_dim(patch) == 2) \
-    { \
-        fclaw_clawpatch_2d_grid_data(glob,patch,&mx,&my,&mbc,&xlower,&ylower,&dx,&dy); \
-        mz = 1; \
-        num_points_per_cell = 4; \
-        num_cells_before = num_patches_before * mx * my; \
-    } \
-    else \
-    { \
-        fclaw_clawpatch_3d_grid_data(glob,patch,&mx,&my,&mz,&mbc,&xlower,&ylower,&zlower,&dx,&dy,&dz); \
-        num_points_per_cell = 8; \
-        num_cells_before = num_patches_before * mx * my * mz; \
-    } \
-\
-    int curr_offset = num_cells_before * num_points_per_cell; \
-\
-    for(int k = 0; k < mz; k++) \
-    { \
-        for(int j = 0; j < my; j++) \
-        { \
-            for(int i = 0; i < mx; i++) \
-            { \
-                *offsets++ = curr_offset; \
-                curr_offset += num_points_per_cell; \
-            } \
-        } \
-    } \
-\
-    if(glob->mpirank == glob->mpisize - 1 \
-       && blockno == glob->domain->num_blocks - 1 \
-       && patchno == glob->domain->blocks[blockno].num_patches - 1) \
-    { \
-        /* last patch on last rank has extra value */ \
-       *offsets = curr_offset; \
-    } \
-}
 
-GET_OFFSETS(int32_t)
-GET_OFFSETS(int64_t)
 static void
 get_coordinates (fclaw_global_t * glob,
                  fclaw_patch_t * patch,
@@ -274,51 +201,113 @@ get_coordinates (fclaw_global_t * glob,
         }
     }
 }
-static void
-point_index_cb (fclaw_global_t * glob,
-                fclaw_patch_t * patch,
-                int blockno,
-                int patchno,
-                char * buffer)
-{
-    int32_t * points = (int32_t *) buffer;
-    const fclaw_clawpatch_options_t* clawpatch_opt = fclaw_clawpatch_get_options(glob);
 
-    int mx,my,mz,mbc;
-    double dx,dy,dz,xlower,ylower,zlower;
-
-    int32_t num_points_before = glob->domain->global_num_patches_before + glob->domain->blocks[blockno].num_patches_before + patchno;
-    if(clawpatch_opt->patch_dim == 2)
-    {
-        fclaw_clawpatch_2d_grid_data(glob,patch,&mx,&my,&mbc,
-                                    &xlower,&ylower,&dx,&dy);
-        mz = 0;
-        dz = 0;
-        zlower = 0;
-        num_points_before *= (mx + 1) * (my + 1);
-    }
-    else 
-    {
-        fclaw_clawpatch_3d_grid_data(glob,patch,&mx,&my,&mz, &mbc,
-                                    &xlower,&ylower,&zlower, &dx,&dy, &dz);
-        num_points_before *= (mx + 1) * (my + 1) * (mz + 1);
-    }
-
-    /* Enumerate point coordinates in the patch */
-    int i, j, k;
-    for (k = 0; k <= mz; ++k)
-    {
-        for (j = 0; j <= my; ++j)
-        {
-            for (i = 0; i <= mx; ++i)
-            {
-                *points = num_points_before;
-                points++;
-                num_points_before++;
-            }
-        }
-    }
+#define GET_OFFSETS(TYPE) \
+static void \
+get_offsets_##TYPE(fclaw_global_t * glob, \
+            fclaw_patch_t * patch, \
+            int blockno, \
+            int patchno, \
+            char * buffer) \
+{ \
+    TYPE * offsets = (TYPE *) buffer; \
+\
+    int num_cells_before; \
+    int mx,my,mz,mbc; \
+    double dx,dy,dz,xlower,ylower,zlower; \
+\
+    int num_patches_before = glob->domain->global_num_patches_before + glob->domain->blocks[blockno].num_patches_before + patchno; \
+    int num_points_per_cell; \
+    if(fclaw_clawpatch_dim(patch) == 2) \
+    { \
+        fclaw_clawpatch_2d_grid_data(glob,patch,&mx,&my,&mbc,&xlower,&ylower,&dx,&dy); \
+        mz = 1; \
+        num_points_per_cell = 4; \
+        num_cells_before = num_patches_before * mx * my; \
+    } \
+    else \
+    { \
+        fclaw_clawpatch_3d_grid_data(glob,patch,&mx,&my,&mz,&mbc,&xlower,&ylower,&zlower,&dx,&dy,&dz); \
+        num_points_per_cell = 8; \
+        num_cells_before = num_patches_before * mx * my * mz; \
+    } \
+\
+    int curr_offset = num_cells_before * num_points_per_cell; \
+\
+    for(int k = 0; k < mz; k++) \
+    { \
+        for(int j = 0; j < my; j++) \
+        { \
+            for(int i = 0; i < mx; i++) \
+            { \
+                *offsets++ = curr_offset; \
+                curr_offset += num_points_per_cell; \
+            } \
+        } \
+    } \
+\
+    if(glob->mpirank == glob->mpisize - 1 \
+       && blockno == glob->domain->num_blocks - 1 \
+       && patchno == glob->domain->blocks[blockno].num_patches - 1) \
+    { \
+        /* last patch on last rank has extra value */ \
+       *offsets = curr_offset; \
+    } \
 }
+
+GET_OFFSETS(int32_t)
+GET_OFFSETS(int64_t)
+
+#define POINT_INDEX_CB(TYPE) \
+static void \
+get_point_indexes_##TYPE (fclaw_global_t * glob, \
+                          fclaw_patch_t * patch, \
+                          int blockno, \
+                          int patchno, \
+                          char * buffer) \
+{ \
+    TYPE * points = (TYPE *) buffer; \
+    const fclaw_clawpatch_options_t* clawpatch_opt = fclaw_clawpatch_get_options(glob); \
+\
+    int mx,my,mz,mbc; \
+    double dx,dy,dz,xlower,ylower,zlower; \
+\
+    TYPE num_points_before = glob->domain->global_num_patches_before + glob->domain->blocks[blockno].num_patches_before + patchno; \
+    if(clawpatch_opt->patch_dim == 2) \
+    { \
+        fclaw_clawpatch_2d_grid_data(glob,patch,&mx,&my,&mbc, \
+                                    &xlower,&ylower,&dx,&dy); \
+        mz = 0; \
+        dz = 0; \
+        zlower = 0; \
+        num_points_before *= (mx + 1) * (my + 1); \
+    } \
+    else \
+    { \
+        fclaw_clawpatch_3d_grid_data(glob,patch,&mx,&my,&mz, &mbc, \
+                                    &xlower,&ylower,&zlower, &dx,&dy, &dz); \
+        num_points_before *= (mx + 1) * (my + 1) * (mz + 1); \
+    } \
+\
+    /* Enumerate point coordinates in the patch */ \
+    int i, j, k; \
+    for (k = 0; k <= mz; ++k) \
+    { \
+        for (j = 0; j <= my; ++j) \
+        { \
+            for (i = 0; i <= mx; ++i) \
+            { \
+                *points = num_points_before; \
+                points++; \
+                num_points_before++; \
+            } \
+        } \
+    } \
+}
+
+POINT_INDEX_CB(int32_t)
+POINT_INDEX_CB(int64_t)
+
 static void
 write_2d_patch_q (fclaw_global_t * glob,
                   fclaw_patch_t * patch,
@@ -398,185 +387,18 @@ get_data (fclaw_global_t * glob,
     }
 }
 
-static
-void
-set_attribute_numerical(hid_t loc_id, const char *obj_name, const char *attr_name, hsize_t size,
-                        hid_t tid, const void *data)
-{
-    herr_t status = 0;
+/*----------------------------------------------------------------------
+    Utility functions
+  ----------------------------------------------------------------------*/
 
-    /* Open the object */
-    hid_t obj_id = H5Oopen(loc_id, obj_name, H5P_DEFAULT);
-
-    /* Create the data space for the attribute. */
-    hid_t sid = H5Screate_simple(1, &size, NULL);
-
-    /* Delete the attribute if it already exists */
-    if(H5Aexists(obj_id, attr_name))
-        status |= H5Adelete(obj_id, attr_name);
-
-    /* Create the attribute. */
-    hid_t attr_id = H5Acreate2(obj_id, attr_name, tid, sid, H5P_DEFAULT, H5P_DEFAULT);
-
-    /* Write the attribute data. */
-    status |= H5Awrite(attr_id, tid, data);
-
-    status |= H5Aclose(attr_id);
-    status |= H5Sclose(sid);
-    status |= H5Oclose(obj_id);
-
-    if(status != 0 || obj_id < 0 || sid < 0 || attr_id < 0)
-    {
-        printf("fclaw_clawpatch_output_hdf5.c Error in set_attribute_numerical\n");
-    }
-}
-static void
-make_single_value_dataset_numerical(int mpirank,
-                                    hid_t loc_id, 
-                                    const char *dset_name, 
-                                    int rank, 
-                                    const hsize_t *dims, 
-                                    hid_t tid,
-                                    const void *data)
-{
-    herr_t status = 0;
-
-    /* Create the data space for the dataset. */
-    hid_t sid = H5Screate_simple(rank, dims, NULL);
-
-    /* Create the dataset. */
-    hid_t did = H5Dcreate2(loc_id, dset_name, tid, sid, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-
-    /* Write the dataset only if there is data to write */
-    if (data && mpirank == 0)
-    {
-        status |= H5Dwrite(did, tid, H5S_ALL, H5S_ALL, H5P_DEFAULT, data);
-    }
-
-    /* End access to the dataset and release resources used by it. */
-    status |= H5Dclose(did);
-
-    /* Terminate access to the data space. */
-    status |= H5Sclose(sid);
-
-    if(status != 0 || sid < 0 || did < 0)
-    {
-        printf("fclaw_clawpatch_output_hdf5.c Error in make_single_value_dataset_numerical\n");
-    }
-}
-
-static void
-limit_chunk_size(hid_t tid, 
-                 int subdims_rank,
-                 const hsize_t *subdims,
-                 int rank, 
-                 const hsize_t *chunk_dims, 
-                 hsize_t *chunk_dims_under_4GB,
-                 int limit_other_dims)
-{
-    hsize_t max_chunk_size = 1 << 28; // 4*2^30 bytes, 4GB
-    hsize_t type_size = H5Tget_size(tid);
-    hsize_t chunk_size = type_size;
-    if(limit_other_dims)
-    {
-        //only first dimension is similar data,
-        //so chunk other dimensions for better compression
-        for(int i = 1; i < rank; i++)
-        {
-            chunk_dims_under_4GB[i] = 1;
-        }
-    }
-    else
-    {
-        for(int i = rank-1; i >= 1; i--)
-        {
-            chunk_size *= chunk_dims[i];
-            if(chunk_size > max_chunk_size)
-            {
-                chunk_dims_under_4GB[i] = 1;
-            }
-            else
-            {
-                chunk_dims_under_4GB[i] = chunk_dims[i];
-            }
-        }
-    }
-    // the subdims in forestclaw output are column-major
-    // check that we aren't exceeding 4gb
-    if(subdims_rank == 0)
-    {
-        chunk_dims_under_4GB[0] = 1;
-    }
-    else
-    {
-        chunk_dims_under_4GB[0] = 1;
-        for(int i = 0; i < subdims_rank; i++)
-        {
-            chunk_size *= subdims[i];
-            if(chunk_size > max_chunk_size)
-            {
-                break;
-            }
-            else
-            {
-                chunk_dims_under_4GB[0] *= subdims[i];
-            }
-        }
-    }
-}
-hid_t make_dataset(const fclaw_clawpatch_options_t *clawpatch_opts,
-                   hid_t loc_id, 
-                   hid_t tid, 
-                   const char *dset_name, 
-                   int subdims_rank,
-                   const hsize_t *subdims,
-                   int rank, 
-                   const hsize_t *dims, 
-                   const hsize_t *chunk_dims)
-{
-    herr_t status = 0;
-
-    hid_t prop_id = H5Pcreate(H5P_DATASET_CREATE);
-
-    status |= H5Pset_fill_time(prop_id, H5D_FILL_TIME_NEVER);
-    
-    if(chunk_dims != NULL && clawpatch_opts->hdf5_compression_level > 0)
-    {
-        hsize_t limited_chunk_dims[rank];
-        int limit_other_dims = tid != H5T_NATIVE_INT32 && tid != H5T_NATIVE_INT64;
-        limit_chunk_size(tid, 
-                         subdims_rank, subdims,
-                         rank, chunk_dims, limited_chunk_dims,
-                         limit_other_dims);
-        status |= H5Pset_chunk(prop_id, rank, limited_chunk_dims);
-        if(tid == H5T_NATIVE_INT || tid == H5T_NATIVE_UINT8)
-        {
-            status |= H5Pset_scaleoffset(prop_id, H5Z_SO_INT, 1);
-        }
-        else
-        {
-            status |= H5Pset_shuffle(prop_id);
-        }
-        status |= H5Pset_deflate(prop_id, clawpatch_opts->hdf5_compression_level);
-    }
-
-    
-    /* Create the data space for the dataset. */
-    hid_t sid = H5Screate_simple(rank, dims, NULL);
-
-    /* Create the dataset. */
-    hid_t did = H5Dcreate2(loc_id, dset_name, tid, sid, H5P_DEFAULT, prop_id, H5P_DEFAULT);
-
-    status |= H5Sclose(sid);
-
-    if(status != 0 || sid < 0 || did < 0)
-    {
-        printf("fclaw_clawpatch_output_hdf5.c Error in make_dataset\n");
-    }
-
-    return did;
-}
-
+/**
+ * Retrieves the block number and patch number for a given index.
+ *
+ * @param glob The global context.
+ * @param i The patch index.
+ * @param blockno Pointer to store the block number.
+ * @param patchno Pointer to store the patch number.
+ */
 static void
 get_patch_blockno(fclaw_global_t *glob, int i, int *blockno, int *patchno)
 {
@@ -588,12 +410,75 @@ get_patch_blockno(fclaw_global_t *glob, int i, int *blockno, int *patchno)
     *patchno = i - glob->domain->blocks[*blockno].num_patches_before;
 }
 
+/**
+ * Check if the given block number and patch number are valid.
+ *
+ * @param glob The global context.
+ * @param blockno The block number to check.
+ * @param patchno The patch number to check.
+ * @return 1 if the block number and patch number are valid, 0 otherwise.
+ */
 static int 
 patch_blockno_valid(fclaw_global_t *glob, int blockno, int patchno)
 {
     return blockno < glob->domain->num_blocks && patchno < glob->domain->blocks[blockno].num_patches;
 }
 
+/*----------------------------------------------------------------------
+    Virtualized funcitons
+  ----------------------------------------------------------------------*/
+
+/**
+ * @brief Virtualized functions needed for making a patch dataset
+ */
+typedef struct make_dataset_vtable
+{
+    /**
+     * @brief Get the overall dimensions of a dataset
+     *
+     * @param[in] glob The global context.
+     * @param[in] rank The rank of the patch.
+     * @param[in] patch_dims The dimensions of the patch.
+     * @param[out] dataset_dims The array to store the dataset dimensions.
+     */
+    void (*get_dataset_dims)(fclaw_global_t *glob, 
+                             int rank, 
+                             const hsize_t *patch_dims, 
+                             hsize_t *dataset_dims);
+    /**
+     * @brief Get the slab dimensions for a given patch in a block.
+     *
+     * @param[in] glob The global context.
+     * @param[in] patchno The patch number.
+     * @param[in] blockno The block number.
+     * @param[in] rank The rank of the data.
+     * @param[in] patch_dims The dimensions of the patch.
+     * @param[out] slab_start The starting indices of the slab.
+     * @param[out] slab_dims The dimensions of the slab.
+     */
+    void (*get_slab_dims)(fclaw_global_t *glob, 
+                          int patchno, 
+                          int blockno, int rank, 
+                          const hsize_t *patch_dims, 
+                          hsize_t *slab_start, 
+                          hsize_t *slab_dims);
+} make_dataset_vtable_t;
+
+/* ------ default functions -----*/
+
+/**
+ * Calculates the slab dimensions for a given patch in a block.
+ * This just returns the patch dimensions, and the starting index.
+ * If the patch is not valid, the slab dimensions are set to 0.
+ *
+ * @param[in] glob The global context.
+ * @param[in] patchno The patch number.
+ * @param[in] blockno The block number.
+ * @param[in] rank The rank of the data.
+ * @param[in] patch_dims The dimensions of the patch.
+ * @param[out] slab_start The starting indices of the slab.
+ * @param[out] slab_dims The dimensions of the slab.
+ */
 static void
 get_slab_dims(fclaw_global_t *glob, 
               int patchno, int blockno, 
@@ -619,8 +504,21 @@ get_slab_dims(fclaw_global_t *glob,
         }
     }
 }
-static void
-get_dataset_dims(fclaw_global_t *glob, int rank, const hsize_t *patch_dims, hsize_t *dataset_dims)
+
+/**
+ * @brief Calculate the overall dataset dimensions.
+ * This is just the first patch dimensions multiplied by the number of patches.
+ *
+ * @param[in] glob The global context.
+ * @param[in] rank The rank of the patch.
+ * @param[in] patch_dims The dimensions of the patch.
+ * @param[out] dataset_dims The array to store the dataset dimensions.
+ */
+static 
+void get_dataset_dims(fclaw_global_t *glob, 
+                      int rank, 
+                      const hsize_t *patch_dims, 
+                      hsize_t *dataset_dims)
 {
     for(int i = 0; i < rank; i++)
     {
@@ -628,26 +526,39 @@ get_dataset_dims(fclaw_global_t *glob, int rank, const hsize_t *patch_dims, hsiz
     }
     dataset_dims[0] *= glob->domain->global_num_patches;
 }
-int get_local_max_chunks(fclaw_global_t *glob)
-{
-    return glob->domain->local_max_patches;
-}
-typedef struct make_dataset_vtable
-{
-    void (*get_dataset_dims)(fclaw_global_t *glob, int rank, const hsize_t *patch_dims, hsize_t *dataset_dims);
-    void (*get_slab_dims)(fclaw_global_t *glob, int patchno, int blockno, int rank, const hsize_t *patch_dims, hsize_t *slab_start, hsize_t *slab_dims);
-} make_dataset_vtable_t;
+
+/** default vtable */
 static make_dataset_vtable_t default_vtable = 
 {
     get_dataset_dims,
     get_slab_dims
 };
+/**
+ * @brief Calculate the overall dataset dimensions for the offset dataset
+ * This is the same as default plus an extra value for the last patch on the last rank.
+ *
+ * @param[in] glob The global context.
+ * @param[in] rank The rank of the patch.
+ * @param[in] patch_dims The dimensions of the patch.
+ * @param[out] dataset_dims The array to store the dataset dimensions.
+ */
 static void
 get_dataset_dims_offset(fclaw_global_t *glob, int rank, const hsize_t *patch_dims, hsize_t *dataset_dims)
 {
     get_dataset_dims(glob, rank, patch_dims, dataset_dims);
     dataset_dims[0] += 1;
 }
+/**
+ * Same as default but on last patch on last rank, the slab dimensions are increased by 1.
+ *
+ * @param[in] glob The global context.
+ * @param[in] patchno The patch number.
+ * @param[in] blockno The block number.
+ * @param[in] rank The rank of the data.
+ * @param[in] patch_dims The dimensions of the patch.
+ * @param[out] slab_start The starting indices of the slab.
+ * @param[out] slab_dims The dimensions of the slab.
+ */
 static void
 get_slab_dims_offset(fclaw_global_t *glob, 
                      int patchno, int blockno, 
@@ -662,23 +573,286 @@ get_slab_dims_offset(fclaw_global_t *glob,
         slab_dims[0] += 1;
     }
 }
+/** vtable for offset datset */
 static make_dataset_vtable_t offset_vtable = 
 {
     get_dataset_dims_offset,
     get_slab_dims_offset
 };
+
+/*----------------------------------------------------------------------
+    HDF funcitons
+  ----------------------------------------------------------------------*/
+
+/**
+ * Sets a numerical attribute for an HDF5 object.
+ *
+ * @param loc_id The location identifier of the object.
+ * @param obj_name The name of the object.
+ * @param attr_name The name of the attribute.
+ * @param size The size of the attribute data.
+ * @param tid The datatype the attribute.
+ * @param data The attribute data.
+ */
+static
+void set_attribute_numerical(hid_t loc_id, 
+                             const char *obj_name, 
+                             const char *attr_name, 
+                             hsize_t size,
+                             hid_t tid, 
+                             const void *data)
+{
+    herr_t status = 0;
+
+    /* Open the object */
+    hid_t obj_id = H5Oopen(loc_id, obj_name, H5P_DEFAULT);
+
+    /* Create the data space for the attribute. */
+    hid_t sid = H5Screate_simple(1, &size, NULL);
+
+    /* Delete the attribute if it already exists */
+    if(H5Aexists(obj_id, attr_name))
+        status |= H5Adelete(obj_id, attr_name);
+
+    /* Create the attribute. */
+    hid_t attr_id = H5Acreate2(obj_id, attr_name, tid, sid, H5P_DEFAULT, H5P_DEFAULT);
+
+    /* Write the attribute data. */
+    status |= H5Awrite(attr_id, tid, data);
+
+    status |= H5Aclose(attr_id);
+    status |= H5Sclose(sid);
+    status |= H5Oclose(obj_id);
+
+    if(status != 0 || obj_id < 0 || sid < 0 || attr_id < 0)
+    {
+        fclaw_abortf("fclaw_clawpatch_output_hdf5.c Error in set_attribute_numerical\n");
+    }
+}
+
+/**
+ * Creates a single-value dataset in an HDF5 file.
+ *
+ * This is used for vtu numcells, numconnectivity, etc
+ *
+ * @param mpirank The MPI rank of the current process.
+ * @param loc_id The identifier of the location where the dataset will be created.
+ * @param dset_name The name of the dataset.
+ * @param rank The rank of the dataset.
+ * @param dims An array of dimensions specifying the size of the dataset.
+ * @param tid The datatype of the dataset.
+ * @param data A pointer to the data to be written to the dataset.
+ */
+static void make_single_value_dataset_numerical(int mpirank,
+                                                hid_t loc_id,
+                                                const char *dset_name,
+                                                int rank,
+                                                const hsize_t *dims,
+                                                hid_t tid,
+                                                const void *data)
+{
+    herr_t status = 0;
+
+    /* Create the data space for the dataset. */
+    hid_t sid = H5Screate_simple(rank, dims, NULL);
+
+    /* Create the dataset. */
+    hid_t did = H5Dcreate2(loc_id, dset_name, tid, sid, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+
+    /* Write the dataset only if there is data to write */
+    if (data && mpirank == 0)
+    {
+        status |= H5Dwrite(did, tid, H5S_ALL, H5S_ALL, H5P_DEFAULT, data);
+    }
+
+    /* End access to the dataset and release resources used by it. */
+    status |= H5Dclose(did);
+
+    /* Terminate access to the data space. */
+    status |= H5Sclose(sid);
+
+    if (status != 0 || sid < 0 || did < 0)
+    {
+        fclaw_abortf("fclaw_clawpatch_output_hdf5.c Error in make_single_value_dataset_numerical\n");
+    }
+}
+
+/**
+ * Limits the chunk size for HDF5.
+ * The initial chunk size is a contiguous block of patch data.
+ * The max limit of a chunk in HDF5 is 4GB. So there can be cases where 
+ * the chunk size has to be limited to fit within the 4GB limit.
+ *
+ * @param tid The HDF5 datatype identifier.
+ * @param subdims_rank The rank of the subdimensions.
+ * @param subdims The subdimensions array. 
+                  The first dimenion of chunk_dims is a flattend array of patch data.
+                  For example if there is a 2D patch data that is 8x8 cells, then
+                  chunk_dims[0] will be 64 and the subdims array will be {8,8}.
+ * @param rank The rank of the data
+ * @param chunk_dims The chunk dimensions array.
+ * @param limited_chunk_dims The limited chunk dimensions array.
+ * @param limit_other_dims Flag indicating whether to limit other dimensions for better compression.
+                           The data across the other dimensions will be dissimilar. So the 
+                           other chunk dimensions can be set to 1 in order to compress better, 
+                           since the chunks will have similar data.
+ */
+static void
+limit_chunk_size(hid_t tid, 
+                 int subdims_rank,
+                 const hsize_t *subdims,
+                 int rank, 
+                 const hsize_t *chunk_dims, 
+                 hsize_t *limited_chunk_dims,
+                 int limit_other_dims)
+{
+    hsize_t max_chunk_size = 1 << 28; // 4*2^30 bytes, 4GB
+    hsize_t type_size = H5Tget_size(tid);
+    hsize_t chunk_size = type_size;
+    if(limit_other_dims)
+    {
+        //only first dimension is similar data,
+        //so chunk other dimensions for better compression
+        for(int i = 1; i < rank; i++)
+        {
+            limited_chunk_dims[i] = 1;
+        }
+    }
+    else
+    {
+        for(int i = rank-1; i >= 1; i--)
+        {
+            chunk_size *= chunk_dims[i];
+            if(chunk_size > max_chunk_size)
+            {
+                limited_chunk_dims[i] = 1;
+            }
+            else
+            {
+                limited_chunk_dims[i] = chunk_dims[i];
+            }
+        }
+    }
+    // the subdims in forestclaw output are column-major
+    // check that we aren't exceeding 4gb
+    if(subdims_rank == 0)
+    {
+        limited_chunk_dims[0] = 1;
+    }
+    else
+    {
+        limited_chunk_dims[0] = 1;
+        for(int i = 0; i < subdims_rank; i++)
+        {
+            chunk_size *= subdims[i];
+            if(chunk_size > max_chunk_size)
+            {
+                break;
+            }
+            else
+            {
+                limited_chunk_dims[0] *= subdims[i];
+            }
+        }
+    }
+}
+
+/**
+ * Creates a new HDF5 dataset. And returns the dataset identifier, 
+ * so that the dataset can be written to.
+ *
+ * @param clawpatch_opts The clawpatch options.
+ * @param loc_id The location identifier for the dataset.
+ * @param tid The datatype for the dataset.
+ * @param dset_name The name of the dataset.
+ * @param subdims_rank The rank of the sub-dimensions.
+ * @param subdims The sub-dimensions of the dataset. See limit_chunk_size for more information.
+ * @param rank The rank of the dataset.
+ * @param dims The dimensions of the dataset.
+ * @param patch_dims The dimensions for a single patch.
+ * @return The dataset identifier.
+ */
+static hid_t 
+make_dataset(const fclaw_clawpatch_options_t *clawpatch_opts,
+             hid_t loc_id, 
+             hid_t tid, 
+             const char *dset_name, 
+             int subdims_rank,
+             const hsize_t *subdims,
+             int rank, 
+             const hsize_t *dims, 
+             const hsize_t *patch_dims)
+{
+    herr_t status = 0;
+
+    hid_t prop_id = H5Pcreate(H5P_DATASET_CREATE);
+
+    status |= H5Pset_fill_time(prop_id, H5D_FILL_TIME_NEVER);
+    
+    if(patch_dims != NULL && clawpatch_opts->hdf5_compression_level > 0)
+    {
+        hsize_t limited_chunk_dims[rank];
+        int limit_other_dims = tid != H5T_NATIVE_INT32 && tid != H5T_NATIVE_INT64;
+        limit_chunk_size(tid, 
+                         subdims_rank, subdims,
+                         rank, patch_dims, limited_chunk_dims,
+                         limit_other_dims);
+        status |= H5Pset_chunk(prop_id, rank, limited_chunk_dims);
+        if(tid == H5T_NATIVE_INT || tid == H5T_NATIVE_UINT8)
+        {
+            status |= H5Pset_scaleoffset(prop_id, H5Z_SO_INT, 1);
+        }
+        else
+        {
+            status |= H5Pset_shuffle(prop_id);
+        }
+        status |= H5Pset_deflate(prop_id, clawpatch_opts->hdf5_compression_level);
+    }
+
+    
+    /* Create the data space for the dataset. */
+    hid_t sid = H5Screate_simple(rank, dims, NULL);
+
+    /* Create the dataset. */
+    hid_t did = H5Dcreate2(loc_id, dset_name, tid, sid, H5P_DEFAULT, prop_id, H5P_DEFAULT);
+
+    status |= H5Sclose(sid);
+
+    if(status != 0 || sid < 0 || did < 0)
+    {
+        fclaw_abortf("fclaw_clawpatch_output_hdf5.c Error in make_dataset\n");
+    }
+
+    return did;
+}
+
+/**
+ * @brief Makes a patch dataset.
+ * 
+ * @param glob the global context
+ * @param loc_id the location identifier for the dataset
+ * @param dset_name the name of the dataset
+ * @param subdims_rank the rank of the sub-dimensions
+ * @param subdims the sub-dimensions of the dataset. see limit_chunk_size for more information
+ * @param rank the rank of the dataset
+ * @param patch_dims the dimensions for a single patch
+ * @param num_patches_to_buffer the number of patches to buffer
+ * @param tid the datatype for the dataset 
+ * @param patch_cb the callback function to get the patch data
+ * @param vt the virtualized functions for creating the dataset
+ */
 static void
 make_dataset_numerical(fclaw_global_t *glob,
-                   hid_t loc_id, 
-                   const char *dset_name, 
-                   int subdims_rank, 
-                   const hsize_t *subdims,
-                   int rank, 
-                   const hsize_t *patch_dims, 
-                   int num_patches_to_buffer,
-                   hid_t tid,
-                   fclaw_hdf5_patch_data_t patch_cb,
-                   make_dataset_vtable_t *vt)
+                       hid_t loc_id, 
+                       const char *dset_name, 
+                       int subdims_rank, 
+                       const hsize_t *subdims,
+                       int rank, 
+                       const hsize_t *patch_dims, 
+                       int num_patches_to_buffer,
+                       hid_t tid,
+                       fclaw_hdf5_patch_data_t patch_cb,
+                       make_dataset_vtable_t *vt)
 {
     const fclaw_clawpatch_options_t *clawpatch_opts = fclaw_clawpatch_get_options(glob);
 
@@ -782,50 +956,6 @@ make_dataset_numerical(fclaw_global_t *glob,
     }
 }
 
-void make_patch_dataset(fclaw_global_t *glob,
-                        hid_t loc_id, 
-                        const char *dset_name, 
-                        int subdims_rank, 
-                        const hsize_t *subdims,
-                        int rank, 
-                        const hsize_t *patch_dims, 
-                        int num_patches_to_buffer,
-                        hid_t tid,
-                        fclaw_hdf5_patch_data_t patch_cb)
-{
-    make_dataset_numerical(glob, 
-                           loc_id, 
-                           dset_name, 
-                           subdims_rank, subdims,
-                           rank, patch_dims, 
-                           num_patches_to_buffer, 
-                           tid, 
-                           patch_cb, 
-                           &default_vtable);
-}
-
-void make_offset_dataset(fclaw_global_t *glob,
-                         hid_t loc_id, 
-                         const char *dset_name, 
-                         int subdims_rank, 
-                         const hsize_t *subdims,
-                         int rank, 
-                         const hsize_t *patch_dims, 
-                         int num_patches_to_buffer,
-                         hid_t tid,
-                         fclaw_hdf5_patch_data_t patch_cb)
-{
-    make_dataset_numerical(glob, 
-                           loc_id, 
-                           dset_name, 
-                           subdims_rank, subdims,
-                           rank, patch_dims, 
-                           num_patches_to_buffer, 
-                           tid, 
-                           patch_cb, 
-                           &offset_vtable);
-}
-
 //this is copied form hdf5lt needed to change to NULLPAD for VTK
 void
 set_attribute_string(hid_t loc_id, const char *obj_name, const char *attr_name, const char *attr_data)
@@ -866,6 +996,15 @@ set_attribute_string(hid_t loc_id, const char *obj_name, const char *attr_name, 
         printf("fclaw_clawpatch_output_hdf5.c Error in set_attribute_string\n");
     }
 }
+
+/**
+ * @brief Write vtkhdf file
+ * 
+ * @param glob the global context
+ * @param filename the name of the file
+ * @param coordinate_cb the callback function to get the coordinate data
+ * @param value_cb the callback function to get the value data
+ */
 static void
 fclaw_hdf_write_file (fclaw_global_t * glob, 
                       const char* filename,
@@ -960,37 +1099,40 @@ fclaw_hdf_write_file (fclaw_global_t * glob,
 
     hsize_t patch_dims[4] = {0,0,0,0};
     patch_dims[0] = num_cells_per_patch;
-    make_patch_dataset(glob, 
-                       vtkhdf_gid, 
-                       "Types", 
-                       patch_dim, num_cells_per_patch_subdims,
-                       1, patch_dims, 
-                       num_patches_to_buffer, 
-                       H5T_NATIVE_UINT8, 
-                       types_cb);
+    make_dataset_numerical(glob, 
+                           vtkhdf_gid, 
+                           "Types", 
+                           patch_dim, num_cells_per_patch_subdims,
+                           1, patch_dims, 
+                           num_patches_to_buffer, 
+                           H5T_NATIVE_UINT8, 
+                           types_cb,
+                           &default_vtable);
 
     // write offsets
     patch_dims[0] = num_cells_per_patch;
-    make_offset_dataset(glob, 
-                        vtkhdf_gid, 
-                        "Offsets", 
-                        patch_dim, num_cells_per_patch_subdims,
-                        1, patch_dims, 
-                        num_patches_to_buffer, 
-                        fits32 ? H5T_NATIVE_INT32 : H5T_NATIVE_INT64,
-                        fits32 ? get_offsets_int32_t : get_offsets_int64_t);
+    make_dataset_numerical(glob, 
+                           vtkhdf_gid, 
+                           "Offsets", 
+                           patch_dim, num_cells_per_patch_subdims,
+                           1, patch_dims, 
+                           num_patches_to_buffer, 
+                           fits32 ? H5T_NATIVE_INT32 : H5T_NATIVE_INT64,
+                           fits32 ? get_offsets_int32_t : get_offsets_int64_t,
+                           &offset_vtable);
 
 
     patch_dims[0] = num_points_per_patch;
     patch_dims[1] = 3;
-    make_patch_dataset(glob, 
-                       vtkhdf_gid, 
-                       "Points", 
-                       patch_dim, num_points_per_patch_subdims,
-                       2, patch_dims, 
-                       num_patches_to_buffer, 
-                       H5T_NATIVE_DOUBLE, 
-                       coordinate_cb);
+    make_dataset_numerical(glob, 
+                           vtkhdf_gid, 
+                           "Points", 
+                           patch_dim, num_points_per_patch_subdims,
+                           2, patch_dims, 
+                           num_patches_to_buffer, 
+                           H5T_NATIVE_DOUBLE, 
+                           coordinate_cb,
+                           &default_vtable);
 
     patch_dims[0] = 1;
     if(patch_dim == 2)
@@ -1004,14 +1146,15 @@ fclaw_hdf_write_file (fclaw_global_t * glob,
         patch_dims[2] = my+1;
         patch_dims[3] = mx+1;
     }
-    make_patch_dataset(glob, 
-                       vtkhdf_gid, 
-                       "PointIndexes", 
-                       0, NULL,
-                       patch_dim+1, patch_dims, 
-                       num_patches_to_buffer, 
-                       H5T_NATIVE_INT32, 
-                       point_index_cb);
+    make_dataset_numerical(glob, 
+                           vtkhdf_gid, 
+                           "PointIndexes", 
+                           0, NULL,
+                           patch_dim+1, patch_dims, 
+                           num_patches_to_buffer, 
+                           fits32 ? H5T_NATIVE_INT32 : H5T_NATIVE_INT64, 
+                           fits32 ? get_point_indexes_int32_t : get_point_indexes_int64_t,
+                           &default_vtable);
 
     patch_dims[0] = glob->domain->global_num_patches;
     hid_t src_space = H5Screate_simple(patch_dim+1, patch_dims, NULL);
@@ -1040,7 +1183,14 @@ fclaw_hdf_write_file (fclaw_global_t * glob,
         status |= H5Sselect_hyperslab(virt_space, H5S_SELECT_SET, &start, &stride, &count, NULL);
         status |= H5Pset_virtual(dcpl_id, virt_space, ".", "/VTKHDF/PointIndexes", src_space);
     }
-    hid_t virt_id = H5Dcreate2(vtkhdf_gid, "Connectivity", H5T_NATIVE_INT32, virt_space, H5P_DEFAULT, dcpl_id, H5P_DEFAULT);
+
+    hid_t virt_id = H5Dcreate2(vtkhdf_gid, 
+                               "Connectivity", 
+                               fits32 ? H5T_NATIVE_INT32 : H5T_NATIVE_INT64,
+                               virt_space, 
+                               H5P_DEFAULT, 
+                               dcpl_id, 
+                               H5P_DEFAULT);
     status |= H5Dclose(virt_id);
     status |= H5Sclose(src_space);
     status |= H5Sclose(virt_space);
@@ -1053,47 +1203,51 @@ fclaw_hdf_write_file (fclaw_global_t * glob,
     
     patch_dims[0] = num_cells_per_patch;
     patch_dims[1] = clawpatch_opt->meqn;
-    make_patch_dataset(glob, 
-                       celldata_gid, 
-                       "meqn", 
-                       patch_dim, num_cells_per_patch_subdims,
-                       2, patch_dims, 
-                       num_patches_to_buffer, 
-                       H5T_NATIVE_DOUBLE, 
-                       value_cb);
+    make_dataset_numerical(glob, 
+                           celldata_gid, 
+                           "meqn", 
+                           patch_dim, num_cells_per_patch_subdims,
+                           2, patch_dims, 
+                           num_patches_to_buffer, 
+                           H5T_NATIVE_DOUBLE, 
+                           value_cb,
+                           &default_vtable);
 
     // write blockno
     patch_dims[0] = num_cells_per_patch;
-    make_patch_dataset(glob, 
-                       celldata_gid, 
-                       "blockno", 
-                       patch_dim, num_cells_per_patch_subdims,
-                       1, patch_dims, 
-                       num_patches_to_buffer, 
-                       H5T_NATIVE_INT, 
-                       blockno_cb);
+    make_dataset_numerical(glob, 
+                           celldata_gid, 
+                           "blockno", 
+                           patch_dim, num_cells_per_patch_subdims,
+                           1, patch_dims, 
+                           num_patches_to_buffer, 
+                           H5T_NATIVE_INT, 
+                           blockno_cb,
+                           &default_vtable);
 
     //write patchno
     patch_dims[0] = num_cells_per_patch;
-    make_patch_dataset(glob, 
-                       celldata_gid, 
-                       "patchno", 
-                       patch_dim, num_cells_per_patch_subdims,
-                       1, patch_dims, 
-                       num_patches_to_buffer, 
-                       H5T_NATIVE_INT, 
-                       patchno_cb);
+    make_dataset_numerical(glob, 
+                           celldata_gid, 
+                           "patchno", 
+                           patch_dim, num_cells_per_patch_subdims,
+                           1, patch_dims, 
+                           num_patches_to_buffer, 
+                           H5T_NATIVE_INT, 
+                           patchno_cb,
+                           &default_vtable);
 
     //write mpirank
     patch_dims[0] = num_cells_per_patch;
-    make_patch_dataset(glob, 
-                       celldata_gid, 
-                       "mpirank", 
-                       patch_dim, num_cells_per_patch_subdims,
-                       1, patch_dims, 
-                       num_patches_to_buffer, 
-                       H5T_NATIVE_INT, 
-                       mpirank_cb);
+    make_dataset_numerical(glob, 
+                           celldata_gid, 
+                           "mpirank", 
+                           patch_dim, num_cells_per_patch_subdims,
+                           1, patch_dims, 
+                           num_patches_to_buffer, 
+                           H5T_NATIVE_INT, 
+                           mpirank_cb,
+                           &default_vtable);
 
     status |= H5Gclose(celldata_gid);
 
