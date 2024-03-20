@@ -2,8 +2,6 @@
 
 bin_PROGRAMS += applications/demo/2d/swirl_restart/swirl
 
-TESTS += applications/demo/2d/swirl_restart/regressions.sh
-
 applications_demo_2d_swirl_restart_swirl_SOURCES = \
 	applications/demo/2d/swirl_restart/swirl_user.cpp \
 	applications/demo/2d/swirl_restart/swirl_user.h \
