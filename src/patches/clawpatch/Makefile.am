@@ -27,6 +27,12 @@ libclawpatch_installed_headers = \
 	src/patches/metric/fclaw3d_metric.hpp \
 	src/patches/metric/fclaw3d_metric_default_fort.h
 
+if FCLAW_WITH_HDF5
+libclawpatch_installed_headers += \
+	src/patches/clawpatch/fclaw_clawpatch_output_hdf5.h
+endif
+
+
 libclawpatch_compiled_sources = \
 	src/patches/clawpatch/fclaw_clawpatch.cpp \
 	src/patches/clawpatch/fclaw_clawpatch_diagnostics.c \
@@ -102,6 +108,10 @@ libclawpatch_compiled_sources = \
 	src/patches/metric/fortran_source2d/fclaw2d_metric_default_fort.f90 \
 	src/patches/metric/fortran_source3d/fclaw3d_metric_default_fort.f90
 
+if FCLAW_WITH_HDF5
+libclawpatch_compiled_sources += \
+	src/patches/clawpatch/fclaw_clawpatch_output_hdf5.c
+endif
 
 ## Name of library to build
 lib_LTLIBRARIES += src/patches/clawpatch/libclawpatch.la
@@ -114,6 +124,12 @@ FCLAW_CLAWPATCH_CPPFLAGS = -I@top_srcdir@/src/patches/clawpatch \
 FCLAW_CLAWPATCH_FFLAGS = -I@top_srcdir@/src/patches/metric/fortran_source2d
 FCLAW_CLAWPATCH_LDADD    = @top_builddir@/src/patches/clawpatch/libclawpatch.la
 
+if FCLAW_WITH_HDF5
+FCLAW_CLAWPATCH_LDADD += $(HDF5_LIBS)
+endif
+
+
+
 ## Sources needed to build this library
 src_patches_clawpatch_libclawpatch_la_SOURCES = \
         $(libclawpatch_internal_headers) \
@@ -122,6 +138,11 @@ src_patches_clawpatch_libclawpatch_la_SOURCES = \
 ## Headers needed to build this library.  
 src_patches_clawpatch_libclawpatch_la_CPPFLAGS = \
                 $(AM_CPPFLAGS)
+
+if FCLAW_WITH_HDF5
+src_patches_clawpatch_libclawpatch_la_CPPFLAGS += \
+				$(HDF5_CFLAGS)
+endif
 
 ## Add headers from this library to general header "pool", to be used by other apps
 AM_CPPFLAGS += $(FCLAW_CLAWPATCH_CPPFLAGS)
