@@ -31,7 +31,6 @@ jobs:
         - name: "Serial With Clawpack and HDF"
           configure_flags: "-Dclawpack=ON -Dhdf5=ON"
           ubuntu_packages: ""
-          dont_test: true
         - name: "Serial With GeoClaw"
           configure_flags: "-Dgeoclaw=ON"
           ubuntu_packages: ""
@@ -56,7 +55,6 @@ jobs:
         - name: "MPI With Clawpack and HDF"
           configure_flags: "-Dmpi=ON -Dclawpack=ON -Dhdf5=ON"
           ubuntu_packages: "libopenmpi-dev openmpi-bin"
-          dont_test: true
         - name: "MPI With GeoClaw"
           configure_flags: "-Dmpi=ON -Dgeoclaw=ON"
           ubuntu_packages: "libopenmpi-dev openmpi-bin"
