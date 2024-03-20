@@ -32,7 +32,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw_options.h>
 #include <fclaw_map.h>
-#include <hdf5_hl.h>
 #include <hdf5.h>
 
 /*----------------------------------------------------------------------
