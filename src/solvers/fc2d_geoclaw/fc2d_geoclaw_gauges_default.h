@@ -29,9 +29,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef __cplusplus
 extern "C"
 {
-#if 0
-}
-#endif
 #endif
 
 struct fclaw_global;
@@ -41,7 +38,7 @@ struct fclaw_block;
 
 void geoclaw_read_gauges_data_default(struct fclaw_global *glob, 
                                       struct fclaw_gauge **gauges, 
-                                      int *num);
+                                      int *num,int *dim);
 
 void geoclaw_create_gauge_files_default(struct fclaw_global *glob, 
                                         struct fclaw_gauge *gauges, 
@@ -51,7 +48,7 @@ void geoclaw_gauge_normalize_coordinates(struct fclaw_global *glob,
                                          struct fclaw_block *block,
                                          int blockno, 
                                          struct fclaw_gauge *g,
-                                         double *xc, double *yc);
+                                         double *xc, double *yc, double *zc);
 
 
 void geoclaw_gauge_update_default(struct fclaw_global* glob, 
@@ -64,9 +61,6 @@ void geoclaw_print_gauges_default(struct fclaw_global *glob,
                                   struct fclaw_gauge *gauge);
 
 #ifdef __cplusplus
-#if 0
-{
-#endif
 }
 #endif
 
