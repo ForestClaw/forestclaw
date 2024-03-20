@@ -1,6 +1,6 @@
-set(all ${PROJECT_SOURCE_DIR}/clawpack/advection/2d/all)
+set(all ${PROJECT_SOURCE_DIR}/demo/2d/all)
 
-add_library(swirl_f OBJECT 
+add_library(swirl_restart_f OBJECT 
   psi.f 
   setprob.f
   user_4.6/qinit.f 
@@ -15,7 +15,7 @@ add_library(swirl_f OBJECT
   ${all}/clawpack5_rpt2adv.f90
 )
 
-add_executable(swirl 
+add_executable(swirl_restart 
   swirl_user.cpp 
   swirl.cpp 
   swirl_options.c
@@ -23,15 +23,15 @@ add_executable(swirl
   $<TARGET_OBJECTS:swirl_f>
 )
 
-target_include_directories(swirl PRIVATE 
+set_target_properties(swirl_restart PROPERTIES OUTPUT_NAME swirl)
+
+target_include_directories(swirl_restart PRIVATE 
   ${CMAKE_CURRENT_SOURCE_DIR} 
   ${all}
 )
 
-target_link_libraries(swirl PRIVATE 
+target_link_libraries(swirl_restart PRIVATE 
  FORESTCLAW::CLAWPACK4.6
  FORESTCLAW::CLAWPACK5
 )
 
-add_test(NAME clawpack_advection_2d_swirl COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/regressions.sh WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-set_tests_properties(clawpack_advection_2d_swirl PROPERTIES ENVIRONMENT "${FCLAW_TEST_ENVIRONMENT}")
