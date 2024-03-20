@@ -27,10 +27,8 @@
 #include <fclaw2d_file.h>
 
 #include "../all/advection_user.h"
-#include <p4est_wrap.h>         /* just temporary for testing */
+#include <p4est_wrap.h>         /* just for testing */
 #include <fclaw2d_convenience.h>
-
-#define FCLAW_SWIRL_IO_DEMO 0
 
 static
 void create_domain(fclaw_global_t *glob)
@@ -55,7 +53,6 @@ void create_domain(fclaw_global_t *glob)
     fclaw_domain_list_neighbors(domain, FCLAW_VERBOSITY_DEBUG);
 }
 
-#if FCLAW_SWIRL_IO_DEMO
 static void
 check_fclaw2d_file_error_code (int errcode, const char *str)
 {
@@ -75,12 +72,10 @@ check_fclaw2d_file_error_code (int errcode, const char *str)
         SC_ABORTF ("%s: %*.*s", str, reslen, reslen, err_str);
     }
 }
-#endif
 
 static
 void run_program(fclaw_global_t* glob)
 {
-#if FCLAW_SWIRL_IO_DEMO
     int i;
     int errcode, retval;
     fclaw2d_file_context_t *fc;
@@ -89,7 +84,6 @@ void run_program(fclaw_global_t* glob)
     int64_t test_int = 12;
     char *data, *local_arr_data;
     fclaw2d_domain_t *read_domain;
-#endif
 
     /* Initialize virtual table for ForestClaw */
     fclaw_vtables_initialize(glob);
@@ -113,7 +107,6 @@ void run_program(fclaw_global_t* glob)
     fclaw_initialize(glob);
     fclaw_run(glob);
 
-#if FCLAW_SWIRL_IO_DEMO
     /* Example usage of forestclaw file functions. This is just for
      * demonstration purposes. For an actual restart functionality in ForestClaw
      * the workflow must be extended by providing buffers with the required
@@ -260,7 +253,6 @@ void run_program(fclaw_global_t* glob)
     retval = fclaw2d_file_close (fc, &errcode);
     check_fclaw2d_file_error_code (errcode, "file close 2");
     FCLAW_EXECUTE_ASSERT_FALSE (retval);
-#endif
 
     fclaw_finalize(glob);
 }
