@@ -14,10 +14,10 @@ on:
     types: [published]
 
 env:
-  CFLAGS: -lgfortran
-  CXXFLAGS: -lgfortran --std=c++17
-  FCFLAGS: -lgfortran -cpp
-  FFLAGS: -lgfortran -cpp
+  CFLAGS: -lgfortran -O2 -g
+  CXXFLAGS: -lgfortran --std=c++17 -O2 -g
+  FCFLAGS: -lgfortran -cpp -O2 -g
+  FFLAGS: -lgfortran -cpp -O2 -g
 
 jobs:
   linux:
