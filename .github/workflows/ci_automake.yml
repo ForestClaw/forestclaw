@@ -34,6 +34,10 @@ jobs:
         - name: "Serial With Clawpack"
           configure_flags: "--enable-clawpack"
           ubuntu_packages: ""
+        - name: "Serial With Clawpack and HDF"
+          configure_flags: "--enable-clawpack --with-hdf5"
+          ubuntu_packages: "libhdf5-dev"
+          dont_test: true
         - name: "Serial With GeoClaw"
           configure_flags: "--enable-geoclaw"
           ubuntu_packages: ""
@@ -41,11 +45,13 @@ jobs:
           configure_flags: "CUDA_CFLAGS=\"-arch=sm_61\" LIBS=\"-lcuda -lcudart -lnvToolsExt\" --enable-cudaclaw --disable-shared"
           ubuntu_packages: "nvidia-cuda-toolkit"
           cuda: true
+          dont_test: true
         - name: "Serial With CudaClaw (CUDA 11.3)"
           configure_flags: "NVCC=/usr/local/cuda-11.3/bin/nvcc CUDA_CFLAGS=\"-arch=sm_61\" LIBS=\"-L/usr/local/cuda-11.3/lib64 -lcudart -lnvToolsExt\" --enable-cudaclaw --disable-shared"
           ubuntu_packages: ""
           cuda: true
           cuda_11_3: true
+          dont_test: true
         - name: "MPI Minimal"
           configure_flags: "--enable-mpi"
           ubuntu_packages: "libopenmpi-dev openmpi-bin"
@@ -55,6 +61,10 @@ jobs:
         - name: "MPI With Clawpack"
           configure_flags: "--enable-clawpack --enable-mpi"
           ubuntu_packages: "libopenmpi-dev openmpi-bin"
+        - name: "MPI With Clawpack and HDF"
+          configure_flags: "--enable-clawpack --enable-mpi --with-hdf5"
+          ubuntu_packages: "libopenmpi-dev openmpi-bin libhdf5-openmpi-dev"
+          dont_test: true
         - name: "MPI With GeoClaw"
           configure_flags: "--enable-geoclaw --enable-mpi"
           ubuntu_packages: "libopenmpi-dev openmpi-bin"
@@ -67,10 +77,12 @@ jobs:
           ubuntu_packages: "libopenmpi-dev openmpi-bin"
           cuda: true
           cuda_11_3: true
+          dont_test: true
         - name: "MPI With ThunderEgg"
           configure_flags: "--enable-mpi --enable-thunderegg --with-thunderegg=$GITHUB_WORKSPACE/ThunderEgg"
           ubuntu_packages: "cmake libopenmpi-dev openmpi-bin libfftw3-dev"
           thunderegg: true
+          dont_test: true
 
     name: Automake ${{ matrix.name }} Build on Linux
     steps:
@@ -128,7 +140,7 @@ jobs:
        make -j || make -j || make -j || make -j || make -j
 
     - name: Tests
-      if: ${{ !matrix.cuda }}
+      if: ${{ !matrix.dont_test }}
       run: make -j check V=0
 
     - name: Print Test log
