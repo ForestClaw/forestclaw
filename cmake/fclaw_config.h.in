@@ -35,7 +35,7 @@
 #cmakedefine FCLAW_ENABLE_MPIIO
 
 /* Define to 1 if we are using HDF5 */
-#cmakedefine FCLAW_ENABLE_HDF5
+#cmakedefine FCLAW_WITH_HDF5
 
 /* F77 compiler */
 

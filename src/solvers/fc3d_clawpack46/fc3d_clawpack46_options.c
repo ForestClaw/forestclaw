@@ -97,7 +97,7 @@ clawpack_check(fc3d_clawpack46_options_t *clawopt)
     clawopt->method[4] = clawopt->src_term;
     clawopt->method[5] = clawopt->mcapa;
 
-#ifndef FCLAW_ENABLE_HDF5
+#ifndef FCLAW_WITH_HDF5
     if(clawopt->hdf5_out)
     {
         fclaw_global_errorf("fc3d_clawpack46: ERROR: ForestClaw built without HDF5, cannot output hdf5.\n");

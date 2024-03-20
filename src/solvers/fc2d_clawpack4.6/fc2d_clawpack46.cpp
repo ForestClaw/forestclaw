@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_clawpatch_options.h>
 #include <fclaw_clawpatch_output_ascii.h> 
 #include <fclaw_clawpatch_output_vtk.h>
-#ifdef FCLAW_ENABLE_HDF5
+#ifdef FCLAW_WITH_HDF5
 #include <fclaw_clawpatch_output_hdf5.h>
 #endif
 #include <fclaw2d_clawpatch_fort.h>
@@ -465,7 +465,7 @@ void clawpack46_output(fclaw_global_t *glob, int iframe)
 		fclaw_clawpatch_output_vtk(glob,iframe);
 	}
 
-#ifdef FCLAW_ENABLE_HDF5
+#ifdef FCLAW_WITH_HDF5
 	if (clawpack_options->hdf5_out != 0)
 	{
 		fclaw_clawpatch_output_hdf5(glob,iframe);
