@@ -72,6 +72,7 @@ jobs:
           configure_flags: "CUDA_CFLAGS=\"-arch=sm_61 -I/usr/lib/x86_64-linux-gnu/openmpi/include\" LIBS=\"-lcuda -lcudart -lnvToolsExt\" --enable-cudaclaw --enable-mpi --disable-shared"
           ubuntu_packages: "libopenmpi-dev openmpi-bin nvidia-cuda-toolkit"
           cuda: true
+          dont_test: true
         - name: "MPI With CudaClaw (CUDA 11.3)"
           configure_flags: "NVCC=/usr/local/cuda-11.3/bin/nvcc CUDA_CFLAGS=\"-arch=sm_61 -I/usr/lib/x86_64-linux-gnu/openmpi/include\" LIBS=\"-L/usr/local/cuda-11.3/lib64 -lcudart -lnvToolsExt\" --enable-cudaclaw --enable-mpi --disable-shared"
           ubuntu_packages: "libopenmpi-dev openmpi-bin"
