@@ -62,7 +62,7 @@ jobs:
 
     name: External ${{ matrix.name }} Build on Linux
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       name: Checkout source code
 
     - name: Install system dependencies
