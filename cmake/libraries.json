@@ -4,6 +4,6 @@
     "tag": "2.1.5"
   },
   "hdf5": {
-    "url": "https://github.com/HDFGroup/hdf5/archive/refs/tags/hdf5-1_10_11.tar.gz"
+    "url": "https://github.com/HDFGroup/hdf5/archive/refs/tags/hdf5-1_14_3.tar.gz"
   }
 }
