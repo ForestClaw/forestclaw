@@ -14,10 +14,10 @@ on:
     types: [published]
 
 env:
-  CFLAGS: -lgfortran
-  CXXFLAGS: -lgfortran --std=c++17
-  FCFLAGS: -lgfortran -cpp
-  FFLAGS: -lgfortran -cpp
+  CFLAGS: -lgfortran -O2 -g
+  CXXFLAGS: -lgfortran --std=c++17 -O2 -g
+  FCFLAGS: -lgfortran -cpp -O2 -g
+  FFLAGS: -lgfortran -cpp -O2 -g
 
 jobs:
   linux:
@@ -34,6 +34,9 @@ jobs:
         - name: "Serial With Clawpack"
           configure_flags: "--enable-clawpack"
           ubuntu_packages: ""
+        - name: "Serial With Clawpack and HDF"
+          configure_flags: "--enable-clawpack --with-hdf5"
+          ubuntu_packages: "libhdf5-dev"
         - name: "Serial With GeoClaw"
           configure_flags: "--enable-geoclaw"
           ubuntu_packages: ""
@@ -55,6 +58,9 @@ jobs:
         - name: "MPI With Clawpack"
           configure_flags: "--enable-clawpack --enable-mpi"
           ubuntu_packages: "libopenmpi-dev openmpi-bin"
+        - name: "MPI With Clawpack and HDF"
+          configure_flags: "--enable-clawpack --enable-mpi --with-hdf5"
+          ubuntu_packages: "libopenmpi-dev openmpi-bin libhdf5-openmpi-dev"
         - name: "MPI With GeoClaw"
           configure_flags: "--enable-geoclaw --enable-mpi"
           ubuntu_packages: "libopenmpi-dev openmpi-bin"
@@ -74,10 +80,10 @@ jobs:
 
     name: Automake ${{ matrix.name }} Build on Linux
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       name: "Checkout Source code"
 
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       name: "Checkout ThunderEgg Source code"
       if: ${{ matrix.thunderegg }}
       with:

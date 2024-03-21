@@ -94,6 +94,11 @@ add_library(clawpatch
   ${metric}/fclaw3d_metric.cpp
   ${metric}/fclaw3d_metric_default.c
 )
+if(hdf5)
+target_sources(clawpatch PRIVATE
+  fclaw_clawpatch_output_hdf5.c
+)
+endif()
 
 target_include_directories(clawpatch
   PUBLIC
@@ -105,6 +110,9 @@ target_include_directories(clawpatch
 )
 
 target_link_libraries(clawpatch PUBLIC forestclaw)
+if(hdf5)
+  target_link_libraries(clawpatch PRIVATE HDF5::HDF5)
+endif()
 
 # -- install
 
@@ -138,6 +146,12 @@ install(FILES
   ${metric}/fclaw3d_metric_default_fort.h
   TYPE INCLUDE
 )
+if(hdf5)
+install(FILES
+  fclaw_clawpatch_output_hdf5.h
+  TYPE INCLUDE
+)
+endif()
 
 install(TARGETS clawpatch
   EXPORT ${PROJECT_NAME}-targets)

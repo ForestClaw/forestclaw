@@ -28,6 +28,9 @@ jobs:
         - name: "Serial With Clawpack"
           configure_flags: "-Dclawpack=ON"
           ubuntu_packages: ""
+        - name: "Serial With Clawpack and HDF"
+          configure_flags: "-Dclawpack=ON -Dhdf5=ON"
+          ubuntu_packages: ""
         - name: "Serial With GeoClaw"
           configure_flags: "-Dgeoclaw=ON"
           ubuntu_packages: ""
@@ -46,6 +49,9 @@ jobs:
           ubuntu_packages: "libopenmpi-dev openmpi-bin"
         - name: "MPI With Clawpack"
           configure_flags: "-Dmpi=ON -Dclawpack=ON"
+          ubuntu_packages: "libopenmpi-dev openmpi-bin"
+        - name: "MPI With Clawpack and HDF"
+          configure_flags: "-Dmpi=ON -Dclawpack=ON -Dhdf5=ON"
           ubuntu_packages: "libopenmpi-dev openmpi-bin"
         - name: "MPI With GeoClaw"
           configure_flags: "-Dmpi=ON -Dgeoclaw=ON"
@@ -66,7 +72,7 @@ jobs:
 
     name: CMake ${{ matrix.name }} Build on Linux
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       name: Checkout source code
 
     - name: Install system dependencies
@@ -126,7 +132,7 @@ jobs:
       FC: gfortran-11
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       name: Checkout source code
 
     - name: Install system dependencies
