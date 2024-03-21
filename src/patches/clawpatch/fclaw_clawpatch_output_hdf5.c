@@ -1055,9 +1055,9 @@ fclaw_hdf_write_file (fclaw_global_t * glob,
     status |= H5Pset_coll_metadata_write(fapl_id, 1);
     status |= H5Pset_all_coll_metadata_ops(fapl_id, 1);
 #endif
+    status |= H5Pset_libver_bounds(fapl_id, H5F_LIBVER_V110, H5F_LIBVER_LATEST);
 
     hid_t fcpl_id = H5Pcreate(H5P_FILE_CREATE);
-    status |= H5Pset_file_space_strategy(fcpl_id, H5F_FSPACE_STRATEGY_NONE, 0, 0);
 
     // Create a new file collectively and release property list identifier.
     hid_t file_id = H5Fcreate(filename, H5F_ACC_TRUNC, fcpl_id, fapl_id);
