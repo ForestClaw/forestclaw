@@ -148,6 +148,12 @@ if(TARGET FORESTCLAW::CLAWPACK3_46)
 
 endif()
 
+# ----------------------------------
+# demo examples
+# ----------------------------------
+if(TARGET FORESTCLAW::CLAWPACK4.6 AND TARGET FORESTCLAW::CLAWPACK5)
+    include(demo/demo.cmake)
+endif()
 
 # Include examples that use the low-level interface to p4est
 # They should always compile

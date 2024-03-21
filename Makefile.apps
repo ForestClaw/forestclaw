@@ -29,6 +29,7 @@ include src/solvers/fc3d_clawpack46/Makefile.am    # clawpack 3
 ## examples
 include applications/clawpack/clawpack.apps
 include applications/clawpack/claw3.apps
+include applications/demo/demo.apps
 
 endif
 
