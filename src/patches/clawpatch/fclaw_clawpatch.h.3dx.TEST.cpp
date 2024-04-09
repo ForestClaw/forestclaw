@@ -217,7 +217,7 @@ TEST_CASE("3dx fclaw_clawpatch_vtable_initialize")
     CHECK(clawpatch_vt->d3->fort_compute_patch_error    == NULL);
     CHECK(clawpatch_vt->d3->fort_conservation_check     == NULL);
     CHECK(clawpatch_vt->d3->fort_compute_error_norm     == NULL);
-    CHECK(clawpatch_vt->d3->fort_compute_patch_area     == NULL);
+    CHECK(clawpatch_vt->d3->fort_compute_patch_volume   == NULL);
 
     CHECK(clawpatch_vt->is_set                      == 1);
 

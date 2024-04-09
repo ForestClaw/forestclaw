@@ -349,7 +349,7 @@ struct fclaw_clawpatch_vtable_3d
     /** Calculates the error norms for a patch */
     fclaw3d_clawpatch_fort_norm_t                  fort_compute_error_norm;
     /** Calculates the area of a patch */
-    fclaw3d_clawpatch_fort_area_t                  fort_compute_patch_area;
+    fclaw3d_clawpatch_fort_volume_t                fort_compute_patch_volume;
 
     /** @} */
 };
