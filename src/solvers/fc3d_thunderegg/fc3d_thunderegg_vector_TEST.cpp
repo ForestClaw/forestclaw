@@ -62,6 +62,7 @@ struct OctDomain {
         memset(&fopts, 0, sizeof(fopts));
         fopts.mi=1;
         fopts.mj=1;
+        fopts.mk=1;
         fopts.minlevel=1;
         fopts.maxlevel=1;
         fopts.manifold=false;
@@ -215,7 +216,7 @@ TEST_CASE("fclaw3d_thunderegg_get_vector")
         test_data.setup();
 
         //set data
-        for(int i=0; i < 4; i++){
+        for(int i=0; i < 8; i++){
             double * data = nullptr;
             switch(data_choice){
                 case RHS:
@@ -262,13 +263,13 @@ TEST_CASE("fclaw3d_thunderegg_get_vector")
             CHECK(view.getStrides()[3] == (mx+2*mbc)*(my+2*mbc)*(mz+2*mbc));
             int idx=0;
             for(int eqn=0; eqn<meqn; eqn++){
-                for(int k=-mbc; k<my+mbc; k++){
-                for(int j=-mbc; j<my+mbc; j++){
-                    for(int i=-mbc; i<mx+mbc; i++){
-                        CHECK(view(i,j,k,eqn) == patch_idx*(mx+2*mbc)*(my+2*mbc)*(mz+2*mbc)*meqn + idx);
-                        idx++;
+                for(int k=-mbc; k<mz+mbc; k++){
+                    for(int j=-mbc; j<my+mbc; j++){
+                        for(int i=-mbc; i<mx+mbc; i++){
+                            CHECK(view(i,j,k,eqn) == patch_idx*(mx+2*mbc)*(my+2*mbc)*(mz+2*mbc)*meqn + idx);
+                            idx++;
+                        }
                     }
-                }
                 }
             }
         }
@@ -298,7 +299,7 @@ TEST_CASE("fclaw3d_thunderegg_store_vector")
 
         //set data
         Communicator comm(MPI_COMM_WORLD);
-        Vector<3> vec(comm,{mx,my,mz},meqn,4,mbc);
+        Vector<3> vec(comm,{mx,my,mz},meqn,8,mbc);
         for(int patch_idx=0; patch_idx < vec.getNumLocalPatches(); patch_idx++){
             PatchView<double, 3> view = vec.getPatchView(patch_idx);
             int idx=0;
@@ -316,7 +317,7 @@ TEST_CASE("fclaw3d_thunderegg_store_vector")
 
         fc3d_thunderegg_store_vector(test_data.glob,data_choice,vec);
         //check
-        for(int i=0; i < 4; i++){
+        for(int i=0; i < 8; i++){
             double * data = nullptr;
             switch(data_choice){
                 case RHS:
@@ -357,12 +358,8 @@ TEST_CASE("fclaw3d_thunderegg_get_vector multiblock")
         }
         test_data.setup();
 
-        int mx = test_data.opts->mx;
-        int my = test_data.opts->my;
-        int mbc = test_data.opts->mbc;
-
         //set data
-        for(int i=0; i < 4; i++){
+        for(int i=0; i < 8; i++){
             double * data = nullptr;
             switch(data_choice){
                 case RHS:
@@ -398,18 +395,18 @@ TEST_CASE("fclaw3d_thunderegg_get_vector multiblock")
             CHECK(view.getEnd()[0] == mx-1);
             CHECK(view.getEnd()[1] == my-1);
             CHECK(view.getEnd()[2] == mz-1);
-            CHECK(view.getEnd()[2] == meqn-1);
+            CHECK(view.getEnd()[3] == meqn-1);
             CHECK(view.getGhostEnd()[0] == mx-1+mbc);
             CHECK(view.getGhostEnd()[1] == my-1+mbc);
-            CHECK(view.getGhostEnd()[1] == mz-1+mbc);
-            CHECK(view.getGhostEnd()[2] == meqn-1);
+            CHECK(view.getGhostEnd()[2] == mz-1+mbc);
+            CHECK(view.getGhostEnd()[3] == meqn-1);
             CHECK(view.getStrides()[0] == 1);
             CHECK(view.getStrides()[1] == (mx+2*mbc));
             CHECK(view.getStrides()[2] == (mx+2*mbc)*(my+2*mbc));
-            CHECK(view.getStrides()[2] == (mx+2*mbc)*(my+2*mbc)*(mz+2*mbc));
+            CHECK(view.getStrides()[3] == (mx+2*mbc)*(my+2*mbc)*(mz+2*mbc));
             int idx=0;
             for(int eqn=0; eqn<meqn; eqn++){
-                for(int k=-mbc; k<my+mbc; k++){
+                for(int k=-mbc; k<mz+mbc; k++){
                     for(int j=-mbc; j<my+mbc; j++){
                         for(int i=-mbc; i<mx+mbc; i++){
                             CHECK(view(i,j,k,eqn) == patch_idx*(mx+2*mbc)*(my+2*mbc)*(mz+2*mbc)*meqn + idx);
@@ -445,7 +442,7 @@ TEST_CASE("fclaw3d_thunderegg_store_vector multiblock")
 
         //set data
         Communicator comm(MPI_COMM_WORLD);
-        Vector<3> vec(comm,{mx,my},meqn,4,mbc);
+        Vector<3> vec(comm,{mx,my,mz},meqn,8,mbc);
         for(int patch_idx=0; patch_idx < vec.getNumLocalPatches(); patch_idx++){
             PatchView<double, 3> view = vec.getPatchView(patch_idx);
             int idx=0;
@@ -463,7 +460,7 @@ TEST_CASE("fclaw3d_thunderegg_store_vector multiblock")
 
         fc3d_thunderegg_store_vector(test_data.glob,data_choice,vec);
         //check
-        for(int i=0; i < 4; i++){
+        for(int i=0; i < 8; i++){
             double * data = nullptr;
             switch(data_choice){
                 case RHS:
