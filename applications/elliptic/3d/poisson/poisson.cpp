@@ -35,8 +35,8 @@
 #include <fclaw_clawpatch_options.h>
 #include <fclaw_clawpatch.h>
 
-#include <fc2d_thunderegg.h>
-#include <fc2d_thunderegg_options.h>
+#include <fc3d_thunderegg.h>
+#include <fc3d_thunderegg_options.h>
 
 
 static
@@ -47,14 +47,16 @@ void create_domain(fclaw_global_t* glob)
  
     int mi = fclaw_opt->mi;
     int mj = fclaw_opt->mj;
+    int mk = fclaw_opt->mk;
 
     int a = fclaw_opt->periodic_x;
     int b = fclaw_opt->periodic_y;
+    int c = fclaw_opt->periodic_z;
 
-    fclaw_domain_t *domain = fclaw_domain_new_2d_brick(glob->mpicomm, mi,mj,a,b, fclaw_opt->minlevel);
+    fclaw_domain_t *domain = fclaw_domain_new_3d_brick(glob->mpicomm, mi,mj,mk,a,b,c, fclaw_opt->minlevel);
 
     /* Map unit square to disk using mapc2m_disk.f */
-    fclaw_map_context_t *brick = fclaw_map_new_2d_brick(domain, mi, mj, a, b);
+    fclaw_map_context_t *brick = fclaw_map_new_3d_brick(domain, mi, mj, mk, a, b, c);
     fclaw_map_context_t *cont = fclaw_map_new_nomap_brick(brick);
 
     fclaw_global_store_domain(glob, domain);
@@ -75,7 +77,7 @@ void run_program(fclaw_global_t* glob)
     fclaw_vtables_initialize(glob);
 
     /* Test thunderegg solver */
-    fc2d_thunderegg_solver_initialize(glob);
+    fc3d_thunderegg_solver_initialize(glob);
 
     /* set up elliptic solver to use the thunderegg solver */
     poisson_link_solvers(glob);
@@ -121,13 +123,13 @@ main (int argc, char **argv)
     /* Options */
     fclaw_options_t             *fclaw_opt;
     fclaw_clawpatch_options_t *clawpatch_opt;
-    fc2d_thunderegg_options_t    *mg_opt;
+    fc3d_thunderegg_options_t    *mg_opt;
     poisson_options_t              *user_opt;
 
     /* Create new options packages */
     fclaw_opt =                   fclaw_options_register(app,  NULL,        "fclaw_options.ini");
-    clawpatch_opt =   fclaw_clawpatch_2d_options_register(app, "clawpatch",  "fclaw_options.ini");
-    mg_opt =            fc2d_thunderegg_options_register(app, "thunderegg", "fclaw_options.ini");
+    clawpatch_opt =   fclaw_clawpatch_3d_options_register(app, "clawpatch",  "fclaw_options.ini");
+    mg_opt =            fc3d_thunderegg_options_register(app, "thunderegg", "fclaw_options.ini");
     user_opt =                  poisson_options_register(app,               "fclaw_options.ini");  
 
     /* Read configuration file(s) and command line, and process options */
@@ -148,7 +150,7 @@ main (int argc, char **argv)
         /* Store option packages in glob */
         fclaw_options_store           (glob, fclaw_opt);
         fclaw_clawpatch_options_store (glob, clawpatch_opt);
-        fc2d_thunderegg_options_store    (glob, mg_opt);
+        fc3d_thunderegg_options_store    (glob, mg_opt);
         poisson_options_store            (glob, user_opt);
 
         create_domain(glob);

@@ -19,43 +19,49 @@
 !! where h = dx or h = dy, is non-zero.
 !!
 
-subroutine poisson_fort_apply_bc(blockno, mx, my,mbc,mfields,xlower,ylower, &
-    dx,dy,t,intersects_bc,bctype,rhs,g_bc,cons_check,flux_sum)
+subroutine poisson_fort_apply_bc(blockno, mx, my, mz, mbc, mfields, xlower, ylower, zlower, &
+    dx, dy, dz, t, intersects_bc, bctype, rhs, g_bc, cons_check, flux_sum)
 
     implicit none
 
-    integer blockno, mx,my,mbc,mfields,intersects_bc(0:3),bctype(0:3)
+    integer blockno, mx, my, mz, mbc, mfields, intersects_bc(0:5), bctype(0:5)
     integer cons_check
-    double precision xlower,ylower,dx,dy,t,g_bc, flux_sum(mfields)
-    double precision rhs(1-mbc:mx+mbc,1-mbc:my+mbc,mfields)
+    double precision xlower, ylower, zlower, dx, dy, dz, t, g_bc, flux_sum(mfields)
+    double precision rhs(1-mbc:mx+mbc, 1-mbc:my+mbc, 1-mbc:mz+mbc, mfields)
 
     !! Dummy arrays needed to apply boundary conditions
-    double precision qh(1-mbc:mx+mbc,1-mbc:my+mbc,mfields)
-    double precision beta(1-mbc:mx+mbc,1-mbc:my+mbc,3)
+    double precision qh(1-mbc:mx+mbc, 1-mbc:my+mbc, 1-mbc:mz+mbc, mfields)
+    double precision beta(1-mbc:mx+mbc, 1-mbc:my+mbc, 1-mbc:mz+mbc, 4)
 
-    integer i,j, m, iface, idir, i1, ig, ic, j1, jg, jc
-    double precision d, h, x, y, g
-    double precision a,b
-    double precision val_beta, grad_beta(2), flux(0:3)
+    integer i, j, k, m, iface, idir, i1, ig, ic, j1, jg, jc, k1, kg, kc
+    double precision d, h, x, y, z, g
+    double precision a, b
+    double precision val_beta, grad_beta(3), flux(0:5)
     double precision uI, dI
 
     logical ccheck
 
     ccheck = cons_check .ne. 0
 
-    do i = 1-mbc,mx+mbc
+    do k = 1-mbc,mz+mbc
         do j = 1-mbc,my+mbc
-            x = xlower + (i-0.5)*dx
-            y = ylower + (j-0.5)*dy
-            call poisson_fort_beta(x,y,val_beta,grad_beta)
-            beta(i,j,1) = val_beta
+            do i = 1-mbc,mx+mbc
+                x = xlower + (i-0.5)*dx
+                y = ylower + (j-0.5)*dy
+                z = zlower + (k-0.5)*dz
+                call poisson_fort_beta(x,y,z,val_beta,grad_beta)
+                beta(i,j,k,1) = val_beta
+            end do
         end do
     end do
 
-    do i = 2-mbc,mx+mbc
+    do k = 2-mbc,mz+mbc
         do j = 2-mbc,my+mbc
-            beta(i,j,2) = (beta(i,j,1) + beta(i-1,j,1))/2.d0
-            beta(i,j,3) = (beta(i,j,1) + beta(i,j-1,1))/2.d0
+            do i = 2-mbc,mx+mbc
+                beta(i,j,k,2) = (beta(i,j,k,1) + beta(i-1,j,k,1))/2.d0
+                beta(i,j,k,3) = (beta(i,j,k,1) + beta(i,j-1,k,1))/2.d0
+                beta(i,j,k,4) = (beta(i,j,k,1) + beta(i,j,k-1,1))/2.d0
+            end do
         end do
     end do
 
@@ -63,13 +69,15 @@ subroutine poisson_fort_apply_bc(blockno, mx, my,mbc,mfields,xlower,ylower, &
     do m = 1,mfields
 
         !! Homogeneous array;  this is overkill - we don't need the entire array.
-        do i = 1-mbc,mx+mbc
+        do k = 1-mbc,mz+mbc
             do j = 1-mbc,my+mbc
-                qh(i,j,m) = 0
+                do i = 1-mbc,mx+mbc
+                    qh(i,j,k,m) = 0
+                end do
             end do
         end do
 
-        do iface = 0,3
+        do iface = 0,5
             if (intersects_bc(iface) .ne. 0) then
                 idir = iface/2   !! direction : 0 or 1
 
@@ -84,8 +92,10 @@ subroutine poisson_fort_apply_bc(blockno, mx, my,mbc,mfields,xlower,ylower, &
 
                 if (idir == 0) then
                     h = dx
-                else
+                else if (idir == 1) then
                     h = dy
+                else
+                    h = dz
                 endif
 
                 !! Discretize the boundary conditions as : 
@@ -105,7 +115,7 @@ subroutine poisson_fort_apply_bc(blockno, mx, my,mbc,mfields,xlower,ylower, &
                 d = (a/2.d0 + b/h)  
                 if (d .eq. 0) then
                     write(6,*) 'poisson_fort_apply_bc : ill-defined BCs'
-                    stop
+                    error stop
                 endif
 
                 if (idir .eq. 0) then
@@ -121,18 +131,21 @@ subroutine poisson_fort_apply_bc(blockno, mx, my,mbc,mfields,xlower,ylower, &
                     !! location at interface
                     x = xlower + (i1 - 1)*dx    
 
-                    do j = 1,my
-                        y = ylower + (j-0.5)*dy
+                    do k = 1,mz
+                        z = zlower + (k-0.5)*dz
+                        do j = 1,my
+                            y = ylower + (j-0.5)*dy
 
-                        !! inhomogeneity
-                        g = g_bc(iface,t,x,y)
+                            !! inhomogeneity
+                            g = g_bc(iface,t,x,y,z)
 
-                        !! Assume uI == 0
-                        uI = 0
-                        if (ccheck) then
-                            uI = rhs(ic,j,m)
-                        endif
-                        qh(ig,j,m) = (g - dI*uI)/d
+                            !! Assume uI == 0
+                            uI = 0
+                            if (ccheck) then
+                                uI = rhs(ic,j,k,m)
+                            endif
+                            qh(ig,j,k,m) = (g - dI*uI)/d
+                        end do
                     end do
                 elseif (idir .eq. 1) then
                     if (iface .eq. 2) then
@@ -147,18 +160,50 @@ subroutine poisson_fort_apply_bc(blockno, mx, my,mbc,mfields,xlower,ylower, &
                     !! location at interface
                     y = ylower + (j1 - 1)*dy
 
-                    do i = 1,mx
-                        x = xlower + (i-0.5)*dx
+                    do k = 1,mz
+                        z = zlower + (k-0.5)*dz
+                        do i = 1,mx
+                            x = xlower + (i-0.5)*dx
 
-                        !! inhomogeneity
-                        g = g_bc(iface,t,x,y)
+                            !! inhomogeneity
+                            g = g_bc(iface,t,x,y,z)
 
-                        uI = 0
-                        if (ccheck) then
-                            uI = rhs(i,jc,m)
-                        endif
+                            uI = 0
+                            if (ccheck) then
+                                uI = rhs(i,jc,k,m)
+                            endif
 
-                        qh(i,jg,m) = (g - dI*uI)/d
+                            qh(i,jg,k,m) = (g - dI*uI)/d
+                        end do
+                    end do
+                elseif (idir .eq. 2) then
+                    if (iface .eq. 4) then
+                        kc = 1
+                        k1 = 1
+                        kg = 0
+                    elseif (iface .eq. 5) then
+                        kc = my
+                        k1 = my+1
+                        kg = my+1
+                    endif
+                    !! location at interface
+                    z = zlower + (k1 - 1)*dz
+
+                    do j = 1,my
+                        y = ylower + (j-0.5)*dy
+                        do i = 1,mx
+                            x = xlower + (i-0.5)*dx
+
+                            !! inhomogeneity
+                            g = g_bc(iface,t,x,y,z)
+
+                            uI = 0
+                            if (ccheck) then
+                                uI = rhs(i,j,kc,m)
+                            endif
+
+                            qh(i,j,kg,m) = (g - dI*uI)/d
+                        end do
                     end do
                 endif
             endif
@@ -168,53 +213,88 @@ subroutine poisson_fort_apply_bc(blockno, mx, my,mbc,mfields,xlower,ylower, &
         !! Laplace operator
 
         if (intersects_bc(0) .ne. 0) then
-            do j = 1,my
-                if (ccheck) then
-                    flux(0) = beta(1,j,2)*(rhs(1,j,m) - qh(0,j,m))/dx
-                    flux_sum(m) = flux_sum(m) - flux(0)*dy    
-                else
-                    flux(0) = beta(1,j,2)*(qh(1,j,m) - qh(0,j,m))/dx
-                    rhs(1,j,m) = rhs(1,j,m) - (-flux(0)/dx)
-                endif
+            do k = 1,mz
+                do j = 1,my
+                    if (ccheck) then
+                        flux(0) = beta(1,j,k,2)*(rhs(1,j,k,m) - qh(0,j,k,m))/dx
+                        flux_sum(m) = flux_sum(m) - flux(0)*dy*dz   
+                    else
+                        flux(0) = beta(1,j,k,2)*(qh(1,j,k,m) - qh(0,j,k,m))/dx
+                        rhs(1,j,k,m) = rhs(1,j,k,m) - (-flux(0)/dx)
+                    endif
+                end do
             end do
         endif            
         
         if (intersects_bc(1) .ne. 0) then
-            do j = 1,my
-                if (ccheck) then
-                    flux(1) = beta(mx+1,j,2)*(qh(mx+1,j,m) - rhs(mx,j,m))/dx
-                    flux_sum(m) = flux_sum(m) + flux(1)*dy
-                else
-                    flux(1) = beta(mx+1,j,2)*(qh(mx+1,j,m) - qh(mx,j,m))/dx
-                    rhs(mx,j,m) = rhs(mx,j,m) - (flux(1)/dx)
-                endif
+            do k = 1,mz
+                do j = 1,my
+                    if (ccheck) then
+                        flux(1) = beta(mx+1,j,k,2)*(qh(mx+1,j,k,m) - rhs(mx,j,k,m))/dx
+                        flux_sum(m) = flux_sum(m) + flux(1)*dy*dz
+                    else
+                        flux(1) = beta(mx+1,j,k,2)*(qh(mx+1,j,k,m) - qh(mx,j,k,m))/dx
+                        rhs(mx,j,k,m) = rhs(mx,j,k,m) - (flux(1)/dx)
+                    endif
+                end do
             end do
         endif
 
         if (intersects_bc(2) .ne. 0) then
-            do i = 1,mx
-                if (ccheck) then
-                    flux(2) = beta(i,1,3)*(rhs(i,1,m) - qh(i,0,m))/dy
-                    flux_sum(m) = flux_sum(m) - flux(2)*dx
-                else
-                    flux(2) = beta(i,1,3)*(qh(i,1,m) - qh(i,0,m))/dy
-                    rhs(i,1,m) = rhs(i,1,m) - (-flux(2)/dy)
-                endif
+            do k = 1,mz
+                do i = 1,mx
+                    if (ccheck) then
+                        flux(2) = beta(i,1,k,3)*(rhs(i,1,k,m) - qh(i,0,k,m))/dy
+                        flux_sum(m) = flux_sum(m) - flux(2)*dx*dz
+                    else
+                        flux(2) = beta(i,1,k,3)*(qh(i,1,k,m) - qh(i,0,k,m))/dy
+                        rhs(i,1,k,m) = rhs(i,1,k,m) - (-flux(2)/dy)
+                    endif
+                end do
             end do
         endif
 
         if (intersects_bc(3) .ne. 0) then
-            do i = 1,mx
-                if (ccheck) then
-                    flux(3) = beta(i,my+1,3)*(qh(i,my+1,m) - rhs(i,my,m))/dy           
-                    flux_sum(m) = flux_sum(m) + flux(3)*dx
-                else
-                    flux(3) = beta(i,my+1,3)*(qh(i,my+1,m) - qh(i,my,m))/dy           
-                    rhs(i,my,m) = rhs(i,my,m) - (flux(3)/dy)
-                endif
+            do k = 1,mz
+                do i = 1,mx
+                    if (ccheck) then
+                        flux(3) = beta(i,my+1,k,3)*(qh(i,my+1,k,m) - rhs(i,my,k,m))/dy           
+                        flux_sum(m) = flux_sum(m) + flux(3)*dx*dz
+                    else
+                        flux(3) = beta(i,my+1,k,3)*(qh(i,my+1,k,m) - qh(i,my,k,m))/dy           
+                        rhs(i,my,k,m) = rhs(i,my,k,m) - (flux(3)/dy)
+                    endif
+                end do
             end do
         endif
 
+        if (intersects_bc(4) .ne. 0) then
+            do j = 1,my
+                do i = 1,mx
+                    if (ccheck) then
+                        flux(4) = beta(i,j,1,4)*(rhs(i,j,1,m) - qh(i,j,0,m))/dz
+                        flux_sum(m) = flux_sum(m) - flux(4)*dx*dy
+                    else
+                        flux(4) = beta(i,j,1,4)*(qh(i,j,1,m) - qh(i,j,0,m))/dz
+                        rhs(i,j,1,m) = rhs(i,j,1,m) - (-flux(4)/dz)
+                    endif
+                end do
+            end do
+        endif
+
+        if (intersects_bc(5) .ne. 0) then
+            do j = 1,my
+                do i = 1,mx
+                    if (ccheck) then
+                        flux(5) = beta(i,j,mz+1,4)*(qh(i,j,mz+1,m) - rhs(i,j,mz,m))/dz
+                        flux_sum(m) = flux_sum(m) + flux(5)*dx*dy
+                    else
+                        flux(5) = beta(i,j,mz+1,4)*(qh(i,j,mz+1,m) - qh(i,j,mz,m))/dz           
+                        rhs(i,j,mz,m) = rhs(i,j,mz,m) - (flux(5)/dz)
+                    endif
+                end do
+            end do
+        endif
     end do
 
 end subroutine poisson_fort_apply_bc

@@ -28,7 +28,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <fclaw_include_all.h>
 
-#include <fc2d_thunderegg.h>
+#include <fc3d_thunderegg.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -43,7 +43,7 @@ typedef struct {
     double* global_error; /* meqn x 3 array of errors after gather */
     double *mass0;  /* Mass at initial time */
     double *mass;
-    double area;
+    double volume;
     double *rhs;       /* Sum of rhs hand side */
     double *boundary;  /* sum around boundary */
     double *c_kahan;  

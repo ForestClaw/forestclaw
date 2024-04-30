@@ -30,22 +30,21 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "poisson_options.h"
 #include "poisson_diagnostics.h"
+#include "poisson_operator.h"
 
 #include <fclaw_clawpatch.h>
 #include <fclaw_clawpatch_options.h>
-#include <fclaw2d_clawpatch_fort.h>
+#include <fclaw3d_clawpatch_fort.h>
 
-#include <fc2d_thunderegg.h>
-#include <fc2d_thunderegg_fort.h>
-#include <fc2d_thunderegg_options.h>
-#include <fc2d_thunderegg_physical_bc.h>
-#include <fc2d_thunderegg_starpatch.h>
-#include <fc2d_thunderegg_fivepoint.h>
+#include <fc3d_thunderegg.h>
+#include <fc3d_thunderegg_fort.h>
+#include <fc3d_thunderegg_options.h>
+#include <fc3d_thunderegg_physical_bc.h>
 
 #include <fclaw_elliptic_solver.h>
 
 
-//#include <fclaw2d_farraybox.hpp>
+//#include <fclaw3d_farraybox.hpp>
 
 
 #ifdef __cplusplus
@@ -74,38 +73,38 @@ void POISSON_SETPROB();
 #define POISSON_FORT_RHS FCLAW_F77_FUNC(poisson_fort_rhs,POISSON_FORT_RHS)
 
 void POISSON_FORT_RHS(const int* blockno, const int* mbc, const int* mx, 
-                     const int* my, const int* mfields, 
-                     const double *xlower, const double *ylower,
-                     const double* dx, const double* dy, double rhs[]);
+                     const int* my, const int* mz, const int* mfields, 
+                     const double *xlower, const double *ylower, const double* zlower,
+                     const double* dx, const double* dy, const double* dz, double rhs[]);
 
 
 #define POISSON_FORT_BETA FCLAW_F77_FUNC(poisson_fort_beta,POISSON_FORT_BETA)
 
-void POISSON_FORT_BETA(const double* x, const double* y, const double* b, double grad[]);
+void POISSON_FORT_BETA(const double* x, const double* y, const double *z, const double* b, double grad[]);
 
 #define POISSON_COMPUTE_ERROR FCLAW_F77_FUNC(poisson_compute_error,POISSON_COMPUTE_ERROR)
 
-void POISSON_COMPUTE_ERROR(int* blockno, int *mx, int *my, int* mbc, int* mfields,
-                           double *dx, double *dy, double *xlower,
-                           double *ylower, double *t, double q[],
+void POISSON_COMPUTE_ERROR(int* blockno, int *mx, int *my, int *mz, int* mbc, int* mfields,
+                           double *dx, double *dy, double *dz, double *xlower,
+                           double *ylower, double *zlower, double *t, double q[],
                            double error[], double soln[]);
 
 
 #define POISSON_FORT_APPLY_BC FCLAW_F77_FUNC(poisson_fort_apply_bc, \
                                             POISSON_FORT_APPLY_BC)
 
-void POISSON_FORT_APPLY_BC(const int* blockno, const  int* mx, const  int* my, 
+void POISSON_FORT_APPLY_BC(const int* blockno, const  int* mx, const  int* my, const int* mz,
                           const  int* mbc, const  int* mfields, 
-                          const double* xlower, const double* ylower,
-                          const double* dx, const double* dy, const double* t,
+                          const double* xlower, const double* ylower, const double* zlower,
+                          const double* dx, const double* dy, const double* dz, const double* t,
                           int intersects_bc[], int mthbc[], 
-                          double rhs[], fc2d_thunderegg_fort_eval_bc_t g_bc, 
+                          double rhs[], fc3d_thunderegg_fort_eval_bc_t g_bc, 
                           int* cons_check, double flux_sum[]);
 
 
 #define POISSON_FORT_EVAL_BC FCLAW_F77_FUNC(poisson_fort_eval_bc, POISSON_FORT_EVAL_BC)
 
-double POISSON_FORT_EVAL_BC(const int* iface, const double* t,const double* x, const double* y);
+double POISSON_FORT_EVAL_BC(const int* iface, const double* t,const double* x, const double* y, const double* z);
 
 
 
@@ -115,10 +114,10 @@ double POISSON_FORT_EVAL_BC(const int* iface, const double* t,const double* x, c
            FCLAW_F77_FUNC(poisson_fort_output_ascii, \
                           POISSON_FORT_OUTPUT_ASCII)
 void POISSON_FORT_OUTPUT_ASCII(char* matname1,
-                              int* mx,        int* my,
+                              int* mx,        int* my, int* mz,
                               int* meqn,      int* mbc,
-                              double* xlower, double* ylower,
-                              double* dx,     double* dy,
+                              double* xlower, double* ylower, double* zlower,
+                              double* dx,     double* dy, double* dz,
                               double q[],double soln[], double error[],
                               int* patch_num, int* level,
                               int* blockno,   int* mpirank);

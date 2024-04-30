@@ -11,7 +11,7 @@ subroutine poisson_setprob()
     DOUBLE PRECISION alpha, x0,y0,a,b
     COMMON /comm_rhs/ alpha, x0,y0,a,b
 
-    integer bc_type(0:3)
+    integer bc_type(0:5)
     common /comm_bc/ bc_type
 
     DOUBLE PRECISION pi,pi2
@@ -44,6 +44,8 @@ subroutine poisson_setprob()
     read(10,*) bc_type(1)
     read(10,*) bc_type(2)
     read(10,*) bc_type(3)
+    read(10,*) bc_type(4)
+    read(10,*) bc_type(5)
     close(10)
 
 end subroutine poisson_setprob

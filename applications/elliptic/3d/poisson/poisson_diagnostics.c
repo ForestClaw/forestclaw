@@ -53,7 +53,7 @@ void poisson_diagnostics_initialize(fclaw_global_t *glob,
     error_data->mass0  = FCLAW_ALLOC_ZERO(double,mfields);
     error_data->rhs   = FCLAW_ALLOC_ZERO(double,mfields);
     error_data->boundary   = FCLAW_ALLOC_ZERO(double,mfields);
-    error_data->area = 0;
+    error_data->volume = 0;
     error_data->c_kahan = FCLAW_ALLOC_ZERO(double,mfields);   
 
     *acc_patch = error_data;
@@ -82,7 +82,7 @@ void poisson_diagnostics_reset(fclaw_global_t *glob,
         error_data->boundary[m] = 0;
         error_data->c_kahan[m] = 0;
     }
-    error_data->area = 0;
+    error_data->volume = 0;
 }
 
 static
@@ -96,14 +96,15 @@ void poisson_compute(fclaw_domain_t *domain,
     poisson_error_info_t *error_data = (poisson_error_info_t*) s->user; 
 
     /* Accumulate area for final computation of error */
-    int mx, my, mbc;
-    double xlower,ylower,dx,dy;
-    fclaw_clawpatch_2d_grid_data(s->glob,patch,&mx,&my,&mbc,&xlower,&ylower,&dx,&dy);
+    int mx, my, mz, mbc;
+    double xlower,ylower,zlower,dx,dy,dz;
+    fclaw_clawpatch_3d_grid_data(s->glob,patch,&mx,&my,&mz,&mbc,
+                                 &xlower,&ylower,&zlower,&dx,&dy,&dz);
 
     fclaw_clawpatch_vtable_t *clawpatch_vt = fclaw_clawpatch_vt(s->glob);
     double *area = fclaw_clawpatch_get_2d_area(s->glob,patch);  
-    FCLAW_ASSERT(clawpatch_vt->d2->fort_compute_patch_area != NULL);
-    error_data->area += clawpatch_vt->d2->fort_compute_patch_area(&mx,&my,&mbc,&dx,&dy,area);
+    FCLAW_ASSERT(clawpatch_vt->d3->fort_compute_patch_volume != NULL);
+    error_data->volume += clawpatch_vt->d3->fort_compute_patch_volume(&mx,&my,&mz,&mbc,&dx,&dy,&dz,area);
 
     /* Compute error */
     const fclaw_options_t *fclaw_opt = fclaw_get_options(s->glob);
@@ -145,7 +146,7 @@ void poisson_diagnostics_gather(fclaw_global_t *glob,
 
     if (fclaw_opt->compute_error != 0)
     {
-        double total_area = fclaw_domain_global_sum(domain, error_data->area);
+        double total_area = fclaw_domain_global_sum(domain, error_data->volume);
         FCLAW_ASSERT(total_area != 0);
 
         double *error_norm = FCLAW_ALLOC_ZERO(double,3*mfields);

@@ -1,8 +1,8 @@
-double precision function poisson_fort_eval_bc(iface,t,x,y)
+double precision function poisson_fort_eval_bc(iface,t,x,y,z)
     implicit none
 
     integer iface
-    double precision x,y,t
+    double precision x,y,z,t
 
     integer bctype(0:3)
     common /comm_bc/ bctype
