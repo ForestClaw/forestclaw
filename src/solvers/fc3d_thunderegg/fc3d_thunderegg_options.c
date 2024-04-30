@@ -40,9 +40,9 @@ thunderegg_register (fc3d_thunderegg_options_t* mg_opt, sc_options_t * opt)
 
     /* Array of NumFaces=4 values */
     fclaw_options_add_int_array (opt, 0, "boundary_conditions", 
-                                 &mg_opt->bc_cond_string, "1 1 1 1",
-                                 &mg_opt->boundary_conditions, 4,
-                                 "[thunderegg] Physical boundary condition type [1 1 1 1]");
+                                 &mg_opt->bc_cond_string, "1 1 1 1 1 1",
+                                 &mg_opt->boundary_conditions, 6,
+                                 "[thunderegg] Physical boundary condition type [1 1 1 1 1 1]");
 
     sc_options_add_bool (opt, 0, "ascii-out", &mg_opt->ascii_out, 0,
                            "Output ASCII formatted data [F]");
