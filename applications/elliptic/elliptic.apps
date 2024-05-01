@@ -4,6 +4,7 @@
 
 ## Elliptic example
 include applications/elliptic/poisson/Makefile.am
+include applications/elliptic/3d/poisson/Makefile.am
 
 ## Heat equation
 include applications/elliptic/heat/Makefile.am

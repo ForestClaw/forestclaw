@@ -4,6 +4,7 @@
 
 ## Elliptic example
 add_subdirectory(elliptic/poisson)
+add_subdirectory(elliptic/3d/poisson)
 
 ## Heat equation
 add_subdirectory(elliptic/heat)
