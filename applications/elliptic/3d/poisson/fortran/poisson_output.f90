@@ -30,23 +30,23 @@ subroutine poisson_fort_header_ascii(matname1,matname2, time,mfields,maux,ngrids
 end subroutine poisson_fort_header_ascii
 
 subroutine poisson_fort_output_ascii(matname1, & 
-         mx,my,mfields,mbc, xlower,ylower, dx,dy,  & 
+         mx,my,mz,mfields,mbc, xlower,ylower,zlower, dx,dy,dz,  & 
          rhs,soln,error,patch_num,level,blockno,mpirank)
 
     implicit none
 
     character(len=11) matname1
-    integer mfields,mbc,mx,my
+    integer mfields,mbc,mx,my,mz
     integer patch_num
     integer level, blockno, mpirank
-    double precision xlower, ylower,dx,dy
+    double precision xlower, ylower, zlower,dx,dy,dz
 
-    double precision rhs(1-mbc:mx+mbc,1-mbc:my+mbc,mfields)
-    double precision error(1-mbc:mx+mbc,1-mbc:my+mbc,mfields)
-    double precision soln(1-mbc:mx+mbc,1-mbc:my+mbc,mfields)
+    double precision rhs(1-mbc:mx+mbc,1-mbc:my+mbc,1-mbc:mz+mbc,mfields)
+    double precision error(1-mbc:mx+mbc,1-mbc:my+mbc,1-mbc:mz+mbc,mfields)
+    double precision soln(1-mbc:mx+mbc,1-mbc:my+mbc,1-mbc:mz+mbc,mfields)
 
     integer matunit1
-    integer i,j,mq
+    integer i,j,k,mq
 
     matunit1 = 10
     open(matunit1,file=matname1,position='append');
@@ -63,28 +63,30 @@ subroutine poisson_fort_output_ascii(matname1, &
         stop
     endif
 
-    do j = 1,my
-        do i = 1,mx
-            do mq = 1,mfields
-                if (abs(rhs(i,j,mq)) .lt. 1d-99) then
-                    rhs(i,j,mq) = 0.d0
-                elseif (abs(rhs(i,j,mq)) .gt. 1d99) then
-                    rhs(i,j,mq) = 1d99
+    do k = 1,mz
+        do j = 1,my
+            do i = 1,mx
+                do mq = 1,mfields
+                    if (abs(rhs(i,j,k,mq)) .lt. 1d-99) then
+                        rhs(i,j,k,mq) = 0.d0
+                    elseif (abs(rhs(i,j,k,mq)) .gt. 1d99) then
+                        rhs(i,j,k,mq) = 1d99
+                    endif
+                end do
+                if (abs(error(i,j,k,1)) .lt. 1d-99) then
+                    error(i,j,k,1) = 0.d0
+                elseif (abs(error(i,j,k,1)) .gt. 1d99) then
+                    error(i,j,k,1) = 1d99
                 endif
+                if (abs(soln(i,j,k,1)) .lt. 1d-99) then
+                    soln(i,j,k,1) = 0.d0
+                elseif (abs(soln(i,j,k,1)) .gt. 1d99) then
+                    soln(i,j,k,1) = 1d99
+                endif
+                write(matunit1,120) (rhs(i,j,k,mq),mq=1,mfields), soln(i,j,k,1), error(i,j,k,1)
             end do
-            if (abs(error(i,j,1)) .lt. 1d-99) then
-                error(i,j,1) = 0.d0
-            elseif (abs(error(i,j,1)) .gt. 1d99) then
-                error(i,j,1) = 1d99
-            endif
-            if (abs(soln(i,j,1)) .lt. 1d-99) then
-                soln(i,j,1) = 0.d0
-            elseif (abs(soln(i,j,1)) .gt. 1d99) then
-                soln(i,j,1) = 1d99
-            endif
-            write(matunit1,120) (rhs(i,j,mq),mq=1,mfields), soln(i,j,1), error(i,j,1)
+            write(matunit1,*) ' '
         end do
-        write(matunit1,*) ' '
     end do
 120 format (5E26.16)
 
