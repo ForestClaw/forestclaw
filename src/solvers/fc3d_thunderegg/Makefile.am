@@ -19,7 +19,6 @@ lib_LTLIBRARIES += src/solvers/fc3d_thunderegg/libfc3d_thunderegg.la
 
 ## Named variables that can be referenced from other libraries/apps
 FCLAW_THUNDEREGG_CPPFLAGS = -I@top_srcdir@/src/solvers/fc3d_thunderegg \
-	                       -I@top_srcdir@/src/solvers/fc3d_thunderegg/operators \
 						   $(THUNDEREGG_CFLAGS)
 
 FCLAW_THUNDEREGG_LDADD    = @top_builddir@/src/solvers/fc3d_thunderegg/libfc3d_thunderegg.la \

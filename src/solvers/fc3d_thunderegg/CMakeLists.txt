@@ -25,7 +25,6 @@ target_link_libraries(fc3d_thunderegg PUBLIC forestclaw clawpatch ThunderEgg::Th
 
 target_include_directories(fc3d_thunderegg PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/operators>
   $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
   $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
 )
