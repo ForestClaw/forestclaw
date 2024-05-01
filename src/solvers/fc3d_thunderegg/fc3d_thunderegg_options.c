@@ -111,7 +111,7 @@ static fclaw_exit_type_t
 thunderegg_postprocess (fc3d_thunderegg_options_t * mg_opt)
 {
     fclaw_options_convert_int_array (mg_opt->bc_cond_string, 
-                                     &mg_opt->boundary_conditions,4);
+                                     &mg_opt->boundary_conditions,6);
     
     return FCLAW_NOEXIT;
 }
