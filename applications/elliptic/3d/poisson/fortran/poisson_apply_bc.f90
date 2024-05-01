@@ -182,9 +182,9 @@ subroutine poisson_fort_apply_bc(blockno, mx, my, mz, mbc, mfields, xlower, ylow
                         k1 = 1
                         kg = 0
                     elseif (iface .eq. 5) then
-                        kc = my
-                        k1 = my+1
-                        kg = my+1
+                        kc = mz
+                        k1 = mz+1
+                        kg = mz+1
                     endif
                     !! location at interface
                     z = zlower + (k1 - 1)*dz
