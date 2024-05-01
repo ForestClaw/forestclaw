@@ -1,48 +1,48 @@
-DOUBLE PRECISION function poisson_qexact(x,y)
+DOUBLE PRECISION function poisson_qexact(x,y,z)
     IMPLICIT NONE
 
-    DOUBLE PRECISION x,y
+    DOUBLE PRECISION x,y,z
     
     INTEGER example
     COMMON /comm_example/ example
 
     INTEGER flag
-    DOUBLE PRECISION grad(2), q, qlap
+    DOUBLE PRECISION grad(3), q, qlap
 
 
     flag = 0  !! Don't compute the gradient
-    call poisson_qexact_complete(example,x,y,q,qlap,grad,flag)
+    call poisson_qexact_complete(example,x,y,z,q,qlap,grad,flag)
 
     poisson_qexact = q
 
 end function poisson_qexact
 
-DOUBLE PRECISION function poisson_qexact_rhs(x,y)
+DOUBLE PRECISION function poisson_qexact_rhs(x,y,z)
     implicit none
 
-    double precision x,y
+    double precision x,y,z
 
     INTEGER example
     COMMON /comm_example/ example
 
     integer flag
-    double precision q,qlap,b, grad_q(2), grad_beta(2)
+    double precision q,qlap,b, grad_q(3), grad_beta(3)
 
-    CALL poisson_fort_beta(x,y,b,grad_beta)
+    CALL poisson_fort_beta(x,y,z,b,grad_beta)
 
     flag = 2
-    CALL poisson_qexact_complete(example,x,y,q,qlap,grad_q,flag)
+    CALL poisson_qexact_complete(example,x,y,z,q,qlap,grad_q,flag)
 
-    poisson_qexact_rhs = grad_beta(1)*grad_q(1) +  grad_beta(2)*grad_q(2) + b*qlap
+    poisson_qexact_rhs = grad_beta(1)*grad_q(1) +  grad_beta(3)*grad_q(3) + b*qlap
 
 END FUNCTION poisson_qexact_rhs
 
 
 
-SUBROUTINE poisson_qexact_gradient(x,y,q,grad)
+SUBROUTINE poisson_qexact_gradient(x,y,z,q,grad)
     IMPLICIT NONE
 
-    DOUBLE PRECISION x,y, q, grad(2)
+    DOUBLE PRECISION x,y,z, q, grad(3)
 
     INTEGER flag
     DOUBLE PRECISION qlap
@@ -51,17 +51,17 @@ SUBROUTINE poisson_qexact_gradient(x,y,q,grad)
     COMMON /comm_example/ example
 
     flag = 1
-    CALL poisson_qexact_complete(example,x,y,q,qlap,grad,flag)
+    CALL poisson_qexact_complete(example,x,y,z,q,qlap,grad,flag)
 
 END SUBROUTINE poisson_qexact_gradient
 
 
 
-SUBROUTINE poisson_qexact_complete(example,x,y,q,qlap,grad,flag)
+SUBROUTINE poisson_qexact_complete(example,x,y,z,q,qlap,grad,flag)
     use hsmooth_mod, only : m_polar, x0_polar, y0_polar
     IMPLICIT NONE
 
-    DOUBLE PRECISION x,y, q, qlap, grad(2)
+    DOUBLE PRECISION x,y,z, q, qlap, grad(3)
     INTEGER flag, example
 
 !!    INTEGER example
@@ -75,7 +75,7 @@ SUBROUTINE poisson_qexact_complete(example,x,y,q,qlap,grad,flag)
 
     DOUBLE PRECISION r, r2, theta
     double precision hsmooth, h_grad(2), hsmooth_laplacian
-    DOUBLE PRECISION qx,qy, dqdr, t1(2), t2(2)
+    DOUBLE PRECISION qx,qy,qz, dqdr, t1(2), t2(2)
     double precision q1, qx1, qy1, qlap1, x0p,y0p
     integer id
 
@@ -83,10 +83,11 @@ SUBROUTINE poisson_qexact_complete(example,x,y,q,qlap,grad,flag)
     qx = 0
     qy = 0
     if (example .eq. 0) then
-        q = x**2 + y**2
+        q = x**2 + y**2 + z**2
         qx = 2*x
         qy = 2*y
-        qlap = 4
+        qz = 2*z
+        qlap = 6
     elseif (example .eq. 1) then
         !! example in polar coordinates (r)
         r2 = (x-x0)**2 + (y-y0)**2
@@ -176,6 +177,7 @@ SUBROUTINE poisson_qexact_complete(example,x,y,q,qlap,grad,flag)
     if (flag .ge. 1) then
         grad(1) = qx
         grad(2) = qy
+        grad(3) = qz
     endif
 
 end subroutine poisson_qexact_complete
@@ -188,10 +190,10 @@ double precision function sech(x)
     sech = 1.d0/cosh(x)
 end function sech
 
-subroutine poisson_fort_beta(x,y,b,grad)
+subroutine poisson_fort_beta(x,y,z,b,grad)
     implicit none
 
-    double precision x,y,b,grad(2)
+    double precision x,y,z,b,grad(2)
 
     integer beta_choice
     common /comm_beta/ beta_choice
