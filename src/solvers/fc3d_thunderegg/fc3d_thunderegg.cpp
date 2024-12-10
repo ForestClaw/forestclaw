@@ -162,8 +162,7 @@ void fc3d_thunderegg_solver_initialize(fclaw_global_t* glob)
 
 	mg_vt->is_set = 1;
 
-	FCLAW_ASSERT(fclaw_pointer_map_get(glob->vtables,"fc3d_thunderegg") == NULL);
-	fclaw_pointer_map_insert(glob->vtables, "fc3d_thunderegg", mg_vt, thunderegg_vt_destroy);
+	fclaw_global_vtable_store(glob, "fc3d_thunderegg", mg_vt, thunderegg_vt_destroy);
 }
 
 
@@ -172,7 +171,7 @@ void fc3d_thunderegg_solver_initialize(fclaw_global_t* glob)
 fc3d_thunderegg_vtable_t* fc3d_thunderegg_vt(fclaw_global_t* glob)
 {
 	fc3d_thunderegg_vtable_t* thunderegg_vt = (fc3d_thunderegg_vtable_t*) 
-	   							fclaw_pointer_map_get(glob->vtables, "fc3d_thunderegg");
+		fclaw_global_get_vtable(glob, "fc3d_thunderegg");
 	FCLAW_ASSERT(thunderegg_vt != NULL);
 	FCLAW_ASSERT(thunderegg_vt->is_set != 0);
 	return thunderegg_vt;
