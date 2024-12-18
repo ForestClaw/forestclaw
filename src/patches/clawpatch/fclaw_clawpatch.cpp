@@ -143,6 +143,7 @@ static
 double* clawpatch_get_area(struct fclaw_global* glob,
                            fclaw_patch_t* patch)
 {
+    FCLAW_ASSERT(fclaw_clawpatch_dim(patch) == 2);
     return fclaw2d_metric_patch_get_area(glob, patch);
 }
 
@@ -150,6 +151,7 @@ static
 double* clawpatch_get_volume(struct fclaw_global* glob,
                            fclaw_patch_t* patch)
 {
+    FCLAW_ASSERT(fclaw_clawpatch_dim(patch) == 3);
     return fclaw3d_metric_patch_get_volume(glob, patch);
 }
 
