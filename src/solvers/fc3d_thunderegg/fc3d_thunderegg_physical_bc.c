@@ -69,6 +69,7 @@ void cb_fc3d_thunderegg_physical_bc(fclaw_domain_t *domain,
     int cons_check = 0;
     double flux_sum[6];
 
+    FCLAW_ASSERT(mg_vt->fort_apply_bc != NULL);
     mg_vt->fort_apply_bc(&blockno, &mx, &my, &mz, &mbc, &mfields, 
                          &xlower, &ylower, &zlower, &dx,&dy,&dz,&t, intersects_bc,
                          mg_opt->boundary_conditions,rhs, mg_vt->fort_eval_bc,
