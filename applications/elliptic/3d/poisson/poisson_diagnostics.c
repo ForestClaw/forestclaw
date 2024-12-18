@@ -102,9 +102,9 @@ void poisson_compute(fclaw_domain_t *domain,
                                  &xlower,&ylower,&zlower,&dx,&dy,&dz);
 
     fclaw_clawpatch_vtable_t *clawpatch_vt = fclaw_clawpatch_vt(s->glob);
-    double *area = fclaw_clawpatch_get_2d_area(s->glob,patch);  
+    double *volume = fclaw_clawpatch_get_3d_volume(s->glob,patch);  
     FCLAW_ASSERT(clawpatch_vt->d3->fort_compute_patch_volume != NULL);
-    error_data->volume += clawpatch_vt->d3->fort_compute_patch_volume(&mx,&my,&mz,&mbc,&dx,&dy,&dz,area);
+    error_data->volume += clawpatch_vt->d3->fort_compute_patch_volume(&mx,&my,&mz,&mbc,&dx,&dy,&dz,volume);
 
     /* Compute error */
     const fclaw_options_t *fclaw_opt = fclaw_get_options(s->glob);
