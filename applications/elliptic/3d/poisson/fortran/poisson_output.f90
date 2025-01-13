@@ -51,8 +51,8 @@ subroutine poisson_fort_output_ascii(matname1, &
     matunit1 = 10
     open(matunit1,file=matname1,position='append');
 
-    call fclaw2d_clawpatch46_fort_write_grid_header(matunit1, & 
-           mx,my,xlower,ylower, dx,dy,patch_num,level, & 
+    call fclaw3d_clawpatch_fort_write_grid_header(matunit1, & 
+           mx,my,mz,xlower,ylower,zlower, dx,dy,dz,patch_num,level, & 
            blockno,mpirank)
 
     if (mfields .gt. 5) then
