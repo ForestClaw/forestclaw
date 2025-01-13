@@ -67,8 +67,8 @@ SUBROUTINE poisson_qexact_complete(example,x,y,z,q,qlap,grad,flag)
 !!    INTEGER example
 !!    COMMON /comm_example/ example
 
-    DOUBLE PRECISION alpha,x0,y0,z0,a,b
-    COMMON /comm_rhs/ alpha,x0,y0,z0,a,b
+    DOUBLE PRECISION alpha,x0,y0,z0,a,b,c
+    COMMON /comm_rhs/ alpha,x0,y0,z0,a,b,c
 
     DOUBLE PRECISION pi,pi2
     COMMON /compi/ pi, pi2
@@ -105,34 +105,55 @@ SUBROUTINE poisson_qexact_complete(example,x,y,z,q,qlap,grad,flag)
         endif
     elseif (example .eq. 2) then
         !! Example in Cartesian coordinates
-        q = cos(pi*a*x)*cos(pi*b*y)
+        q = cos(pi*a*x)*cos(pi*b*y)*cos(pi*c*z)
         if (flag .ge. 1) then
-            qx =  pi*a*cos(pi*a*x)*cos(pi*b*y)
-            qy = -pi*b*sin(pi*a*x)*sin(pi*b*y)
+            qx = -pi*a*sin(pi*a*x)*cos(pi*b*y)*cos(pi*c*z)
+            qy = -pi*b*cos(pi*a*x)*sin(pi*b*y)*cos(pi*c*z)
+            qz = -pi*c*sin(pi*a*x)*cos(pi*b*y)*sin(pi*c*z)
             if (flag .eq. 2 ) then
-                qlap = -(pi**2*(a**2 + b**2))*cos(pi*a*x)*cos(pi*b*y)
+                qlap = -pi**2*(a**2 + b**2 + c**2)*cos(pi*a*x)*cos(pi*b*y)*cos(pi*c*z)
             endif
         endif
     elseif (example .eq. 3) then
-        !! d/(dx)((1 - x) x (1 - y) y exp(x y)) = (y - 1) y e^(x y) (x^2 y - (y - 2) x - 1)
-        !! d/(dy)((1 - x) x (1 - y) y exp(x y)) = (x - 1) x e^(x y) (x y^2 - (x - 2) y - 1)
-        q = (1-x)*x*(1-y)*y*exp(x*y)
+        !! d/dx = (y - 1) y (z - 1) z (-e^(x y z)) (x^2 y z + x (2 - y z) - 1)
+        !! d/dy = (x - 1) x (z - 1) z (-e^(x y z)) (x y^2 z + y (2 - x z) - 1)
+        !! d/dz = (x - 1) x (y - 1) y (-e^(x y z)) (x y z^2 + z (2 - x y) - 1)
+        q = (1-x)*x*(1-y)*y*(1-z)*z*exp(x*y*z)
 
         if (flag .ge. 1) then
-            qx = (y - 1)*y*exp(x*y)*(x**2*y - (y - 2)*x - 1)
-            qy = (x - 1)*x*exp(x*y)*(x*y**2 - (x - 2)*y - 1)
+            qx = -(y-1)*y*(z-1)*z*exp(x*y*z)*(x**2*y*z + x*(2-y*z) - 1)
+            qy = -(x-1)*x*(z-1)*z*exp(x*y*z)*(x*y**2*z + y*(2-x*z) - 1)
+            qz = -(x-1)*x*(y-1)*y*exp(x*y*z)*(x*y*z**2 + z*(2-x*y) - 1)
             if (flag .eq. 2) then
-                !!Δ((1 - x) x (1 - y) y e^(x y)) = 
-                !! e^(x y) (x^4 (y - 1) y 
-                !! - x^3 (y^2 - 5 y + 2) 
-                !! + x^2 (y^4 - y^3 - 4 y + 4) 
-                !! - x (y^4 - 5 y^3 + 4 y^2 + 2) 
-                !! - 2 (y - 1)^2 y)
-                qlap = exp(x*y)*(x**4*(y - 1)*y & 
-                                 - x**3*(y**2 - 5*y + 2) & 
-                                 + x**2*(y**4 - y**3 - 4*y + 4) & 
-                                 - x*(y**4 - 5*y**3 + 4*y**2 + 2) &
-                                 - 2*(y - 1)**2*y)
+                !! Δ((1 - x) x (1 - y) y (1 - z) z exp(x y z)) 
+                !! = e^(x y z) * (
+                !!     -(x - 1) x^3 (y - 1) y^3 (z - 1) z 
+                !!     - (x - 1) x^3 (y - 1) y (z - 1) z^3 
+                !!     - 2 (x - 1) x^2 (y - 1) y^2 (z - 1) 
+                !!     - 2 (x - 1) x^2 (y - 1) y^2 z 
+                !!     - 2 (x - 1) x^2 y (z - 1) z^2 
+                !!     - 2 (x - 1) x^2 (y - 1) (z - 1) z^2 
+                !!     - ((x - 1) x (y - 1) y^3 (z - 1) z^3) 
+                !!     - 2 (x - 1) (y - 1) y^2 (z - 1) z^2 
+                !!     - 2 x (y - 1) y^2 (z - 1) z^2 
+                !!     - 2 (x - 1) x (y - 1) y 
+                !!     - 2 (x - 1) x (z - 1) z 
+                !!     - 2 (y - 1) y (z - 1) z
+                !! )
+                qlap = exp(x*y*z)*( &
+                        -(x-1)*x**3*(y-1)*y**3*(z-1)*z &
+                        -(x-1)*x**3*(y-1)*y*(z-1)*z**3 &
+                        -2*(x-1)*x**2*(y-1)*y**2*(z-1) & 
+                        -2*(x-1)*x**2*(y-1)*y**2*z &
+                        -2*(x-1)*x**2*y*(z-1)*z**2 &
+                        -2*(x-1)*x**2*(y-1)*(z-1)*z**2 &
+                        -((x-1)*x*(y-1)*y**3*(z-1)*z**3) &
+                        -2*(x-1)*(y-1)*y**2*(z-1)*z**2 &
+                        -2*x*(y-1)*y**2*(z-1)*z**2 &
+                        -2*(x-1)*x*(y-1)*y &
+                        -2*(x-1)*x*(z-1)*z &
+                        -2*(y-1)*y*(z-1)*z &
+                      )
             endif
         endif
     elseif (example .eq. 4) then
