@@ -57,45 +57,48 @@ END SUBROUTINE poisson_qexact_gradient
 
 
 
-SUBROUTINE poisson_qexact_complete(example,x,y,q,qlap,grad,flag)
+SUBROUTINE poisson_qexact_complete(example,x,y,z,q,qlap,grad,flag)
     use hsmooth_mod, only : m_polar, x0_polar, y0_polar
     IMPLICIT NONE
 
-    DOUBLE PRECISION x,y, q, qlap, grad(2)
+    DOUBLE PRECISION x,y,z, q, qlap, grad(3)
     INTEGER flag, example
 
 !!    INTEGER example
 !!    COMMON /comm_example/ example
 
-    DOUBLE PRECISION alpha,x0,y0,a,b
-    COMMON /comm_rhs/ alpha,x0,y0,a,b
+    DOUBLE PRECISION alpha,x0,y0,z0,a,b
+    COMMON /comm_rhs/ alpha,x0,y0,z0,a,b
 
     DOUBLE PRECISION pi,pi2
     COMMON /compi/ pi, pi2
 
     DOUBLE PRECISION r, r2, theta
-    double precision hsmooth, h_grad(2), hsmooth_laplacian
-    DOUBLE PRECISION qx,qy, dqdr, t1(2), t2(2)
+    double precision hsmooth, h_grad(3), hsmooth_laplacian
+    DOUBLE PRECISION qx,qy,qz, dqdr, t1(3), t2(3)
     double precision q1, qx1, qy1, qlap1, x0p,y0p
     integer id
 
     if (example .eq. 0) then
-        q = x**2 + y**2
+        q = x**2 + y**2 + z**2
         qx = 2*x
         qy = 2*y
-        qlap = 4
+        qz = 2*z
+        qlap = 6
     elseif (example .eq. 1) then
         !! example in polar coordinates (r)
-        r2 = (x-x0)**2 + (y-y0)**2
+        r2 = (x-x0)**2 + (y-y0)**2 + (z-z0)**2
         q1 = exp(-alpha/2.d0*r2)
         q = q1 + 1
         if (flag .ge. 1) then
             r = sqrt(r2)
             t1(1) = (x-x0)/r
             t1(2) = (y-y0)/r
+            t1(3) = (z-z0)/r
             dqdr = -alpha*r*q1
             qx = dqdr*t1(1)  !! Cartesian components of gradient
             qy = dqdr*t1(2)
+            qz = dqdr*t1(3)
             if (flag .eq. 2) then
                 qlap = alpha*exp(-alpha/2.d0*r2)*(alpha*r2 - 2)
             endif
@@ -169,6 +172,7 @@ SUBROUTINE poisson_qexact_complete(example,x,y,q,qlap,grad,flag)
     if (flag .ge. 1) then
         grad(1) = qx
         grad(2) = qy
+        grad(3) = qz
     endif
 
 end subroutine poisson_qexact_complete
