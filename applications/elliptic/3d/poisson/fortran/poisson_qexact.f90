@@ -1,48 +1,48 @@
-DOUBLE PRECISION function poisson_qexact(x,y)
+DOUBLE PRECISION function poisson_qexact(x,y,z)
     IMPLICIT NONE
 
-    DOUBLE PRECISION x,y
+    DOUBLE PRECISION x,y,z
     
     INTEGER example
     COMMON /comm_example/ example
 
     INTEGER flag
-    DOUBLE PRECISION grad(2), q, qlap
+    DOUBLE PRECISION grad(3), q, qlap
 
 
     flag = 0  !! Don't compute the gradient
-    call poisson_qexact_complete(example,x,y,q,qlap,grad,flag)
+    call poisson_qexact_complete(example,x,y,z,q,qlap,grad,flag)
 
     poisson_qexact = q
 
 end function poisson_qexact
 
-DOUBLE PRECISION function poisson_qexact_rhs(x,y)
+DOUBLE PRECISION function poisson_qexact_rhs(x,y,z)
     implicit none
 
-    double precision x,y
+    double precision x,y,z
 
     INTEGER example
     COMMON /comm_example/ example
 
     integer flag
-    double precision q,qlap,b, grad_q(2), grad_beta(2)
+    double precision q,qlap,b, grad_q(3), grad_beta(3)
 
-    CALL poisson_fort_beta(x,y,b,grad_beta)
+    CALL poisson_fort_beta(x,y,z,b,grad_beta)
 
     flag = 2
-    CALL poisson_qexact_complete(example,x,y,q,qlap,grad_q,flag)
+    CALL poisson_qexact_complete(example,x,y,z,q,qlap,grad_q,flag)
 
-    poisson_qexact_rhs = grad_beta(1)*grad_q(1) +  grad_beta(2)*grad_q(2) + b*qlap
+    poisson_qexact_rhs = grad_beta(1)*grad_q(1) +  grad_beta(2)*grad_q(2) + grad_beta(3)*grad_q(3) + b*qlap
 
 END FUNCTION poisson_qexact_rhs
 
 
 
-SUBROUTINE poisson_qexact_gradient(x,y,q,grad)
+SUBROUTINE poisson_qexact_gradient(x,y,z,q,grad)
     IMPLICIT NONE
 
-    DOUBLE PRECISION x,y, q, grad(2)
+    DOUBLE PRECISION x,y,z, q, grad(3)
 
     INTEGER flag
     DOUBLE PRECISION qlap
@@ -51,7 +51,7 @@ SUBROUTINE poisson_qexact_gradient(x,y,q,grad)
     COMMON /comm_example/ example
 
     flag = 1
-    CALL poisson_qexact_complete(example,x,y,q,qlap,grad,flag)
+    CALL poisson_qexact_complete(example,x,y,z,q,qlap,grad,flag)
 
 END SUBROUTINE poisson_qexact_gradient
 
@@ -181,10 +181,10 @@ double precision function sech(x)
     sech = 1.d0/cosh(x)
 end function sech
 
-subroutine poisson_fort_beta(x,y,b,grad)
+subroutine poisson_fort_beta(x,y,z,b,grad)
     implicit none
 
-    double precision x,y,b,grad(2)
+    double precision x,y,z,b,grad(3)
 
     integer beta_choice
     common /comm_beta/ beta_choice
@@ -192,24 +192,28 @@ subroutine poisson_fort_beta(x,y,b,grad)
     DOUBLE PRECISION pi,pi2
     COMMON /compi/ pi, pi2
 
-    DOUBLE PRECISION bx, by
+    DOUBLE PRECISION bx, by, bz
 
     if (beta_choice .eq. 0) then
         b = 1
         bx = 0
         by = 0
+        bz = 0
     elseif (beta_choice .eq. 1) then
-        b = cos(pi*x)*cos(pi*y) + 2
-        bx = -pi*sin(pi*x)*cos(pi*y)
-        by = -pi*cos(pi*x)*sin(pi*y)
+        b = cos(pi*x)*cos(pi*y)*cos(pi*z) + 2
+        bx = -pi*sin(pi*x)*cos(pi*y)*cos(pi*z)
+        by = -pi*cos(pi*x)*sin(pi*y)*cos(pi*z)
+        bz = -pi*cos(pi*x)*cos(pi*y)*sin(pi*z)
     elseif (beta_choice .eq. 2) then
-        b = 1 + x*y
-        bx = y
-        by = x
+        b = 1 + x*y*z
+        bx = y*z
+        by = x*z
+        bz = x*y
     endif
 
     grad(1) = bx
     grad(2) = by
+    grad(3) = bz
 
 end subroutine poisson_fort_beta
 
