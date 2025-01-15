@@ -158,20 +158,32 @@ fclaw2d_vtk_write_header (fclaw_domain_t * domain, fclaw2d_vtk_state_t * s)
                                 "offset=\"%lld\">\n", s->inttype,
                                 (long long) s->offset_patchno) < 0;
     retval = retval || fprintf (file, "    </DataArray>\n") < 0;
+
+    const char *format_single = "    <DataArray type=\"Float32\" Name=\"%s\" format=\"appended\" offset=\"%lld\">\n";
+    const char *format_multiple = "    <DataArray type=\"Float32\" Name=\"%s\" NumberOfComponents=\"%d\" format=\"appended\" offset=\"%lld\">\n";
+
     if (s->meqn == 1)
     {
-        retval = retval || fprintf (file, "    <DataArray type=\"Float32\" "
-                                    "Name=\"meqn\" "
-                                    "format=\"appended\" offset=\"%lld\">\n",
-                                    (long long) s->offset_meqn) < 0;
+        retval = retval || fprintf (file, format_single, "meqn", (long long) s->offset_meqn) < 0;
     }
     else
     {
-        retval = retval || fprintf (file, "    <DataArray type=\"Float32\" "
-                                    "Name=\"meqn\" NumberOfComponents=\"%d\" "
-                                    "format=\"appended\" offset=\"%lld\">\n",
-                                    s->meqn, (long long) s->offset_meqn) < 0;
+        retval = retval || fprintf (file, format_multiple, "meqn", s->meqn, (long long) s->offset_meqn) < 0;
     }
+
+    if (s->rhs_fields > 0)
+    {
+        if (s->rhs_fields == 1) {
+            retval = retval || fprintf(file, format_single, "rhs", (long long) s->offset_rhs) < 0;
+            retval = retval || fprintf(file, format_single, "soln", (long long) s->offset_soln) < 0;
+            retval = retval || fprintf(file, format_single, "error", (long long) s->offset_error) < 0;
+        } else {
+            retval = retval || fprintf(file, format_multiple, "rhs", s->rhs_fields, (long long) s->offset_rhs) < 0;
+            retval = retval || fprintf(file, format_multiple, "soln", s->rhs_fields, (long long) s->offset_soln) < 0;
+            retval = retval || fprintf(file, format_multiple, "error", s->rhs_fields, (long long) s->offset_error) < 0;
+        }
+    }
+
     retval = retval || fprintf (file, "    </DataArray>\n") < 0;
     retval = retval || fprintf (file, "   </CellData>\n") < 0;
     retval = retval || fprintf (file, "   <PointData>\n") < 0;
