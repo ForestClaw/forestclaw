@@ -76,8 +76,8 @@ clawpatch_register(fclaw_clawpatch_options_t *clawpatch_options,
     sc_options_add_int (opt, 0, "meqn", &clawpatch_options->meqn, 1,
                         "Number of equations [1]");
 
-    sc_options_add_int (opt, 0, "rhs-fields", &clawpatch_options->rhs_fields, 1,
-                        "Number of fields in rhs [1]");
+    sc_options_add_int (opt, 0, "rhs-fields", &clawpatch_options->rhs_fields, 0,
+                        "Number of fields in rhs [0]");
 
     /* ---------------------- advanced options -------------------------- */
     sc_options_add_int (opt, 0, "interp_stencil_width",
