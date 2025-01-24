@@ -69,7 +69,7 @@ jobs:
       run: |
         sudo apt-get update -yq
         sudo apt-get install -yq --no-install-recommends \
-            ninja-build ${{ matrix.ubuntu_packages }}
+            ${{ matrix.ubuntu_packages }}
 
     - name: CMake configure examples
       run: cmake -B applications/build -S applications --preset ci -DTEST_FETCH_CONTENT=true ${{ matrix.flags }} -DTEST_FETCH_CONTENT_TAG="`git rev-parse HEAD`" -DTEST_FETCH_CONTENT_REPO="`pwd`"

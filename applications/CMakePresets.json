@@ -10,7 +10,7 @@
 {
   "name": "ci",
   "binaryDir": "${sourceDir}/build",
-  "generator": "Ninja",
+  "generator": "Unix Makefiles",
   "environment": {
     "CUDAARCHS": "72"
   },
@@ -21,7 +21,7 @@
 {
   "name": "default",
   "binaryDir": "${sourceDir}/build",
-  "generator": "Ninja",
+  "generator": "Unix Makefiles",
   "cacheVariables": {"CMAKE_BUILD_TYPE": "Release",
     "mpi": true,
     "openmp": true}

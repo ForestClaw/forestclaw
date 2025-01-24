@@ -112,6 +112,52 @@ typedef struct fclaw_match_wrap_user
     void *user;
 } fclaw_match_wrap_user_t;
 
+/** 
+ * @brief Callback wrapper struct for pack callbacks.
+ *
+ * This allows callbacks with dimension independent types to be 
+ * called from dimension dependent code.
+ *
+ * This type should be passed in as the user pointer alongside
+ * @ref fclaw2d_pack_wrap_cb or @ref fclaw3d_pack_wrap_cb
+ * to the function that takes a dimensioned callback.
+ *
+ * @ref fclaw2d_pack_wrap_cb or @ref fclaw3d_pack_wrap_cb
+ * will then call the dimension independent callback specified in the struct,
+ * passing the user pointer specified in the struct.
+ * 
+ */
+typedef struct fclaw_pack_wrap_user
+{
+    /** Dimension independent pack callback to call */
+    fclaw_pack_callback_t pcb;
+    /** User pointer to pass to dimension independent callback */
+    void *user;
+} fclaw_pack_wrap_user_t;
+
+/** 
+ * @brief Callback wrapper struct for unpack callbacks.
+ *
+ * This allows callbacks with dimension independent types to be 
+ * called from dimension dependent code.
+ *
+ * This type should be passed in as the user pointer alongside
+ * @ref fclaw2d_unpack_wrap_cb or @ref fclaw3d_unpack_wrap_cb
+ * to the function that takes a dimensioned callback.
+ *
+ * @ref fclaw2d_unpack_wrap_cb or @ref fclaw3d_unpack_wrap_cb
+ * will then call the dimension independent callback specified in the struct,
+ * passing the user pointer specified in the struct.
+ * 
+ */
+typedef struct fclaw_unpack_wrap_user
+{
+    /** Dimension independent unpack callback to call */
+    fclaw_unpack_callback_t ucb;
+    /** User pointer to pass to dimension independent callback */
+    void *user;
+} fclaw_unpack_wrap_user_t;
+
 /**
  * @brief Callback wrapper struct for match callbacks.
  *

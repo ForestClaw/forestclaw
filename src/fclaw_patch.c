@@ -53,20 +53,39 @@ void* get_user_patch(fclaw_patch_t* patch)
 	return pdata->user_patch;
 }
 
-
+static
+void set_unpacking_flag(fclaw_patch_t* patch)
+{
+	fclaw_patch_data_t *pdata = get_patch_data(patch);
+	pdata->flags |= FCLAW_PATCH_DATA_UNPACKING;
+}
+static
+int is_unpacking(fclaw_patch_t* patch)
+{
+	fclaw_patch_data_t *pdata = get_patch_data(patch);
+	return pdata->flags & FCLAW_PATCH_DATA_UNPACKING;
+}
+static
+void clear_unpacking_flag(fclaw_patch_t* patch)
+{
+	fclaw_patch_data_t *pdata = get_patch_data(patch);
+	pdata->flags &= ~FCLAW_PATCH_DATA_UNPACKING;
+}
 
 /* ----------------------------- Creating/deleting patches ---------------------------- */
 
 static
 void patch_data_new(fclaw_global_t* glob,
+				    fclaw_domain_t* domain,
 					fclaw_patch_t* this_patch,
 					int this_block_idx, int this_patch_idx)
 {
-	fclaw_patch_vtable_t *patch_vt = fclaw_patch_vt(glob);
-
-	/* Initialize user data */
-	fclaw_patch_data_t *pdata = FCLAW_ALLOC(fclaw_patch_data_t, 1);
-	this_patch->user = (void *) pdata;
+	if(this_patch->user == NULL)
+	{
+		fclaw_patch_vtable_t *patch_vt = fclaw_patch_vt(glob);
+		/* Initialize user data */
+		fclaw_patch_data_t *pdata = FCLAW_ALLOC(fclaw_patch_data_t, 1);
+		this_patch->user = (void *) pdata;
 
 #if 0   
     /* This check is dubious, since glob->domain is the old domain */
@@ -80,22 +99,28 @@ void patch_data_new(fclaw_global_t* glob,
     }
 #endif    
 
-	pdata->patch_idx = this_patch_idx;
-	pdata->block_idx = this_block_idx;
+		pdata->patch_idx = this_patch_idx;
+		pdata->block_idx = this_block_idx;
 
-	/* create new user data */
-	FCLAW_ASSERT(patch_vt->patch_new != NULL);
-	pdata->user_patch = patch_vt->patch_new();
+		/* create new user data */
+		FCLAW_ASSERT(patch_vt->patch_new != NULL);
+		pdata->user_patch = patch_vt->patch_new();
 
-	++glob->domain->count_set_patch; //this is now in cb_fclaw2d_regrid_repopulate 
-	pdata->neighbors_set = 0;
-	pdata->considered_for_refinement = 0;
+		++domain->count_set_patch;
+		pdata->neighbors_set = 0;
+		pdata->flags = 0;
+		pdata->num_owners = 1;
+	}
+	else
+	{
+		FCLAW_ASSERT(is_unpacking(this_patch));
+	}
 }
 
 static 
 size_t patch_data_packsize()
 {
-	return sizeof(int);
+	return sizeof(fclaw_patch_data_flags_t);
 }
 
 static
@@ -103,17 +128,21 @@ void patch_data_pack(fclaw_global_t* glob,
 					 fclaw_patch_t* this_patch,
 					 void* pack_data_here)
 {
+	FCLAW_ASSERT(!is_unpacking(this_patch));
 	fclaw_patch_data_t *pdata = get_patch_data(this_patch);
-	fclaw_pack_int(pdata->considered_for_refinement, (char*) pack_data_here);
+	FCLAW_PACK(pdata->flags, (char*) pack_data_here);
 }
 
 static
 void patch_data_unpack(fclaw_global_t* glob,
+					   fclaw_domain_t* domain,
 					   fclaw_patch_t* this_patch,
+					   int blockno, int patchno,
 					   void* unpack_data_from_here)
 {
+	patch_data_new(glob,domain,this_patch,blockno,patchno);
 	fclaw_patch_data_t *pdata = get_patch_data(this_patch);
-	fclaw_unpack_int((char*) unpack_data_from_here, &pdata->considered_for_refinement);
+	FCLAW_UNPACK((char*) unpack_data_from_here, &pdata->flags);
 }
 
 void fclaw_patch_reset_data(fclaw_global_t* glob,
@@ -137,7 +166,8 @@ void fclaw_patch_reset_data(fclaw_global_t* glob,
 }
 
 void fclaw_patch_data_delete(fclaw_global_t *glob,
-							   fclaw_patch_t *this_patch)
+							 fclaw_domain_t *domain,
+							 fclaw_patch_t *this_patch)
 {
 	fclaw_patch_vtable_t *patch_vt = fclaw_patch_vt(glob);
 	FCLAW_ASSERT(patch_vt->patch_delete != NULL);
@@ -145,29 +175,38 @@ void fclaw_patch_data_delete(fclaw_global_t *glob,
 
     if (pdata != NULL)
     {
-        if (patch_vt->destroy_user_data)
-        {
-            patch_vt->destroy_user_data(glob,this_patch);
-        }
+		if(pdata->num_owners > 1)
+		{
+			--pdata->num_owners;
+		}
+		else
+		{
+	        if (patch_vt->destroy_user_data)
+	        {
+	            patch_vt->destroy_user_data(glob,this_patch);
+	        }
 
-        patch_vt->patch_delete(pdata->user_patch);
-        ++glob->domain->count_delete_patch;
+			patch_vt->patch_delete(pdata->user_patch);
 
-		FCLAW_FREE(pdata);
+			FCLAW_FREE(pdata);
+		}
+
+		++domain->count_delete_patch;
 		this_patch->user = NULL;
 	}
 }
 
 void fclaw_patch_build(fclaw_global_t *glob,
-						 fclaw_patch_t *this_patch,
-						 int blockno,
-						 int patchno,
-						 void *user)
+					   fclaw_domain_t *domain,
+					   fclaw_patch_t *this_patch,
+					   int blockno,
+					   int patchno,
+					   void *user)
 {
 	fclaw_patch_vtable_t *patch_vt = fclaw_patch_vt(glob);
 
 	/* This is where we store 'user' (from the point of view of a p4est user) data */
-	patch_data_new(glob,this_patch,blockno, patchno);
+	patch_data_new(glob,domain,this_patch,blockno, patchno);
 
 	FCLAW_ASSERT(patch_vt->build != NULL);
 	patch_vt->build(glob,
@@ -198,17 +237,18 @@ void fclaw_patch_build(fclaw_global_t *glob,
 
 
 void fclaw_patch_build_from_fine(fclaw_global_t *glob,
-                                   fclaw_patch_t *fine_patches,
-                                   fclaw_patch_t *coarse_patch,
-                                   int blockno,
-                                   int coarse_patchno,
-                                   int fine0_patchno,
-                                   fclaw_build_mode_t build_mode)
+								 fclaw_domain_t *domain,
+								 fclaw_patch_t *fine_patches,
+								 fclaw_patch_t *coarse_patch,
+								 int blockno,
+								 int coarse_patchno,
+								 int fine0_patchno,
+								 fclaw_build_mode_t build_mode)
 {
     fclaw_patch_vtable_t *patch_vt = fclaw_patch_vt(glob);
     FCLAW_ASSERT(patch_vt->build_from_fine != NULL);
 
-    patch_data_new(glob,coarse_patch,blockno, coarse_patchno);
+    patch_data_new(glob,domain,coarse_patch,blockno, coarse_patchno);
 
     fclaw_patch_data_t *pdata = get_patch_data(coarse_patch);
     pdata->block_idx = blockno;
@@ -231,6 +271,22 @@ void fclaw_patch_build_from_fine(fclaw_global_t *glob,
         patch_vt->setup(glob,coarse_patch,blockno,coarse_patchno);
     }
 }
+
+void fclaw_patch_shallow_copy(struct fclaw_global *glob,
+                              struct fclaw_domain *src_domain,
+                              struct fclaw_patch *src_patch,
+                              struct fclaw_domain *dst_domain,
+                              struct fclaw_patch *dst_patch,
+							  int blockno,
+							  int old_patchno,
+							  int new_patchno)
+{
+	fclaw_patch_data_t *pdata = get_patch_data(src_patch);
+	dst_patch->user = pdata;
+	++pdata->num_owners;
+	++dst_domain->count_set_patch;
+}
+
 
 #if 0
 void fclaw2d_patch_create_user_data(fclaw2d_global_t* glob,
@@ -641,16 +697,16 @@ void fclaw_patch_average2coarse(fclaw_global_t *glob,
 
 void fclaw_patch_interpolate2fine(fclaw_global_t* glob,
 									fclaw_patch_t* coarse_patch,
-									fclaw_patch_t* fine_patches,
+									fclaw_patch_t* fine_patch,
 									int this_blockno, int coarse_patchno,
-									int fine0_patchno)
+									int fine_patchno, int igrid)
 {
 	fclaw_patch_vtable_t *patch_vt = fclaw_patch_vt(glob);
 	FCLAW_ASSERT(patch_vt->interpolate2fine != NULL);
 
-	patch_vt->interpolate2fine(glob,coarse_patch,fine_patches,
+	patch_vt->interpolate2fine(glob,coarse_patch,fine_patch,
 							   this_blockno,coarse_patchno,
-							   fine0_patchno);
+							   fine_patchno, igrid);
 }
 
 /* ---------------------------- Ghost patches (local and remote) ---------------------- */
@@ -717,7 +773,7 @@ void fclaw_patch_remote_ghost_build(fclaw_global_t *glob,
 
 	FCLAW_ASSERT(patch_vt->remote_ghost_build != NULL);
 
-	patch_data_new(glob,this_patch,blockno,patchno);
+	patch_data_new(glob,glob->domain,this_patch,blockno,patchno);
 
 	patch_vt->remote_ghost_build(glob,this_patch,blockno,
 							patchno,build_mode);
@@ -796,31 +852,154 @@ void fclaw_patch_partition_pack(fclaw_global_t *glob,
 
 void fclaw_patch_partition_unpack(fclaw_global_t *glob,  
 									fclaw_domain_t *new_domain,
-									fclaw_patch_t *this_patch,
-									int this_block_idx,
-									int this_patch_idx,
+									fclaw_patch_t *patch,
+									int blockno,
+									int patchno,
 									void *unpack_data_from_here)
 {
 	fclaw_patch_vtable_t *patch_vt = fclaw_patch_vt(glob);
 
-	fclaw_build_mode_t build_mode = FCLAW_BUILD_FOR_UPDATE;
-
-	fclaw_patch_build(glob,this_patch,this_block_idx,
-						this_patch_idx,(void*) &build_mode);
-
-	/* This copied q data from memory */
-	FCLAW_ASSERT(patch_vt->partition_unpack != NULL);
-
-	patch_vt->partition_unpack(glob,  /* contains old domain */
-							   new_domain,
-							   this_patch,
-							   this_block_idx,
-							   this_patch_idx,
-							   unpack_data_from_here);
-
+	/* unpack patch data struct first */
 	FCLAW_ASSERT(patch_vt->partition_packsize != NULL);
 	void* pdata_unpack_data_from_here = (void*) ((char*) unpack_data_from_here + patch_vt->partition_packsize(glob));
-	patch_data_unpack(glob,this_patch,pdata_unpack_data_from_here);
+	patch_data_unpack(glob,new_domain,patch,
+					  blockno,patchno,pdata_unpack_data_from_here);
+
+	fclaw_build_mode_t build_mode = FCLAW_BUILD_FOR_UPDATE;
+
+	set_unpacking_flag(patch);
+	if(fclaw_patch_has_coarse_data(glob, patch))
+	{
+        int igrid = fclaw_patch_childid(patch);
+        double width = patch->xupper - patch->xlower;
+        double height = patch->yupper - patch->ylower;
+        double depth = patch->zupper - patch->zlower;
+        fclaw2d_patch_t artificial_patch_2d;
+        fclaw3d_patch_t artificial_patch_3d;
+        fclaw_patch_t artificial_patch;
+		if(patch->refine_dim == 2)
+		{
+        	artificial_patch_2d.level  = patch->level-1;
+        	artificial_patch_2d.xlower = patch->xlower;
+        	artificial_patch_2d.ylower = patch->ylower;
+        	artificial_patch_2d.xupper = patch->xupper;
+        	artificial_patch_2d.yupper = patch->yupper;
+        	artificial_patch_2d.flags  = patch->d2->flags;
+        	int lower_x_axis = !(igrid & 0x1);
+        	if(lower_x_axis)
+        	{
+        	    artificial_patch_2d.xupper += width;
+        	}
+        	else
+        	{
+        	    artificial_patch_2d.xlower -= width;
+        	}
+        	int lower_y_axis = !(igrid & 0x2);
+        	if(lower_y_axis)
+        	{
+        	    artificial_patch_2d.yupper += height;
+        	}
+        	else
+        	{
+        	    artificial_patch_2d.ylower -= height;
+        	}
+        	artificial_patch.level  = artificial_patch_2d.level;
+        	artificial_patch.xlower = artificial_patch_2d.xlower;
+        	artificial_patch.ylower = artificial_patch_2d.ylower;
+        	artificial_patch.xupper = artificial_patch_2d.xupper;
+        	artificial_patch.yupper = artificial_patch_2d.yupper;
+        	artificial_patch.d2 = &artificial_patch_2d;
+        	artificial_patch.refine_dim = 2;
+        	artificial_patch_2d.user = &artificial_patch;
+		}
+		else
+		{
+			artificial_patch_3d.level  = patch->level-1;
+			artificial_patch_3d.xlower = patch->xlower;
+			artificial_patch_3d.ylower = patch->ylower;
+			artificial_patch_3d.zlower = patch->zlower;
+			artificial_patch_3d.xupper = patch->xupper;
+			artificial_patch_3d.yupper = patch->yupper;
+			artificial_patch_3d.zupper = patch->zupper;
+			artificial_patch_3d.flags  = patch->d3->flags;
+			int lower_x_axis = !(igrid & 0x1);
+			if(lower_x_axis)
+			{
+			    artificial_patch_3d.xupper += width;
+			}
+			else
+			{
+			    artificial_patch_3d.xlower -= width;
+			}
+			int lower_y_axis = !(igrid & 0x2);
+			if(lower_y_axis)
+			{
+			    artificial_patch_3d.yupper += height;
+			}
+			else
+			{
+			    artificial_patch_3d.ylower -= height;
+			}
+			int lower_z_axis = !(igrid & 0x4);
+			if(lower_z_axis)
+			{
+			    artificial_patch_3d.zupper += depth;
+			}
+			else
+			{
+			    artificial_patch_3d.zlower -= depth;
+			}
+			artificial_patch.level  = artificial_patch_3d.level;
+			artificial_patch.xlower = artificial_patch_3d.xlower;
+			artificial_patch.ylower = artificial_patch_3d.ylower;
+			artificial_patch.zlower = artificial_patch_3d.zlower;
+			artificial_patch.xupper = artificial_patch_3d.xupper;
+			artificial_patch.yupper = artificial_patch_3d.yupper;
+			artificial_patch.zupper = artificial_patch_3d.zupper;
+			artificial_patch.d3 = &artificial_patch_3d;
+			artificial_patch.refine_dim = 3;
+			artificial_patch_3d.user = &artificial_patch;
+		}
+
+		//shallow pach data
+		fclaw_patch_shallow_copy(glob,
+								 new_domain,patch,
+								 new_domain,&artificial_patch,
+								 blockno,patchno,-1);
+
+
+		fclaw_patch_build(glob,new_domain,&artificial_patch,blockno,
+							-1,(void*) &build_mode);
+
+		/* This copied q data from memory */
+		FCLAW_ASSERT(patch_vt->partition_unpack != NULL);
+
+		patch_vt->partition_unpack(glob,  /* contains old domain */
+								   new_domain,
+								   &artificial_patch,
+								   blockno,
+								   patchno,
+								   unpack_data_from_here);
+		
+		fclaw_patch_data_delete(glob,new_domain,&artificial_patch);
+	}
+	else
+	{
+		fclaw_patch_build(glob,new_domain,patch,blockno,
+							patchno,(void*) &build_mode);
+
+		/* This copied q data from memory */
+		FCLAW_ASSERT(patch_vt->partition_unpack != NULL);
+
+		patch_vt->partition_unpack(glob,  /* contains old domain */
+								   new_domain,
+								   patch,
+								   blockno,
+								   patchno,
+								   unpack_data_from_here);
+	}
+
+	clear_unpacking_flag(patch);
 }
 
 /* ----------------------------------- Restart  --------------------------------------- */
@@ -1242,22 +1421,21 @@ void fclaw_patch_considered_for_refinement_set(struct fclaw_global *glob,
                                                struct fclaw_patch* patch)
 {
     fclaw_patch_data_t *pdata = get_patch_data(patch);
-	//FCLAW_ASSERT(pdata->considered_for_refinement == 0);
-	pdata->considered_for_refinement = 1;
+	pdata->flags |= FCLAW_PATCH_DATA_CONSIDERED_FOR_REFINEMENT;
 }
 
 void fclaw_patch_considered_for_refinement_clear(struct fclaw_global *glob,
                                                  struct fclaw_patch* patch)
 {
     fclaw_patch_data_t *pdata = get_patch_data(patch);
-	pdata->considered_for_refinement = 0;
+	pdata->flags &= ~FCLAW_PATCH_DATA_CONSIDERED_FOR_REFINEMENT;
 }
 
 int fclaw_patch_considered_for_refinement(struct fclaw_global *glob,
 										 struct fclaw_patch* patch)
 {
 	fclaw_patch_data_t *pdata = get_patch_data(patch);
-	return pdata->considered_for_refinement;
+	return pdata->flags & FCLAW_PATCH_DATA_CONSIDERED_FOR_REFINEMENT;
 }
 
 static
@@ -1266,9 +1444,9 @@ void considred_for_refinement_cb(fclaw_domain_t *domain,
 								 int blockno, int patchno,
 								 void *user)
 {
-	fclaw_patch_data_t *pdata = get_patch_data(patch);
-	int *all_patches_considered = (int*) user;
-	if (!pdata->considered_for_refinement)
+	fclaw_global_iterate_t *s = (fclaw_global_iterate_t*) user;
+	int *all_patches_considered = (int*) s->user;
+	if (!fclaw_patch_considered_for_refinement(s->glob,patch))
 	{
 		*all_patches_considered = 0;
 	}
@@ -1277,7 +1455,7 @@ void considred_for_refinement_cb(fclaw_domain_t *domain,
 int fclaw_patch_all_considered_for_refinement(struct fclaw_global *glob)
 {
 	int local_all_patches_considered = 1;
-	fclaw_domain_iterate_patches(glob->domain, considred_for_refinement_cb, &local_all_patches_considered);
+	fclaw_global_iterate_patches(glob, considred_for_refinement_cb, &local_all_patches_considered);
 	int all_patches_considered;
 	sc_MPI_Allreduce(&local_all_patches_considered, &all_patches_considered, 1, sc_MPI_INT, sc_MPI_LAND, glob->mpicomm);
 	return all_patches_considered;
@@ -1289,11 +1467,32 @@ void clear_considred_for_refinement_cb(fclaw_domain_t *domain,
 								       int blockno, int patchno,
 								       void *user)
 {
-	fclaw_patch_data_t *pdata = get_patch_data(patch);
-	pdata->considered_for_refinement = 0;
+	fclaw_global_t *glob = ((fclaw_global_iterate_t*) user)->glob;
+	fclaw_patch_considered_for_refinement_clear(glob, patch);
 }
 
 void fclaw_patch_clear_all_considered_for_refinement(struct fclaw_global *glob)
 {
-	fclaw_domain_iterate_patches(glob->domain, clear_considred_for_refinement_cb, NULL);
+	fclaw_global_iterate_patches(glob, clear_considred_for_refinement_cb, NULL);
+}
+
+void fclaw_patch_has_coarse_data_set(struct fclaw_global *glob,
+                                     struct fclaw_patch* patch)
+{
+	fclaw_patch_data_t *pdata = get_patch_data(patch);
+	pdata->flags |= FCLAW_PATCH_DATA_HAS_COARSE_DATA;
+}
+
+void fclaw_patch_has_coarse_data_clear(struct fclaw_global *glob,
+                                       struct fclaw_patch* patch)
+{
+	fclaw_patch_data_t *pdata = get_patch_data(patch);
+	pdata->flags &= ~FCLAW_PATCH_DATA_HAS_COARSE_DATA;
+}
+
+int fclaw_patch_has_coarse_data(struct fclaw_global *glob,
+                                struct fclaw_patch* patch)
+{
+	fclaw_patch_data_t *pdata = get_patch_data(patch);
+	return pdata->flags & FCLAW_PATCH_DATA_HAS_COARSE_DATA;
 }

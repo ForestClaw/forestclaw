@@ -516,10 +516,11 @@ int geoclaw_patch_tag4coarsening(fclaw_global_t *glob,
 static
 void geoclaw_interpolate2fine(fclaw_global_t *glob,
                               fclaw_patch_t *coarse_patch,
-                              fclaw_patch_t *fine_patches,
+                              fclaw_patch_t *fine_patch,
                               int blockno, 
                               int coarse_patchno,
-                              int fine0_patchno)
+                              int fine_patchno,
+                              int igrid)
 
 {
     int mx,my,mbc;
@@ -535,20 +536,14 @@ void geoclaw_interpolate2fine(fclaw_global_t *glob,
     double *auxcoarse;
     fclaw_clawpatch_aux_data(glob,coarse_patch,&auxcoarse,&maux);
 
-    /* Loop over four siblings (z-ordering) */
-    for (int igrid = 0; igrid < 4; igrid++)
-    {
-        fclaw_patch_t* fine_patch = &fine_patches[igrid];
+    double *qfine;
+    fclaw_clawpatch_soln_data(glob,fine_patch,&qfine,&meqn);
 
-        double *qfine;
-        fclaw_clawpatch_soln_data(glob,fine_patch,&qfine,&meqn);
+    double *auxfine;
+    fclaw_clawpatch_aux_data(glob,fine_patch,&auxfine,&maux);
 
-        double *auxfine;
-        fclaw_clawpatch_aux_data(glob,fine_patch,&auxfine,&maux);
-
-        FC2D_GEOCLAW_FORT_INTERPOLATE2FINE(&mx,&my,&mbc,&meqn,qcoarse,qfine,
-                                           &maux,auxcoarse,auxfine, &igrid);
-    }
+    FC2D_GEOCLAW_FORT_INTERPOLATE2FINE(&mx,&my,&mbc,&meqn,qcoarse,qfine,
+                                       &maux,auxcoarse,auxfine, &igrid);
 }
 
 static

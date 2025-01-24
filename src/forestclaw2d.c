@@ -548,15 +548,15 @@ fclaw2d_patch_face_swap (int *faceno, int *rfaceno)
     const int iface = *faceno;
     const int orientation = *rfaceno / P4EST_FACES;
 
-    P4EST_ASSERT (0 <= *faceno && *faceno < P4EST_FACES);
-    P4EST_ASSERT (0 <= *rfaceno && *rfaceno < P4EST_HALF * P4EST_FACES);
-    P4EST_ASSERT (0 <= orientation && orientation < P4EST_HALF);
+    FCLAW_ASSERT (0 <= *faceno && *faceno < P4EST_FACES);
+    FCLAW_ASSERT (0 <= *rfaceno && *rfaceno < P4EST_HALF * P4EST_FACES);
+    FCLAW_ASSERT (0 <= orientation && orientation < P4EST_HALF);
 
     *faceno = *rfaceno % P4EST_FACES;
     *rfaceno = iface + P4EST_FACES * orientation;
 
-    P4EST_ASSERT (0 <= *faceno && *faceno < P4EST_FACES);
-    P4EST_ASSERT (0 <= *rfaceno && *rfaceno < P4EST_HALF * P4EST_FACES);
+    FCLAW_ASSERT (0 <= *faceno && *faceno < P4EST_FACES);
+    FCLAW_ASSERT (0 <= *rfaceno && *rfaceno < P4EST_HALF * P4EST_FACES);
 }
 
 void
@@ -1835,7 +1835,7 @@ fclaw2d_domain_iterate_pack (fclaw2d_domain_t * domain, size_t data_size,
             /* find range of receiving processes */
             first_receiver =
                 p4est_bsearch_partition (old_gfq[mpirank], new_gfq, mpisize);
-            P4EST_ASSERT (0 <= first_receiver && first_receiver < mpisize);
+            FCLAW_ASSERT (0 <= first_receiver && first_receiver < mpisize);
             last_receiver =
                 p4est_bsearch_partition (old_gfq[mpirank + 1] - 1,
                                          &new_gfq[first_receiver],
@@ -1904,7 +1904,7 @@ fclaw2d_domain_iterate_pack (fclaw2d_domain_t * domain, size_t data_size,
                     block = domain->blocks + blockno;
                 }
                 patchno = i - block->num_patches_before;
-                P4EST_ASSERT (0 <= patchno && patchno < block->num_patches);
+                FCLAW_ASSERT (0 <= patchno && patchno < block->num_patches);
             }
 
             /* do not pack patch if source size is 0 */
@@ -2096,7 +2096,7 @@ fclaw2d_domain_iterate_unpack (fclaw2d_domain_t * domain,
                     block = domain->blocks + blockno;
                 }
                 patchno = i - block->num_patches_before;
-                P4EST_ASSERT (0 <= patchno && patchno < block->num_patches);
+                FCLAW_ASSERT (0 <= patchno && patchno < block->num_patches);
 
                 /* update dest data index accordingly */
                 if (!skip_local && !skip_refined)
@@ -2140,7 +2140,7 @@ fclaw2d_domain_iterate_unpack (fclaw2d_domain_t * domain,
 void
 fclaw2d_domain_partition_free (fclaw2d_domain_partition_t * p)
 {
-    P4EST_ASSERT (!p->inside_async);
+    FCLAW_ASSERT (!p->inside_async);
     sc_array_destroy (p->src_data);
     sc_array_destroy (p->dest_data);
     if (p->src_sizes != NULL)

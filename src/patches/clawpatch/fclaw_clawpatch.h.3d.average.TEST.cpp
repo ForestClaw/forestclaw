@@ -40,8 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_regrid.h>
 #include <test.hpp>
 #include <test/test.hpp>
-#include <fstream>
-#include <bitset>
+#include <string>
 
 #include <fclaw_forestclaw.h>
 
@@ -268,14 +267,6 @@ TEST_CASE("3d clawpatch average")
                 // get q
                 double* q = fclaw_clawpatch_get_q(g->glob, patch);
                 double* error_q = fclaw_clawpatch_get_q(iterate->error_glob, error_patch);
-
-                //get physical boundaries
-                int intersects_bc[fclaw_domain_num_faces(domain)];
-                for(int i=0;i<fclaw_domain_num_faces(domain);i++)
-                {
-                    fclaw_patch_relation_t type = fclaw_patch_get_face_type(patch, i);
-                    intersects_bc[i] = type == FCLAW_PATCH_BOUNDARY;
-                }
 
                 //clear error q
                 int size = fclaw_clawpatch_size(iterate->error_glob);

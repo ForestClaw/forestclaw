@@ -216,6 +216,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define fclaw2d_patch_wrap_cb              fclaw3d_patch_wrap_cb
 #define fclaw2d_transfer_wrap_cb           fclaw3d_transfer_wrap_cb
 #define fclaw2d_match_wrap_cb              fclaw3d_match_wrap_cb
+#define fclaw2d_pack_wrap_cb               fclaw3d_pack_wrap_cb
+#define fclaw2d_unpack_wrap_cb             fclaw3d_unpack_wrap_cb
 #define fclaw2d_intersect_wrap_cb          fclaw3d_intersect_wrap_cb
 #define fclaw2d_interpolate_point_wrap_cb  fclaw3d_interpolate_point_wrap_cb
 #define fclaw2d_file_error_wrap            fclaw3d_file_error_wrap

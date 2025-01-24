@@ -398,7 +398,7 @@ set_patches(fclaw_domain_t * domain, fclaw_patch_t * patch, int blockno, int pat
 
     if(user_data->pointerno == 0)
     {
-	    fclaw_patch_build(user_data->glob, patch, blockno, patchno,(void*) &build_mode);
+	    fclaw_patch_build(user_data->glob, domain, patch, blockno, patchno,(void*) &build_mode);
     }
 
     void* data = fclaw_patch_checkpoint_get_pointer(user_data->glob, patch, blockno, patchno, user_data->pointerno);

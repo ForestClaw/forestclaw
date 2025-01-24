@@ -54,8 +54,9 @@ void cb_partition_pack(fclaw_domain_t *domain,
 }
 
 
+
 static
-void  cb_partition_transfer(fclaw_domain_t * old_domain,
+void  cb_transfer(fclaw_domain_t * old_domain,
                             fclaw_patch_t * old_patch,
                             fclaw_domain_t * new_domain,
                             fclaw_patch_t * new_patch,
@@ -63,22 +64,36 @@ void  cb_partition_transfer(fclaw_domain_t * old_domain,
                             int old_patchno, int new_patchno,
                             void *user)
 {
+    fclaw_global_t *glob = (fclaw_global_t *) user;
+    FCLAW_ASSERT(old_patch->xlower == new_patch->xlower);
+    FCLAW_ASSERT(old_patch->ylower == new_patch->ylower);
+    FCLAW_ASSERT(old_patch->zlower == new_patch->zlower);
+    FCLAW_ASSERT(old_patch->xupper == new_patch->xupper);
+    FCLAW_ASSERT(old_patch->yupper == new_patch->yupper);
+    FCLAW_ASSERT(old_patch->zupper == new_patch->zupper);
+
+    fclaw_patch_shallow_copy(glob,old_domain,old_patch,new_domain,new_patch,
+                             blockno,old_patchno,new_patchno);
+    fclaw_patch_data_delete(glob,old_domain,old_patch);
+}
+
+static
+void  cb_transfer_and_unpack(fclaw_domain_t * old_domain,
+                            fclaw_patch_t * old_patch,
+                            fclaw_domain_t * new_domain,
+                            fclaw_patch_t * new_patch,
+                            int blockno,
+                            int old_patchno, int new_patchno,
+                            void *user)
+       
+{
     /* Transfer data to new domain */
     fclaw_global_iterate_t *g = (fclaw_global_iterate_t *) user;
 
     if (old_patch != NULL)
     {
-        FCLAW_ASSERT(old_patch->xlower == new_patch->xlower);
-        FCLAW_ASSERT(old_patch->ylower == new_patch->ylower);
-        FCLAW_ASSERT(old_patch->zlower == new_patch->zlower);
-        FCLAW_ASSERT(old_patch->xupper == new_patch->xupper);
-        FCLAW_ASSERT(old_patch->yupper == new_patch->yupper);
-        FCLAW_ASSERT(old_patch->zupper == new_patch->zupper);
-
-        new_patch->user = old_patch->user;
-        old_patch->user = NULL;
-        ++old_domain->count_delete_patch;
-        ++new_domain->count_set_patch;
+        cb_transfer(old_domain,old_patch,new_domain,new_patch,
+                    blockno,old_patchno,new_patchno,g->glob);
     }
     else
     {
@@ -94,24 +109,13 @@ void  cb_partition_transfer(fclaw_domain_t * old_domain,
         and the both domains are needed to increment/decrement patches */
         fclaw_patch_partition_unpack(g->glob,new_domain,new_patch,
                                        blockno,new_patchno,unpack_data_from_here);
-
-        /* Reason for the following two lines: the glob contains the old domain 
-        which is incremented in ddata_old  but we really want to increment the 
-        new domain. */
-        --old_domain->count_set_patch;
-        ++new_domain->count_set_patch;
-
-
     }
 }
 
-
-/* --------------------------------------------------------------------------
-   Public interface
-   -------------------------------------------------------------------------- */
-/* Question : Do all patches on this processor get packed? */
-void fclaw_partition_domain(fclaw_global_t* glob,
-                              fclaw_timer_names_t running)
+/* old partitioning interface, kept for comparison */
+static
+void partition_domain_legacy(fclaw_global_t* glob,
+                          fclaw_timer_names_t running)
 {
     fclaw_domain_t** domain = &glob->domain;
     fclaw_timer_start (&glob->timers[FCLAW_TIMER_PARTITION]);
@@ -173,7 +177,7 @@ void fclaw_partition_domain(fclaw_global_t* glob,
 
         /* New version? */
         fclaw_global_iterate_partitioned(glob,domain_partitioned,
-                                           cb_partition_transfer,
+                                           cb_transfer_and_unpack,
                                            (void*) patch_data);
 
         /* then the old domain is no longer necessary */
@@ -190,4 +194,86 @@ void fclaw_partition_domain(fclaw_global_t* glob,
     fclaw_domain_free_after_partition (*domain, &patch_data);
 
     fclaw_timer_stop (&glob->timers[FCLAW_TIMER_PARTITION]);
+}
+
+static
+void patch_pack_cb(fclaw_domain_t * domain,
+                   fclaw_patch_t * patch, int blockno,
+                   int patchno, void *pack_data_here,
+                   void *user)
+{
+    fclaw_global_t *glob = (fclaw_global_t *) user;
+    fclaw_patch_partition_pack(glob,patch,
+                               blockno,patchno,
+                               pack_data_here);
+    fclaw_patch_data_delete(glob,domain,patch);
+}
+
+static
+void patch_unpack_cb(fclaw_domain_t * domain,
+                     fclaw_patch_t * patch,
+                     int blockno, int patchno,
+                     void *unpack_data_from_here,
+                     void *user)
+{
+    fclaw_global_t *glob = (fclaw_global_t *) user;
+    fclaw_patch_partition_unpack(glob,domain,patch,
+                                 blockno,patchno,
+                                 unpack_data_from_here);
+}
+
+
+static
+void partition_domain(fclaw_global_t* glob,
+                      fclaw_timer_names_t running)
+{
+    fclaw_domain_t** domain = &glob->domain;
+    fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
+    fclaw_timer_start (&glob->timers[FCLAW_TIMER_PARTITION]);
+
+    int exponent = fclaw_opt->subcycle && fclaw_opt->weighted_partition ? 1 : 0;
+    fclaw_domain_t *new_domain =
+        fclaw_domain_partition (*domain, exponent);
+
+    if(new_domain != NULL)
+    {
+        size_t psize = fclaw_patch_partition_packsize(glob);
+        fclaw_domain_partition_t *p = fclaw_domain_iterate_pack(*domain, 
+                                                                psize,
+                                                                patch_pack_cb,
+                                                                (void *) glob);
+    
+        fclaw_domain_iterate_transfer(*domain, new_domain,
+                                      cb_transfer,
+                                      glob);
+
+        fclaw_domain_iterate_unpack(new_domain, p, patch_unpack_cb, (void *) glob);
+        fclaw_domain_partition_free(p);
+
+        /* then the old domain is no longer necessary */
+        fclaw_domain_reset(glob);
+        *domain = new_domain;
+        new_domain = NULL;
+
+        /* internal clean up */
+        fclaw_domain_complete(*domain);
+    }
+
+    fclaw_timer_stop (&glob->timers[FCLAW_TIMER_PARTITION]);
+}
+
+/* --------------------------------------------------------------------------
+   Public interface
+   -------------------------------------------------------------------------- */
+void fclaw_partition_domain(fclaw_global_t* glob,
+                              fclaw_timer_names_t running)
+{
+    if(fclaw_get_options(glob)->partition_mode == FCLAW_PARTITION_MODE_LEGACY)
+    {
+        partition_domain_legacy(glob,running);
+    }
+    else
+    {
+        partition_domain(glob,running);
+    }
 }

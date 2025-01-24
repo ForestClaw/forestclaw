@@ -82,7 +82,7 @@ jobs:
       run: |
         sudo apt-get update -yq
         sudo apt-get install -yq --no-install-recommends \
-            ninja-build ${{ matrix.ubuntu_packages }}
+            ${{ matrix.ubuntu_packages }}
 
     - name: Install Cuda Toolkit 11.3
       if: ${{ matrix.cuda_11_3 }}

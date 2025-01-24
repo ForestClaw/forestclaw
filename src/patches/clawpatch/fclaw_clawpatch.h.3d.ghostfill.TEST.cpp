@@ -42,8 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_options.h>
 #include <test.hpp>
 #include <test/test.hpp>
-#include <fstream>
-#include <bitset>
+#include <string>
 
 #include <fclaw_forestclaw.h>
 
@@ -530,8 +529,8 @@ TEST_CASE("3d clawpatch ghost fill on uniform cube")
         test_data_out.setup();
 
         
-        char test_no_str[5];
-        snprintf(test_no_str, 5, "%04d", test_no);
+        char test_no_str[100];
+        snprintf(test_no_str, 100, "%04d", test_no);
         std::string filename = "3d_clawpatch_ghost_fill_on_uniform_cube_"+std::string(test_no_str);
 
         test_ghost_fill(test_data, test_data_out, filename);
@@ -636,8 +635,8 @@ TEST_CASE("3d clawpatch ghost fill on cube with refinement")
         test_data_out.setup();
         CHECK_EQ(test_data_out.glob->domain->global_num_patches, 127);
 
-        char test_no_str[5];
-        snprintf(test_no_str, 5, "%04d", test_no);
+        char test_no_str[100];
+        snprintf(test_no_str, 100, "%04d", test_no);
         std::string filename = "3d_clawpatch_ghost_fill_on_cube_with_refinement_"+std::string(test_no_str);
 
         test_ghost_fill(test_data, test_data_out, filename);
@@ -743,8 +742,8 @@ TEST_CASE("3d clawpatch ghost fill on cube with refinement coarse interior")
         test_data_out.setup();
         CHECK_EQ(test_data_out.glob->domain->global_num_patches, 456);
 
-        char test_no_str[5];
-        snprintf(test_no_str, 5, "%04d", test_no);
+        char test_no_str[100];
+        snprintf(test_no_str, 100, "%04d", test_no);
         std::string filename = "3d_clawpatch_ghost_fill_on_cube_with_refinement_coarse_interior_"+std::string(test_no_str);
 
         test_ghost_fill(test_data, test_data_out, filename);
@@ -803,8 +802,8 @@ TEST_CASE("3d clawpatch ghost fill on uniform brick")
         test_data_out.setup();
 
         
-        char test_no_str[5];
-        snprintf(test_no_str, 5, "%04d", test_no);
+        char test_no_str[100];
+        snprintf(test_no_str, 100, "%04d", test_no);
         std::string filename = "3d_clawpatch_ghost_fill_on_uniform_2x2x2_brick_" + std::string(test_no_str);
 
         test_ghost_fill(test_data, test_data_out, filename);
@@ -913,8 +912,8 @@ TEST_CASE("3d clawpatch ghost fill on 2x2x2 brick with refinement on one block")
         test_data_out.setup();
         CHECK_EQ(test_data_out.glob->domain->global_num_patches, (8*7 + 8*8));
 
-        char test_no_str[5];
-        snprintf(test_no_str, 5, "%04d", test_no);
+        char test_no_str[100];
+        snprintf(test_no_str, 100, "%04d", test_no);
         std::string filename = "3d_clawpatch_ghost_fill_on_2x2x2_brick_with_refinement_on_one_block_"+std::string(test_no_str);
 
         test_ghost_fill(test_data, test_data_out, filename);
@@ -1024,8 +1023,8 @@ TEST_CASE("3d clawpatch ghost fill on 2x2x2 brick with refinement on all but one
         test_data_out.setup();
         CHECK_EQ(test_data_out.glob->domain->global_num_patches, 8*1 + 8*8*7);
 
-        char test_no_str[5];
-        snprintf(test_no_str, 5, "%04d", test_no);
+        char test_no_str[100];
+        snprintf(test_no_str, 100, "%04d", test_no);
         std::string filename = "3d_clawpatch_ghost_fill_on_2x2x2_brick_with_refinement_on_all_but_one_block_"+std::string(test_no_str);
 
         test_ghost_fill(test_data, test_data_out, filename);
@@ -1140,8 +1139,8 @@ TEST_CASE("3d clawpatch ghost fill on 2x2x2 brick with refinement coarse interio
         test_data_out.setup();
         CHECK_EQ(test_data_out.glob->domain->global_num_patches, 505);
 
-        char test_no_str[5];
-        snprintf(test_no_str, 5, "%04d", test_no);
+        char test_no_str[100];
+        snprintf(test_no_str, 100, "%04d", test_no);
         std::string filename = "3d_clawpatch_ghost_fill_on_2x2x2_brick_with_refinement_coarse_interior_"+std::string(test_no_str);
 
         test_ghost_fill(test_data, test_data_out, filename);
@@ -1256,8 +1255,8 @@ TEST_CASE("3d clawpatch ghost fill on 2x2x2 brick with refinement 2")
         test_data_out.setup();
         CHECK_EQ(test_data_out.glob->domain->global_num_patches, 113);
 
-        char test_no_str[5];
-        snprintf(test_no_str, 5, "%04d", test_no);
+        char test_no_str[100];
+        snprintf(test_no_str, 100, "%04d", test_no);
         std::string filename = "3d_clawpatch_ghost_fill_on_2x2x2_brick_with_refinement_2_"+std::string(test_no_str);
 
         test_ghost_fill(test_data, test_data_out, filename);

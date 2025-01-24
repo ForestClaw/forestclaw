@@ -64,10 +64,12 @@ void cb_initialize (fclaw_domain_t *domain,
 
 	fclaw_build_mode_t build_mode = FCLAW_BUILD_FOR_UPDATE;
 
-	fclaw_patch_build(g->glob,this_patch,
-						this_block_idx,
-						this_patch_idx,
-						&build_mode);
+	fclaw_patch_build(g->glob,
+                      domain,
+                      this_patch,
+                      this_block_idx,
+                      this_patch_idx,
+                      &build_mode);
 	fclaw_patch_initialize(g->glob,this_patch,this_block_idx,this_patch_idx);
 }
 
@@ -168,30 +170,11 @@ void build_initial_domain(fclaw_global_t *glob)
             {
                 fclaw_global_infof(" -- Have new initial refinement\n");
 
-                /* Re-initialize new grids.   Ghost cell values needed for
-                   interpolation have already been set by initialization */
-                fclaw_timer_start (&glob->timers[FCLAW_TIMER_REGRID_BUILD]);
-                fclaw_global_iterate_adapted(glob, new_domain,
-                                               cb_fclaw_regrid_repopulate,
-                                               (void *) &domain_init);
-
-                fclaw_timer_stop (&glob->timers[FCLAW_TIMER_REGRID_BUILD]);
-
-                /* free all memory associated with old domain */
-                fclaw_domain_reset(glob);
-                *domain = new_domain;
-                new_domain = NULL;
-
-                /* Repartition domain to new processors.    */
-                fclaw_partition_domain(glob,FCLAW_TIMER_INIT);
-
-                /* Set up ghost patches.  This probably doesn't need to be done
-                   each time we add a new level. */
-                fclaw_exchange_setup(glob,FCLAW_TIMER_INIT);
-                
-                /* This is normally called from regrid, once the initial domain
-                   has been set up */
-                fclaw_regrid_set_neighbor_types(glob);
+                fclaw_regrid_process_new_refinement(glob, 
+                                                    domain, 
+                                                    new_domain, 
+                                                    domain_init, 
+                                                    FCLAW_TIMER_INIT);
             }
             else
             {
@@ -219,9 +202,16 @@ void fclaw_initialize_domain_flags(fclaw_global_t *glob)
         (glob->domain, fclaw_opt->smooth_refine, fclaw_opt->smooth_level,
          fclaw_opt->coarsen_delay);
 
+    int skip_local = fclaw_opt->partition_mode == FCLAW_PARTITION_MODE_SKIP_LOCAL || 
+                     fclaw_opt->partition_mode == FCLAW_PARTITION_MODE_REFINE_AFTER;
+    
+    int skip_refined = fclaw_opt->partition_mode == FCLAW_PARTITION_MODE_REFINE_AFTER;
+
     /* set partitioning */
     fclaw_domain_set_partitioning (glob->domain,
-                                   fclaw_opt->partition_for_coarsening, 1, 0);
+                                   fclaw_opt->partition_for_coarsening, 
+                                   skip_local,
+                                   skip_refined);
 }
 
 static void

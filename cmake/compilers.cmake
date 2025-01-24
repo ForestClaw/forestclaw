@@ -17,3 +17,6 @@ elseif(CMAKE_Fortran_COMPILER_ID STREQUAL "GNU")
     "$<$<COMPILE_LANGUAGE:Fortran>:-Wall>"
     )
 endif()
+
+# preprocess all Fortran files
+set(CMAKE_Fortran_PREPROCESS ON)

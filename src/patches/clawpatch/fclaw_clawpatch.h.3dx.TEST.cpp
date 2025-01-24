@@ -282,7 +282,7 @@ TEST_CASE("3dx fclaw_clawpatch patch_build")
         fclaw_clawpatch_vtable_initialize(glob, 4);
 
                 CHECK(domain->blocks[0].patches[0].user == nullptr);
-        fclaw_patch_build(glob, &domain->blocks[0].patches[0], 0, 0, &build_mode);
+        fclaw_patch_build(glob,domain, &domain->blocks[0].patches[0], 0, 0, &build_mode);
         CHECK(domain->blocks[0].patches[0].user != nullptr);
 
         fclaw_clawpatch_t* cp = fclaw_clawpatch_get_clawpatch(&domain->blocks[0].patches[0]);
@@ -340,7 +340,7 @@ TEST_CASE("3dx fclaw_clawpatch patch_build")
             CHECK_BOX_DIMENSIONS(cp->elliptic_soln, opts->mbc, opts->mx, opts->my, opts->mz, opts->rhs_fields);
         }
 
-        fclaw_patch_data_delete(glob, &domain->blocks[0].patches[0]);
+        fclaw_patch_data_delete(glob,domain, &domain->blocks[0].patches[0]);
         fclaw_clawpatch_options_destroy(opts);
         fclaw_domain_destroy(domain);
         fclaw_map_destroy(map);
@@ -944,7 +944,7 @@ namespace{
     fclaw_clawpatch_t* i2f_cp1;
     fclaw_clawpatch_t* i2f_cp2;
     fclaw_clawpatch_t* i2f_cp3;
-    std::bitset<4> i2f_igrids;
+    int i2f_igrid;
     int i2f_manifold;
 }
 TEST_CASE("3dx fclaw_clawpatch interpolate2fine")
@@ -999,15 +999,17 @@ TEST_CASE("3dx fclaw_clawpatch interpolate2fine")
         }
 #endif
 
-        CHECK(i2f_igrids[*igrid] == false);
-        i2f_igrids[*igrid] = true;
+        CHECK_EQ(*igrid, i2f_igrid);
+
         CHECK(*manifold == i2f_manifold);
     };
 
-    fclaw_patch_interpolate2fine(coarse_test_data.glob,
-                                   &coarse_test_data.domain->blocks[0].patches[0],
-                                   &fine_test_data.domain->blocks[0].patches[0],
-                                   0, 0, 0);
-
-    CHECK(i2f_igrids.all());
+    for(int i = 0; i < 4; i++)
+    {
+        i2f_igrid = i;
+        fclaw_patch_interpolate2fine(coarse_test_data.glob,
+                                     &coarse_test_data.domain->blocks[0].patches[0],
+                                     &fine_test_data.domain->blocks[0].patches[i],
+                                     0, 0, 0, i);
+    }
 }

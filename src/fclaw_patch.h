@@ -65,6 +65,16 @@ typedef enum
 } fclaw_build_mode_t;
 
 
+typedef enum
+{
+    /** Patch considered for refinement */
+    FCLAW_PATCH_DATA_CONSIDERED_FOR_REFINEMENT = 0x1,
+    /** Patch has coarse data and it's family needs to be refined */
+    FCLAW_PATCH_DATA_HAS_COARSE_DATA = 0x2,
+    /** Patch is currently being unpacked during partitioning */
+    FCLAW_PATCH_DATA_UNPACKING = 0x4,
+
+} fclaw_patch_data_flags_t;
 
 /**
  * @brief Structure for user patch data
@@ -100,8 +110,10 @@ struct fclaw_patch_data
     /** Block index */
     int block_idx;
 
-    /** True if patch has been considered for refinement */
-    int considered_for_refinement;
+    /** Boolean flags */
+    int flags;
+    /** Number of fclaw_patch_t objects that have this patch set as patch->user */
+    int num_owners;
 
     /** User defined patch structure */
     void *user_patch;
@@ -212,30 +224,35 @@ struct fclaw_region;
  * @brief Deallocate the user data pointer for a patch
  * 
  * @param[in] glob the global context 
+ * @param[in] domain the domain
  * @param[in,out] patch the patch context, user data pointer is set to NULL on return
  */
 void fclaw_patch_data_delete(struct fclaw_global *glob,
-                               struct fclaw_patch *patch);
+                             struct fclaw_domain *domain,
+                             struct fclaw_patch *patch);
 
 /**
  * @brief Construct a new patch object
  * 
  * @param[in] glob the global context
+ * @param[in] domain the domain
  * @param[in,out] this_patch the patch context
  * @param[in] blockno the block number
  * @param[in] patchno the patch number
  * @param[in,out] user user data pointer
  */
 void fclaw_patch_build(struct fclaw_global *glob,
-                         struct fclaw_patch *this_patch,
-                         int blockno,
-                         int patchno,
-                         void *user);
+                       struct fclaw_domain *domain,
+                       struct fclaw_patch *this_patch,
+                       int blockno,
+                       int patchno,
+                       void *user);
 
 /**
  * @brief Construct a new patch object from a set of fine patches
  * 
  * @param[in] glob the global context
+ * @param[in] domain the domain
  * @param[in] fine_patches the fine patch contexts
  * @param[in,out] coarse_patches the coarse patch context
  * @param[in] blockno the block number
@@ -244,13 +261,34 @@ void fclaw_patch_build(struct fclaw_global *glob,
  * @param[in] build_mode the build mode
  */
 void fclaw_patch_build_from_fine(struct fclaw_global *glob,
-                                   struct fclaw_patch *fine_patches,
-                                   struct fclaw_patch *coarse_patch,
-                                   int blockno,
-                                   int coarse_patchno,
-                                   int fine0_patchno,
-                                   fclaw_build_mode_t build_mode);
+                                 struct fclaw_domain *domain,
+                                 struct fclaw_patch *fine_patches,
+                                 struct fclaw_patch *coarse_patch,
+                                 int blockno,
+                                 int coarse_patchno,
+                                 int fine0_patchno,
+                                 fclaw_build_mode_t build_mode);
 
+/**
+ * @brief Create a shallow copy of a patch
+ * 
+ * @param[in] glob the global context
+ * @param[in] src_domain the source domain
+ * @param[in] src_patch the source patch 
+ * @param[in] dst_domain the destination domain
+ * @param[in,out] dst_patch the destination patch
+ * @param[in] blockno the block number
+ * @param[in] src_patchno the source patch number
+ * @param[in] dst_patchno the destination patch number
+ */
+void fclaw_patch_shallow_copy(struct fclaw_global *glob,
+                              struct fclaw_domain *src_domain,
+                              struct fclaw_patch *src_patch,
+                              struct fclaw_domain *dst_domain,
+                              struct fclaw_patch *dst_patch,
+							  int blockno,
+							  int old_patchno,
+							  int new_patchno);
 
 ///@}
 /* ------------------------------------------------------------------------------------ */
@@ -697,13 +735,14 @@ int fclaw_patch_intersects_region(struct fclaw_global *glob,
  * @param[in,out] fine_patches the fine patch contexts
  * @param[in] blockno the block number
  * @param[in] coarse_patchno the patch number of the coarse patch
- * @param[in] fine0_patchno the patch number of the first fine patch
+ * @param[in] fine_patchno the patch number of the fine patch
+ * @param[in] igrid the index of the fine patch in the child array
  */
 void fclaw_patch_interpolate2fine(struct fclaw_global *glob,
                                     struct fclaw_patch* coarse_patch,
-                                    struct fclaw_patch* fine_patches,
+                                    struct fclaw_patch* fine_patch,
                                     int this_blockno, int coarse_patchno,
-                                    int fine0_patchno);
+                                    int fine_patchno, int igrid);
 
 /**
  * @brief Averages from a set of fine patches to a coarse patch
@@ -1462,13 +1501,14 @@ typedef int (*fclaw_patch_intersects_region_t)(struct fclaw_global *glob,
  * @param[in,out] fine_patches the fine patch contexts
  * @param[in] blockno the block number
  * @param[in] coarse_patchno the patch number of the coarse patch
- * @param[in] fine_patchno the patch number of the first fine patch
+ * @param[in] fine_patchno the patch number of the fine patch
+ * @param[in] igrid the index of the fine patch in the child array
  */
 typedef void (*fclaw_patch_interpolate2fine_t)(struct fclaw_global *glob,
                                                  struct fclaw_patch *coarse_patch,
-                                                 struct fclaw_patch* fine_patches,
+                                                 struct fclaw_patch* fine_patch,
                                                  int blockno, int coarse_patchno,
-                                                 int fine_patchno);
+                                                 int fine_patchno, int igrid);
 /**
  * @brief Averages from a set of fine patches to a coarse patch
  * 
@@ -2162,6 +2202,12 @@ void fclaw_patch_set_block_corner_count(struct fclaw_global *glob,
                                           struct fclaw_patch* this_patch,
                                           int icorner, int block_corner_count);
 
+///@}
+/* ------------------------------------------------------------------------------------ */
+///                                 @name Patch Flags
+/* ------------------------------------------------------------------------------------ */
+///@{
+
 /**
  * @brief Set that this patch has been considered for refinement
  * 
@@ -2203,6 +2249,33 @@ int fclaw_patch_all_considered_for_refinement(struct fclaw_global *glob);
  * @param glob the global context
  */
 void fclaw_patch_clear_all_considered_for_refinement(struct fclaw_global *glob);
+
+/**
+ * @brief Set that this patch has coarse data
+ * 
+ * @param glob the global context
+ * @param patch the patch context
+ */
+void fclaw_patch_has_coarse_data_set(struct fclaw_global *glob,
+                                     struct fclaw_patch* patch);
+/**
+ * @brief Clear the flag that this patch has coarse data
+ * 
+ * @param glob the global context
+ * @param patch the patch context
+ */
+void fclaw_patch_has_coarse_data_clear(struct fclaw_global *glob,
+                                       struct fclaw_patch* patch);
+
+/**
+ * @brief Returns true if a patch has coarse data
+ * 
+ * @param glob the global context
+ * @param patch the patch context
+ * @return int true if a patch has coarse data
+ */
+int fclaw_patch_has_coarse_data(struct fclaw_global *glob,
+                                struct fclaw_patch* patch);
 
 ///@}
 

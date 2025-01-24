@@ -112,8 +112,21 @@ void fclaw_options_convert_double_array (const char *array_string,
 void fclaw_options_destroy_array(void* array);
 
 
-/* Plan is to replace fclaw_options_t with fclaw_options_t.
-   Maybe use a macro as an intermediate step? */
+/**
+ * @brief Enum for partition mode
+ */
+enum fclaw_parition_mode
+{
+    /** Use legacy paritioning interface */
+    FCLAW_PARTITION_MODE_LEGACY,
+    /** Pack/unpack all patches */
+    FCLAW_PARTITION_MODE_PACK_ALL,
+    /** Skip packing of local patches */
+    FCLAW_PARTITION_MODE_SKIP_LOCAL,
+    /** Skip packing of local patches and refine after partitioning */
+    FCLAW_PARTITION_MODE_REFINE_AFTER
+};
+
 
 struct fclaw_options
 {
@@ -254,6 +267,9 @@ struct fclaw_options
     const char * regression_check; /**< filename of regression check values */
 
     double max_refinement_ratio; /**< Maximum refinment ratio before partitioning and continuing refinement. */
+
+    int partition_mode; /**< Partition mode */
+    sc_keyvalue_t *kv_partition_mode; /**< sc_keyvalue needed for enum option type */
 };
 
 struct fclaw_global;

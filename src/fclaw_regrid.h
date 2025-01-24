@@ -27,6 +27,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define FCLAW_REGRID_H
 
 #include <forestclaw.h>    /* Needed to define fclaw2d_patch_relation_t */
+#include <fclaw_timer.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -92,8 +93,23 @@ void fclaw_regrid(struct fclaw_global *glob);
 
 void fclaw_regrid_set_neighbor_types(struct fclaw_global *glob);
 
-
-
+/**
+ * @brief Process new refinement.
+ *
+ * This is to be called with the new domain that fclaw_domain_adapt returns.
+ * THis will perform any coarsening and refinment and will repartition the domain.
+ * 
+ * @param glob the global context
+ * @param domain the old domain
+ * @param new_domain the new domain returned by fclaw_domain_adapt
+ * @param domain_init true if this is the first time the domain is being initialized
+ * @param timer the timer to use
+ */
+void fclaw_regrid_process_new_refinement(struct fclaw_global *glob,
+                                         fclaw_domain_t **domain,
+                                         fclaw_domain_t *new_domain,
+                                         int domain_init,
+                                         fclaw_timer_names_t timer);
 
 #ifdef __cplusplus
 #if 0

@@ -837,6 +837,130 @@ void fclaw_domain_iterate_partitioned(fclaw_domain_t *old_domain, fclaw_domain_t
     }
 }
 
+struct fclaw_domain_partition
+{
+
+    int refine_dim;
+    fclaw2d_domain_partition_t *d2;
+    fclaw3d_domain_partition_t *d3;
+    fclaw_pack_wrap_user_t wrap;
+};
+
+fclaw_domain_partition_t
+    * fclaw_domain_iterate_pack (fclaw_domain_t * domain,
+                                 size_t data_size,
+                                 fclaw_pack_callback_t patch_pack,
+                                 void *user)
+{
+    fclaw_domain_partition_t *partition = FCLAW_ALLOC(fclaw_domain_partition_t, 1);
+    partition->wrap.pcb = patch_pack;
+    partition->wrap.user = user;
+    if(domain->refine_dim == 2)
+    {
+        partition->refine_dim = 2;
+        partition->d2 = fclaw2d_domain_iterate_pack(domain->d2,
+                                                    data_size,
+                                                    fclaw2d_pack_wrap_cb,
+                                                    &partition->wrap);
+        partition->d3 = NULL;
+    }
+    else if (domain->refine_dim == 3)
+    {
+        partition->refine_dim = 3;
+        partition->d2 = NULL;
+        partition->d3 = fclaw3d_domain_iterate_pack(domain->d3,
+                                                    data_size,
+                                                    fclaw3d_pack_wrap_cb,
+                                                    &partition->wrap);
+    }
+    else
+    {
+        SC_ABORT_NOT_REACHED();
+    }
+
+    return partition;
+}
+
+void fclaw_domain_iterate_transfer (fclaw_domain_t * old_domain,
+                                    fclaw_domain_t * new_domain,
+                                    fclaw_transfer_callback_t
+                                    patch_transfer, void *user)
+{
+    FCLAW_ASSERT(old_domain->refine_dim == new_domain->refine_dim);
+
+    fclaw_transfer_wrap_user_t wrap;
+    wrap.tcb = patch_transfer;
+    wrap.user = user;
+
+    if(old_domain->refine_dim == 2)
+    {
+        fclaw2d_domain_iterate_transfer(old_domain->d2,
+                                        new_domain->d2,
+                                        fclaw2d_transfer_wrap_cb,
+                                        &wrap);
+    }
+    else if(old_domain->refine_dim == 3)
+    {
+        fclaw3d_domain_iterate_transfer(old_domain->d3,
+                                        new_domain->d3,
+                                        fclaw3d_transfer_wrap_cb,
+                                        &wrap);
+    }
+    else
+    {
+        SC_ABORT_NOT_REACHED();
+    }
+
+}
+
+void fclaw_domain_iterate_unpack (fclaw_domain_t * domain,
+                                  fclaw_domain_partition_t * partition,
+                                  fclaw_unpack_callback_t patch_unpack,
+                                  void *user)
+{
+    FCLAW_ASSERT(domain->refine_dim == partition->refine_dim);
+
+    fclaw_unpack_wrap_user_t wrap;
+    wrap.ucb = patch_unpack;
+    wrap.user = user;
+
+    if(domain->refine_dim == 2)
+    {
+        fclaw2d_domain_iterate_unpack(domain->d2,
+                                      partition->d2,
+                                      fclaw2d_unpack_wrap_cb,
+                                      &wrap);
+    }
+    else if (domain->refine_dim == 3)
+    {
+        fclaw3d_domain_iterate_unpack(domain->d3,
+                                      partition->d3,
+                                      fclaw3d_unpack_wrap_cb,
+                                      &wrap);
+    }
+    else
+    {
+        SC_ABORT_NOT_REACHED();
+    }
+}
+
+void fclaw_domain_partition_free (fclaw_domain_partition_t * partition)
+{
+    if(partition->refine_dim == 2)
+    {
+        fclaw2d_domain_partition_free(partition->d2);
+    }
+    else if (partition->refine_dim == 3)
+    {
+        fclaw3d_domain_partition_free(partition->d3);
+    }
+    else
+    {
+        SC_ABORT_NOT_REACHED();
+    }
+    FCLAW_FREE(partition);
+}
+
 void fclaw_domain_free_after_partition(fclaw_domain_t *domain, void ***patch_data)
 {
     if(domain->refine_dim == 2)

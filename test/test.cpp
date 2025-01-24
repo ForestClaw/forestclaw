@@ -27,6 +27,9 @@ void throw_exception()
         expect_abort=false;
         std::longjmp(jump_buffer, 1);
     }
+    else{
+        FAIL("An abort was called");
+    }
 }
 
 void fclaw_test_expect_abort()

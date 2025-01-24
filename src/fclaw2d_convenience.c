@@ -522,8 +522,8 @@ fclaw2d_domain_adapt (fclaw2d_domain_t * domain)
     p4est_wrap_t *wrap = (p4est_wrap_t *) domain->pp;
 
     FCLAW_ASSERT (domain->pp_owned);
-    P4EST_ASSERT (!domain->just_adapted);
-    P4EST_ASSERT (!domain->just_partitioned);
+    FCLAW_ASSERT (!domain->just_adapted);
+    FCLAW_ASSERT (!domain->just_partitioned);
 
     /* propagate desired refinement level to neighbors */
     if (domain->p.smooth_refine)
@@ -578,7 +578,7 @@ fclaw2d_domain_adapt (fclaw2d_domain_t * domain)
                                                                     nblockno,
                                                                     npatchno
                                                                     [0]);
-                        P4EST_ASSERT (npatch->level == level);
+                        FCLAW_ASSERT (npatch->level == level);
                         if (npatch->level >= domain->p.smooth_level)
                             /* Match target level only if we are in a level that
                                should be refined */
@@ -592,7 +592,7 @@ fclaw2d_domain_adapt (fclaw2d_domain_t * domain)
                                                                     nblockno,
                                                                     npatchno
                                                                     [0]);
-                        P4EST_ASSERT (npatch->level == level - 1);
+                        FCLAW_ASSERT (npatch->level == level - 1);
                         if (npatch->level >= domain->p.smooth_level)
                             max_tlevel =
                                 SC_MAX (max_tlevel, npatch->target_level);
@@ -607,7 +607,7 @@ fclaw2d_domain_adapt (fclaw2d_domain_t * domain)
                                                                    nblockno,
                                                                    npatchno
                                                                    [k]);
-                            P4EST_ASSERT (npatch->level == level + 1);
+                            FCLAW_ASSERT (npatch->level == level + 1);
                             if (npatch->level >= domain->p.smooth_level)
                                 max_tlevel =
                                     SC_MAX (max_tlevel, npatch->target_level);
@@ -1054,7 +1054,7 @@ search_point_fn (p4est_t * p4est, p4est_topidx_t which_tree,
     }
     if (now != earlier)
     {
-        P4EST_ASSERT (earlier == -1 || now < earlier);
+        FCLAW_ASSERT (earlier == -1 || now < earlier);
         *(int *) sc_array_index_int (sd->results, ip) = now;
     }
 
@@ -1383,9 +1383,9 @@ overlap_consumer_add (overlap_consumer_comm_t * c, void *point, int rank)
     overlap_buf_t *sb;
     overlap_ind_t *qi;
 
-    P4EST_ASSERT (c != NULL);
-    P4EST_ASSERT (c->send_buffer != NULL && c->query_indices != NULL);
-    P4EST_ASSERT (0 <= rank && rank < c->domain->mpisize);
+    FCLAW_ASSERT (c != NULL);
+    FCLAW_ASSERT (c->send_buffer != NULL && c->query_indices != NULL);
+    FCLAW_ASSERT (0 <= rank && rank < c->domain->mpisize);
     overlap_point_t *op = (overlap_point_t *) point;
     FCLAW_ASSERT (op != NULL && op->point != NULL);
     op->rank = rank;            /* mark, that we added this point to the process buffer */
@@ -1398,10 +1398,10 @@ overlap_consumer_add (overlap_consumer_comm_t * c, void *point, int rank)
     {
         sb = (overlap_buf_t *) sc_array_index (c->send_buffer, bcount - 1);
         qi = (overlap_ind_t *) sc_array_index (c->query_indices, bcount - 1);
-        P4EST_ASSERT (sb->rank == qi->rank);
-        P4EST_ASSERT (sb->rank <= rank);
-        P4EST_ASSERT (sb->ops.elem_count == qi->oqs.elem_count);
-        P4EST_ASSERT (sb->ops.elem_count > 0);
+        FCLAW_ASSERT (sb->rank == qi->rank);
+        FCLAW_ASSERT (sb->rank <= rank);
+        FCLAW_ASSERT (sb->ops.elem_count == qi->oqs.elem_count);
+        FCLAW_ASSERT (sb->ops.elem_count > 0);
     }
     if (bcount == 0 || sb->rank < rank)
     {
@@ -1682,13 +1682,13 @@ producer_interpolate (overlap_producer_comm_t * p)
                              (sc_MPI_Request *) p->recv_reqs->array,
                              &received, prod_indices, sc_MPI_STATUSES_IGNORE);
         SC_CHECK_MPI (mpiret);
-        P4EST_ASSERT (received != sc_MPI_UNDEFINED);
-        P4EST_ASSERT (received > 0);
+        FCLAW_ASSERT (received != sc_MPI_UNDEFINED);
+        FCLAW_ASSERT (received > 0);
 
         for (i = 0; i < received; ++i)
         {
             /* compute the prodata for the points sent by process prod_indices[i] */
-            P4EST_ASSERT (0 <= prod_indices[i]
+            FCLAW_ASSERT (0 <= prod_indices[i]
                           && prod_indices[i] < num_senders);
             rb = (overlap_buf_t *) sc_array_index_int (p->recv_buffer,
                                                        prod_indices[i]);
@@ -1725,7 +1725,7 @@ consumer_update_from_buffer (overlap_consumer_comm_t * c, sc_array_t * buffer,
     int i;
 
     /* obtain the array of points we want to update the query points with */
-    P4EST_ASSERT (0 <= bi && bi < (int) buffer->elem_count);
+    FCLAW_ASSERT (0 <= bi && bi < (int) buffer->elem_count);
     rb = (overlap_buf_t *) sc_array_index_int (buffer, bi);
     qi = (overlap_ind_t *) sc_array_index_int (c->query_indices, bi);
 
@@ -1759,8 +1759,8 @@ consumer_update_query_points (overlap_consumer_comm_t * c)
                              (sc_MPI_Request *) c->recv_reqs->array,
                              &received, cons_indices, sc_MPI_STATUSES_IGNORE);
         SC_CHECK_MPI (mpiret);
-        P4EST_ASSERT (received != sc_MPI_UNDEFINED);
-        P4EST_ASSERT (received > 0);
+        FCLAW_ASSERT (received != sc_MPI_UNDEFINED);
+        FCLAW_ASSERT (received > 0);
 
         for (i = 0; i < received; ++i)
         {
@@ -1827,15 +1827,15 @@ consumer_free_communication_data (overlap_consumer_comm_t * c)
         rb = (overlap_buf_t *) sc_array_index (c->recv_buffer, bz);
         SC_ASSERT (sb->rank == rb->rank);
 #ifdef FCLAW_ENABLE_DEBUG
-        SC_ASSERT (prev_rank < sb->rank);
+        FCLAW_ASSERT (prev_rank < sb->rank);
         prev_rank = sb->rank;
         if (bz == (size_t) c->iconrank)
         {
-            P4EST_ASSERT (rb->ops.elem_count == 0);
+            FCLAW_ASSERT (rb->ops.elem_count == 0);
         }
         else
         {
-            P4EST_ASSERT (rb->ops.elem_count == sb->ops.elem_count);
+            FCLAW_ASSERT (rb->ops.elem_count == sb->ops.elem_count);
         }
 #endif
         FCLAW_ASSERT (sb->ops.elem_count > 0);
@@ -1876,11 +1876,11 @@ producer_free_communication_data (overlap_producer_comm_t * p)
 #ifdef FCLAW_ENABLE_DEBUG
         if (i == p->iprorank)
         {
-            P4EST_ASSERT (rb->ops.elem_count == 0);
+            FCLAW_ASSERT (rb->ops.elem_count == 0);
         }
         else
         {
-            P4EST_ASSERT (rb->ops.elem_count > 0);
+            FCLAW_ASSERT (rb->ops.elem_count > 0);
         }
 #endif
         sc_array_reset (&rb->ops);
