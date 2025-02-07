@@ -45,11 +45,17 @@ poisson_register (poisson_options_t *user, sc_options_t * opt)
     sc_options_add_double (opt, 0, "y0", &user->y0, 0.5,
                            "y-location of center (used in example == 1) [0.5]");
 
+    sc_options_add_double (opt, 0, "z0", &user->z0, 0.5,
+                           "z-location of center (used in example == 1) [0.5]");
+
     sc_options_add_double (opt, 0, "a", &user->a, 2,
                            "x-frequency (used in example == 2) [2]");
 
     sc_options_add_double (opt, 0, "b", &user->b, 2,
                            "y-frequency of center (used in example == 2) [2]");
+
+    sc_options_add_double (opt, 0, "c", &user->c, 2,
+                           "z-frequency of center (used in example == 2) [2]");
 
     /* For disk */
     sc_options_add_double (opt, 0, "eps-disk", &user->eps_disk, 0.015625,

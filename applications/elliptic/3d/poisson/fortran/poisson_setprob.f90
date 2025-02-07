@@ -8,8 +8,8 @@ subroutine poisson_setprob()
     INTEGER beta_choice
     COMMON /comm_beta/ beta_choice
 
-    DOUBLE PRECISION alpha, x0,y0,a,b
-    COMMON /comm_rhs/ alpha, x0,y0,a,b
+    DOUBLE PRECISION alpha, x0,y0,z0,a,b,c
+    COMMON /comm_rhs/ alpha, x0,y0,z0,a,b,c
 
     integer bc_type(0:5)
     common /comm_bc/ bc_type
@@ -28,8 +28,10 @@ subroutine poisson_setprob()
     read(10,*) alpha
     read(10,*) x0
     read(10,*) y0
+    read(10,*) z0
     read(10,*) a
     read(10,*) b
+    read(10,*) c
     read(10,*) eps_disk
     read(10,*) m_polar
 

@@ -55,9 +55,11 @@ typedef struct poisson_options
     double alpha;
     double x0;
     double y0; 
+    double z0;
 
     double a; 
     double b;
+    double c;
 
     double eps_disk;
     

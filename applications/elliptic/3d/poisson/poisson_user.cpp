@@ -40,8 +40,10 @@ void poisson_problem_setup(fclaw_global_t *glob)
         fprintf(f,  "%-24.6f   %s",user->alpha,      "% alpha\n");
         fprintf(f,  "%-24.6f   %s",user->x0,         "% x0\n");
         fprintf(f,  "%-24.6f   %s",user->y0,         "% y0\n");
+        fprintf(f,  "%-24.6f   %s",user->z0,         "% z0\n");
         fprintf(f,  "%-24.6f   %s",user->a,          "% a\n");
         fprintf(f,  "%-24.6f   %s",user->b,          "% b\n");
+        fprintf(f,  "%-24.6f   %s",user->c,          "% c\n");
         fprintf(f,  "%-24.6f   %s",user->eps_disk,   "% eps_disk\n");
         fprintf(f,  "%-24d   %s",user->m_polar,    "% m_polar\n");
         for(int i = 0; i < user->m_polar; i++)
