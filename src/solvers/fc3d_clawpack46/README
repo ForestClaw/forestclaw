@@ -1,6 +1,6 @@
-Notes on the Clawpack/GeoClaw solver: 
+Notes on the Clawpack 3d solver: 
 
-FORTRAN code and files for the ForestClaw Geoclaw extension were 
+FORTRAN code and files for the ForestClaw CLAWPACK solver extension were 
 taken originally from the open source project Clawpack: 
 
     Clawpack Copyright (c) 1994-2025 Clawpack Developers, BSD license: 
@@ -11,8 +11,8 @@ taken originally from the open source project Clawpack:
 Also see http://www.clawpack.org
 
 
-Some of the Clawpack/GeoClaw files used here have been modified to suit 
-purposes in ForestClaw. 
+Some of the Clawpack files used here have been modified to suit purposes 
+in ForestClaw. 
 
 
 
