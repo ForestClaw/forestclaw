@@ -51,7 +51,7 @@ void cb_fc3d_thunderegg_physical_bc(fclaw_domain_t *domain,
 
 
     /* Determine which faces are at the physical boundary */
-    int intersects_bc[4];
+    int intersects_bc[6];
     fclaw_physical_get_bc(s->glob,blockno,patchno,intersects_bc);
 
     int mx, my, mz, mbc;
