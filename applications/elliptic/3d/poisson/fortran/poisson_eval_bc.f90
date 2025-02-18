@@ -10,7 +10,7 @@ double precision function poisson_fort_eval_bc(iface,t,x,y,z)
     integer normals(0:5,3)
     double precision q,grad(3), qn, a,b
 
-    data normals /-1,1,0,0,0,0,-1,1,0,0,0,0,-1,1,0,0,0,0/
+    data normals /-1,1,0,0,0,0,0,0,-1,1,0,0,0,0,0,0,-1,1/
 
     call poisson_qexact_gradient(x,y,z,q,grad)
 
