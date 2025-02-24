@@ -2,7 +2,7 @@ module hsmooth_mod
     implicit none
     integer :: m_polar = -1
 
-    double precision, dimension(:), allocatable :: x0_polar,y0_polar
+    double precision, dimension(:), allocatable :: x0_polar,y0_polar,z0_polar
     double precision, dimension(:), allocatable :: r0_polar,r1_polar
     integer, dimension(:), allocatable :: n_polar
 
@@ -17,8 +17,8 @@ contains
             stop
         endif
 
-        allocate(x0_polar(m_polar), y0_polar(m_polar),r0_polar(m_polar), & 
-                 r1_polar(m_polar), n_polar(m_polar))
+        allocate(x0_polar(m_polar), y0_polar(m_polar), z0_polar(m_polar), &
+                 r0_polar(m_polar), r1_polar(m_polar), n_polar(m_polar))
     end subroutine allocate_polar_arrays
 end module hsmooth_mod
 
