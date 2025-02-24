@@ -25,9 +25,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "poisson_operator.h"
 
-#include "fc3d_thunderegg.h"
-#include "fc3d_thunderegg_options.h"
-#include "fc3d_thunderegg_vector.hpp"
+#include <fc3d_thunderegg.h>
+#include <fc3d_thunderegg_options.h>
+#include <fc3d_thunderegg_vector.hpp>
 
 #include <fclaw_elliptic_solver.h>
 
@@ -214,6 +214,8 @@ void poisson_solve(fclaw_global_t *glob)
 
     // get finest level
     Domain<3> te_domain = domain_gen.getFinestDomain();
+    std::shared_ptr<Timer> timer = make_shared<Timer>(te_domain.getCommunicator());
+    te_domain.setTimer(timer);
 
     // ghost filler
     TriLinearGhostFiller ghost_filler(te_domain, fill_type);
@@ -276,6 +278,7 @@ void poisson_solve(fclaw_global_t *glob)
         //next domain
         Domain<3> curr_domain = te_domain;
         Domain<3> next_domain = domain_gen.getCoarserDomain();
+        next_domain.setTimer(timer);
 
         //restrictor
         GMG::LinearRestrictor<3> restrictor(curr_domain, 
@@ -289,6 +292,7 @@ void poisson_solve(fclaw_global_t *glob)
         while(domain_gen.hasCoarserDomain())
         {
             next_domain = domain_gen.getCoarserDomain();
+            next_domain.setTimer(timer);
 
             //operator
             TriLinearGhostFiller ghost_filler(curr_domain, fill_type);
@@ -377,6 +381,7 @@ void poisson_solve(fclaw_global_t *glob)
     int its = iter_solver.solve(op, u, f, M.get(),prt_output);
 
     fclaw_global_productionf("Iterations: %i\n", its);    
+    //std::cout << *timer;
 
     /* Solution is copied to right hand side */
     fc3d_thunderegg_store_vector(glob, RHS, u);
