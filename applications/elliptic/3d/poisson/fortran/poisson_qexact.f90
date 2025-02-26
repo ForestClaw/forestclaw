@@ -160,6 +160,7 @@ SUBROUTINE poisson_qexact_complete(example,x,y,z,q,qlap,grad,flag)
         q = 0
         qx = 0
         qy = 0
+        qz = 0
         qlap = 0
         do id = 1,m_polar
             x0p = x0_polar(id)
