@@ -19,14 +19,14 @@ subroutine fc3d_thunderegg_fort_apply_bc_default(blockno, mx, my, mz, mbc,meqn,x
     do k = 1-mbc,mz+mbc
         do j = 1-mbc,my+mbc
             do i = 1-mbc,mx+mbc
-            q(i,j,k) = 0
+                q(i,j,k) = 0
             end do
         end do
     end do
 
     do iface = 0,5
         if (intersects_bc(iface) .ne. 0) then
-            idir = iface/2   !! direction : 0 or 1
+            idir = iface/2   !! direction : 0, 1, or 2
 
             if (bctype(iface) .eq. 1) then
                 a = 1
