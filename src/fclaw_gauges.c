@@ -235,7 +235,7 @@ void gauge_initialize(fclaw_global_t* glob, void** acc)
             {
                 /* Map gauge to global [0,1]x[0,1] space. This works for the brick
                    but not clear what happens for the cubed sphere */
-                double p[gauge_dim];
+                double p[3];
                 fclaw_gauge_normalize_coordinates(glob,block,nb,&gauges[i],&p[0],&p[1],&p[2]);
 
 
