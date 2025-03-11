@@ -1711,6 +1711,8 @@ void initialize_2d_claw46_fort_vt(fclaw_clawpatch_vtable_t* clawpatch_vt)
     clawpatch_vt->d2->fort_local_ghost_pack      = FCLAW2D_CLAWPATCH46_FORT_LOCAL_GHOST_PACK;
 
     clawpatch_vt->d2->fort_timeinterp            = FCLAW2D_CLAWPATCH46_FORT_TIMEINTERP;
+
+    clawpatch_vt->d2->fort_gauge_update          = FCLAW2D_CLAWPATCH46_FORT_GAUGE_UPDATE;
 }
 
 static 
@@ -1748,6 +1750,9 @@ void initialize_2d_claw5_fort_vt(fclaw_clawpatch_vtable_t* clawpatch_vt)
     clawpatch_vt->d2->fort_local_ghost_pack   = FCLAW2D_CLAWPATCH5_FORT_LOCAL_GHOST_PACK;
 
     clawpatch_vt->d2->fort_timeinterp         = FCLAW2D_CLAWPATCH5_FORT_TIMEINTERP;
+
+    clawpatch_vt->d2->fort_gauge_update       = FCLAW2D_CLAWPATCH5_FORT_GAUGE_UPDATE;
+
 }
 
 static 
@@ -1950,6 +1955,14 @@ void fclaw_clawpatch_vtable_initialize(fclaw_global_t* glob,
     patch_vt->checkpoint_pointer_sizes = restart_pointer_sizes;
     patch_vt->checkpoint_names        = restart_names;
     patch_vt->checkpoint_get_pointer  = get_pointer;
+
+    /* Gauges */
+    fclaw_gauges_vtable_t*  gauges_vt = fclaw_gauges_vt(glob);
+    gauges_vt->read_data               = fclaw_clawpatch_gauges_read_data;
+    gauges_vt->create_files           = fclaw_clawpatch_gauges_create_files; 
+    gauges_vt->normalize_coordinates  = fclaw_clawpatch_gauges_normalize_coordinates;
+    gauges_vt->update                 = fclaw_clawpatch_gauges_update;
+    gauges_vt->print_buffer           = fclaw_clawpatch_gauges_print;
 
     /* output functions */
     clawpatch_vt->time_header_ascii  = fclaw_clawpatch_time_header_ascii;

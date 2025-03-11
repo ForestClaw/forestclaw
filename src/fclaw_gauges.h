@@ -166,16 +166,20 @@ typedef void (*fclaw_gauge_print_t)(struct fclaw_global *glob,
 typedef struct fclaw_gauges_vtable
 {
     /** @brief Sets the data for each gauge */
-    fclaw_gauge_set_data_t      set_gauge_data;
+    fclaw_gauge_read_data_t      read_data;
+
     /** @brief Creates files for each gauge */
-    fclaw_gauge_create_files_t  create_gauge_files;
-    /** @brief Updates the current buffer entry for the gauge */
-    fclaw_gauge_update_t        update_gauge;
-    /** @brief Prints the buffer to a file */
-    fclaw_gauge_print_t         print_gauge_buffer;
+    fclaw_gauge_create_files_t  create_files;
 
     /** @brief Maps gauge to normalized coordinates in a global [0,1]x[0,1]  domain. */
     fclaw_gauge_normalize_t     normalize_coordinates;
+
+    /** @brief Updates the current buffer entry for the gauge */
+    fclaw_gauge_update_t        update;
+
+    /** @brief Prints the buffer to a file */
+    fclaw_gauge_print_t         print_buffer;
+
 
     /** @brief true if vtable has been set */
     int is_set;
@@ -186,7 +190,7 @@ typedef struct fclaw_gauges_vtable
  * 
  * @param glob the global context
  */
-void fclaw_locate_gauges(struct fclaw_global *glob);
+void fclaw_gauges_locate(struct fclaw_global *glob);
 
 /**
  * @brief Initialize the gauges vtable
@@ -206,7 +210,10 @@ fclaw_gauges_vtable_t* fclaw_gauges_vt(struct fclaw_global *glob);
 
 
 /* ------------------------ Virtualized gauge functions ------------------------------- */
+#if 0
 
+#if 0
+/* Not sure what this function was doing */
 /**
  * @brief Set the data for each gauge
  * 
@@ -214,10 +221,10 @@ fclaw_gauges_vtable_t* fclaw_gauges_vt(struct fclaw_global *glob);
  * @param gauges the array of gauges
  * @param num_gauges the number of gauges
  */
-#if 0
 void fclaw_set_gauge_data(struct fclaw_global* glob, 
                           struct fclaw_gauge **gauges, 
                           int *num_gauges);
+
 #endif
 
 /**
@@ -227,12 +234,9 @@ void fclaw_set_gauge_data(struct fclaw_global* glob,
  * @param[in] gauges the array of gauges
  * @param[in] num_gauges the number of gauges
  */
-#if 0
 void fclaw_create_gauge_files(struct fclaw_global* glob, 
                               struct fclaw_gauge *gauges, 
                               int num_gauges);
-#endif                              
-
 /**
  * @brief Map gauge to normalized coordinates in a global [0,1]x[0,1]  domain.
  * 
@@ -274,7 +278,7 @@ void  fclaw_update_gauge(struct fclaw_global* glob,
 void fclaw_print_gauge_buffer(struct fclaw_global* glob, 
                               struct fclaw_gauge *g);
 
-
+#endif
 /* ---------------------------------- Gauges ------------------------------------------ */
 
 /**
@@ -284,7 +288,7 @@ void fclaw_print_gauge_buffer(struct fclaw_global* glob,
  * @param[in] num_gauges the number of gauges
  * @param[out] g allocated array of gauges 
  */
-void fclaw_gauge_allocate(struct fclaw_global *glob, int num_gauges,
+void fclaw_gauges_allocate(struct fclaw_global *glob, int num_gauges,
                           struct fclaw_gauge **g);
 
 /**
@@ -298,7 +302,7 @@ void fclaw_gauge_allocate(struct fclaw_global *glob, int num_gauges,
  * @param[in] t2 Tend
  * @param[in] min_time_increment How often to output the gauge
  */
-void fclaw_gauge_set_data(struct fclaw_global *glob, 
+void fclaw_gauges_set_data(struct fclaw_global *glob, 
                           struct fclaw_gauge *g,  
                           int num, int dim,
                           double xc, double yc, double zc,
@@ -316,7 +320,7 @@ void fclaw_gauge_set_data(struct fclaw_global *glob,
  * @param[out] t1 Tstart
  * @param[out] t2 Tend
  */
-void fclaw_gauge_get_data(struct fclaw_global *glob, 
+void fclaw_gauges_get_data(struct fclaw_global *glob, 
                              struct fclaw_gauge *g,                             
                              int *num, int *dim,
                              double *xc, double *yc, double *zc,
@@ -329,7 +333,7 @@ void fclaw_gauge_get_data(struct fclaw_global *glob,
  * @param g the gauge
  * @return int the gauge number
  */
-int fclaw_gauge_get_id(struct fclaw_global *glob, 
+int fclaw_gauges_get_id(struct fclaw_global *glob, 
                        struct fclaw_gauge *g);
     
 /**
@@ -339,7 +343,7 @@ int fclaw_gauge_get_id(struct fclaw_global *glob,
  * @param g the gauge
  * @param guser the data 
  */
-void fclaw_gauge_set_buffer_entry(struct fclaw_global *glob,
+void fclaw_gauges_set_buffer_entry(struct fclaw_global *glob,
                                   struct fclaw_gauge* g,
                                   void* guser);
 
@@ -351,7 +355,7 @@ void fclaw_gauge_set_buffer_entry(struct fclaw_global *glob,
  * @param[out] kmax size of buffer
  * @param[out] gauge_buffer the buffer
  */
-void fclaw_gauge_get_buffer(struct fclaw_global *glob,
+void fclaw_gauges_get_buffer(struct fclaw_global *glob,
                             struct fclaw_gauge *g,
                             int *kmax, void*** gauge_buffer);
 
@@ -362,7 +366,7 @@ void fclaw_gauge_get_buffer(struct fclaw_global *glob,
  * @param[in] g the gauge
  * @param[in] user the user data
  */
-void fclaw_gauge_set_user_data(struct fclaw_global *glob,
+void fclaw_gauges_set_user_data(struct fclaw_global *glob,
                                struct fclaw_gauge* g,
                                void* user);
 
@@ -373,7 +377,7 @@ void fclaw_gauge_set_user_data(struct fclaw_global *glob,
  * @param g the gauge
  * @return void* the user data
  */
-void* fclaw_gauge_get_user_data(struct fclaw_global *glob,
+void* fclaw_gauges_get_user_data(struct fclaw_global *glob,
                                 struct fclaw_gauge* g);
 
 

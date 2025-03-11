@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
+Copyright (c) 2012-2025 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -267,6 +267,9 @@ struct fclaw_clawpatch_vtable_2d
     /** Calculates the area of a patch */
     clawpatch_fort_area_t                  fort_compute_patch_area;
 
+    /** Update gauges */
+    clawpatch_fort_gauge_update_t          fort_gauge_update;
+
     /** @} */
 
 };
@@ -350,6 +353,9 @@ struct fclaw_clawpatch_vtable_3d
     fclaw3d_clawpatch_fort_norm_t                  fort_compute_error_norm;
     /** Calculates the area of a patch */
     fclaw3d_clawpatch_fort_area_t                  fort_compute_patch_area;
+
+    fclaw3d_clawpatch_fort_gauge_update_t          fort_gauge_update;
+
 
     /** @} */
 };
