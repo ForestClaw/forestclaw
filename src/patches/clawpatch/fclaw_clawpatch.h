@@ -35,6 +35,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw2d_clawpatch_conservation.h>
 #include <fclaw_clawpatch_diagnostics.h>
 
+#include <fclaw_clawpatch_gauges.h>
+
 
 #ifdef __cplusplus
 extern "C"
@@ -268,7 +270,7 @@ struct fclaw_clawpatch_vtable_2d
     clawpatch_fort_area_t                  fort_compute_patch_area;
 
     /** Update gauges */
-    clawpatch_fort_gauge_update_t          fort_gauge_update;
+    clawpatch_fort_gauges_update_t          fort_gauge_update;
 
     /** @} */
 
@@ -354,7 +356,7 @@ struct fclaw_clawpatch_vtable_3d
     /** Calculates the area of a patch */
     fclaw3d_clawpatch_fort_area_t                  fort_compute_patch_area;
 
-    fclaw3d_clawpatch_fort_gauge_update_t          fort_gauge_update;
+    fclaw3d_clawpatch_fort_gauges_update_t          fort_gauge_update;
 
 
     /** @} */

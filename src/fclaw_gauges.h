@@ -48,6 +48,7 @@ typedef struct fclaw_gauge
 {
     /** @brief The block that the gauge is in */
     int blockno;
+
     /** @brief Location of the gauge in the results array */
     int location_in_results;
 
@@ -55,6 +56,7 @@ typedef struct fclaw_gauge
        gauge information */
     /** @brief true if this gauge is on the local processor */
     int is_local;
+
     /** @brief the patch that the gauge is in */
     int patchno;
 
@@ -68,6 +70,7 @@ typedef struct fclaw_gauge
     double t1;
     /** @brief Tend */
     double t2;
+
     /** @brief Gauge number */
     int num;
 
@@ -103,7 +106,7 @@ struct fclaw_gauge;
  * @param[in,out] gauges the array of gauges
  * @param[in] num_gauges the number of gauges
  */
-typedef void (*fclaw_gauge_set_data_t)(struct fclaw_global *glob, 
+typedef void (*fclaw_gauges_read_data_t)(struct fclaw_global *glob, 
                                        struct fclaw_gauge **gauges, 
                                        int *num,
                                        int *dim);
@@ -115,7 +118,7 @@ typedef void (*fclaw_gauge_set_data_t)(struct fclaw_global *glob,
  * @param[in] gauges the array of gauges
  * @param[in] num_gauges the number of gauges
  */
-typedef void (*fclaw_gauge_create_files_t)(struct fclaw_global *glob, 
+typedef void (*fclaw_gauges_create_files_t)(struct fclaw_global *glob, 
                                            struct fclaw_gauge *gauges, 
                                            int num_gauges);
 
@@ -128,7 +131,7 @@ typedef void (*fclaw_gauge_create_files_t)(struct fclaw_global *glob,
  * @param[in] g the gauge
  * @param[out] xc,yc the normalized coordinates
  */
-typedef void (*fclaw_gauge_normalize_t)(struct fclaw_global *glob, 
+typedef void (*fclaw_gauges_normalize_t)(struct fclaw_global *glob, 
                                        struct fclaw_block *block,
                                        int blockno, 
                                        struct fclaw_gauge *g,
@@ -145,7 +148,7 @@ typedef void (*fclaw_gauge_normalize_t)(struct fclaw_global *glob,
  * @param[in] tcurr the current time
  * @param[in,out] g the gauge
  */
-typedef void (*fclaw_gauge_update_t)(struct fclaw_global* glob, 
+typedef void (*fclaw_gauges_update_t)(struct fclaw_global* glob, 
                                      struct fclaw_block* block,
                                      struct fclaw_patch* patch, 
                                      int blockno, int patchno,
@@ -157,7 +160,7 @@ typedef void (*fclaw_gauge_update_t)(struct fclaw_global* glob,
  * @param glob the global context
  * @param g the gauge
  */
-typedef void (*fclaw_gauge_print_t)(struct fclaw_global *glob, 
+typedef void (*fclaw_gauges_print_t)(struct fclaw_global *glob, 
                                     struct fclaw_gauge *gauge);
 
 /**
@@ -166,19 +169,19 @@ typedef void (*fclaw_gauge_print_t)(struct fclaw_global *glob,
 typedef struct fclaw_gauges_vtable
 {
     /** @brief Sets the data for each gauge */
-    fclaw_gauge_read_data_t      read_data;
+    fclaw_gauges_read_data_t      read_data;
 
     /** @brief Creates files for each gauge */
-    fclaw_gauge_create_files_t  create_files;
+    fclaw_gauges_create_files_t  create_files;
 
     /** @brief Maps gauge to normalized coordinates in a global [0,1]x[0,1]  domain. */
-    fclaw_gauge_normalize_t     normalize_coordinates;
+    fclaw_gauges_normalize_t     normalize_coordinates;
 
     /** @brief Updates the current buffer entry for the gauge */
-    fclaw_gauge_update_t        update;
+    fclaw_gauges_update_t        update;
 
     /** @brief Prints the buffer to a file */
-    fclaw_gauge_print_t         print_buffer;
+    fclaw_gauges_print_t         print_buffer;
 
 
     /** @brief true if vtable has been set */

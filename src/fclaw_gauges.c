@@ -224,7 +224,7 @@ void gauges_initialize(fclaw_global_t* glob, void** acc)
     if (num_gauges > 0)
     {
         fclaw_gauge_t *gauges = gauge_acc->gauges;
-        fclaw_create_gauge_files(glob,gauges,num_gauges);    
+        gauges_create_files(glob,gauges,num_gauges);    
 
         /* ------------------------------------------------------------------
            Finish setting gauges with ForestClaw specific info 
@@ -400,12 +400,8 @@ void gauges_initialize(fclaw_global_t* glob, void** acc)
 
 /* Needed for diagnostics */
 static
-void gauges_update(fclaw_global_t *glob, void* acc)
+void gauges_compute(fclaw_global_t *glob, void* acc)
 {
-    fclaw_block_t *block;
-    fclaw_patch_t *patch;
-    fclaw_gauge_t *g;
-
     const fclaw_options_t * fclaw_opt = fclaw_get_options(glob);
 
     fclaw_gauge_acc_t* gauge_acc = (fclaw_gauge_acc_t*) acc;
@@ -417,7 +413,7 @@ void gauges_update(fclaw_global_t *glob, void* acc)
 
     for (int i = 0; i < num_gauges; i++)
     {
-        g = &gauges[i];
+        fclaw_gauge_t *g = &gauges[i];
         if (tcurr >= g->t1 && tcurr <= g->t2 &&
             tcurr - g->last_time >= g->min_time_increment)
         {
@@ -425,7 +421,7 @@ void gauges_update(fclaw_global_t *glob, void* acc)
                this processor. This keeps the time consistent across all processors, 
                so that when this gauge is local to this processor, it knows when 
                it was last updated (even if it was updated on another processor). */
-            fclaw_gauge_t *g->last_time = tcurr;
+            g->last_time = tcurr;
 
             if (g->is_local)
             {
@@ -461,6 +457,10 @@ void gauges_finalize(fclaw_global_t *glob, void** acc)
     fclaw_gauge_info_t* gauge_info = 
         (fclaw_gauge_info_t *) fclaw_global_get_attribute(glob,"gauge_info");
 
+    /* Clean up gauges and print anything left over in buffers */
+    fclaw_gauge_acc_t* gauge_acc = *((fclaw_gauge_acc_t**) acc);
+
+
     fclaw_gauge_t *gauges = gauge_acc->gauges;
     for(int i = 0; i < gauge_acc->num_gauges; i++)
     {
@@ -475,9 +475,6 @@ void gauges_finalize(fclaw_global_t *glob, void** acc)
         }
         FCLAW_FREE(g->buffer);               
     }
-
-    /* Clean up gauges and print anything left over in buffers */
-    fclaw_gauge_acc_t* gauge_acc = *((fclaw_gauge_acc_t**) acc);
 
     if (gauge_acc->gauges != NULL)
     {
@@ -539,7 +536,7 @@ void fclaw_gauges_vtable_initialize(fclaw_global_t* glob)
 
     fclaw_diagnostics_vtable_t *diag_vt  = fclaw_diagnostics_vt(glob);
     diag_vt->gauges_init_diagnostics     = gauges_initialize;
-    diag_vt->gauges_compute_diagnostics  = gauges_update;
+    diag_vt->gauges_compute_diagnostics  = gauges_compute;
     diag_vt->gauges_finalize_diagnostics = gauges_finalize;
 
     gauges_vt->is_set = 1;

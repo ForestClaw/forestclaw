@@ -42,25 +42,6 @@ extern "C"
 /* fix syntax highlighting */    
 #endif
 
-/*  
-    USER : This struct can be used to store any user defined information that 
-    any gauge should have access to.  Right now, we store only q and aux values.
-
-    Instances of this struct are stored as void* in the fclaw_gauge_t struct.
-*/    
-
-typedef struct clawpatch_gauge_data
-{
-    int level;
-    double tcurr;
-    int meqn;      /* Needed when printing out buffers */
-    int maux;
-    double *qvar;  /* Store qvalues */
-    double *avar;  /* Store aux variables */
-
-} clawpatch_gauge_data_t;
-
-
 /*
     Five main functions are defined here.  These are called virtually from 
     functions defined in fclaw_gauges.c. 
@@ -322,7 +303,7 @@ void fclaw_clawpatch_gauges_update(fclaw_global_t*
 
 
     fclaw_clawpatch_vtable_t* clawpatch_vt = 
-        fclaw_clawpatch_vt(glob)
+        fclaw_clawpatch_vt(glob);
     double qvar[meqn], avar[maux];  /* q[meqn] */
     if (dim == 2)
     {
@@ -338,8 +319,6 @@ void fclaw_clawpatch_gauges_update(fclaw_global_t*
         /* Don't check time interval here;  this is done in fclaw_gauges.c */
 
         /* Interpolate q and aux variables to gauge location */
-        fclaw_clawpatch_vtable_t* clawpatch_vt = 
-                        fclaw_clawpatch_vt(glob)
         clawpatch_vt->d2->fort_gauge_update(&num, &mx,&my,&mbc,&meqn,
                                             &xlower,&ylower,
                                             &dx,&dy,q,&maux,aux,&xc,&yc,
@@ -347,7 +326,7 @@ void fclaw_clawpatch_gauges_update(fclaw_global_t*
     }
     else if (dim == 3)
     {
-        int mx, my, mz,mbc;o
+        int mx, my, mz,mbc;
         double xlower,ylower,zlower,dx,dy,dz;
         fclaw_clawpatch_3d_grid_data(glob,patch,&mx,&my,&mz,&mbc,
                                      &xlower,&ylower,&zlower,
@@ -370,8 +349,9 @@ void fclaw_clawpatch_gauges_update(fclaw_global_t*
         USER : Store qvar, avar and anything else into the 
         "fclaw_clawpatch2d_gauge_user".  
     */
-    fclaw_clawpatch_gauge_t *g_clawpatch = FCLAW_ALLOC(fclaw_clawpatch_gauge_t,1);
-    g->level = patch->level;
+    fclaw_clawpatch_gauge_data_t *g_clawpatch = 
+               FCLAW_ALLOC(fclaw_clawpatch_gauge_data_t,1);
+    // g->level = patch->level;
     g_clawpatch->tcurr = tcurr;
     g_clawpatch->qvar = FCLAW_ALLOC(double,meqn);
     g_clawpatch->avar = FCLAW_ALLOC(double,maux);
@@ -403,17 +383,17 @@ void fclaw_clawpatch_gauges_print(fclaw_global_t *glob,
     /* This assumes on buffers be organized as an array; entries
        start at 0 and end with kmax-1 */
     int kmax;
-    fclaw_clawpatch_gauge_t **gauge_buffer;
+    fclaw_clawpatch_gauge_data_t **gauge_buffer;
     fclaw_gauges_get_buffer(glob,gauge,&kmax,(void***) &gauge_buffer);
 
-    int id = fclaw_gauge_get_id(glob,gauge);
+    int id = fclaw_gauges_get_id(glob,gauge);
     char filename[15];  /* gaugexxxxx.txt + EOL character */
     sprintf(filename,"gauge%05d.txt",id);
 
     FILE *fp = fopen(filename, "a");
     for(int k = 0; k < kmax; k++)
     {
-        fclaw_clawpatch_gauge_t *guser = gauge_buffer[k];
+        fclaw_clawpatch_gauge_data_t *guser = gauge_buffer[k];
 
         /* USER : Specify formatting here */
         fprintf(fp, "%5d %15.7e",guser->level, guser->tcurr);

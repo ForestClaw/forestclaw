@@ -1,4 +1,4 @@
-SUBROUTINE fclaw2d_clawpatch46_fort_gauge_update(num,mx,my,mbc, & 
+SUBROUTINE fclaw2d_clawpatch46_fort_gauges_update(num,mx,my,mbc, & 
     meqn,xlower,ylower, dx,dy,q,maux,aux,xc,yc,qvar,avar)
 
     implicit none
@@ -46,4 +46,4 @@ SUBROUTINE fclaw2d_clawpatch46_fort_gauge_update(num,mx,my,mbc, &
         if (abs(avar(m)) < 1d-99) avar(m) = 0.d0
     end do
 
-END SUBROUTINE magic2d_update_gauge
+END SUBROUTINE fclaw2d_clawpatch46_fort_gauges_update

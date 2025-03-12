@@ -470,7 +470,7 @@ typedef void (*clawpatch_fort_norm_t)(const int* blockno, const int *mx,
  * @param[out] qvar, avar Vectors of interpolated solution and aux array at gauge point.
  */
 
-typedef void (clawpatch_fort_gauge_update_t)(const int *num, 
+typedef void (*clawpatch_fort_gauges_update_t)(const int *num, 
                                              const int *mx, 
                                              const int *my, 
                                              const int* mbc, 

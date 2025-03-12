@@ -35,6 +35,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_regions.h>
 #include <fclaw_clawpatch_regions.h>
 
+#include <fclaw_gauges.h>
+#include <fclaw_clawpatch_gauges.h>
+
 #include <fclaw2d_clawpatch_fort.h>
 #include <fclaw2d_clawpatch_conservation.h>
 #include <fclaw2d_clawpatch_conservation_fort.h>
@@ -1712,7 +1715,7 @@ void initialize_2d_claw46_fort_vt(fclaw_clawpatch_vtable_t* clawpatch_vt)
 
     clawpatch_vt->d2->fort_timeinterp            = FCLAW2D_CLAWPATCH46_FORT_TIMEINTERP;
 
-    clawpatch_vt->d2->fort_gauge_update          = FCLAW2D_CLAWPATCH46_FORT_GAUGE_UPDATE;
+    clawpatch_vt->d2->fort_gauge_update          = FCLAW2D_CLAWPATCH46_FORT_GAUGES_UPDATE;
 }
 
 static 
@@ -1751,7 +1754,7 @@ void initialize_2d_claw5_fort_vt(fclaw_clawpatch_vtable_t* clawpatch_vt)
 
     clawpatch_vt->d2->fort_timeinterp         = FCLAW2D_CLAWPATCH5_FORT_TIMEINTERP;
 
-    clawpatch_vt->d2->fort_gauge_update       = FCLAW2D_CLAWPATCH5_FORT_GAUGE_UPDATE;
+    clawpatch_vt->d2->fort_gauge_update       = FCLAW2D_CLAWPATCH5_FORT_GAUGES_UPDATE;
 
 }
 
@@ -1782,6 +1785,9 @@ void initialize_3dx_claw46_fort_vt(fclaw_clawpatch_vtable_t* clawpatch_vt)
     clawpatch_vt->d3->fort_local_ghost_pack      = FCLAW3DX_CLAWPATCH46_FORT_LOCAL_GHOST_PACK;
 
     clawpatch_vt->d3->fort_timeinterp            = FCLAW3D_CLAWPATCH46_FORT_TIMEINTERP;
+
+    clawpatch_vt->d3->fort_gauge_update          = FCLAW3D_CLAWPATCH46_FORT_GAUGES_UPDATE;
+
 }
 
 static 

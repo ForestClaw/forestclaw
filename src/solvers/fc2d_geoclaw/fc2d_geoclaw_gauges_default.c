@@ -118,7 +118,7 @@ void geoclaw_read_gauges_data_default(fclaw_global_t *glob,
     }
     else
     {
-        fclaw_gauge_allocate(glob,*num_gauges,gauges);
+        fclaw_gauges_allocate(glob,*num_gauges,gauges);
         fclaw_gauge_t *g = *gauges;
 
         num = FCLAW_ALLOC(int,   *num_gauges);
@@ -156,7 +156,7 @@ void geoclaw_read_gauges_data_default(fclaw_global_t *glob,
         for(i = 0; i < *num_gauges; i++)
         {
             double zc = 0;
-            fclaw_gauge_set_data(glob,&g[i],num[i],*dim,
+            fclaw_gauges_set_data(glob,&g[i],num[i],*dim,
                                  xc[i],yc[i],zc,t1[i],t2[i],
                                  min_time_increment[i]);
         }
@@ -196,7 +196,7 @@ void geoclaw_create_gauge_files_default(fclaw_global_t *glob,
     {
         double zc;
         int dim;
-        fclaw_gauge_get_data(glob,&gauges[i],&num, &dim, &xc, &yc, &zc, &t1, &t2);
+        fclaw_gauges_get_data(glob,&gauges[i],&num, &dim, &xc, &yc, &zc, &t1, &t2);
 
         sprintf(filename,"gauge%05d.txt",num);
         fp = fopen(filename, "w");
@@ -261,7 +261,7 @@ void geoclaw_gauge_update_default(fclaw_global_t*
 
     double zc;
     int dim;
-    fclaw_gauge_get_data(glob,g,&num, &dim, &xc, &yc, &zc, &t1, &t2);
+    fclaw_gauges_get_data(glob,g,&num, &dim, &xc, &yc, &zc, &t1, &t2);
 
     FCLAW_ASSERT(xc >= xlower && xc <= xlower + mx*dx);
     FCLAW_ASSERT(yc >= ylower && yc <= ylower + my*dy);
@@ -285,7 +285,7 @@ void geoclaw_gauge_update_default(fclaw_global_t*
         guser->qvar[m] = qvar[m];
     }
     guser->avar[0] = avar[0];   /* Just store bathymetry for now */
-    fclaw_gauge_set_buffer_entry(glob,g,guser);
+    fclaw_gauges_set_buffer_entry(glob,g,guser);
 }
 
 void geoclaw_print_gauges_default(fclaw_global_t *glob, 
@@ -299,9 +299,9 @@ void geoclaw_print_gauges_default(fclaw_global_t *glob,
 
     /* This assumes on buffers be organized as an array; entries
        start at 0 and with kmax-1 */
-    fclaw_gauge_get_buffer(glob,gauge,&kmax,(void***) &gauge_buffer);
+    fclaw_gauges_get_buffer(glob,gauge,&kmax,(void***) &gauge_buffer);
 
-    id = fclaw_gauge_get_id(glob,gauge);
+    id = fclaw_gauges_get_id(glob,gauge);
     sprintf(filename,"gauge%05d.txt",id);
     fp = fopen(filename, "a");
     for(k = 0; k < kmax; k++)

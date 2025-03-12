@@ -1,4 +1,4 @@
-SUBROUTINE fclaw_clawpatch_gauge_update(num,mx,my,mz,mbc,meqn,&
+SUBROUTINE fclaw3d_clawpatch46_fort_gauges_update(num,mx,my,mz,mbc,meqn,&
     xlower,ylower, zlower, dx,dy,dz,q,maux,aux,xc,yc,zc,qvar,avar)
 
     implicit none
@@ -11,13 +11,13 @@ SUBROUTINE fclaw_clawpatch_gauge_update(num,mx,my,mz,mbc,meqn,&
 
     !! local variables:
     double precision :: xcent,ycent,zcent,xoff,yoff,zoff
-    integer :: iindex,jindex,kindex, mq, m
+    integer :: iindex,jindex,kindex, mq, m, k
 
     double precision :: qz(0:1), az(0:1)
 
     iindex =  int((xc-xlower)/dx) + 1
     jindex =  int((yc-ylower)/dy) + 1
-    iindex =  int((zc-zlower)/dz) + 1
+    kindex =  int((zc-zlower)/dz) + 1
 
     xcent  = xlower + (iindex-.5d0)*dx
     ycent  = ylower + (jindex-.5d0)*dy
@@ -29,12 +29,12 @@ SUBROUTINE fclaw_clawpatch_gauge_update(num,mx,my,mz,mbc,meqn,&
     !! Linear interpolation between four cells
     do mq=1,meqn
         do k = 0,1
-            qz[k] = (1.d0 - xoff) * (1.d0 - yoff) * q(iindex,jindex,kindex+k,mq)  &
+            qz(k) = (1.d0 - xoff) * (1.d0 - yoff) * q(iindex,jindex,kindex+k,mq)  &
             + xoff*(1.d0 - yoff) * q(iindex+1,jindex,kindex+k,mq)  &
             + (1.d0 - xoff) * yoff * q(iindex,jindex+1,kindex+k,mq)  &
             + xoff * yoff * q(iindex+1,jindex+1,kindex+k,mq)
         enddo
-        qvar[mq] = qz(0) + (qz(1) - qz(0))*zoff
+        qvar(mq) = qz(0) + (qz(1) - qz(0))*zoff
     enddo
 
     !! Linear interpolation between four cells
@@ -45,7 +45,7 @@ SUBROUTINE fclaw_clawpatch_gauge_update(num,mx,my,mz,mbc,meqn,&
             + (1.d0 - xoff) * yoff * aux(iindex,jindex+1,kindex+k,m)  &
             + xoff * yoff * aux(iindex+1,jindex+1,kindex+1,m)
         end do
-        avar[m] = az(0) + (az(1) - az(0))*zoff
+        avar(m) = az(0) + (az(1) - az(0))*zoff
     enddo
 
 
@@ -57,4 +57,4 @@ SUBROUTINE fclaw_clawpatch_gauge_update(num,mx,my,mz,mbc,meqn,&
         if (abs(avar(m)) < 1d-99) avar(m) = 0.d0
     end do
 
-END SUBROUTINE magic3d_update_gauge
+END SUBROUTINE fclaw3d_clawpatch46_fort_gauges_update

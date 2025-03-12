@@ -38,6 +38,25 @@ struct fclaw_gauge;
 struct fclaw_patch;
 struct fclaw_block;
 
+/*  
+    USER : This struct can be used to store any user defined information that 
+    any gauge should have access to.  Right now, we store only q and aux values.
+
+    Instances of this struct are stored as void* in the fclaw_gauge_t struct.
+*/    
+
+typedef struct fclaw_clawpatch_gauge_data
+{
+    int level;
+    double tcurr;
+    int meqn;      /* Needed when printing out buffers */
+    int maux;
+    double *qvar;  /* Store qvalues */
+    double *avar;  /* Store aux variables */
+
+} fclaw_clawpatch_gauge_data_t;
+
+
 void fclaw_clawpatch_gauges_read_data(struct fclaw_global *glob, 
                                       struct fclaw_gauge **gauges, 
                                       int *num, int* dim);
@@ -64,11 +83,11 @@ void fclaw_clawpatch_gauges_print(struct fclaw_global *glob,
 
 /* ----------------------------------- FORTRAN  ---------------------------------------- */
 
-#define FCLAW2D_CLAWPATCH46_FORT_GAUGE_UPDATE \
-           FCLAW_F77_FUNC(fclaw2d_clawpatch46_fort_gauge_update, \
-                          FCLAW2D_CLAWPATCH46_FORT_GAUGE_UPDATE)
+#define FCLAW2D_CLAWPATCH46_FORT_GAUGES_UPDATE \
+           FCLAW_F77_FUNC(fclaw2d_clawpatch46_fort_gauges_update, \
+                          FCLAW2D_CLAWPATCH46_FORT_GAUGES_UPDATE)
 
-void FCLAW2D_CLAWPATCH46_FORT_GAUGE_UPDATE(const int *num, 
+void FCLAW2D_CLAWPATCH46_FORT_GAUGES_UPDATE(const int *num, 
                                            const int *mx, 
                                            const int *my, 
                                            const int* mbc, 
@@ -86,10 +105,10 @@ void FCLAW2D_CLAWPATCH46_FORT_GAUGE_UPDATE(const int *num,
                                            double avar[]);
 
 
-#define FCLAW2D_CLAWPATCH5_FORT_GAUGE_UPDATE \
-           FCLAW_F77_FUNC(fclaw2d_clawpatch5_fort_gauge_update, \
-                          FCLAW2D_CLAWPATCH5_FORT_GAUGE_UPDATE)
-void FCLAW2D_CLAWPATCH5_FORT_GAUGE_UPDATE(const int *num, 
+#define FCLAW2D_CLAWPATCH5_FORT_GAUGES_UPDATE \
+           FCLAW_F77_FUNC(fclaw2d_clawpatch5_fort_gauges_update, \
+                          FCLAW2D_CLAWPATCH5_FORT_GAUGES_UPDATE)
+void FCLAW2D_CLAWPATCH5_FORT_GAUGES_UPDATE(const int *num, 
                                           const int *mx, 
                                           const int *my, 
                                           const int* mbc, 
@@ -108,10 +127,10 @@ void FCLAW2D_CLAWPATCH5_FORT_GAUGE_UPDATE(const int *num,
 
 
 
-#define FCLAW3D_CLAWPATCH46_FORT_GAUGE_UPDATE \
-    FCLAW_F77_FUNC(fclaw3d_clawpatch46_fort_gauge_update, \
-                    FCLAW3D_CLAWPATCH46_FORT_GAUGE_UPDATE)
-void FCLAW3D_CLAWPATCH46_FORT_GAUGE_UPDATE(const int *num 
+#define FCLAW3D_CLAWPATCH46_FORT_GAUGES_UPDATE \
+    FCLAW_F77_FUNC(fclaw3d_clawpatch46_fort_gauges_update, \
+                    FCLAW3D_CLAWPATCH46_FORT_GAUGES_UPDATE)
+void FCLAW3D_CLAWPATCH46_FORT_GAUGES_UPDATE(const int *num, 
                                            const int *mx, 
                                            const int *my, 
                                            const int *mz, 
