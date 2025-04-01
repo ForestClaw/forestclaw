@@ -23,6 +23,20 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+/** \file fclaw3d_convenience.h
+ * Routines for domain creation, adaptation, partitioning and searching.
+ *
+ * This file provides functions to create domains from existing connectivity
+ * instances as well as some default domains like the unit cube or a brick.
+ *
+ * This file also provides functions to perform domain refinement, coarsening
+ * and repartitioning.
+ *
+ * Additionally, there are several functionalities based on searching the domain
+ * ranging from searching points to ray integration and the exchange of
+ * interpolation data for mesh coupling.
+ */
+
 #ifndef FCLAW3D_CONVENIENCE_H
 #define FCLAW3D_CONVENIENCE_H
 
