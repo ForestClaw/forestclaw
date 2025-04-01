@@ -67,16 +67,23 @@ extern "C"
  */
 fclaw2d_domain_t *fclaw2d_domain_new_p4est (p4est_t *p4est);
 
+/** Construct a domain for the unitsquare. */
 fclaw2d_domain_t *fclaw2d_domain_new_unitsquare (sc_MPI_Comm mpicomm,
                                                  int initial_level);
 
+/** Construct a periodic domain for a torus consisting of one block. */
 fclaw2d_domain_t *fclaw2d_domain_new_torus (sc_MPI_Comm mpicomm,
                                             int initial_level);
 
+/** Construct a domain for a pillowsphere consisting of two blocks. */
 fclaw2d_domain_t *fclaw2d_domain_new_twosphere (sc_MPI_Comm mpicomm,
                                                 int initial_level);
+
+/** Construct a domain for a cubed sphere consisting of six blocks. */
 fclaw2d_domain_t *fclaw2d_domain_new_cubedsphere (sc_MPI_Comm mpicomm,
                                                   int initial_level);
+
+/** Construct a domain for a spherical disk consisting of five blocks. */
 fclaw2d_domain_t *fclaw2d_domain_new_disk (sc_MPI_Comm mpicomm,
                                            int periodic_in_x,
                                            int periodic_in_y,
@@ -110,6 +117,7 @@ fclaw2d_domain_t *fclaw2d_domain_new_conn (sc_MPI_Comm mpicomm,
                                            int initial_level,
                                            p4est_connectivity_t * conn);
 
+/** Destroy a domain structure.  Also destroy all attributes. */
 void fclaw2d_domain_destroy (fclaw2d_domain_t * domain);
 
 /** Create a new domain based on refine and coarsen marks set previously.
