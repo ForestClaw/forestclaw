@@ -682,7 +682,7 @@ void fclaw_clawpatch_aux_data(struct fclaw_global *glob,
  * @param[out] mfields the number fields
  */
 void fclaw_clawpatch_rhs_data(struct fclaw_global* glob,
-                              fclaw_patch_t* patch,
+                              struct fclaw_patch* patch,
                               double **rhs, 
                               int *mfields);
 /**
