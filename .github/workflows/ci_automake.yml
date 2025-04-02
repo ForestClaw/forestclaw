@@ -104,8 +104,8 @@ jobs:
       if: ${{ matrix.thunderegg }}
       run: |
         cd thunderegg
-        cmake -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/thunderegg_install/ -DBUILD_TESTING=OFF .
-        make install
+        cmake -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/thunderegg_install/ -DThunderEgg_BUILD_TESTING=OFF .
+        cmake --build . --parallel 4 --target install
 
     - name: Run bootstrap Script
       run: ./bootstrap
