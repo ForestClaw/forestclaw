@@ -23,6 +23,21 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+/** \file fclaw_convenience.h
+ * Routines for domain creation, adaptation, partitioning and searching.
+ *
+ * This file provides functions to create 2D and 3D domains from existing
+ * connectivity instances as well as some default domains like the unit cube
+ * or a cubed sphere.
+ *
+ * This file also provides functions to perform domain refinement, coarsening
+ * and repartitioning.
+ *
+ * Additionally, there are several functionalities based on searching the domain
+ * ranging from searching points to ray integration and the exchange of
+ * interpolation data for mesh coupling.
+ */
+
 #ifndef FCLAW_CONVENIENCE_H
 #define FCLAW_CONVENIENCE_H
 
@@ -36,16 +51,23 @@ extern "C"
 #endif
 #endif
 
+/** Construct a 2D domain for the unitsquare. */
 fclaw_domain_t *fclaw_domain_new_unitsquare (sc_MPI_Comm mpicomm,
                                              int initial_level);
 
+/** Construct a 2D periodoc domain for a torus consisting of one block. */
 fclaw_domain_t *fclaw_domain_new_2d_torus (sc_MPI_Comm mpicomm,
-                                            int initial_level);
+                                           int initial_level);
 
+/** Construct a 2D domain for a pillowsphere consisting of two blocks.*/
 fclaw_domain_t *fclaw_domain_new_2d_twosphere (sc_MPI_Comm mpicomm,
                                                int initial_level);
+
+/** Construct a 2D domain for a cubed sphere consisting of six blocks. */
 fclaw_domain_t *fclaw_domain_new_2d_cubedsphere (sc_MPI_Comm mpicomm,
                                                  int initial_level);
+
+/** Construct a 2D domain for a spherical disk consisting of five blocks. */
 fclaw_domain_t *fclaw_domain_new_2d_disk (sc_MPI_Comm mpicomm,
                                           int periodic_in_x,
                                           int periodic_in_y,
@@ -69,6 +91,7 @@ fclaw_domain_t *fclaw_domain_new_2d_brick (sc_MPI_Comm mpicomm,
                                            int periodic_in_y,
                                            int initial_level);
 
+/** Construct a 3D domain for the unitcube. */
 fclaw_domain_t *fclaw_domain_new_unitcube (sc_MPI_Comm mpicomm,
                                            int initial_level);
 
@@ -77,10 +100,12 @@ fclaw_domain_t *fclaw_domain_new_unitcube (sc_MPI_Comm mpicomm,
  * \param [in] mpicomm          We expect sc_MPI_Init to be called earlier.
  * \param [in] blocks_in_x      Positive number of blocks in x direction.
  * \param [in] blocks_in_y      Positive number of blocks in y direction.
+ * \param [in] blocks_in_z      Positive number of blocks in z direction.
  * \param [in] periodic_in_x    True if the right side of the rightmost blocks
  *                              connect periodically to the left side of the
  *                              leftmost blocks.
- * \param [in] periodic_in_y    Periodicity along the vertical direction.
+ * \param [in] periodic_in_y    Periodicity in y direction.
+ * \param [in] periodic_in_z    Periodicity in z direction.
  * \param [in] initial_level    A non-negative integer <= P4EST_QMAXLEVEL.
  * \return                      A fully initialized domain structure.
  */
@@ -92,6 +117,7 @@ fclaw_domain_t *fclaw_domain_new_3d_brick (sc_MPI_Comm mpicomm,
                                            int periodic_in_z,
                                            int initial_level);
 
+/** Destroy a domain structure.  Also destroy all attributes. */
 void fclaw_domain_destroy (fclaw_domain_t * domain);
 
 /** Create a new domain based on refine and coarsen marks set previously.
