@@ -23,6 +23,20 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+/** \file fclaw3d_convenience.h
+ * Routines for domain creation, adaptation, partitioning and searching.
+ *
+ * This file provides functions to create domains from existing connectivity
+ * instances as well as some default domains like the unit cube or a brick.
+ *
+ * This file also provides functions to perform domain refinement, coarsening
+ * and repartitioning.
+ *
+ * Additionally, there are several functionalities based on searching the domain
+ * ranging from searching points to ray integration and the exchange of
+ * interpolation data for mesh coupling.
+ */
+
 #ifndef FCLAW3D_CONVENIENCE_H
 #define FCLAW3D_CONVENIENCE_H
 
@@ -52,6 +66,7 @@ extern "C"
  */
 fclaw3d_domain_t *fclaw3d_domain_new_p8est (p8est_t *p8est);
 
+/** Construct a domain for the unitcube. */
 fclaw3d_domain_t *fclaw3d_domain_new_unitcube (sc_MPI_Comm mpicomm,
                                                int initial_level);
 
@@ -60,10 +75,12 @@ fclaw3d_domain_t *fclaw3d_domain_new_unitcube (sc_MPI_Comm mpicomm,
  * \param [in] mpicomm          We expect sc_MPI_Init to be called earlier.
  * \param [in] blocks_in_x      Positive number of blocks in x direction.
  * \param [in] blocks_in_y      Positive number of blocks in y direction.
+ * \param [in] blocks_in_z      Positive number of blocks in z direction.
  * \param [in] periodic_in_x    True if the right side of the rightmost blocks
  *                              connect periodically to the left side of the
  *                              leftmost blocks.
- * \param [in] periodic_in_y    Periodicity along the vertical direction.
+ * \param [in] periodic_in_y    Periodicity in y direction.
+ * \param [in] periodic_in_z    Periodicity in z direction.
  * \param [in] initial_level    A non-negative integer <= P4EST_QMAXLEVEL.
  * \return                      A fully initialized domain structure.
  */
@@ -85,6 +102,7 @@ fclaw3d_domain_t *fclaw3d_domain_new_conn (sc_MPI_Comm mpicomm,
                                            int initial_level,
                                            p8est_connectivity_t * conn);
 
+/** Destroy a domain structure.  Also destroy all attributes. */
 void fclaw3d_domain_destroy (fclaw3d_domain_t * domain);
 
 /** Create a new domain based on refine and coarsen marks set previously.
