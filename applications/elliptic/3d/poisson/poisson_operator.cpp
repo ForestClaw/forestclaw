@@ -213,7 +213,7 @@ void poisson_solve(fclaw_global_t *glob)
     P8estDomainGenerator domain_gen(wrap->p4est, ns, mbc, bmf);
 
     // get finest level
-    Domain<3> te_domain = domain_gen.getFinestDomain();
+    Domain<3> te_domain = domain_gen.getCoarserDomain();
     std::shared_ptr<Timer> timer = make_shared<Timer>(te_domain.getCommunicator());
     te_domain.setTimer(timer);
 
