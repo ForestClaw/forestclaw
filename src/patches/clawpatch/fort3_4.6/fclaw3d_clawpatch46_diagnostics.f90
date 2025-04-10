@@ -46,7 +46,7 @@ subroutine fclaw3d_clawpatch46_fort_conservation_check(mx,my,mz, &
 end subroutine fclaw3d_clawpatch46_fort_conservation_check
 
 !! # Compute area of a patch
-double precision function fclaw3d_clawpatch46_fort_compute_patch_area( & 
+double precision function fclaw3d_clawpatch46_fort_compute_patch_volume( & 
          mx,my, mz, mbc,dx,dy,dz, volume)
     implicit none
 
@@ -74,9 +74,9 @@ double precision function fclaw3d_clawpatch46_fort_compute_patch_area( &
         sum = dx*dy*dz*mx*my*mz
     endif
 
-    fclaw3d_clawpatch46_fort_compute_patch_area = sum
+    FCLAW3D_CLAWPATCH46_FORT_COMPUTE_PATCH_VOLUME = sum
 
-end function fclaw3d_clawpatch46_fort_compute_patch_area
+end function FCLAW3D_CLAWPATCH46_FORT_COMPUTE_PATCH_VOLUME
 
 
 subroutine fclaw3d_clawpatch46_fort_compute_error_norm( & 

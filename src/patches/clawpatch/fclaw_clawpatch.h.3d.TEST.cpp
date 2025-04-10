@@ -218,7 +218,7 @@ TEST_CASE("3d fclaw_clawpatch_vtable_initialize")
     CHECK(clawpatch_vt->d3->fort_compute_patch_error    == NULL);
     CHECK(clawpatch_vt->d3->fort_conservation_check     == &FCLAW3D_CLAWPATCH46_FORT_CONSERVATION_CHECK);
     CHECK(clawpatch_vt->d3->fort_compute_error_norm     == &FCLAW3D_CLAWPATCH46_FORT_COMPUTE_ERROR_NORM);
-    CHECK(clawpatch_vt->d3->fort_compute_patch_volume   == &FCLAW3D_CLAWPATCH46_FORT_COMPUTE_PATCH_AREA);
+    CHECK(clawpatch_vt->d3->fort_compute_patch_volume   == &FCLAW3D_CLAWPATCH46_FORT_COMPUTE_PATCH_VOLUME);
 
     CHECK(clawpatch_vt->is_set                      == 1);
 
