@@ -25,8 +25,8 @@ target_link_libraries(poisson PRIVATE
   FORESTCLAW::FC2D_THUNDEREGG
 )
 
-add_test(NAME elliptic_poisson 
+add_test(NAME elliptic_2d_poisson 
          COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/regressions.sh
          WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-set_tests_properties(elliptic_poisson
+set_tests_properties(elliptic_2d_poisson
          PROPERTIES ENVIRONMENT "${FCLAW_TEST_ENVIRONMENT}")
