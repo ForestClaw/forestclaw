@@ -1,12 +1,12 @@
 # -*- Makefile -*-
-libthunderegg_generated_headers =
+libthunderegg_3d_generated_headers =
 
-libthunderegg_installed_headers = \
+libthunderegg_3d_installed_headers = \
 	src/solvers/fc3d_thunderegg/fc3d_thunderegg.h \
 	src/solvers/fc3d_thunderegg/fc3d_thunderegg_options.h \
 	src/solvers/fc3d_thunderegg/fc3d_thunderegg_physical_bc.h
 
-libthunderegg_compiled_sources = \
+libthunderegg_3d_compiled_sources = \
 	src/solvers/fc3d_thunderegg/fc3d_thunderegg.cpp \
 	src/solvers/fc3d_thunderegg/fc3d_thunderegg_options.c \
 	src/solvers/fc3d_thunderegg/fc3d_thunderegg_vector.cpp \
@@ -18,16 +18,16 @@ libthunderegg_compiled_sources = \
 lib_LTLIBRARIES += src/solvers/fc3d_thunderegg/libfc3d_thunderegg.la
 
 ## Named variables that can be referenced from other libraries/apps
-FCLAW_THUNDEREGG_CPPFLAGS = -I@top_srcdir@/src/solvers/fc3d_thunderegg \
-						   $(THUNDEREGG_CFLAGS)
+FCLAW_THUNDEREGG_3D_CPPFLAGS = -I@top_srcdir@/src/solvers/fc3d_thunderegg \
+						       $(THUNDEREGG_CFLAGS)
 
-FCLAW_THUNDEREGG_LDADD    = @top_builddir@/src/solvers/fc3d_thunderegg/libfc3d_thunderegg.la \
-						   $(THUNDEREGG_LIBS)
+FCLAW_THUNDEREGG_3D_LDADD    = @top_builddir@/src/solvers/fc3d_thunderegg/libfc3d_thunderegg.la \
+						   	   $(THUNDEREGG_LIBS)
 
 ## Sources needed to build this library
 src_solvers_fc3d_thunderegg_libfc3d_thunderegg_la_SOURCES = \
-          $(libthunderegg_internal_headers) \
-          $(libthunderegg_compiled_sources)
+          $(libthunderegg_3d_internal_headers) \
+          $(libthunderegg_3d_compiled_sources)
 
 ## Headers needed to build this library.  Only AM_CPPFLAGS required; others are
 ## included in AM_CPPFLAGS, but are included here for clarity (although makes
@@ -35,13 +35,13 @@ src_solvers_fc3d_thunderegg_libfc3d_thunderegg_la_SOURCES = \
 src_solvers_fc3d_thunderegg_libfc3d_thunderegg_la_CPPFLAGS = \
           $(AM_CPPFLAGS) \
           $(FCLAW_CPPFLAGS) \
-          $(FCLAW_THUNDEREGG_CPPFLAGS) \
-          $(FCLAW_CLAWPATCH_CPPFLAGS)
+          $(FCLAW_THUNDEREGG_3D_CPPFLAGS) \
+          $(FCLAW_CLAWPATCH_3D_CPPFLAGS)
 
 ## Add headers from this library to general header pool, to be used by other apps
-AM_CPPFLAGS  += $(FCLAW_THUNDEREGG_CPPFLAGS)
+AM_CPPFLAGS  += $(FCLAW_THUNDEREGG_3D_CPPFLAGS)
 
-LDADD        += $(FCLAW_THUNDEREGG_LDADD)
+LDADD        += $(FCLAW_THUNDEREGG_3D_LDADD)
 
 include_HEADERS += $(libthunderegg_installed_headers)
 
@@ -62,6 +62,6 @@ src_solvers_fc3d_thunderegg_fc3d_thunderegg_TEST_LDADD = \
 	test/libtestutils.la \
 	$(test_libtestutils_la_LDADD) \
     $(LDADD) \
-    $(FCLAW_THUNDEREGG_LDADD) \
+    $(FCLAW_THUNDEREGG_3D_LDADD) \
     $(FCLAW_CLAWPATCH_LDADD) \
     $(FCLAW_LDADD)

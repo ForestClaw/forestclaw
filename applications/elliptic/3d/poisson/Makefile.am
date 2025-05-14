@@ -1,29 +1,28 @@
-## Makefile.am in applications/elliptic/poisson
+## Makefile.am in applications/elliptic/3d/poisson
 
-bin_PROGRAMS += applications/elliptic/poisson/poisson
+bin_PROGRAMS += applications/elliptic/3d/poisson/poisson
 
-TESTS += applications/elliptic/poisson/regressions.sh
+TESTS += applications/elliptic/3d/poisson/regressions.sh
 
-applications_elliptic_poisson_poisson_SOURCES = \
-	applications/elliptic/poisson/poisson.cpp \
-	applications/elliptic/poisson/poisson_user.cpp \
-	applications/elliptic/poisson/poisson_user.h \
-	applications/elliptic/poisson/poisson_options.c \
-	applications/elliptic/poisson/poisson_diagnostics.c \
-	applications/elliptic/poisson/hsmooth.f90 \
-	applications/elliptic/poisson/fortran/poisson_setprob.f90 \
-	applications/elliptic/poisson/fortran/poisson_fort_rhs.f90 \
-	applications/elliptic/poisson/fortran/poisson_compute_error.f \
-	applications/elliptic/poisson/fortran/poisson_qexact.f90 \
-	applications/elliptic/poisson/fortran/poisson_apply_bc.f90 \
-	applications/elliptic/poisson/fortran/poisson_eval_bc.f90 \
-	applications/elliptic/poisson/fortran/poisson_tag4refinement.f \
-	applications/elliptic/poisson/fortran/poisson_tag4coarsening.f \
-	applications/elliptic/poisson/fortran/poisson_output.f90
+applications_elliptic_3d_poisson_poisson_SOURCES = \
+	applications/elliptic/3d/poisson/poisson.cpp \
+	applications/elliptic/3d/poisson/poisson_user.cpp \
+	applications/elliptic/3d/poisson/poisson_user.h \
+	applications/elliptic/3d/poisson/poisson_operator.cpp \
+	applications/elliptic/3d/poisson/poisson_options.c \
+	applications/elliptic/3d/poisson/poisson_diagnostics.c \
+	applications/elliptic/3d/poisson/hsmooth.f90 \
+	applications/elliptic/3d/poisson/fortran/poisson_setprob.f90 \
+	applications/elliptic/3d/poisson/fortran/poisson_fort_rhs.f90 \
+	applications/elliptic/3d/poisson/fortran/poisson_compute_error.f90 \
+	applications/elliptic/3d/poisson/fortran/poisson_qexact.f90 \
+	applications/elliptic/3d/poisson/fortran/poisson_apply_bc.f90 \
+	applications/elliptic/3d/poisson/fortran/poisson_eval_bc.f90 \
+	applications/elliptic/3d/poisson/fortran/poisson_output.f90
 
 
 EXTRA_DIST += \
-	applications/elliptic/poisson/fclaw_options.ini
+	applications/elliptic/3d/poisson/fclaw_options.ini
 
 #	applications/elliptic/poisson/regression.ini \
 #	applications/elliptic/poisson/afterframe.m \
@@ -35,14 +34,14 @@ EXTRA_DIST += \
 ##  -- Only really need AM_CPPFLAGS and LDADD (since these include all the other 
 ##     variables).  But others are included here for completeness
 
-applications_elliptic_poisson_poisson_CPPFLAGS = \
+applications_elliptic_3d_poisson_poisson_CPPFLAGS = \
         $(AM_CPPFLAGS) \
-        $(FCLAW_THUNDEREGG_CPPFLAGS) \
+        $(FCLAW_THUNDEREGG_3D_CPPFLAGS) \
         $(FCLAW_CLAWPATCH_CPPFLAGS)
 
 
-applications_elliptic_poisson_poisson_LDADD = \
+applications_elliptic_3d_poisson_poisson_LDADD = \
         $(LDADD) \
-        $(FCLAW_THUNDEREGG_LDADD) \
+        $(FCLAW_THUNDEREGG_3D_LDADD) \
         $(FCLAW_CLAWPATCH_LDADD) \
         $(FCLAW_LDADD)
