@@ -43,7 +43,7 @@ AM_CPPFLAGS  += $(FCLAW_THUNDEREGG_3D_CPPFLAGS)
 
 LDADD        += $(FCLAW_THUNDEREGG_3D_LDADD)
 
-include_HEADERS += $(libthunderegg_installed_headers)
+include_HEADERS += $(libthunderegg_3d_installed_headers)
 
 ## UNIT TESTS
 check_PROGRAMS += src/solvers/fc3d_thunderegg/fc3d_thunderegg.TEST
