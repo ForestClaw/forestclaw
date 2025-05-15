@@ -21,7 +21,7 @@ env:
 
 jobs:
   linux:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     timeout-minutes: 60
 
     strategy:
@@ -40,15 +40,10 @@ jobs:
         - name: "Serial With GeoClaw"
           configure_flags: "--enable-geoclaw"
           ubuntu_packages: ""
-        - name: "Serial With CudaClaw (CUDA 10.1)"
+        - name: "Serial With CudaClaw"
           configure_flags: "CUDA_CFLAGS=\"-arch=sm_61\" LIBS=\"-lcuda -lcudart -lnvToolsExt\" --enable-cudaclaw --disable-shared"
           ubuntu_packages: "nvidia-cuda-toolkit"
           cuda: true
-        - name: "Serial With CudaClaw (CUDA 11.3)"
-          configure_flags: "NVCC=/usr/local/cuda-11.3/bin/nvcc CUDA_CFLAGS=\"-arch=sm_61\" LIBS=\"-L/usr/local/cuda-11.3/lib64 -lcudart -lnvToolsExt\" --enable-cudaclaw --disable-shared"
-          ubuntu_packages: ""
-          cuda: true
-          cuda_11_3: true
         - name: "MPI Minimal"
           configure_flags: "--enable-mpi"
           ubuntu_packages: "libopenmpi-dev openmpi-bin"
@@ -64,15 +59,10 @@ jobs:
         - name: "MPI With GeoClaw"
           configure_flags: "--enable-geoclaw --enable-mpi"
           ubuntu_packages: "libopenmpi-dev openmpi-bin"
-        - name: "MPI With CudaClaw (CUDA 10.1)"
+        - name: "MPI With CudaClaw"
           configure_flags: "CUDA_CFLAGS=\"-arch=sm_61 -I/usr/lib/x86_64-linux-gnu/openmpi/include\" LIBS=\"-lcuda -lcudart -lnvToolsExt\" --enable-cudaclaw --enable-mpi --disable-shared"
           ubuntu_packages: "libopenmpi-dev openmpi-bin nvidia-cuda-toolkit"
           cuda: true
-        - name: "MPI With CudaClaw (CUDA 11.3)"
-          configure_flags: "NVCC=/usr/local/cuda-11.3/bin/nvcc CUDA_CFLAGS=\"-arch=sm_61 -I/usr/lib/x86_64-linux-gnu/openmpi/include\" LIBS=\"-L/usr/local/cuda-11.3/lib64 -lcudart -lnvToolsExt\" --enable-cudaclaw --enable-mpi --disable-shared"
-          ubuntu_packages: "libopenmpi-dev openmpi-bin"
-          cuda: true
-          cuda_11_3: true
         - name: "MPI With ThunderEgg"
           configure_flags: "--enable-mpi --enable-thunderegg --with-thunderegg=$GITHUB_WORKSPACE/thunderegg_install"
           ubuntu_packages: "cmake libopenmpi-dev openmpi-bin libfftw3-dev"
@@ -87,14 +77,6 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install ${{ matrix.ubuntu_packages }}
-
-    - name: Install Cuda Toolkit 11.3
-      if: ${{ matrix.cuda_11_3 }}
-      run: |
-        wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/cuda-keyring_1.0-1_all.deb
-        sudo dpkg -i cuda-keyring_1.0-1_all.deb
-        sudo apt-get update
-        sudo apt-get -y install cuda-toolkit-11-3
 
     - name: Init and Update Submodules
       run: |
