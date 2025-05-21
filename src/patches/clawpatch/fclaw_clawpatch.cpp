@@ -143,6 +143,7 @@ static
 double* clawpatch_get_area(struct fclaw_global* glob,
                            fclaw_patch_t* patch)
 {
+    FCLAW_ASSERT(fclaw_clawpatch_dim(patch) == 2);
     return fclaw2d_metric_patch_get_area(glob, patch);
 }
 
@@ -150,6 +151,7 @@ static
 double* clawpatch_get_volume(struct fclaw_global* glob,
                            fclaw_patch_t* patch)
 {
+    FCLAW_ASSERT(fclaw_clawpatch_dim(patch) == 3);
     return fclaw3d_metric_patch_get_volume(glob, patch);
 }
 
@@ -1764,6 +1766,14 @@ void initialize_3dx_claw46_fort_vt(fclaw_clawpatch_vtable_t* clawpatch_vt)
     clawpatch_vt->fort_header_ascii              = FCLAW3D_CLAWPATCH46_FORT_HEADER_ASCII;
     clawpatch_vt->d3->fort_output_ascii          = FCLAW3D_CLAWPATCH46_FORT_OUTPUT_ASCII;
 
+    /* Diagnostic functions */
+    clawpatch_vt->conservation_check            = fclaw_clawpatch_diagnostics_cons_default;
+    clawpatch_vt->compute_error                 = fclaw_clawpatch_diagnostics_error_default;
+    clawpatch_vt->d3->fort_compute_patch_error  = NULL;   /* User defined */
+    clawpatch_vt->d3->fort_compute_error_norm   = FCLAW3D_CLAWPATCH46_FORT_COMPUTE_ERROR_NORM;
+    clawpatch_vt->d3->fort_compute_patch_volume = FCLAW3D_CLAWPATCH46_FORT_COMPUTE_PATCH_VOLUME;
+    clawpatch_vt->d3->fort_conservation_check   = FCLAW3D_CLAWPATCH46_FORT_CONSERVATION_CHECK;
+
     /* Ghost cell exchange functions */
     clawpatch_vt->d3->fort_copy_face             = FCLAW3DX_CLAWPATCH46_FORT_COPY_FACE;
     clawpatch_vt->d3->fort_average_face          = FCLAW3DX_CLAWPATCH46_FORT_AVERAGE_FACE;
@@ -1793,6 +1803,14 @@ void initialize_3d_claw46_fort_vt(fclaw_clawpatch_vtable_t* clawpatch_vt)
     clawpatch_vt->fort_header_ascii              = FCLAW3D_CLAWPATCH46_FORT_HEADER_ASCII;
     clawpatch_vt->d3->fort_output_ascii          = FCLAW3D_CLAWPATCH46_FORT_OUTPUT_ASCII;
 
+    /* Diagnostic functions */
+    clawpatch_vt->conservation_check            = fclaw_clawpatch_diagnostics_cons_default;
+    clawpatch_vt->compute_error                 = fclaw_clawpatch_diagnostics_error_default;
+    clawpatch_vt->d3->fort_compute_patch_error  = NULL;   /* User defined */
+    clawpatch_vt->d3->fort_compute_error_norm   = FCLAW3D_CLAWPATCH46_FORT_COMPUTE_ERROR_NORM;
+    clawpatch_vt->d3->fort_compute_patch_volume = FCLAW3D_CLAWPATCH46_FORT_COMPUTE_PATCH_VOLUME;
+    clawpatch_vt->d3->fort_conservation_check   = FCLAW3D_CLAWPATCH46_FORT_CONSERVATION_CHECK;
+ 
     /* Ghost cell exchange functions */
     clawpatch_vt->d3->fort_copy_face             = FCLAW3D_CLAWPATCH46_FORT_COPY_FACE;
     clawpatch_vt->d3->fort_average_face          = FCLAW3D_CLAWPATCH46_FORT_AVERAGE_FACE;

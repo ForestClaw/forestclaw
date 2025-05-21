@@ -212,12 +212,12 @@ TEST_CASE("3dx fclaw_clawpatch_vtable_initialize")
     CHECK(clawpatch_vt->local_ghost_pack_aux            == NULL);
 
     //diagnostics
-    CHECK(clawpatch_vt->conservation_check              == NULL);
-    CHECK(clawpatch_vt->compute_error                   == NULL);
+    CHECK(clawpatch_vt->conservation_check              == fclaw_clawpatch_diagnostics_cons_default);
+    CHECK(clawpatch_vt->compute_error                   == fclaw_clawpatch_diagnostics_error_default);
     CHECK(clawpatch_vt->d3->fort_compute_patch_error    == NULL);
-    CHECK(clawpatch_vt->d3->fort_conservation_check     == NULL);
-    CHECK(clawpatch_vt->d3->fort_compute_error_norm     == NULL);
-    CHECK(clawpatch_vt->d3->fort_compute_patch_area     == NULL);
+    CHECK(clawpatch_vt->d3->fort_conservation_check     == &FCLAW3D_CLAWPATCH46_FORT_CONSERVATION_CHECK);
+    CHECK(clawpatch_vt->d3->fort_compute_error_norm     == &FCLAW3D_CLAWPATCH46_FORT_COMPUTE_ERROR_NORM);
+    CHECK(clawpatch_vt->d3->fort_compute_patch_volume   == &FCLAW3D_CLAWPATCH46_FORT_COMPUTE_PATCH_VOLUME);
 
     CHECK(clawpatch_vt->is_set                      == 1);
 

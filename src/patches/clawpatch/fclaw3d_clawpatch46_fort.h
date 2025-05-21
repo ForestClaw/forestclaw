@@ -629,19 +629,19 @@ void FCLAW3D_CLAWPATCH46_FORT_CONSERVATION_CHECK(int *mx,
                                                  double* c_kahan);
 
 /** Fortran subroutine name */
-#define FCLAW3D_CLAWPATCH46_FORT_COMPUTE_PATCH_AREA \
-          FCLAW_F77_FUNC(fclaw3d_clawpatch46_fort_compute_patch_area, \
-                         FCLAW3D_CLAWPATCH46_FORT_COMPUTE_PATCH_AREA)
+#define FCLAW3D_CLAWPATCH46_FORT_COMPUTE_PATCH_VOLUME \
+          FCLAW_F77_FUNC(fclaw3d_clawpatch46_fort_compute_patch_volume, \
+                         FCLAW3D_CLAWPATCH46_FORT_COMPUTE_PATCH_VOLUME)
 
-/** @copydoc fclaw3d_clawpatch46_fort_compute_patch_area() */
-double FCLAW3D_CLAWPATCH46_FORT_COMPUTE_PATCH_AREA(int *mx, 
-                                                   int* my, 
-                                                   int* mz, 
-                                                   int*mbc, 
-                                                   double* dx, 
-                                                   double* dy, 
-                                                   double* dz,
-                                                   double area[]);
+/** @copydoc fclaw3d_clawpatch46_fort_compute_patch_volume() */
+double FCLAW3D_CLAWPATCH46_FORT_COMPUTE_PATCH_VOLUME(int *mx, 
+                                                    int* my, 
+                                                    int* mz, 
+                                                    int*mbc, 
+                                                    double* dx, 
+                                                    double* dy, 
+                                                    double* dz,
+                                                    double area[]);
 
 /** Fortran subroutine name */
 #define FCLAW3D_CLAWPATCH46_FORT_COMPUTE_ERROR_NORM \

@@ -3,16 +3,17 @@
 # --------------------------------------------
 
 ## Elliptic example
-add_subdirectory(elliptic/poisson)
+add_subdirectory(elliptic/2d/poisson)
+add_subdirectory(elliptic/3d/poisson)
 
 ## Heat equation
-add_subdirectory(elliptic/heat)
+add_subdirectory(elliptic/2d/heat)
 
 ## Allencahn equation
-add_subdirectory(elliptic/allencahn)
+add_subdirectory(elliptic/2d/allencahn)
 
 ## Crystal growth
-add_subdirectory(elliptic/phasefield)
+add_subdirectory(elliptic/2d/phasefield)
 
 ## Heat Phasefield two solver example
-add_subdirectory(elliptic/heat_phasefield)
+add_subdirectory(elliptic/2d/heat_phasefield)

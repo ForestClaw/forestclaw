@@ -138,6 +138,7 @@ endif(FCLAW_ENABLE_CUDACLAW)
 if(FCLAW_ENABLE_THUNDEREGG)
 
   add_subdirectory(src/solvers/fc2d_thunderegg)
+  add_subdirectory(src/solvers/fc3d_thunderegg)
 
 endif(FCLAW_ENABLE_THUNDEREGG)
 # --- package
