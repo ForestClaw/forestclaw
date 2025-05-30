@@ -26,6 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_clawpatch_options.h>
 
 #include <fclaw_global.h>
+#include <fclaw_options.h>
 #include <fclaw_packing.h>
 #include <sc_keyvalue.h>
 
@@ -97,6 +98,12 @@ clawpatch_register(fclaw_clawpatch_options_t *clawpatch_options,
                        &clawpatch_options->vtk_patch_threshold, 0,
                        "Number of patches to buffer before each write in vtk output. 0 means buffer all patches before writing [0]");
 
+    fclaw_options_add_int_array(opt, 0, "vtk-aux-output",
+                                &clawpatch_options->vtk_aux_output_string, "[]",
+                                &clawpatch_options->vtk_aux_output, 0,
+                                "List of length maux of aux variables to output in vtk. 1 means output, 0 means do not output. "
+                                "If empty, no aux variables are output []");
+
     /* ---------------------- hdf5 options -------------------------- */
     sc_options_add_int(opt, 0, "hdf5-patch-threshold", 
                        &clawpatch_options->hdf5_patch_threshold, 0,
@@ -124,7 +131,10 @@ clawpatch_register(fclaw_clawpatch_options_t *clawpatch_options,
 static fclaw_exit_type_t
 clawpatch_postprocess(fclaw_clawpatch_options_t *clawpatch_opt)
 {
-    /* Convert strings to arrays (no strings to process here) */
+    /* Convert strings to arrays */
+    fclaw_options_convert_int_array(clawpatch_opt->vtk_aux_output_string,
+                                    &clawpatch_opt->vtk_aux_output,
+                                    clawpatch_opt->maux);
     return FCLAW_NOEXIT;
 }
 
@@ -198,6 +208,8 @@ fclaw_clawpatch_options_new (int dim)
 void
 fclaw_clawpatch_options_destroy (fclaw_clawpatch_options_t *clawpatch_opt)
 {
+    FCLAW_FREE(clawpatch_opt->vtk_aux_output);
+
     if(clawpatch_opt->kv_refinement_criteria != NULL)
     {
         sc_keyvalue_destroy (clawpatch_opt->kv_refinement_criteria);

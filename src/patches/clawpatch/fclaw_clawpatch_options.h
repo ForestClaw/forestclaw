@@ -89,6 +89,8 @@ struct fclaw_clawpatch_options
 
 
     int vtk_patch_threshold; /**< The buffer threshold for vtk output */
+    const char* vtk_aux_output_string; /**< vtk aux output string */
+    int* vtk_aux_output; /**< vtk aux output array */
     int hdf5_patch_threshold; /**< The buffer threshold for hdf5 output */
     int hdf5_compression_level; /**< The compression level for hdf5 output */
 
