@@ -70,6 +70,7 @@ typedef struct fclaw2d_vtk_state
     const char *inttype;
     fclaw_vtk_patch_data_t coordinate_cb;
     fclaw_vtk_patch_data_t value_cb;
+    fclaw_vtk_patch_data_t aux_cb;
     fclaw_vtk_patch_data_t rhs_cb;
     fclaw_vtk_patch_data_t soln_cb;
     fclaw_vtk_patch_data_t error_cb;
@@ -532,7 +533,7 @@ write_patchno_cb (fclaw_domain_t * domain, fclaw_patch_t * patch,
 {
     fclaw_global_iterate_t *g = (fclaw_global_iterate_t*) user;
     write_field_iter_user_t *iter = (write_field_iter_user_t *) g->user;
-    fclaw2d_vtk_state_t *s = (fclaw2d_vtk_state_t *) iter->user;
+    fclaw2d_vtk_state_t *s = (fclaw2d_vtk_state_t *) iter->s;
     int c;
     const int64_t gpno =
         domain->global_num_patches_before +
@@ -725,6 +726,8 @@ fclaw2d_vtk_write_data (fclaw_global_t * glob, fclaw2d_vtk_state_t * s)
                              write_patchno_cb, NULL);
     fclaw2d_vtk_write_field (glob, s, s->offset_meqn, s->psize_meqn,
                              write_field_cb, s->value_cb);
+    fclaw2d_vtk_write_field (glob, s, s->offset_aux, s->psize_aux,
+                             write_field_cb, s->aux_cb);
     fclaw2d_vtk_write_field (glob, s, s->offset_rhs, s->psize_rhs,
                              write_field_cb, s->rhs_cb);
     fclaw2d_vtk_write_field (glob, s, s->offset_soln, s->psize_soln,
@@ -1180,8 +1183,8 @@ void fclaw_clawpatch_output_vtk_to_file (fclaw_global_t * glob, const char* file
                               clawpatch_opt->my,
                               0,
                               clawpatch_opt->meqn,
-                              clawpatch_opt->rhs_fields,
                               num_aux_fields,
+                              clawpatch_opt->rhs_fields,
                               fclaw_opt->vtkspace, 0,
                               fclaw2d_output_vtk_coordinate_cb,
                               fclaw_output_vtk_value_cb,
@@ -1197,8 +1200,8 @@ void fclaw_clawpatch_output_vtk_to_file (fclaw_global_t * glob, const char* file
                               clawpatch_opt->my, 
                               clawpatch_opt->mz,
                               clawpatch_opt->meqn,
-                              clawpatch_opt->rhs_fields,
                               num_aux_fields,
+                              clawpatch_opt->rhs_fields,
                               fclaw_opt->vtkspace, 0,
                               fclaw3d_output_vtk_coordinate_cb,
                               fclaw_output_vtk_value_cb,
