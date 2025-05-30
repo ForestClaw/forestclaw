@@ -301,15 +301,22 @@ add_to_buffer (fclaw2d_vtk_state_t * s, int64_t psize_field)
     ++s->num_buffered_patches;
 }
 
+typedef struct write_field_iter_user
+{
+    fclaw2d_vtk_state_t *s; /**< the VTK state */
+    void* user; /**< user data for the callback */
+} write_field_iter_user_t;
+
 static void
-write_position_cb (fclaw_domain_t * domain, fclaw_patch_t * patch,
-                   int blockno, int patchno, void *user)
+write_field_cb (fclaw_domain_t * domain, fclaw_patch_t * patch,
+                int blockno, int patchno, void *user)
 {
     fclaw_global_iterate_t *g = (fclaw_global_iterate_t*) user;
-    fclaw2d_vtk_state_t *s = (fclaw2d_vtk_state_t *) g->user;
+    write_field_iter_user_t *iter = (write_field_iter_user_t *) g->user;
+    fclaw_vtk_patch_data_t cb = (fclaw_vtk_patch_data_t) iter->user; /**< the callback */
 
-    s->coordinate_cb (g->glob, patch, blockno, patchno, s->buf);
-    add_to_buffer (s, s->psize_position);
+    cb (g->glob, patch, blockno, patchno, iter->s->buf);
+    add_to_buffer (iter->s, iter->s->psize_position);
 }
 
 static void
@@ -317,7 +324,8 @@ write_2d_connectivity_cb (fclaw_domain_t * domain, fclaw_patch_t * patch,
                        int blockno, int patchno, void *user)
 {
     fclaw_global_iterate_t *g = (fclaw_global_iterate_t*) user;
-    fclaw2d_vtk_state_t *s = (fclaw2d_vtk_state_t *) g->user;
+    write_field_iter_user_t *iter = (write_field_iter_user_t *) g->user;
+    fclaw2d_vtk_state_t *s = iter->s;
     int i, j;
     const int64_t pbefore = s->points_per_patch *
         (domain->global_num_patches_before +
@@ -358,12 +366,14 @@ write_2d_connectivity_cb (fclaw_domain_t * domain, fclaw_patch_t * patch,
     }
     add_to_buffer (s, s->psize_connectivity);
 }
+
 static void
 write_3d_connectivity_cb (fclaw_domain_t * domain, fclaw_patch_t * patch,
                           int blockno, int patchno, void *user)
 {
     fclaw_global_iterate_t *g = (fclaw_global_iterate_t*) user;
-    fclaw2d_vtk_state_t *s = (fclaw2d_vtk_state_t *) g->user;
+    write_field_iter_user_t *iter = (write_field_iter_user_t *) g->user;
+    fclaw2d_vtk_state_t *s = iter->s;
     int i, j, k;
     const int64_t pbefore = s->points_per_patch *
         (domain->global_num_patches_before +
@@ -427,7 +437,8 @@ write_offsets_cb (fclaw_domain_t * domain, fclaw_patch_t * patch,
                   int blockno, int patchno, void *user)
 {
     fclaw_global_iterate_t *g = (fclaw_global_iterate_t*) user;
-    fclaw2d_vtk_state_t *s = (fclaw2d_vtk_state_t *) g->user;
+    write_field_iter_user_t *iter = (write_field_iter_user_t *) g->user;
+    fclaw2d_vtk_state_t *s = iter->s;
     int c;
     const int64_t cbefore = s->cells_per_patch *
         (domain->global_num_patches_before +
@@ -459,7 +470,8 @@ write_types_cb (fclaw_domain_t * domain, fclaw_patch_t * patch,
                 int blockno, int patchno, void *user)
 {
     fclaw_global_iterate_t *g = (fclaw_global_iterate_t*) user;
-    fclaw2d_vtk_state_t *s = (fclaw2d_vtk_state_t *) g->user;
+    write_field_iter_user_t *iter = (write_field_iter_user_t *) g->user;
+    fclaw2d_vtk_state_t *s = iter->s;
     int c;
 
     char *cdata = s->buf;
@@ -485,7 +497,8 @@ write_mpirank_cb (fclaw_domain_t * domain, fclaw_patch_t * patch,
                   int blockno, int patchno, void *user)
 {
     fclaw_global_iterate_t *g = (fclaw_global_iterate_t*) user;
-    fclaw2d_vtk_state_t *s = (fclaw2d_vtk_state_t *) g->user;
+    write_field_iter_user_t *iter = (write_field_iter_user_t *) g->user;
+    fclaw2d_vtk_state_t *s = iter->s;
     int c;
 
     int *idata = (int *) s->buf;
@@ -501,7 +514,8 @@ write_blockno_cb (fclaw_domain_t * domain, fclaw_patch_t * patch,
                   int blockno, int patchno, void *user)
 {
     fclaw_global_iterate_t *g = (fclaw_global_iterate_t*) user;
-    fclaw2d_vtk_state_t *s = (fclaw2d_vtk_state_t *) g->user;
+    write_field_iter_user_t *iter = (write_field_iter_user_t *) g->user;
+    fclaw2d_vtk_state_t *s = iter->s;
     int c;
 
     int *idata = (int *) s->buf;
@@ -517,7 +531,8 @@ write_patchno_cb (fclaw_domain_t * domain, fclaw_patch_t * patch,
                   int blockno, int patchno, void *user)
 {
     fclaw_global_iterate_t *g = (fclaw_global_iterate_t*) user;
-    fclaw2d_vtk_state_t *s = (fclaw2d_vtk_state_t *) g->user;
+    write_field_iter_user_t *iter = (write_field_iter_user_t *) g->user;
+    fclaw2d_vtk_state_t *s = (fclaw2d_vtk_state_t *) iter->user;
     int c;
     const int64_t gpno =
         domain->global_num_patches_before +
@@ -544,57 +559,9 @@ write_patchno_cb (fclaw_domain_t * domain, fclaw_patch_t * patch,
 }
 
 static void
-write_meqn_cb (fclaw_domain_t * domain, fclaw_patch_t * patch,
-               int blockno, int patchno, void *user)
-{
-    fclaw_global_iterate_t* g = (fclaw_global_iterate_t*) user;
-
-    fclaw2d_vtk_state_t *s = (fclaw2d_vtk_state_t *) g->user;
-
-    s->value_cb (g->glob, patch, blockno, patchno, s->buf);
-    add_to_buffer (s, s->psize_meqn);
-}
-
-static void
-write_rhs_cb (fclaw_domain_t * domain, fclaw_patch_t * patch,
-              int blockno, int patchno, void *user)
-{
-    fclaw_global_iterate_t* g = (fclaw_global_iterate_t*) user;
-
-    fclaw2d_vtk_state_t *s = (fclaw2d_vtk_state_t *) g->user;
-
-    s->rhs_cb (g->glob, patch, blockno, patchno, s->buf);
-    add_to_buffer (s, s->psize_rhs);
-}
-
-static void
-write_soln_cb (fclaw_domain_t * domain, fclaw_patch_t * patch,
-               int blockno, int patchno, void *user)
-{
-    fclaw_global_iterate_t* g = (fclaw_global_iterate_t*) user;
-
-    fclaw2d_vtk_state_t *s = (fclaw2d_vtk_state_t *) g->user;
-
-    s->soln_cb (g->glob, patch, blockno, patchno, s->buf);
-    add_to_buffer (s, s->psize_soln);
-}
-
-static void
-write_error_cb (fclaw_domain_t * domain, fclaw_patch_t * patch,
-                int blockno, int patchno, void *user)
-{
-    fclaw_global_iterate_t* g = (fclaw_global_iterate_t*) user;
-
-    fclaw2d_vtk_state_t *s = (fclaw2d_vtk_state_t *) g->user;
-
-    s->error_cb (g->glob, patch, blockno, patchno, s->buf);
-    add_to_buffer (s, s->psize_error);
-}
-
-static void
 fclaw2d_vtk_write_field (fclaw_global_t * glob, fclaw2d_vtk_state_t * s,
                          int64_t offset_field, int64_t psize_field,
-                         fclaw_patch_callback_t cb)
+                         fclaw_patch_callback_t cb, void* user)
 {
     if(psize_field == 0)
     {
@@ -654,7 +621,10 @@ fclaw2d_vtk_write_field (fclaw_global_t * glob, fclaw2d_vtk_state_t * s,
         SC_CHECK_MPI (mpiret);
 #endif
     }
-    fclaw_global_iterate_patches (glob, cb, s);
+    write_field_iter_user_t iter;
+    iter.s = s;
+    iter.user = user;
+    fclaw_global_iterate_patches (glob, cb, &iter);
 
 #ifdef P4EST_ENABLE_MPIIO
     if (s->num_buffered_patches > 0 || s->patch_threshold == 0)
@@ -739,27 +709,28 @@ fclaw2d_vtk_write_data (fclaw_global_t * glob, fclaw2d_vtk_state_t * s)
 
     /* write meta data fields */
     fclaw2d_vtk_write_field (glob, s, s->offset_position, s->psize_position,
-                             write_position_cb);
+                             write_field_cb, s->coordinate_cb);
     fclaw2d_vtk_write_field (glob, s, s->offset_connectivity,
-                             s->psize_connectivity, (s->dim == 2) ? write_2d_connectivity_cb : write_3d_connectivity_cb);
+                             s->psize_connectivity, (s->dim == 2) ? write_2d_connectivity_cb : write_3d_connectivity_cb,
+                             NULL);
     fclaw2d_vtk_write_field (glob, s, s->offset_offsets, s->psize_offsets,
-                             write_offsets_cb);
+                             write_offsets_cb, NULL);
     fclaw2d_vtk_write_field (glob, s, s->offset_types, s->psize_types,
-                             write_types_cb);
+                             write_types_cb, NULL);
     fclaw2d_vtk_write_field (glob, s, s->offset_mpirank, s->psize_mpirank,
-                             write_mpirank_cb);
+                             write_mpirank_cb, NULL);
     fclaw2d_vtk_write_field (glob, s, s->offset_blockno, s->psize_blockno,
-                             write_blockno_cb);
+                             write_blockno_cb, NULL);
     fclaw2d_vtk_write_field (glob, s, s->offset_patchno, s->psize_patchno,
-                             write_patchno_cb);
+                             write_patchno_cb, NULL);
     fclaw2d_vtk_write_field (glob, s, s->offset_meqn, s->psize_meqn,
-                             write_meqn_cb);
+                             write_field_cb, s->value_cb);
     fclaw2d_vtk_write_field (glob, s, s->offset_rhs, s->psize_rhs,
-                             write_rhs_cb);
+                             write_field_cb, s->rhs_cb);
     fclaw2d_vtk_write_field (glob, s, s->offset_soln, s->psize_soln,
-                             write_soln_cb);
+                             write_field_cb, s->soln_cb);
     fclaw2d_vtk_write_field (glob, s, s->offset_error, s->psize_error,
-                             write_error_cb);
+                             write_field_cb, s->error_cb);
 
 #ifdef P4EST_ENABLE_MPIIO
     /* collectively close the file */
