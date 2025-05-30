@@ -46,6 +46,7 @@ typedef struct fclaw2d_vtk_state
     int patch_children;
     int mx, my, mz;
     int meqn;
+    int num_aux_fields;
     int rhs_fields;
     int points_per_patch, cells_per_patch;
     int intsize, ndsize;
@@ -61,6 +62,7 @@ typedef struct fclaw2d_vtk_state
     int64_t offset_blockno, psize_blockno;
     int64_t offset_patchno, psize_patchno;
     int64_t offset_meqn, psize_meqn;
+    int64_t offset_aux, psize_aux;
     int64_t offset_rhs, psize_rhs;
     int64_t offset_soln, psize_soln;
     int64_t offset_error, psize_error;
@@ -148,18 +150,21 @@ fclaw2d_vtk_write_header (fclaw_domain_t * domain, fclaw2d_vtk_state_t * s)
                                 (long long) s->offset_types) < 0;
     retval = retval || fprintf (file, "    </DataArray>\n") < 0;
     retval = retval || fprintf (file, "   </Cells>\n") < 0;
+
+    char field_names[BUFSIZ];
+    strncpy(field_names, "meqn", sizeof(field_names));
+    
+    if (s->num_aux_fields > 0)
+    {
+        strncat(field_names, ",aux", sizeof(field_names) - strlen(field_names) - 1);
+    }
     if (s->rhs_fields > 0)
     {
-        retval = retval || fprintf (file, "   <CellData Scalars=\"mpirank,"
-                                    "blockno,patchno\" Fields=\"meqn,rhs,soln,error\">\n") < 0;
+        strncat(field_names, ",rhs,soln,error", sizeof(field_names) - strlen(field_names) - 1);
+    }
 
-    }
-    else 
-    {
-        retval = retval || fprintf (file, "   <CellData Scalars=\"mpirank,"
-                                    "blockno,patchno\" Fields=\"meqn\">\n") < 0;
-    
-    }
+    retval = retval || fprintf (file, "   <CellData Scalars=\"mpirank,"
+                                "blockno,patchno\" Fields=\"%s\">\n", field_names) < 0;
     retval = retval || fprintf (file, "    <DataArray type=\"Int32\" "
                                 "Name=\"mpirank\" format=\"appended\" "
                                 "offset=\"%lld\">\n",
@@ -188,6 +193,15 @@ fclaw2d_vtk_write_header (fclaw_domain_t * domain, fclaw2d_vtk_state_t * s)
     else
     {
         retval = retval || fprintf (file, format_multiple, "meqn", s->meqn, (long long) s->offset_meqn) < 0;
+    }
+
+    if (s->num_aux_fields > 0)
+    {
+        if (s->num_aux_fields == 1) {
+            retval = retval || fprintf(file, format_single, "aux", (long long) s->offset_aux) < 0;
+        } else {
+            retval = retval || fprintf(file, format_multiple, "aux", s->num_aux_fields, (long long) s->offset_aux) < 0;
+        }
     }
 
     if (s->rhs_fields > 0)
@@ -786,7 +800,7 @@ fclaw2d_vtk_write_footer (fclaw_domain_t * domain, fclaw2d_vtk_state_t * s)
 static int
 fclaw_vtk_write_file (int dim, fclaw_global_t * glob, const char *basename,
                       int mx, int my, int mz,
-                      int meqn, int rhs_fields,
+                      int meqn, int num_aux_fields, int rhs_fields,
                       double vtkspace, int vtkwrite,
                       fclaw_vtk_patch_data_t coordinate_cb,
                       fclaw_vtk_patch_data_t value_cb,
@@ -814,6 +828,7 @@ fclaw_vtk_write_file (int dim, fclaw_global_t * glob, const char *basename,
     }
     s->meqn = meqn;
     s->rhs_fields = rhs_fields;
+    s->num_aux_fields = num_aux_fields;
     s->points_per_patch = (mx + 1) * (my + 1);
     s->cells_per_patch = mx * my;
     if(dim == 3)
@@ -845,6 +860,7 @@ fclaw_vtk_write_file (int dim, fclaw_global_t * glob, const char *basename,
     s->psize_blockno = s->cells_per_patch * 4;
     s->psize_patchno = s->cells_per_patch * s->intsize;
     s->psize_meqn = s->cells_per_patch * s->meqn * sizeof (float);
+    s->psize_aux = s->cells_per_patch * s->num_aux_fields * sizeof (float);
     s->psize_rhs = s->cells_per_patch * s->rhs_fields * sizeof (float);
     s->psize_soln = s->cells_per_patch * s->rhs_fields * sizeof (float);
     s->psize_error = s->cells_per_patch * s->rhs_fields * sizeof (float);
@@ -866,26 +882,16 @@ fclaw_vtk_write_file (int dim, fclaw_global_t * glob, const char *basename,
         s->offset_blockno + s->psize_blockno * domain->global_num_patches;
     s->offset_meqn = s->ndsize +
         s->offset_patchno + s->psize_patchno * domain->global_num_patches;
-    
-    if (s->rhs_fields > 0)
-    {
-        s->offset_rhs = s->ndsize +
-            s->offset_meqn + s->psize_meqn * domain->global_num_patches;
-        s->offset_soln = s->ndsize +
-            s->offset_rhs + s->psize_rhs * domain->global_num_patches;
-        s->offset_error = s->ndsize +
-            s->offset_soln + s->psize_soln * domain->global_num_patches;
-        s->offset_end = s->ndsize +
-            s->offset_error + s->psize_error * domain->global_num_patches;
-    }
-    else
-    {
-        s->offset_rhs = 0;
-        s->offset_soln = 0;
-        s->offset_error = 0;
-        s->offset_end = s->ndsize +
-            s->offset_meqn + s->psize_meqn * domain->global_num_patches;
-    }
+    s->offset_aux = s->ndsize +
+        s->offset_meqn + s->psize_meqn * domain->global_num_patches;
+    s->offset_rhs = s->ndsize +
+        s->offset_aux + s->psize_meqn * domain->global_num_patches;
+    s->offset_soln = s->ndsize +
+        s->offset_rhs + s->psize_rhs * domain->global_num_patches;
+    s->offset_error = s->ndsize +
+        s->offset_soln + s->psize_soln * domain->global_num_patches;
+    s->offset_end = s->ndsize +
+        s->offset_error + s->psize_error * domain->global_num_patches;
 
     s->buf = NULL;
     s->sink = NULL;
@@ -936,7 +942,7 @@ fclaw_vtk_write_2d_file (fclaw_global_t * glob, const char *basename,
                         fclaw_vtk_patch_data_t value_cb,
                         int patch_threshold)
 {
-    return fclaw_vtk_write_file(2,glob,basename,mx,my,0,meqn,0,vtkspace,vtkwrite,
+    return fclaw_vtk_write_file(2,glob,basename,mx,my,0,meqn,0,0,vtkspace,vtkwrite,
                                 coordinate_cb,value_cb,NULL,NULL,NULL, patch_threshold);
 }
 
@@ -949,7 +955,7 @@ fclaw_vtk_write_3d_file (fclaw_global_t * glob, const char *basename,
                         fclaw_vtk_patch_data_t value_cb,
                         int patch_threshold)
 {
-    return fclaw_vtk_write_file(3,glob,basename,mx,my,mz,meqn,0,vtkspace,vtkwrite,
+    return fclaw_vtk_write_file(3,glob,basename,mx,my,mz,meqn,0,0,vtkspace,vtkwrite,
                                 coordinate_cb,value_cb,NULL,NULL,NULL, patch_threshold);
 }
 
@@ -1187,6 +1193,14 @@ void fclaw_clawpatch_output_vtk_to_file (fclaw_global_t * glob, const char* file
     const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
     const fclaw_clawpatch_options_t *clawpatch_opt = fclaw_clawpatch_get_options(glob);
 
+    int num_aux_fields = 0;
+    for(int i = 0; i < clawpatch_opt->maux; i++)
+    {
+        if (clawpatch_opt->vtk_aux_output[i])
+        {
+            num_aux_fields++;
+        }
+    }
 
     if(clawpatch_opt->patch_dim == 2)
     {
@@ -1196,6 +1210,7 @@ void fclaw_clawpatch_output_vtk_to_file (fclaw_global_t * glob, const char* file
                               0,
                               clawpatch_opt->meqn,
                               clawpatch_opt->rhs_fields,
+                              num_aux_fields,
                               fclaw_opt->vtkspace, 0,
                               fclaw2d_output_vtk_coordinate_cb,
                               fclaw_output_vtk_value_cb,
@@ -1212,6 +1227,7 @@ void fclaw_clawpatch_output_vtk_to_file (fclaw_global_t * glob, const char* file
                               clawpatch_opt->mz,
                               clawpatch_opt->meqn,
                               clawpatch_opt->rhs_fields,
+                              num_aux_fields,
                               fclaw_opt->vtkspace, 0,
                               fclaw3d_output_vtk_coordinate_cb,
                               fclaw_output_vtk_value_cb,
