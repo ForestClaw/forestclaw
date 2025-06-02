@@ -305,6 +305,7 @@ add_to_buffer (fclaw2d_vtk_state_t * s, int64_t psize_field)
 typedef struct write_field_iter_user
 {
     fclaw2d_vtk_state_t *s; /**< the VTK state */
+    int64_t psize_field; /**< the patch size of the field in bytes */
     void* user; /**< user data for the callback */
 } write_field_iter_user_t;
 
@@ -317,7 +318,7 @@ write_field_cb (fclaw_domain_t * domain, fclaw_patch_t * patch,
     fclaw_vtk_patch_data_t cb = (fclaw_vtk_patch_data_t) iter->user; /**< the callback */
 
     cb (g->glob, patch, blockno, patchno, iter->s->buf);
-    add_to_buffer (iter->s, iter->s->psize_position);
+    add_to_buffer (iter->s, iter->psize_field);
 }
 
 static void
@@ -624,6 +625,7 @@ fclaw2d_vtk_write_field (fclaw_global_t * glob, fclaw2d_vtk_state_t * s,
     }
     write_field_iter_user_t iter;
     iter.s = s;
+    iter.psize_field = psize_field;
     iter.user = user;
     fclaw_global_iterate_patches (glob, cb, &iter);
 
@@ -840,32 +842,67 @@ fclaw_vtk_write_file (int dim, fclaw_global_t * glob, const char *basename,
     s->psize_error = s->cells_per_patch * s->rhs_fields * sizeof (float);
 
     /* compute offsets in bytes after beginning of appended data section */
+    int64_t curr_offset = 0;
     s->offset_position = 0;
-    s->offset_connectivity = s->ndsize +
-        s->offset_position + s->psize_position * domain->global_num_patches;
-    s->offset_offsets = s->ndsize +
-        s->offset_connectivity +
+    curr_offset += s->ndsize + s->psize_position * domain->global_num_patches;
+
+    s->offset_connectivity = curr_offset;
+    curr_offset += s->ndsize +
         s->psize_connectivity * domain->global_num_patches;
-    s->offset_types = s->ndsize +
-        s->offset_offsets + s->psize_offsets * domain->global_num_patches;
-    s->offset_mpirank = s->ndsize +
-        s->offset_types + s->psize_types * domain->global_num_patches;
-    s->offset_blockno = s->ndsize +
-        s->offset_mpirank + s->psize_mpirank * domain->global_num_patches;
-    s->offset_patchno = s->ndsize +
-        s->offset_blockno + s->psize_blockno * domain->global_num_patches;
-    s->offset_meqn = s->ndsize +
-        s->offset_patchno + s->psize_patchno * domain->global_num_patches;
-    s->offset_aux = s->ndsize +
-        s->offset_meqn + s->psize_meqn * domain->global_num_patches;
-    s->offset_rhs = s->ndsize +
-        s->offset_aux + s->psize_meqn * domain->global_num_patches;
-    s->offset_soln = s->ndsize +
-        s->offset_rhs + s->psize_rhs * domain->global_num_patches;
-    s->offset_error = s->ndsize +
-        s->offset_soln + s->psize_soln * domain->global_num_patches;
-    s->offset_end = s->ndsize +
-        s->offset_error + s->psize_error * domain->global_num_patches;
+
+    s->offset_offsets = curr_offset;
+    curr_offset += s->ndsize +
+        s->psize_offsets * domain->global_num_patches;
+
+    s->offset_types = curr_offset;
+    curr_offset += s->ndsize +
+        s->psize_types * domain->global_num_patches;
+
+    s->offset_mpirank = curr_offset;
+    curr_offset += s->ndsize +
+        s->psize_mpirank * domain->global_num_patches;
+    
+    s->offset_blockno = curr_offset;
+    curr_offset += s->ndsize +
+        s->psize_blockno * domain->global_num_patches;
+
+    s->offset_patchno = curr_offset;
+    curr_offset += s->ndsize +
+        s->psize_patchno * domain->global_num_patches;
+    
+    s->offset_meqn = curr_offset;
+    curr_offset += s->ndsize +
+        s->psize_meqn * domain->global_num_patches;
+
+    s->offset_aux = curr_offset;
+    if(s->num_aux_fields > 0)
+    {
+        curr_offset += s->ndsize +
+            s->psize_aux * domain->global_num_patches;
+    }
+
+    s->offset_rhs = curr_offset;
+    if(s->rhs_fields > 0)
+    {
+        curr_offset += s->ndsize +
+            s->psize_rhs * domain->global_num_patches;
+    }
+
+    s->offset_soln = curr_offset;
+    if(s->rhs_fields > 0)
+    {
+        curr_offset += s->ndsize +
+            s->psize_soln * domain->global_num_patches;
+    }
+
+    s->offset_error = curr_offset;
+    if(s->rhs_fields > 0)
+    {
+        curr_offset += s->ndsize +
+            s->psize_error * domain->global_num_patches;
+    }
+
+    s->offset_end = curr_offset;
 
     s->buf = NULL;
     s->sink = NULL;
