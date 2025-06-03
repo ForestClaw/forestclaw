@@ -36,9 +36,6 @@ if(FCLAW_ENABLE_CUDACLAW)
   find_package(CUDAToolkit REQUIRED)
 endif()
 
-include(cmake/config.cmake)
-include(cmake/compilers.cmake)
-
 # --- p4est, sc
 include(cmake/GitSubmodule.cmake)
 
@@ -70,6 +67,9 @@ if(FCLAW_ENABLE_THUNDEREGG)
 endif()
 
 # --- configure
+
+include(cmake/config.cmake)
+include(cmake/compilers.cmake)
 
 # Conda's HDF5 never works with the system compiler
 if(DEFINED ENV{CONDA_PREFIX})
