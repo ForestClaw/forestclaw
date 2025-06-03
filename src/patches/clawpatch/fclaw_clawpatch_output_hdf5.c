@@ -29,6 +29,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_clawpatch_options.h>
 
 #include <fclaw_global.h>
+#include <fclaw_filesystem.h>
 
 #include <fclaw_options.h>
 #include <fclaw_map.h>
@@ -1169,6 +1170,7 @@ fclaw_hdf_write_file (fclaw_global_t * glob,
     char vtkhdf[8] = "/VTKHDF";
     char celldata[18] = "/VTKHDF/CellData";
     
+    fclaw_remove(filename);
     herr_t status = 0;
     // Set up file access property list with parallel I/O access
     hid_t fapl_id = H5Pcreate(H5P_FILE_ACCESS);
