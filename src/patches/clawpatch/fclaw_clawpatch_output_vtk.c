@@ -1216,14 +1216,14 @@ fclaw_output_vtk_aux_cb (fclaw_global_t * glob,
                 {
                     for (eqn = 0; eqn < maux; ++eqn)
                     {
-                        if(clawpatch_opt->vtk_aux_out[k])
+                        if(clawpatch_opt->vtk_aux_out[eqn])
                         {
                             /* For Clawpack 5.0 layout */
                             //*f++ = (float) q[((j+mbc)*xlane + (i+mbc))*meqn + k];
 
                             /* For Clawpack 4.x layout */
-                            int aux_out = clawpatch_opt->vtk_aux_out[k] - 1;
-                            *f++ = (float) q[eqn * zlane * ylane * xlane + (aux_out + mbc) * ylane * xlane + (j + mbc) * xlane + i + mbc];
+                            int aux_out = clawpatch_opt->vtk_aux_out[eqn] - 1;
+                            *f++ = (float) q[aux_out * zlane * ylane * xlane + (k + mbc) * ylane * xlane + (j + mbc) * xlane + i + mbc];
                         }
                     }
                 }
