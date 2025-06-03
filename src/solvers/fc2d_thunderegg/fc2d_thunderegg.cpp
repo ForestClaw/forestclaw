@@ -33,6 +33,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_clawpatch.h>
 #include <fclaw_clawpatch_output_ascii.h> 
 #include <fclaw_clawpatch_output_vtk.h>
+#ifdef FCLAW_WITH_HDF5
+#include <fclaw_clawpatch_output_hdf5.h>
+#endif
 
 #include <fclaw_patch.h>
 #include <fclaw_global.h>
@@ -141,6 +144,13 @@ void thunderegg_output(fclaw_global_t *glob, int iframe)
 	{
 		fclaw_clawpatch_output_vtk(glob,iframe);
 	}
+
+#ifdef FCLAW_WITH_HDF5
+    if (mg_options->hdf5_out != 0)
+    {
+        fclaw_clawpatch_output_hdf5(glob,iframe);
+    }
+#endif
 }
 
 
