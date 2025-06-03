@@ -36,6 +36,9 @@ if(FCLAW_ENABLE_CUDACLAW)
   find_package(CUDAToolkit REQUIRED)
 endif()
 
+include(cmake/config.cmake)
+include(cmake/compilers.cmake)
+
 # --- p4est, sc
 include(cmake/GitSubmodule.cmake)
 
@@ -88,8 +91,6 @@ if(FCLAW_ENABLE_HDF5 AND NOT TARGET HDF5::HDF5)
   endif()
 endif()
 
-include(cmake/config.cmake)
-include(cmake/compilers.cmake)
 
 
 # --- test
