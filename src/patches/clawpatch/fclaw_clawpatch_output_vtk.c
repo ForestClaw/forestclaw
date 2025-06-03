@@ -1180,13 +1180,14 @@ fclaw_output_vtk_aux_cb (fclaw_global_t * glob,
             {
                 for (k = 0; k < maux; ++k)
                 {
-                    if(clawpatch_opt->vtk_aux_out[k])
+                    if(clawpatch_opt->vtk_aux_out[k] > 0)
                     {
                         /* For Clawpack 5.0 layout */
                         //*f++ = (float) q[((j+mbc)*xlane + (i+mbc))*meqn + k];
 
                         /* For Clawpack 4.x layout */
-                        *f++ = (float) q[(k * ylane + j + mbc) * xlane + i + mbc];
+                        int aux_out = clawpatch_opt->vtk_aux_out[k] - 1;
+                        *f++ = (float) q[(aux_out * ylane + j + mbc) * xlane + i + mbc];
                     }
                 }
             }
@@ -1221,7 +1222,8 @@ fclaw_output_vtk_aux_cb (fclaw_global_t * glob,
                             //*f++ = (float) q[((j+mbc)*xlane + (i+mbc))*meqn + k];
 
                             /* For Clawpack 4.x layout */
-                            *f++ = (float) q[eqn * zlane * ylane * xlane + (k + mbc) * ylane * xlane + (j + mbc) * xlane + i + mbc];
+                            int aux_out = clawpatch_opt->vtk_aux_out[k] - 1;
+                            *f++ = (float) q[eqn * zlane * ylane * xlane + (aux_out + mbc) * ylane * xlane + (j + mbc) * xlane + i + mbc];
                         }
                     }
                 }
@@ -1293,12 +1295,11 @@ void fclaw_clawpatch_output_vtk_to_file (fclaw_global_t * glob, const char* file
     int num_aux_fields = 0;
     for(int i = 0; i < clawpatch_opt->maux; i++)
     {
-        if (clawpatch_opt->vtk_aux_out[i])
+        if (clawpatch_opt->vtk_aux_out[i] > 0)
         {
             num_aux_fields++;
         }
     }
-    printf("num_aux_fields = %d\n", num_aux_fields);
 
     if(clawpatch_opt->patch_dim == 2)
     {

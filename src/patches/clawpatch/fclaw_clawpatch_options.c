@@ -99,9 +99,9 @@ clawpatch_register(fclaw_clawpatch_options_t *clawpatch_options,
                        "Number of patches to buffer before each write in vtk output. 0 means buffer all patches before writing [0]");
 
     fclaw_options_add_int_array(opt, 0, "vtk-aux-out",
-                                &clawpatch_options->vtk_aux_out_string, "[]",
+                                &clawpatch_options->vtk_aux_out_string, "",
                                 &clawpatch_options->vtk_aux_out, 0,
-                                "List of length maux of aux variables to output in vtk. 1 means output, 0 means do not output. "
+                                "List of aux field indexes to output in vtk. Indes are base 1, so 1 is the first aux field. "
                                 "If empty, no aux variables are output []");
 
     /* ---------------------- hdf5 options -------------------------- */
@@ -188,6 +188,15 @@ clawpatch_check(fclaw_clawpatch_options_t *clawpatch_opt)
         fclaw_global_essentialf("Clawpatch error : hdf5-compression-level must be " \
                                 "between 0 and 9.\n");
         return FCLAW_EXIT_ERROR;            
+    }
+
+    for (int i = 0; i < clawpatch_opt->maux; i++)
+    {
+        if (clawpatch_opt->vtk_aux_out[i] < 0 || clawpatch_opt->vtk_aux_out[i] > clawpatch_opt->maux)
+        {
+            fclaw_global_essentialf("Clawpatch error : vtk-aux-out must be in the range [1,maux].\n");
+            return FCLAW_EXIT_ERROR;
+        }
     }
      
     return FCLAW_NOEXIT;
