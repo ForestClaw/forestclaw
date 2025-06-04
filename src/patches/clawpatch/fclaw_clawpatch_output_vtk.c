@@ -713,7 +713,7 @@ fclaw2d_vtk_write_data (fclaw_global_t * glob, fclaw2d_vtk_state_t * s)
 
     /* write meta data fields */
     fclaw2d_vtk_write_field (glob, s, s->offset_position, s->psize_position,
-                             write_field_cb, s->coordinate_cb);
+                             write_field_cb, (void*) s->coordinate_cb);
     fclaw2d_vtk_write_field (glob, s, s->offset_connectivity,
                              s->psize_connectivity, (s->dim == 2) ? write_2d_connectivity_cb : write_3d_connectivity_cb,
                              NULL);
@@ -728,15 +728,15 @@ fclaw2d_vtk_write_data (fclaw_global_t * glob, fclaw2d_vtk_state_t * s)
     fclaw2d_vtk_write_field (glob, s, s->offset_patchno, s->psize_patchno,
                              write_patchno_cb, NULL);
     fclaw2d_vtk_write_field (glob, s, s->offset_meqn, s->psize_meqn,
-                             write_field_cb, s->value_cb);
+                             write_field_cb, (void*) s->value_cb);
     fclaw2d_vtk_write_field (glob, s, s->offset_aux, s->psize_aux,
-                             write_field_cb, s->aux_cb);
+                             write_field_cb, (void*) s->aux_cb);
     fclaw2d_vtk_write_field (glob, s, s->offset_rhs, s->psize_rhs,
-                             write_field_cb, s->rhs_cb);
+                             write_field_cb, (void*) s->rhs_cb);
     fclaw2d_vtk_write_field (glob, s, s->offset_soln, s->psize_soln,
-                             write_field_cb, s->soln_cb);
+                             write_field_cb, (void*) s->soln_cb);
     fclaw2d_vtk_write_field (glob, s, s->offset_error, s->psize_error,
-                             write_field_cb, s->error_cb);
+                             write_field_cb, (void*) s->error_cb);
 
 #ifdef P4EST_ENABLE_MPIIO
     /* collectively close the file */
