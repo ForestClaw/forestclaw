@@ -50,6 +50,9 @@ thunderegg_register (fc2d_thunderegg_options_t* mg_opt, sc_options_t * opt)
     sc_options_add_bool (opt, 0, "vtk-out", &mg_opt->vtk_out, 0,
                            "Output VTK formatted data [F]");
 
+    sc_options_add_bool (opt, 0, "hdf5-out", &mg_opt->hdf5_out, 0,
+                           "Output HDF5 formatted data [F]");
+
     sc_options_add_bool (opt, 0, "mg-prec", &mg_opt->mg_prec, 1,
                            "Use thunderegg preconditioner [T]");
 

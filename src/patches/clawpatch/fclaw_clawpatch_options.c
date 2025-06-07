@@ -26,6 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_clawpatch_options.h>
 
 #include <fclaw_global.h>
+#include <fclaw_options.h>
 #include <fclaw_packing.h>
 #include <sc_keyvalue.h>
 
@@ -97,6 +98,12 @@ clawpatch_register(fclaw_clawpatch_options_t *clawpatch_options,
                        &clawpatch_options->vtk_patch_threshold, 0,
                        "Number of patches to buffer before each write in vtk output. 0 means buffer all patches before writing [0]");
 
+    fclaw_options_add_int_array(opt, 0, "vtk-aux-out",
+                                &clawpatch_options->vtk_aux_out_string, "",
+                                &clawpatch_options->vtk_aux_out, 0,
+                                "List of aux field indexes to output in vtk. Indes are base 1, so 1 is the first aux field. "
+                                "If empty, no aux variables are output []");
+
     /* ---------------------- hdf5 options -------------------------- */
     sc_options_add_int(opt, 0, "hdf5-patch-threshold", 
                        &clawpatch_options->hdf5_patch_threshold, 0,
@@ -104,6 +111,13 @@ clawpatch_register(fclaw_clawpatch_options_t *clawpatch_options,
     sc_options_add_int(opt, 0, "hdf5-compression-level", 
                        &clawpatch_options->hdf5_compression_level, 5,
                        "Compression level for hdf5 output. 0 is no compression, 9 is most compression. [5]");
+    fclaw_options_add_int_array(opt, 0, "hdf5-aux-out",
+                                &clawpatch_options->hdf5_aux_out_string, "",
+                                &clawpatch_options->hdf5_aux_out, 0,
+                                "List of aux field indexes to output in hdf5. Indes are base 1, so 1 is the first aux field. "
+                                "If empty, no aux variables are output []");
+
+
 
     /* Set verbosity level for reporting timing */
     sc_keyvalue_t *kv = clawpatch_options->kv_refinement_criteria;
@@ -124,7 +138,14 @@ clawpatch_register(fclaw_clawpatch_options_t *clawpatch_options,
 static fclaw_exit_type_t
 clawpatch_postprocess(fclaw_clawpatch_options_t *clawpatch_opt)
 {
-    /* Convert strings to arrays (no strings to process here) */
+    /* Convert strings to arrays */
+    fclaw_options_convert_int_array(clawpatch_opt->vtk_aux_out_string,
+                                    &clawpatch_opt->vtk_aux_out,
+                                    clawpatch_opt->maux);
+
+    fclaw_options_convert_int_array(clawpatch_opt->hdf5_aux_out_string,
+                                    &clawpatch_opt->hdf5_aux_out,
+                                    clawpatch_opt->maux);
     return FCLAW_NOEXIT;
 }
 
@@ -179,7 +200,21 @@ clawpatch_check(fclaw_clawpatch_options_t *clawpatch_opt)
                                 "between 0 and 9.\n");
         return FCLAW_EXIT_ERROR;            
     }
-     
+
+    for (int i = 0; i < clawpatch_opt->maux; i++)
+    {
+        if (clawpatch_opt->vtk_aux_out[i] < 0 || clawpatch_opt->vtk_aux_out[i] > clawpatch_opt->maux)
+        {
+            fclaw_global_essentialf("Clawpatch error : vtk-aux-out must be in the range [1,maux].\n");
+            return FCLAW_EXIT_ERROR;
+        }
+
+        if (clawpatch_opt->hdf5_aux_out[i] < 0 || clawpatch_opt->hdf5_aux_out[i] > clawpatch_opt->maux)
+        {
+            fclaw_global_essentialf("Clawpatch error : vtk-aux-out must be in the range [1,maux].\n");
+            return FCLAW_EXIT_ERROR;
+        }
+    }
     return FCLAW_NOEXIT;
 }
 
@@ -198,6 +233,9 @@ fclaw_clawpatch_options_new (int dim)
 void
 fclaw_clawpatch_options_destroy (fclaw_clawpatch_options_t *clawpatch_opt)
 {
+    FCLAW_FREE(clawpatch_opt->vtk_aux_out);
+    FCLAW_FREE(clawpatch_opt->hdf5_aux_out);
+
     if(clawpatch_opt->kv_refinement_criteria != NULL)
     {
         sc_keyvalue_destroy (clawpatch_opt->kv_refinement_criteria);

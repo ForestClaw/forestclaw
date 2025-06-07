@@ -68,6 +68,9 @@ endif()
 
 # --- configure
 
+include(cmake/config.cmake)
+include(cmake/compilers.cmake)
+
 # Conda's HDF5 never works with the system compiler
 if(DEFINED ENV{CONDA_PREFIX})
   list(APPEND CMAKE_IGNORE_PREFIX_PATH $ENV{CONDA_PREFIX})
@@ -88,8 +91,6 @@ if(FCLAW_ENABLE_HDF5 AND NOT TARGET HDF5::HDF5)
   endif()
 endif()
 
-include(cmake/config.cmake)
-include(cmake/compilers.cmake)
 
 
 # --- test

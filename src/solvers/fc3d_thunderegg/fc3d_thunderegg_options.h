@@ -66,6 +66,7 @@ struct fc3d_thunderegg_options
     /* Output */
     int ascii_out;
     int vtk_out;
+    int hdf5_out;
 
     /* bicgstab settings */
     int mg_prec;
