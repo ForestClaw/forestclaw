@@ -52,6 +52,9 @@ typedef struct fclaw_gauge
     /** @brief Location of the gauge in the results array */
     int location_in_results;
 
+    /** @brief Gauge is in the domain  */
+    int in_domain;
+
     /* Some data needed to get around fact that in parallel, we don't communicate
        gauge information */
     /** @brief true if this gauge is on the local processor */
@@ -137,6 +140,7 @@ typedef void (*fclaw_gauges_normalize_t)(struct fclaw_global *glob,
                                        struct fclaw_gauge *g,
                                        double *xc, double *yc, double *zc);
 
+
 /**
  * @brief Updates the current buffer entry for the gauge
  * 
@@ -201,6 +205,16 @@ void fclaw_gauges_locate(struct fclaw_global *glob);
  * @param glob the global context
  */
 void fclaw_gauges_vtable_initialize(struct fclaw_global *glob);
+
+
+/**
+ * @brief Setup gauges for search in p4est
+ * 
+ * @param glob the global context
+ * @param acc accumulator
+ */
+void gauges_setup(struct fclaw_global* glob, void** acc);
+
 
 /**
  * @brief Get the gauges vtable
