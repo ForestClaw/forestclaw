@@ -49,19 +49,25 @@ typedef struct fclaw_gauge
     /** @brief The block that the gauge is in */
     int blockno;
 
+    /** @brief the patch that the gauge is in */
+    int patchno;
+
+    /** @brief level of patch gauge is in */
+    int level;
+
     /** @brief Location of the gauge in the results array */
     int location_in_results;
 
     /** @brief Gauge is in the domain  */
     int in_domain;
 
+    /** @brief Set True for static gauges  */
+    int is_static;
+
     /* Some data needed to get around fact that in parallel, we don't communicate
        gauge information */
     /** @brief true if this gauge is on the local processor */
     int is_local;
-
-    /** @brief the patch that the gauge is in */
-    int patchno;
 
     /** @{ @brief Relative to [ax,ay]x[bx,by] set in fclaw2d_options */
     double xc;   
@@ -167,6 +173,17 @@ typedef void (*fclaw_gauges_update_t)(struct fclaw_global* glob,
 typedef void (*fclaw_gauges_print_t)(struct fclaw_global *glob, 
                                     struct fclaw_gauge *gauge);
 
+
+/**
+ * @brief Move non-static gauges
+ * 
+ * @param glob the global context
+ * @param g the gauge
+ */
+typedef void (*fclaw_gauges_move_t)(struct fclaw_global *glob, 
+                                    struct fclaw_gauge *gauge,
+                                    double t, double dt);
+
 /**
  * @brief vtable for gauges
  */
@@ -187,6 +204,8 @@ typedef struct fclaw_gauges_vtable
     /** @brief Prints the buffer to a file */
     fclaw_gauges_print_t         print_buffer;
 
+    fclaw_gauges_move_t          move;
+
 
     /** @brief true if vtable has been set */
     int is_set;
@@ -197,7 +216,7 @@ typedef struct fclaw_gauges_vtable
  * 
  * @param glob the global context
  */
-void fclaw_gauges_locate(struct fclaw_global *glob);
+void fclaw_gauges_locate_patches(struct fclaw_global *glob);
 
 /**
  * @brief Initialize the gauges vtable
@@ -208,12 +227,12 @@ void fclaw_gauges_vtable_initialize(struct fclaw_global *glob);
 
 
 /**
- * @brief Setup gauges for search in p4est
+ * @brief Create list of gauges within each block
  * 
  * @param glob the global context
  * @param acc accumulator
  */
-void gauges_setup(struct fclaw_global* glob, void** acc);
+void fclaw_gauges_setup_block_lists(struct fclaw_global* glob);
 
 
 /**
@@ -227,6 +246,10 @@ fclaw_gauges_vtable_t* fclaw_gauges_vt(struct fclaw_global *glob);
 
 
 /* ------------------------ Virtualized gauge functions ------------------------------- */
+
+void fclaw_gauges_update_positions(struct fclaw_global *glob, 
+                                   int level, double t, double dt);
+
 #if 0
 
 #if 0
@@ -243,6 +266,7 @@ void fclaw_set_gauge_data(struct fclaw_global* glob,
                           int *num_gauges);
 
 #endif
+
 
 /**
  * @brief Create files for each gauge
@@ -396,6 +420,19 @@ void fclaw_gauges_set_user_data(struct fclaw_global *glob,
  */
 void* fclaw_gauges_get_user_data(struct fclaw_global *glob,
                                 struct fclaw_gauge* g);
+
+
+/**
+ * @brief Set the position of moving gauges
+ * 
+ * @param glob the global context
+ * @param g the gauge
+ * @param xc,yc,zc Position of the gauge
+ */
+void fclaw_gauges_set_position(struct fclaw_global *glob, 
+                                 struct fclaw_gauge *g,
+                                 double xc, double yc, double zc);
+
 
 
 #ifdef __cplusplus

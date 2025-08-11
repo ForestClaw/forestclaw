@@ -33,6 +33,10 @@ extern "C"
 {
 #endif
 
+#if 0
+/* Syntax highlighting */
+#endif    
+
 struct fclaw_global;
 struct fclaw_gauge;
 struct fclaw_patch;
@@ -51,10 +55,24 @@ typedef struct fclaw_clawpatch_gauge_data
     double tcurr;
     int meqn;      /* Needed when printing out buffers */
     int maux;
+    double xc;
+    double yc;
+    double zc;
     double *qvar;  /* Store qvalues */
     double *avar;  /* Store aux variables */
 
 } fclaw_clawpatch_gauge_data_t;
+
+
+
+#if 0
+void fclaw_clawpatch_gauges_allocate(struct fclaw_global *glob, 
+                                     int meqn, int maux, 
+                                     struct fclaw_clawpatch_gauge_data **g);
+
+void fclaw_clawpatch_gauges_deallocate(struct fclaw_global *glob,
+                                       struct fclaw_clawpatch_gauge_data **g);
+#endif
 
 
 void fclaw_clawpatch_gauges_read_data(struct fclaw_global *glob, 

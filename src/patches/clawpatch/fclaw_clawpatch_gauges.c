@@ -280,12 +280,36 @@ void fclaw_clawpatch_gauges_normalize_coordinates(fclaw_global_t *glob,
     }
 }
 
+/* Define user gauges - these store user data needed by each gauge */
+static
+void fclaw_clawpatch_gauges_allocate(fclaw_global_t *glob, 
+                                     int meqn, int maux,
+                                     fclaw_clawpatch_gauge_data_t **guser)
+{
+    *guser = FCLAW_ALLOC(fclaw_clawpatch_gauge_data_t,1);
+
+    (*guser)->qvar = FCLAW_ALLOC(double,meqn);
+    (*guser)->avar = FCLAW_ALLOC(double,maux);
+}
+
+static
+void fclaw_clawpatch_gauges_deallocate(fclaw_global_t *glob,
+                                       fclaw_clawpatch_gauge_data_t **guser)
+{
+    FCLAW_FREE((*guser)->qvar);
+    FCLAW_FREE((*guser)->avar);
+    FCLAW_FREE(*guser);
+    *guser = NULL;
+}
+
+
+
 /* Interpolate patch data to gauge */
-void fclaw_clawpatch_gauges_update(fclaw_global_t* 
-                                          glob, fclaw_block_t* block,
-                                          fclaw_patch_t* patch, 
-                                          int blockno, int patchno,
-                                          double tcurr, fclaw_gauge_t *g)
+void fclaw_clawpatch_gauges_update(fclaw_global_t* glob, 
+                                   fclaw_block_t* block,
+                                   fclaw_patch_t* patch, 
+                                   int blockno, int patchno,
+                                   double tcurr, fclaw_gauge_t *g)
 {
     /* Get basic gauge info : (id, xc, yc, t1, t2) */
     int num, dim;
@@ -302,8 +326,7 @@ void fclaw_clawpatch_gauges_update(fclaw_global_t*
     fclaw_clawpatch_aux_data(glob,patch,&aux,&maux);
 
 
-    fclaw_clawpatch_vtable_t* clawpatch_vt = 
-        fclaw_clawpatch_vt(glob);
+    fclaw_clawpatch_vtable_t* clawpatch_vt = fclaw_clawpatch_vt(glob);
     double qvar[meqn], avar[maux];  /* q[meqn] */
     if (dim == 2)
     {
@@ -347,36 +370,42 @@ void fclaw_clawpatch_gauges_update(fclaw_global_t*
 
     /* 
         USER : Store qvar, avar and anything else into the 
-        "fclaw_clawpatch2d_gauge_user".  
+        "fclaw_clawpatch_gauge_data_t" that is needed when 
+        writing out gauges.  
     */
-    fclaw_clawpatch_gauge_data_t *g_clawpatch = 
-               FCLAW_ALLOC(fclaw_clawpatch_gauge_data_t,1);
-    // g->level = patch->level;
-    g_clawpatch->tcurr = tcurr;
-    g_clawpatch->qvar = FCLAW_ALLOC(double,meqn);
-    g_clawpatch->avar = FCLAW_ALLOC(double,maux);
-    g_clawpatch->meqn = meqn;  /* Needed for printing the buffers */
-    g_clawpatch->maux = maux; 
 
-    /* USER : Print out state values */
+    fclaw_clawpatch_gauge_data_t *guser;
+    fclaw_clawpatch_gauges_allocate(glob,meqn,maux,&guser);
+
+    guser->level = patch->level;
+    guser->tcurr = tcurr;
+
+    guser->meqn = meqn;  /* Needed for printing the buffers */
+    guser->maux = maux; 
+
+    guser->xc = xc;
+    guser->yc = yc;
+    guser->zc = zc;
+
+    /* USER : Store state values */
     for(int m = 0; m < meqn; m++)
     {
-        g_clawpatch->qvar[m] = qvar[m];
+        guser->qvar[m] = qvar[m];
     }
 
-    /* USER : Print out aux values */
+    /* USER : Store aux values */
     for(int m = 0; m < maux; m++)
     {
-        g_clawpatch->avar[m] = avar[m];       
+        guser->avar[m] = avar[m];       
     }
 
-    /* The 'fclaw_clawpatch_gauge__clawpatch' is stored in the buffer */
-    fclaw_gauges_set_buffer_entry(glob,g,g_clawpatch);
+    /* Store pointer  to guser in buffer for g for printing later */
+    fclaw_gauges_set_buffer_entry(glob,g,guser);
 }
 
 
 void fclaw_clawpatch_gauges_print(fclaw_global_t *glob, 
-                                          fclaw_gauge_t *gauge) 
+                                  fclaw_gauge_t *gauge) 
 {
 
 
@@ -396,7 +425,10 @@ void fclaw_clawpatch_gauges_print(fclaw_global_t *glob,
         fclaw_clawpatch_gauge_data_t *guser = gauge_buffer[k];
 
         /* USER : Specify formatting here */
-        fprintf(fp, "%5d %15.7e",guser->level, guser->tcurr);
+        fprintf(fp, "%5d %24.16f %24.16f %24.16f "\
+                "%12.4e",guser->level, 
+                guser->xc, guser->yc, guser->zc,
+                guser->tcurr);
         int meqn = guser->meqn;
         for(int mq = 0; mq < meqn; mq++)
         {
@@ -410,9 +442,12 @@ void fclaw_clawpatch_gauges_print(fclaw_global_t *glob,
         }
         fprintf(fp,"\n");
 
+#if 0
         FCLAW_FREE(guser->qvar);
         FCLAW_FREE(guser->avar);
         FCLAW_FREE(guser);
+#endif
+        fclaw_clawpatch_gauges_deallocate(glob,&guser);
     }
     fclose(fp);
 }

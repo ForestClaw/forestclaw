@@ -254,7 +254,7 @@ static void
 post_setup(fclaw_global_t* glob)
 {
     fclaw_diagnostics_initialize(glob);
-    fclaw_gauges_locate(glob);
+    fclaw_gauges_locate_patches(glob);
 
     fclaw_after_regrid(glob, 1);
 

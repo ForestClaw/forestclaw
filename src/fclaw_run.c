@@ -456,13 +456,13 @@ void outstyle_3(fclaw_global_t *glob)
 
         if (fclaw_opt->advance_one_step)
         {
-            //fclaw2d_diagnostics_gather(glob,init_flag);
+            fclaw_diagnostics_gather(glob,init_flag);
         }
 
         if (n % nstep_inner == 0)
         {
             iframe++;
-            fclaw_diagnostics_gather(glob,init_flag);
+            //fclaw_diagnostics_gather(glob,init_flag);
             fclaw_output_frame(glob,iframe);
 
             /* save context values */

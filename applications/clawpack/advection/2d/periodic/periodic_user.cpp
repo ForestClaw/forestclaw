@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
+Copyright (c) 2012-2025 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -44,6 +44,21 @@ void periodic_problem_setup(fclaw_global_t* glob)
     SETPROB();  /* Reads file created above */
 }
 
+void periodic_gauge_move(fclaw_global_t* glob, fclaw_gauge_t *g,
+                         double t, double dt)
+{
+    int num, dim;
+    double xc,yc,zc,t1,t2;            
+    fclaw_gauges_get_data(glob,g,&num,&dim,&xc,&yc,&zc,&t1,&t2);
+
+    const user_options_t* user = periodic_get_options(glob);
+
+    xc += 5*dt*user->uvel;
+    yc += 5*dt*user->vvel;
+
+    fclaw_gauges_set_position(glob, g, xc, yc, g->zc);
+}
+
 
 void periodic_link_solvers(fclaw_global_t *glob)
 {
@@ -69,6 +84,12 @@ void periodic_link_solvers(fclaw_global_t *glob)
         clawpack5_vt->fort_rpn2      = &CLAWPACK5_RPN2ADV;
         clawpack5_vt->fort_rpt2      = &CLAWPACK5_RPT2ADV;
     }
+
+    /* Move gauges */
+    fclaw_gauges_vtable_t* gauges_vt = (fclaw_gauges_vtable_t*) 
+                        fclaw_global_get_vtable(glob, "fclaw_gauges");
+
+    gauges_vt->move = periodic_gauge_move;
 }
 
 
