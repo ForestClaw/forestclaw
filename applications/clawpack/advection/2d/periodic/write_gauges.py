@@ -10,7 +10,9 @@ gaugedata = fclaw_analysis.GaugeData(dim,min_time_increment=0)
 #  x,y   : Location of the gauge
 #  t0,t1 : (t0,t1) interval over which to monitor the gauge.
 
-gaugedata.gauges.append([0, 0, 0, 0, 1e10])
+for i in range(10):
+    gaugedata.gauges.append([i, 0, 0, 0, 1e10])
+
 
 # gaugedata.gauges.append([  1, -0.5, -0.5,  0, 1.e10])
 # gaugedata.gauges.append([  2, 0.5, 0.5,  0, 1.e10])

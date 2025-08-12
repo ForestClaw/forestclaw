@@ -9,7 +9,8 @@ setpatchborderprops('linewidth',1);
 clim([0,1])
 view(2);
 
-rh = add_regions(t);
+
+% rh = add_regions(t);
 set(rh,'color','r')
 
 NoQuery = 0;
