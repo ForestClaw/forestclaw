@@ -511,10 +511,13 @@ void fclaw_gauges_locate_patches(fclaw_global_t *glob)
         g->patchno = *((int *) sc_array_index_int(results, index));        
         g->is_local = (g->patchno >= 0);  /* Local to this processor */
 
-        fclaw_block_t *block = &glob->domain->blocks[g->blockno];
-        fclaw_patch_t *patch = &block->patches[g->patchno]; 
         if (!g->is_local && g->next_buffer_location > 0)
         {
+#if 0            
+            fclaw_block_t *block = &glob->domain->blocks[g->blockno];
+            fclaw_patch_t *patch = &block->patches[g->patchno]; 
+#endif            
+
             /* Patch moved off of processor, but the buffer is not empty. */
             gauges_print_buffer(glob,g);
             g->next_buffer_location = 0;
