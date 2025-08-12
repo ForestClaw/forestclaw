@@ -335,9 +335,10 @@ void fclaw_clawpatch_gauges_update(fclaw_global_t* glob,
         fclaw_clawpatch_2d_grid_data(glob,patch,&mx,&my,&mbc,
                                      &xlower,&ylower,&dx,&dy);
 
-        /* Check that gauge is in current patch */
-        FCLAW_ASSERT(xc >= xlower && xc <= xlower + mx*dx);
-        FCLAW_ASSERT(yc >= ylower && yc <= ylower + my*dy);
+        /* Check that gauge is in current patch.  Allow gauge to be slightly
+           outside patch - should still lead to accurate results.  */
+        FCLAW_ASSERT(xlower <= xc && xc <= xlower + mx*dx);
+        FCLAW_ASSERT(ylower <= yc && yc <= ylower + my*dy);
 
         /* Don't check time interval here;  this is done in fclaw_gauges.c */
 

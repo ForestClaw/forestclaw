@@ -35,7 +35,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_vtable.h>
 
 #include <fclaw_time_sync.h>
-#include <fclaw_gauges.h>
 
 
 typedef struct fclaw2d_level_data
@@ -268,7 +267,8 @@ double fclaw_advance_all_levels(fclaw_global_t *glob,
 	/* Step inc at maxlevel should be 1 by definition */
 	FCLAW_ASSERT(ts_counter[maxlevel].step_inc == 1);
 	int n_fine_steps = ts_counter[maxlevel].total_steps;
-	for(int nf = 0; nf < n_fine_steps; nf++)
+	int nf;
+	for(nf = 0; nf < n_fine_steps; nf++)
 	{
 		/* Coarser levels get updated recursively */
 		/* Advance stores anything needed for later synchronization */
@@ -319,13 +319,6 @@ double fclaw_advance_all_levels(fclaw_global_t *glob,
 			    }
 			}
 		}
-        else
-        {
-            /* We only advance one step in this call */
-            //fclaw_global_essentialf("advance : setup gauges;  nf = %d\n",nf);
-            fclaw_gauges_setup_block_lists(glob);
-            fclaw_gauges_locate_patches(glob);                            
-        }
 	}
 	fclaw_global_infof("Advance is done with coarse grid step at " \
 					  " time %12.6e\n",t_curr);

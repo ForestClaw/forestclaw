@@ -61,6 +61,8 @@ typedef struct fclaw_gauge_info
 {
     sc_array_t *block_offsets;
     sc_array_t *coordinates;
+    int is_initialized;
+    int moving_gauges;
 } fclaw_gauge_info_t;
 
 /* ----------------------------------------------------------------------------
@@ -220,6 +222,9 @@ void gauges_initialize(fclaw_global_t* glob, void** acc)
 
 
     fclaw_gauge_info_t *gauge_info = FCLAW_ALLOC_ZERO(fclaw_gauge_info_t,1);
+    gauge_info->moving_gauges = fclaw_opt->moving_gauges;
+    gauge_info->is_initialized = 0;
+
     fclaw_global_attribute_store(glob,
                                  "gauge_info",
                                  gauge_info,
@@ -244,23 +249,26 @@ void gauges_initialize(fclaw_global_t* glob, void** acc)
             gauges[i].blockno = -1;
             gauges[i].location_in_results = -1;
             gauges[i].in_domain = 0;
-            gauges[i].is_static = 0; /* Assume static gauge */
+            gauges[i].is_moving = gauge_info->moving_gauges; /* Assume static gauge */
             gauges[i].buffer = FCLAW_ALLOC(void*,buffer_len);  /* Array of generic ptrs */
             gauges[i].next_buffer_location = 0;
         }       
     }
 
-    //fclaw_gauges_setup_block_lists(glob);
+    /* Create block lists and locate gauges in patches. 
+       For static gauges, we only need to create the block list once. 
+       For moving gauges, the block lists must be recreated each time 
+       we want to locate gauges in patches. */
+
+    fclaw_gauges_locate_patches(glob);
 }    
 
-void fclaw_gauges_setup_block_lists(fclaw_global_t* glob)
+static
+int fclaw_gauges_setup_block_lists(fclaw_global_t* glob, 
+                                    fclaw_gauge_acc_t *gauge_acc,
+                                    sc_array_t **block_offsets_ptr,
+                                    sc_array_t **coordinates_ptr)
 {
-    fclaw_gauge_acc_t* gauge_acc = 
-    (fclaw_gauge_acc_t*) fclaw_diagnostics_get_acc(glob)->gauge_accumulator;
-
-    fclaw_gauge_info_t* gauge_info = 
-        (fclaw_gauge_info_t *) fclaw_global_get_attribute(glob,"gauge_info");
-
     fclaw_gauge_t *gauges = gauge_acc->gauges;
 
     int num_gauges = gauge_acc->num_gauges;
@@ -284,17 +292,10 @@ void fclaw_gauges_setup_block_lists(fclaw_global_t* glob)
 
         int num_blocks = glob->domain->num_blocks;
 
-        /* In case we are calling setup multiple times */
-        if (gauge_info->block_offsets != NULL)
-            sc_array_destroy(gauge_info->block_offsets);
-
-        if (gauge_info->coordinates != NULL)
-            sc_array_destroy(gauge_info->coordinates);
-
-        gauge_info->block_offsets = sc_array_new_count(sizeof(int), 
+        sc_array_t *block_offsets = sc_array_new_count(sizeof(int), 
                                                       num_blocks+1);
 
-        gauge_info->coordinates = sc_array_new_count(gauge_dim*sizeof(double), 
+        sc_array_t *coordinates = sc_array_new_count(gauge_dim*sizeof(double), 
                                                      num_gauges);
 
         /* We don't know how the blocks are arranged in the brick domain
@@ -305,7 +306,7 @@ void fclaw_gauges_setup_block_lists(fclaw_global_t* glob)
         fclaw_block_t *blocks = glob->domain->blocks;
 
         int num_gauges_set = 0;
-        int *bo = (int*) sc_array_index_int(gauge_info->block_offsets,0);
+        int *bo = (int*) sc_array_index_int(block_offsets,0);
         bo[0] = 0;
 
         double p0[gauge_dim];
@@ -407,7 +408,7 @@ void fclaw_gauges_setup_block_lists(fclaw_global_t* glob)
                        domain in [0,mi]x[0,mj].  This may not work for the 
                        cubed sphere case */
 
-                    double *c = (double*) sc_array_index_int(gauge_info->coordinates, ng);
+                    double *c = (double*) sc_array_index_int(coordinates, ng);
 
                     c[0] = mi*(gx - xll);
                     c[1] = mj*(gy - yll);
@@ -424,10 +425,9 @@ void fclaw_gauges_setup_block_lists(fclaw_global_t* glob)
             }  /* end of num_gauges */
 
             /* Set number of gauges for block nb */
-            bo = (int*) sc_array_index_int(gauge_info->block_offsets, nb+1);
+            bo = (int*) sc_array_index_int(block_offsets, nb+1);
 
             bo[0] = num_gauges_set;  
-            //total_gauges_set += number_of_gauges_set;
         }
         gauge_acc->num_gauges_set = num_gauges_set;
 
@@ -436,46 +436,57 @@ void fclaw_gauges_setup_block_lists(fclaw_global_t* glob)
 
         if (num_gauges_set < num_gauges)            
         {            
-#if 0            
-            fclaw_global_essentialf("Incorrect gauge count.  Gauge file has %d gauges, " \
-                                    "but only %d were found in the domain.\n",num_gauges,
-                                    total_gauges_set);
-#endif                                    
             for(int i = 0; i < num_gauges; i++)
                 if (!gauges[i].in_domain)
-                {
-                    fclaw_global_essentialf("Gauge %d is not in the domain.\n",
+                    fclaw_global_infof("Gauge %d is not in the domain.\n",
                                             gauges[i].num);
-                }
 
             /* Ignore any gauges that are outside of the domain */
-            sc_array_resize (gauge_info->coordinates, num_gauges_set);
+            sc_array_resize (coordinates, num_gauges_set);
         }
+        *block_offsets_ptr = block_offsets;
+        *coordinates_ptr = coordinates;
+        return num_gauges_set;
+    } 
+    else
+    {
+        *block_offsets_ptr = NULL;
+        *coordinates_ptr = NULL;   
+        return 0;     
     } /* num_gauges > 0 */
 }
 
+/* This is called after regrid and when gauge the positions are updated */
 void fclaw_gauges_locate_patches(fclaw_global_t *glob)
 {
     fclaw_gauge_acc_t* gauge_acc = 
         (fclaw_gauge_acc_t*) fclaw_diagnostics_get_acc(glob)->gauge_accumulator;
-    //fclaw_gauge_info_t* gauge_info = glob->gauge_info;
 
     /* Set block offsets for all gauges;  return number of gauges
        that are actually in the domain */
-    int num_gauges_set = fclaw_gauges_setup_block_lists(glob);        
+    fclaw_gauge_info_t* gauge_info = 
+        (fclaw_gauge_info_t *) fclaw_global_get_attribute(glob,"gauge_info");
 
-    /* Locate each gauge in the new mesh */
-    //int num_gauges_set = gauge_acc->num_gauges_set;
+    int num_gauges_set;
+    if (!gauge_info->is_initialized || gauge_info->moving_gauges)
+    {
+        num_gauges_set = fclaw_gauges_setup_block_lists(glob,
+                                                        gauge_acc,
+                                                        &gauge_info->block_offsets,
+                                                        &gauge_info->coordinates); 
+        gauge_info->is_initialized = 1;
+    }
+    else
+    {
+        /* Gauges are not moving but have been initialized */
+        num_gauges_set = gauge_acc->num_gauges_set;
+    }
 
     if (num_gauges_set == 0)
         return;
 
-    sc_array_t *results = sc_array_new_size(sizeof(int), num_gauges_set);
-
     /* This calls the main p4est search routine */
-    fclaw_gauge_info_t* gauge_info = 
-        (fclaw_gauge_info_t *) fclaw_global_get_attribute(glob,"gauge_info");
-
+    sc_array_t *results = sc_array_new_size(sizeof(int), num_gauges_set);
     fclaw_domain_search_points(glob->domain, 
                                gauge_info->block_offsets,
                                gauge_info->coordinates, results);
@@ -500,31 +511,27 @@ void fclaw_gauges_locate_patches(fclaw_global_t *glob)
         g->patchno = *((int *) sc_array_index_int(results, index));        
         g->is_local = (g->patchno >= 0);  /* Local to this processor */
 
-#if 0
         fclaw_block_t *block = &glob->domain->blocks[g->blockno];
         fclaw_patch_t *patch = &block->patches[g->patchno]; 
-        g->level = patch->level;
-#endif
-        g->level = -1;  /* set below if g is local */
-
-
         if (!g->is_local && g->next_buffer_location > 0)
         {
-            fclaw_block_t *block = &glob->domain->blocks[g->blockno];
-            fclaw_patch_t *patch = &block->patches[g->patchno]; 
-            g->level = patch->level;
-
             /* Patch moved off of processor, but the buffer is not empty. */
             gauges_print_buffer(glob,g);
             g->next_buffer_location = 0;
         }
     }
     sc_array_destroy(results);
+
+    if (gauge_info->moving_gauges)
+    {
+        /* We need to relocate gauges within patches each time */
+        sc_array_destroy(gauge_info->block_offsets);
+        sc_array_destroy(gauge_info->coordinates);
+    }
 }
 
 /* This will be called after an update on a level */
 void  fclaw_gauges_update_positions(fclaw_global_t* glob,
-                                    int level,
                                     double t, double dt)
 {
     fclaw_gauge_acc_t* gauge_acc = 
@@ -543,25 +550,9 @@ void  fclaw_gauges_update_positions(fclaw_global_t* glob,
         if (!g->in_domain)
             continue;
 
-        if (!g->is_static) 
-        {
-            /* Gauges are moved level by level. Since each processor stores
-               all gauges, we move them all here, even remote gauges */
-            if (g->level == level)
-                gauge_vt->move(glob,g, t, dt);
-        }
+        if (g->is_moving) 
+            gauge_vt->move(glob,g, t, dt);
     }
-
-#if 0
-    /* This can't be done until all levels have been updated. So where
-       do we do it? */
-
-    /* Get new block information for all gauges */
-    gauges_setup(glob);
-
-    /* Get new patch information for gauges */
-    fclaw_gauges_locate_patches(glob);
-#endif    
 }
 
 
@@ -626,7 +617,6 @@ void gauges_compute(fclaw_global_t *glob, void* acc)
 }
 
 
-
 static
 void gauges_finalize(fclaw_global_t *glob, void** acc)
 {
@@ -647,26 +637,23 @@ void gauges_finalize(fclaw_global_t *glob, void** acc)
         hundred gauges).  But we only want to print those gauge buffers that 
         for gauges that are on the local processor */        
         if (g->is_local)
-        {
             gauges_print_buffer(glob,g);
-        }
+
         FCLAW_FREE(g->buffer);               
     }
 
-    if (gauge_acc->gauges != NULL)
+    const fclaw_options_t * fclaw_opt = fclaw_get_options(glob);
+    if (!fclaw_opt->moving_gauges)
     {
-        FCLAW_FREE(gauge_acc->gauges); 
-    }       
-
-    if (gauge_info->block_offsets != NULL)
-    {
+        /* info for moving gauges is destroyed at the end of each 
+        "locate patches" call.  Only static gauge info needs 
+        to be destroyed here. */
         sc_array_destroy(gauge_info->block_offsets);
+        sc_array_destroy(gauge_info->coordinates);            
     }
 
-    if (gauge_info->coordinates != NULL)
-    {
-        sc_array_destroy(gauge_info->coordinates);
-    }
+    if (gauge_acc->gauges != NULL)
+        FCLAW_FREE(gauge_acc->gauges); 
 
     /* What about the user gauge ? */
     

@@ -62,7 +62,7 @@ typedef struct fclaw_gauge
     int in_domain;
 
     /** @brief Set True for static gauges  */
-    int is_static;
+    int is_moving;
 
     /* Some data needed to get around fact that in parallel, we don't communicate
        gauge information */
@@ -71,7 +71,7 @@ typedef struct fclaw_gauge
 
     /** @{ @brief Relative to [ax,ay]x[bx,by] set in fclaw2d_options */
     double xc;   
-    double yc;
+    double yc;    
     double zc;
     /** @} */
 
@@ -225,6 +225,7 @@ void fclaw_gauges_locate_patches(struct fclaw_global *glob);
  */
 void fclaw_gauges_vtable_initialize(struct fclaw_global *glob);
 
+#if 0
 
 /**
  * @brief Create list of gauges within each block
@@ -233,6 +234,9 @@ void fclaw_gauges_vtable_initialize(struct fclaw_global *glob);
  * @param acc accumulator
  */
 void fclaw_gauges_setup_block_lists(struct fclaw_global* glob);
+#endif
+
+
 
 
 /**
@@ -248,7 +252,7 @@ fclaw_gauges_vtable_t* fclaw_gauges_vt(struct fclaw_global *glob);
 /* ------------------------ Virtualized gauge functions ------------------------------- */
 
 void fclaw_gauges_update_positions(struct fclaw_global *glob, 
-                                   int level, double t, double dt);
+                                   double t, double dt);
 
 #if 0
 

@@ -29,9 +29,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_domain.h>
 #include <fclaw_patch.h>
 
-#include <fclaw_gauges.h>
-
-
 static
 void cb_single_step_count(fclaw_domain_t *domain,
                           fclaw_patch_t *this_patch,
@@ -77,6 +74,7 @@ double fclaw_update_single_step(fclaw_global_t *glob,
                                   int level,
                                   double t, double dt)
 {
+
     /* Iterate over every patch at this level */
     fclaw_single_step_data_t ss_data;
     ss_data.t = t;
@@ -99,9 +97,7 @@ double fclaw_update_single_step(fclaw_global_t *glob,
     fclaw_global_iterate_level(glob, level, 
                                  cb_single_step,(void *) &ss_data);
 #endif   
-
-    /* Update position of gauges on this level */
-    fclaw_gauges_update_positions(glob, level, t, dt);
+ 
 
     return ss_data.maxcfl;
 }
