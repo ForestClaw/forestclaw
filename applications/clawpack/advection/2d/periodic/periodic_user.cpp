@@ -55,8 +55,8 @@ void periodic_gauge_move(fclaw_global_t* glob, fclaw_gauge_t *g,
 
     /* With this velocity, the gauges will leave the domain before the 
        simulation is done. */
-    xc += 2*dt*user->uvel;
-    yc += 2*dt*user->vvel;
+    xc += dt*user->uvel;
+    yc += dt*user->vvel;
 
     fclaw_gauges_set_position(glob, g, xc, yc, g->zc);
 }

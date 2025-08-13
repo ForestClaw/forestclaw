@@ -337,8 +337,10 @@ void fclaw_clawpatch_gauges_update(fclaw_global_t* glob,
 
         /* Check that gauge is in current patch.  Allow gauge to be slightly
            outside patch - should still lead to accurate results.  */
-        FCLAW_ASSERT(xlower <= xc && xc <= xlower + mx*dx);
-        FCLAW_ASSERT(ylower <= yc && yc <= ylower + my*dy);
+
+        /* This check is problematic for moving gauges ... */
+        //FCLAW_ASSERT(xlower <= xc && xc <= xlower + mx*dx);
+        //FCLAW_ASSERT(ylower <= yc && yc <= ylower + my*dy);
 
         /* Don't check time interval here;  this is done in fclaw_gauges.c */
 

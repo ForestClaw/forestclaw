@@ -384,7 +384,6 @@ int fclaw_gauges_setup_block_lists(fclaw_global_t* glob,
             {
 
                 fclaw_gauge_t *g = &gauges[i];
-                g->in_domain = 0;  /* Set to 1 if g is in the domain */
 
                 /* Map gauge to global [0,1]x[0,1] space. This works for the brick
                    but not clear what happens for the cubed sphere */
@@ -492,7 +491,7 @@ void fclaw_gauges_locate_patches(fclaw_global_t *glob)
                                gauge_info->coordinates, results);
 
     fclaw_gauge_t *gauges = gauge_acc->gauges;
-    for (int i = 0; i < num_gauges_set; ++i)
+    for (int i = 0; i < num_gauges_set; i++)
     {
         fclaw_gauge_t *g = &gauges[i];
 
@@ -513,11 +512,6 @@ void fclaw_gauges_locate_patches(fclaw_global_t *glob)
 
         if (!g->is_local && g->next_buffer_location > 0)
         {
-#if 0            
-            fclaw_block_t *block = &glob->domain->blocks[g->blockno];
-            fclaw_patch_t *patch = &block->patches[g->patchno]; 
-#endif            
-
             /* Patch moved off of processor, but the buffer is not empty. */
             gauges_print_buffer(glob,g);
             g->next_buffer_location = 0;
