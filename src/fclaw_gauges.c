@@ -482,7 +482,15 @@ void fclaw_gauges_locate_patches(fclaw_global_t *glob)
     }
 
     if (num_gauges_set == 0)
+    {
+        if (gauge_info->moving_gauges)
+        {
+            /* All gauges have moved out of the domain;   we clean up here */
+            sc_array_destroy(gauge_info->block_offsets);
+            sc_array_destroy(gauge_info->coordinates);
+        }
         return;
+    }
 
     /* This calls the main p4est search routine */
     sc_array_t *results = sc_array_new_size(sizeof(int), num_gauges_set);
