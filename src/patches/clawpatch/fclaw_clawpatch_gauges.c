@@ -338,11 +338,25 @@ void fclaw_clawpatch_gauges_update(fclaw_global_t* glob,
         /* Check that gauge is in current patch.  Allow gauge to be slightly
            outside patch - should still lead to accurate results.  */
 
-        /* This check is problematic for moving gauges ... */
-        //FCLAW_ASSERT(xlower <= xc && xc <= xlower + mx*dx);
-        //FCLAW_ASSERT(ylower <= yc && yc <= ylower + my*dy);
+        FCLAW_ASSERT(xc >= xlower && xc <= xlower + mx*dx);
+        FCLAW_ASSERT(yc >= ylower && yc <= ylower + my*dy);
 
-        /* Don't check time interval here;  this is done in fclaw_gauges.c */
+#if 0        
+        /* This check is problematic for moving gauges ... */
+
+        double eps = 1e-14;
+        if (xlower <= xc && xc <= xlower + mx*dx*(1+eps))
+        {
+            fclaw_global_essentialf("xlower <= xc && xc <= xlower + mx*dx\n");
+        }
+        FCLAW_ASSERT(xlower <= xc && xc <= xlower + mx*dx);
+
+        if (ylower <= yc && yc <= ylower + my*dy*(1+eps))
+        {
+            fclaw_global_essentialf("ylower <= yc && yc <= ylower + my*dy\n");
+        }
+        FCLAW_ASSERT(ylower <= yc && yc <= ylower + my*dy);
+#endif        
 
         /* Interpolate q and aux variables to gauge location */
         clawpatch_vt->d2->fort_gauge_update(&num, &mx,&my,&mbc,&meqn,

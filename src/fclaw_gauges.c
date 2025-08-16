@@ -51,7 +51,6 @@ typedef struct fclaw_gauge_acc
     int dim;
     int num_gauges;
     int num_gauges_set;  /* In case some gauges are not in the domain */    
-    int is_latest_domain;
     fclaw_gauge_t *gauges;
 } fclaw_gauge_acc_t;
 
@@ -301,11 +300,16 @@ int fclaw_gauges_setup_block_lists(fclaw_global_t* glob,
         /* We don't know how the blocks are arranged in the brick domain
            so we reverse engineer this information */
         int is_brick = FCLAW_MAP_IS_BRICK(&cont);
-        //int brick_dim[gauge_dim];
 
         fclaw_block_t *blocks = glob->domain->blocks;
 
         int num_gauges_set = 0;
+        for(int i = 0; i < num_gauges; i++)
+        {
+            /* Start with no gauges in the domain */
+            gauges[i].in_domain = 0;
+        }
+
         int *bo = (int*) sc_array_index_int(block_offsets,0);
         bo[0] = 0;
 
@@ -322,6 +326,8 @@ int fclaw_gauges_setup_block_lists(fclaw_global_t* glob,
         int mi = fclaw_opt->mi;
         int mj = fclaw_opt->mj;
 
+        /* Loop over each block;  within each block, loop over all gauges to 
+           get list of gauges/block.  */
         for (int nb = 0; nb < num_blocks; nb++)
         {
             double xll,yll,zll,xur,yur,zur;
@@ -380,6 +386,7 @@ int fclaw_gauges_setup_block_lists(fclaw_global_t* glob,
                 zur = 1;
             }
 
+            /* Search all gauges to see if any are in the block `nb`. */
             for(int i = 0; i < num_gauges; i++)
             {
 
@@ -393,9 +400,7 @@ int fclaw_gauges_setup_block_lists(fclaw_global_t* glob,
                 int gauge_in_block = (xll <= gx && gx < xur) && 
                                      (yll <= gy && gy < yur);
                 if (gauge_dim == 3)
-                {                    
                     gauge_in_block  &= (zll <= gz && gz < zur);
-                }
 
                 if (gauge_in_block)
                 {
@@ -411,10 +416,9 @@ int fclaw_gauges_setup_block_lists(fclaw_global_t* glob,
 
                     c[0] = mi*(gx - xll);
                     c[1] = mj*(gy - yll);
+
                     if (gauge_dim == 3)
-                    {
                         c[2] = fclaw_opt->mk*(gz - zll);
-                    }
 
                     /* Store location of this gauge in a global list */
                     g->location_in_results = ng;
@@ -426,8 +430,9 @@ int fclaw_gauges_setup_block_lists(fclaw_global_t* glob,
             /* Set number of gauges for block nb */
             bo = (int*) sc_array_index_int(block_offsets, nb+1);
 
-            bo[0] = num_gauges_set;  
-        }
+            *bo = num_gauges_set;  
+        } /* End block loop */
+
         gauge_acc->num_gauges_set = num_gauges_set;
 
         /* Each processor checks all gauges and all blocks, so no need for a 
@@ -481,51 +486,46 @@ void fclaw_gauges_locate_patches(fclaw_global_t *glob)
         num_gauges_set = gauge_acc->num_gauges_set;
     }
 
-    if (num_gauges_set == 0)
+    int num_gauges = gauge_acc->num_gauges;
+    if (num_gauges_set > 0)
     {
-        if (gauge_info->moving_gauges)
+        /* This calls the main p4est search routine */
+        sc_array_t *results = sc_array_new_size(sizeof(int), num_gauges_set);
+        fclaw_domain_search_points(glob->domain, 
+                                   gauge_info->block_offsets,
+                                   gauge_info->coordinates, results);
+
+        fclaw_gauge_t *gauges = gauge_acc->gauges;
+        for (int i = 0; i < num_gauges; i++)
         {
-            /* All gauges have moved out of the domain;   we clean up here */
-            sc_array_destroy(gauge_info->block_offsets);
-            sc_array_destroy(gauge_info->coordinates);
+            fclaw_gauge_t *g = &gauges[i];
+
+            if (!g->in_domain)
+            {
+                continue;
+            }
+
+            int index = g->location_in_results;
+            FCLAW_ASSERT(index >= 0 && index < num_gauges_set);
+
+            /* patchno == -1  : Patch is not on this processor
+               patchno >= 0   : Patch number is in local patch list.
+            */
+
+            /* Current patch no (patches can move under gauges, but blocks 
+               remain fixed. */
+            g->patchno = *((int *) sc_array_index_int(results, index));        
+            g->is_local = (g->patchno >= 0);  /* Local to this processor */
+
+            if (!g->is_local && g->next_buffer_location > 0)
+            {
+                /* Patch moved off of processor, but the buffer is not empty. */
+                gauges_print_buffer(glob,g);
+                g->next_buffer_location = 0;
+            }
         }
-        return;
+        sc_array_destroy(results);
     }
-
-    /* This calls the main p4est search routine */
-    sc_array_t *results = sc_array_new_size(sizeof(int), num_gauges_set);
-    fclaw_domain_search_points(glob->domain, 
-                               gauge_info->block_offsets,
-                               gauge_info->coordinates, results);
-
-    fclaw_gauge_t *gauges = gauge_acc->gauges;
-    for (int i = 0; i < num_gauges_set; i++)
-    {
-        fclaw_gauge_t *g = &gauges[i];
-
-        if (!g->in_domain)
-            continue;
-
-        int index = g->location_in_results;
-        FCLAW_ASSERT(index >= 0 && index < num_gauges_set);
-
-        /* patchno == -1  : Patch is not on this processor
-           patchno >= 0   : Patch number is in local patch list.
-        */
-
-        /* Current patch no (patches can move under gauges, but blocks 
-           remain fixed. */
-        g->patchno = *((int *) sc_array_index_int(results, index));        
-        g->is_local = (g->patchno >= 0);  /* Local to this processor */
-
-        if (!g->is_local && g->next_buffer_location > 0)
-        {
-            /* Patch moved off of processor, but the buffer is not empty. */
-            gauges_print_buffer(glob,g);
-            g->next_buffer_location = 0;
-        }
-    }
-    sc_array_destroy(results);
 
     if (gauge_info->moving_gauges)
     {
@@ -547,13 +547,12 @@ void  fclaw_gauges_update_positions(fclaw_global_t* glob,
     const fclaw_gauges_vtable_t* gauge_vt = fclaw_gauges_vt(glob);
     FCLAW_ASSERT(gauge_vt->move != NULL);
 
-    int num_gauges_set = gauge_acc->num_gauges_set;    
-    for(int i = 0; i < num_gauges_set; i++)
+    /* Update position of all gauges, even if they are not in the domain
+       initially.   */
+    int num_gauges = gauge_acc->num_gauges;    
+    for(int i = 0; i < num_gauges; i++)
     {
         fclaw_gauge_t* g = &gauges[i];
-
-        if (!g->in_domain)
-            continue;
 
         if (g->is_moving) 
             gauge_vt->move(glob,g, t, dt);
@@ -572,19 +571,14 @@ void gauges_compute(fclaw_global_t *glob, void* acc)
 
     int buffer_len = fclaw_opt->gauge_buffer_length;
     double tcurr = glob->curr_time;
-    //int num_gauges = gauge_acc->num_gauges;
-    int num_gauges_set = gauge_acc->num_gauges_set;
+    int num_gauges = gauge_acc->num_gauges;
 
     /* Update location;  setup gauges;  determine if they are local or remote */
 
     /* Only compute those gauges that are actually set */
-    for (int i = 0; i < num_gauges_set; i++)
+    for (int i = 0; i < num_gauges; i++)
     {
         fclaw_gauge_t *g = &gauges[i];
-
-        /* Ignore any gauge that is not in the domain. */
-        if (!g->in_domain)
-            continue;
 
         if (tcurr >= g->t1 && tcurr <= g->t2 &&
             tcurr - g->last_time >= g->min_time_increment)
@@ -595,7 +589,8 @@ void gauges_compute(fclaw_global_t *glob, void* acc)
                it was last updated (even if it was updated on another processor). */
             g->last_time = tcurr;
 
-            if (g->is_local)
+            /* Only record gauges that are in the domain */
+            if (g->is_local && g->in_domain)
             {
                 fclaw_block_t *block = &glob->domain->blocks[g->blockno];
                 fclaw_patch_t *patch = &block->patches[g->patchno]; 
