@@ -10,11 +10,15 @@ gaugedata = fclaw_analysis.GaugeData(dim,min_time_increment=0)
 #  x,y   : Location of the gauge
 #  t0,t1 : (t0,t1) interval over which to monitor the gauge.
 
-gaugedata.gauges.append([  0,  0,    0,    0, 1.e10])
-gaugedata.gauges.append([  1, -0.5, -0.5,  0, 1.e10])
-gaugedata.gauges.append([  2,  0.5,  0.5,  0, 1.e10])
+# This gauge travels in a circle and never leaves the domain
+gaugedata.gauges.append([  0, 0.5, 0,  0, 1.e10])
 
-# A gauge that is not in the domain (for testing purposes)
-gaugedata.gauges.append([  4, 0, -2,  0, 1.e10])
+# This gauge travels in a straight line and may leave the domain eventually
+# depending on the speed of the gauge
+gaugedata.gauges.append([  1,  0,    0,    0, 1.e10])
+
+# This gauge does not start in the domain, but may enter the domain 
+# during the simulation. 
+gaugedata.gauges.append([  2, -1.5, -1.5,  0, 1.e10])
 
 gaugedata.write(data_source='write_gauges.py')

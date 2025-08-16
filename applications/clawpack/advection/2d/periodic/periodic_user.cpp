@@ -51,25 +51,30 @@ void periodic_problem_setup(fclaw_global_t* glob)
 void periodic_gauge_move(fclaw_global_t* glob, fclaw_gauge_t *g,
                          double t, double dt)
 {
-#if 1    
-    /* Gauge travels in straight line */
-    int num, dim;
-    double xc,yc,zc,t1,t2;            
-    fclaw_gauges_get_data(glob,g,&num,&dim,&xc,&yc,&zc,&t1,&t2);
+    /* These will reposition all gauges, even if they are currently not 
+       in the domain */
 
-    const user_options_t* user = periodic_get_options(glob);
-
-    /* With this velocity, the gauges may leave the domain before the 
-       simulation is done. */
-    xc += dt*user->uvel;
-    yc += dt*user->vvel;
-#else
-
-    /* Prescribed velocity : gauge travels in a circle */
     double xc,yc;
-    xc = 0.5*cos(M_PI*t);
-    yc = 0.5*sin(M_PI*t);
-#endif    
+    if (g->num == 0)
+    {
+        /* Prescribed velocity : gauge travels in a circle */
+        xc = 0.5*cos(M_PI*t);
+        yc = 0.5*sin(M_PI*t);        
+    }
+    else
+    {
+        /* Gauge travels in straight line.  May start outside of the domain. */
+        int num, dim;
+        double zc,t1,t2;            
+        fclaw_gauges_get_data(glob,g,&num,&dim,&xc,&yc,&zc,&t1,&t2);
+
+        const user_options_t* user = periodic_get_options(glob);
+
+        /* With this velocity, the gauges may leave the domain before the 
+           simulation is done. */
+        xc += dt*user->uvel;
+        yc += dt*user->vvel;
+    }
 
     fclaw_gauges_set_position(glob, g, xc, yc, g->zc);
 }
