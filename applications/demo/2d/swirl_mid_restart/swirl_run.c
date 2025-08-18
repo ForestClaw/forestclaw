@@ -155,6 +155,10 @@ void outstyle_1(fclaw_global_t *glob)
     if(iframe == 0 && first_call)
     {
         fclaw_output_frame(glob,iframe);
+        /* save context values */
+        fclaw_context_save(ctx);
+        /* output checkpoint */
+        fclaw_output_checkpoint(glob, iframe);
     }
 
     const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
