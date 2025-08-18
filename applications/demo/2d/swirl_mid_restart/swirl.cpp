@@ -88,7 +88,12 @@ void run_program(fclaw_global_t* glob)
         char partition_file[BUFSIZ];
         snprintf(restart_file, BUFSIZ, "fort_frame_%04d.checkpoint", restart_iframe);
         snprintf(partition_file, BUFSIZ, "fort_frame_%04d.partition", restart_iframe);
-        fclaw_restart_from_file(glob, restart_file, partition_file);
+
+        fclaw_global_essentialf("-----------------------------------------\n");
+        fclaw_global_essentialf("Restarting from checkpoint file %s\n", restart_file);
+        fclaw_global_essentialf("-----------------------------------------\n");
+
+        fclaw_reinitialize_from_file(glob, restart_file, partition_file);
         swirl_run(glob);
     }
     fclaw_finalize(glob);
