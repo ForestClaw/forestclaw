@@ -6,6 +6,7 @@ applications_demo_2d_swirl_mid_restart_swirl_SOURCES = \
 	applications/demo/2d/swirl_mid_restart/swirl_user.cpp \
 	applications/demo/2d/swirl_mid_restart/swirl_user.h \
 	applications/demo/2d/swirl_mid_restart/swirl_options.c \
+	applications/demo/2d/swirl_mid_restart/swirl_run.c \
 	applications/demo/2d/swirl_mid_restart/swirl.cpp \
 	applications/demo/2d/swirl_mid_restart/psi.f \
 	applications/demo/2d/swirl_mid_restart/setprob.f \

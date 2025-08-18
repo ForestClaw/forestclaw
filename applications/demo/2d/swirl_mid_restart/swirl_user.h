@@ -104,6 +104,7 @@ void swirl_initialize_rays(fclaw_global_t* glob);
 sc_array_t * swirl_integrals_new(void);
 sc_array_t * swirl_rays_new (void);
 
+void swirl_run(fclaw_global_t *glob);
 
 
 #ifdef __cplusplus

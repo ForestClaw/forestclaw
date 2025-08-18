@@ -24,7 +24,7 @@
 */
 
 #include "swirl_user.h"
-#include <fclaw2d_file.h>
+#include <fclaw_restart.h>
 
 #include "../all/advection_user.h"
 #include <p4est_wrap.h>         /* just for testing */
@@ -76,7 +76,21 @@ void run_program(fclaw_global_t* glob)
        Run
        --------------------------------------------------------------- */
     fclaw_initialize(glob);
-    fclaw_run(glob);
+
+    const fclaw_options_t* fclaw_opt = fclaw_get_options(glob);
+    while(glob->curr_time < fclaw_opt->tfinal)
+    {
+        swirl_run(glob);
+    }
+    for(int restart_iframe = fclaw_opt->nout-1; restart_iframe >= 0; restart_iframe--)
+    {
+        char restart_file[BUFSIZ];
+        char partition_file[BUFSIZ];
+        snprintf(restart_file, BUFSIZ, "fort_frame_%04d.checkpoint", restart_iframe);
+        snprintf(partition_file, BUFSIZ, "fort_frame_%04d.partition", restart_iframe);
+        fclaw_restart_from_file(glob, restart_file, partition_file);
+        swirl_run(glob);
+    }
     fclaw_finalize(glob);
 }
 
@@ -109,9 +123,7 @@ main (int argc, char **argv)
     if (!vexit)
     {
         /* Create global structure which stores the domain, timers, etc */
-        int size, rank;
-        sc_MPI_Comm mpicomm = fclaw_app_get_mpi_size_rank (app, &size, &rank);
-        fclaw_global_t *glob = fclaw_global_new_comm (mpicomm, size, rank);
+        fclaw_global_t *glob = fclaw_global_new(app);
 
         /* Store option packages in glob */
         fclaw_options_store           (glob, fclaw_opt);
@@ -126,7 +138,6 @@ main (int argc, char **argv)
         run_program(glob);
 
         fclaw_global_destroy(glob);
-        //fclaw2d_global_destroy(glob2);
     }
 
     fclaw_app_destroy (app);
