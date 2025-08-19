@@ -52,10 +52,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * - The context object shoulde be retrieved at the beginning of a function with fclaw_context_get.
  * - The values should be retrieved with fclaw_context_get_int or fclaw_context_get_double.
  *    - These should be called in the same manner every time the resumable function is called.
- *    - If these arent called in the same manner, the program will abort.
  * - The values should be saved with fclaw_context_save right before exit points in the function.
  *    - the save call will save all the variables pointed to in the get_double/int calls.
- *
  * 
  */
 
@@ -93,9 +91,7 @@ fclaw_context_t* fclaw_context_get(fclaw_global_t *glob, const char *name);
  * @brief Get an integer value from the context object.
  *
  * This function retrieves an integer value from the context object. If the value does not exist in the context,
- * the current value remains unchanged. The only case where this function modifies the value is if the context object
- * already existed in the global context and this is the first call after fclaw_context_get().
- * If the context is not new and the value does not exist, an error message is printed and the program aborts.
+ * the current value remains unchanged.
  * 
  * @param context the context object
  * @param name the name of the value
@@ -109,9 +105,7 @@ void fclaw_context_get_int(fclaw_context_t *context,
  * @brief Get a double value from the context object. 
  *
  * This function retrieves an integer value from the context object. If the value does not exist in the context,
- * the current value remains unchanged. The only case where this function modifies the value is if the context object
- * already existed in the global context and this is the first call after fclaw_context_get().
- * If the context is not new and the value does not exist, an error message is printed and the program aborts.
+ * the current value remains unchanged.
  *
  * @param context the context object
  * @param name the name of the value
@@ -126,9 +120,8 @@ void fclaw_context_get_double(fclaw_context_t *context,
  * 
  * This will get the values from the pointers provided in the get functions. 
  *
- * If the context is not new, and all values have not been retrieved (ie fclaw_context_get_int or fclaw_context_get_double),
- * this function will abort with an error message.
- * 
+ * For values that were not retrieved between save calls, the old existing value will be kept.
+ *
  * @param context the context object to save to
  */
 void fclaw_context_save(fclaw_context_t *context);

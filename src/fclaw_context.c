@@ -174,7 +174,8 @@ void save_value(const char *key, void *data, void *user)
     value_t *value = (value_t *) data;
     if(value->pointer == NULL)
     {
-        fclaw_abortf("fclaw_context_save: Value %s has no pointer\n", key);
+        /* Pointer is not set, nothing to save, old existing value will be kept */
+        return;
     }
     if(value->type == FCLAW_CONTEXT_INT)
     {
