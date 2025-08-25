@@ -1143,15 +1143,15 @@ fclaw_hdf_write_file (fclaw_global_t * glob,
 
     //get mx, my, mz, meqn from clawpatch options
     int patch_dim = clawpatch_opt->patch_dim;
-    int mx   = clawpatch_opt->mx;
-    int my   = clawpatch_opt->my;
-    int mz   = clawpatch_opt->mz;
+    int64_t mx   = clawpatch_opt->mx;
+    int64_t my   = clawpatch_opt->my;
+    int64_t mz   = clawpatch_opt->mz;
 
-    int global_num_patches = glob->domain->global_num_patches;
+    int64_t global_num_patches = glob->domain->global_num_patches;
 
-    int num_cells_per_patch;
-    int num_points_per_patch;
-    int num_points_per_cell;
+    int64_t num_cells_per_patch;
+    int64_t num_points_per_patch;
+    int64_t num_points_per_cell;
     if(clawpatch_opt->patch_dim == 2)
     {
         num_cells_per_patch = mx * my;
