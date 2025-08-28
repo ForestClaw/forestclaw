@@ -59,7 +59,6 @@ value_destroy(void *data)
 
 struct fclaw_context
 {
-    int initializing;
     int saved;
     fclaw_pointer_map_t *values;
 };
@@ -69,7 +68,6 @@ context_new()
 {
     fclaw_context_t *context = FCLAW_ALLOC(fclaw_context_t, 1);
     context->saved = 0;
-    context->initializing = 1;
     context->values = fclaw_pointer_map_new();
     return context;
 }
@@ -102,7 +100,6 @@ fclaw_context_t* fclaw_context_get(fclaw_global_t *glob, const char *name)
     }
     else
     {
-        context->initializing = 0;
         if(!context->saved)
         {
             fclaw_abortf("fclaw_context_get: Context needs to be saved before it can be retrieved again\n");
@@ -132,16 +129,12 @@ void fclaw_context_get_int(fclaw_context_t *context,
             v->initializing = 0;
         }
     }
-    else if (context->initializing)
+    else
     {
         v = FCLAW_ALLOC(value_t, 1);
         v->type = FCLAW_CONTEXT_INT;
         v->initializing = 0;
         fclaw_pointer_map_insert(context->values, name, v, value_destroy);
-    }
-    else
-    {
-        fclaw_abortf("fclaw_context_get_int: Value %s not found\n", name);
     }
     
     v->pointer = value;
@@ -164,16 +157,12 @@ void fclaw_context_get_double(fclaw_context_t *context,
             v->initializing = 0;
         }
     }
-    else if(context->initializing)
+    else
     {
         v = FCLAW_ALLOC(value_t, 1);
         v->type = FCLAW_CONTEXT_DOUBLE;
         v->initializing = 0;
         fclaw_pointer_map_insert(context->values, name, v, value_destroy);
-    }
-    else
-    {
-        fclaw_abortf("fclaw_context_get_double: Value %s not found\n", name);
     }
 
     v->pointer = value;
@@ -185,7 +174,8 @@ void save_value(const char *key, void *data, void *user)
     value_t *value = (value_t *) data;
     if(value->pointer == NULL)
     {
-        fclaw_abortf("fclaw_context_save: Value %s has no pointer\n", key);
+        /* Pointer is not set, nothing to save, old existing value will be kept */
+        return;
     }
     if(value->type == FCLAW_CONTEXT_INT)
     {
@@ -280,7 +270,6 @@ size_t context_unpack(fclaw_global_t *glob, char *buffer, void *data)
 {
     char* buffer_start = buffer;
     fclaw_context_t *context = (fclaw_context_t *)data;
-    context->initializing = 0;
     context->saved = 1;
     int size;
     buffer += fclaw_unpack_int(buffer, &size);

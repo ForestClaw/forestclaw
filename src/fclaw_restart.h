@@ -54,6 +54,11 @@ fclaw_restart_from_file (struct fclaw_global * glob,
                          const char* restart_filename,
                          const char* partition_filename);
 
+void
+fclaw_reinitialize_from_file (struct fclaw_global * glob,
+                              const char* restart_filename,
+                              const char* partition_filename);
+
 /**
  * @brief Tests the restart functionality by reading data from a restart file.
  *
