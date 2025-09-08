@@ -22,4 +22,8 @@ gaugedata.gauges.append([  1,  0,    0,    0, 1.e10])
 # during the simulation. 
 gaugedata.gauges.append([  2, -1.5, -1.5,  0, 1.e10])
 
+# This is a static gauge - the "move" function doesn't move the gauge.  
+gaugedata.gauges.append([20, -0.5, -0.5,  0, 1.e10])
+
+
 gaugedata.write(data_source='write_gauges.py')

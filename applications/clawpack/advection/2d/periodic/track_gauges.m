@@ -128,8 +128,8 @@ function [xvec,yvec,zvec,xcurr,ycurr,zcurr] = ...
 gname = sprintf('%s/gauge%05d.txt',outdir,g.id);
 if (exist(gname,'file'))
 
-    % Skip '3' header lines
-    tseries = importdata(gname,' ',3);
+    % Skip '2' header lines
+    tseries = importdata(gname,' ',2);
 
     % Index locations of (x,y,z) and tseries
     x_idx = 2;
@@ -201,7 +201,7 @@ end
 
 
 
-function gauges = read_gauge_data()
+function gauges = read_gauge_data_XXX()
 
 if (~exist('gauges.data','file'))
     fprintf('File gauges.data does not exist.  No gauges will be plotted.\n');
