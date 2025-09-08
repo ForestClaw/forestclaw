@@ -284,11 +284,17 @@ void outstyle_1(fclaw_global_t *glob)
 
             if (fclaw_opt->advance_one_step)
             {
-                /* Update all gauge positions (local and remote) */
-                fclaw_gauges_update_positions(glob, t_curr, dt_step);    
+                if (fclaw_opt->moving_gauges)
+                {                    
+                    /* Update all gauge positions (local and remote) */
+                    fclaw_gauges_update_positions(glob, t_curr, dt_step);    
 
-                /* Re-create block lists and patch numbers */
-                fclaw_gauges_locate_patches(glob);
+                    /* Re-create block lists and patch numbers.  This is also 
+                       called after each regrid, but must be called a second 
+                       time here if gauges move.  */
+                    fclaw_gauges_locate_patches(glob);
+                }
+
 
                 /* Interpolate the current solution to gauges */
                 fclaw_diagnostics_gather(glob, init_flag);                

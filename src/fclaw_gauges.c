@@ -74,7 +74,7 @@ typedef struct fclaw_gauge_info
             -- Reads data from a "gauge.data" file. 
 
         -- void gauges_create_files(...)
-            -- Creates gauge output files
+            -- Creates gauge output files gaugeXXXXX.txt
 
         -- void gauges_normalize_coordinates(...)
             -- this is used to locate the gauge within a block.  This may 
@@ -243,12 +243,14 @@ void gauges_initialize(fclaw_global_t* glob, void** acc)
         int buffer_len = fclaw_opt->gauge_buffer_length;
         for(int i = 0; i < num_gauges; i++)
         {
+            gauges[i].xc = gauges[i].x0;   /* Set current position */
+            gauges[i].yc = gauges[i].y0;
+            gauges[i].zc = gauges[i].z0;
             gauges[i].last_time = gauges[i].t1;
             gauges[i].patchno = -1;
             gauges[i].blockno = -1;
             gauges[i].location_in_results = -1;
             gauges[i].in_domain = 0;
-            gauges[i].is_moving = gauge_info->moving_gauges; /* Assume static gauge */
             gauges[i].buffer = FCLAW_ALLOC(void*,buffer_len);  /* Array of generic ptrs */
             gauges[i].next_buffer_location = 0;
         }       
@@ -535,7 +537,8 @@ void fclaw_gauges_locate_patches(fclaw_global_t *glob)
     }
 }
 
-/* This will be called after an update on a level */
+/* This will be called from fclaw_run, at the end of each global 
+   time step. */
 void  fclaw_gauges_update_positions(fclaw_global_t* glob,
                                     double t, double dt)
 {
@@ -553,9 +556,7 @@ void  fclaw_gauges_update_positions(fclaw_global_t* glob,
     for(int i = 0; i < num_gauges; i++)
     {
         fclaw_gauge_t* g = &gauges[i];
-
-        if (g->is_moving) 
-            gauge_vt->move(glob,g, t, dt);
+        gauge_vt->move(glob,g, t, dt);
     }
 }
 
@@ -610,7 +611,7 @@ void gauges_compute(fclaw_global_t *glob, void* acc)
             {
                 /* If this gauge is not local, then it should not have anything in the 
                    buffer */
-                FCLAW_ASSERT(g->next_buffer_location == 0);
+                //FCLAW_ASSERT(g->next_buffer_location == 0);
             }
         }
     }
@@ -732,12 +733,16 @@ void fclaw_gauges_allocate(fclaw_global_t *glob, int num_gauges,
 void fclaw_gauges_set_data(fclaw_global_t *glob, 
                              fclaw_gauge_t *g,
                              int num, int dim,
+                             double x0, double y0, double z0,
                              double xc, double yc, double zc,
                              double  t1, double t2, 
                              double min_time_increment)
 {
     g->num = num;
     g->dim = dim;
+    g->x0 = x0;
+    g->y0 = y0;
+    g->z0 = z0;
     g->xc = xc;
     g->yc = yc;
     g->zc = zc;
@@ -749,11 +754,15 @@ void fclaw_gauges_set_data(fclaw_global_t *glob,
 void fclaw_gauges_get_data(fclaw_global_t *glob, 
                           fclaw_gauge_t *g,
                           int *num, int *dim,
+                          double *x0, double *y0, double *z0,
                           double *xc, double *yc, double *zc,
                           double  *t1, double *t2)
 {
     *num = g->num;
     *dim = g->dim;
+    *x0 = g->x0;
+    *y0 = g->y0;
+    *z0 = g->z0;
     *xc = g->xc;
     *yc = g->yc;
     *zc = g->zc;

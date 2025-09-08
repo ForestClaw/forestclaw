@@ -59,10 +59,12 @@ extern "C"
 
         -- void gauges_update(...)
             -- Update the gauge value.  This requires interpolation from the 
-               mesh to the gauge point.
+               mesh to the gauge point.        
 
         -- void gauges_print_buffer(...)
             -- Print out the gauge buffer to a gauge file.
+
+    One additional function is the user defined "move" function.  
 */
 
 
@@ -155,9 +157,9 @@ void fclaw_clawpatch_gauges_read_data(fclaw_global_t *glob,
         fclaw_gauge_t *g = *gauges;
 
         int *num = FCLAW_ALLOC(int,   *num_gauges);
-        double *xc  = FCLAW_ALLOC(double,*num_gauges);
-        double *yc  = FCLAW_ALLOC(double,*num_gauges);
-        double *zc  = FCLAW_ALLOC(double,*num_gauges);
+        double *x0  = FCLAW_ALLOC(double,*num_gauges);
+        double *y0  = FCLAW_ALLOC(double,*num_gauges);
+        double *z0  = FCLAW_ALLOC(double,*num_gauges);
         double *t1  = FCLAW_ALLOC(double,*num_gauges);
         double *t2  = FCLAW_ALLOC(double,*num_gauges);
         double *min_time_increment = FCLAW_ALLOC(double,*num_gauges);
@@ -168,9 +170,9 @@ void fclaw_clawpatch_gauges_read_data(fclaw_global_t *glob,
         {                        
             fgets(line,max_line_len, f_gauges_data);
             num[i] = strtod(line,&next);
-            xc[i] = strtod(next,&next);
-            yc[i] = strtod(next,&next);
-            zc[i] = (gauge_dim == 2) ? 0 : strtod(next,&next);
+            x0[i] = strtod(next,&next);
+            y0[i] = strtod(next,&next);
+            z0[i] = (gauge_dim == 2) ? 0 : strtod(next,&next);
             t1[i] = strtod(next,&next);
             t2[i] = strtod(next,NULL);
         }
@@ -190,15 +192,17 @@ void fclaw_clawpatch_gauges_read_data(fclaw_global_t *glob,
         /* Final step : Set gauge data */
         for(int i = 0; i < *num_gauges; i++)
         {
+            /* Both (x0,y0,z0) and (xc,yc,zc) set to same values here */
             fclaw_gauges_set_data(glob,&g[i],num[i],gauge_dim,
-                                 xc[i],yc[i],zc[i],t1[i],t2[i],
+                                 x0[i],y0[i],z0[i],x0[i],y0[i],z0[i],
+                                 t1[i],t2[i],
                                  min_time_increment[i]);
         }
 
         FCLAW_FREE(num);
-        FCLAW_FREE(xc);
-        FCLAW_FREE(yc);
-        FCLAW_FREE(zc);
+        FCLAW_FREE(x0);
+        FCLAW_FREE(y0);
+        FCLAW_FREE(z0);
         FCLAW_FREE(t1);
         FCLAW_FREE(t2);
         FCLAW_FREE(min_time_increment);
@@ -228,18 +232,19 @@ void fclaw_clawpatch_gauges_create_files(fclaw_global_t *glob,
     {
         int num, dim;
         double xc,yc,zc, t1,t2;
-        fclaw_gauges_get_data(glob,&gauges[i],&num, &dim, 
+        double x0, y0, z0;
+        fclaw_gauges_get_data(glob,&gauges[i],&num, &dim, &x0, &y0, &z0,
                              &xc, &yc, &zc, &t1, &t2);
 
         sprintf(filename,"gauge%05d.txt",num);
         FILE *fp = fopen(filename, "w");
         if (dim == 2)
             fprintf(fp, "# gauge_id= %5d location=( %17.10e %17.10e )\n",
-                    num, xc, yc);
+                    num, x0, y0);
         else if (dim == 3)
             fprintf(fp, "# gauge_id= %5d location=( %17.10e %17.10e %17.10e)\n",
-                    num, xc, yc,zc);
-        fprintf(fp, "# Columns: level time q0   q1   q2 .... aux0  aux1  aux 2...\n");
+                    num, x0, y0,z0);
+        fprintf(fp, "# Columns: level x, y, z, time q0   q1   q2 .... aux0  aux1  aux 2...\n");
         fclose(fp);
     }
 }
@@ -314,7 +319,9 @@ void fclaw_clawpatch_gauges_update(fclaw_global_t* glob,
     /* Get basic gauge info : (id, xc, yc, t1, t2) */
     int num, dim;
     double xc,yc, zc, t1, t2;
-    fclaw_gauges_get_data(glob,g,&num, &dim, &xc, &yc, &zc, &t1, &t2);
+    double x0, y0, z0;
+    fclaw_gauges_get_data(glob,g,&num, &dim, &x0, &y0, &z0, 
+                          &xc, &yc, &zc, &t1, &t2);
 
     /* Retrieve patch data */
     int meqn;

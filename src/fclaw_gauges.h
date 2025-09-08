@@ -61,19 +61,23 @@ typedef struct fclaw_gauge
     /** @brief Gauge is in the domain  */
     int in_domain;
 
-    /** @brief Set True for static gauges  */
-    int is_moving;
-
     /* Some data needed to get around fact that in parallel, we don't communicate
        gauge information */
     /** @brief true if this gauge is on the local processor */
     int is_local;
 
-    /** @{ @brief Relative to [ax,ay]x[bx,by] set in fclaw2d_options */
+    /** @{ @brief Initial location in [ax,ay]x[bx,by] set in fclaw2d_options */
+    double x0;   
+    double y0;    
+    double z0;
+    /** @} */
+
+    /** @{ @brief Current location  [ax,ay]x[bx,by] set in fclaw2d_options */
     double xc;   
     double yc;    
     double zc;
     /** @} */
+
 
     /** @brief Tstart */
     double t1;
@@ -350,6 +354,7 @@ void fclaw_gauges_allocate(struct fclaw_global *glob, int num_gauges,
 void fclaw_gauges_set_data(struct fclaw_global *glob, 
                           struct fclaw_gauge *g,  
                           int num, int dim,
+                          double x0, double y0, double z0,
                           double xc, double yc, double zc,
                           double  t1, double t2,
                           double min_time_increment);
@@ -368,6 +373,7 @@ void fclaw_gauges_set_data(struct fclaw_global *glob,
 void fclaw_gauges_get_data(struct fclaw_global *glob, 
                              struct fclaw_gauge *g,                             
                              int *num, int *dim,
+                             double *x0, double *y0, double *z0,
                              double *xc, double *yc, double *zc,
                              double  *t1, double *t2);
 
