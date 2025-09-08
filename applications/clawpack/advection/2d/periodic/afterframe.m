@@ -9,7 +9,9 @@ setpatchborderprops('linewidth',1);
 clim([0,1])
 view(2);
 
-add_gauges();
+% add_gauges();
+
+[tcurr_hdl,track_hdl] = track_gauges(t,[0,1,2]);
 
 % rh = add_regions(t);
 % set(rh,'color','r')

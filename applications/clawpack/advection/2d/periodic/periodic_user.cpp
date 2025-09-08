@@ -52,7 +52,16 @@ void periodic_gauge_move(fclaw_global_t* glob, fclaw_gauge_t *g,
                          double t, double dt)
 {
     /* These will reposition all gauges, even if they are currently not 
-       in the domain */
+       in the domain.  
+
+       Avaialable fields : 
+
+        g->num               : Gauge ID
+        g->x0, g->y0, g->z0  : Initial position of the gauge 
+        g->xc, g->yc, g->zc  : Current position of the gauge
+
+
+    */
 
     double xc,yc;
     if (g->num == 0)
@@ -65,8 +74,10 @@ void periodic_gauge_move(fclaw_global_t* glob, fclaw_gauge_t *g,
     {
         /* Gauge travels in straight line.  May start outside of the domain. */
         int num, dim;
-        double zc,t1,t2;            
-        fclaw_gauges_get_data(glob,g,&num,&dim,&xc,&yc,&zc,&t1,&t2);
+        double zc,t1,t2; 
+        double x0, y0,z0;
+        fclaw_gauges_get_data(glob,g,&num,&dim,&x0, &y0, &z0, 
+                              &xc,&yc,&zc,&t1,&t2);
 
         const user_options_t* user = periodic_get_options(glob);
 

@@ -11,7 +11,8 @@ gaugedata = fclaw_analysis.GaugeData(dim,min_time_increment=0)
 #  t0,t1 : (t0,t1) interval over which to monitor the gauge.
 
 # This gauge travels in a circle and never leaves the domain
-gaugedata.gauges.append([  0, 0.5, 0,  0, 1.e10])
+R = 0.5    # R < 1 : circle doesn't leave the domain. 
+gaugedata.gauges.append([  0, R, 0,  0, 1.e10])
 
 # This gauge travels in a straight line and may leave the domain eventually
 # depending on the speed of the gauge
