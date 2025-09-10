@@ -342,28 +342,31 @@ void fclaw_clawpatch_gauges_update(fclaw_global_t* glob,
         fclaw_clawpatch_2d_grid_data(glob,patch,&mx,&my,&mbc,
                                      &xlower,&ylower,&dx,&dy);
 
-        /* Check that gauge is in current patch.  Allow gauge to be slightly
-           outside patch - should still lead to accurate results.  */
+        /* Check that gauge is in current patch.  */
+        if (!(xc >= xlower && xc <= xlower + mx*dx))
+        {
+            printf("xc : update\n");
+            printf("num = %d\n",num);
+            printf("xc = %20.16f; yc = %20.16f\n",xc,yc);
+            printf("xlower = %20.16f;  ylower = %20.16f\n",xlower,ylower);
+            printf("xupper = %20.16f;  yupper = %20.16f\n",xlower+mx*dx,ylower+my*dy);
+            printf("\n\n");
+        }
 
+        if (!(yc >= ylower && yc <= ylower + my*dy))
+        {
+            printf("yc : update\n");
+            printf("num = %d\n",num);
+            printf("xc = %20.16f; yc = %20.16f\n",xc,yc);
+            printf("xlower = %20.16f;  ylower = %20.16f\n",xlower,ylower);
+            printf("xupper = %20.16f;  yupper = %20.16f\n",xlower+mx*dx,ylower+my*dy);
+            printf("\n\n");
+        }
+
+#if 1
         FCLAW_ASSERT(xc >= xlower && xc <= xlower + mx*dx);
         FCLAW_ASSERT(yc >= ylower && yc <= ylower + my*dy);
-
-#if 0        
-        /* This check is problematic for moving gauges ... */
-
-        double eps = 1e-14;
-        if (xlower <= xc && xc <= xlower + mx*dx*(1+eps))
-        {
-            fclaw_global_essentialf("xlower <= xc && xc <= xlower + mx*dx\n");
-        }
-        FCLAW_ASSERT(xlower <= xc && xc <= xlower + mx*dx);
-
-        if (ylower <= yc && yc <= ylower + my*dy*(1+eps))
-        {
-            fclaw_global_essentialf("ylower <= yc && yc <= ylower + my*dy\n");
-        }
-        FCLAW_ASSERT(ylower <= yc && yc <= ylower + my*dy);
-#endif        
+#endif
 
         /* Interpolate q and aux variables to gauge location */
         clawpatch_vt->d2->fort_gauge_update(&num, &mx,&my,&mbc,&meqn,
@@ -427,6 +430,102 @@ void fclaw_clawpatch_gauges_update(fclaw_global_t* glob,
     fclaw_gauges_set_buffer_entry(glob,g,guser);
 }
 
+/* Interpolate patch data to gauge */
+void fclaw_clawpatch_gauges_move_local(fclaw_global_t* glob, 
+                                       fclaw_block_t* block,
+                                       fclaw_patch_t* patch, 
+                                       int blockno, int patchno,
+                                       double t, double dt, 
+                                       fclaw_gauge_t *g)
+{
+    /* Get basic gauge info : (id, xc, yc, t1, t2) */
+    int num, dim;
+    double xc,yc, zc, t1, t2;
+    double x0, y0, z0;
+    fclaw_gauges_get_data(glob,g,&num, &dim, &x0, &y0, &z0, 
+                          &xc, &yc, &zc, &t1, &t2);
+
+    /* Retrieve patch data */
+    int meqn;
+    double *q;
+    fclaw_clawpatch_soln_data(glob,patch,&q,&meqn);
+
+    int maux;
+    double *aux;
+    fclaw_clawpatch_aux_data(glob,patch,&aux,&maux);
+
+    fclaw_clawpatch_vtable_t* clawpatch_vt = fclaw_clawpatch_vt(glob);
+    double xc_new, yc_new, zc_new;
+    if (dim == 2)
+    {
+        int mx, my, mbc;
+        double xlower,ylower,dx,dy;
+        fclaw_clawpatch_2d_grid_data(glob,patch,&mx,&my,&mbc,
+                                     &xlower,&ylower,&dx,&dy);
+
+        if (!(xc >= xlower && xc <= xlower + mx*dx))
+        {
+            printf("xc : move local\n");
+            printf("num = %d\n",num);
+
+            printf("xc = %20.16f; yc = %20.16f\n",xc,yc);
+            printf("xlower = %20.16f;  ylower = %20.16f\n",xlower,ylower);
+            printf("xupper = %20.16f;  yupper = %20.16f\n",xlower+mx*dx,ylower+my*dy);
+            printf("\n\n");
+        }
+
+        if (!(yc >= ylower && yc <= ylower + my*dy))
+        {
+            printf("yc : move local\n");
+            printf("num = %d\n",num);
+            printf("xc = %20.16f; yc = %20.16f\n",xc,yc);
+            printf("xlower = %20.16f;  ylower = %20.16f\n",xlower,ylower);
+            printf("xupper = %20.16f;  yupper = %20.16f\n",xlower+mx*dx,ylower+my*dy);
+            printf("\n\n");
+        }
+#if 1
+        /* Check that gauge is in current patch.  */
+        FCLAW_ASSERT(xc >= xlower && xc <= xlower + mx*dx);
+        FCLAW_ASSERT(yc >= ylower && yc <= ylower + my*dy);
+#endif        
+
+
+
+
+        /* Interpolate q and aux variables to gauge location */
+        clawpatch_vt->d2->fort_gauge_move_local(&num, &mx,&my,&mbc,&meqn,
+                                                &xlower,&ylower,
+                                                &dx,&dy,q,&maux,aux,&xc,&yc,
+                                                &t, &dt,
+                                                &xc_new, &yc_new);
+
+        /* Assume that in 2d, the z position does not move */
+        zc_new = zc;
+    }
+    else if (dim == 3)
+    {
+        int mx, my, mz,mbc;
+        double xlower,ylower,zlower,dx,dy,dz;
+        fclaw_clawpatch_3d_grid_data(glob,patch,&mx,&my,&mz,&mbc,
+                                     &xlower,&ylower,&zlower,
+                                     &dx,&dy,&dz);
+
+        /* Check that gauge is in current patch */
+        FCLAW_ASSERT(xc >= xlower && xc <= xlower + mx*dx);
+        FCLAW_ASSERT(yc >= ylower && yc <= ylower + my*dy);
+        FCLAW_ASSERT(zc >= zlower && zc <= zlower + mz*dz);
+
+        /* Interpolate q and aux variables to gauge location */
+        clawpatch_vt->d3->fort_gauge_move_local(&num, &mx,&my,&mz,&mbc,&meqn,
+                                                &xlower,&ylower,&zlower,
+                                                &dx,&dy,&dz,
+                                                q,&maux,aux,&xc,&yc,&zc,
+                                                &t, &dt,
+                                                &xc_new,&yc_new,&zc_new);
+    }
+    fclaw_gauges_set_position(glob, g, xc_new, yc_new, zc_new);
+}
+
 
 void fclaw_clawpatch_gauges_print(fclaw_global_t *glob, 
                                   fclaw_gauge_t *gauge) 
@@ -466,11 +565,6 @@ void fclaw_clawpatch_gauges_print(fclaw_global_t *glob,
         }
         fprintf(fp,"\n");
 
-#if 0
-        FCLAW_FREE(guser->qvar);
-        FCLAW_FREE(guser->avar);
-        FCLAW_FREE(guser);
-#endif
         fclaw_clawpatch_gauges_deallocate(glob,&guser);
     }
     fclose(fp);

@@ -718,6 +718,30 @@ typedef void (*fclaw3d_clawpatch_fort_gauges_update_t)(const int *num,
                                                 double qvar[], 
                                                 double avar[]);
 
+
+typedef void (*fclaw3d_clawpatch_fort_gauges_move_local_t)(const int *num, 
+                                                           const int *mx, 
+                                                           const int *my, 
+                                                           const int *mz, 
+                                                           const int *mbc, 
+                                                           const int *meqn, 
+                                                           const double *xlower,
+                                                           const double *ylower,
+                                                           const double *zlower,
+                                                           const double *dx, 
+                                                           const double *dy,
+                                                           const double *dz,
+                                                           double q[],
+                                                           const int *maux, 
+                                                           double aux[],
+                                                           const double *t,
+                                                           const double *dt,
+                                                           const double *xc, 
+                                                           const double *yc,
+                                                           const double *zc, 
+                                                           const double *xc_new, 
+                                                           const double *yc_new,
+                                                           const double *zc_new); 
 /** @} */
 
 /** 

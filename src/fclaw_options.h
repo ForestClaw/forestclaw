@@ -165,6 +165,7 @@ struct fclaw_options
     int output_gauges;
     int gauge_buffer_length; 
     int moving_gauges; 
+    int moving_gauges_local;
 
     /* Regions */
     int use_regions;     

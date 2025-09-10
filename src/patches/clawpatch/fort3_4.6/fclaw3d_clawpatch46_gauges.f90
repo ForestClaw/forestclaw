@@ -58,3 +58,25 @@ SUBROUTINE fclaw3d_clawpatch46_fort_gauges_update(num,mx,my,mz,mbc,meqn,&
     end do
 
 END SUBROUTINE fclaw3d_clawpatch46_fort_gauges_update
+
+
+!! This is a dummy routine that should be updated by the user.  
+SUBROUTINE fclaw3d_clawpatch46_fort_gauges_move_local(num,mx,my,mz,mbc,meqn,&
+    xlower,ylower, zlower, dx,dy,dz,q,maux,aux,xc,yc,zc, t, dt, &
+    xc_new,yc_new,zc_new)
+
+    implicit none
+
+    integer :: num, mx, my, mz,mbc, meqn, maux
+    double precision :: xlower, ylower, zlower,dx, dy, dz, xc, yc, zc
+    double precision :: xc_new, yc_new, zc_new, t, dt
+    double precision :: q(1-mbc:mx+mbc, 1-mbc:my+mbc,1-mbc:mz+mbc,meqn)
+    double precision :: aux(1-mbc:mx+mbc, 1-mbc:my+mbc,1-mbc:mz+mbc,maux)
+
+    xc_new = xc
+    yc_new = yc
+    zc_new = zc
+
+END SUBROUTINE fclaw3d_clawpatch46_fort_gauges_move_local
+
+

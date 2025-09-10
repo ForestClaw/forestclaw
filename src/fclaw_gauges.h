@@ -179,15 +179,30 @@ typedef void (*fclaw_gauges_print_t)(struct fclaw_global *glob,
 
 
 /**
- * @brief Move non-static gauges
+ * @brief Move non-static gauges using a prescribed velocity field
  * 
  * @param glob the global context
  * @param g the gauge
  */
 typedef void (*fclaw_gauges_move_t)(struct fclaw_global *glob, 
-                                    struct fclaw_gauge *gauge,
-                                    double t, double dt);
+                                    double t, double dt,
+                                    struct fclaw_gauge *gauge);
 
+
+/**
+ * @brief Move non-static gauges using local (patch) information
+ * 
+ * @param glob the global context
+ * @param g the gauge
+ */
+typedef void (*fclaw_gauges_move_local_t)(struct fclaw_global* glob, 
+                                          struct fclaw_block *block,
+                                          struct fclaw_patch *patch,
+                                          int blockno, int patchno,
+                                          double tcurr, double dt, 
+                                          struct fclaw_gauge *g);
+
+    
 /**
  * @brief vtable for gauges
  */
@@ -210,6 +225,7 @@ typedef struct fclaw_gauges_vtable
 
     fclaw_gauges_move_t          move;
 
+    fclaw_gauges_move_local_t    move_local;
 
     /** @brief true if vtable has been set */
     int is_set;

@@ -150,6 +150,10 @@ fclaw_register (fclaw_options_t* fclaw_opt, sc_options_t * opt)
     sc_options_add_bool (opt, 0, "moving-gauges", &fclaw_opt->moving_gauges, 0,
                             "Moving gauges [F]");
 
+    sc_options_add_bool (opt, 0, "moving-gauges-local", 
+                         &fclaw_opt->moving_gauges_local, 0,
+                            "Move only local gauges [F]");
+
     sc_options_add_int(opt, 0, "gauge-buffer-length",
                        &fclaw_opt->gauge_buffer_length, 1,
                        "Number of lines of gauge output to buffer before printing [1]");

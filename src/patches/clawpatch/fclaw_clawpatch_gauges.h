@@ -96,10 +96,20 @@ void fclaw_clawpatch_gauges_update(struct fclaw_global* glob,
                                    double tcurr, 
                                    struct fclaw_gauge *g);
 
+void fclaw_clawpatch_gauges_move_local(struct fclaw_global* glob, 
+                                       struct fclaw_block* block,
+                                       struct fclaw_patch* patch, 
+                                       int blockno, int patchno,
+                                       double t, double dt, 
+                                       struct fclaw_gauge *g);
+
+
 void fclaw_clawpatch_gauges_print(struct fclaw_global *glob, 
                                   struct fclaw_gauge *gauge);
 
 /* ----------------------------------- FORTRAN  ---------------------------------------- */
+
+/* -------------------- Update gauge values -------------------------*/
 
 #define FCLAW2D_CLAWPATCH46_FORT_GAUGES_UPDATE \
            FCLAW_F77_FUNC(fclaw2d_clawpatch46_fort_gauges_update, \
@@ -144,7 +154,6 @@ void FCLAW2D_CLAWPATCH5_FORT_GAUGES_UPDATE(const int *num,
                                           double avar[]);
 
 
-
 #define FCLAW3D_CLAWPATCH46_FORT_GAUGES_UPDATE \
     FCLAW_F77_FUNC(fclaw3d_clawpatch46_fort_gauges_update, \
                     FCLAW3D_CLAWPATCH46_FORT_GAUGES_UPDATE)
@@ -168,6 +177,83 @@ void FCLAW3D_CLAWPATCH46_FORT_GAUGES_UPDATE(const int *num,
                                            const double *zc,
                                            double qvar[], 
                                            double avar[]);
+
+
+/* -------------------- Update gauge position -------------------------*/
+#define FCLAW2D_CLAWPATCH46_FORT_GAUGES_MOVE_LOCAL \
+           FCLAW_F77_FUNC(fclaw2d_clawpatch46_fort_gauges_move_local, \
+                          FCLAW2D_CLAWPATCH46_FORT_GAUGES_MOVE_LOCAL)
+
+void FCLAW2D_CLAWPATCH46_FORT_GAUGES_MOVE_LOCAL(const int *num, 
+                                                const int *mx, 
+                                                const int *my, 
+                                                const int* mbc, 
+                                                const int *meqn, 
+                                                const double* xlower,
+                                                const double *ylower,
+                                                const double *dx, 
+                                                const double* dy,
+                                                double q[],
+                                                const int *maux, 
+                                                double aux[],
+                                                const double *xc, 
+                                                const double *yc,
+                                                const double *t, 
+                                                const double *dt,
+                                                double *xc_new,
+                                                double *yc_new);
+
+
+#define FCLAW2D_CLAWPATCH5_FORT_GAUGES_MOVE_LOCAL \
+           FCLAW_F77_FUNC(fclaw2d_clawpatch5_fort_gauges_move_local, \
+                          FCLAW2D_CLAWPATCH5_FORT_GAUGES_MOVE_LOCAL)
+
+void FCLAW2D_CLAWPATCH5_FORT_GAUGES_MOVE_LOCAL(const int *num, 
+                                                const int *mx, 
+                                                const int *my, 
+                                                const int* mbc, 
+                                                const int *meqn, 
+                                                const double* xlower,
+                                                const double *ylower,
+                                                const double *dx, 
+                                                const double* dy,
+                                                double q[],
+                                                const int *maux, 
+                                                double aux[],
+                                                const double *xc, 
+                                                const double *yc,
+                                                const double *t, 
+                                                const double *dt,
+                                                double *xc_new,
+                                                double *yc_new);
+
+
+#define FCLAW3D_CLAWPATCH46_FORT_GAUGES_MOVE_LOCAL \
+    FCLAW_F77_FUNC(fclaw3d_clawpatch46_fort_gauges_move_local, \
+                    FCLAW3D_CLAWPATCH46_FORT_GAUGES_MOVE_LOCAL)
+void FCLAW3D_CLAWPATCH46_FORT_GAUGES_MOVE_LOCAL(const int *num, 
+                                                const int *mx, 
+                                                const int *my, 
+                                                const int *mz, 
+                                                const int *mbc, 
+                                                const int *meqn,
+                                                const double *xlower,
+                                                const double *ylower, 
+                                                const double *zlower,
+                                                const double *dx, 
+                                                const double *dy, 
+                                                const double *dz,
+                                                double q[],
+                                                const int *maux,
+                                                double aux[],
+                                                const double *xc,
+                                                const double *yc, 
+                                                const double *zc,
+                                                const double *t, 
+                                                const double *dt,
+                                                const double *xc_new,
+                                                const double *yc_new, 
+                                                const double *zc_new);
 
 #ifdef __cplusplus
 }

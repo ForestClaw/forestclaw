@@ -271,6 +271,7 @@ struct fclaw_clawpatch_vtable_2d
 
     /** Update gauges */
     clawpatch_fort_gauges_update_t          fort_gauge_update;
+    clawpatch_fort_gauges_move_local_t      fort_gauge_move_local;
 
     /** @} */
 
@@ -358,6 +359,7 @@ struct fclaw_clawpatch_vtable_3d
 
     fclaw3d_clawpatch_fort_gauges_update_t          fort_gauge_update;
 
+    fclaw3d_clawpatch_fort_gauges_move_local_t      fort_gauge_move_local;
 
     /** @} */
 };

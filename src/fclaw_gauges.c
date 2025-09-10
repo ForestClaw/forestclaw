@@ -146,17 +146,45 @@ void gauges_normalize_coordinates(fclaw_global_t *glob,
 
 
 static
-void  gauges_update(fclaw_global_t* glob, 
-                    fclaw_block_t *block,
-                    fclaw_patch_t *patch,
-                    int blockno, int patchno,
-                    double tcurr, fclaw_gauge_t *g)
+void  gauges_update_values(fclaw_global_t* glob, 
+                           fclaw_block_t *block,
+                           fclaw_patch_t *patch,
+                           int blockno, int patchno,
+                           double tcurr, fclaw_gauge_t *g)
 {
     const fclaw_gauges_vtable_t* gauge_vt = fclaw_gauges_vt(glob);
     FCLAW_ASSERT(gauge_vt->update != NULL);
 
     gauge_vt->update(glob,block,patch,blockno,patchno,tcurr,g);
 }
+
+/* This will likely give un-reliable results in parallel */
+static
+void  gauges_move_local(fclaw_global_t* glob, 
+                        fclaw_block_t *block,
+                        fclaw_patch_t *patch,
+                        int blockno, int patchno,
+                        double tcurr, double dt, 
+                        fclaw_gauge_t *g)
+{
+    const fclaw_gauges_vtable_t* gauge_vt = fclaw_gauges_vt(glob);
+    FCLAW_ASSERT(gauge_vt->move_local != NULL);
+
+    gauge_vt->move_local(glob,block,patch,blockno,patchno,tcurr,dt,g);
+}
+
+/* This will work in parallel */
+static
+void  gauges_move(fclaw_global_t* glob, 
+                  double tcurr, double dt, 
+                  fclaw_gauge_t *g)
+{
+    const fclaw_gauges_vtable_t* gauge_vt = fclaw_gauges_vt(glob);
+    FCLAW_ASSERT(gauge_vt->move != NULL);
+
+    gauge_vt->move(glob,tcurr,dt,g);
+}
+
 
 static
 void gauges_print_buffer(fclaw_global_t* glob, fclaw_gauge_t *g)
@@ -393,6 +421,11 @@ int fclaw_gauges_setup_block_lists(fclaw_global_t* glob,
             {
 
                 fclaw_gauge_t *g = &gauges[i];
+                if (g->in_domain)
+                {
+                    /* We have already found the location for this gauge */
+                    continue;
+                }
 
                 /* Map gauge to global [0,1]x[0,1] space. This works for the brick
                    but not clear what happens for the cubed sphere */
@@ -504,26 +537,38 @@ void fclaw_gauges_locate_patches(fclaw_global_t *glob)
 
             if (!g->in_domain)
             {
-                continue;
+                /* Gauge is not on any processor */
+                g->patchno = -1;
+                g->is_local= 0;
+                if (g->next_buffer_location > 0)
+                {
+                    /* Patch moved off of domain, but the buffer is not empty. */
+                    gauges_print_buffer(glob,g);
+                    g->next_buffer_location = 0;
+                }
             }
-
-            int index = g->location_in_results;
-            FCLAW_ASSERT(index >= 0 && index < num_gauges_set);
-
-            /* patchno == -1  : Patch is not on this processor
-               patchno >= 0   : Patch number is in local patch list.
-            */
-
-            /* Current patch no (patches can move under gauges, but blocks 
-               remain fixed. */
-            g->patchno = *((int *) sc_array_index_int(results, index));        
-            g->is_local = (g->patchno >= 0);  /* Local to this processor */
-
-            if (!g->is_local && g->next_buffer_location > 0)
+            else
             {
-                /* Patch moved off of processor, but the buffer is not empty. */
-                gauges_print_buffer(glob,g);
-                g->next_buffer_location = 0;
+                /* If the gauge is in the domain, it should be "set" 
+                   (but not necessarily local) */
+                int index = g->location_in_results;
+                FCLAW_ASSERT(index >= 0 && index < num_gauges_set);
+
+                /* patchno == -1  : Patch is not on this processor
+                   patchno >= 0   : Patch number is in local patch list.
+                */
+
+                /* Current patch no (patches can move under gauges, but blocks 
+                   remain fixed. */
+                g->patchno = *((int *) sc_array_index_int(results, index));        
+                g->is_local = (g->patchno >= 0);  /* Local to this processor */
+
+                if (!g->is_local && g->next_buffer_location > 0)
+                {
+                    /* Patch moved off of processor, but the buffer is not empty. */
+                    gauges_print_buffer(glob,g);
+                    g->next_buffer_location = 0;
+                }
             }
         }
         sc_array_destroy(results);
@@ -542,13 +587,12 @@ void fclaw_gauges_locate_patches(fclaw_global_t *glob)
 void  fclaw_gauges_update_positions(fclaw_global_t* glob,
                                     double t, double dt)
 {
+    const fclaw_options_t * fclaw_opt = fclaw_get_options(glob);
+
     fclaw_gauge_acc_t* gauge_acc = 
         (fclaw_gauge_acc_t*) fclaw_diagnostics_get_acc(glob)->gauge_accumulator;
 
     fclaw_gauge_t *gauges = gauge_acc->gauges;
-
-    const fclaw_gauges_vtable_t* gauge_vt = fclaw_gauges_vt(glob);
-    FCLAW_ASSERT(gauge_vt->move != NULL);
 
     /* Update position of all gauges, even if they are not in the domain
        initially.   */
@@ -556,8 +600,24 @@ void  fclaw_gauges_update_positions(fclaw_global_t* glob,
     for(int i = 0; i < num_gauges; i++)
     {
         fclaw_gauge_t* g = &gauges[i];
-        gauge_vt->move(glob,g, t, dt);
+        if (fclaw_opt->moving_gauges_local && g->is_local)
+        {
+            /* Only local gauges can be updated */
+            fclaw_block_t *block = &glob->domain->blocks[g->blockno];
+            fclaw_patch_t *patch = &block->patches[g->patchno]; 
+            gauges_move_local(glob,block,patch,
+                              g->blockno,g->patchno,
+                              t,dt,g);
+        }
+        else
+        {
+            /* Move gauges according to a prescribed velocity field - 
+               no local information is needed */
+            gauges_move(glob,t, dt,g);
+        }
     }
+
+    /* If we only move local gauges, we will need a broadcast here */
 }
 
 
@@ -595,9 +655,9 @@ void gauges_compute(fclaw_global_t *glob, void* acc)
             {
                 fclaw_block_t *block = &glob->domain->blocks[g->blockno];
                 fclaw_patch_t *patch = &block->patches[g->patchno]; 
-                gauges_update(glob,block,patch,
-                              g->blockno,g->patchno,
-                              tcurr,g);
+                gauges_update_values(glob,block,patch,
+                                     g->blockno,g->patchno,
+                                     tcurr,g);
 
                 g->next_buffer_location++;
                 
@@ -611,7 +671,7 @@ void gauges_compute(fclaw_global_t *glob, void* acc)
             {
                 /* If this gauge is not local, then it should not have anything in the 
                    buffer */
-                //FCLAW_ASSERT(g->next_buffer_location == 0);
+                FCLAW_ASSERT(g->next_buffer_location == 0);
             }
         }
     }

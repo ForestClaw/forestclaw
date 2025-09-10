@@ -47,3 +47,25 @@ SUBROUTINE fclaw2d_clawpatch5_fort_gauges_update(num,mx,my,mbc,meqn,xlower,ylowe
     end do
 
 END SUBROUTINE fclaw2d_clawpatch5_fort_gauges_update
+
+
+SUBROUTINE fclaw2d_clawpatch5_fort_gauges_move_local(num,mx,my,mbc, & 
+    meqn,xlower,ylower, dx,dy,q,maux,aux,xc,yc,t, dt, xc_new,yc_new)
+
+    implicit none
+
+    integer :: num, mx, my, mbc, meqn, maux
+    double precision :: xlower, ylower, dx, dy, xc, yc
+    double precision :: xc_new,yc_new, t, dt
+    double precision :: q(meqn,1-mbc:mx+mbc, 1-mbc:my+mbc)
+    double precision :: aux(maux,1-mbc:mx+mbc, 1-mbc:my+mbc)
+
+    !! Don't do anything yet ... See routine above for tips on how to get 
+    !! information for the gauge
+
+    xc_new = xc
+    yc_new = yc
+
+
+END SUBROUTINE fclaw2d_clawpatch5_fort_gauges_move_local
+
