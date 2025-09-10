@@ -5,6 +5,7 @@ add_library(periodic_f OBJECT
   fdisc.f
   user_4.6/qinit.f 
   user_4.6/clawpack46_setaux.f
+  user_4.6/periodic_gauges.f90
   user_5.0/qinit.f90 
   user_5.0/clawpack5_setaux.f90
   ${all}/clawpack46_rpn2adv.f 

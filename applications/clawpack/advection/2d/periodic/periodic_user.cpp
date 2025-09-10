@@ -30,12 +30,12 @@ static
 void periodic_problem_setup(fclaw_global_t* glob)
 {
     const user_options_t* user = periodic_get_options(glob);
-
     const fclaw_options_t * fclaw_opt = fclaw_get_options(glob);
 
     if (glob->mpirank == 0)
     {
         FILE *f = fopen("setprob.data","w");
+        fprintf(f,"%-24d %s\n",user->initial_condition,"\% initial-condition");
         fprintf(f,"%-24.4f %s\n",user->uvel,"\% u-velocity");
         fprintf(f,"%-24.4f %s\n",user->vvel,"\% v-velocity");
         fprintf(f,"%-24d %s\n",fclaw_opt->moving_gauges,"\% moving_gauges");
@@ -48,8 +48,10 @@ void periodic_problem_setup(fclaw_global_t* glob)
     SETPROB();  /* Reads file created above */
 }
 
-void periodic_gauge_move(fclaw_global_t* glob, fclaw_gauge_t *g,
-                         double t, double dt)
+void periodic_gauge_move(fclaw_global_t* glob, 
+                         double t, double dt,
+                         fclaw_gauge_t *g)
+
 {
     /* These will reposition select gauges, even if they are currently not 
        in the domain.  
@@ -76,7 +78,7 @@ void periodic_gauge_move(fclaw_global_t* glob, fclaw_gauge_t *g,
         xc = 0.5*cos(M_PI*t);
         yc = 0.5*sin(M_PI*t);        
     }
-    else if (g->num < 5)
+    else if (g->num < 10)
     {
         /* use background velocity to move the gauge */
         const user_options_t* user = periodic_get_options(glob);
@@ -88,7 +90,7 @@ void periodic_gauge_move(fclaw_global_t* glob, fclaw_gauge_t *g,
     }
     else
     {
-        /* Gauges with IDs > 10 do not move.  */
+        /* Gauges with IDs >= 10 do not move.  */
     }
 
     fclaw_gauges_set_position(glob, g, xc, yc, g->zc);
@@ -100,6 +102,8 @@ void periodic_link_solvers(fclaw_global_t *glob)
     fclaw_vtable_t *vt = fclaw_vt(glob);
     vt->problem_setup = &periodic_problem_setup;  /* Version-independent */
 
+    const fclaw_options_t * fclaw_opt = fclaw_get_options(glob);
+
     const user_options_t* user = periodic_get_options(glob);
     if (user->claw_version == 4)
     {
@@ -109,6 +113,7 @@ void periodic_link_solvers(fclaw_global_t *glob)
         clawpack46_vt->fort_setaux    = &CLAWPACK46_SETAUX;
         clawpack46_vt->fort_rpn2      = &CLAWPACK46_RPN2ADV;
         clawpack46_vt->fort_rpt2      = &CLAWPACK46_RPT2ADV;
+
     }
     else if (user->claw_version == 5)
     {
@@ -124,7 +129,16 @@ void periodic_link_solvers(fclaw_global_t *glob)
     fclaw_gauges_vtable_t* gauges_vt = (fclaw_gauges_vtable_t*) 
                         fclaw_global_get_vtable(glob, "fclaw_gauges");
 
-    gauges_vt->move = periodic_gauge_move;
+    if (fclaw_opt->moving_gauges)
+    {
+        /* This will be used if 'moving_gauges_local' is False */
+        gauges_vt->move = periodic_gauge_move;
+        if (user->claw_version == 4)
+        {
+            fclaw_clawpatch_vtable_t *clawpatch_vt = fclaw_clawpatch_vt(glob);
+            clawpatch_vt->d2->fort_gauge_move_local = PERIODIC_GAUGES_MOVE_LOCAL;
+        }
+    }
 }
 
 

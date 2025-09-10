@@ -39,8 +39,11 @@ extern "C"
 
 typedef struct user_options
 {
+    int initial_condition;
+
     double uvel;
     double vvel;
+   
     int claw_version;
     int is_registered;
 
@@ -55,6 +58,22 @@ user_options_t* periodic_options_register (fclaw_app_t * app,
 void periodic_options_store (fclaw_global_t* glob, user_options_t* user);
 
 const user_options_t* periodic_get_options(fclaw_global_t* glob);
+
+
+/* -------------------- Update gauge position -------------------------*/
+#define PERIODIC_GAUGES_MOVE_LOCAL \
+           FCLAW_F77_FUNC(periodic_gauges_move_local, \
+                          PERIODIC_GAUGES_MOVE_LOCAL)
+
+void PERIODIC_GAUGES_MOVE_LOCAL(const int *num, const int *mx, 
+                                const int *my, const int* mbc, const int *meqn, 
+                                const double* xlower,const double *ylower,
+                                const double *dx, const double* dy,
+                                double q[],
+                                const int *maux, double aux[],
+                                const double *xc, const double *yc,
+                                const double *t, const double *dt,
+                                double *xc_new,double *yc_new);
 
 
 

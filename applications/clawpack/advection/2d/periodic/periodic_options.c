@@ -29,6 +29,10 @@ static void *
 periodic_register (user_options_t *user, sc_options_t * opt)
 {
     /* [user] User options */
+
+    sc_options_add_int (opt, 0, "initial-condition", &user->initial_condition, 0,
+                           "Initial condition (0-1) [0]");
+
     sc_options_add_double (opt, 0, "uvel", &user->uvel, 1,
                            "Velocity in x direction [1]");
 
