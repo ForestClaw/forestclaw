@@ -596,7 +596,9 @@ void  fclaw_gauges_update_positions(fclaw_global_t* glob,
 
     /* Update position of all gauges, even if they are not in the domain
        initially.   */
+
     int num_gauges = gauge_acc->num_gauges;    
+
     for(int i = 0; i < num_gauges; i++)
     {
         fclaw_gauge_t* g = &gauges[i];
@@ -607,7 +609,20 @@ void  fclaw_gauges_update_positions(fclaw_global_t* glob,
             fclaw_patch_t *patch = &block->patches[g->patchno]; 
             gauges_move_local(glob,block,patch,
                               g->blockno,g->patchno,
-                              t,dt,g);
+                              t,dt,g); 
+
+#if 0
+            /* Do something with an all_gather : 
+               Each processor will have np local gauges;  once these 
+               gauges are updated, we want to send these local 
+               coordinates to all other processors, each of which 
+               stores a local copy of all gauges. */
+            int MPI_Allgatherv(const void *sendbuf, int sendcount, 
+                                MPI_Datatype sendtype,
+                                void *recvbuf, const int *recvcounts, 
+                                const int *displs,
+                                MPI_Datatype recvtype, MPI_Comm comm)
+#endif            
         }
         else
         {
@@ -616,8 +631,6 @@ void  fclaw_gauges_update_positions(fclaw_global_t* glob,
             gauges_move(glob,t, dt,g);
         }
     }
-
-    /* If we only move local gauges, we will need a broadcast here */
 }
 
 
