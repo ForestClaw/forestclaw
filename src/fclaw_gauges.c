@@ -599,36 +599,93 @@ void  fclaw_gauges_update_positions(fclaw_global_t* glob,
 
     int num_gauges = gauge_acc->num_gauges;    
 
-    for(int i = 0; i < num_gauges; i++)
+    if (fclaw_opt->moving_gauges_local)
     {
-        fclaw_gauge_t* g = &gauges[i];
-        if (fclaw_opt->moving_gauges_local && g->is_local)
+        int num_local_gauges = 0;
+        for(int i = 0; i < num_gauges; i++)
         {
-            /* Only local gauges can be updated */
-            fclaw_block_t *block = &glob->domain->blocks[g->blockno];
-            fclaw_patch_t *patch = &block->patches[g->patchno]; 
-            gauges_move_local(glob,block,patch,
-                              g->blockno,g->patchno,
-                              t,dt,g); 
-
-#if 0
-            /* Do something with an all_gather : 
-               Each processor will have np local gauges;  once these 
-               gauges are updated, we want to send these local 
-               coordinates to all other processors, each of which 
-               stores a local copy of all gauges. */
-            int MPI_Allgatherv(const void *sendbuf, int sendcount, 
-                                MPI_Datatype sendtype,
-                                void *recvbuf, const int *recvcounts, 
-                                const int *displs,
-                                MPI_Datatype recvtype, MPI_Comm comm)
-#endif            
+            fclaw_gauge_t* g = &gauges[i];
+            if (g->is_local)
+            {
+                num_local_gauges++;
+            }
         }
-        else
+        int* num_gauges_on_proc = FCLAW_ALLOC(int,glob->mpisize);
+        sc_MPI_Allgather(&num_local_gauges,1,sc_MPI_INT,
+                         num_gauges_on_proc,1,sc_MPI_INT,glob->mpicomm);
+        int* displacements = FCLAW_ALLOC(int,glob->mpisize);
+        displacements[0] = 0;
+        for (int i = 1; i < glob->mpisize; i++)
         {
-            /* Move gauges according to a prescribed velocity field - 
-               no local information is needed */
-            gauges_move(glob,t, dt,g);
+            displacements[i] = displacements[i-1] + num_gauges_on_proc[i-1]*4;
+        }
+
+        double* data = FCLAW_ALLOC(double,num_local_gauges*4);
+
+
+        int curr_displacement = displacements[glob->mpirank];
+        for(int i = 0; i < num_gauges; i++)
+        {
+            fclaw_gauge_t* g = &gauges[i];
+            if (g->is_local)
+            {
+                /* Only local gauges can be updated */
+                fclaw_block_t *block = &glob->domain->blocks[g->blockno];
+                fclaw_patch_t *patch = &block->patches[g->patchno]; 
+                gauges_move_local(glob,block,patch,
+                                  g->blockno,g->patchno,
+                                  t,dt,g); 
+
+                data[curr_displacement] = i;
+                curr_displacement++;
+                data[curr_displacement] = g->xc;
+                curr_displacement++;
+                data[curr_displacement] = g->yc;
+                curr_displacement++;
+                data[curr_displacement] = g->zc;
+                curr_displacement++;
+            }
+            else
+            {
+                data[curr_displacement] = -1;
+                curr_displacement += 4;
+            }
+        }
+
+        sc_MPI_Allgatherv(MPI_IN_PLACE,0,MPI_DATATYPE_NULL,
+                           data,num_gauges_on_proc,displacements,
+                           sc_MPI_DOUBLE,glob->mpicomm);
+        
+        /* Update all gauges */
+        for(int i = 0; i < num_gauges; i++)
+        {
+            int k = data[i*4];
+            if(k != -1)
+            {
+                fclaw_gauge_t* g = &gauges[k];
+                if (!g->is_local)
+                {
+                    g->xc = data[i*4+1];
+                    g->yc = data[i*4+2];
+                    g->zc = data[i*4+3];
+                }
+            }
+        }
+
+        FCLAW_FREE(data);
+        FCLAW_FREE(num_gauges_on_proc);
+        FCLAW_FREE(displacements);
+    }
+    else
+    {
+        for(int i = 0; i < num_gauges; i++)
+        {
+            fclaw_gauge_t* g = &gauges[i];
+            {
+                /* Move gauges according to a prescribed velocity field - 
+                   no local information is needed */
+                gauges_move(glob,t, dt,g);
+            }
         }
     }
 }
