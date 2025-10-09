@@ -613,14 +613,19 @@ void  fclaw_gauges_update_positions(fclaw_global_t* glob,
         int* num_gauges_on_proc = FCLAW_ALLOC(int,glob->mpisize);
         sc_MPI_Allgather(&num_local_gauges,1,sc_MPI_INT,
                          num_gauges_on_proc,1,sc_MPI_INT,glob->mpicomm);
+        int global_num_owned_gauges = num_gauges_on_proc[0];
         int* displacements = FCLAW_ALLOC(int,glob->mpisize);
         displacements[0] = 0;
+        int* counts = FCLAW_ALLOC(int,glob->mpisize);
+        counts[0] = num_gauges_on_proc[0]*4;
         for (int i = 1; i < glob->mpisize; i++)
         {
             displacements[i] = displacements[i-1] + num_gauges_on_proc[i-1]*4;
+            counts[i] = num_gauges_on_proc[i]*4;
+            global_num_owned_gauges += num_gauges_on_proc[i-1];
         }
 
-        double* data = FCLAW_ALLOC(double,num_local_gauges*4);
+        double* data = FCLAW_ALLOC(double,global_num_owned_gauges*4);
 
 
         int curr_displacement = displacements[glob->mpirank];
@@ -645,19 +650,14 @@ void  fclaw_gauges_update_positions(fclaw_global_t* glob,
                 data[curr_displacement] = g->zc;
                 curr_displacement++;
             }
-            else
-            {
-                data[curr_displacement] = -1;
-                curr_displacement += 4;
-            }
         }
 
         sc_MPI_Allgatherv(MPI_IN_PLACE,0,MPI_DATATYPE_NULL,
-                           data,num_gauges_on_proc,displacements,
+                           data,counts,displacements,
                            sc_MPI_DOUBLE,glob->mpicomm);
         
         /* Update all gauges */
-        for(int i = 0; i < num_gauges; i++)
+        for(int i = 0; i < global_num_owned_gauges; i++)
         {
             int k = data[i*4];
             if(k != -1)
