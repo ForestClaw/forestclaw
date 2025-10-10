@@ -622,7 +622,7 @@ void  fclaw_gauges_update_positions(fclaw_global_t* glob,
         {
             displacements[i] = displacements[i-1] + num_gauges_on_proc[i-1]*4;
             counts[i] = num_gauges_on_proc[i]*4;
-            global_num_owned_gauges += num_gauges_on_proc[i-1];
+            global_num_owned_gauges += num_gauges_on_proc[i];
         }
 
         double* data = FCLAW_ALLOC(double,global_num_owned_gauges*4);
@@ -674,6 +674,7 @@ void  fclaw_gauges_update_positions(fclaw_global_t* glob,
 
         FCLAW_FREE(data);
         FCLAW_FREE(num_gauges_on_proc);
+        FCLAW_FREE(counts);
         FCLAW_FREE(displacements);
     }
     else
