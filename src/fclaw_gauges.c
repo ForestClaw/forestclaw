@@ -601,6 +601,10 @@ void  fclaw_gauges_update_positions(fclaw_global_t* glob,
 
     if (fclaw_opt->moving_gauges_local)
     {
+        /* Movement of gauges are locally determined, 
+           each local gauge has to be communicated globally */
+
+        /* Determine number of local gauges */
         int num_local_gauges = 0;
         for(int i = 0; i < num_gauges; i++)
         {
@@ -610,24 +614,40 @@ void  fclaw_gauges_update_positions(fclaw_global_t* glob,
                 num_local_gauges++;
             }
         }
+
+        /* Gather number of gauges owned by each processor */
         int* num_gauges_on_proc = FCLAW_ALLOC(int,glob->mpisize);
         sc_MPI_Allgather(&num_local_gauges,1,sc_MPI_INT,
                          num_gauges_on_proc,1,sc_MPI_INT,glob->mpicomm);
-        int global_num_owned_gauges = num_gauges_on_proc[0];
-        int* displacements = FCLAW_ALLOC(int,glob->mpisize);
-        displacements[0] = 0;
-        int* counts = FCLAW_ALLOC(int,glob->mpisize);
-        counts[0] = num_gauges_on_proc[0]*4;
-        for (int i = 1; i < glob->mpisize; i++)
+
+        /* Get global number of gauges that are owned.
+           This may be less than the total number of gauges since some
+           may be outside the domain and no processor owns them. */
+        int global_num_owned_gauges = 0;
+        for(int i = 0; i < glob->mpisize; i++)
         {
-            displacements[i] = displacements[i-1] + num_gauges_on_proc[i-1]*4;
-            counts[i] = num_gauges_on_proc[i]*4;
             global_num_owned_gauges += num_gauges_on_proc[i];
         }
 
+        /* Determine displacements and counts for all processors,
+           needed for Allgatherv */
+        int* displacements = FCLAW_ALLOC(int,glob->mpisize);
+        displacements[0] = 0;
+
+        int* counts = FCLAW_ALLOC(int,glob->mpisize);
+        /* four doubles for each gauge: id, and x,y,z coordinates */
+        counts[0] = num_gauges_on_proc[0] * 4;
+
+        for (int i = 1; i < glob->mpisize; i++)
+        {
+            displacements[i] = displacements[i-1] + num_gauges_on_proc[i-1]*4;
+            counts[i] = num_gauges_on_proc[i] * 4;
+        }
+
+        /* global data array for gauge positions */
         double* data = FCLAW_ALLOC(double,global_num_owned_gauges*4);
 
-
+        /* put local gauge positions into global array */
         int curr_displacement = displacements[glob->mpirank];
         for(int i = 0; i < num_gauges; i++)
         {
@@ -652,11 +672,29 @@ void  fclaw_gauges_update_positions(fclaw_global_t* glob,
             }
         }
 
+        /* Move all non-local gauges and update poisitions.
+           The positions of gauges owned by other processors
+           will be overwritten after the Allgatherv call below. 
+           This is a way to update the positions of gauges that 
+           aren't owned by any processor. */
+        for(int i = 0; i < num_gauges; i++)
+        {
+            fclaw_gauge_t* g = &gauges[i];
+            if (!g->is_local)
+            {
+                gauges_move(glob,t, dt,g);
+            }
+        }
+
+        /* Gather all gauge positions */
+#ifdef FCLAW_ENABLE_MPI
         sc_MPI_Allgatherv(MPI_IN_PLACE,0,MPI_DATATYPE_NULL,
                            data,counts,displacements,
                            sc_MPI_DOUBLE,glob->mpicomm);
-        
-        /* Update all gauges */
+#endif
+
+
+        /* Update gauges positions based on gathered data */
         for(int i = 0; i < global_num_owned_gauges; i++)
         {
             int k = data[i*4];
