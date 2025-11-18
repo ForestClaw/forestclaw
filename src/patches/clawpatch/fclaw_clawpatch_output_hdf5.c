@@ -29,6 +29,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_clawpatch_options.h>
 
 #include <fclaw_global.h>
+#include <fclaw_filesystem.h>
 
 #include <fclaw_options.h>
 #include <fclaw_map.h>
@@ -307,83 +308,205 @@ get_point_indexes_##TYPE (fclaw_global_t * glob, \
 POINT_INDEX_CB(int32_t)
 POINT_INDEX_CB(int64_t)
 
+/* typdef for data acess functions q,rhs,etc */
+typedef void (*patch_data_access_t)(struct fclaw_global *glob, struct fclaw_patch *patch, double **q, int *meqn);
+
 static void
-write_2d_patch_q (fclaw_global_t * glob,
-                  fclaw_patch_t * patch,
-                  int blockno,
-                  int patchno,
-                  float * q_out)
+pack_data (fclaw_global_t * glob,
+           fclaw_patch_t * patch,
+           int blockno, int patchno,
+           patch_data_access_t access,
+           char *a)
 {
-    int mx,my,mbc;
-    double dx,dy,xlower,ylower;
-    fclaw_clawpatch_2d_grid_data(glob,patch,&mx,&my, &mbc,
-                                &xlower,&ylower, &dx,&dy);
 
     int meqn;
-    double* q;
-    fclaw_clawpatch_soln_data(glob,patch,&q,&meqn);
+    double *q;
+    access(glob, patch, &q, &meqn);
 
-    for (int j = 0; j < my; ++j)
+    int patch_dim = fclaw_clawpatch_dim(patch);
+    if(patch_dim == 2)
     {
-        for (int i = 0; i < mx; ++i)
+        int mx,my,mbc;
+        double xlower,ylower,dx,dy;
+
+        fclaw_clawpatch_2d_grid_data(glob,patch,&mx,&my,&mbc,
+                                    &xlower,&ylower,&dx,&dy);
+
+        const int xlane = mx + 2 * mbc;
+        const int ylane = my + 2 * mbc;
+
+        // Enumerate equation data in the patch
+        float *f = (float *) a;
+        int i, j, k;
+        for (j = 0; j < my; ++j)
         {
-            for (int m = 0; m < meqn; m++)
+            for (i = 0; i < mx; ++i)
             {
-                size_t out_idx = j*mx*meqn + i*meqn + m;
-                size_t in_idx = m*(mx+2*mbc)*(my+2*mbc) + (j+mbc)*(mx+2*mbc) + (i+mbc);
-                q_out[out_idx] = q[in_idx];
+                for (k = 0; k < meqn; ++k)
+                {
+                    /* For Clawpack 5.0 layout */
+                    //*f++ = (float) q[((j+mbc)*xlane + (i+mbc))*meqn + k];
+
+                    /* For Clawpack 4.x layout */
+                    *f++ = (float) q[(k * ylane + j + mbc) * xlane + i + mbc];
+                }
             }
         }
+
     }
-}
-static void
-write_3d_patch_q (fclaw_global_t * glob,
-                  fclaw_patch_t * patch,
-                  int blockno,
-                  int patchno,
-                  float * q_out)
-{
-    int mx,my,mz,mbc;
-    double dx,dy,dz,xlower,ylower,zlower;
-    fclaw_clawpatch_3d_grid_data(glob,patch,&mx,&my,&mz, &mbc,
-                                &xlower,&ylower,&zlower, &dx,&dy, &dz);
-
-    int meqn;
-    double* q;
-    fclaw_clawpatch_soln_data(glob,patch,&q,&meqn);
-
-    for (int k = 0; k < mz; ++k)
+    else
     {
-        for (int j = 0; j < my; ++j)
+        int mx,my,mz,mbc;
+        double xlower,ylower,zlower,dx,dy,dz;
+        fclaw_clawpatch_3d_grid_data(glob,patch,&mx,&my,&mz, &mbc,
+                                   &xlower,&ylower,&zlower, &dx,&dy, &dz);
+
+        const int xlane = mx + 2 * mbc;
+        const int ylane = my + 2 * mbc;
+        const int zlane = mz + 2 * mbc;
+
+        // Enumerate equation data in the patch
+        float *f = (float *) a;
+        int i, j, k, eqn;
+        for (k = 0; k < mz; ++k)
         {
-            for (int i = 0; i < mx; ++i)
+            for (j = 0; j < my; ++j)
             {
-                for (int m = 0; m < meqn; m++)
+                for (i = 0; i < mx; ++i)
                 {
-                    size_t out_idx = k*mx*my*meqn + j*mx*meqn + i*meqn + m;
-                    size_t in_idx = m*(mx+2*mbc)*(my+2*mbc)*(mz+2*mbc) + (k+mbc)*(mx+2*mbc)*(my+2*mbc) + (j+mbc)*(mx+2*mbc) + (i+mbc);
-                    q_out[out_idx] = q[in_idx];
+                    for (eqn = 0; eqn < meqn; ++eqn)
+                    {
+                        /* For Clawpack 5.0 layout */
+                        //*f++ = (float) q[((j+mbc)*xlane + (i+mbc))*meqn + k];
+
+                        /* For Clawpack 4.x layout */
+                        *f++ = (float) q[eqn * zlane * ylane * xlane + (k + mbc) * ylane * xlane + (j + mbc) * xlane + i + mbc];
+                    }
                 }
             }
         }
     }
 }
+
 static void
-get_data (fclaw_global_t * glob,
+meqn_cb (fclaw_global_t * glob,
           fclaw_patch_t * patch,
-          int blockno,
-          int patchno,
-          char * buffer)
+          int blockno, int patchno,
+          char *a)
 {
-    float * q_out = (float *) buffer;
-    if (fclaw_clawpatch_dim(patch) == 2)
+    pack_data(glob, patch, blockno, patchno, &fclaw_clawpatch_soln_data, a);
+}
+
+static void
+aux_cb (fclaw_global_t * glob,
+        fclaw_patch_t * patch,
+        int blockno, int patchno,
+        char *a)
+{
+    fclaw_clawpatch_options_t *clawpatch_opt = fclaw_clawpatch_get_options(glob);
+    int maux;
+    double *q;
+    fclaw_clawpatch_aux_data(glob, patch, &q, &maux);
+
+    int patch_dim = fclaw_clawpatch_dim(patch);
+    if(patch_dim == 2)
     {
-        write_2d_patch_q(glob, patch, blockno, patchno, q_out);
+        int mx,my,mbc;
+        double xlower,ylower,dx,dy;
+
+        fclaw_clawpatch_2d_grid_data(glob,patch,&mx,&my,&mbc,
+                                    &xlower,&ylower,&dx,&dy);
+
+        const int xlane = mx + 2 * mbc;
+        const int ylane = my + 2 * mbc;
+
+        // Enumerate equation data in the patch
+        float *f = (float *) a;
+        int i, j, k;
+        for (j = 0; j < my; ++j)
+        {
+            for (i = 0; i < mx; ++i)
+            {
+                for (k = 0; k < maux; ++k)
+                {
+                    if(clawpatch_opt->hdf5_aux_out[k] > 0)
+                    {
+                        /* For Clawpack 5.0 layout */
+                        //*f++ = (float) q[((j+mbc)*xlane + (i+mbc))*meqn + k];
+
+                        /* For Clawpack 4.x layout */
+                        int aux_out = clawpatch_opt->hdf5_aux_out[k] - 1;
+                        *f++ = (float) q[(aux_out * ylane + j + mbc) * xlane + i + mbc];
+                    }
+                }
+            }
+        }
+
     }
     else
     {
-        write_3d_patch_q(glob, patch, blockno, patchno, q_out);
+        int mx,my,mz,mbc;
+        double xlower,ylower,zlower,dx,dy,dz;
+        fclaw_clawpatch_3d_grid_data(glob,patch,&mx,&my,&mz, &mbc,
+                                   &xlower,&ylower,&zlower, &dx,&dy, &dz);
+
+        const int xlane = mx + 2 * mbc;
+        const int ylane = my + 2 * mbc;
+        const int zlane = mz + 2 * mbc;
+
+        // Enumerate equation data in the patch
+        float *f = (float *) a;
+        int i, j, k, eqn;
+        for (k = 0; k < mz; ++k)
+        {
+            for (j = 0; j < my; ++j)
+            {
+                for (i = 0; i < mx; ++i)
+                {
+                    for (eqn = 0; eqn < maux; ++eqn)
+                    {
+                        if(clawpatch_opt->hdf5_aux_out[eqn] > 0)
+                        {
+                            /* For Clawpack 5.0 layout */
+                            //*f++ = (float) q[((j+mbc)*xlane + (i+mbc))*meqn + k];
+
+                            /* For Clawpack 4.x layout */
+                            int aux_out = clawpatch_opt->hdf5_aux_out[eqn] - 1;
+                            *f++ = (float) q[aux_out * zlane * ylane * xlane + (k + mbc) * ylane * xlane + (j + mbc) * xlane + i + mbc];
+                        }
+                    }
+                }
+            }
+        }
     }
+
+}
+
+static void
+rhs_cb (fclaw_global_t * glob,
+        fclaw_patch_t * patch,
+        int blockno, int patchno,
+        char *a)
+{
+    pack_data(glob, patch, blockno, patchno, &fclaw_clawpatch_rhs_data, a);
+}
+
+static void
+soln_cb (fclaw_global_t * glob,
+         fclaw_patch_t * patch,
+         int blockno, int patchno,
+         char *a)
+{
+    pack_data(glob, patch, blockno, patchno, &fclaw_clawpatch_elliptic_soln_data, a);
+}
+
+static void
+error_cb (fclaw_global_t * glob,
+          fclaw_patch_t * patch,
+          int blockno, int patchno,
+          char *a)
+{
+    pack_data(glob, patch, blockno, patchno, &fclaw_clawpatch_elliptic_error_data, a);
 }
 
 /*----------------------------------------------------------------------
@@ -1020,15 +1143,15 @@ fclaw_hdf_write_file (fclaw_global_t * glob,
 
     //get mx, my, mz, meqn from clawpatch options
     int patch_dim = clawpatch_opt->patch_dim;
-    int mx   = clawpatch_opt->mx;
-    int my   = clawpatch_opt->my;
-    int mz   = clawpatch_opt->mz;
+    int64_t mx   = clawpatch_opt->mx;
+    int64_t my   = clawpatch_opt->my;
+    int64_t mz   = clawpatch_opt->mz;
 
-    int global_num_patches = glob->domain->global_num_patches;
+    int64_t global_num_patches = glob->domain->global_num_patches;
 
-    int num_cells_per_patch;
-    int num_points_per_patch;
-    int num_points_per_cell;
+    int64_t num_cells_per_patch;
+    int64_t num_points_per_patch;
+    int64_t num_points_per_cell;
     if(clawpatch_opt->patch_dim == 2)
     {
         num_cells_per_patch = mx * my;
@@ -1047,6 +1170,7 @@ fclaw_hdf_write_file (fclaw_global_t * glob,
     char vtkhdf[8] = "/VTKHDF";
     char celldata[18] = "/VTKHDF/CellData";
     
+    fclaw_remove(filename);
     herr_t status = 0;
     // Set up file access property list with parallel I/O access
     hid_t fapl_id = H5Pcreate(H5P_FILE_ACCESS);
@@ -1211,6 +1335,64 @@ fclaw_hdf_write_file (fclaw_global_t * glob,
                            value_cb,
                            &default_vtable);
 
+    //write elliptic data
+    if(clawpatch_opt->rhs_fields > 0)
+    {
+        patch_dims[0] = num_cells_per_patch;
+        patch_dims[1] = clawpatch_opt->rhs_fields;
+        make_dataset_numerical(glob, 
+                               celldata_gid, 
+                               "rhs", 
+                               patch_dim, num_cells_per_patch_subdims,
+                               2, patch_dims, 
+                               num_patches_to_buffer, 
+                               H5T_NATIVE_FLOAT, 
+                               rhs_cb,
+                               &default_vtable);
+        make_dataset_numerical(glob, 
+                               celldata_gid, 
+                               "soln", 
+                               patch_dim, num_cells_per_patch_subdims,
+                               2, patch_dims, 
+                               num_patches_to_buffer, 
+                               H5T_NATIVE_FLOAT, 
+                               soln_cb,
+                               &default_vtable);
+        make_dataset_numerical(glob, 
+                               celldata_gid, 
+                               "error", 
+                               patch_dim, num_cells_per_patch_subdims,
+                               2, patch_dims, 
+                               num_patches_to_buffer, 
+                               H5T_NATIVE_FLOAT, 
+                               error_cb,
+                               &default_vtable);
+    }
+
+    //write aux data
+    int num_aux = 0;
+    for(int i = 0; i < clawpatch_opt->maux; i++)
+    {
+        if(clawpatch_opt->hdf5_aux_out[i] > 0)
+        {
+            num_aux++;
+        }
+    }
+    if(num_aux > 0)
+    {
+        patch_dims[0] = num_cells_per_patch;
+        patch_dims[1] = num_aux;
+        make_dataset_numerical(glob, 
+                               celldata_gid, 
+                               "aux", 
+                               patch_dim, num_cells_per_patch_subdims,
+                               2, patch_dims, 
+                               num_patches_to_buffer, 
+                               H5T_NATIVE_FLOAT, 
+                               aux_cb,
+                               &default_vtable);
+    }
+
     // write blockno
     patch_dims[0] = num_cells_per_patch;
     make_dataset_numerical(glob, 
@@ -1271,7 +1453,7 @@ void fclaw_clawpatch_output_hdf5_to_file (struct fclaw_global* glob,
     fclaw_hdf_write_file (glob, 
                           filename, 
                           coordinate_cb == NULL ? get_coordinates : coordinate_cb, 
-                          coordinate_cb == NULL ? get_data : value_cb);
+                          coordinate_cb == NULL ? meqn_cb : value_cb);
 }
 
 void fclaw_clawpatch_output_hdf5 (fclaw_global_t * glob, int iframe)

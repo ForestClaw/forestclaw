@@ -68,6 +68,9 @@ endif()
 
 # --- configure
 
+include(cmake/config.cmake)
+include(cmake/compilers.cmake)
+
 # Conda's HDF5 never works with the system compiler
 if(DEFINED ENV{CONDA_PREFIX})
   list(APPEND CMAKE_IGNORE_PREFIX_PATH $ENV{CONDA_PREFIX})
@@ -88,8 +91,6 @@ if(FCLAW_ENABLE_HDF5 AND NOT TARGET HDF5::HDF5)
   endif()
 endif()
 
-include(cmake/config.cmake)
-include(cmake/compilers.cmake)
 
 
 # --- test
@@ -138,6 +139,7 @@ endif(FCLAW_ENABLE_CUDACLAW)
 if(FCLAW_ENABLE_THUNDEREGG)
 
   add_subdirectory(src/solvers/fc2d_thunderegg)
+  add_subdirectory(src/solvers/fc3d_thunderegg)
 
 endif(FCLAW_ENABLE_THUNDEREGG)
 # --- package

@@ -638,22 +638,22 @@ typedef void (*fclaw3d_clawpatch_fort_conscheck_t)(int *mx,
                                                    double *c_kahan);
 
 /**
- * @brief Calculates the area of a patch
+ * @brief Calculates the volume of a patch
  * 
  * @param[in] mx, my, mz the number cells in the x and y directions, excluding ghost
  * @param[in] mbc the number of ghost cells
  * @param[in] dx, dy, dz spacing of cells in the x and y directions
- * @param[in] area array of area values for cells
+ * @param[in] volume array of volume values for cells
  * @return the total area of the patch
  */
-typedef double (*fclaw3d_clawpatch_fort_area_t)(int *mx, 
-                                                int* my, 
-                                                int* mz, 
-                                                int *mbc, 
-                                                double *dx, 
-                                                double** dy, 
-                                                double *dz, 
-                                                double area[]);
+typedef double (*fclaw3d_clawpatch_fort_volume_t)(int *mx, 
+                                                  int* my, 
+                                                  int* mz, 
+                                                  int *mbc, 
+                                                  double *dx, 
+                                                  double *dy, 
+                                                  double *dz, 
+                                                  double volume[]);
 
 /**
  * @brief Calculates the error norms for a patch

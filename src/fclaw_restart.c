@@ -414,7 +414,8 @@ static
 void restart (fclaw_global_t * glob,
               const char* restart_filename,
               const char* partition_filename,
-              fclaw_timer_names_t timer)
+              fclaw_timer_names_t timer,
+              int init_flag)
 {
     int refine_dim = glob->domain->refine_dim;
     fclaw_domain_reset(glob);
@@ -508,7 +509,11 @@ void restart (fclaw_global_t * glob,
     CHECK_ERROR_CODE_AND_ABORT(refine_dim, errcode, "restart read used_ini");
 
     const char* used_ini = (const char*) sc_array_index(&array, 0);
-    check_options(glob, used_ini);
+    if(init_flag)
+    {
+        //only check options if initializing
+        check_options(glob, used_ini);
+    }
     
     sc_array_reset(&array);
 
@@ -569,7 +574,10 @@ void restart (fclaw_global_t * glob,
     fclaw_file_close(fc, &errcode);
     CHECK_ERROR_CODE_AND_ABORT(refine_dim, errcode, "restart close file");
 
-    fclaw_initialize_domain_flags(glob);
+    if(init_flag)
+    {
+        fclaw_initialize_domain_flags(glob);
+    }
     fclaw_exchange_setup(glob,timer);
     fclaw_regrid_set_neighbor_types(glob);
 }
@@ -758,7 +766,15 @@ fclaw_restart_from_file (fclaw_global_t * glob,
                          const char* restart_filename,
                          const char* partition_filename)
 {
-    restart(glob, restart_filename, partition_filename, FCLAW_TIMER_INIT);
+    restart(glob, restart_filename, partition_filename, FCLAW_TIMER_INIT, 1);
+}
+
+void
+fclaw_reinitialize_from_file(struct fclaw_global *glob, 
+                             const char *restart_filename, 
+                             const char *partition_filename)
+{
+    restart(glob, restart_filename, partition_filename, FCLAW_TIMER_NONE, 0);
 }
 
 void fclaw_output_checkpoint(fclaw_global_t* glob, int iframe)

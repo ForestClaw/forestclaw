@@ -44,6 +44,7 @@ include src/solvers/fc2d_clawpack4.6/Makefile.am
 
 ## Solver libraries (most example apps require both)
 include src/solvers/fc2d_thunderegg/Makefile.am
+include src/solvers/fc3d_thunderegg/Makefile.am
 
 ## Applications that use an elliptic solver
 include applications/elliptic/elliptic.apps

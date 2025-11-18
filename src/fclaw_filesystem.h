@@ -54,6 +54,13 @@ char* fclaw_cwd();
  */
 void fclaw_cd(const char* dir);
 
+/**
+ * @brief remove a file
+ *
+ * If the file does not exist, this function does nothing.
+ */
+void fclaw_remove(const char* file);
+
 #ifdef __cplusplus
 #if 0
 {

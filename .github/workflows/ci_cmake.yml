@@ -18,7 +18,7 @@ env:
 jobs:
 
   linux:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     timeout-minutes: 60
 
     strategy:
@@ -37,16 +37,10 @@ jobs:
         - name: "Serial With GeoClaw"
           configure_flags: "-Dgeoclaw=ON"
           ubuntu_packages: ""
-        - name: "Serial With CudaClaw (CUDA 10.1)"
+        - name: "Serial With CudaClaw"
           configure_flags: "-Dcudaclaw=ON"
           ubuntu_packages: "nvidia-cuda-toolkit"
           cuda: true
-        - name: "Serial With CudaClaw (CUDA 11.3)"
-          configure_flags: "-Dcudaclaw=ON"
-          configure_environment: "CUDACXX=/usr/local/cuda/bin/nvcc"
-          ubuntu_packages: ""
-          cuda: true
-          cuda_11_3: true
         - name: "MPI Minimal"
           configure_flags: "-Dmpi=ON"
           ubuntu_packages: "libopenmpi-dev openmpi-bin"
@@ -59,16 +53,10 @@ jobs:
         - name: "MPI With GeoClaw"
           configure_flags: "-Dmpi=ON -Dgeoclaw=ON"
           ubuntu_packages: "libopenmpi-dev openmpi-bin"
-        - name: "MPI With CudaClaw (CUDA 10.1)"
+        - name: "MPI With CudaClaw"
           configure_flags: "-Dmpi=ON -Dcudaclaw=ON"
           ubuntu_packages: "libopenmpi-dev openmpi-bin nvidia-cuda-toolkit"
           cuda: true
-        - name: "MPI With CudaClaw (CUDA 11.3)"
-          configure_flags: "-Dmpi=ON -Dcudaclaw=ON"
-          configure_environment: "CUDACXX=/usr/local/cuda/bin/nvcc"
-          ubuntu_packages: "libopenmpi-dev openmpi-bin"
-          cuda: true
-          cuda_11_3: true
         - name: "MPI With ThunderEgg"
           configure_flags: "-Dmpi=ON -Dthunderegg=ON"
           ubuntu_packages: "libopenmpi-dev openmpi-bin libfftw3-dev"
@@ -83,14 +71,6 @@ jobs:
         sudo apt-get update -yq
         sudo apt-get install -yq --no-install-recommends \
             ${{ matrix.ubuntu_packages }}
-
-    - name: Install Cuda Toolkit 11.3
-      if: ${{ matrix.cuda_11_3 }}
-      run: |
-        wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/cuda-keyring_1.0-1_all.deb
-        sudo dpkg -i cuda-keyring_1.0-1_all.deb
-        sudo apt-get update
-        sudo apt-get -y install cuda-toolkit-11-3
 
     - name: CMake configure
       run: ${{ matrix.configure_environment }} cmake --preset ci ${{ matrix.configure_flags }}

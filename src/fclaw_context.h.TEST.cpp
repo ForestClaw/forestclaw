@@ -23,6 +23,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include "fclaw_global.h"
 #include <fclaw_context.h>
 #include <test.hpp>
 
@@ -210,26 +211,39 @@ TEST_CASE("fclaw_context_get_int existing context two values")
 
 TEST_CASE("fclaw_context_get_int called for non-existing value")
 {
-	fclaw_global_t* glob = fclaw_global_new_comm(sc_MPI_COMM_SELF, 1, 0);
-	fclaw_context_t *context = fclaw_context_get(glob, "test");
-	fclaw_context_save(context);
+	for(int default_value : {-100, 0, 42})
+	{
+		fclaw_global_t* glob = fclaw_global_new_comm(sc_MPI_COMM_SELF, 1, 0);
+		fclaw_context_t *context = fclaw_context_get(glob, "test");
+		fclaw_context_save(context);
 
-	// second get call, since we didn't get_int in first, should fail
-	context = fclaw_context_get(glob, "test");
-	int value;
-	CHECK_SC_ABORTED(fclaw_context_get_int(context, "test", &value));
+		// second get call, since we didn't get_int in first, should fail
+		context = fclaw_context_get(glob, "test");
+		int value = default_value;
+		fclaw_context_get_int(context, "test", &value);
+		CHECK_EQ(value, default_value);
+
+		fclaw_global_destroy(glob);
+	}
 }
 
 TEST_CASE("fclaw_context_get_int called for non-exising value other value")
 {
-	fclaw_global_t* glob = fclaw_global_new_comm(sc_MPI_COMM_SELF, 1, 0);
-	fclaw_context_t *context = fclaw_context_get(glob, "test");
-	int value = 0;
-	fclaw_context_get_int(context, "test", &value);
-	fclaw_context_save(context);
+	for(int default_value : {-100, 0, 42})
+	{
+		fclaw_global_t* glob = fclaw_global_new_comm(sc_MPI_COMM_SELF, 1, 0);
+		fclaw_context_t *context = fclaw_context_get(glob, "test");
+		int value = 0;
+		fclaw_context_get_int(context, "test", &value);
+		fclaw_context_save(context);
 
-	context = fclaw_context_get(glob, "test");
-	CHECK_SC_ABORTED(fclaw_context_get_int(context, "test-does-not-exist", &value));
+		context = fclaw_context_get(glob, "test");
+		int value2 = default_value;
+		fclaw_context_get_int(context, "test-does-not-exist", &value2);
+		CHECK_EQ(value2, default_value);
+
+		fclaw_global_destroy(glob);
+	}
 }
 
 TEST_CASE("fclaw_context_get_int save without getting all variables")
@@ -240,9 +254,18 @@ TEST_CASE("fclaw_context_get_int save without getting all variables")
 	fclaw_context_get_int(context, "test", &value);
 	fclaw_context_save(context);
 
-	// second get call, since we don't get_int, should fail
+	// second get call
 	context = fclaw_context_get(glob, "test");
-	CHECK_SC_ABORTED(fclaw_context_save(context));
+	// change value, shouldn't save, since get wasn't called
+	value = 1;
+	fclaw_context_save(context);
+
+	// check that value wasn't changed
+	context = fclaw_context_get(glob, "test");
+	fclaw_context_get_int(context, "test", &value);
+	CHECK_EQ(value, 0);
+
+	fclaw_global_destroy(glob);
 }
 
 TEST_CASE("fclaw_context_get_double new context")
@@ -382,26 +405,40 @@ TEST_CASE("fclaw_context_get_double existing context two values")
 
 TEST_CASE("fclaw_context_get_double called for non-existing value")
 {
-	fclaw_global_t* glob = fclaw_global_new_comm(sc_MPI_COMM_SELF, 1, 0);
-	fclaw_context_t *context = fclaw_context_get(glob, "test");
-	fclaw_context_save(context);
+	for(double default_value : {-100, 0, 42})
+	{
+		fclaw_global_t* glob = fclaw_global_new_comm(sc_MPI_COMM_SELF, 1, 0);
+		fclaw_context_t *context = fclaw_context_get(glob, "test");
+		fclaw_context_save(context);
 
-	// second get call, since we didn't get_double in first, should fail
-	context = fclaw_context_get(glob, "test");
-	double value;
-	CHECK_SC_ABORTED(fclaw_context_get_double(context, "test", &value));
+		// second get call, since we didn't get_double in first, should fail
+		context = fclaw_context_get(glob, "test");
+		double value = default_value;
+		fclaw_context_get_double(context, "test", &value);
+
+		CHECK_EQ(value, default_value);
+
+		fclaw_global_destroy(glob);
+	}
 }
 
 TEST_CASE("fclaw_context_get_double called for non-exising value other value")
 {
-	fclaw_global_t* glob = fclaw_global_new_comm(sc_MPI_COMM_SELF, 1, 0);
-	fclaw_context_t *context = fclaw_context_get(glob, "test");
-	double value = 0;
-	fclaw_context_get_double(context, "test", &value);
-	fclaw_context_save(context);
+	for(double default_value : {-100, 0, 42})
+	{
+		fclaw_global_t* glob = fclaw_global_new_comm(sc_MPI_COMM_SELF, 1, 0);
+		fclaw_context_t *context = fclaw_context_get(glob, "test");
+		double value = 0;
+		fclaw_context_get_double(context, "test", &value);
+		fclaw_context_save(context);
 
-	context = fclaw_context_get(glob, "test");
-	CHECK_SC_ABORTED(fclaw_context_get_double(context, "test-does-not-exist", &value));
+		context = fclaw_context_get(glob, "test");
+		double value2 = default_value;
+		fclaw_context_get_double(context, "test-does-not-exist", &value2);
+		CHECK_EQ(value2, default_value);
+
+		fclaw_global_destroy(glob);
+	}
 }
 
 TEST_CASE("fclaw_context_get_double save without getting all variables")
@@ -412,9 +449,18 @@ TEST_CASE("fclaw_context_get_double save without getting all variables")
 	fclaw_context_get_double(context, "test", &value);
 	fclaw_context_save(context);
 
-	// second get call, since we don't get_double, should fail
+	// second get call
 	context = fclaw_context_get(glob, "test");
-	CHECK_SC_ABORTED(fclaw_context_save(context));
+	// change value, shouldn't save, since get wasn't called
+	value = 1;
+	fclaw_context_save(context);
+	
+	// check that value wasn't changed
+	context = fclaw_context_get(glob, "test");
+	fclaw_context_get_double(context, "test", &value);
+	CHECK_EQ(value, 0);
+
+	fclaw_global_destroy(glob);
 }
 
 TEST_CASE("fclaw_context_get_double and fclaw_context_get_int called for same value")

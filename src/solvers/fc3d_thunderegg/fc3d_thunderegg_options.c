@@ -1,0 +1,242 @@
+/*
+Copyright (c) 2019-2023 Carsten Burstedde, Donna Calhoun, Scott Aiton, Grady Wright
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+ * Redistributions of source code must retain the above copyright notice, this
+list of conditions and the following disclaimer.
+ * Redistributions in binary form must reproduce the above copyright notice,
+this list of conditions and the following disclaimer in the documentation
+and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
+#include "fc3d_thunderegg_options.h"
+
+#include <fclaw_global.h>
+#include <fclaw_options.h>
+
+static void*
+thunderegg_register (fc3d_thunderegg_options_t* mg_opt, sc_options_t * opt)
+{
+
+#if 0
+    sc_options_add_int (opt, 0, "mfields", &mg_opt->mfields, 0,
+                        "The number of fields in solution [1]");
+#endif                        
+
+
+    /* Array of NumFaces=4 values */
+    fclaw_options_add_int_array (opt, 0, "boundary_conditions", 
+                                 &mg_opt->bc_cond_string, "1 1 1 1 1 1",
+                                 &mg_opt->boundary_conditions, 6,
+                                 "[thunderegg] Physical boundary condition type [1 1 1 1 1 1]");
+
+    sc_options_add_bool (opt, 0, "ascii-out", &mg_opt->ascii_out, 0,
+                           "Output ASCII formatted data [F]");
+
+    sc_options_add_bool (opt, 0, "vtk-out", &mg_opt->vtk_out, 0,
+                           "Output VTK formatted data [F]");
+    
+    sc_options_add_bool (opt, 0, "hdf5-out", &mg_opt->hdf5_out, 0,
+                           "Output HDF5 formatted data [F]");
+
+    sc_options_add_bool (opt, 0, "mg-prec", &mg_opt->mg_prec, 1,
+                           "Use thunderegg preconditioner [T]");
+
+    sc_options_add_int (opt, 0, "max-it", &mg_opt->max_it, 10000,
+                           "Max iterations for BiCGStab solver. [10000]");
+
+    sc_options_add_int (opt, 0, "verbosity-level", &mg_opt->verbosity_level, 0,
+                           "Verbosity level (0-1) [0]");
+
+    sc_options_add_double (opt, 0, "tol", &mg_opt->tol, 1e-12,
+                           "Tolerance for BiCGStab solver. [1e-12]");
+
+    sc_options_add_int (opt, 0, "pre-sweeps", &mg_opt->pre_sweeps, 1,
+                           "Number of sweeps on down cycle [1]");
+
+    sc_options_add_int (opt, 0, "post-sweeps", &mg_opt->post_sweeps, 1,
+                           "Number of sweeps on up cycle [1]");
+
+    sc_options_add_int (opt, 0, "mid-sweeps", &mg_opt->mid_sweeps, 1,
+                           "Number of sweeps inbetween up and down [1]");
+
+    sc_options_add_int (opt, 0, "coarse-sweeps", &mg_opt->coarse_sweeps, 1,
+                           "Number of sweeps on coarse level [1]");
+
+    sc_options_add_string (opt, 0, "cycle-type", &mg_opt->cycle_type, "V",
+                           "Cycle type [V]");
+
+    sc_options_add_double (opt, 0, "patch-iter-tol", &mg_opt->patch_iter_tol, 1e-1,
+                           "Tolerance for patch-based iterative solvers [1e-1]");
+
+    sc_options_add_int (opt, 0, "patch-iter-max-it", &mg_opt->patch_iter_max_it, 1000,
+                           "Max allowed iterations for patch-based iterative solvers [1000]");
+
+
+    /* Set operator type (starpatch, fivepoint) */
+    sc_keyvalue_t *kv_op = mg_opt->kv_patch_operator = sc_keyvalue_new ();
+    sc_keyvalue_set_int (kv_op, "starpatch",  STARPATCH);     /* Uses FFT, CG or BICG */
+    sc_keyvalue_set_int (kv_op, "fivepoint",  FIVEPOINT);     /* Uses FFT, CG or BICG */
+    sc_keyvalue_set_int (kv_op, "varpoisson", VARPOISSON);   /* Uses BICG or CG */
+    sc_keyvalue_set_int (kv_op, "heat",       HEAT);   /* Uses BICG or CG */
+    sc_keyvalue_set_int (kv_op, "user_operator",  USER_OPERATOR);   /* Uses BICG or CG */
+    sc_options_add_keyvalue (opt, 0, "patch_operator", &mg_opt->patch_operator,
+                             "fivepoint", kv_op, "Set patch operator type [fivepoint]");
+
+    /* Set solver type (FFT, BICG) */
+    sc_keyvalue_t *kv_s = mg_opt->kv_patch_solver = sc_keyvalue_new ();
+    sc_keyvalue_set_int (kv_s, "bicg", BICG);
+    sc_keyvalue_set_int (kv_s, "cg", CG);
+    sc_keyvalue_set_int (kv_s, "fft",  FFT);     
+    sc_keyvalue_set_int (kv_s, "user_solver",  USER_SOLVER);     
+    sc_options_add_keyvalue (opt, 0, "patch_solver", &mg_opt->patch_solver,
+                             "bicg", kv_s, "Set patch solver type [BICG]");
+
+    mg_opt->is_registered = 1;
+    return NULL;
+}
+
+static fclaw_exit_type_t
+thunderegg_postprocess (fc3d_thunderegg_options_t * mg_opt)
+{
+    fclaw_options_convert_int_array (mg_opt->bc_cond_string, 
+                                     &mg_opt->boundary_conditions,6);
+    
+    return FCLAW_NOEXIT;
+}
+
+
+static fclaw_exit_type_t
+thunderegg_check(fc3d_thunderegg_options_t *mg_opt)
+{
+    return FCLAW_NOEXIT;
+}
+
+static
+void thunderegg_destroy (fc3d_thunderegg_options_t * mg_opt)
+{
+    fclaw_options_destroy_array (mg_opt->boundary_conditions);
+
+    FCLAW_ASSERT (mg_opt->kv_patch_operator != NULL);
+    sc_keyvalue_destroy (mg_opt->kv_patch_operator);
+
+    FCLAW_ASSERT (mg_opt->kv_patch_solver != NULL);
+    sc_keyvalue_destroy (mg_opt->kv_patch_solver);
+}
+
+/* ------------------------------------------------------
+   Generic calls to options handling;  each calls 
+   clawpack-specific options call back
+   ------------------------------------------------------ */
+
+static void*
+options_register (fclaw_app_t * app, void *package, sc_options_t * opt)
+{
+    fc3d_thunderegg_options_t *mg_opt;
+
+    FCLAW_ASSERT (app != NULL);
+    FCLAW_ASSERT (package != NULL);
+
+    mg_opt = (fc3d_thunderegg_options_t*) package;
+
+    return thunderegg_register(mg_opt,opt);
+}
+
+
+static fclaw_exit_type_t
+options_postprocess (fclaw_app_t * app, void *package, void *registered)
+{
+    fc3d_thunderegg_options_t *mg_opt;
+
+    FCLAW_ASSERT (app != NULL);
+    FCLAW_ASSERT (package != NULL);
+    FCLAW_ASSERT (registered == NULL);
+
+    mg_opt = (fc3d_thunderegg_options_t*) package;
+    FCLAW_ASSERT (mg_opt->is_registered);
+
+    return thunderegg_postprocess (mg_opt);
+}
+
+
+static fclaw_exit_type_t
+options_check (fclaw_app_t * app, void *package, void *registered)
+{
+    fc3d_thunderegg_options_t *mg_opt;
+
+    FCLAW_ASSERT (app != NULL);
+    FCLAW_ASSERT (package != NULL);
+    FCLAW_ASSERT (registered == NULL);
+
+    mg_opt = (fc3d_thunderegg_options_t*) package;
+    FCLAW_ASSERT (mg_opt->is_registered);
+
+    return thunderegg_check(mg_opt);
+}
+
+static void
+options_destroy (fclaw_app_t * app, void *package, void *registered)
+{
+    fc3d_thunderegg_options_t *mg_opt;
+
+    FCLAW_ASSERT (app != NULL);
+    FCLAW_ASSERT (package != NULL);
+    FCLAW_ASSERT (registered == NULL);
+
+    mg_opt = (fc3d_thunderegg_options_t*) package;
+    FCLAW_ASSERT (mg_opt->is_registered);
+
+    thunderegg_destroy (mg_opt);
+
+    FCLAW_FREE (mg_opt);
+}
+
+static const fclaw_app_options_vtable_t thunderegg_options_vtable = {
+    options_register,
+    options_postprocess,
+    options_check,
+    options_destroy,
+};
+
+/* ----------------------------------------------------------
+   Public interface to clawpack options
+   ---------------------------------------------------------- */
+fc3d_thunderegg_options_t*  fc3d_thunderegg_options_register (fclaw_app_t * app,
+                                                              const char *section,
+                                                              const char *configfile)
+{
+    fc3d_thunderegg_options_t *mg_opt;
+
+    FCLAW_ASSERT (app != NULL);
+
+    mg_opt = FCLAW_ALLOC (fc3d_thunderegg_options_t, 1);
+    fclaw_app_options_register (app, section, configfile,
+                                &thunderegg_options_vtable, mg_opt);
+    
+    fclaw_app_set_attribute(app, section, mg_opt);
+    return mg_opt;
+}
+
+fc3d_thunderegg_options_t* fc3d_thunderegg_get_options(fclaw_global_t *glob)
+{
+    return (fc3d_thunderegg_options_t*) fclaw_global_get_options(glob,"fc3d_thunderegg");
+}
+
+void fc3d_thunderegg_options_store (fclaw_global_t* glob, fc3d_thunderegg_options_t* mg_opt)
+{
+    fclaw_global_options_store(glob, "fc3d_thunderegg", mg_opt);
+}

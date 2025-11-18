@@ -77,3 +77,17 @@ void fclaw_cd(const char* dir)
     FCLAW_ASSERT(error == 0);
 #endif
 }
+
+void fclaw_remove(const char* file)
+{
+#ifdef __cpp_lib_filesystem
+    std::filesystem::path file_path(file);
+    if(std::filesystem::exists(file_path))
+    {
+        std::filesystem::remove(file_path);
+    }
+#else
+    int error = unlink(file);
+    FCLAW_ASSERT(error == 0 || errno == ENOENT); // ENOENT is ok if file does not exist
+#endif
+}
