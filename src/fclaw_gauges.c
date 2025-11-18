@@ -813,7 +813,7 @@ void gauges_finalize(fclaw_global_t *glob, void** acc)
     }
 
     const fclaw_options_t * fclaw_opt = fclaw_get_options(glob);
-    if (!fclaw_opt->moving_gauges)
+    if (!fclaw_opt->moving_gauges && num_gauges > 0)
     {
         /* info for moving gauges is destroyed at the end of each 
         "locate patches" call.  Only static gauge info needs 
