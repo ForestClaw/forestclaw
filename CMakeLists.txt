@@ -41,9 +41,12 @@ include(cmake/GitSubmodule.cmake)
 
 if(FCLAW_ENABLE_SUBMODULES)
 
+  git_submodule(${CMAKE_CURRENT_SOURCE_DIR}/sc)
+  set(SC_BUILD_TESTING OFF CACHE BOOL "" FORCE)
+  add_subdirectory(sc)
+
   git_submodule(${CMAKE_CURRENT_SOURCE_DIR}/p4est)
   set(P4EST_BUILD_TESTING OFF CACHE BOOL "" FORCE)
-  set(SC_BUILD_TESTING OFF CACHE BOOL "" FORCE)
   add_subdirectory(p4est)
 
 else()
