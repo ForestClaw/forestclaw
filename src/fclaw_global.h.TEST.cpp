@@ -222,11 +222,8 @@ TEST_CASE("fclaw_global_pack with a single packed attribute")
 
 		size_t bytes_read = fclaw_global_unpack(buffer, glob2);
 
-		if(!already_stored_attribute)
-		{
-			attribute2 = (dummy_attribute*)(fclaw_global_get_attribute(glob2, "dummy1"));
-			REQUIRE_NE(attribute2, nullptr);
-		}
+		attribute2 = (dummy_attribute*)(fclaw_global_get_attribute(glob2, "dummy1"));
+		REQUIRE_NE(attribute2, nullptr);
 
 		REQUIRE_EQ(bytes_read, packsize);
 
@@ -298,16 +295,10 @@ TEST_CASE("fclaw_global_pack with two packed attributes")
 
 		size_t bytes_read = fclaw_global_unpack(buffer, glob2);
 
-		if(!already_stored_attribute_1)
-		{
-			attribute2_1 = (dummy_attribute*)(fclaw_global_get_attribute(glob2, "dummy1"));
-			REQUIRE_NE(attribute2_1, nullptr);
-		}
-		if(!already_stored_attribute_2)
-		{
-			attribute2_2 = (dummy_attribute*)(fclaw_global_get_attribute(glob2, "dummy2"));
-			REQUIRE_NE(attribute2_2, nullptr);
-		}
+		attribute2_1 = (dummy_attribute*)(fclaw_global_get_attribute(glob2, "dummy1"));
+		REQUIRE_NE(attribute2_1, nullptr);
+		attribute2_2 = (dummy_attribute*)(fclaw_global_get_attribute(glob2, "dummy2"));
+		REQUIRE_NE(attribute2_2, nullptr);
 
 		REQUIRE_EQ(bytes_read, packsize);
 
