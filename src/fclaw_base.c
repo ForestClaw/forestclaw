@@ -336,6 +336,9 @@ fclaw_app_destroy (fclaw_app_t * a)
     FCLAW_ASSERT (a->opt_pkg != NULL);
     FCLAW_ASSERT (a->opt != NULL);
 
+    /* destroy central options structure */
+    sc_options_destroy (a->opt);
+
     /* let the options packages clean up their memory */
     for (zz = a->opt_pkg->elem_count; zz > 0; --zz)
     {
@@ -350,9 +353,8 @@ fclaw_app_destroy (fclaw_app_t * a)
     }
     sc_array_destroy (a->opt_pkg);
 
-    /* destroy central structures */
+    /* destroy attributes */
     sc_keyvalue_destroy (a->attributes);
-    sc_options_destroy (a->opt);
 
     FCLAW_FREE (a);
 
