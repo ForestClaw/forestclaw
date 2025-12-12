@@ -246,6 +246,7 @@ void gauges_initialize(fclaw_global_t* glob, void** acc)
     *acc = gauge_acc;
     gauge_acc->num_gauges = num_gauges;
     gauge_acc->dim = gauge_dim;
+    gauge_acc->num_gauges_set = 0;
 
 
     fclaw_gauge_info_t *gauge_info = FCLAW_ALLOC_ZERO(fclaw_gauge_info_t,1);
@@ -489,8 +490,10 @@ int fclaw_gauges_setup_block_lists(fclaw_global_t* glob,
     } 
     else
     {
+        /* No gauges: ensure pointers and counters are consistent */
         *block_offsets_ptr = NULL;
         *coordinates_ptr = NULL;   
+        gauge_acc->num_gauges_set = 0;
         return 0;     
     } /* num_gauges > 0 */
 }
