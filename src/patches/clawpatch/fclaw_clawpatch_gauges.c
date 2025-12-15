@@ -118,6 +118,11 @@ void fclaw_clawpatch_gauges_read_data(fclaw_global_t *glob,
     /* USER: Maximum line length in gauges input file gauges.data */
 
     FILE *f_gauges_data = fopen("gauges.data","r");
+    if (f_gauges_data == NULL)
+    {
+        fclaw_abortf("read_gauges_data : Could not open gauges.data file.\n");
+    }
+
     int max_line_len = 200;  
     char *line = FCLAW_ALLOC(char,max_line_len);
 
