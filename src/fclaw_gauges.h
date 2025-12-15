@@ -223,8 +223,10 @@ typedef struct fclaw_gauges_vtable
     /** @brief Prints the buffer to a file */
     fclaw_gauges_print_t         print_buffer;
 
+    /** @brief Move non-static gauges using a prescribed velocity field */
     fclaw_gauges_move_t          move;
 
+    /** @brief Move non-static gauges using local (patch) information */
     fclaw_gauges_move_local_t    move_local;
 
     /** @brief true if vtable has been set */
