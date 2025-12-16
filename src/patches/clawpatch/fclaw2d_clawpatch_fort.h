@@ -448,10 +448,77 @@ typedef double (*clawpatch_fort_area_t)(int *mx, int* my, int*mbc, double* dx,
  * @param[in] error error array
  * @param[out] error_norm a 2d array of  l1, l2, and inf norms for each eqn
  */
-typedef void (*clawpatch_fort_norm_t)(const int* blockno, const int *mx, const int *my, const int *mbc, const int *meqn,
+typedef void (*clawpatch_fort_norm_t)(const int* blockno, const int *mx, 
+                                      const int *my, const int *mbc, const int *meqn,
 									  const double *dx, const double *dy, double area[],
 									  double error[], double error_norm[]);
 
+
+/**
+ * @brief Updates values at gauges
+ * 
+ * @param[in] num the gauge number (or id)
+ * @param[in] mx, my the number cells in the x and y directions, excluding ghost
+ * @param[in] mbc the number of ghost cells
+ * @param[in] meqn the number of equations
+ * @param[in] xlower, ylower Lower corner of patch
+ * @param[in] dx, dy spacing of cells in the x and y directions
+ * @param[in] q  Solution on patch
+ * @param[in] maux Number of aux variables
+ * @param[in] aux Auxilliary array
+ * @param[in] xc, yc Location of gauge
+ * @param[out] qvar, avar Vectors of interpolated solution and aux array at gauge point.
+ */
+
+typedef void (*clawpatch_fort_gauges_update_t)(const int *num, 
+                                             const int *mx, 
+                                             const int *my, 
+                                             const int* mbc, 
+                                             const int *meqn, 
+                                             const double* xlower,
+                                             const double *ylower,
+                                             const double *dx, 
+                                             const double* dy,
+                                             double q[],
+                                             const int *maux, double aux[],
+                                             const double *xc, double *yc,
+                                             double qvar[], double avar[]);
+
+
+/**
+ * @brief Move gauge positions
+ * 
+ * @param[in] num the gauge number (or id)
+ * @param[in] mx, my the number cells in the x and y directions, excluding ghost
+ * @param[in] mbc the number of ghost cells
+ * @param[in] meqn the number of equations
+ * @param[in] xlower, ylower Lower corner of patch
+ * @param[in] dx, dy spacing of cells in the x and y directions
+ * @param[in] q  Solution on patch
+ * @param[in] maux Number of aux variables
+ * @param[in] aux Auxilliary array
+ * @param[in] xc, yc Current location of gauge
+ * @param[out] xc_new, yc_new New location of gauge
+ */
+
+typedef void (*clawpatch_fort_gauges_move_local_t)(const int *num, 
+                                                   const int *mx, 
+                                                   const int *my, 
+                                                   const int* mbc, 
+                                                   const int *meqn, 
+                                                   const double* xlower,
+                                                   const double *ylower,
+                                                   const double *dx, 
+                                                   const double* dy,
+                                                   double q[],
+                                                   const int *maux, 
+                                                   double aux[],
+                                                   const double *xc, 
+                                                   const double *yc,
+                                                   const double *t, 
+                                                   const double *dt,
+                                                   double *xc_new, 
+                                                   double *yc_new);
 /** @} */
 
 /** @{ @name Fortran Headers *//*-------------------------------------------------------*/

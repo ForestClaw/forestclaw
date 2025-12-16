@@ -680,6 +680,68 @@ typedef void (*fclaw3d_clawpatch_fort_norm_t)(int* blockno,
                                               double error[], 
                                               double error_norm[]);
 
+
+/**
+ * @brief Updates values at gauges
+ * 
+ * @param[in] num the gauge number (or id)
+ * @param[in] mx, my the number cells in the x and y directions, excluding ghost
+ * @param[in] mbc the number of ghost cells
+ * @param[in] meqn the number of equations
+ * @param[in] xlower, ylower Lower corner of patch
+ * @param[in] dx, dy spacing of cells in the x and y directions
+ * @param[in] q  Solution on patch
+ * @param[in] maux Number of aux variables
+ * @param[in] aux Auxilliary array
+ * @param[in] xc, yc Location of gauge
+ * @param[out] qvar, avar Vectors of interpolated solution and aux array at gauge point.
+ */
+
+typedef void (*fclaw3d_clawpatch_fort_gauges_update_t)(const int *num, 
+                                                const int *mx, 
+                                                const int *my, 
+                                                const int *mz, 
+                                                const int *mbc, 
+                                                const int *meqn, 
+                                                const double *xlower,
+                                                const double *ylower,
+                                                const double *zlower,
+                                                const double *dx, 
+                                                const double *dy,
+                                                const double *dz,
+                                                double q[],
+                                                const int *maux, 
+                                                double aux[],
+                                                const double *xc, 
+                                                const double *yc,
+                                                const double *zc, 
+                                                double qvar[], 
+                                                double avar[]);
+
+
+typedef void (*fclaw3d_clawpatch_fort_gauges_move_local_t)(const int *num, 
+                                                           const int *mx, 
+                                                           const int *my, 
+                                                           const int *mz, 
+                                                           const int *mbc, 
+                                                           const int *meqn, 
+                                                           const double *xlower,
+                                                           const double *ylower,
+                                                           const double *zlower,
+                                                           const double *dx, 
+                                                           const double *dy,
+                                                           const double *dz,
+                                                           double q[],
+                                                           const int *maux, 
+                                                           double aux[],
+                                                           const double *t,
+                                                           const double *dt,
+                                                           const double *xc, 
+                                                           const double *yc,
+                                                           const double *zc, 
+                                                           const double *xc_new, 
+                                                           const double *yc_new,
+                                                           const double *zc_new); 
 /** @} */
 
 /** 

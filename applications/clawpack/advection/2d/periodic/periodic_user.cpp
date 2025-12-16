@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
+Copyright (c) 2012-2025 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -24,17 +24,21 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "periodic_user.h"
+#include "math.h"
 
 static
 void periodic_problem_setup(fclaw_global_t* glob)
 {
     const user_options_t* user = periodic_get_options(glob);
+    const fclaw_options_t * fclaw_opt = fclaw_get_options(glob);
 
     if (glob->mpirank == 0)
     {
         FILE *f = fopen("setprob.data","w");
+        fprintf(f,"%-24d %s\n",user->initial_condition,"\% initial-condition");
         fprintf(f,"%-24.4f %s\n",user->uvel,"\% u-velocity");
         fprintf(f,"%-24.4f %s\n",user->vvel,"\% v-velocity");
+        fprintf(f,"%-24d %s\n",fclaw_opt->moving_gauges,"\% moving_gauges");
         fclose(f);
     }
 
@@ -44,11 +48,61 @@ void periodic_problem_setup(fclaw_global_t* glob)
     SETPROB();  /* Reads file created above */
 }
 
+void periodic_gauge_move(fclaw_global_t* glob, 
+                         double t, double dt,
+                         fclaw_gauge_t *g)
+
+{
+    /* These will reposition select gauges, even if they are currently not 
+       in the domain.  
+
+       Available fields : 
+
+        g->num               : Gauge ID
+        g->x0, g->y0, g->z0  : Initial position of the gauge 
+        g->xc, g->yc, g->zc  : Current position of the gauge
+
+
+    */
+
+    /* Gauge travels in straight line.  May start outside of the domain. */
+    int num, dim;
+    double xc, yc, zc,t1,t2; 
+    double x0, y0,z0;
+    fclaw_gauges_get_data(glob,g,&num,&dim,&x0, &y0, &z0, 
+                          &xc,&yc,&zc,&t1,&t2);
+
+    if (g->num == 0)
+    {
+        /* Prescribed velocity : gauge travels in a circle */
+        xc = 0.5*cos(M_PI*t);
+        yc = 0.5*sin(M_PI*t);        
+    }
+    else if (g->num < 10)
+    {
+        /* use background velocity to move the gauge */
+        const user_options_t* user = periodic_get_options(glob);
+
+        /* With this velocity, the gauges may leave the domain before the 
+           simulation is done. */
+        xc += dt*user->uvel;
+        yc += dt*user->vvel;
+    }
+    else
+    {
+        /* Gauges with IDs >= 10 do not move.  */
+    }
+
+    fclaw_gauges_set_position(glob, g, xc, yc, g->zc);
+}
+
 
 void periodic_link_solvers(fclaw_global_t *glob)
 {
     fclaw_vtable_t *vt = fclaw_vt(glob);
     vt->problem_setup = &periodic_problem_setup;  /* Version-independent */
+
+    const fclaw_options_t * fclaw_opt = fclaw_get_options(glob);
 
     const user_options_t* user = periodic_get_options(glob);
     if (user->claw_version == 4)
@@ -59,6 +113,7 @@ void periodic_link_solvers(fclaw_global_t *glob)
         clawpack46_vt->fort_setaux    = &CLAWPACK46_SETAUX;
         clawpack46_vt->fort_rpn2      = &CLAWPACK46_RPN2ADV;
         clawpack46_vt->fort_rpt2      = &CLAWPACK46_RPT2ADV;
+
     }
     else if (user->claw_version == 5)
     {
@@ -68,6 +123,21 @@ void periodic_link_solvers(fclaw_global_t *glob)
         clawpack5_vt->fort_setaux    = &CLAWPACK5_SETAUX;
         clawpack5_vt->fort_rpn2      = &CLAWPACK5_RPN2ADV;
         clawpack5_vt->fort_rpt2      = &CLAWPACK5_RPT2ADV;
+    }
+
+    /* Move gauges */
+    fclaw_gauges_vtable_t* gauges_vt = (fclaw_gauges_vtable_t*) 
+                        fclaw_global_get_vtable(glob, "fclaw_gauges");
+
+    if (fclaw_opt->moving_gauges)
+    {
+        /* This will be used if 'moving_gauges_local' is False */
+        gauges_vt->move = periodic_gauge_move;
+        if (user->claw_version == 4)
+        {
+            fclaw_clawpatch_vtable_t *clawpatch_vt = fclaw_clawpatch_vt(glob);
+            clawpatch_vt->d2->fort_gauge_move_local = PERIODIC_GAUGES_MOVE_LOCAL;
+        }
     }
 }
 

@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2025 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -79,7 +79,7 @@ void geoclaw_read_gauges_data_default(fclaw_global_t *glob,
     FILE *f_gauges_data;
     int max_line_len = 200;  /* Maximum line length in file  gauges.data */
     char *line, *next;  
-    double *xc,*yc,*t1,*t2,*min_time_increment;
+    double *x0,*y0,*t1,*t2,*min_time_increment;
     int *num;
     int i;
 
@@ -118,12 +118,12 @@ void geoclaw_read_gauges_data_default(fclaw_global_t *glob,
     }
     else
     {
-        fclaw_gauge_allocate(glob,*num_gauges,gauges);
+        fclaw_gauges_allocate(glob,*num_gauges,gauges);
         fclaw_gauge_t *g = *gauges;
 
         num = FCLAW_ALLOC(int,   *num_gauges);
-        xc  = FCLAW_ALLOC(double,*num_gauges);
-        yc  = FCLAW_ALLOC(double,*num_gauges);
+        x0  = FCLAW_ALLOC(double,*num_gauges);
+        y0  = FCLAW_ALLOC(double,*num_gauges);
         t1  = FCLAW_ALLOC(double,*num_gauges);
         t2  = FCLAW_ALLOC(double,*num_gauges);
         min_time_increment = FCLAW_ALLOC(double,*num_gauges);
@@ -133,8 +133,8 @@ void geoclaw_read_gauges_data_default(fclaw_global_t *glob,
         {                        
             fgets(line,max_line_len, f_gauges_data);
             num[i] = strtod(line,&next);
-            xc[i] = strtod(next,&next);
-            yc[i] = strtod(next,&next);
+            x0[i] = strtod(next,&next);
+            y0[i] = strtod(next,&next);
             t1[i] = strtod(next,&next);
             t2[i] = strtod(next,NULL);
         }
@@ -155,15 +155,16 @@ void geoclaw_read_gauges_data_default(fclaw_global_t *glob,
 
         for(i = 0; i < *num_gauges; i++)
         {
-            double zc = 0;
-            fclaw_gauge_set_data(glob,&g[i],num[i],*dim,
-                                 xc[i],yc[i],zc,t1[i],t2[i],
+            double z0 = 0;
+            fclaw_gauges_set_data(glob,&g[i],num[i],*dim,
+
+                                 x0[i],y0[i],z0,x0[i],y0[i],z0,t1[i],t2[i],
                                  min_time_increment[i]);
         }
 
         FCLAW_FREE(num);
-        FCLAW_FREE(xc);
-        FCLAW_FREE(yc);
+        FCLAW_FREE(x0);
+        FCLAW_FREE(y0);
         FCLAW_FREE(t1);
         FCLAW_FREE(t2);
         FCLAW_FREE(min_time_increment);
@@ -183,7 +184,7 @@ void geoclaw_create_gauge_files_default(fclaw_global_t *glob,
                                         int num_gauges)
 {
     int num;
-    double xc,yc,t1,t2;
+    double xc,yc,x0,y0,t1,t2;
 
     /* -----------------------------------------------------
     Open output gauge files and add header information
@@ -194,9 +195,10 @@ void geoclaw_create_gauge_files_default(fclaw_global_t *glob,
     int num_eqns = 4;  /* meqn + 1 (h, hu, hv, eta) */
     for (int i = 0; i < num_gauges; i++)
     {
-        double zc;
+        double zc,z0;
         int dim;
-        fclaw_gauge_get_data(glob,&gauges[i],&num, &dim, &xc, &yc, &zc, &t1, &t2);
+        fclaw_gauges_get_data(glob,&gauges[i],&num, &dim, &x0, &y0, &z0, 
+                              &xc, &yc, &zc, &t1, &t2);
 
         sprintf(filename,"gauge%05d.txt",num);
         fp = fopen(filename, "w");
@@ -252,16 +254,17 @@ void geoclaw_gauge_update_default(fclaw_global_t*
     double *q, *aux;
     double qvar[3], avar[1];  /* q[meqn] */
     int num;
-    double xc,yc, t1, t2;
+    double xc,yc, x0,y0, t1, t2;
 
     int m;
 
     fclaw_clawpatch_2d_grid_data(glob,patch,&mx,&my,&mbc,
                                 &xlower,&ylower,&dx,&dy);
 
-    double zc;
+    double zc,z0;
     int dim;
-    fclaw_gauge_get_data(glob,g,&num, &dim, &xc, &yc, &zc, &t1, &t2);
+    fclaw_gauges_get_data(glob,g,&num, &dim, &x0, &y0, &z0, 
+                          &xc, &yc, &zc, &t1, &t2);
 
     FCLAW_ASSERT(xc >= xlower && xc <= xlower + mx*dx);
     FCLAW_ASSERT(yc >= ylower && yc <= ylower + my*dy);
@@ -285,7 +288,7 @@ void geoclaw_gauge_update_default(fclaw_global_t*
         guser->qvar[m] = qvar[m];
     }
     guser->avar[0] = avar[0];   /* Just store bathymetry for now */
-    fclaw_gauge_set_buffer_entry(glob,g,guser);
+    fclaw_gauges_set_buffer_entry(glob,g,guser);
 }
 
 void geoclaw_print_gauges_default(fclaw_global_t *glob, 
@@ -299,9 +302,9 @@ void geoclaw_print_gauges_default(fclaw_global_t *glob,
 
     /* This assumes on buffers be organized as an array; entries
        start at 0 and with kmax-1 */
-    fclaw_gauge_get_buffer(glob,gauge,&kmax,(void***) &gauge_buffer);
+    fclaw_gauges_get_buffer(glob,gauge,&kmax,(void***) &gauge_buffer);
 
-    id = fclaw_gauge_get_id(glob,gauge);
+    id = fclaw_gauges_get_id(glob,gauge);
     sprintf(filename,"gauge%05d.txt",id);
     fp = fopen(filename, "a");
     for(k = 0; k < kmax; k++)

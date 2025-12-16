@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun, Scott Aiton
+Copyright (c) 2012-2025 Carsten Burstedde, Donna Calhoun, Scott Aiton
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -34,6 +34,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw3d_clawpatch_fort.h>
 #include <fclaw2d_clawpatch_conservation.h>
 #include <fclaw_clawpatch_diagnostics.h>
+
+#include <fclaw_clawpatch_gauges.h>
 
 
 #ifdef __cplusplus
@@ -267,6 +269,10 @@ struct fclaw_clawpatch_vtable_2d
     /** Calculates the area of a patch */
     clawpatch_fort_area_t                  fort_compute_patch_area;
 
+    /** Update gauges */
+    clawpatch_fort_gauges_update_t          fort_gauge_update;
+    clawpatch_fort_gauges_move_local_t      fort_gauge_move_local;
+
     /** @} */
 
 };
@@ -350,6 +356,10 @@ struct fclaw_clawpatch_vtable_3d
     fclaw3d_clawpatch_fort_norm_t                  fort_compute_error_norm;
     /** Calculates the area of a patch */
     fclaw3d_clawpatch_fort_volume_t                fort_compute_patch_volume;
+
+    fclaw3d_clawpatch_fort_gauges_update_t          fort_gauge_update;
+
+    fclaw3d_clawpatch_fort_gauges_move_local_t      fort_gauge_move_local;
 
     /** @} */
 };

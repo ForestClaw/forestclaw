@@ -13,6 +13,7 @@ applications_clawpack_advection_2d_periodic_periodic_SOURCES = \
 	applications/clawpack/advection/2d/periodic/fdisc.f \
     applications/clawpack/advection/2d/periodic/user_4.6/clawpack46_setaux.f \
 	applications/clawpack/advection/2d/periodic/user_4.6/qinit.f \
+	applications/clawpack/advection/2d/periodic/user_4.6/periodic_gauges.f90 \
     applications/clawpack/advection/2d/periodic/user_5.0/clawpack5_setaux.f90 \
 	applications/clawpack/advection/2d/periodic/user_5.0/qinit.f90 \
 	applications/clawpack/advection/2d/all/clawpack46_rpn2adv.f \

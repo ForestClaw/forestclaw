@@ -422,6 +422,7 @@ fclaw_global_unpack(char * buffer, fclaw_global_t * glob)
             entry = FCLAW_ALLOC(attribute_entry_t,1);
             entry->packing_vtable_key = packing_vtable_key;
             entry->destroy = vt->destroy;
+            entry->attribute = vt->new_data(glob);
             fclaw_pointer_map_insert(glob->attributes, attribute_key, entry, attribute_entry_destroy);
         }
         else
@@ -429,9 +430,8 @@ fclaw_global_unpack(char * buffer, fclaw_global_t * glob)
             FCLAW_ASSERT(strcmp(entry->packing_vtable_key,packing_vtable_key) == 0);
             FCLAW_FREE(packing_vtable_key);
             entry->destroy(entry->attribute);
+            entry->attribute = vt->new_data(glob);
         }
-
-        entry->attribute = vt->new_data(glob);
 
         buffer += vt->unpack(glob, buffer, entry->attribute);
 

@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012-2022 Carsten Burstedde, Donna Calhoun
+Copyright (c) 2012-2025 Carsten Burstedde, Donna Calhoun
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -52,8 +52,14 @@ typedef struct fclaw_ray
     int num;                 /* User defined ID */
     void* ray_data;          /* User defined */
     double integral;         /**< scalar integral value lives here */
-    int untrustworthy;       /**< set to nonzero if integration
+
+    /* Rename */
+    int untrustworthy;       /**< set to nonzero if integration    
                                   result may be inaccurate */
+#if 0
+    int accuracy_flag;      /* if 0, accuracy should be okay */
+#endif
+
 } fclaw_ray_t;
 
 

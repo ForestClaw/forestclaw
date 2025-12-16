@@ -557,7 +557,7 @@ void fclaw_regrid(fclaw_global_t *glob)
     fclaw_after_regrid(glob, has_been_refined);
 
     /* Only if gauges count > 0 */
-    fclaw_locate_gauges(glob);
+    fclaw_gauges_locate_patches(glob);
 
     /* Stop timer.  Be sure to use timers from new grid, if one was
        created */

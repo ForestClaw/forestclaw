@@ -306,13 +306,14 @@ double FCLAW2D_CLAWPATCH46_FORT_COMPUTE_PATCH_AREA(int *mx, int* my, int*mbc, do
                           FCLAW2D_CLAWPATCH46_FORT_COMPUTE_ERROR_NORM)
 
 /** @copydoc fclaw2d_clawpatch46_fort_compute_error_norm() */
-void FCLAW2D_CLAWPATCH46_FORT_COMPUTE_ERROR_NORM (const int* blockno, const int* mx,const int* my,const int* mbc,
+void FCLAW2D_CLAWPATCH46_FORT_COMPUTE_ERROR_NORM (const int* blockno, 
+                                                  const int* mx,const int* my,const int* mbc,
                                                   const int* meqn,const double* dx,const double* dy,
                                                   double area[], double error[],
                                                   double* error_norm);
 
-/* ----------------------------- Parallel ghost patches  ------------------------------ */
 
+/* ----------------------------- Parallel ghost patches  ------------------------------ */
 
 /** Fortran subroutine name */
 #define FCLAW2D_CLAWPATCH46_FORT_LOCAL_GHOST_PACK \

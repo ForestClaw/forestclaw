@@ -4,10 +4,14 @@
       double precision pi, pi2
       common /compi/ pi,pi2
 
+      integer initial_condition
+      common /com_initcond/ initial_condition
+
       double precision uvel, vvel
       common /comvelocity/ uvel, vvel
 
       open(10,file='setprob.data')
+      read(10,*) initial_condition
       read(10,*) uvel
       read(10,*) vvel
       close(10)

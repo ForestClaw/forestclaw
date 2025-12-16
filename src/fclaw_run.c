@@ -37,6 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_packing.h>
 
 #include "fclaw_math.h"
+#include "fclaw_gauges.h"
 
 /*  -----------------------------------------------------------------
     Time stepping
@@ -283,6 +284,19 @@ void outstyle_1(fclaw_global_t *glob)
 
             if (fclaw_opt->advance_one_step)
             {
+                if (fclaw_opt->moving_gauges)
+                {                    
+                    /* Update all gauge positions (local and remote) */
+                    fclaw_gauges_update_positions(glob, t_curr, dt_step);    
+
+                    /* Re-create block lists and patch numbers.  This is also 
+                       called after each regrid, but must be called a second 
+                       time here if gauges move.  */
+                    fclaw_gauges_locate_patches(glob);
+                }
+
+
+                /* Interpolate the current solution to gauges */
                 fclaw_diagnostics_gather(glob, init_flag);                
             }
 
@@ -456,13 +470,17 @@ void outstyle_3(fclaw_global_t *glob)
 
         if (fclaw_opt->advance_one_step)
         {
-            //fclaw2d_diagnostics_gather(glob,init_flag);
+            /* Move gauges */
+            fclaw_global_essentialf("Updating gauges at time t = %f\n",t_curr);
+            fclaw_gauges_update_positions(glob, t_curr, dt_step);    
+            fclaw_gauges_locate_patches(glob);
+            fclaw_diagnostics_gather(glob,init_flag);
         }
 
         if (n % nstep_inner == 0)
         {
             iframe++;
-            fclaw_diagnostics_gather(glob,init_flag);
+            //fclaw_diagnostics_gather(glob,init_flag);
             fclaw_output_frame(glob,iframe);
 
             /* save context values */
