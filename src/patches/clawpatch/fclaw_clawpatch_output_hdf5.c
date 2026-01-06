@@ -212,12 +212,12 @@ get_offsets_##TYPE(fclaw_global_t * glob, \
 { \
     TYPE * offsets = (TYPE *) buffer; \
 \
-    int num_cells_before; \
+    TYPE num_cells_before; \
     int mx,my,mz,mbc; \
     double dx,dy,dz,xlower,ylower,zlower; \
 \
-    int num_patches_before = glob->domain->global_num_patches_before + glob->domain->blocks[blockno].num_patches_before + patchno; \
-    int num_points_per_cell; \
+    TYPE num_patches_before = glob->domain->global_num_patches_before + glob->domain->blocks[blockno].num_patches_before + patchno; \
+    TYPE num_points_per_cell; \
     if(fclaw_clawpatch_dim(patch) == 2) \
     { \
         fclaw_clawpatch_2d_grid_data(glob,patch,&mx,&my,&mbc,&xlower,&ylower,&dx,&dy); \
@@ -232,7 +232,7 @@ get_offsets_##TYPE(fclaw_global_t * glob, \
         num_cells_before = num_patches_before * mx * my * mz; \
     } \
 \
-    int curr_offset = num_cells_before * num_points_per_cell; \
+    TYPE curr_offset = num_cells_before * num_points_per_cell; \
 \
     for(int k = 0; k < mz; k++) \
     { \
