@@ -134,6 +134,7 @@ install(FILES
 	fclaw_clawpatch_output_vtk.h
 	fclaw_clawpatch_pillow.h
   fclaw_clawpatch_regions.h
+  fclaw_clawpatch_gauges.h
 
 	fclaw2d_clawpatch_conservation.h
 	fclaw2d_clawpatch_transform.h
