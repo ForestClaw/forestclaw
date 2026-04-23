@@ -58,13 +58,13 @@ if exist(tname, 'file')
     end
 end
 
-bytes = read_file_bytes(filename);
-[header_text, appended_start] = split_vtu_header(bytes);
+[fid, header_text, payload_start] = open_vtu_header(filename);
+fid_cleanup = onCleanup(@() fclose(fid)); %#ok<NASGU>
 
 piece = parse_piece_counts(header_text);
 arrays = parse_data_arrays(header_text);
 
-values = decode_appended_arrays(bytes, appended_start, arrays);
+values = decode_appended_arrays_streaming(fid, payload_start, arrays);
 
 required_fields = {'Position','connectivity','types','mpirank','blockno','meqn'};
 for ireq = 1:numel(required_fields)
@@ -210,32 +210,42 @@ amr = assign_levels_from_spacing(amr, dim);
 
 end
 
-% Read complete file contents as raw bytes.
-function bytes = read_file_bytes(filename)
+% Open VTU file and read only the XML header, stopping at the binary payload.
+% Returns open file handle fid (caller must close), the XML header as a string,
+% and payload_start as the 0-based file offset of the first byte after '_'.
+function [fid, header_text, payload_start] = open_vtu_header(filename)
 fid = fopen(filename, 'r');
 if fid < 0
     error('Unable to open %s', filename);
 end
-bytes = fread(fid, inf, '*uint8');
-fclose(fid);
-end
 
-% Split XML header from raw appended payload location.
-function [header_text, appended_start] = split_vtu_header(bytes)
+chunk_size = 65536;
+buf = uint8([]);
 needle = uint8('<AppendedData');
-idx = strfind(bytes.', needle);
-if isempty(idx)
-    error('No AppendedData section found in VTU file.');
+
+while true
+    chunk = fread(fid, chunk_size, '*uint8');
+    buf = [buf; chunk]; %#ok<AGROW>
+
+    ad_idx = strfind(buf.', needle);
+    if ~isempty(ad_idx)
+        search_from = ad_idx(1) + numel(needle);
+        u_rel = find(buf(search_from:end) == uint8('_'), 1, 'first');
+        if ~isempty(u_rel)
+            % underscore_pos is the 1-based index of '_' in buf.
+            underscore_pos = search_from + u_rel - 1;
+            % payload_start is the 0-based file offset of the byte after '_'.
+            payload_start = underscore_pos;  % equals 0-based offset because MATLAB is 1-based
+            header_text = char(buf(1:underscore_pos-1)).';
+            return;
+        end
+    end
+
+    if isempty(chunk)
+        fclose(fid);
+        error('No AppendedData payload marker "_" found in %s.', filename);
+    end
 end
-start_idx = idx(1);
-tail = bytes(start_idx:min(numel(bytes), start_idx + 2048));
-u_idx = find(tail == uint8('_'), 1, 'first');
-if isempty(u_idx)
-    error('AppendedData payload marker "_" not found.');
-end
-% appended_start is the byte index of the '_' marker in AppendedData.
-appended_start = start_idx + u_idx - 1;
-header_text = char(bytes(1:appended_start-1)).';
 end
 
 % Parse global point/cell counts declared in the VTU Piece tag.
@@ -288,31 +298,33 @@ else
 end
 end
 
-% Decode all appended arrays using declared offsets and VTK data types.
-function values = decode_appended_arrays(bytes, appended_start, arrays)
+% Seek to each DataArray by offset and read only its bytes from the open file.
+function values = decode_appended_arrays_streaming(fid, payload_start, arrays)
 values = struct();
 for i = 1:numel(arrays)
     a = arrays(i);
-    % Offsets are measured from the byte immediately after '_'.
-    payload_pos = appended_start + 1 + a.offset;
-    nbytes = read_uint64_le(bytes, payload_pos);
-    data_start = payload_pos + 8;
-    data_end = data_start + double(nbytes) - 1;
-
-    if data_end > numel(bytes)
-        error('AppendedData offset/size exceeds file bounds for %s.', a.Name);
+    % Offsets in the VTU header are measured from the byte immediately after '_'.
+    if fseek(fid, payload_start + a.offset, 'bof') ~= 0
+        error('Seek failed for DataArray "%s".', a.Name);
     end
-
-    raw = bytes(data_start:data_end);
+    nbytes = double(read_uint64_le_from_fid(fid));
+    raw = fread(fid, nbytes, '*uint8');
+    if numel(raw) < nbytes
+        error('Unexpected end of file reading DataArray "%s".', a.Name);
+    end
     values.(a.Name) = cast_appended(raw, a.type, a.num_components);
 end
 end
 
-% Read little-endian UInt64 length prefix used by VTU AppendedData blocks.
-function u = read_uint64_le(bytes, pos)
+% Read a little-endian UInt64 length prefix from the current file position.
+function u = read_uint64_le_from_fid(fid)
+raw = fread(fid, 8, '*uint8');
+if numel(raw) < 8
+    error('Unexpected end of file reading 8-byte length prefix.');
+end
 u = uint64(0);
 for k = 0:7
-    u = bitor(u, bitshift(uint64(bytes(pos+k)), 8*k));
+    u = bitor(u, bitshift(uint64(raw(k+1)), 8*k));
 end
 end
 
