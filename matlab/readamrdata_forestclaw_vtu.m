@@ -1,0 +1,507 @@
+function [amr,t] = readamrdata_forestclaw_vtu(dim,Frame,dir)
+
+% Read ForestClaw VTU output and return AMR patch data.
+%
+%   [amr,t] = readamrdata_forestclaw_vtu(dim,Frame,dir)
+%
+%   Input:
+%     dim   - Patch dimension (2 or 3).
+%     Frame - Output frame number.
+%     dir   - Directory containing fort_frame_####.vtu (optional).
+%
+%   Output:
+%     amr   - Struct array with fields compatible with legacy ForestClaw
+%             MATLAB readers: gridno, level, blockno, mpirank,
+%             mx/my/(mz), xlow/ylow/(zlow), dx/dy/(dz), data.
+%     t     - Time from fort.t#### when available; otherwise Frame.
+%
+%   Notes:
+%     - VTU data is read from AppendedData encoding="raw" sections.
+%     - Data columns in amr(ng).data are patch cells; rows are concatenated
+%       in order: meqn, aux, rhs, soln, error (when present).
+
+if nargin < 3
+    dir = '';
+end
+
+if ~isempty(dir)
+    lastch = dir(end);
+    if ~(lastch == '/' || lastch == '\\')
+        % Normalize directory input so filename concatenation is robust.
+        dir = [dir filesep];
+    end
+end
+
+filename = [dir, sprintf('fort_frame_%04d.vtu', Frame)];
+if ~exist(filename, 'file')
+    amr = [];
+    t = [];
+    disp(' ');
+    disp(['Frame ',num2str(Frame),' (',filename,') does not exist ***']);
+    disp(' ');
+    return
+end
+
+disp(['Reading data from ',filename]);
+
+% Use legacy fort.tXXXX time if available, otherwise fall back to frame index.
+t = Frame;
+tname = [dir, sprintf('fort.t%04d', Frame)];
+if exist(tname, 'file')
+    tfid = fopen(tname, 'r');
+    if tfid >= 0
+        tval = fscanf(tfid, '%g', 1);
+        fclose(tfid);
+        if ~isempty(tval)
+            t = tval;
+        end
+    end
+end
+
+bytes = read_file_bytes(filename);
+[header_text, appended_start] = split_vtu_header(bytes);
+
+piece = parse_piece_counts(header_text);
+arrays = parse_data_arrays(header_text);
+
+values = decode_appended_arrays(bytes, appended_start, arrays);
+
+required_fields = {'Position','connectivity','types','mpirank','blockno','meqn'};
+for ireq = 1:numel(required_fields)
+    if ~isfield(values, required_fields{ireq})
+        error('Required VTU DataArray "%s" is missing in %s.', required_fields{ireq}, filename);
+    end
+end
+
+% Convert VTK connectivity to 1-based indexing for MATLAB array access.
+points = reshape(values.Position, 3, []).';
+connectivity = double(values.connectivity) + 1;
+connectivity = reshape(connectivity, [], piece.num_cells);
+types = double(values.types(:));
+
+if dim == 2
+    expected_type = 9;
+    verts_per_cell = 4;
+else
+    expected_type = 12;
+    verts_per_cell = 8;
+end
+
+if ~all(types == expected_type)
+    error('Unexpected VTK cell type in %s.', filename);
+end
+
+if size(connectivity,1) ~= verts_per_cell
+    error('Connectivity width does not match expected %d vertices per cell.', verts_per_cell);
+end
+
+if size(points,1) ~= piece.num_points
+    error('Point count mismatch while reading %s.', filename);
+end
+
+if size(connectivity,2) ~= piece.num_cells
+    error('Cell count mismatch while reading %s.', filename);
+end
+
+% ForestClaw VTU writes patches as disconnected connectivity components.
+component_labels = connected_cell_components(connectivity, size(points,1));
+roots = unique(component_labels, 'stable');
+num_patches = numel(roots);
+amr = struct('gridno', {}, ...
+             'level', {}, ...
+             'blockno', {}, ...
+             'mpirank', {}, ...
+             'mx', {}, ...
+             'my', {}, ...
+             'mz', {}, ...
+             'xlow', {}, ...
+             'ylow', {}, ...
+             'zlow', {}, ...
+             'dx', {}, ...
+             'dy', {}, ...
+             'dz', {}, ...
+             'data', {});
+
+field_order = {'meqn', 'aux', 'rhs', 'soln', 'error'};
+
+for ng = 1:num_patches
+    amrdata = struct('gridno', [], ...
+                     'level', [], ...
+                     'blockno', [], ...
+                     'mpirank', [], ...
+                     'mx', [], ...
+                     'my', [], ...
+                     'mz', [], ...
+                     'xlow', [], ...
+                     'ylow', [], ...
+                     'zlow', [], ...
+                     'dx', [], ...
+                     'dy', [], ...
+                     'dz', [], ...
+                     'data', []);
+    comp_id = roots(ng);
+    cell_ids = find(component_labels == comp_id);
+
+    patch_conn = connectivity(:, cell_ids);
+    patch_pts_ids = unique(patch_conn(:));
+    patch_pts = points(patch_pts_ids, :);
+
+    if dim == 2
+        [mx,my] = infer_2d_shape(patch_conn, points);
+        mz = [];
+    else
+        [mx,my,mz] = infer_3d_shape(patch_conn, points);
+    end
+
+    [xlow,dx] = infer_axis_spacing(patch_pts(:,1));
+    [ylow,dy] = infer_axis_spacing(patch_pts(:,2));
+    if dim > 2
+        [zlow,dz] = infer_axis_spacing(patch_pts(:,3));
+    end
+
+    % Fill legacy AMR metadata expected by plotting/post-processing scripts.
+    amrdata.gridno = ng;
+    amrdata.blockno = int_mode(values.blockno(cell_ids));
+    amrdata.mpirank = int_mode(values.mpirank(cell_ids));
+    amrdata.mx = mx;
+    amrdata.my = my;
+    if dim > 2
+        amrdata.mz = mz;
+    else
+        amrdata.mz = [];
+    end
+
+    amrdata.xlow = xlow;
+    amrdata.ylow = ylow;
+    if dim > 2
+        amrdata.zlow = zlow;
+    else
+        amrdata.zlow = [];
+    end
+
+    amrdata.dx = dx;
+    amrdata.dy = dy;
+    if dim > 2
+        amrdata.dz = dz;
+    else
+        amrdata.dz = [];
+    end
+
+    patch_data = [];
+    for k = 1:numel(field_order)
+        fname_k = field_order{k};
+        if isfield(values, fname_k)
+            field_raw = values.(fname_k);
+            % Each field is stored as [ncomp x ncells] after reshape.
+            field_data = reshape(float_array(field_raw), [], piece.num_cells);
+            patch_data = [patch_data; field_data(:, cell_ids)]; %#ok<AGROW>
+        end
+    end
+    amrdata.data = patch_data;
+
+    if isfield(values, 'patchno')
+        amrdata.gridno = int_mode(values.patchno(cell_ids)) + 1;
+    end
+
+    amr(ng) = amrdata; %#ok<AGROW>
+end
+
+amr = assign_levels_from_spacing(amr, dim);
+
+end
+
+% Read complete file contents as raw bytes.
+function bytes = read_file_bytes(filename)
+fid = fopen(filename, 'r');
+if fid < 0
+    error('Unable to open %s', filename);
+end
+bytes = fread(fid, inf, '*uint8');
+fclose(fid);
+end
+
+% Split XML header from raw appended payload location.
+function [header_text, appended_start] = split_vtu_header(bytes)
+needle = uint8('<AppendedData');
+idx = strfind(bytes.', needle);
+if isempty(idx)
+    error('No AppendedData section found in VTU file.');
+end
+start_idx = idx(1);
+tail = bytes(start_idx:min(numel(bytes), start_idx + 2048));
+u_idx = find(tail == uint8('_'), 1, 'first');
+if isempty(u_idx)
+    error('AppendedData payload marker "_" not found.');
+end
+% appended_start is the byte index of the '_' marker in AppendedData.
+appended_start = start_idx + u_idx - 1;
+header_text = char(bytes(1:appended_start-1)).';
+end
+
+% Parse global point/cell counts declared in the VTU Piece tag.
+function piece = parse_piece_counts(header_text)
+tok = regexp(header_text, '<Piece\s+[^>]*NumberOfPoints="(\d+)"\s+NumberOfCells="(\d+)"', 'tokens', 'once');
+if isempty(tok)
+    error('VTU Piece metadata is missing NumberOfPoints/NumberOfCells.');
+end
+piece.num_points = str2double(tok{1});
+piece.num_cells = str2double(tok{2});
+end
+
+% Parse appended DataArray metadata (name, type, offset, components).
+function arrays = parse_data_arrays(header_text)
+tags = regexp(header_text, '<DataArray\s+([^>]*)>', 'tokens');
+arrays = struct('Name', {}, 'type', {}, 'offset', {}, 'num_components', {});
+for i = 1:numel(tags)
+    attrs = tags{i}{1};
+    name = read_attr(attrs, 'Name');
+    if isempty(name)
+        continue;
+    end
+    fmt = read_attr(attrs, 'format');
+    if ~strcmp(fmt, 'appended')
+        continue;
+    end
+
+    a.Name = name;
+    a.type = read_attr(attrs, 'type');
+    a.offset = str2double(read_attr(attrs, 'offset'));
+
+    nc = read_attr(attrs, 'NumberOfComponents');
+    if isempty(nc)
+        a.num_components = 1;
+    else
+        a.num_components = str2double(nc);
+    end
+    arrays(end+1) = a; %#ok<AGROW>
+end
+end
+
+% Read one XML attribute value from an attribute string.
+function value = read_attr(attrs, key)
+pat = [key, '="([^"]+)"'];
+tok = regexp(attrs, pat, 'tokens', 'once');
+if isempty(tok)
+    value = '';
+else
+    value = tok{1};
+end
+end
+
+% Decode all appended arrays using declared offsets and VTK data types.
+function values = decode_appended_arrays(bytes, appended_start, arrays)
+values = struct();
+for i = 1:numel(arrays)
+    a = arrays(i);
+    % Offsets are measured from the byte immediately after '_'.
+    payload_pos = appended_start + 1 + a.offset;
+    nbytes = read_uint64_le(bytes, payload_pos);
+    data_start = payload_pos + 8;
+    data_end = data_start + double(nbytes) - 1;
+
+    if data_end > numel(bytes)
+        error('AppendedData offset/size exceeds file bounds for %s.', a.Name);
+    end
+
+    raw = bytes(data_start:data_end);
+    values.(a.Name) = cast_appended(raw, a.type, a.num_components);
+end
+end
+
+% Read little-endian UInt64 length prefix used by VTU AppendedData blocks.
+function u = read_uint64_le(bytes, pos)
+u = uint64(0);
+for k = 0:7
+    u = bitor(u, bitshift(uint64(bytes(pos+k)), 8*k));
+end
+end
+
+% Convert raw byte payload into MATLAB numeric arrays based on VTK type.
+function out = cast_appended(raw, vtk_type, ncomp)
+switch vtk_type
+    case 'Float64'
+        out = typecast(raw, 'double');
+    case 'Float32'
+        out = typecast(raw, 'single');
+    case 'Int32'
+        out = typecast(raw, 'int32');
+    case 'Int64'
+        out = typecast(raw, 'int64');
+    case 'UInt8'
+        out = uint8(raw);
+    otherwise
+        error('Unsupported VTK type: %s', vtk_type);
+end
+
+if ncomp > 1
+    out = reshape(out, ncomp, []);
+end
+end
+
+% Build connected components of cells that share vertices.
+function labels = connected_cell_components(connectivity, npoints)
+ncells = size(connectivity, 2);
+parent = 1:ncells;
+owner = zeros(npoints, 1);
+
+for c = 1:ncells
+    verts = connectivity(:, c);
+    for iv = 1:numel(verts)
+        v = verts(iv);
+        if owner(v) == 0
+            owner(v) = c;
+        else
+            % Union-Find merge when two cells touch the same point.
+            parent = unite(parent, c, owner(v));
+        end
+    end
+end
+
+labels = zeros(ncells,1);
+for c = 1:ncells
+    labels(c) = find_root(parent, c);
+end
+end
+
+% Union operation for cell component labels.
+function parent = unite(parent, a, b)
+ra = find_root(parent, a);
+rb = find_root(parent, b);
+if ra ~= rb
+    parent(rb) = ra;
+end
+end
+
+% Find operation for cell component labels.
+function r = find_root(parent, x)
+r = x;
+while parent(r) ~= r
+    r = parent(r);
+end
+end
+
+% Infer (mx,my) assuming patch points lie on a Cartesian x/y grid.
+function [mx,my] = infer_2d_shape(patch_conn, points)
+patch_point_ids = unique(patch_conn(:));
+patch_xy = double(points(patch_point_ids, 1:2));
+
+nx = numel(unique(patch_xy(:,1)));
+ny = numel(unique(patch_xy(:,2)));
+
+if nx * ny ~= numel(patch_point_ids)
+    error('2D patch points do not form a rectangular Cartesian lattice.');
+end
+
+ncells = size(patch_conn, 2);
+mx = nx - 1;
+my = ny - 1;
+if mx * my ~= ncells
+    error('Cartesian-grid inference mismatch: mx*my does not equal cell count.');
+end
+end
+
+% Infer (mx,my,mz) assuming patch points lie on a Cartesian x/y/z grid.
+function [mx,my,mz] = infer_3d_shape(patch_conn, points)
+patch_point_ids = unique(patch_conn(:));
+patch_xyz = double(points(patch_point_ids, 1:3));
+
+nx = numel(unique(patch_xyz(:,1)));
+ny = numel(unique(patch_xyz(:,2)));
+nz = numel(unique(patch_xyz(:,3)));
+
+if nx * ny * nz ~= numel(patch_point_ids)
+    error('3D patch points do not form a rectangular Cartesian lattice.');
+end
+
+mx = nx - 1;
+my = ny - 1;
+mz = nz - 1;
+
+ncells = size(patch_conn, 2);
+if mx * my * mz ~= ncells
+    error('Cartesian-grid inference mismatch: mx*my*mz does not equal cell count.');
+end
+end
+
+% Estimate axis origin and spacing from unique coordinate values.
+function [x0,dx] = infer_axis_spacing(vals)
+u = unique(sort(double(vals(:))));
+if numel(u) < 2
+    x0 = u(1);
+    dx = 0;
+    return
+end
+d = diff(u);
+tol = max(1e-12, max(abs(u)) * 1e-10);
+d = d(d > tol);
+if isempty(d)
+    x0 = u(1);
+    dx = 0;
+else
+    x0 = u(1);
+    dx = min(d);
+end
+end
+
+% Return mode for integer metadata that should be constant per patch.
+function m = int_mode(v)
+v = double(v(:));
+if isempty(v)
+    m = 0;
+    return
+end
+uv = unique(v);
+counts = zeros(size(uv));
+for i = 1:numel(uv)
+    counts(i) = sum(v == uv(i));
+end
+[~,idx] = max(counts);
+m = uv(idx);
+end
+
+% Convert numeric arrays to double and normalize orientation for reshape.
+function arr = float_array(v)
+arr = double(v);
+if isvector(arr)
+    arr = arr(:).';
+end
+end
+
+% Assign AMR levels from relative spacing tiers.
+function amr = assign_levels_from_spacing(amr, dim)
+if isempty(amr)
+    return
+end
+
+all_dx = zeros(numel(amr),1);
+for i = 1:numel(amr)
+    all_dx(i) = amr(i).dx;
+end
+
+levels = spacing_to_levels(all_dx);
+for i = 1:numel(amr)
+    amr(i).level = levels(i);
+    if dim == 2
+        if ~isfield(amr(i), 'mz')
+            amr(i).mz = [];
+        end
+        if ~isfield(amr(i), 'zlow')
+            amr(i).zlow = [];
+        end
+        if ~isfield(amr(i), 'dz')
+            amr(i).dz = [];
+        end
+    end
+end
+end
+
+% Convert unique spacing values to level indices (coarsest -> level 1).
+function levels = spacing_to_levels(dx)
+udx = unique(sort(dx, 'descend'));
+levels = zeros(size(dx));
+for i = 1:numel(dx)
+    [~,idx] = min(abs(udx - dx(i)));
+    levels(i) = idx;
+end
+end
+
