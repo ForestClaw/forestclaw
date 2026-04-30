@@ -44,19 +44,8 @@ end
 
 disp(['Reading data from ',filename]);
 
-% Use legacy fort.tXXXX time if available, otherwise fall back to frame index.
+% Use frame number for time
 t = Frame;
-tname = [dir, sprintf('fort.t%04d', Frame)];
-if exist(tname, 'file')
-    tfid = fopen(tname, 'r');
-    if tfid >= 0
-        tval = fscanf(tfid, '%g', 1);
-        fclose(tfid);
-        if ~isempty(tval)
-            t = tval;
-        end
-    end
-end
 
 [fid, header_text, payload_start] = open_vtu_header(filename);
 fid_cleanup = onCleanup(@() fclose(fid)); %#ok<NASGU>
