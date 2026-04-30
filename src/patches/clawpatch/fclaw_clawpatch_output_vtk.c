@@ -62,6 +62,10 @@ typedef struct fclaw2d_vtk_state
     int64_t offset_mpirank, psize_mpirank;
     int64_t offset_blockno, psize_blockno;
     int64_t offset_patchno, psize_patchno;
+    int64_t offset_mxmymz, psize_mxmymz;
+    int64_t offset_level, psize_level;
+    int64_t offset_xyzlow, psize_xyzlow;
+    int64_t offset_dxdydz, psize_dxdydz;
     int64_t offset_meqn, psize_meqn;
     int64_t offset_aux, psize_aux;
     int64_t offset_rhs, psize_rhs;
@@ -152,6 +156,33 @@ fclaw2d_vtk_write_header (fclaw_domain_t * domain, fclaw2d_vtk_state_t * s)
                                 (long long) s->offset_types) < 0;
     retval = retval || fprintf (file, "    </DataArray>\n") < 0;
     retval = retval || fprintf (file, "   </Cells>\n") < 0;
+
+    retval = retval || fprintf (file, "   <FieldData>\n") < 0;
+    retval = retval || fprintf (file, "    <DataArray type=\"Int32\" "
+                                "Name=\"mx_my_mz\" NumberOfComponents=\"3\" NumberOfTuples=\"%lld\" format=\"appended\" "
+                                "offset=\"%lld\">\n",
+                                (long long) domain->global_num_patches,
+                                (long long) s->offset_mxmymz) < 0;
+    retval = retval || fprintf (file, "    </DataArray>\n") < 0;
+    retval = retval || fprintf (file, "    <DataArray type=\"Int32\" "
+                                "Name=\"level\" NumberOfTuples=\"%lld\" format=\"appended\" "
+                                "offset=\"%lld\">\n",
+                                (long long) domain->global_num_patches,
+                                (long long) s->offset_level) < 0;
+    retval = retval || fprintf (file, "    </DataArray>\n") < 0;
+    retval = retval || fprintf (file, "    <DataArray type=\"Float64\" "
+                                "Name=\"xyz_low\" NumberOfComponents=\"3\" NumberOfTuples=\"%lld\" format=\"appended\" "
+                                "offset=\"%lld\">\n",
+                                (long long) domain->global_num_patches,
+                                (long long) s->offset_xyzlow) < 0;
+    retval = retval || fprintf (file, "    </DataArray>\n") < 0;
+    retval = retval || fprintf (file, "    <DataArray type=\"Float64\" "
+                                "Name=\"dx_dy_dz\" NumberOfComponents=\"3\" NumberOfTuples=\"%lld\" format=\"appended\" "
+                                "offset=\"%lld\">\n",
+                                (long long) domain->global_num_patches,
+                                (long long) s->offset_dxdydz) < 0;
+    retval = retval || fprintf (file, "    </DataArray>\n") < 0;
+    retval = retval || fprintf (file, "   </FieldData>\n") < 0;
 
     char field_names[BUFSIZ];
     strncpy(field_names, "meqn", sizeof(field_names));
@@ -562,6 +593,88 @@ write_patchno_cb (fclaw_domain_t * domain, fclaw_patch_t * patch,
 }
 
 static void
+write_mxmymz_cb (fclaw_domain_t * domain, fclaw_patch_t * patch,
+                 int blockno, int patchno, void *user)
+{
+    fclaw_global_iterate_t *g = (fclaw_global_iterate_t *) user;
+    write_field_iter_user_t *iter = (write_field_iter_user_t *) g->user;
+    fclaw2d_vtk_state_t *s = iter->s;
+    int32_t *idata = (int32_t *) s->buf;
+    *idata++ = (int32_t) s->mx;
+    *idata++ = (int32_t) s->my;
+    *idata++ = (int32_t) s->mz;
+    add_to_buffer (s, s->psize_mxmymz);
+}
+
+/* Extract physical grid geometry for a patch; works for both 2D and 3D. */
+static void
+get_patch_geometry (fclaw_global_t * glob, fclaw_patch_t * patch, int dim,
+                    double *xlower, double *ylower, double *zlower,
+                    double *dx, double *dy, double *dz)
+{
+    if (dim == 2)
+    {
+        int mx, my, mbc;
+        fclaw_clawpatch_2d_grid_data (glob, patch, &mx, &my, &mbc,
+                                      xlower, ylower, dx, dy);
+        *zlower = 0.0;
+        *dz = 0.0;
+    }
+    else
+    {
+        int mx, my, mz, mbc;
+        fclaw_clawpatch_3d_grid_data (glob, patch, &mx, &my, &mz, &mbc,
+                                      xlower, ylower, zlower, dx, dy, dz);
+    }
+}
+
+static void
+write_level_cb (fclaw_domain_t * domain, fclaw_patch_t * patch,
+                int blockno, int patchno, void *user)
+{
+    fclaw_global_iterate_t *g = (fclaw_global_iterate_t *) user;
+    write_field_iter_user_t *iter = (write_field_iter_user_t *) g->user;
+    fclaw2d_vtk_state_t *s = iter->s;
+    int32_t *idata = (int32_t *) s->buf;
+    *idata = (int32_t) patch->level;
+    add_to_buffer (s, s->psize_level);
+}
+
+static void
+write_xyzlow_cb (fclaw_domain_t * domain, fclaw_patch_t * patch,
+                 int blockno, int patchno, void *user)
+{
+    fclaw_global_iterate_t *g = (fclaw_global_iterate_t *) user;
+    write_field_iter_user_t *iter = (write_field_iter_user_t *) g->user;
+    fclaw2d_vtk_state_t *s = iter->s;
+    double xlower, ylower, zlower, dx, dy, dz;
+    get_patch_geometry (g->glob, patch, s->dim,
+                        &xlower, &ylower, &zlower, &dx, &dy, &dz);
+    double *ddata = (double *) s->buf;
+    *ddata++ = xlower;
+    *ddata++ = ylower;
+    *ddata++ = zlower;
+    add_to_buffer (s, s->psize_xyzlow);
+}
+
+static void
+write_dxdydz_cb (fclaw_domain_t * domain, fclaw_patch_t * patch,
+                 int blockno, int patchno, void *user)
+{
+    fclaw_global_iterate_t *g = (fclaw_global_iterate_t *) user;
+    write_field_iter_user_t *iter = (write_field_iter_user_t *) g->user;
+    fclaw2d_vtk_state_t *s = iter->s;
+    double xlower, ylower, zlower, dx, dy, dz;
+    get_patch_geometry (g->glob, patch, s->dim,
+                        &xlower, &ylower, &zlower, &dx, &dy, &dz);
+    double *ddata = (double *) s->buf;
+    *ddata++ = dx;
+    *ddata++ = dy;
+    *ddata++ = dz;
+    add_to_buffer (s, s->psize_dxdydz);
+}
+
+static void
 fclaw2d_vtk_write_field (fclaw_global_t * glob, fclaw2d_vtk_state_t * s,
                          int64_t offset_field, int64_t psize_field,
                          fclaw_patch_callback_t cb, void* user)
@@ -727,6 +840,14 @@ fclaw2d_vtk_write_data (fclaw_global_t * glob, fclaw2d_vtk_state_t * s)
                              write_blockno_cb, NULL);
     fclaw2d_vtk_write_field (glob, s, s->offset_patchno, s->psize_patchno,
                              write_patchno_cb, NULL);
+    fclaw2d_vtk_write_field (glob, s, s->offset_mxmymz, s->psize_mxmymz,
+                             write_mxmymz_cb, NULL);
+    fclaw2d_vtk_write_field (glob, s, s->offset_level, s->psize_level,
+                             write_level_cb, NULL);
+    fclaw2d_vtk_write_field (glob, s, s->offset_xyzlow, s->psize_xyzlow,
+                             write_xyzlow_cb, NULL);
+    fclaw2d_vtk_write_field (glob, s, s->offset_dxdydz, s->psize_dxdydz,
+                             write_dxdydz_cb, NULL);
     fclaw2d_vtk_write_field (glob, s, s->offset_meqn, s->psize_meqn,
                              write_field_cb, (void*) s->value_cb);
     fclaw2d_vtk_write_field (glob, s, s->offset_aux, s->psize_aux,
@@ -838,6 +959,10 @@ fclaw_vtk_write_file (int dim, fclaw_global_t * glob, const char *basename,
     s->psize_mpirank = s->cells_per_patch * 4;
     s->psize_blockno = s->cells_per_patch * 4;
     s->psize_patchno = s->cells_per_patch * s->intsize;
+    s->psize_mxmymz = 3 * sizeof (int32_t);
+    s->psize_level = 1 * sizeof (int32_t);
+    s->psize_xyzlow = 3 * sizeof (double);
+    s->psize_dxdydz = 3 * sizeof (double);
     s->psize_meqn = s->cells_per_patch * s->meqn * sizeof (float);
     s->psize_aux = s->cells_per_patch * s->num_aux_fields * sizeof (float);
     s->psize_rhs = s->cells_per_patch * s->rhs_fields * sizeof (float);
@@ -872,7 +997,23 @@ fclaw_vtk_write_file (int dim, fclaw_global_t * glob, const char *basename,
     s->offset_patchno = curr_offset;
     curr_offset += s->ndsize +
         s->psize_patchno * domain->global_num_patches;
-    
+
+    s->offset_mxmymz = curr_offset;
+    curr_offset += s->ndsize +
+        s->psize_mxmymz * domain->global_num_patches;
+
+    s->offset_level = curr_offset;
+    curr_offset += s->ndsize +
+        s->psize_level * domain->global_num_patches;
+
+    s->offset_xyzlow = curr_offset;
+    curr_offset += s->ndsize +
+        s->psize_xyzlow * domain->global_num_patches;
+
+    s->offset_dxdydz = curr_offset;
+    curr_offset += s->ndsize +
+        s->psize_dxdydz * domain->global_num_patches;
+
     s->offset_meqn = curr_offset;
     curr_offset += s->ndsize +
         s->psize_meqn * domain->global_num_patches;

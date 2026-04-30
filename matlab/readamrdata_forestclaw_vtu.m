@@ -54,7 +54,9 @@ piece = parse_piece_counts(header_text);
 arrays = parse_data_arrays(header_text);
 
 % Phase 1: read only topology arrays (geometry + metadata, not field data).
-topo_names = {'Position', 'connectivity', 'types', 'mpirank', 'blockno', 'patchno'};
+% Include explicit metadata arrays written by newer versions of the VTU writer.
+topo_names = {'Position', 'connectivity', 'types', 'mpirank', 'blockno', 'patchno', ...
+              'mx_my_mz', 'level', 'xyz_low', 'dx_dy_dz'};
 topo = decode_specific_arrays(fid, payload_start, arrays, topo_names);
 
 required_fields = {'Position','connectivity','types','mpirank','blockno','patchno'};
@@ -141,17 +143,60 @@ for ng = 1:num_patches
     patch_pts_ids = unique(patch_conn(:));
     patch_pts = points(patch_pts_ids, :);
 
-    if dim == 2
-        [mx,my] = infer_2d_shape(patch_conn, points);
-        mz = [];
+    % Patch shape (mx, my, mz): prefer explicit FieldData metadata; fall back to inference.
+    if isfield(topo, 'mx_my_mz')
+        mxmymz = reshape(double(topo.mx_my_mz), 3, []);
+        mx = mxmymz(1, ng);
+        my = mxmymz(2, ng);
+        if dim > 2
+            mz = mxmymz(3, ng);
+        else
+            mz = [];
+        end
     else
-        [mx,my,mz] = infer_3d_shape(patch_conn, points);
+        if dim == 2
+            [mx,my] = infer_2d_shape(patch_conn, points);
+            mz = [];
+        else
+            [mx,my,mz] = infer_3d_shape(patch_conn, points);
+        end
     end
 
-    [xlow,dx] = infer_axis_spacing(patch_pts(:,1));
-    [ylow,dy] = infer_axis_spacing(patch_pts(:,2));
-    if dim > 2
-        [zlow,dz] = infer_axis_spacing(patch_pts(:,3));
+    % Patch origin and spacing: prefer explicit FieldData; fall back to inference.
+    if isfield(topo, 'xyz_low')
+        xyz_low_arr = reshape(double(topo.xyz_low), 3, []);
+        xlow = xyz_low_arr(1, ng);
+        ylow = xyz_low_arr(2, ng);
+        if dim > 2
+            zlow = xyz_low_arr(3, ng);
+        else
+            zlow = [];
+        end
+    else
+        [xlow,~] = infer_axis_spacing(patch_pts(:,1));
+        [ylow,~] = infer_axis_spacing(patch_pts(:,2));
+        if dim > 2
+            [zlow,~] = infer_axis_spacing(patch_pts(:,3));
+        end
+    end
+    
+    if isfield(topo, 'dx_dy_dz')
+        dxdydz_arr = reshape(double(topo.dx_dy_dz), 3, []);
+        dx = dxdydz_arr(1, ng);
+        dy = dxdydz_arr(2, ng);
+        if dim > 2
+            dz = dxdydz_arr(3, ng);
+        else
+            dz = [];
+        end
+    else
+        [~,dx] = infer_axis_spacing(patch_pts(:,1));
+        [~,dy] = infer_axis_spacing(patch_pts(:,2));
+        if dim > 2
+            [~,dz] = infer_axis_spacing(patch_pts(:,3));
+        else
+            dz = [];
+        end
     end
 
     % Fill legacy AMR metadata expected by plotting/post-processing scripts.
@@ -198,7 +243,29 @@ for ng = 1:num_patches
     amr(ng) = amrdata; %#ok<AGROW>
 end
 
-amr = assign_levels_from_spacing(amr, dim);
+% If explicit level data was written by the VTU writer, use it directly;
+% otherwise infer AMR levels from relative cell spacing (legacy files).
+if ~isfield(topo, 'level')
+    amr = assign_levels_from_spacing(amr, dim);
+else
+    for ng = 1:numel(amr)
+        amr(ng).level = double(topo.level(ng));
+    end
+end
+
+if dim == 2
+    for ng = 1:numel(amr)
+        if ~isfield(amr(ng), 'mz')
+            amr(ng).mz   = [];
+        end
+        if ~isfield(amr(ng), 'zlow')
+            amr(ng).zlow = [];
+        end
+        if ~isfield(amr(ng), 'dz')
+            amr(ng).dz   = [];
+        end
+    end
+end
 
 end
 
@@ -569,4 +636,6 @@ for i = 1:numel(dx)
     levels(i) = idx;
 end
 end
+
+
 
