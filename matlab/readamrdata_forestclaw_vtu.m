@@ -64,20 +64,22 @@ fid_cleanup = onCleanup(@() fclose(fid)); %#ok<NASGU>
 piece = parse_piece_counts(header_text);
 arrays = parse_data_arrays(header_text);
 
-values = decode_appended_arrays_streaming(fid, payload_start, arrays);
+% Phase 1: read only topology arrays (geometry + metadata, not field data).
+topo_names = {'Position', 'connectivity', 'types', 'mpirank', 'blockno', 'patchno'};
+topo = decode_specific_arrays(fid, payload_start, arrays, topo_names);
 
-required_fields = {'Position','connectivity','types','mpirank','blockno','meqn'};
+required_fields = {'Position','connectivity','types','mpirank','blockno','patchno'};
 for ireq = 1:numel(required_fields)
-    if ~isfield(values, required_fields{ireq})
+    if ~isfield(topo, required_fields{ireq})
         error('Required VTU DataArray "%s" is missing in %s.', required_fields{ireq}, filename);
     end
 end
 
 % Convert VTK connectivity to 1-based indexing for MATLAB array access.
-points = reshape(values.Position, 3, []).';
-connectivity = double(values.connectivity) + 1;
+points = reshape(topo.Position, 3, []).';
+connectivity = double(topo.connectivity) + 1;
 connectivity = reshape(connectivity, [], piece.num_cells);
-types = double(values.types(:));
+types = double(topo.types(:));
 
 if dim == 2
     expected_type = 9;
@@ -103,10 +105,13 @@ if size(connectivity,2) ~= piece.num_cells
     error('Cell count mismatch while reading %s.', filename);
 end
 
-% ForestClaw VTU writes patches as disconnected connectivity components.
-component_labels = connected_cell_components(connectivity, size(points,1));
-roots = unique(component_labels, 'stable');
-num_patches = numel(roots);
+% All patches have the same number of cells; compute patch map by arithmetic.
+num_patches = numel(unique(double(topo.patchno(:)), 'sorted'));
+ncells_per_patch = piece.num_cells / num_patches;
+if ncells_per_patch ~= floor(ncells_per_patch)
+    error('num_cells (%d) is not evenly divisible by num_patches (%d) in %s.', ...
+          piece.num_cells, num_patches, filename);
+end
 amr = struct('gridno', {}, ...
              'level', {}, ...
              'blockno', {}, ...
@@ -139,8 +144,9 @@ for ng = 1:num_patches
                      'dy', [], ...
                      'dz', [], ...
                      'data', []);
-    comp_id = roots(ng);
-    cell_ids = find(component_labels == comp_id);
+    % Compute this patch's 1-based cell index range directly from uniform size.
+    cell_start_0 = (ng-1) * ncells_per_patch;  % 0-based offset into flat arrays
+    cell_ids = (cell_start_0+1 : cell_start_0+ncells_per_patch);  % 1-based MATLAB indices
 
     patch_conn = connectivity(:, cell_ids);
     patch_pts_ids = unique(patch_conn(:));
@@ -160,9 +166,9 @@ for ng = 1:num_patches
     end
 
     % Fill legacy AMR metadata expected by plotting/post-processing scripts.
-    amrdata.gridno = ng;
-    amrdata.blockno = int_mode(values.blockno(cell_ids));
-    amrdata.mpirank = int_mode(values.mpirank(cell_ids));
+    amrdata.gridno = double(topo.patchno(cell_ids(1))) + 1;
+    amrdata.blockno = double(topo.blockno(cell_ids(1)));
+    amrdata.mpirank = double(topo.mpirank(cell_ids(1)));
     amrdata.mx = mx;
     amrdata.my = my;
     if dim > 2
@@ -187,21 +193,18 @@ for ng = 1:num_patches
         amrdata.dz = [];
     end
 
+    % Phase 2: seek to this patch's cell slice in each field array and read it.
     patch_data = [];
     for k = 1:numel(field_order)
         fname_k = field_order{k};
-        if isfield(values, fname_k)
-            field_raw = values.(fname_k);
-            % Each field is stored as [ncomp x ncells] after reshape.
-            field_data = reshape(float_array(field_raw), [], piece.num_cells);
-            patch_data = [patch_data; field_data(:, cell_ids)]; %#ok<AGROW>
+        fa = find_array(arrays, fname_k);
+        if ~isempty(fa)
+            raw = read_array_cells(fid, payload_start, fa, cell_ids(1)-1, numel(cell_ids));
+            field_data = reshape(float_array(cast_appended(raw, fa.type, fa.num_components)), [], numel(cell_ids));
+            patch_data = [patch_data; field_data]; %#ok<AGROW>
         end
     end
     amrdata.data = patch_data;
-
-    if isfield(values, 'patchno')
-        amrdata.gridno = int_mode(values.patchno(cell_ids)) + 1;
-    end
 
     amr(ng) = amrdata; %#ok<AGROW>
 end
@@ -295,6 +298,67 @@ if isempty(tok)
     value = '';
 else
     value = tok{1};
+end
+end
+
+% Read only the named DataArrays from the appended section; skip all others.
+function values = decode_specific_arrays(fid, payload_start, arrays, names)
+values = struct();
+for i = 1:numel(arrays)
+    if any(strcmp(arrays(i).Name, names))
+        a = arrays(i);
+        if fseek(fid, payload_start + a.offset, 'bof') ~= 0
+            error('Seek failed for DataArray "%s".', a.Name);
+        end
+        nbytes = double(read_uint64_le_from_fid(fid));
+        raw = fread(fid, nbytes, '*uint8');
+        if numel(raw) < nbytes
+            error('Unexpected end of file reading DataArray "%s".', a.Name);
+        end
+        values.(a.Name) = cast_appended(raw, a.type, a.num_components);
+    end
+end
+end
+
+% Return the arrays entry whose Name matches, or [] if not found.
+function a = find_array(arrays, name)
+a = [];
+for i = 1:numel(arrays)
+    if strcmp(arrays(i).Name, name)
+        a = arrays(i);
+        return;
+    end
+end
+end
+
+% Return the byte width of one scalar element for a VTK type string.
+function n = vtk_type_size(vtk_type)
+switch vtk_type
+    case {'Float64', 'Int64'}
+        n = 8;
+    case {'Float32', 'Int32'}
+        n = 4;
+    case 'UInt8'
+        n = 1;
+    otherwise
+        error('Unknown VTK type "%s".', vtk_type);
+end
+end
+
+% Read a contiguous range of cells from a flat appended DataArray by seeking.
+% cell_start is 0-based; ncells is the count to read.
+function raw = read_array_cells(fid, payload_start, a, cell_start, ncells)
+elem_size = vtk_type_size(a.type);
+bytes_per_cell = a.num_components * elem_size;
+% Skip 8-byte length prefix then jump to cell_start within the data.
+data_offset = payload_start + a.offset + 8 + cell_start * bytes_per_cell;
+if fseek(fid, data_offset, 'bof') ~= 0
+    error('Seek failed reading cells from DataArray "%s".', a.Name);
+end
+nbytes_to_read = ncells * bytes_per_cell;
+raw = fread(fid, nbytes_to_read, '*uint8');
+if numel(raw) < nbytes_to_read
+    error('Unexpected end of file reading cells from DataArray "%s".', a.Name);
 end
 end
 
