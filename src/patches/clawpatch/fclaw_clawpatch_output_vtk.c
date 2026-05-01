@@ -62,10 +62,10 @@ typedef struct fclaw2d_vtk_state
     int64_t offset_mpirank, psize_mpirank;
     int64_t offset_blockno, psize_blockno;
     int64_t offset_patchno, psize_patchno;
-    int64_t offset_mxmymz, psize_mxmymz;
     int64_t offset_level, psize_level;
     int64_t offset_xyzlow, psize_xyzlow;
     int64_t offset_dxdydz, psize_dxdydz;
+    double time_value;
     int64_t offset_meqn, psize_meqn;
     int64_t offset_aux, psize_aux;
     int64_t offset_rhs, psize_rhs;
@@ -128,6 +128,34 @@ fclaw2d_vtk_write_header (fclaw_domain_t * domain, fclaw2d_vtk_state_t * s)
                                 "header_type=\"UInt64\" "
                                 ">\n") < 0;
     retval = retval || fprintf (file, " <UnstructuredGrid>\n") < 0;
+    retval = retval || fprintf (file, "  <FieldData>\n") < 0;
+    retval = retval || fprintf (file, "   <DataArray type=\"Int32\" "
+                                "Name=\"mx_my_mz\" NumberOfComponents=\"3\" NumberOfTuples=\"1\" format=\"ascii\">\n") < 0;
+    retval = retval || fprintf (file, "    %d %d %d\n", s->mx, s->my, s->mz) < 0;
+    retval = retval || fprintf (file, "   </DataArray>\n") < 0;
+    retval = retval || fprintf (file, "   <DataArray type=\"Int32\" "
+                                "Name=\"level\" NumberOfTuples=\"%lld\" format=\"appended\" "
+                                "offset=\"%lld\">\n",
+                                (long long) domain->global_num_patches,
+                                (long long) s->offset_level) < 0;
+    retval = retval || fprintf (file, "   </DataArray>\n") < 0;
+    retval = retval || fprintf (file, "   <DataArray type=\"Float64\" "
+                                "Name=\"xyz_low\" NumberOfComponents=\"3\" NumberOfTuples=\"%lld\" format=\"appended\" "
+                                "offset=\"%lld\">\n",
+                                (long long) domain->global_num_patches,
+                                (long long) s->offset_xyzlow) < 0;
+    retval = retval || fprintf (file, "   </DataArray>\n") < 0;
+    retval = retval || fprintf (file, "   <DataArray type=\"Float64\" "
+                                "Name=\"dx_dy_dz\" NumberOfComponents=\"3\" NumberOfTuples=\"%lld\" format=\"appended\" "
+                                "offset=\"%lld\">\n",
+                                (long long) domain->global_num_patches,
+                                (long long) s->offset_dxdydz) < 0;
+    retval = retval || fprintf (file, "   </DataArray>\n") < 0;
+    retval = retval || fprintf (file, "   <DataArray type=\"Float64\" "
+                                "Name=\"TimeValue\" NumberOfTuples=\"1\" format=\"ascii\">\n") < 0;
+    retval = retval || fprintf (file, "    %.*g\n", 17, s->time_value) < 0;
+    retval = retval || fprintf (file, "   </DataArray>\n") < 0;
+    retval = retval || fprintf (file, "  </FieldData>\n") < 0;
     retval = retval || fprintf (file, "  <Piece NumberOfPoints=\"%lld\" "
                                 "NumberOfCells=\"%lld\">\n",
                                 (long long) s->global_num_points,
@@ -156,33 +184,6 @@ fclaw2d_vtk_write_header (fclaw_domain_t * domain, fclaw2d_vtk_state_t * s)
                                 (long long) s->offset_types) < 0;
     retval = retval || fprintf (file, "    </DataArray>\n") < 0;
     retval = retval || fprintf (file, "   </Cells>\n") < 0;
-
-    retval = retval || fprintf (file, "   <FieldData>\n") < 0;
-    retval = retval || fprintf (file, "    <DataArray type=\"Int32\" "
-                                "Name=\"mx_my_mz\" NumberOfComponents=\"3\" NumberOfTuples=\"%lld\" format=\"appended\" "
-                                "offset=\"%lld\">\n",
-                                (long long) domain->global_num_patches,
-                                (long long) s->offset_mxmymz) < 0;
-    retval = retval || fprintf (file, "    </DataArray>\n") < 0;
-    retval = retval || fprintf (file, "    <DataArray type=\"Int32\" "
-                                "Name=\"level\" NumberOfTuples=\"%lld\" format=\"appended\" "
-                                "offset=\"%lld\">\n",
-                                (long long) domain->global_num_patches,
-                                (long long) s->offset_level) < 0;
-    retval = retval || fprintf (file, "    </DataArray>\n") < 0;
-    retval = retval || fprintf (file, "    <DataArray type=\"Float64\" "
-                                "Name=\"xyz_low\" NumberOfComponents=\"3\" NumberOfTuples=\"%lld\" format=\"appended\" "
-                                "offset=\"%lld\">\n",
-                                (long long) domain->global_num_patches,
-                                (long long) s->offset_xyzlow) < 0;
-    retval = retval || fprintf (file, "    </DataArray>\n") < 0;
-    retval = retval || fprintf (file, "    <DataArray type=\"Float64\" "
-                                "Name=\"dx_dy_dz\" NumberOfComponents=\"3\" NumberOfTuples=\"%lld\" format=\"appended\" "
-                                "offset=\"%lld\">\n",
-                                (long long) domain->global_num_patches,
-                                (long long) s->offset_dxdydz) < 0;
-    retval = retval || fprintf (file, "    </DataArray>\n") < 0;
-    retval = retval || fprintf (file, "   </FieldData>\n") < 0;
 
     char field_names[BUFSIZ];
     strncpy(field_names, "meqn", sizeof(field_names));
@@ -592,20 +593,6 @@ write_patchno_cb (fclaw_domain_t * domain, fclaw_patch_t * patch,
     add_to_buffer (s, s->psize_patchno);
 }
 
-static void
-write_mxmymz_cb (fclaw_domain_t * domain, fclaw_patch_t * patch,
-                 int blockno, int patchno, void *user)
-{
-    fclaw_global_iterate_t *g = (fclaw_global_iterate_t *) user;
-    write_field_iter_user_t *iter = (write_field_iter_user_t *) g->user;
-    fclaw2d_vtk_state_t *s = iter->s;
-    int32_t *idata = (int32_t *) s->buf;
-    *idata++ = (int32_t) s->mx;
-    *idata++ = (int32_t) s->my;
-    *idata++ = (int32_t) s->mz;
-    add_to_buffer (s, s->psize_mxmymz);
-}
-
 /* Extract physical grid geometry for a patch; works for both 2D and 3D. */
 static void
 get_patch_geometry (fclaw_global_t * glob, fclaw_patch_t * patch, int dim,
@@ -840,8 +827,6 @@ fclaw2d_vtk_write_data (fclaw_global_t * glob, fclaw2d_vtk_state_t * s)
                              write_blockno_cb, NULL);
     fclaw2d_vtk_write_field (glob, s, s->offset_patchno, s->psize_patchno,
                              write_patchno_cb, NULL);
-    fclaw2d_vtk_write_field (glob, s, s->offset_mxmymz, s->psize_mxmymz,
-                             write_mxmymz_cb, NULL);
     fclaw2d_vtk_write_field (glob, s, s->offset_level, s->psize_level,
                              write_level_cb, NULL);
     fclaw2d_vtk_write_field (glob, s, s->offset_xyzlow, s->psize_xyzlow,
@@ -944,6 +929,7 @@ fclaw_vtk_write_file (int dim, fclaw_global_t * glob, const char *basename,
     s->inttype = s->fits32 ? "Int32" : "Int64";
     s->intsize = s->fits32 ? sizeof (int32_t) : sizeof (int64_t);
     s->ndsize = 8;   /* uint64 */
+    s->time_value = glob->curr_time;
     s->coordinate_cb = coordinate_cb;
     s->value_cb = value_cb;
     s->aux_cb = aux_cb;
@@ -959,7 +945,6 @@ fclaw_vtk_write_file (int dim, fclaw_global_t * glob, const char *basename,
     s->psize_mpirank = s->cells_per_patch * 4;
     s->psize_blockno = s->cells_per_patch * 4;
     s->psize_patchno = s->cells_per_patch * s->intsize;
-    s->psize_mxmymz = 3 * sizeof (int32_t);
     s->psize_level = 1 * sizeof (int32_t);
     s->psize_xyzlow = 3 * sizeof (double);
     s->psize_dxdydz = 3 * sizeof (double);
@@ -997,10 +982,6 @@ fclaw_vtk_write_file (int dim, fclaw_global_t * glob, const char *basename,
     s->offset_patchno = curr_offset;
     curr_offset += s->ndsize +
         s->psize_patchno * domain->global_num_patches;
-
-    s->offset_mxmymz = curr_offset;
-    curr_offset += s->ndsize +
-        s->psize_mxmymz * domain->global_num_patches;
 
     s->offset_level = curr_offset;
     curr_offset += s->ndsize +

@@ -56,7 +56,7 @@ arrays = parse_data_arrays(header_text);
 % Phase 1: read only topology arrays (geometry + metadata, not field data).
 % Include explicit metadata arrays written by newer versions of the VTU writer.
 topo_names = {'Position', 'connectivity', 'types', 'mpirank', 'blockno', 'patchno', ...
-              'mx_my_mz', 'level', 'xyz_low', 'dx_dy_dz'};
+              'mx_my_mz', 'level', 'xyz_low', 'dx_dy_dz', 'TimeValue'};
 topo = decode_specific_arrays(fid, payload_start, arrays, topo_names);
 
 required_fields = {'Position','connectivity','types','mpirank','blockno','patchno'};
@@ -120,6 +120,18 @@ amr = struct('gridno', {}, ...
 
 field_order = {'meqn', 'aux', 'rhs', 'soln', 'error'};
 
+% Extract global mx_my_mz metadata (same for all patches)
+if isfield(topo, 'mx_my_mz')
+    mxmymz_global = reshape(double(topo.mx_my_mz), 3, []);
+    mx_global = mxmymz_global(1, 1);
+    my_global = mxmymz_global(2, 1);
+    if dim > 2
+        mz_global = mxmymz_global(3, 1);
+    else
+        mz_global = [];
+    end
+end
+
 for ng = 1:num_patches
     amrdata = struct('gridno', [], ...
                      'level', [], ...
@@ -143,16 +155,11 @@ for ng = 1:num_patches
     patch_pts_ids = unique(patch_conn(:));
     patch_pts = points(patch_pts_ids, :);
 
-    % Patch shape (mx, my, mz): prefer explicit FieldData metadata; fall back to inference.
+    % Patch shape (mx, my, mz): use global metadata (same for all patches) or fall back to inference.
     if isfield(topo, 'mx_my_mz')
-        mxmymz = reshape(double(topo.mx_my_mz), 3, []);
-        mx = mxmymz(1, ng);
-        my = mxmymz(2, ng);
-        if dim > 2
-            mz = mxmymz(3, ng);
-        else
-            mz = [];
-        end
+        mx = mx_global;
+        my = my_global;
+        mz = mz_global;
     else
         if dim == 2
             [mx,my] = infer_2d_shape(patch_conn, points);
@@ -251,6 +258,11 @@ else
     for ng = 1:numel(amr)
         amr(ng).level = double(topo.level(ng));
     end
+end
+
+% Extract global time value if available.
+if isfield(topo, 'TimeValue')
+    t = double(topo.TimeValue(1));
 end
 
 if dim == 2
