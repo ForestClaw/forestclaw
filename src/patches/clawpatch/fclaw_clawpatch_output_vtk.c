@@ -130,23 +130,23 @@ fclaw2d_vtk_write_header (fclaw_domain_t * domain, fclaw2d_vtk_state_t * s)
     retval = retval || fprintf (file, " <UnstructuredGrid>\n") < 0;
     retval = retval || fprintf (file, "  <FieldData>\n") < 0;
     retval = retval || fprintf (file, "   <DataArray type=\"Int32\" "
-                                "Name=\"mx_my_mz\" NumberOfComponents=\"3\" NumberOfTuples=\"1\" format=\"ascii\">\n") < 0;
+                                "Name=\"patch_dimension\" NumberOfComponents=\"3\" NumberOfTuples=\"1\" format=\"ascii\">\n") < 0;
     retval = retval || fprintf (file, "    %d %d %d\n", s->mx, s->my, s->mz) < 0;
     retval = retval || fprintf (file, "   </DataArray>\n") < 0;
     retval = retval || fprintf (file, "   <DataArray type=\"Int32\" "
-                                "Name=\"level\" NumberOfTuples=\"%lld\" format=\"appended\" "
+                                "Name=\"levels\" NumberOfTuples=\"%lld\" format=\"appended\" "
                                 "offset=\"%lld\">\n",
                                 (long long) domain->global_num_patches,
                                 (long long) s->offset_level) < 0;
     retval = retval || fprintf (file, "   </DataArray>\n") < 0;
     retval = retval || fprintf (file, "   <DataArray type=\"Float64\" "
-                                "Name=\"xyz_low\" NumberOfComponents=\"3\" NumberOfTuples=\"%lld\" format=\"appended\" "
+                                "Name=\"patch_starts\" NumberOfComponents=\"3\" NumberOfTuples=\"%lld\" format=\"appended\" "
                                 "offset=\"%lld\">\n",
                                 (long long) domain->global_num_patches,
                                 (long long) s->offset_xyzlow) < 0;
     retval = retval || fprintf (file, "   </DataArray>\n") < 0;
     retval = retval || fprintf (file, "   <DataArray type=\"Float64\" "
-                                "Name=\"dx_dy_dz\" NumberOfComponents=\"3\" NumberOfTuples=\"%lld\" format=\"appended\" "
+                                "Name=\"patch_spacings\" NumberOfComponents=\"3\" NumberOfTuples=\"%lld\" format=\"appended\" "
                                 "offset=\"%lld\">\n",
                                 (long long) domain->global_num_patches,
                                 (long long) s->offset_dxdydz) < 0;

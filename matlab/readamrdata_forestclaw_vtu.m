@@ -56,7 +56,7 @@ arrays = parse_data_arrays(header_text);
 % Phase 1: read only topology arrays (geometry + metadata, not field data).
 % Include explicit metadata arrays written by newer versions of the VTU writer.
 topo_names = {'Position', 'connectivity', 'types', 'mpirank', 'blockno', 'patchno', ...
-              'mx_my_mz', 'level', 'xyz_low', 'dx_dy_dz', 'TimeValue'};
+              'patch_dimension', 'levels', 'patch_starts', 'patch_spacings', 'TimeValue'};
 topo = decode_specific_arrays(fid, payload_start, arrays, topo_names);
 
 required_fields = {'Position','connectivity','types','mpirank','blockno','patchno'};
@@ -120,9 +120,9 @@ amr = struct('gridno', {}, ...
 
 field_order = {'meqn', 'aux', 'rhs', 'soln', 'error'};
 
-% Extract global mx_my_mz metadata (same for all patches)
-if isfield(topo, 'mx_my_mz')
-    mxmymz_global = reshape(double(topo.mx_my_mz), 3, []);
+% Extract global patch_dimension metadata (same for all patches)
+if isfield(topo, 'patch_dimension')
+    mxmymz_global = reshape(double(topo.patch_dimension), 3, []);
     mx_global = mxmymz_global(1, 1);
     my_global = mxmymz_global(2, 1);
     if dim > 2
@@ -156,7 +156,7 @@ for ng = 1:num_patches
     patch_pts = points(patch_pts_ids, :);
 
     % Patch shape (mx, my, mz): use global metadata (same for all patches) or fall back to inference.
-    if isfield(topo, 'mx_my_mz')
+    if isfield(topo, 'patch_dimension')
         mx = mx_global;
         my = my_global;
         mz = mz_global;
@@ -170,8 +170,8 @@ for ng = 1:num_patches
     end
 
     % Patch origin and spacing: prefer explicit FieldData; fall back to inference.
-    if isfield(topo, 'xyz_low')
-        xyz_low_arr = reshape(double(topo.xyz_low), 3, []);
+    if isfield(topo, 'patch_starts')
+        xyz_low_arr = reshape(double(topo.patch_starts), 3, []);
         xlow = xyz_low_arr(1, ng);
         ylow = xyz_low_arr(2, ng);
         if dim > 2
@@ -187,8 +187,8 @@ for ng = 1:num_patches
         end
     end
     
-    if isfield(topo, 'dx_dy_dz')
-        dxdydz_arr = reshape(double(topo.dx_dy_dz), 3, []);
+    if isfield(topo, 'patch_spacings')
+        dxdydz_arr = reshape(double(topo.patch_spacings), 3, []);
         dx = dxdydz_arr(1, ng);
         dy = dxdydz_arr(2, ng);
         if dim > 2
@@ -252,11 +252,11 @@ end
 
 % If explicit level data was written by the VTU writer, use it directly;
 % otherwise infer AMR levels from relative cell spacing (legacy files).
-if ~isfield(topo, 'level')
+if ~isfield(topo, 'levels')
     amr = assign_levels_from_spacing(amr, dim);
 else
     for ng = 1:numel(amr)
-        amr(ng).level = double(topo.level(ng));
+        amr(ng).level = double(topo.levels(ng));
     end
 end
 
