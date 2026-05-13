@@ -44,20 +44,27 @@ end
 
 disp(['Reading data from ',filename]);
 
-% Use frame number for time
-t = Frame;
+h = parse_vtu_header(filename);
+fid_cleanup = onCleanup(@() fclose(h.fid)); %#ok<NASGU>
 
-[fid, header_text, payload_start] = open_vtu_header(filename);
-fid_cleanup = onCleanup(@() fclose(fid)); %#ok<NASGU>
+have_field_data = isfield(h.VTKFile.UnstructuredGrid, 'FieldData');
 
-piece = parse_piece_counts(header_text);
-arrays = parse_data_arrays(header_text);
+% Set time
+if have_field_data
+    t = find_by_name(h.VTKFile.UnstructuredGrid.FieldData.DataArray, 'TimeValue').data;
+else
+    t = Frame;
+end
+
+num_points = h.VTKFile.UnstructuredGrid.Piece.NumberOfPoints;
+num_cells  = h.VTKFile.UnstructuredGrid.Piece.NumberOfCells;
+arrays = collect_appended_arrays(h.VTKFile);
 
 % Phase 1: read only topology arrays (geometry + metadata, not field data).
 % Include explicit metadata arrays written by newer versions of the VTU writer.
 topo_names = {'Position', 'connectivity', 'types', 'mpirank', 'blockno', 'patchno', ...
               'patch_dimension', 'levels', 'patch_starts', 'patch_spacings', 'TimeValue'};
-topo = decode_specific_arrays(fid, payload_start, arrays, topo_names);
+topo = decode_specific_arrays(h.fid, h.payload_start, arrays, topo_names);
 
 required_fields = {'Position','connectivity','types','mpirank','blockno','patchno'};
 for ireq = 1:numel(required_fields)
@@ -69,7 +76,7 @@ end
 % Convert VTK connectivity to 1-based indexing for MATLAB array access.
 points = reshape(topo.Position, 3, []).';
 connectivity = double(topo.connectivity) + 1;
-connectivity = reshape(connectivity, [], piece.num_cells);
+connectivity = reshape(connectivity, [], num_cells);
 types = double(topo.types(:));
 
 if dim == 2
@@ -240,7 +247,7 @@ for ng = 1:num_patches
         fname_k = field_order{k};
         fa = find_array(arrays, fname_k);
         if ~isempty(fa)
-            raw = read_array_cells(fid, payload_start, fa, cell_ids(1)-1, numel(cell_ids));
+            raw = read_array_cells(h.fid, h.payload_start, fa, cell_ids(1)-1, numel(cell_ids));
             field_data = reshape(float_array(cast_appended(raw, fa.type, fa.num_components)), [], numel(cell_ids));
             patch_data = [patch_data; field_data]; %#ok<AGROW>
         end
@@ -260,11 +267,6 @@ else
     end
 end
 
-% Extract global time value if available.
-if isfield(topo, 'TimeValue')
-    t = double(topo.TimeValue(1));
-end
-
 if dim == 2
     for ng = 1:numel(amr)
         if ~isfield(amr(ng), 'mz')
@@ -281,91 +283,14 @@ end
 
 end
 
-% Open VTU file and read only the XML header, stopping at the binary payload.
-% Returns open file handle fid (caller must close), the XML header as a string,
-% and payload_start as the 0-based file offset of the first byte after '_'.
-function [fid, header_text, payload_start] = open_vtu_header(filename)
-fid = fopen(filename, 'r');
-if fid < 0
-    error('Unable to open %s', filename);
-end
-
-chunk_size = 65536;
-buf = uint8([]);
-needle = uint8('<AppendedData');
-
-while true
-    chunk = fread(fid, chunk_size, '*uint8');
-    buf = [buf; chunk]; %#ok<AGROW>
-
-    ad_idx = strfind(buf.', needle);
-    if ~isempty(ad_idx)
-        search_from = ad_idx(1) + numel(needle);
-        u_rel = find(buf(search_from:end) == uint8('_'), 1, 'first');
-        if ~isempty(u_rel)
-            % underscore_pos is the 1-based index of '_' in buf.
-            underscore_pos = search_from + u_rel - 1;
-            % payload_start is the 0-based file offset of the byte after '_'.
-            payload_start = underscore_pos;  % equals 0-based offset because MATLAB is 1-based
-            header_text = char(buf(1:underscore_pos-1)).';
-            return;
-        end
+% Return the DataArray struct whose Name matches, or [] if not found.
+function da = find_by_name(arrays, name)
+da = [];
+for i = 1:numel(arrays)
+    if strcmp(arrays(i).Name, name)
+        da = arrays(i);
+        return;
     end
-
-    if isempty(chunk)
-        fclose(fid);
-        error('No AppendedData payload marker "_" found in %s.', filename);
-    end
-end
-end
-
-% Parse global point/cell counts declared in the VTU Piece tag.
-function piece = parse_piece_counts(header_text)
-tok = regexp(header_text, '<Piece\s+[^>]*NumberOfPoints="(\d+)"\s+NumberOfCells="(\d+)"', 'tokens', 'once');
-if isempty(tok)
-    error('VTU Piece metadata is missing NumberOfPoints/NumberOfCells.');
-end
-piece.num_points = str2double(tok{1});
-piece.num_cells = str2double(tok{2});
-end
-
-% Parse appended DataArray metadata (name, type, offset, components).
-function arrays = parse_data_arrays(header_text)
-tags = regexp(header_text, '<DataArray\s+([^>]*)>', 'tokens');
-arrays = struct('Name', {}, 'type', {}, 'offset', {}, 'num_components', {});
-for i = 1:numel(tags)
-    attrs = tags{i}{1};
-    name = read_attr(attrs, 'Name');
-    if isempty(name)
-        continue;
-    end
-    fmt = read_attr(attrs, 'format');
-    if ~strcmp(fmt, 'appended')
-        continue;
-    end
-
-    a.Name = name;
-    a.type = read_attr(attrs, 'type');
-    a.offset = str2double(read_attr(attrs, 'offset'));
-
-    nc = read_attr(attrs, 'NumberOfComponents');
-    if isempty(nc)
-        a.num_components = 1;
-    else
-        a.num_components = str2double(nc);
-    end
-    arrays(end+1) = a; %#ok<AGROW>
-end
-end
-
-% Read one XML attribute value from an attribute string.
-function value = read_attr(attrs, key)
-pat = [key, '="([^"]+)"'];
-tok = regexp(attrs, pat, 'tokens', 'once');
-if isempty(tok)
-    value = '';
-else
-    value = tok{1};
 end
 end
 
@@ -587,22 +512,6 @@ else
 end
 end
 
-% Return mode for integer metadata that should be constant per patch.
-function m = int_mode(v)
-v = double(v(:));
-if isempty(v)
-    m = 0;
-    return
-end
-uv = unique(v);
-counts = zeros(size(uv));
-for i = 1:numel(uv)
-    counts(i) = sum(v == uv(i));
-end
-[~,idx] = max(counts);
-m = uv(idx);
-end
-
 % Convert numeric arrays to double and normalize orientation for reshape.
 function arr = float_array(v)
 arr = double(v);
@@ -646,6 +555,215 @@ levels = zeros(size(dx));
 for i = 1:numel(dx)
     [~,idx] = min(abs(udx - dx(i)));
     levels(i) = idx;
+end
+end
+
+% ============================ XML Header Parsing ============================
+
+% Parse a VTU file header into a struct h with fields:
+%   h.fid           - open file handle (caller must close)
+%   h.payload_start - 0-based file offset of the first payload byte
+%   h.VTKFile       - struct mirroring the XML header hierarchy:
+%       .type, .version, .byte_order, .header_type
+%       .UnstructuredGrid.Piece.NumberOfPoints  (numeric)
+%       .UnstructuredGrid.Piece.NumberOfCells   (numeric)
+%       .UnstructuredGrid.Piece.Points.DataArray(...)
+%       .UnstructuredGrid.Piece.Cells.DataArray(...)
+%       .UnstructuredGrid.Piece.CellData.DataArray(...)
+%       .UnstructuredGrid.FieldData.DataArray(...)  [if present]
+%       .AppendedData.encoding
+function h = parse_vtu_header(filename)
+fid = fopen(filename, 'r');
+if fid < 0
+    error('Unable to open %s', filename);
+end
+
+chunk_size = 65536;
+buf = uint8([]);
+needle = uint8('<AppendedData');
+
+while true
+    chunk = fread(fid, chunk_size, '*uint8');
+    buf = [buf; chunk]; %#ok<AGROW>
+
+    ad_idx = strfind(buf.', needle);
+    if ~isempty(ad_idx)
+        search_from = ad_idx(1) + numel(needle);
+        u_rel = find(buf(search_from:end) == uint8('_'), 1, 'first');
+        if ~isempty(u_rel)
+            % underscore_pos is the 1-based index of '_' in buf.
+            underscore_pos = search_from + u_rel - 1;
+            % h.payload_start is the 0-based file offset of the byte after '_'.
+            h.fid = fid;
+            h.payload_start = underscore_pos;  % equals 0-based offset because MATLAB is 1-based
+            h.VTKFile = build_vtu_struct(char(buf(1:underscore_pos-1)).');
+            return;
+        end
+    end
+
+    if isempty(chunk)
+        fclose(fid);
+        error('No AppendedData payload marker "_" found in %s.', filename);
+    end
+end
+end
+
+% Build a MATLAB struct mirroring the VTU XML header hierarchy.
+function vtk = build_vtu_struct(header_text)
+vtk = tag_attrs(header_text, 'VTKFile');
+
+piece = tag_attrs(header_text, 'Piece');
+piece.NumberOfPoints = str2double(piece.NumberOfPoints);
+piece.NumberOfCells  = str2double(piece.NumberOfCells);
+
+section_names = {'Points', 'Cells', 'CellData', 'PointData'};
+for k = 1:numel(section_names)
+    sname = section_names{k};
+    content = extract_between_tags(header_text, sname);
+    if ~isempty(content)
+        sect = tag_attrs(header_text, sname);
+        sect.DataArray = section_data_arrays(content);
+        piece.(sname) = sect;
+    end
+end
+
+vtk.UnstructuredGrid.Piece = piece;
+
+fd_content = extract_between_tags(header_text, 'FieldData');
+if ~isempty(fd_content)
+    fd = tag_attrs(header_text, 'FieldData');
+    fd.DataArray = section_data_arrays(fd_content);
+    % Read inline values for ASCII DataArrays immediately during header parse.
+    for i = 1:numel(fd.DataArray)
+        if strcmp(fd.DataArray(i).format, 'ascii')
+            fd.DataArray(i).data = read_ascii_da_content(fd_content, fd.DataArray(i).Name);
+        end
+    end
+    vtk.UnstructuredGrid.FieldData = fd;
+end
+
+vtk.AppendedData = tag_attrs(header_text, 'AppendedData');
+end
+
+% Collect all DataArrays with format="appended" from a VTKFile struct.
+% Returns a struct array with fields Name, type, offset, num_components
+% compatible with decode_specific_arrays and find_array.
+function arrays = collect_appended_arrays(vtk)
+arrays = struct('Name', {}, 'type', {}, 'offset', {}, 'num_components', {});
+section_names = {'Points', 'Cells', 'CellData', 'PointData'};
+piece = vtk.UnstructuredGrid.Piece;
+for k = 1:numel(section_names)
+    sname = section_names{k};
+    if ~isfield(piece, sname) || ~isfield(piece.(sname), 'DataArray')
+        continue;
+    end
+    for i = 1:numel(piece.(sname).DataArray)
+        da = piece.(sname).DataArray(i);
+        if ~strcmp(da.format, 'appended')
+            continue;
+        end
+        a.Name           = da.Name;
+        a.type           = da.type;
+        a.offset         = da.offset;
+        a.num_components = da.NumberOfComponents;
+        arrays(end+1) = a; %#ok<AGROW>
+    end
+end
+
+% FieldData lives at UnstructuredGrid level, not inside Piece.
+if isfield(vtk.UnstructuredGrid, 'FieldData') && ...
+        isfield(vtk.UnstructuredGrid.FieldData, 'DataArray')
+    for i = 1:numel(vtk.UnstructuredGrid.FieldData.DataArray)
+        da = vtk.UnstructuredGrid.FieldData.DataArray(i);
+        if ~strcmp(da.format, 'appended')
+            continue;
+        end
+        a.Name           = da.Name;
+        a.type           = da.type;
+        a.offset         = da.offset;
+        a.num_components = da.NumberOfComponents;
+        arrays(end+1) = a; %#ok<AGROW>
+    end
+end
+end
+
+% Extract all XML attributes from the first <tagname ...> tag as a struct.
+function s = tag_attrs(text, tagname)
+pat = ['<', tagname, '(?=[\s>\/])(\s[^>]*)?>'];
+tok = regexp(text, pat, 'tokens', 'once');
+if isempty(tok) || isempty(tok{1})
+    s = struct();
+    return;
+end
+kv = regexp(tok{1}, '(\w+)="([^"]*)"', 'tokens');
+s = struct();
+for i = 1:numel(kv)
+    s.(kv{i}{1}) = kv{i}{2};
+end
+end
+
+% Return the content between <tagname ...> and </tagname>, or '' if absent.
+function content = extract_between_tags(text, tagname)
+open_pat = ['<', tagname, '(?=[\s>])([^>]*)>'];
+[~, e] = regexp(text, open_pat, 'start', 'end', 'once');
+if isempty(e)
+    content = '';
+    return;
+end
+close_pat = ['</', tagname, '>'];
+c_rel = regexp(text(e+1:end), close_pat, 'start', 'once');
+if isempty(c_rel)
+    content = '';
+    return;
+end
+content = text(e+1 : e + c_rel - 1);
+end
+
+% Parse all <DataArray ...> elements in text into a struct array.
+% Fields: Name, type, NumberOfComponents (numeric), format, offset (numeric), data ([] or numeric).
+function das = section_data_arrays(text)
+das = struct('Name', {}, 'type', {}, 'NumberOfComponents', {}, 'format', {}, 'offset', {}, 'data', {});
+toks = regexp(text, '<DataArray\s+([^>]*)>', 'tokens');
+for i = 1:numel(toks)
+    attr_str = toks{i}{1};
+    da.Name               = read_attr(attr_str, 'Name');
+    da.type               = read_attr(attr_str, 'type');
+    da.NumberOfComponents = str2double_or(read_attr(attr_str, 'NumberOfComponents'), 1);
+    da.format             = read_attr(attr_str, 'format');
+    da.offset             = str2double_or(read_attr(attr_str, 'offset'), NaN);
+    da.data               = [];
+    das(end+1) = da; %#ok<AGROW>
+end
+end
+
+% Extract numeric values from an inline ASCII DataArray element, matched by Name.
+function vals = read_ascii_da_content(text, name)
+pat = ['<DataArray\s+[^>]*Name="', name, '"[^>]*>([\s\S]*?)<\/DataArray>'];
+tok = regexp(text, pat, 'tokens', 'once');
+if isempty(tok) || isempty(tok{1})
+    vals = [];
+    return;
+end
+vals = sscanf(strtrim(tok{1}), '%g');
+end
+
+% Return str2double(s) when s is non-empty, otherwise return default.
+function v = str2double_or(s, default)
+if isempty(s)
+    v = default;
+else
+    v = str2double(s);
+end
+end
+
+% Read one XML attribute value from an attribute string.
+function value = read_attr(attrs, key)
+pat = [key, '="([^"]+)"'];
+tok = regexp(attrs, pat, 'tokens', 'once');
+if isempty(tok)
+    value = '';
+else
+    value = tok{1};
 end
 end
 
