@@ -16,9 +16,7 @@ function [amr,t] = readamrdata_forestclaw_vtu(dim,Frame,dir)
 %     t     - Time from fort.t#### when available; otherwise Frame.
 %
 %   Notes:
-%     - VTU data is read from AppendedData encoding="raw" sections.
-%     - Data columns in amr(ng).data are patch cells; rows are concatenated
-%       in order: meqn, aux, rhs, soln, error (when present).
+%     - XML header is parsed into a struct.
 %     - Local helper read_by_name(h, arrays, name, startIdx, endIdx)
 %       accepts an optional 1-based inclusive tuple range.
 
@@ -50,25 +48,25 @@ h = parse_vtu_header(filename);
 fid_cleanup = onCleanup(@() fclose(h.fid));
 
 have_field_data = isfield(h.VTKFile.UnstructuredGrid, 'FieldData');
+if ~have_field_data
+    error('FieldData section not found in VTU file %s; unable to read time and patch metadata. Possible old Forestclaw VTU output.', filename);
+end
 
 % Global Variables
-num_points = h.VTKFile.UnstructuredGrid.Piece.NumberOfPoints;
 num_cells  = h.VTKFile.UnstructuredGrid.Piece.NumberOfCells;
-mx = 0;
-if have_field_data
-    t = find_by_name(h.VTKFile.UnstructuredGrid.FieldData.DataArray, 'TimeValue').data;
-    patch_dimension = find_by_name(h.VTKFile.UnstructuredGrid.FieldData.DataArray, 'patch_dimension').data;
-    mx = patch_dimension(1);
-    my = patch_dimension(2);
-    if dim == 3 
-        mz = patch_dimension(3);
-    end
-    patch_starts = read_by_name(h, h.VTKFile.UnstructuredGrid.FieldData.DataArray, 'patch_starts');
-    patch_spacings = read_by_name(h, h.VTKFile.UnstructuredGrid.FieldData.DataArray, 'patch_spacings');
-    levels = read_by_name(h, h.VTKFile.UnstructuredGrid.FieldData.DataArray, 'levels');
-    num_patches = numel(levels);
-else
-    t = Frame;
+
+t = find_by_name(h.VTKFile.UnstructuredGrid.FieldData.DataArray, 'TimeValue').data;
+patch_dimension = find_by_name(h.VTKFile.UnstructuredGrid.FieldData.DataArray, 'patch_dimension').data;
+
+patch_starts = read_by_name(h, h.VTKFile.UnstructuredGrid.FieldData.DataArray, 'patch_starts');
+patch_spacings = read_by_name(h, h.VTKFile.UnstructuredGrid.FieldData.DataArray, 'patch_spacings');
+levels = read_by_name(h, h.VTKFile.UnstructuredGrid.FieldData.DataArray, 'levels');
+
+num_patches = numel(levels);
+mx = patch_dimension(1);
+my = patch_dimension(2);
+if dim == 3 
+    mz = patch_dimension(3);
 end
 
 % All patches have the same number of cells; compute patch map by arithmetic.
@@ -322,115 +320,6 @@ end
 
 if ncomp > 1
     out = reshape(out, ncomp, []);
-end
-end
-
-% Infer (mx,my) assuming patch points lie on a Cartesian x/y grid.
-function [mx,my] = infer_2d_shape(patch_conn, points)
-patch_point_ids = unique(patch_conn(:));
-patch_xy = double(points(patch_point_ids, 1:2));
-
-nx = numel(unique(patch_xy(:,1)));
-ny = numel(unique(patch_xy(:,2)));
-
-if nx * ny ~= numel(patch_point_ids)
-    error('2D patch points do not form a rectangular Cartesian lattice.');
-end
-
-ncells = size(patch_conn, 2);
-mx = nx - 1;
-my = ny - 1;
-if mx * my ~= ncells
-    error('Cartesian-grid inference mismatch: mx*my does not equal cell count.');
-end
-end
-
-% Infer (mx,my,mz) assuming patch points lie on a Cartesian x/y/z grid.
-function [mx,my,mz] = infer_3d_shape(patch_conn, points)
-patch_point_ids = unique(patch_conn(:));
-patch_xyz = double(points(patch_point_ids, 1:3));
-
-nx = numel(unique(patch_xyz(:,1)));
-ny = numel(unique(patch_xyz(:,2)));
-nz = numel(unique(patch_xyz(:,3)));
-
-if nx * ny * nz ~= numel(patch_point_ids)
-    error('3D patch points do not form a rectangular Cartesian lattice.');
-end
-
-mx = nx - 1;
-my = ny - 1;
-mz = nz - 1;
-
-ncells = size(patch_conn, 2);
-if mx * my * mz ~= ncells
-    error('Cartesian-grid inference mismatch: mx*my*mz does not equal cell count.');
-end
-end
-
-% Estimate axis origin and spacing from unique coordinate values.
-function [x0,dx] = infer_axis_spacing(vals)
-u = unique(sort(double(vals(:))));
-if numel(u) < 2
-    x0 = u(1);
-    dx = 0;
-    return
-end
-d = diff(u);
-tol = max(1e-12, max(abs(u)) * 1e-10);
-d = d(d > tol);
-if isempty(d)
-    x0 = u(1);
-    dx = 0;
-else
-    x0 = u(1);
-    dx = min(d);
-end
-end
-
-% Convert numeric arrays to double and normalize orientation for reshape.
-function arr = float_array(v)
-arr = double(v);
-if isvector(arr)
-    arr = arr(:).';
-end
-end
-
-% Assign AMR levels from relative spacing tiers.
-function amr = assign_levels_from_spacing(amr, dim)
-if isempty(amr)
-    return
-end
-
-all_dx = zeros(numel(amr),1);
-for i = 1:numel(amr)
-    all_dx(i) = amr(i).dx;
-end
-
-levels = spacing_to_levels(all_dx);
-for i = 1:numel(amr)
-    amr(i).level = levels(i);
-    if dim == 2
-        if ~isfield(amr(i), 'mz')
-            amr(i).mz = [];
-        end
-        if ~isfield(amr(i), 'zlow')
-            amr(i).zlow = [];
-        end
-        if ~isfield(amr(i), 'dz')
-            amr(i).dz = [];
-        end
-    end
-end
-end
-
-% Convert unique spacing values to level indices (coarsest -> level 1).
-function levels = spacing_to_levels(dx)
-udx = unique(sort(dx, 'descend'));
-levels = zeros(size(dx));
-for i = 1:numel(dx)
-    [~,idx] = min(abs(udx - dx(i)));
-    levels(i) = idx;
 end
 end
 
