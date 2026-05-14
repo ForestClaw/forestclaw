@@ -19,6 +19,8 @@ function [amr,t] = readamrdata_forestclaw_vtu(dim,Frame,dir)
 %     - VTU data is read from AppendedData encoding="raw" sections.
 %     - Data columns in amr(ng).data are patch cells; rows are concatenated
 %       in order: meqn, aux, rhs, soln, error (when present).
+%     - Local helper read_by_name(h, arrays, name, startIdx, endIdx)
+%       accepts an optional 1-based inclusive tuple range.
 
 if nargin < 3
     dir = '';
@@ -26,7 +28,7 @@ end
 
 if ~isempty(dir)
     lastch = dir(end);
-    if ~(lastch == '/' || lastch == '\\')
+    if ~(lastch == "/" || lastch == "\\")
         % Normalize directory input so filename concatenation is robust.
         dir = [dir filesep];
     end
@@ -45,71 +47,32 @@ end
 disp(['Reading data from ',filename]);
 
 h = parse_vtu_header(filename);
-fid_cleanup = onCleanup(@() fclose(h.fid)); %#ok<NASGU>
+fid_cleanup = onCleanup(@() fclose(h.fid));
 
 have_field_data = isfield(h.VTKFile.UnstructuredGrid, 'FieldData');
 
-% Set time
+% Global Variables
+num_points = h.VTKFile.UnstructuredGrid.Piece.NumberOfPoints;
+num_cells  = h.VTKFile.UnstructuredGrid.Piece.NumberOfCells;
+mx = 0;
 if have_field_data
     t = find_by_name(h.VTKFile.UnstructuredGrid.FieldData.DataArray, 'TimeValue').data;
+    patch_dimension = find_by_name(h.VTKFile.UnstructuredGrid.FieldData.DataArray, 'patch_dimension').data;
+    mx = patch_dimension(1);
+    my = patch_dimension(2);
+    if dim == 3 
+        mz = patch_dimension(3);
+    end
+    patch_starts = read_by_name(h, h.VTKFile.UnstructuredGrid.FieldData.DataArray, 'patch_starts');
+    patch_spacings = read_by_name(h, h.VTKFile.UnstructuredGrid.FieldData.DataArray, 'patch_spacings');
+    levels = read_by_name(h, h.VTKFile.UnstructuredGrid.FieldData.DataArray, 'levels');
+    num_patches = numel(levels);
 else
     t = Frame;
 end
 
-num_points = h.VTKFile.UnstructuredGrid.Piece.NumberOfPoints;
-num_cells  = h.VTKFile.UnstructuredGrid.Piece.NumberOfCells;
-arrays = collect_appended_arrays(h.VTKFile);
-
-% Phase 1: read only topology arrays (geometry + metadata, not field data).
-% Include explicit metadata arrays written by newer versions of the VTU writer.
-topo_names = {'Position', 'connectivity', 'types', 'mpirank', 'blockno', 'patchno', ...
-              'patch_dimension', 'levels', 'patch_starts', 'patch_spacings', 'TimeValue'};
-topo = decode_specific_arrays(h.fid, h.payload_start, arrays, topo_names);
-
-required_fields = {'Position','connectivity','types','mpirank','blockno','patchno'};
-for ireq = 1:numel(required_fields)
-    if ~isfield(topo, required_fields{ireq})
-        error('Required VTU DataArray "%s" is missing in %s.', required_fields{ireq}, filename);
-    end
-end
-
-% Convert VTK connectivity to 1-based indexing for MATLAB array access.
-points = reshape(topo.Position, 3, []).';
-connectivity = double(topo.connectivity) + 1;
-connectivity = reshape(connectivity, [], num_cells);
-types = double(topo.types(:));
-
-if dim == 2
-    expected_type = 9;
-    verts_per_cell = 4;
-else
-    expected_type = 12;
-    verts_per_cell = 8;
-end
-
-if ~all(types == expected_type)
-    error('Unexpected VTK cell type in %s.', filename);
-end
-
-if size(connectivity,1) ~= verts_per_cell
-    error('Connectivity width does not match expected %d vertices per cell.', verts_per_cell);
-end
-
-if size(points,1) ~= piece.num_points
-    error('Point count mismatch while reading %s.', filename);
-end
-
-if size(connectivity,2) ~= piece.num_cells
-    error('Cell count mismatch while reading %s.', filename);
-end
-
 % All patches have the same number of cells; compute patch map by arithmetic.
-num_patches = numel(unique(double(topo.patchno(:)), 'sorted'));
-ncells_per_patch = piece.num_cells / num_patches;
-if ncells_per_patch ~= floor(ncells_per_patch)
-    error('num_cells (%d) is not evenly divisible by num_patches (%d) in %s.', ...
-          piece.num_cells, num_patches, filename);
-end
+ncells_per_patch = num_cells / num_patches;
 amr = struct('gridno', {}, ...
              'level', {}, ...
              'blockno', {}, ...
@@ -124,20 +87,6 @@ amr = struct('gridno', {}, ...
              'dy', {}, ...
              'dz', {}, ...
              'data', {});
-
-field_order = {'meqn', 'aux', 'rhs', 'soln', 'error'};
-
-% Extract global patch_dimension metadata (same for all patches)
-if isfield(topo, 'patch_dimension')
-    mxmymz_global = reshape(double(topo.patch_dimension), 3, []);
-    mx_global = mxmymz_global(1, 1);
-    my_global = mxmymz_global(2, 1);
-    if dim > 2
-        mz_global = mxmymz_global(3, 1);
-    else
-        mz_global = [];
-    end
-end
 
 for ng = 1:num_patches
     amrdata = struct('gridno', [], ...
@@ -155,68 +104,13 @@ for ng = 1:num_patches
                      'dz', [], ...
                      'data', []);
     % Compute this patch's 1-based cell index range directly from uniform size.
-    cell_start_0 = (ng-1) * ncells_per_patch;  % 0-based offset into flat arrays
-    cell_ids = (cell_start_0+1 : cell_start_0+ncells_per_patch);  % 1-based MATLAB indices
+    cell_start= (ng-1) * ncells_per_patch + 1;  % 0-based offset into flat arrays
 
-    patch_conn = connectivity(:, cell_ids);
-    patch_pts_ids = unique(patch_conn(:));
-    patch_pts = points(patch_pts_ids, :);
-
-    % Patch shape (mx, my, mz): use global metadata (same for all patches) or fall back to inference.
-    if isfield(topo, 'patch_dimension')
-        mx = mx_global;
-        my = my_global;
-        mz = mz_global;
-    else
-        if dim == 2
-            [mx,my] = infer_2d_shape(patch_conn, points);
-            mz = [];
-        else
-            [mx,my,mz] = infer_3d_shape(patch_conn, points);
-        end
-    end
-
-    % Patch origin and spacing: prefer explicit FieldData; fall back to inference.
-    if isfield(topo, 'patch_starts')
-        xyz_low_arr = reshape(double(topo.patch_starts), 3, []);
-        xlow = xyz_low_arr(1, ng);
-        ylow = xyz_low_arr(2, ng);
-        if dim > 2
-            zlow = xyz_low_arr(3, ng);
-        else
-            zlow = [];
-        end
-    else
-        [xlow,~] = infer_axis_spacing(patch_pts(:,1));
-        [ylow,~] = infer_axis_spacing(patch_pts(:,2));
-        if dim > 2
-            [zlow,~] = infer_axis_spacing(patch_pts(:,3));
-        end
-    end
-    
-    if isfield(topo, 'patch_spacings')
-        dxdydz_arr = reshape(double(topo.patch_spacings), 3, []);
-        dx = dxdydz_arr(1, ng);
-        dy = dxdydz_arr(2, ng);
-        if dim > 2
-            dz = dxdydz_arr(3, ng);
-        else
-            dz = [];
-        end
-    else
-        [~,dx] = infer_axis_spacing(patch_pts(:,1));
-        [~,dy] = infer_axis_spacing(patch_pts(:,2));
-        if dim > 2
-            [~,dz] = infer_axis_spacing(patch_pts(:,3));
-        else
-            dz = [];
-        end
-    end
-
-    % Fill legacy AMR metadata expected by plotting/post-processing scripts.
-    amrdata.gridno = double(topo.patchno(cell_ids(1))) + 1;
-    amrdata.blockno = double(topo.blockno(cell_ids(1)));
-    amrdata.mpirank = double(topo.mpirank(cell_ids(1)));
+    % Fill AMR metadata
+    amrdata.gridno = read_by_name(h, h.VTKFile.UnstructuredGrid.Piece.CellData.DataArray, 'patchno', cell_start, cell_start);
+    amrdata.level = double(levels(ng));
+    amrdata.blockno = read_by_name(h, h.VTKFile.UnstructuredGrid.Piece.CellData.DataArray, 'blockno', cell_start, cell_start);
+    amrdata.mpirank = read_by_name(h, h.VTKFile.UnstructuredGrid.Piece.CellData.DataArray, 'mpirank', cell_start, cell_start);
     amrdata.mx = mx;
     amrdata.my = my;
     if dim > 2
@@ -225,60 +119,28 @@ for ng = 1:num_patches
         amrdata.mz = [];
     end
 
-    amrdata.xlow = xlow;
-    amrdata.ylow = ylow;
+    amrdata.xlow = patch_starts(1, ng);
+    amrdata.ylow = patch_starts(2, ng);
     if dim > 2
-        amrdata.zlow = zlow;
+        amrdata.zlow = patch_starts(3, ng);
     else
         amrdata.zlow = [];
     end
 
-    amrdata.dx = dx;
-    amrdata.dy = dy;
+    amrdata.dx = patch_spacings(1, ng);
+    amrdata.dy = patch_spacings(2, ng);
     if dim > 2
-        amrdata.dz = dz;
+        amrdata.dz = patch_spacings(3, ng);
     else
         amrdata.dz = [];
     end
 
-    % Phase 2: seek to this patch's cell slice in each field array and read it.
-    patch_data = [];
-    for k = 1:numel(field_order)
-        fname_k = field_order{k};
-        fa = find_array(arrays, fname_k);
-        if ~isempty(fa)
-            raw = read_array_cells(h.fid, h.payload_start, fa, cell_ids(1)-1, numel(cell_ids));
-            field_data = reshape(float_array(cast_appended(raw, fa.type, fa.num_components)), [], numel(cell_ids));
-            patch_data = [patch_data; field_data]; %#ok<AGROW>
-        end
-    end
-    amrdata.data = patch_data;
+    % read meqn
+    meqn = read_by_name(h, h.VTKFile.UnstructuredGrid.Piece.CellData.DataArray, 'meqn', cell_start, cell_start + ncells_per_patch - 1);
+    % reorder from meqn(m,i) to meqn(i,m)
+    amrdata.data = permute(meqn, [2, 1]);
 
-    amr(ng) = amrdata; %#ok<AGROW>
-end
-
-% If explicit level data was written by the VTU writer, use it directly;
-% otherwise infer AMR levels from relative cell spacing (legacy files).
-if ~isfield(topo, 'levels')
-    amr = assign_levels_from_spacing(amr, dim);
-else
-    for ng = 1:numel(amr)
-        amr(ng).level = double(topo.levels(ng));
-    end
-end
-
-if dim == 2
-    for ng = 1:numel(amr)
-        if ~isfield(amr(ng), 'mz')
-            amr(ng).mz   = [];
-        end
-        if ~isfield(amr(ng), 'zlow')
-            amr(ng).zlow = [];
-        end
-        if ~isfield(amr(ng), 'dz')
-            amr(ng).dz   = [];
-        end
-    end
+    amr(ng) = amrdata;
 end
 
 end
@@ -294,33 +156,124 @@ for i = 1:numel(arrays)
 end
 end
 
-% Read only the named DataArrays from the appended section; skip all others.
-function values = decode_specific_arrays(fid, payload_start, arrays, names)
-values = struct();
-for i = 1:numel(arrays)
-    if any(strcmp(arrays(i).Name, names))
-        a = arrays(i);
-        if fseek(fid, payload_start + a.offset, 'bof') ~= 0
-            error('Seek failed for DataArray "%s".', a.Name);
+% Read a named DataArray by Name from either FieldData or Piece sections.
+% Accepts raw XML DataArray structs or normalized entries from collect_appended_arrays.
+% Optional startIdx/endIdx select an inclusive 1-based tuple range to minimize disk I/O.
+function values = read_by_name(h, arrays, name, startIdx, endIdx)
+values = [];
+da = find_by_name(arrays, name);
+if isempty(da)
+    return;
+end
+
+ncomp = data_array_num_components(da);
+
+have_range = (nargin >= 4 && ~isempty(startIdx)) || (nargin >= 5 && ~isempty(endIdx));
+if nargin < 4 || isempty(startIdx)
+    startIdx = 1;
+end
+if nargin < 5 || isempty(endIdx)
+    endIdx = [];
+end
+
+da_format = data_array_format(da);
+if strcmp(da_format, 'appended')
+    if have_range
+        % Read only the requested tuple range to minimize disk I/O
+        if isempty(endIdx)
+            % Need total tuple count; read full length prefix
+            if fseek(h.fid, h.payload_start + da.offset, 'bof') ~= 0
+                error('Seek failed for DataArray "%s".', da.Name);
+            end
+            nbytes = double(read_uint64_le_from_fid(h.fid));
+            elem_size = vtk_type_size(da.type);
+            ntuples = nbytes / (elem_size * ncomp);
+            endIdx = ntuples;
         end
-        nbytes = double(read_uint64_le_from_fid(fid));
-        raw = fread(fid, nbytes, '*uint8');
+        % Validate range
+        validate_range_indices(da.Name, startIdx, endIdx);
+        % Seek to first tuple and read only requested range
+        raw = read_data_array_range(h, da, startIdx, endIdx);
+    else
+        % Read full array
+        if fseek(h.fid, h.payload_start + da.offset, 'bof') ~= 0
+            error('Seek failed for DataArray "%s".', da.Name);
+        end
+        nbytes = double(read_uint64_le_from_fid(h.fid));
+        raw = fread(h.fid, nbytes, '*uint8');
         if numel(raw) < nbytes
-            error('Unexpected end of file reading DataArray "%s".', a.Name);
+            error('Unexpected end of file reading DataArray "%s".', da.Name);
         end
-        values.(a.Name) = cast_appended(raw, a.type, a.num_components);
+    end
+    values = cast_appended(raw, da.type, ncomp);
+elseif strcmp(da_format, 'ascii')
+    values = da.data;
+    if have_range
+        if isempty(endIdx)
+            if ncomp > 1 && ismatrix(values) && size(values,1) == ncomp
+                endIdx = size(values,2);
+            else
+                endIdx = numel(values);
+            end
+        end
+        validate_range_indices(da.Name, startIdx, endIdx);
+        if ncomp > 1 && ismatrix(values) && size(values,1) == ncomp
+            values = values(:, startIdx:endIdx);
+        else
+            values = values(startIdx:endIdx);
+        end
     end
 end
 end
 
-% Return the arrays entry whose Name matches, or [] if not found.
-function a = find_array(arrays, name)
-a = [];
-for i = 1:numel(arrays)
-    if strcmp(arrays(i).Name, name)
-        a = arrays(i);
-        return;
-    end
+% Read only a range of tuples from an appended DataArray by seeking.
+% startIdx/endIdx are 1-based inclusive tuple indices.
+function raw = read_data_array_range(h, da, startIdx, endIdx)
+elem_size = vtk_type_size(da.type);
+bytes_per_tuple = elem_size * data_array_num_components(da);
+% Seek past 8-byte length prefix, then to startIdx-th tuple (1-based to 0-based).
+data_offset = h.payload_start + da.offset + 8 + (startIdx - 1) * bytes_per_tuple;
+if fseek(h.fid, data_offset, 'bof') ~= 0
+    error('Seek failed reading range from DataArray "%s".', da.Name);
+end
+nbytes_to_read = (endIdx - startIdx + 1) * bytes_per_tuple;
+raw = fread(h.fid, nbytes_to_read, '*uint8');
+if numel(raw) < nbytes_to_read
+    error('Unexpected end of file reading range from DataArray "%s".', da.Name);
+end
+end
+
+% Return DataArray tuple width with compatibility for alternate field names.
+function ncomp = data_array_num_components(da)
+if isfield(da, 'NumberOfComponents') && ~isempty(da.NumberOfComponents)
+    ncomp = da.NumberOfComponents;
+else
+    ncomp = 1;
+end
+end
+
+% Return DataArray format; normalized appended arrays may omit this field.
+function fmt = data_array_format(da)
+if isfield(da, 'format') && ~isempty(da.format)
+    fmt = da.format;
+else
+    fmt = '';
+end
+end
+
+% Validate a requested inclusive tuple range for a named DataArray.
+function validate_range_indices(name, startIdx, endIdx)
+if ~isscalar(startIdx) || ~isnumeric(startIdx) || ~isfinite(startIdx) || startIdx ~= floor(startIdx)
+    error('Invalid startIdx for DataArray "%s": expected a finite integer scalar.', name);
+end
+if ~isscalar(endIdx) || ~isnumeric(endIdx) || ~isfinite(endIdx) || endIdx ~= floor(endIdx)
+    error('Invalid endIdx for DataArray "%s": expected a finite integer scalar.', name);
+end
+if startIdx < 1
+    error('Invalid range for DataArray "%s": startIdx=%d must be >= 1.', name, startIdx);
+end
+if endIdx < startIdx
+    error('Invalid range for DataArray "%s": startIdx=%d must be <= endIdx=%d.', name, startIdx, endIdx);
 end
 end
 
@@ -335,41 +288,6 @@ switch vtk_type
         n = 1;
     otherwise
         error('Unknown VTK type "%s".', vtk_type);
-end
-end
-
-% Read a contiguous range of cells from a flat appended DataArray by seeking.
-% cell_start is 0-based; ncells is the count to read.
-function raw = read_array_cells(fid, payload_start, a, cell_start, ncells)
-elem_size = vtk_type_size(a.type);
-bytes_per_cell = a.num_components * elem_size;
-% Skip 8-byte length prefix then jump to cell_start within the data.
-data_offset = payload_start + a.offset + 8 + cell_start * bytes_per_cell;
-if fseek(fid, data_offset, 'bof') ~= 0
-    error('Seek failed reading cells from DataArray "%s".', a.Name);
-end
-nbytes_to_read = ncells * bytes_per_cell;
-raw = fread(fid, nbytes_to_read, '*uint8');
-if numel(raw) < nbytes_to_read
-    error('Unexpected end of file reading cells from DataArray "%s".', a.Name);
-end
-end
-
-% Seek to each DataArray by offset and read only its bytes from the open file.
-function values = decode_appended_arrays_streaming(fid, payload_start, arrays)
-values = struct();
-for i = 1:numel(arrays)
-    a = arrays(i);
-    % Offsets in the VTU header are measured from the byte immediately after '_'.
-    if fseek(fid, payload_start + a.offset, 'bof') ~= 0
-        error('Seek failed for DataArray "%s".', a.Name);
-    end
-    nbytes = double(read_uint64_le_from_fid(fid));
-    raw = fread(fid, nbytes, '*uint8');
-    if numel(raw) < nbytes
-        error('Unexpected end of file reading DataArray "%s".', a.Name);
-    end
-    values.(a.Name) = cast_appended(raw, a.type, a.num_components);
 end
 end
 
@@ -404,48 +322,6 @@ end
 
 if ncomp > 1
     out = reshape(out, ncomp, []);
-end
-end
-
-% Build connected components of cells that share vertices.
-function labels = connected_cell_components(connectivity, npoints)
-ncells = size(connectivity, 2);
-parent = 1:ncells;
-owner = zeros(npoints, 1);
-
-for c = 1:ncells
-    verts = connectivity(:, c);
-    for iv = 1:numel(verts)
-        v = verts(iv);
-        if owner(v) == 0
-            owner(v) = c;
-        else
-            % Union-Find merge when two cells touch the same point.
-            parent = unite(parent, c, owner(v));
-        end
-    end
-end
-
-labels = zeros(ncells,1);
-for c = 1:ncells
-    labels(c) = find_root(parent, c);
-end
-end
-
-% Union operation for cell component labels.
-function parent = unite(parent, a, b)
-ra = find_root(parent, a);
-rb = find_root(parent, b);
-if ra ~= rb
-    parent(rb) = ra;
-end
-end
-
-% Find operation for cell component labels.
-function r = find_root(parent, x)
-r = x;
-while parent(r) ~= r
-    r = parent(r);
 end
 end
 
@@ -643,48 +519,6 @@ if ~isempty(fd_content)
 end
 
 vtk.AppendedData = tag_attrs(header_text, 'AppendedData');
-end
-
-% Collect all DataArrays with format="appended" from a VTKFile struct.
-% Returns a struct array with fields Name, type, offset, num_components
-% compatible with decode_specific_arrays and find_array.
-function arrays = collect_appended_arrays(vtk)
-arrays = struct('Name', {}, 'type', {}, 'offset', {}, 'num_components', {});
-section_names = {'Points', 'Cells', 'CellData', 'PointData'};
-piece = vtk.UnstructuredGrid.Piece;
-for k = 1:numel(section_names)
-    sname = section_names{k};
-    if ~isfield(piece, sname) || ~isfield(piece.(sname), 'DataArray')
-        continue;
-    end
-    for i = 1:numel(piece.(sname).DataArray)
-        da = piece.(sname).DataArray(i);
-        if ~strcmp(da.format, 'appended')
-            continue;
-        end
-        a.Name           = da.Name;
-        a.type           = da.type;
-        a.offset         = da.offset;
-        a.num_components = da.NumberOfComponents;
-        arrays(end+1) = a; %#ok<AGROW>
-    end
-end
-
-% FieldData lives at UnstructuredGrid level, not inside Piece.
-if isfield(vtk.UnstructuredGrid, 'FieldData') && ...
-        isfield(vtk.UnstructuredGrid.FieldData, 'DataArray')
-    for i = 1:numel(vtk.UnstructuredGrid.FieldData.DataArray)
-        da = vtk.UnstructuredGrid.FieldData.DataArray(i);
-        if ~strcmp(da.format, 'appended')
-            continue;
-        end
-        a.Name           = da.Name;
-        a.type           = da.type;
-        a.offset         = da.offset;
-        a.num_components = da.NumberOfComponents;
-        arrays(end+1) = a; %#ok<AGROW>
-    end
-end
 end
 
 % Extract all XML attributes from the first <tagname ...> tag as a struct.
