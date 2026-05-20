@@ -135,8 +135,7 @@ for ng = 1:num_patches
 
     % read meqn
     meqn = read_by_name(h, h.VTKFile.UnstructuredGrid.Piece.CellData.DataArray, 'meqn', cell_start, cell_start + ncells_per_patch - 1);
-    % reorder from meqn(m,i) to meqn(i,m)
-    amrdata.data = permute(meqn, [2, 1]);
+    amrdata.data = meqn;
 
     amr(ng) = amrdata;
 end
