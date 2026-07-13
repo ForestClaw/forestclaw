@@ -23,7 +23,6 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <fclaw_base.h>
 #include <fclaw_regrid.h>
 
 #include <fclaw_options.h>
@@ -375,10 +374,6 @@ static int domains_are_different(fclaw_domain_t *domain1, fclaw_domain_t *domain
 
     int global_different;
     sc_MPI_Allreduce(&different, &global_different, 1, sc_MPI_INT, sc_MPI_MAX, domain1->mpicomm);
-    if(!global_different)
-    {
-        fclaw_global_productionf("********* p4est false positive\n");
-    }
     return global_different;
 }
 
@@ -562,12 +557,14 @@ void fclaw_regrid(fclaw_global_t *glob)
         fclaw_timer_stop (&glob->timers[FCLAW_TIMER_REGRID]);
         fclaw_timer_start (&glob->timers[FCLAW_TIMER_ADAPT_COMM]);
         fclaw_domain_t *new_domain = fclaw_domain_adapt(*domain);
+        int have_new_refinement = 0;
 
         if (new_domain != NULL)
         {
             if(domains_are_different(*domain, new_domain))
             {
                 has_been_refined = 1;
+                have_new_refinement = 1;
             }
             /* allocate memory for user patch data and user domain data in the new
                domain;  copy data from the old to new the domain. */
@@ -602,7 +599,10 @@ void fclaw_regrid(fclaw_global_t *glob)
                                  time_interp,
                                  FCLAW_TIMER_REGRID);
 
-            ++glob->count_amr_new_domain;
+            if(have_new_refinement)
+            {
+                ++glob->count_amr_new_domain;
+            }
         }
         else
         {
