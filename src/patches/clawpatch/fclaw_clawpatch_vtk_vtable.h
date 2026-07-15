@@ -50,6 +50,7 @@ struct fclaw_patch;
 typedef struct fclaw_vtk_cb_context
 {
     int fits32; /* whether the mesh connectivity fits in 32 bits */
+    int cells_per_patch; /* number of cells per patch */
 } fclaw_vtk_cb_context_t;
 
 /** 
@@ -81,6 +82,7 @@ typedef struct fclaw_clawpatch_vtk_vtable_entry
 {
     const char* name;
     fclaw_vtk_entry_type_t type;
+    int number_of_components; 
     size_t size_per_patch;
     fclaw_vtk_patch_cb_t callback;
 } fclaw_clawpatch_vtk_vtable_entry_t; 
@@ -90,6 +92,7 @@ typedef struct fclaw_clawpatch_vtk_vtable
     sc_list_t* field_entries; /* entries for the field section */
     sc_list_t* point_entries; /* entries for the point section */
     sc_list_t* cell_entries;  /* entries for the cell section */
+    sc_list_t* celldata_entries; /* entries for the celldata section */
 } fclaw_clawpatch_vtk_vtable_t;
 
 /**
