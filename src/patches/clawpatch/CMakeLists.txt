@@ -84,6 +84,7 @@ add_library(clawpatch
   fclaw_clawpatch_options.c
   fclaw_clawpatch_output_ascii.c
   fclaw_clawpatch_output_vtk.c
+  fclaw_clawpatch_vtk_vtable.c
   fclaw_clawpatch_pillow.c
   fclaw_clawpatch_regions.c
 
@@ -132,6 +133,7 @@ install(FILES
 	fclaw_clawpatch_options.h
 	fclaw_clawpatch_output_ascii.h
 	fclaw_clawpatch_output_vtk.h
+  fclaw_clawpatch_vtk_vtable.h
 	fclaw_clawpatch_pillow.h
   fclaw_clawpatch_regions.h
   fclaw_clawpatch_gauges.h
