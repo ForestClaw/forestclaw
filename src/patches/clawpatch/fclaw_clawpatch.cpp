@@ -30,6 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_clawpatch_options.h>
 #include <fclaw_clawpatch_output_ascii.h> 
 #include <fclaw_clawpatch_output_vtk.h>
+#include <fclaw_clawpatch_vtk_vtable.h>
 #include <fclaw_clawpatch_pillow.h>  
 
 #include <fclaw_regions.h>
@@ -2040,6 +2041,9 @@ void fclaw_clawpatch_vtable_initialize(fclaw_global_t* glob,
 
     /* Set the virtual table, even if it isn't used */
     fclaw_clawpatch_pillow_vtable_initialize(glob, claw_version);
+
+    /* Set the vtk vtable */
+    fclaw_clawpatch_vtk_vtable_initialize(glob);
 
     clawpatch_vt->is_set = 1;
 

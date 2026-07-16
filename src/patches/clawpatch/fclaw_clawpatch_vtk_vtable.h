@@ -83,7 +83,7 @@ typedef struct fclaw_clawpatch_vtk_vtable_entry
     const char* name;
     fclaw_vtk_entry_type_t type;
     int number_of_components; 
-    size_t size_per_patch;
+    size_t elements_per_patch; /* number of elements (e.g. points or cells) per patch */
     fclaw_vtk_patch_cb_t callback;
 } fclaw_clawpatch_vtk_vtable_entry_t; 
 	
