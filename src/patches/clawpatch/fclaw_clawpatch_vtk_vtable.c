@@ -51,6 +51,23 @@ fclaw_clawpatch_vtk_vtable_entry_t* vtk_vt_entry_new(const char* name,
 }
 
 static
+void vtk_vt_entry_init(fclaw_clawpatch_vtk_vtable_entry_t* entry,
+                       const char* name,
+                       fclaw_vtk_entry_type_t type,
+                       int number_of_components,
+                       size_t elements_per_patch,
+                       fclaw_vtk_patch_elements_cb_t elements_in_patch,
+                       fclaw_vtk_patch_cb_t callback)
+{
+    entry->name = name;
+    entry->type = type;
+    entry->number_of_components = number_of_components;
+    entry->elements_per_patch = elements_per_patch;
+    entry->elements_in_patch = elements_in_patch;
+    entry->callback = callback;
+}
+
+static
 void vtk_add_field_entry(fclaw_clawpatch_vtk_vtable_t* vtk_vt,
 						 const char* name,
 						 fclaw_vtk_entry_type_t type,
@@ -62,34 +79,6 @@ void vtk_add_field_entry(fclaw_clawpatch_vtk_vtable_t* vtk_vt,
 	fclaw_clawpatch_vtk_vtable_entry_t* entry =
 		vtk_vt_entry_new(name, type, number_of_components, elements_per_patch, elements_in_patch, callback);
 	sc_list_append(vtk_vt->field_entries, entry);
-}
-
-static
-void vtk_add_point_entry(fclaw_clawpatch_vtk_vtable_t* vtk_vt,
-						 const char* name,
-						 fclaw_vtk_entry_type_t type,
-                         int number_of_components,
-						 size_t size_per_patch,
-                         fclaw_vtk_patch_elements_cb_t elements_in_patch,
-						 fclaw_vtk_patch_cb_t callback)
-{
-	fclaw_clawpatch_vtk_vtable_entry_t* entry =
-		vtk_vt_entry_new(name, type, number_of_components, size_per_patch, elements_in_patch, callback);
-	sc_list_append(vtk_vt->point_entries, entry);
-}
-
-static
-void vtk_add_cell_entry(fclaw_clawpatch_vtk_vtable_t* vtk_vt,
-						const char* name,
-						fclaw_vtk_entry_type_t type,
-                        int number_of_components,
-						size_t size_per_patch,
-                        fclaw_vtk_patch_elements_cb_t elements_in_patch,
-						fclaw_vtk_patch_cb_t callback)
-{
-	fclaw_clawpatch_vtk_vtable_entry_t* entry =
-		vtk_vt_entry_new(name, type, number_of_components, size_per_patch, elements_in_patch, callback);
-	sc_list_append(vtk_vt->cell_entries, entry);
 }
 
 static
@@ -114,8 +103,6 @@ fclaw_clawpatch_vtk_vtable_t* vtk_vt_new(void)
 		FCLAW_ALLOC_ZERO(fclaw_clawpatch_vtk_vtable_t, 1);
 
 	vtk_vt->field_entries = sc_list_new(NULL);
-	vtk_vt->point_entries = sc_list_new(NULL);
-	vtk_vt->cell_entries = sc_list_new(NULL);
     vtk_vt->celldata_entries = sc_list_new(NULL);
 
 	return vtk_vt;
@@ -137,26 +124,6 @@ void vtk_vt_destroy(void* vt)
 			FCLAW_FREE(entry);
 		}
 		sc_list_destroy(vtk_vt->field_entries);
-	}
-	if (vtk_vt->point_entries != NULL)
-	{
-		while (vtk_vt->point_entries->elem_count > 0)
-		{
-			entry = (fclaw_clawpatch_vtk_vtable_entry_t*)
-				sc_list_pop(vtk_vt->point_entries);
-			FCLAW_FREE(entry);
-		}
-		sc_list_destroy(vtk_vt->point_entries);
-	}
-	if (vtk_vt->cell_entries != NULL)
-	{
-		while (vtk_vt->cell_entries->elem_count > 0)
-		{
-			entry = (fclaw_clawpatch_vtk_vtable_entry_t*)
-				sc_list_pop(vtk_vt->cell_entries);
-			FCLAW_FREE(entry);
-		}
-		sc_list_destroy(vtk_vt->cell_entries);
 	}
     if (vtk_vt->celldata_entries != NULL)
     {
@@ -915,25 +882,25 @@ void fclaw_clawpatch_vtk_vtable_initialize(struct fclaw_global* glob)
                         &one_element_per_patch,
                         &write_patch_spacings_cb);
 
-    // point entries
-    vtk_add_point_entry(vtk_vt, "Position", FCLAW_VTK_FLOAT64,
-                        3, num_points_per_patch, 
-                        &points_in_patch,
-                        &write_coordinate_cb);
+    // primary point entry
+    vtk_vt_entry_init(&vtk_vt->position_entry, "Position", FCLAW_VTK_FLOAT64,
+                      3, num_points_per_patch,
+                      &points_in_patch,
+                      &write_coordinate_cb);
 
-    // cell entries
-    vtk_add_cell_entry(vtk_vt, "connectivity", FCLAW_VTK_INT32_OR_64, 
-                       1, num_cells_per_patch * num_points_per_cell, 
-                       &connectivity_in_patch,
-                       &write_connectivity_cb);
-    vtk_add_cell_entry(vtk_vt, "offsets", FCLAW_VTK_INT32_OR_64, 
-                       1, num_cells_per_patch, 
-                       &offsets_in_patch,
-                       &write_offsets_cb);
-    vtk_add_cell_entry(vtk_vt, "types", FCLAW_VTK_UINT8,
-                       1, num_cells_per_patch, 
-                       &cells_in_patch,
-                       &write_types_cb);
+    // primary cell entries
+    vtk_vt_entry_init(&vtk_vt->connectivity_entry, "connectivity", FCLAW_VTK_INT32_OR_64,
+                      1, num_cells_per_patch * num_points_per_cell,
+                      &connectivity_in_patch,
+                      &write_connectivity_cb);
+    vtk_vt_entry_init(&vtk_vt->offsets_entry, "offsets", FCLAW_VTK_INT32_OR_64,
+                      1, num_cells_per_patch,
+                      &offsets_in_patch,
+                      &write_offsets_cb);
+    vtk_vt_entry_init(&vtk_vt->types_entry, "types", FCLAW_VTK_UINT8,
+                      1, num_cells_per_patch,
+                      &cells_in_patch,
+                      &write_types_cb);
 
     int meqn = clawpatch_opt->meqn;
     // celldata entries

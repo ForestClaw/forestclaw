@@ -105,8 +105,10 @@ typedef struct fclaw_clawpatch_vtk_vtable_entry
 typedef struct fclaw_clawpatch_vtk_vtable
 {
     sc_list_t* field_entries; /* entries for the field section */
-    sc_list_t* point_entries; /* entries for the point section */
-    sc_list_t* cell_entries;  /* entries for the cell section */
+    fclaw_clawpatch_vtk_vtable_entry_t position_entry; /* primary points entry */
+    fclaw_clawpatch_vtk_vtable_entry_t connectivity_entry; /* primary cells connectivity entry */
+    fclaw_clawpatch_vtk_vtable_entry_t offsets_entry; /* primary cells offsets entry */
+    fclaw_clawpatch_vtk_vtable_entry_t types_entry; /* primary cells types entry */
     sc_list_t* celldata_entries; /* entries for the celldata section */
 } fclaw_clawpatch_vtk_vtable_t;
 

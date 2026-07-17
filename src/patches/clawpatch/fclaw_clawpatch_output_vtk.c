@@ -148,6 +148,29 @@ vtk_type_to_string(fclaw2d_vtk_state_t *s, fclaw_vtk_entry_type_t type)
 }
 
 static int
+print_dataarray_entry(FILE *file,
+                      fclaw2d_vtk_state_t *s,
+                      const fclaw_clawpatch_vtk_vtable_entry_t *entry,
+                      int64_t offset,
+                      const char *format_single,
+                      const char *format_multiple)
+{
+    const char* vtk_type_str = vtk_type_to_string(s, entry->type);
+    if (entry->number_of_components == 1)
+    {
+        return fprintf(file, format_single,
+                       vtk_type_str,
+                       entry->name,
+                       (long long) offset) < 0;
+    }
+    return fprintf(file, format_multiple,
+                   vtk_type_str,
+                   entry->name,
+                   entry->number_of_components,
+                   (long long) offset) < 0;
+}
+
+static int
 fclaw2d_vtk_write_header (fclaw_domain_t * domain, fclaw2d_vtk_state_t * s)
 {
     int retval;
@@ -227,60 +250,40 @@ fclaw2d_vtk_write_header (fclaw_domain_t * domain, fclaw2d_vtk_state_t * s)
     const char *format_multiple = "    <DataArray type=\"%s\" Name=\"%s\" NumberOfComponents=\"%d\" format=\"appended\" offset=\"%lld\">\n"
                                   "    </DataArray>\n";
 
-    // write point vtable entries
-    curr_entry = s->vtk_vt->point_entries->first;
-    curr_offset = s->point_offsets;
-    while (curr_entry != NULL)
-    {        
-        fclaw_clawpatch_vtk_vtable_entry_t* entry =
-            (fclaw_clawpatch_vtk_vtable_entry_t*) curr_entry->data;
-        const char* vtk_type_str = vtk_type_to_string(s, entry->type);
-        if (entry->number_of_components == 1)
-        {            retval = retval || fprintf (file, format_single,
-                                        vtk_type_str,
-                                        entry->name,
-                                        (long long) *curr_offset) < 0;
-        }
-        else        
-        {
-            retval = retval || fprintf (file, format_multiple,
-                                        vtk_type_str,
-                                        entry->name,
-                                        entry->number_of_components,
-                                        (long long) *curr_offset) < 0;
-        }
-        curr_offset++;
-        curr_entry = curr_entry->next;
-    }
+    // write primary point entry
+    retval = retval || print_dataarray_entry(file,
+                                             s,
+                                             &s->vtk_vt->position_entry,
+                                             *curr_offset,
+                                             format_single,
+                                             format_multiple);
+    curr_offset++;
 
     retval = retval || fprintf (file, "   </Points>\n") < 0;
     retval = retval || fprintf (file, "   <Cells>\n") < 0;
 
-    // write cell vtable entries
-    curr_entry = s->vtk_vt->cell_entries->first;
-    curr_offset = s->cell_offsets;
-    while (curr_entry != NULL)
-    {        
-        fclaw_clawpatch_vtk_vtable_entry_t* entry =
-            (fclaw_clawpatch_vtk_vtable_entry_t*) curr_entry->data;
-        const char* vtk_type_str = vtk_type_to_string(s, entry->type);
-        if (entry->number_of_components == 1)
-        {            retval = retval || fprintf (file, format_single,
-                                        vtk_type_str,
-                                        entry->name,
-                                        (long long) *curr_offset) < 0;
-        }
-        else        
-        {
-            retval = retval || fprintf (file, format_multiple,
-                                        vtk_type_str,
-                                        entry->name,
-                                        entry->number_of_components,
-                                        (long long) *curr_offset) < 0;
-        }
-        curr_offset++;
-        curr_entry = curr_entry->next;
-    }
+    // write primary cell entries
+    retval = retval || print_dataarray_entry(file,
+                                             s,
+                                             &s->vtk_vt->connectivity_entry,
+                                             *curr_offset,
+                                             format_single,
+                                             format_multiple);
+    curr_offset++;
+    retval = retval || print_dataarray_entry(file,
+                                             s,
+                                             &s->vtk_vt->offsets_entry,
+                                             *curr_offset,
+                                             format_single,
+                                             format_multiple);
+    curr_offset++;
+    retval = retval || print_dataarray_entry(file,
+                                             s,
+                                             &s->vtk_vt->types_entry,
+                                             *curr_offset,
+                                             format_single,
+                                             format_multiple);
+    curr_offset++;
 
     retval = retval || fprintf (file, "   </Cells>\n") < 0;
     retval = retval || fprintf (file, "   <CellData>\n") < 0;
@@ -578,29 +581,19 @@ fclaw2d_vtk_write_data (fclaw_global_t * glob, fclaw2d_vtk_state_t * s)
         curr_entry = curr_entry->next;
     }
 
-    // write point vtable entries
-    curr_entry = s->vtk_vt->point_entries->first;
+    // write primary point entry
     curr_offset = s->point_offsets;
-    while (curr_entry != NULL)
-    {
-        fclaw_clawpatch_vtk_vtable_entry_t* entry =
-            (fclaw_clawpatch_vtk_vtable_entry_t*) curr_entry->data;
-        fclaw2d_vtk_write_field (glob, s, *curr_offset, entry);
-        curr_offset++;
-        curr_entry = curr_entry->next;
-    }
+    fclaw2d_vtk_write_field(glob, s, *curr_offset, &s->vtk_vt->position_entry);
+    curr_offset++;
 
-    // write cell vtable entries
-    curr_entry = s->vtk_vt->cell_entries->first;
+    // write primary cell entries
     curr_offset = s->cell_offsets;
-    while (curr_entry != NULL)    
-    {
-        fclaw_clawpatch_vtk_vtable_entry_t* entry =
-            (fclaw_clawpatch_vtk_vtable_entry_t*) curr_entry->data;
-        fclaw2d_vtk_write_field (glob, s, *curr_offset, entry);
-        curr_offset++;
-        curr_entry = curr_entry->next;
-    }
+    fclaw2d_vtk_write_field(glob, s, *curr_offset, &s->vtk_vt->connectivity_entry);
+    curr_offset++;
+    fclaw2d_vtk_write_field(glob, s, *curr_offset, &s->vtk_vt->offsets_entry);
+    curr_offset++;
+    fclaw2d_vtk_write_field(glob, s, *curr_offset, &s->vtk_vt->types_entry);
+    curr_offset++;
 
     // write celldata vtable entries
     curr_entry = s->vtk_vt->celldata_entries->first;
@@ -734,37 +727,39 @@ fclaw_vtk_write_file (int dim, fclaw_global_t * glob, const char *basename,
     }
 
 
-    int num_point_entries = s->vtk_vt->point_entries->elem_count;
+    int num_point_entries = 1;
     s->point_offsets = FCLAW_ALLOC (int64_t, num_point_entries);
 
-    curr_entry = s->vtk_vt->point_entries->first;
     curr_entry_offset = s->point_offsets;
-    while (curr_entry != NULL)    
-    {
-        fclaw_clawpatch_vtk_vtable_entry_t* entry =
-            (fclaw_clawpatch_vtk_vtable_entry_t*) curr_entry->data;
-        *curr_entry_offset = curr_offset;
-        size_t psize = entry->elements_per_patch * entry->number_of_components * sizeof_vtk_type(s, entry->type);
-        curr_offset += s->ndsize + psize * s->global_num_patches;
-        curr_entry_offset++;
-        curr_entry = curr_entry->next;
-    }
 
-    int num_cell_entries = s->vtk_vt->cell_entries->elem_count;
+    fclaw_clawpatch_vtk_vtable_entry_t* entry = &s->vtk_vt->position_entry;
+    *curr_entry_offset = curr_offset;
+    size_t psize = entry->elements_per_patch * entry->number_of_components * sizeof_vtk_type(s, entry->type);
+    curr_offset += s->ndsize + psize * s->global_num_patches;
+    curr_entry_offset++;
+
+    int num_cell_entries = 3;
     s->cell_offsets = FCLAW_ALLOC (int64_t, num_cell_entries);
 
-    curr_entry = s->vtk_vt->cell_entries->first;
     curr_entry_offset = s->cell_offsets;
-    while (curr_entry != NULL)    
-    {
-        fclaw_clawpatch_vtk_vtable_entry_t* entry =
-            (fclaw_clawpatch_vtk_vtable_entry_t*) curr_entry->data;
-        *curr_entry_offset = curr_offset;
-        size_t psize = entry->elements_per_patch * entry->number_of_components * sizeof_vtk_type(s, entry->type);
-        curr_offset += s->ndsize + psize * s->global_num_patches;
-        curr_entry_offset++;
-        curr_entry = curr_entry->next;
-    }
+
+    entry = &s->vtk_vt->connectivity_entry;
+    *curr_entry_offset = curr_offset;
+    psize = entry->elements_per_patch * entry->number_of_components * sizeof_vtk_type(s, entry->type);
+    curr_offset += s->ndsize + psize * s->global_num_patches;
+    curr_entry_offset++;
+
+    entry = &s->vtk_vt->offsets_entry;
+    *curr_entry_offset = curr_offset;
+    psize = entry->elements_per_patch * entry->number_of_components * sizeof_vtk_type(s, entry->type);
+    curr_offset += s->ndsize + psize * s->global_num_patches;
+    curr_entry_offset++;
+
+    entry = &s->vtk_vt->types_entry;
+    *curr_entry_offset = curr_offset;
+    psize = entry->elements_per_patch * entry->number_of_components * sizeof_vtk_type(s, entry->type);
+    curr_offset += s->ndsize + psize * s->global_num_patches;
+    curr_entry_offset++;
 
 
     int num_celldata_entries = s->vtk_vt->celldata_entries->elem_count;
