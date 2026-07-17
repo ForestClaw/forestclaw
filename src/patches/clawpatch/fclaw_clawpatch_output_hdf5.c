@@ -309,6 +309,72 @@ get_point_indexes_##TYPE (fclaw_global_t * glob, \
 POINT_INDEX_CB(int32_t)
 POINT_INDEX_CB(int64_t)
 
+#define CONNECTIVITY_CB(TYPE) \
+static void \
+get_connectivity_##TYPE (fclaw_global_t * glob, \
+                         fclaw_patch_t * patch, \
+                         int blockno, \
+                         int patchno, \
+                         char * buffer) \
+{ \
+    TYPE *idata = (TYPE *) buffer; \
+    int mx, my, mz, mbc; \
+    double xlower, ylower, zlower, dx, dy, dz; \
+\
+    TYPE pbefore = glob->domain->global_num_patches_before \
+        + glob->domain->blocks[blockno].num_patches_before + patchno; \
+\
+    if (fclaw_clawpatch_dim(patch) == 2) \
+    { \
+        fclaw_clawpatch_2d_grid_data(glob, patch, &mx, &my, &mbc, \
+                                     &xlower, &ylower, &dx, &dy); \
+\
+        pbefore *= (mx + 1) * (my + 1); \
+\
+        for (int j = 0; j < my; ++j) \
+        { \
+            for (int i = 0; i < mx; ++i) \
+            { \
+                TYPE l = pbefore + i + j * (mx + 1); \
+                *idata++ = l; \
+                *idata++ = l + 1; \
+                *idata++ = l + (mx + 2); \
+                *idata++ = l + (mx + 1); \
+            } \
+        } \
+    } \
+    else \
+    { \
+        fclaw_clawpatch_3d_grid_data(glob, patch, &mx, &my, &mz, &mbc, \
+                                     &xlower, &ylower, &zlower, &dx, &dy, &dz); \
+\
+        pbefore *= (mx + 1) * (my + 1) * (mz + 1); \
+\
+        for (int k = 0; k < mz; ++k) \
+        { \
+            for (int j = 0; j < my; ++j) \
+            { \
+                for (int i = 0; i < mx; ++i) \
+                { \
+                    TYPE l = pbefore + i + j * (mx + 1) \
+                             + k * (my + 1) * (mx + 1); \
+                    *idata++ = l; \
+                    *idata++ = l + 1; \
+                    *idata++ = l + (mx + 2); \
+                    *idata++ = l + (mx + 1); \
+                    *idata++ = l + (mx + 1) * (my + 1); \
+                    *idata++ = l + (mx + 1) * (my + 1) + 1; \
+                    *idata++ = l + (mx + 1) * (my + 1) + (mx + 2); \
+                    *idata++ = l + (mx + 1) * (my + 1) + (mx + 1); \
+                } \
+            } \
+        } \
+    } \
+}
+
+CONNECTIVITY_CB(int32_t)
+CONNECTIVITY_CB(int64_t)
+
 /* typdef for data acess functions q,rhs,etc */
 typedef void (*patch_data_access_t)(struct fclaw_global *glob, struct fclaw_patch *patch, double **q, int *meqn);
 
@@ -1235,53 +1301,16 @@ fclaw_hdf_write_file (fclaw_global_t * glob,
         patch_dims[2] = my+1;
         patch_dims[3] = mx+1;
     }
-    make_dataset_numerical(glob, 
-                           vtkhdf_gid, 
-                           "PointIndexes", 
-                           patch_dim+1, patch_dims,
-                           num_patches_to_buffer, 
-                           fits32 ? H5T_NATIVE_INT32 : H5T_NATIVE_INT64, 
-                           fits32 ? get_point_indexes_int32_t : get_point_indexes_int64_t,
+    patch_dims[0] = num_cells_per_patch * num_points_per_cell;
+    make_dataset_numerical(glob,
+                           vtkhdf_gid,
+                           "Connectivity",
+                           1,
+                           patch_dims,
+                           num_patches_to_buffer,
+                           fits32 ? H5T_NATIVE_INT32 : H5T_NATIVE_INT64,
+                           fits32 ? get_connectivity_int32_t : get_connectivity_int64_t,
                            &default_vtable);
-
-    patch_dims[0] = glob->domain->global_num_patches;
-    hid_t src_space = H5Screate_simple(patch_dim+1, patch_dims, NULL);
-    patch_dims[0] = glob->domain->global_num_patches * num_cells_per_patch * num_points_per_cell;
-    hid_t virt_space = H5Screate_simple(1, patch_dims, NULL);
-
-    hid_t dcpl_id = H5Pcreate(H5P_DATASET_CREATE);
-    hsize_t slab_starts_3d[8][4] = {{0,0,0,0},{0,0,0,1},{0,0,1,1},{0,0,1,0},
-                                    {0,1,0,0},{0,1,0,1},{0,1,1,1},{0,1,1,0}};
-    hsize_t slab_starts_2d[4][3] = {{0,0,0},{0,0,1},{0,1,1},{0,1,0}};
-    hsize_t block_dims_3d[4] = {1,mz,my,mx};
-    hsize_t block_dims_2d[3] = {1,my,mx};
-    for(hsize_t i=0; i < num_points_per_cell; i++)
-    {
-        hsize_t block_count[4] = {global_num_patches,1,1,1};
-        status |= H5Sselect_hyperslab(src_space, 
-                                      H5S_SELECT_SET, 
-                                      patch_dim == 2 ? slab_starts_2d[i] : slab_starts_3d[i],
-                                      NULL, 
-                                      block_count, 
-                                      patch_dim == 2 ? block_dims_2d : block_dims_3d);
-
-        hsize_t stride = num_points_per_cell;
-        hsize_t start = i;
-        hsize_t count = number_of_cells;
-        status |= H5Sselect_hyperslab(virt_space, H5S_SELECT_SET, &start, &stride, &count, NULL);
-        status |= H5Pset_virtual(dcpl_id, virt_space, ".", "/VTKHDF/PointIndexes", src_space);
-    }
-
-    hid_t virt_id = H5Dcreate2(vtkhdf_gid, 
-                               "Connectivity", 
-                               fits32 ? H5T_NATIVE_INT32 : H5T_NATIVE_INT64,
-                               virt_space, 
-                               H5P_DEFAULT, 
-                               dcpl_id, 
-                               H5P_DEFAULT);
-    status |= H5Dclose(virt_id);
-    status |= H5Sclose(src_space);
-    status |= H5Sclose(virt_space);
 
     /* avoid resource leaks by closing */
     status |= H5Gclose(vtkhdf_gid);
