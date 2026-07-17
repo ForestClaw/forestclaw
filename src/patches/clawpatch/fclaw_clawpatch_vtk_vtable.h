@@ -68,6 +68,20 @@ typedef void (*fclaw_vtk_patch_cb_t) (struct fclaw_global * glob,
                                       fclaw_vtk_cb_context_t *context,
                                       char *buffer);
 
+/** 
+ * Callback to compute the number of elements (e.g. points or cells) for a patch.
+ * @param[in] global the global context
+ * @param[in] patch the patch context
+ * @param[in] blockno the block index
+ * @param[in] patchno the patch index
+ * @param[in] context the callback context
+ * @return the number of elements (e.g. points or cells) for this patch
+ */
+typedef size_t (*fclaw_vtk_patch_elements_cb_t) (struct fclaw_global * glob,
+                                                 struct fclaw_patch * patch,
+                                                 int blockno, int patchno,
+                                                 fclaw_vtk_cb_context_t *context);
+
 typedef enum {
     FCLAW_VTK_UINT8,
     FCLAW_VTK_INT32,
@@ -84,6 +98,7 @@ typedef struct fclaw_clawpatch_vtk_vtable_entry
     fclaw_vtk_entry_type_t type;
     int number_of_components; 
     size_t elements_per_patch; /* number of elements (e.g. points or cells) per patch */
+    fclaw_vtk_patch_elements_cb_t elements_in_patch; /* callback to compute number of elements for a patch */
     fclaw_vtk_patch_cb_t callback;
 } fclaw_clawpatch_vtk_vtable_entry_t; 
 	

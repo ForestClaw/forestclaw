@@ -34,6 +34,7 @@ fclaw_clawpatch_vtk_vtable_entry_t* vtk_vt_entry_new(const char* name,
                                                      fclaw_vtk_entry_type_t type,
                                                      int number_of_components,
                                                      size_t elements_per_patch,
+                                                     fclaw_vtk_patch_elements_cb_t elements_in_patch,
                                                      fclaw_vtk_patch_cb_t callback)
 {
 	fclaw_clawpatch_vtk_vtable_entry_t* entry =
@@ -43,6 +44,7 @@ fclaw_clawpatch_vtk_vtable_entry_t* vtk_vt_entry_new(const char* name,
 	entry->type = type;
 	entry->number_of_components = number_of_components;
 	entry->elements_per_patch = elements_per_patch;
+    entry->elements_in_patch = elements_in_patch;
 	entry->callback = callback;
 
 	return entry;
@@ -54,10 +56,11 @@ void vtk_add_field_entry(fclaw_clawpatch_vtk_vtable_t* vtk_vt,
 						 fclaw_vtk_entry_type_t type,
                          int number_of_components,
 						 size_t elements_per_patch,
+                         fclaw_vtk_patch_elements_cb_t elements_in_patch,
 						 fclaw_vtk_patch_cb_t callback)
 {
 	fclaw_clawpatch_vtk_vtable_entry_t* entry =
-		vtk_vt_entry_new(name, type, number_of_components, elements_per_patch, callback);
+		vtk_vt_entry_new(name, type, number_of_components, elements_per_patch, elements_in_patch, callback);
 	sc_list_append(vtk_vt->field_entries, entry);
 }
 
@@ -67,10 +70,11 @@ void vtk_add_point_entry(fclaw_clawpatch_vtk_vtable_t* vtk_vt,
 						 fclaw_vtk_entry_type_t type,
                          int number_of_components,
 						 size_t size_per_patch,
+                         fclaw_vtk_patch_elements_cb_t elements_in_patch,
 						 fclaw_vtk_patch_cb_t callback)
 {
 	fclaw_clawpatch_vtk_vtable_entry_t* entry =
-		vtk_vt_entry_new(name, type, number_of_components, size_per_patch, callback);
+		vtk_vt_entry_new(name, type, number_of_components, size_per_patch, elements_in_patch, callback);
 	sc_list_append(vtk_vt->point_entries, entry);
 }
 
@@ -80,10 +84,11 @@ void vtk_add_cell_entry(fclaw_clawpatch_vtk_vtable_t* vtk_vt,
 						fclaw_vtk_entry_type_t type,
                         int number_of_components,
 						size_t size_per_patch,
+                        fclaw_vtk_patch_elements_cb_t elements_in_patch,
 						fclaw_vtk_patch_cb_t callback)
 {
 	fclaw_clawpatch_vtk_vtable_entry_t* entry =
-		vtk_vt_entry_new(name, type, number_of_components, size_per_patch, callback);
+		vtk_vt_entry_new(name, type, number_of_components, size_per_patch, elements_in_patch, callback);
 	sc_list_append(vtk_vt->cell_entries, entry);
 }
 
@@ -93,10 +98,11 @@ void vtk_add_celldata_entry(fclaw_clawpatch_vtk_vtable_t* vtk_vt,
                             fclaw_vtk_entry_type_t type,
                             int number_of_components,
                             size_t size_per_patch,
+                            fclaw_vtk_patch_elements_cb_t elements_in_patch,
                             fclaw_vtk_patch_cb_t callback)
 {
     fclaw_clawpatch_vtk_vtable_entry_t* entry =
-        vtk_vt_entry_new(name, type, number_of_components, size_per_patch, callback);
+        vtk_vt_entry_new(name, type, number_of_components, size_per_patch, elements_in_patch, callback);
     sc_list_append(vtk_vt->celldata_entries, entry);
 }
 
@@ -777,6 +783,91 @@ write_error_cb (fclaw_global_t * glob, fclaw_patch_t * patch,
     pack_data(glob, patch, blockno, patchno, &fclaw_clawpatch_elliptic_error_data, buffer);
 }
 
+// size callbacks
+
+static size_t
+one_element_per_patch (fclaw_global_t* glob, fclaw_patch_t* patch, 
+                       int blockno, int patchno, 
+                       fclaw_vtk_cb_context_t* ctx)
+{
+    return 1;
+}
+
+static size_t
+points_in_patch (fclaw_global_t* glob, fclaw_patch_t* patch, 
+                 int blockno, int patchno,
+                 fclaw_vtk_cb_context_t* ctx)
+{
+    int mx, my, mz, mbc;
+    double xlower, ylower, zlower, dx, dy, dz;
+    if (fclaw_clawpatch_dim(patch) == 2)
+    {
+        fclaw_clawpatch_2d_grid_data(glob, patch, &mx, &my, &mbc, 
+                                     &xlower, &ylower, &dx, &dy);
+        return (size_t) (mx + 1) * (my + 1);
+    }
+    else
+    {
+        fclaw_clawpatch_3d_grid_data(glob, patch, &mx, &my, &mz, &mbc, 
+                                     &xlower, &ylower, &zlower, &dx, &dy, &dz);
+        return (size_t) (mx + 1) * (my + 1) * (mz + 1);
+    }
+}   
+
+static size_t
+cells_in_patch (fclaw_global_t* glob, fclaw_patch_t* patch, 
+                int blockno, int patchno,
+                fclaw_vtk_cb_context_t* ctx)
+{
+    int mx, my, mz, mbc;
+    double xlower, ylower, zlower, dx, dy, dz;
+    if (fclaw_clawpatch_dim(patch) == 2)
+    {
+        fclaw_clawpatch_2d_grid_data(glob, patch, &mx, &my, &mbc, 
+                                     &xlower, &ylower, &dx, &dy);
+        return (size_t) mx * my;
+    }
+    else
+    {
+        fclaw_clawpatch_3d_grid_data(glob, patch, &mx, &my, &mz, &mbc, 
+                                     &xlower, &ylower, &zlower, &dx, &dy, &dz);
+        return (size_t) mx * my * mz;
+    }
+}
+
+static size_t
+connectivity_in_patch (fclaw_global_t* glob, fclaw_patch_t* patch, 
+                       int blockno, int patchno,
+                       fclaw_vtk_cb_context_t* ctx)
+{
+    int num_cells = cells_in_patch(glob, patch, blockno, patchno, ctx);
+    int num_points_per_cell;
+    if(fclaw_clawpatch_dim(patch) == 2)
+    {
+        num_points_per_cell = 4;
+    }
+    else
+    {
+        num_points_per_cell = 8;
+    }
+    return (size_t) num_cells * num_points_per_cell;
+}
+
+static size_t
+offsets_in_patch (fclaw_global_t* glob, fclaw_patch_t* patch, 
+                  int blockno, int patchno,
+                  fclaw_vtk_cb_context_t* ctx)
+{
+    size_t retval = cells_in_patch(glob, patch, blockno, patchno, ctx);
+    if(glob->mpirank == glob->mpisize - 1 
+       && blockno == glob->domain->num_blocks - 1 
+       && patchno == glob->domain->blocks[blockno].num_patches - 1)
+    {
+        retval += 1;
+    }
+    return retval;
+}
+
 // Public interface to add entries to the vtable
 fclaw_clawpatch_vtk_vtable_t*
 fclaw_clawpatch_vtk_vtable(struct fclaw_global* glob)
@@ -812,35 +903,57 @@ void fclaw_clawpatch_vtk_vtable_initialize(struct fclaw_global* glob)
 
     // field entries
     vtk_add_field_entry(vtk_vt, "levels", FCLAW_VTK_INT32, 
-                        1, 1, &write_level_cb);
+                        1, 1, 
+                        &one_element_per_patch,
+                        &write_level_cb);
     vtk_add_field_entry(vtk_vt, "patch_starts", FCLAW_VTK_FLOAT64, 
-                        3, 1, &write_patch_starts_cb);
+                        3, 1, 
+                        &one_element_per_patch,
+                        &write_patch_starts_cb);
     vtk_add_field_entry(vtk_vt, "patch_spacings", FCLAW_VTK_FLOAT64, 
-                        3, 1, &write_patch_spacings_cb);
+                        3, 1, 
+                        &one_element_per_patch,
+                        &write_patch_spacings_cb);
 
     // point entries
     vtk_add_point_entry(vtk_vt, "Position", FCLAW_VTK_FLOAT64,
-                        3, num_points_per_patch, &write_coordinate_cb);
+                        3, num_points_per_patch, 
+                        &points_in_patch,
+                        &write_coordinate_cb);
 
     // cell entries
     vtk_add_cell_entry(vtk_vt, "connectivity", FCLAW_VTK_INT32_OR_64, 
-                       1, num_cells_per_patch * num_points_per_cell, &write_connectivity_cb);
+                       1, num_cells_per_patch * num_points_per_cell, 
+                       &connectivity_in_patch,
+                       &write_connectivity_cb);
     vtk_add_cell_entry(vtk_vt, "offsets", FCLAW_VTK_INT32_OR_64, 
-                       1, num_cells_per_patch, &write_offsets_cb);
+                       1, num_cells_per_patch, 
+                       &offsets_in_patch,
+                       &write_offsets_cb);
     vtk_add_cell_entry(vtk_vt, "types", FCLAW_VTK_UINT8,
-                       1, num_cells_per_patch, &write_types_cb);
+                       1, num_cells_per_patch, 
+                       &cells_in_patch,
+                       &write_types_cb);
 
     int meqn = clawpatch_opt->meqn;
     // celldata entries
     vtk_add_celldata_entry(vtk_vt, "mpirank", FCLAW_VTK_INT32,
-                           1, num_cells_per_patch, &write_mpirank_cb);
+                           1, num_cells_per_patch, 
+                           &cells_in_patch,
+                           &write_mpirank_cb);
     vtk_add_celldata_entry(vtk_vt, "blockno", FCLAW_VTK_INT32,
-                           1, num_cells_per_patch, &write_blockno_cb);
+                           1, num_cells_per_patch, 
+                           &cells_in_patch,
+                           &write_blockno_cb);
     vtk_add_celldata_entry(vtk_vt, "patchno", FCLAW_VTK_INT32,
-                           1, num_cells_per_patch, &write_patchno_cb);
+                           1, num_cells_per_patch, 
+                            &cells_in_patch,
+                           &write_patchno_cb);
 
     vtk_add_celldata_entry(vtk_vt, "meqn", FCLAW_VTK_FLOAT32,
-                           meqn, num_cells_per_patch, &write_value_cb);
+                           meqn, num_cells_per_patch, 
+                           &cells_in_patch,
+                           &write_value_cb);
     
     int num_aux_fields = 0;
     for (int i = 0; i < clawpatch_opt->maux; ++i)
@@ -854,18 +967,26 @@ void fclaw_clawpatch_vtk_vtable_initialize(struct fclaw_global* glob)
     if (num_aux_fields > 0)
     {
         vtk_add_celldata_entry(vtk_vt, "aux", FCLAW_VTK_FLOAT32,
-                               num_aux_fields, num_cells_per_patch, &write_aux_cb);
+                               num_aux_fields, num_cells_per_patch, 
+                               &cells_in_patch,
+                               &write_aux_cb);
     }
 
     int rhs_fields = clawpatch_opt->rhs_fields;
     if (rhs_fields > 0)
     {
         vtk_add_celldata_entry(vtk_vt, "rhs", FCLAW_VTK_FLOAT32,
-                               rhs_fields, num_cells_per_patch, &write_rhs_cb);
+                               rhs_fields, num_cells_per_patch, 
+                               &cells_in_patch,
+                               &write_rhs_cb);
         vtk_add_celldata_entry(vtk_vt, "soln", FCLAW_VTK_FLOAT32,
-                               rhs_fields, num_cells_per_patch, &write_soln_cb);
+                               rhs_fields, num_cells_per_patch, 
+                               &cells_in_patch,
+                               &write_soln_cb);
         vtk_add_celldata_entry(vtk_vt, "error", FCLAW_VTK_FLOAT32,
-                               rhs_fields, num_cells_per_patch, &write_error_cb);
+                               rhs_fields, num_cells_per_patch, 
+                               &cells_in_patch,
+                               &write_error_cb);
     }
 
 
