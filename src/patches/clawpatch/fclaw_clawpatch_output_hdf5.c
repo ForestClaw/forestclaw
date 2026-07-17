@@ -33,548 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_filesystem.h>
 
 #include <fclaw_options.h>
-#include <fclaw_map.h>
 #include <hdf5.h>
-
-/*----------------------------------------------------------------------
-    Value Callbacks
-  ----------------------------------------------------------------------*/
-static int get_num_cells(fclaw_global_t * glob,
-                         fclaw_patch_t* patch)
-{
-    int mx,my,mz,mbc;
-    double dx,dy,dz,xlower,ylower,zlower;
-
-    int num_cells;
-    if(fclaw_clawpatch_dim(patch) == 2)
-    {
-        fclaw_clawpatch_2d_grid_data(glob,patch,&mx,&my,&mbc,&xlower,&ylower,&dx,&dy);
-        num_cells = mx * my;
-    }
-    else
-    {
-        fclaw_clawpatch_3d_grid_data(glob,patch,&mx,&my,&mz,&mbc,&xlower,&ylower,&zlower,&dx,&dy,&dz);
-        num_cells = mx * my * mz;
-    }
-    return num_cells;
-}
-
-static void 
-blockno_cb (fclaw_global_t * glob,
-            fclaw_patch_t * patch,
-            int blockno,
-            int patchno,
-            char * buffer)
-{
-    int *blocknos = (int *) buffer;
-
-    int num_cells = get_num_cells(glob,patch);
-
-    for(int i = 0; i < num_cells; i++)
-    {
-        blocknos[i] = blockno;
-    }
-}
-
-static void 
-patchno_cb (fclaw_global_t * glob,
-            fclaw_patch_t * patch,
-            int blockno,
-            int patchno,
-            char * buffer)
-{
-    int *patchnos = (int *) buffer;
-
-    int num_cells = get_num_cells(glob,patch);
-
-    for(int i = 0; i < num_cells; i++)
-    {
-        patchnos[i] = patchno;
-    }
-}
-
-static void 
-mpirank_cb (fclaw_global_t * glob,
-            fclaw_patch_t * patch,
-            int blockno,
-            int patchno,
-            char * buffer)
-{
-    int *mpiranks = (int *) buffer;
-
-    int num_cells = get_num_cells(glob,patch);
-
-    for(int i = 0; i < num_cells; i++)
-    {
-        mpiranks[i] = glob->mpirank;
-    }
-}
-
-static void 
-types_cb (fclaw_global_t * glob,
-          fclaw_patch_t * patch,
-          int blockno,
-          int patchno,
-          char * buffer)
-{
-    uint8_t * types = (uint8_t *) buffer;
-
-    int num_cells = get_num_cells(glob,patch);
-
-    uint8_t type;
-    if(fclaw_clawpatch_dim(patch) == 2)
-    {
-        type = 9;
-    }
-    else
-    {
-        type = 12;
-    }
-
-    for(int i = 0; i < num_cells; i++)
-    {
-        types[i] = type;
-    }
-}
-
-static void
-get_coordinates (fclaw_global_t * glob,
-                 fclaw_patch_t * patch,
-                 int blockno,
-                 int patchno,
-                 char * buffer)
-{
-    double * points = (double *) buffer;
-    const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
-    const fclaw_clawpatch_options_t* clawpatch_opt = fclaw_clawpatch_get_options(glob);
-
-    int mx,my,mz,mbc;
-    double dx,dy,dz,xlower,ylower,zlower;
-
-    if(clawpatch_opt->patch_dim == 2)
-    {
-        fclaw_clawpatch_2d_grid_data(glob,patch,&mx,&my,&mbc,
-                                    &xlower,&ylower,&dx,&dy);
-        mz = 0;
-        dz = 0;
-        zlower = 0;
-    }
-    else 
-    {
-        fclaw_clawpatch_3d_grid_data(glob,patch,&mx,&my,&mz, &mbc,
-                                    &xlower,&ylower,&zlower, &dx,&dy, &dz);
-    }
-
-    fclaw_map_context_t* cont = fclaw_map_get(glob);
-    /* Enumerate point coordinates in the patch */
-    int i, j, k;
-    double xpp,ypp,zpp;
-    for (k = 0; k <= mz; ++k)
-    {
-        const double z = zlower + k * dz;
-        for (j = 0; j <= my; ++j)
-        {
-            const double y = ylower + j * dy;
-            for (i = 0; i <= mx; ++i)
-            {
-                const double x = xlower + i * dx;
-                if (clawpatch_opt->patch_dim == 2 && fclaw_opt->manifold)
-                {
-                    FCLAW_MAP_2D_C2M(&cont,&blockno,&x,&y,&xpp,&ypp,&zpp);
-                    *points++ = xpp;
-                    *points++ = ypp;
-                    *points++ = zpp;
-                }
-                else if (clawpatch_opt->patch_dim == 3 && fclaw_opt->manifold)
-                {
-                    FCLAW_MAP_3D_C2M(&cont,&blockno,&x,&y,&z,&xpp,&ypp,&zpp);
-                    *points++ = xpp;
-                    *points++ = ypp;
-                    *points++ = zpp;
-                }
-                else
-                {
-                    *points++ = x;
-                    *points++ = y;
-                    *points++ = z;
-                }
-            }
-        }
-    }
-}
-
-#define GET_OFFSETS(TYPE) \
-static void \
-get_offsets_##TYPE(fclaw_global_t * glob, \
-            fclaw_patch_t * patch, \
-            int blockno, \
-            int patchno, \
-            char * buffer) \
-{ \
-    TYPE * offsets = (TYPE *) buffer; \
-\
-    TYPE num_cells_before; \
-    int mx,my,mz,mbc; \
-    double dx,dy,dz,xlower,ylower,zlower; \
-\
-    TYPE num_patches_before = glob->domain->global_num_patches_before + glob->domain->blocks[blockno].num_patches_before + patchno; \
-    TYPE num_points_per_cell; \
-    if(fclaw_clawpatch_dim(patch) == 2) \
-    { \
-        fclaw_clawpatch_2d_grid_data(glob,patch,&mx,&my,&mbc,&xlower,&ylower,&dx,&dy); \
-        mz = 1; \
-        num_points_per_cell = 4; \
-        num_cells_before = num_patches_before * mx * my; \
-    } \
-    else \
-    { \
-        fclaw_clawpatch_3d_grid_data(glob,patch,&mx,&my,&mz,&mbc,&xlower,&ylower,&zlower,&dx,&dy,&dz); \
-        num_points_per_cell = 8; \
-        num_cells_before = num_patches_before * mx * my * mz; \
-    } \
-\
-    TYPE curr_offset = num_cells_before * num_points_per_cell; \
-\
-    for(int k = 0; k < mz; k++) \
-    { \
-        for(int j = 0; j < my; j++) \
-        { \
-            for(int i = 0; i < mx; i++) \
-            { \
-                *offsets++ = curr_offset; \
-                curr_offset += num_points_per_cell; \
-            } \
-        } \
-    } \
-\
-    if(glob->mpirank == glob->mpisize - 1 \
-       && blockno == glob->domain->num_blocks - 1 \
-       && patchno == glob->domain->blocks[blockno].num_patches - 1) \
-    { \
-        /* last patch on last rank has extra value */ \
-       *offsets = curr_offset; \
-    } \
-}
-
-GET_OFFSETS(int32_t)
-GET_OFFSETS(int64_t)
-
-#define POINT_INDEX_CB(TYPE) \
-static void \
-get_point_indexes_##TYPE (fclaw_global_t * glob, \
-                          fclaw_patch_t * patch, \
-                          int blockno, \
-                          int patchno, \
-                          char * buffer) \
-{ \
-    TYPE * points = (TYPE *) buffer; \
-    const fclaw_clawpatch_options_t* clawpatch_opt = fclaw_clawpatch_get_options(glob); \
-\
-    int mx,my,mz,mbc; \
-    double dx,dy,dz,xlower,ylower,zlower; \
-\
-    TYPE num_points_before = glob->domain->global_num_patches_before + glob->domain->blocks[blockno].num_patches_before + patchno; \
-    if(clawpatch_opt->patch_dim == 2) \
-    { \
-        fclaw_clawpatch_2d_grid_data(glob,patch,&mx,&my,&mbc, \
-                                    &xlower,&ylower,&dx,&dy); \
-        mz = 0; \
-        dz = 0; \
-        zlower = 0; \
-        num_points_before *= (mx + 1) * (my + 1); \
-    } \
-    else \
-    { \
-        fclaw_clawpatch_3d_grid_data(glob,patch,&mx,&my,&mz, &mbc, \
-                                    &xlower,&ylower,&zlower, &dx,&dy, &dz); \
-        num_points_before *= (mx + 1) * (my + 1) * (mz + 1); \
-    } \
-\
-    /* Enumerate point coordinates in the patch */ \
-    int i, j, k; \
-    for (k = 0; k <= mz; ++k) \
-    { \
-        for (j = 0; j <= my; ++j) \
-        { \
-            for (i = 0; i <= mx; ++i) \
-            { \
-                *points = num_points_before; \
-                points++; \
-                num_points_before++; \
-            } \
-        } \
-    } \
-}
-
-POINT_INDEX_CB(int32_t)
-POINT_INDEX_CB(int64_t)
-
-#define CONNECTIVITY_CB(TYPE) \
-static void \
-get_connectivity_##TYPE (fclaw_global_t * glob, \
-                         fclaw_patch_t * patch, \
-                         int blockno, \
-                         int patchno, \
-                         char * buffer) \
-{ \
-    TYPE *idata = (TYPE *) buffer; \
-    int mx, my, mz, mbc; \
-    double xlower, ylower, zlower, dx, dy, dz; \
-\
-    TYPE pbefore = glob->domain->global_num_patches_before \
-        + glob->domain->blocks[blockno].num_patches_before + patchno; \
-\
-    if (fclaw_clawpatch_dim(patch) == 2) \
-    { \
-        fclaw_clawpatch_2d_grid_data(glob, patch, &mx, &my, &mbc, \
-                                     &xlower, &ylower, &dx, &dy); \
-\
-        pbefore *= (mx + 1) * (my + 1); \
-\
-        for (int j = 0; j < my; ++j) \
-        { \
-            for (int i = 0; i < mx; ++i) \
-            { \
-                TYPE l = pbefore + i + j * (mx + 1); \
-                *idata++ = l; \
-                *idata++ = l + 1; \
-                *idata++ = l + (mx + 2); \
-                *idata++ = l + (mx + 1); \
-            } \
-        } \
-    } \
-    else \
-    { \
-        fclaw_clawpatch_3d_grid_data(glob, patch, &mx, &my, &mz, &mbc, \
-                                     &xlower, &ylower, &zlower, &dx, &dy, &dz); \
-\
-        pbefore *= (mx + 1) * (my + 1) * (mz + 1); \
-\
-        for (int k = 0; k < mz; ++k) \
-        { \
-            for (int j = 0; j < my; ++j) \
-            { \
-                for (int i = 0; i < mx; ++i) \
-                { \
-                    TYPE l = pbefore + i + j * (mx + 1) \
-                             + k * (my + 1) * (mx + 1); \
-                    *idata++ = l; \
-                    *idata++ = l + 1; \
-                    *idata++ = l + (mx + 2); \
-                    *idata++ = l + (mx + 1); \
-                    *idata++ = l + (mx + 1) * (my + 1); \
-                    *idata++ = l + (mx + 1) * (my + 1) + 1; \
-                    *idata++ = l + (mx + 1) * (my + 1) + (mx + 2); \
-                    *idata++ = l + (mx + 1) * (my + 1) + (mx + 1); \
-                } \
-            } \
-        } \
-    } \
-}
-
-CONNECTIVITY_CB(int32_t)
-CONNECTIVITY_CB(int64_t)
-
-/* typdef for data acess functions q,rhs,etc */
-typedef void (*patch_data_access_t)(struct fclaw_global *glob, struct fclaw_patch *patch, double **q, int *meqn);
-
-static void
-pack_data (fclaw_global_t * glob,
-           fclaw_patch_t * patch,
-           int blockno, int patchno,
-           patch_data_access_t access,
-           char *a)
-{
-
-    int meqn;
-    double *q;
-    access(glob, patch, &q, &meqn);
-
-    int patch_dim = fclaw_clawpatch_dim(patch);
-    if(patch_dim == 2)
-    {
-        int mx,my,mbc;
-        double xlower,ylower,dx,dy;
-
-        fclaw_clawpatch_2d_grid_data(glob,patch,&mx,&my,&mbc,
-                                    &xlower,&ylower,&dx,&dy);
-
-        const int xlane = mx + 2 * mbc;
-        const int ylane = my + 2 * mbc;
-
-        // Enumerate equation data in the patch
-        float *f = (float *) a;
-        int i, j, k;
-        for (j = 0; j < my; ++j)
-        {
-            for (i = 0; i < mx; ++i)
-            {
-                for (k = 0; k < meqn; ++k)
-                {
-                    /* For Clawpack 5.0 layout */
-                    //*f++ = (float) q[((j+mbc)*xlane + (i+mbc))*meqn + k];
-
-                    /* For Clawpack 4.x layout */
-                    *f++ = (float) q[(k * ylane + j + mbc) * xlane + i + mbc];
-                }
-            }
-        }
-
-    }
-    else
-    {
-        int mx,my,mz,mbc;
-        double xlower,ylower,zlower,dx,dy,dz;
-        fclaw_clawpatch_3d_grid_data(glob,patch,&mx,&my,&mz, &mbc,
-                                   &xlower,&ylower,&zlower, &dx,&dy, &dz);
-
-        const int xlane = mx + 2 * mbc;
-        const int ylane = my + 2 * mbc;
-        const int zlane = mz + 2 * mbc;
-
-        // Enumerate equation data in the patch
-        float *f = (float *) a;
-        int i, j, k, eqn;
-        for (k = 0; k < mz; ++k)
-        {
-            for (j = 0; j < my; ++j)
-            {
-                for (i = 0; i < mx; ++i)
-                {
-                    for (eqn = 0; eqn < meqn; ++eqn)
-                    {
-                        /* For Clawpack 5.0 layout */
-                        //*f++ = (float) q[((j+mbc)*xlane + (i+mbc))*meqn + k];
-
-                        /* For Clawpack 4.x layout */
-                        *f++ = (float) q[eqn * zlane * ylane * xlane + (k + mbc) * ylane * xlane + (j + mbc) * xlane + i + mbc];
-                    }
-                }
-            }
-        }
-    }
-}
-
-static void
-meqn_cb (fclaw_global_t * glob,
-          fclaw_patch_t * patch,
-          int blockno, int patchno,
-          char *a)
-{
-    pack_data(glob, patch, blockno, patchno, &fclaw_clawpatch_soln_data, a);
-}
-
-static void
-aux_cb (fclaw_global_t * glob,
-        fclaw_patch_t * patch,
-        int blockno, int patchno,
-        char *a)
-{
-    fclaw_clawpatch_options_t *clawpatch_opt = fclaw_clawpatch_get_options(glob);
-    int maux;
-    double *q;
-    fclaw_clawpatch_aux_data(glob, patch, &q, &maux);
-
-    int patch_dim = fclaw_clawpatch_dim(patch);
-    if(patch_dim == 2)
-    {
-        int mx,my,mbc;
-        double xlower,ylower,dx,dy;
-
-        fclaw_clawpatch_2d_grid_data(glob,patch,&mx,&my,&mbc,
-                                    &xlower,&ylower,&dx,&dy);
-
-        const int xlane = mx + 2 * mbc;
-        const int ylane = my + 2 * mbc;
-
-        // Enumerate equation data in the patch
-        float *f = (float *) a;
-        int i, j, k;
-        for (j = 0; j < my; ++j)
-        {
-            for (i = 0; i < mx; ++i)
-            {
-                for (k = 0; k < maux; ++k)
-                {
-                    if(clawpatch_opt->hdf5_aux_out[k] > 0)
-                    {
-                        /* For Clawpack 5.0 layout */
-                        //*f++ = (float) q[((j+mbc)*xlane + (i+mbc))*meqn + k];
-
-                        /* For Clawpack 4.x layout */
-                        int aux_out = clawpatch_opt->hdf5_aux_out[k] - 1;
-                        *f++ = (float) q[(aux_out * ylane + j + mbc) * xlane + i + mbc];
-                    }
-                }
-            }
-        }
-
-    }
-    else
-    {
-        int mx,my,mz,mbc;
-        double xlower,ylower,zlower,dx,dy,dz;
-        fclaw_clawpatch_3d_grid_data(glob,patch,&mx,&my,&mz, &mbc,
-                                   &xlower,&ylower,&zlower, &dx,&dy, &dz);
-
-        const int xlane = mx + 2 * mbc;
-        const int ylane = my + 2 * mbc;
-        const int zlane = mz + 2 * mbc;
-
-        // Enumerate equation data in the patch
-        float *f = (float *) a;
-        int i, j, k, eqn;
-        for (k = 0; k < mz; ++k)
-        {
-            for (j = 0; j < my; ++j)
-            {
-                for (i = 0; i < mx; ++i)
-                {
-                    for (eqn = 0; eqn < maux; ++eqn)
-                    {
-                        if(clawpatch_opt->hdf5_aux_out[eqn] > 0)
-                        {
-                            /* For Clawpack 5.0 layout */
-                            //*f++ = (float) q[((j+mbc)*xlane + (i+mbc))*meqn + k];
-
-                            /* For Clawpack 4.x layout */
-                            int aux_out = clawpatch_opt->hdf5_aux_out[eqn] - 1;
-                            *f++ = (float) q[aux_out * zlane * ylane * xlane + (k + mbc) * ylane * xlane + (j + mbc) * xlane + i + mbc];
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-}
-
-static void
-rhs_cb (fclaw_global_t * glob,
-        fclaw_patch_t * patch,
-        int blockno, int patchno,
-        char *a)
-{
-    pack_data(glob, patch, blockno, patchno, &fclaw_clawpatch_rhs_data, a);
-}
-
-static void
-soln_cb (fclaw_global_t * glob,
-         fclaw_patch_t * patch,
-         int blockno, int patchno,
-         char *a)
-{
-    pack_data(glob, patch, blockno, patchno, &fclaw_clawpatch_elliptic_soln_data, a);
-}
-
-static void
-error_cb (fclaw_global_t * glob,
-          fclaw_patch_t * patch,
-          int blockno, int patchno,
-          char *a)
-{
-    pack_data(glob, patch, blockno, patchno, &fclaw_clawpatch_elliptic_error_data, a);
-}
+#include <string.h>
 
 /*----------------------------------------------------------------------
     Utility functions
@@ -598,176 +58,6 @@ get_patch_blockno(fclaw_global_t *glob, int i, int *blockno, int *patchno)
     }
     *patchno = i - glob->domain->blocks[*blockno].num_patches_before;
 }
-
-/**
- * Check if the given block number and patch number are valid.
- *
- * @param glob The global context.
- * @param blockno The block number to check.
- * @param patchno The patch number to check.
- * @return 1 if the block number and patch number are valid, 0 otherwise.
- */
-static int 
-patch_blockno_valid(fclaw_global_t *glob, int blockno, int patchno)
-{
-    return blockno < glob->domain->num_blocks && patchno < glob->domain->blocks[blockno].num_patches;
-}
-
-/*----------------------------------------------------------------------
-    Virtualized funcitons
-  ----------------------------------------------------------------------*/
-
-/**
- * @brief Virtualized functions needed for making a patch dataset
- */
-typedef struct make_dataset_vtable
-{
-    /**
-     * @brief Get the overall dimensions of a dataset
-     *
-     * @param[in] glob The global context.
-     * @param[in] rank The rank of the patch.
-     * @param[in] patch_dims The dimensions of the patch.
-     * @param[out] dataset_dims The array to store the dataset dimensions.
-     */
-    void (*get_dataset_dims)(fclaw_global_t *glob, 
-                             int rank, 
-                             const hsize_t *patch_dims, 
-                             hsize_t *dataset_dims);
-    /**
-     * @brief Get the slab dimensions for a given patch in a block.
-     *
-     * @param[in] glob The global context.
-     * @param[in] patchno The patch number.
-     * @param[in] blockno The block number.
-     * @param[in] rank The rank of the data.
-     * @param[in] patch_dims The dimensions of the patch.
-     * @param[out] slab_start The starting indices of the slab.
-     * @param[out] slab_dims The dimensions of the slab.
-     */
-    void (*get_slab_dims)(fclaw_global_t *glob, 
-                          int patchno, 
-                          int blockno, int rank, 
-                          const hsize_t *patch_dims, 
-                          hsize_t *slab_start, 
-                          hsize_t *slab_dims);
-} make_dataset_vtable_t;
-
-/* ------ default functions -----*/
-
-/**
- * Calculates the slab dimensions for a given patch in a block.
- * This just returns the patch dimensions, and the starting index.
- * If the patch is not valid, the slab dimensions are set to 0.
- *
- * @param[in] glob The global context.
- * @param[in] patchno The patch number.
- * @param[in] blockno The block number.
- * @param[in] rank The rank of the data.
- * @param[in] patch_dims The dimensions of the patch.
- * @param[out] slab_start The starting indices of the slab.
- * @param[out] slab_dims The dimensions of the slab.
- */
-static void
-get_slab_dims(fclaw_global_t *glob, 
-              int patchno, int blockno, 
-              int rank, const hsize_t *patch_dims, hsize_t *slab_start, hsize_t *slab_dims)
-{
-    if(patch_blockno_valid(glob, blockno, patchno))
-    {
-        int i = glob->domain->blocks[blockno].num_patches_before + patchno;
-        slab_start[0] = (glob->domain->global_num_patches_before + i) * patch_dims[0];
-        slab_dims[0] = patch_dims[0];
-        for(int i = 1; i < rank; i++)
-        {
-            slab_start[i] = 0;
-            slab_dims[i] = patch_dims[i];
-        }
-    }
-    else
-    {
-        for(int i = 0; i < rank; i++)
-        {
-            slab_start[i] = 0;
-            slab_dims[i] = 0;
-        }
-    }
-}
-
-/**
- * @brief Calculate the overall dataset dimensions.
- * This is just the first patch dimensions multiplied by the number of patches.
- *
- * @param[in] glob The global context.
- * @param[in] rank The rank of the patch.
- * @param[in] patch_dims The dimensions of the patch.
- * @param[out] dataset_dims The array to store the dataset dimensions.
- */
-static 
-void get_dataset_dims(fclaw_global_t *glob, 
-                      int rank, 
-                      const hsize_t *patch_dims, 
-                      hsize_t *dataset_dims)
-{
-    for(int i = 0; i < rank; i++)
-    {
-        dataset_dims[i] = patch_dims[i];
-    }
-    dataset_dims[0] *= glob->domain->global_num_patches;
-}
-
-/** default vtable */
-static make_dataset_vtable_t default_vtable = 
-{
-    get_dataset_dims,
-    get_slab_dims
-};
-/**
- * @brief Calculate the overall dataset dimensions for the offset dataset
- * This is the same as default plus an extra value for the last patch on the last rank.
- *
- * @param[in] glob The global context.
- * @param[in] rank The rank of the patch.
- * @param[in] patch_dims The dimensions of the patch.
- * @param[out] dataset_dims The array to store the dataset dimensions.
- */
-static void
-get_dataset_dims_offset(fclaw_global_t *glob, int rank, const hsize_t *patch_dims, hsize_t *dataset_dims)
-{
-    get_dataset_dims(glob, rank, patch_dims, dataset_dims);
-    dataset_dims[0] += 1;
-}
-/**
- * Same as default but on last patch on last rank, the slab dimensions are increased by 1.
- *
- * @param[in] glob The global context.
- * @param[in] patchno The patch number.
- * @param[in] blockno The block number.
- * @param[in] rank The rank of the data.
- * @param[in] patch_dims The dimensions of the patch.
- * @param[out] slab_start The starting indices of the slab.
- * @param[out] slab_dims The dimensions of the slab.
- */
-static void
-get_slab_dims_offset(fclaw_global_t *glob, 
-                     int patchno, int blockno, 
-                     int rank, const hsize_t *patch_dims, hsize_t *slab_start, hsize_t *slab_dims)
-{
-    get_slab_dims(glob, patchno, blockno, rank, patch_dims, slab_start, slab_dims);
-    if(glob->mpirank == glob->mpisize - 1 
-       && blockno == glob->domain->num_blocks - 1 
-       && patchno == glob->domain->blocks[blockno].num_patches - 1)
-    {
-        // last patch on last rank has extra value
-        slab_dims[0] += 1;
-    }
-}
-/** vtable for offset datset */
-static make_dataset_vtable_t offset_vtable = 
-{
-    get_dataset_dims_offset,
-    get_slab_dims_offset
-};
 
 /*----------------------------------------------------------------------
     HDF funcitons
@@ -955,7 +245,6 @@ make_dataset(const fclaw_clawpatch_options_t *clawpatch_opts,
     if(patch_dims != NULL && clawpatch_opts->hdf5_compression_level > 0)
     {
         hsize_t limited_chunk_dims[rank];
-        int limit_other_dims = tid != H5T_NATIVE_INT32 && tid != H5T_NATIVE_INT64;
         get_chunk_size(tid,
                    rank,
                    patch_dims,
@@ -981,6 +270,7 @@ make_dataset(const fclaw_clawpatch_options_t *clawpatch_opts,
     hid_t did = H5Dcreate2(loc_id, dset_name, tid, sid, H5P_DEFAULT, prop_id, H5P_DEFAULT);
 
     status |= H5Sclose(sid);
+    status |= H5Pclose(prop_id);
 
     if(status != 0 || sid < 0 || did < 0)
     {
@@ -990,129 +280,248 @@ make_dataset(const fclaw_clawpatch_options_t *clawpatch_opts,
     return did;
 }
 
-/**
- * @brief Makes a patch dataset.
- * 
- * @param glob the global context
- * @param loc_id the location identifier for the dataset
- * @param dset_name the name of the dataset
- * @param rank the rank of the dataset
- * @param patch_dims the dimensions for a single patch
- * @param num_patches_to_buffer the number of patches to buffer
- * @param tid the datatype for the dataset 
- * @param patch_cb the callback function to get the patch data
- * @param vt the virtualized functions for creating the dataset
- */
+static fclaw_clawpatch_vtk_vtable_entry_t* s_hdf5_vtk_entry = NULL;
+static fclaw_vtk_cb_context_t s_hdf5_vtk_ctx;
+
 static void
-make_dataset_numerical(fclaw_global_t *glob,
-                       hid_t loc_id, 
-                       const char *dset_name, 
-                       int rank, 
-                       const hsize_t *patch_dims, 
-                       int num_patches_to_buffer,
-                       hid_t tid,
-                       fclaw_hdf5_patch_data_t patch_cb,
-                       make_dataset_vtable_t *vt)
+hdf5_vtk_entry_adapter(fclaw_global_t *glob,
+                       fclaw_patch_t *patch,
+                       int blockno,
+                       int patchno,
+                       char *buffer)
 {
-    const fclaw_clawpatch_options_t *clawpatch_opts = fclaw_clawpatch_get_options(glob);
+    FCLAW_ASSERT(s_hdf5_vtk_entry != NULL);
+    s_hdf5_vtk_entry->callback(glob, patch, blockno, patchno, &s_hdf5_vtk_ctx, buffer);
+}
 
-    herr_t status = 0;
+static hid_t
+hdf5_tid_from_vtk_type(fclaw_vtk_entry_type_t type, int fits32)
+{
+    switch (type)
+    {
+    case FCLAW_VTK_UINT8:
+        return H5T_NATIVE_UINT8;
+    case FCLAW_VTK_INT32:
+        return H5T_NATIVE_INT32;
+    case FCLAW_VTK_INT64:
+        return H5T_NATIVE_INT64;
+    case FCLAW_VTK_UINT64:
+        return H5T_NATIVE_UINT64;
+    case FCLAW_VTK_FLOAT32:
+        return H5T_NATIVE_FLOAT;
+    case FCLAW_VTK_FLOAT64:
+        return H5T_NATIVE_DOUBLE;
+    case FCLAW_VTK_INT32_OR_64:
+        return fits32 ? H5T_NATIVE_INT32 : H5T_NATIVE_INT64;
+    default:
+        fclaw_abortf("fclaw_clawpatch_output_hdf5.c Unsupported vtk entry type\n");
+        return H5T_NATIVE_INT32;
+    }
+}
 
-    hsize_t dataset_dims[rank];
-    vt->get_dataset_dims(glob, rank, patch_dims, dataset_dims);
+static size_t
+hdf5_entry_elements_in_patch(fclaw_global_t *glob,
+                             fclaw_patch_t *patch,
+                             int blockno,
+                             int patchno,
+                             const fclaw_clawpatch_vtk_vtable_entry_t *entry,
+                             fclaw_vtk_cb_context_t *ctx)
+{
+    if (patch == NULL)
+    {
+        return 0;
+    }
+    return entry->elements_in_patch(glob, patch, blockno, patchno, ctx);
+}
 
-    /* Create the dataset. */
-    hid_t did = make_dataset(clawpatch_opts, 
-                             loc_id, 
-                             tid, 
-                             dset_name, 
-                             rank, dataset_dims, patch_dims);
+static hsize_t
+write_vtable_entry_dataset(fclaw_global_t *glob,
+                           hid_t loc_id,
+                           const char *dset_name,
+                           const fclaw_clawpatch_vtk_vtable_entry_t *entry,
+                           int num_patches_to_buffer,
+                           int fits32,
+                           fclaw_hdf5_patch_data_t patch_cb)
+{
+    if (entry == NULL)
+    {
+        return 0;
+    }
 
-    hid_t plist_id = H5Pcreate(H5P_DATASET_XFER);
+    const int rank = entry->number_of_components == 1 ? 1 : 2;
+    hid_t tid = hdf5_tid_from_vtk_type(entry->type, fits32);
 
+    fclaw_vtk_cb_context_t ctx;
+    ctx.fits32 = fits32;
+    ctx.cells_per_patch = (int) entry->elements_per_patch;
+
+    unsigned long long local_total = 0;
+    for (int local_patch_index = 0;
+         local_patch_index < glob->domain->local_max_patches;
+         ++local_patch_index)
+    {
+        int patchno, blockno;
+        get_patch_blockno(glob, local_patch_index, &blockno, &patchno);
+        fclaw_patch_t *patch = NULL;
+        if (patchno < glob->domain->blocks[blockno].num_patches)
+        {
+            patch = &glob->domain->blocks[blockno].patches[patchno];
+        }
+        local_total += (unsigned long long)
+            hdf5_entry_elements_in_patch(glob, patch, blockno, patchno, entry, &ctx);
+    }
+
+    unsigned long long global_start = 0;
+    unsigned long long global_total = local_total;
 #ifdef FCLAW_ENABLE_MPI
-    status |= H5Pset_dxpl_mpio(plist_id, H5FD_MPIO_COLLECTIVE);
-    //status |= H5Pset_dxpl_mpio_collective_opt(plist_id, H5FD_MPIO_INDIVIDUAL_IO);
+    unsigned long long prefix_total = 0;
+    herr_t mpi_status = 0;
+    mpi_status |= sc_MPI_Scan(&local_total, &prefix_total, 1,
+                              sc_MPI_UNSIGNED_LONG_LONG, sc_MPI_SUM,
+                              glob->mpicomm);
+    mpi_status |= sc_MPI_Allreduce(&local_total, &global_total, 1,
+                                   sc_MPI_UNSIGNED_LONG_LONG, sc_MPI_SUM,
+                                   glob->mpicomm);
+    if (mpi_status != 0)
+    {
+        fclaw_abortf("fclaw_clawpatch_output_hdf5.c Error in MPI scan/reduce\n");
+    }
+    global_start = prefix_total - local_total;
 #endif
 
-    for(int local_patch_index = 0; 
-        local_patch_index < glob->domain->local_max_patches; 
-        local_patch_index += num_patches_to_buffer)
+    hsize_t dataset_dims[2] = {0, 0};
+    dataset_dims[0] = (hsize_t) global_total;
+    if (rank == 2)
     {
-        int num_able_to_buffer 
-            = SC_MIN(num_patches_to_buffer, glob->domain->local_max_patches - local_patch_index);
+        dataset_dims[1] = (hsize_t) entry->number_of_components;
+    }
+
+    hsize_t patch_dims[2] = {0, 0};
+    patch_dims[0] = (hsize_t) entry->elements_per_patch;
+    if (rank == 2)
+    {
+        patch_dims[1] = (hsize_t) entry->number_of_components;
+    }
+
+    hid_t did = make_dataset(fclaw_clawpatch_get_options(glob),
+                             loc_id,
+                             tid,
+                             dset_name,
+                             rank,
+                             dataset_dims,
+                             patch_dims);
+
+    hid_t plist_id = H5Pcreate(H5P_DATASET_XFER);
+    herr_t io_status = 0;
+
+#ifdef FCLAW_ENABLE_MPI
+    herr_t xfer_status = 0;
+    xfer_status |= H5Pset_dxpl_mpio(plist_id, H5FD_MPIO_COLLECTIVE);
+    if (xfer_status != 0)
+    {
+        fclaw_abortf("fclaw_clawpatch_output_hdf5.c Error in H5Pset_dxpl_mpio\n");
+    }
+#endif
+
+    unsigned long long local_prefix = 0;
+    for (int local_patch_index = 0;
+         local_patch_index < glob->domain->local_max_patches;
+         local_patch_index += num_patches_to_buffer)
+    {
+        int num_able_to_buffer = SC_MIN(num_patches_to_buffer,
+                                        glob->domain->local_max_patches - local_patch_index);
 
         hid_t filespace = H5Dget_space(did);
-
-        hsize_t slab_dims[rank];
-        hsize_t slab_start[rank];
+        hsize_t slab_dims[2] = {0, 0};
+        hsize_t slab_start[2] = {0, 0};
         hsize_t buffer_offsets[num_able_to_buffer];
         hsize_t total_buffer_size = 0;
-        for(int j=0; j < num_able_to_buffer; j++)
+        hsize_t batch_total = 0;
+
+        for (int j = 0; j < num_able_to_buffer; j++)
         {
             int patchno, blockno;
-            get_patch_blockno(glob, local_patch_index+j, &blockno, &patchno);
+            get_patch_blockno(glob, local_patch_index + j, &blockno, &patchno);
 
-            hsize_t patch_slab_dims[rank];
-            hsize_t patch_slab_start[rank];
-            vt->get_slab_dims(glob, patchno, blockno, rank, patch_dims, patch_slab_start, patch_slab_dims);
-            buffer_offsets[j] = total_buffer_size;
-            hsize_t buffer_size = patch_slab_dims[0] * H5Tget_size(tid);
-            for(int k = 1; k < rank; k++)
+            fclaw_patch_t *patch = NULL;
+            if (patchno < glob->domain->blocks[blockno].num_patches)
             {
-                buffer_size *= patch_slab_dims[k];
+                patch = &glob->domain->blocks[blockno].patches[patchno];
             }
+
+            size_t patch_count = hdf5_entry_elements_in_patch(glob, patch, blockno, patchno, entry, &ctx);
+            buffer_offsets[j] = total_buffer_size;
+            hsize_t buffer_size = (hsize_t) patch_count * (hsize_t) entry->number_of_components * (hsize_t) H5Tget_size(tid);
             total_buffer_size += buffer_size;
-            if(j == 0)
+            batch_total += (hsize_t) patch_count;
+
+            if (j == 0)
             {
-                for(int k = 0; k < rank; k++)
+                slab_start[0] = (hsize_t) global_start + (hsize_t) local_prefix;
+                slab_dims[0] = (hsize_t) patch_count;
+                if (rank == 2)
                 {
-                    slab_dims[k] = patch_slab_dims[k];
-                    slab_start[k] = patch_slab_start[k];
+                    slab_start[1] = 0;
+                    slab_dims[1] = (hsize_t) entry->number_of_components;
                 }
             }
             else
             {
-                slab_dims[0] += patch_slab_dims[0];
+                slab_dims[0] += (hsize_t) patch_count;
             }
         }
 
-        status |= H5Sselect_hyperslab(filespace, H5S_SELECT_SET, slab_start, NULL, slab_dims, NULL);
-        //create memspace
+        local_prefix += batch_total;
+
+        io_status = 0;
+        io_status |= H5Sselect_hyperslab(filespace, H5S_SELECT_SET, slab_start, NULL, slab_dims, NULL);
         hid_t memspace = H5Screate_simple(rank, slab_dims, NULL);
         FCLAW_ASSERT(H5Sget_select_npoints(filespace) == H5Sget_select_npoints(memspace));
 
         char *buffer = FCLAW_ALLOC(char, total_buffer_size);
-        for(int j=0; j < num_able_to_buffer; j++)
+        for (int j = 0; j < num_able_to_buffer; j++)
         {
             int patchno, blockno;
-            get_patch_blockno(glob, local_patch_index+j, &blockno, &patchno);
-            if(buffer_offsets[j] < total_buffer_size)
+            get_patch_blockno(glob, local_patch_index + j, &blockno, &patchno);
+            if (buffer_offsets[j] < total_buffer_size)
             {
                 fclaw_patch_t *patch = NULL;
-                if(patchno < glob->domain->blocks[blockno].num_patches)
+                if (patchno < glob->domain->blocks[blockno].num_patches)
                 {
                     patch = &glob->domain->blocks[blockno].patches[patchno];
                 }
-                patch_cb(glob, patch, blockno, patchno, buffer + buffer_offsets[j]);
+                if (patch_cb != NULL)
+                {
+                    patch_cb(glob, patch, blockno, patchno, buffer + buffer_offsets[j]);
+                }
+                else
+                {
+                    s_hdf5_vtk_entry = (fclaw_clawpatch_vtk_vtable_entry_t *) entry;
+                    s_hdf5_vtk_ctx = ctx;
+                    hdf5_vtk_entry_adapter(glob, patch, blockno, patchno, buffer + buffer_offsets[j]);
+                }
             }
         }
 
-        status |= H5Dwrite(did, tid, memspace, filespace, plist_id, buffer);
-
-        status |= H5Sclose(memspace);
-        status |= H5Sclose(filespace);
-
+        io_status |= H5Dwrite(did, tid, memspace, filespace, plist_id, buffer);
+        io_status |= H5Sclose(memspace);
+        io_status |= H5Sclose(filespace);
         FCLAW_FREE(buffer);
+        if (io_status != 0)
+        {
+            fclaw_abortf("fclaw_clawpatch_output_hdf5.c Error in write_vtable_entry_dataset\n");
+        }
     }
 
-    status |= H5Pclose(plist_id);
-    status |= H5Dclose(did);
-
-    if(status != 0 || did < 0 || plist_id < 0)
+    io_status = 0;
+    io_status |= H5Pclose(plist_id);
+    io_status |= H5Dclose(did);
+    if (io_status != 0 || did < 0 || plist_id < 0)
     {
-        fclaw_abortf("fclaw_clawpatch_output_hdf5.c Error in make_dataset_numerical\n");
+        fclaw_abortf("fclaw_clawpatch_output_hdf5.c Error in write_vtable_entry_dataset\n");
     }
+
+    return (hsize_t) global_total;
 }
 
 //this is copied form hdf5lt needed to change to NULLPAD for VTK
@@ -1164,6 +573,51 @@ set_attribute_string(hid_t loc_id, const char *obj_name, const char *attr_name, 
  * @param coordinate_cb the callback function to get the coordinate data
  * @param value_cb the callback function to get the value data
  */
+static hsize_t
+hdf5_entry_global_count(fclaw_global_t *glob,
+                        const fclaw_clawpatch_vtk_vtable_entry_t *entry,
+                        fclaw_vtk_cb_context_t *ctx)
+{
+    if (entry == NULL)
+    {
+        return 0;
+    }
+
+    unsigned long long local_total = 0;
+    for (int local_patch_index = 0;
+         local_patch_index < glob->domain->local_max_patches;
+         ++local_patch_index)
+    {
+        int patchno, blockno;
+        get_patch_blockno(glob, local_patch_index, &blockno, &patchno);
+        fclaw_patch_t *patch = NULL;
+        if (patchno < glob->domain->blocks[blockno].num_patches)
+        {
+            patch = &glob->domain->blocks[blockno].patches[patchno];
+        }
+        local_total += (unsigned long long)
+            hdf5_entry_elements_in_patch(glob, patch, blockno, patchno, entry, ctx);
+    }
+
+    unsigned long long global_total = local_total;
+#ifdef FCLAW_ENABLE_MPI
+    unsigned long long prefix_total = 0;
+    herr_t mpi_status = 0;
+    mpi_status |= sc_MPI_Scan(&local_total, &prefix_total, 1,
+                              sc_MPI_UNSIGNED_LONG_LONG, sc_MPI_SUM,
+                              glob->mpicomm);
+    mpi_status |= sc_MPI_Allreduce(&local_total, &global_total, 1,
+                                   sc_MPI_UNSIGNED_LONG_LONG, sc_MPI_SUM,
+                                   glob->mpicomm);
+    if (mpi_status != 0)
+    {
+        fclaw_abortf("fclaw_clawpatch_output_hdf5.c Error in MPI scan/reduce\n");
+    }
+#endif
+
+    return (hsize_t) global_total;
+}
+
 static void
 fclaw_hdf_write_file (fclaw_global_t * glob, 
                       const char* filename,
@@ -1180,27 +634,18 @@ fclaw_hdf_write_file (fclaw_global_t * glob,
     }
 
     //get mx, my, mz, meqn from clawpatch options
-    int patch_dim = clawpatch_opt->patch_dim;
     int64_t mx   = clawpatch_opt->mx;
     int64_t my   = clawpatch_opt->my;
     int64_t mz   = clawpatch_opt->mz;
 
-    int64_t global_num_patches = glob->domain->global_num_patches;
-
     int64_t num_cells_per_patch;
-    int64_t num_points_per_patch;
-    int64_t num_points_per_cell;
     if(clawpatch_opt->patch_dim == 2)
     {
         num_cells_per_patch = mx * my;
-        num_points_per_patch = (mx + 1) * (my + 1);
-        num_points_per_cell = 4;
     }
-    else 
+    else
     {
         num_cells_per_patch = mx * my * mz;
-        num_points_per_patch = (mx + 1) * (my + 1) * (mz + 1);
-        num_points_per_cell = 8;
     }
 
     char vtkhdf[8] = "/VTKHDF";
@@ -1238,79 +683,86 @@ fclaw_hdf_write_file (fclaw_global_t * glob,
 
     // write single value datasets for vtk
 
-    long number_of_cells = global_num_patches * num_cells_per_patch;
-    dims[0] = 1;
-    make_single_value_dataset_numerical(glob->mpirank, vtkhdf_gid, "NumberOfCells", 1, dims, H5T_NATIVE_LONG, &number_of_cells);
+    fclaw_vtk_cb_context_t size_ctx;
+    size_ctx.fits32 = 0;
+    size_ctx.cells_per_patch = (int) num_cells_per_patch;
 
-    long number_of_points = global_num_patches * num_points_per_patch;
-    dims[0] = 1;
-    make_single_value_dataset_numerical(glob->mpirank, vtkhdf_gid, "NumberOfPoints", 1, dims, H5T_NATIVE_LONG, &number_of_points);
-
-
-    long number_of_connectivity_ids = global_num_patches * num_cells_per_patch * num_points_per_cell;
-    dims[0] = 1;
-    make_single_value_dataset_numerical(glob->mpirank, vtkhdf_gid, "NumberOfConnectivityIds", 1, dims, H5T_NATIVE_LONG, &number_of_connectivity_ids);
-
+    hsize_t number_of_points = hdf5_entry_global_count(glob, &vtk_vtable->position_entry, &size_ctx);
+    hsize_t number_of_connectivity_ids = hdf5_entry_global_count(glob, &vtk_vtable->connectivity_entry, &size_ctx);
+    hsize_t number_of_cells = hdf5_entry_global_count(glob, &vtk_vtable->offsets_entry, &size_ctx);
 
     int fits32 = number_of_points <= INT32_MAX
-        && number_of_connectivity_ids <= INT32_MAX;
+        && number_of_connectivity_ids <= INT32_MAX
+        && number_of_cells <= INT32_MAX;
 
-    hsize_t patch_dims[4] = {0,0,0,0};
-    patch_dims[0] = num_cells_per_patch;
-    make_dataset_numerical(glob, 
-                           vtkhdf_gid, 
-                           "Types", 
-                           1, patch_dims, 
-                           num_patches_to_buffer, 
-                           H5T_NATIVE_UINT8, 
-                           types_cb,
-                           &default_vtable);
+    s_hdf5_vtk_ctx.fits32 = fits32;
+    s_hdf5_vtk_ctx.cells_per_patch = (int) num_cells_per_patch;
 
-    // write offsets
-    patch_dims[0] = num_cells_per_patch;
-    make_dataset_numerical(glob, 
-                           vtkhdf_gid, 
-                           "Offsets", 
-                           1, patch_dims, 
-                           num_patches_to_buffer, 
-                           fits32 ? H5T_NATIVE_INT32 : H5T_NATIVE_INT64,
-                           fits32 ? get_offsets_int32_t : get_offsets_int64_t,
-                           &offset_vtable);
+    hsize_t written_number_of_points = write_vtable_entry_dataset(glob,
+                                                                  vtkhdf_gid,
+                                                                  "Points",
+                                                                  &vtk_vtable->position_entry,
+                                                                  num_patches_to_buffer,
+                                                                  fits32,
+                                                                  coordinate_cb);
+    hsize_t written_number_of_connectivity_ids = write_vtable_entry_dataset(glob,
+                                                                            vtkhdf_gid,
+                                                                            "Connectivity",
+                                                                            &vtk_vtable->connectivity_entry,
+                                                                            num_patches_to_buffer,
+                                                                            fits32,
+                                                                            NULL);
+    hsize_t written_number_of_cells = write_vtable_entry_dataset(glob,
+                                                                 vtkhdf_gid,
+                                                                 "Offsets",
+                                                                 &vtk_vtable->offsets_entry,
+                                                                 num_patches_to_buffer,
+                                                                 fits32,
+                                                                 NULL);
+    write_vtable_entry_dataset(glob,
+                               vtkhdf_gid,
+                               "Types",
+                               &vtk_vtable->types_entry,
+                               num_patches_to_buffer,
+                               fits32,
+                               NULL);
 
+    FCLAW_ASSERT(written_number_of_points == number_of_points);
+    FCLAW_ASSERT(written_number_of_connectivity_ids == number_of_connectivity_ids);
+    FCLAW_ASSERT(written_number_of_cells == number_of_cells);
 
-    patch_dims[0] = num_points_per_patch;
-    patch_dims[1] = 3;
-    make_dataset_numerical(glob, 
-                           vtkhdf_gid, 
-                           "Points", 
-                           2, patch_dims, 
-                           num_patches_to_buffer, 
-                           H5T_NATIVE_DOUBLE, 
-                           coordinate_cb,
-                           &default_vtable);
+    dims[0] = 1;
+    long number_of_cells_long = (long) number_of_cells;
+    make_single_value_dataset_numerical(glob->mpirank, vtkhdf_gid, "NumberOfCells", 1, dims, H5T_NATIVE_LONG, &number_of_cells_long);
 
-    patch_dims[0] = 1;
-    if(patch_dim == 2)
+    long number_of_points_long = (long) number_of_points;
+    dims[0] = 1;
+    make_single_value_dataset_numerical(glob->mpirank, vtkhdf_gid, "NumberOfPoints", 1, dims, H5T_NATIVE_LONG, &number_of_points_long);
+
+    long number_of_connectivity_ids_long = (long) number_of_connectivity_ids;
+    dims[0] = 1;
+    make_single_value_dataset_numerical(glob->mpirank, vtkhdf_gid, "NumberOfConnectivityIds", 1, dims, H5T_NATIVE_LONG, &number_of_connectivity_ids_long);
+
+    hid_t fielddata_gid = H5Gcreate2(file_id,
+                                     "/VTKHDF/FieldData",
+                                     H5P_DEFAULT,
+                                     H5P_DEFAULT,
+                                     H5P_DEFAULT);
+    sc_link_t* curr_entry = vtk_vtable->field_entries->first;
+    while (curr_entry != NULL)
     {
-        patch_dims[1] = my+1;
-        patch_dims[2] = mx+1;
+        fclaw_clawpatch_vtk_vtable_entry_t* entry =
+            (fclaw_clawpatch_vtk_vtable_entry_t*) curr_entry->data;
+        write_vtable_entry_dataset(glob,
+                                   fielddata_gid,
+                                   entry->name,
+                                   entry,
+                                   num_patches_to_buffer,
+                                   fits32,
+                                   NULL);
+        curr_entry = curr_entry->next;
     }
-    else
-    {
-        patch_dims[1] = mz+1;
-        patch_dims[2] = my+1;
-        patch_dims[3] = mx+1;
-    }
-    patch_dims[0] = num_cells_per_patch * num_points_per_cell;
-    make_dataset_numerical(glob,
-                           vtkhdf_gid,
-                           "Connectivity",
-                           1,
-                           patch_dims,
-                           num_patches_to_buffer,
-                           fits32 ? H5T_NATIVE_INT32 : H5T_NATIVE_INT64,
-                           fits32 ? get_connectivity_int32_t : get_connectivity_int64_t,
-                           &default_vtable);
+    status |= H5Gclose(fielddata_gid);
 
     /* avoid resource leaks by closing */
     status |= H5Gclose(vtkhdf_gid);
@@ -1318,103 +770,25 @@ fclaw_hdf_write_file (fclaw_global_t * glob,
 
     hid_t celldata_gid = H5Gcreate2(file_id, celldata, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
     
-    patch_dims[0] = num_cells_per_patch;
-    patch_dims[1] = clawpatch_opt->meqn;
-    make_dataset_numerical(glob, 
-                           celldata_gid, 
-                           "meqn", 
-                           2, patch_dims, 
-                           num_patches_to_buffer, 
-                           H5T_NATIVE_FLOAT, 
-                           value_cb,
-                           &default_vtable);
-
-    //write elliptic data
-    if(clawpatch_opt->rhs_fields > 0)
+    curr_entry = vtk_vtable->celldata_entries->first;
+    while (curr_entry != NULL)
     {
-        patch_dims[0] = num_cells_per_patch;
-        patch_dims[1] = clawpatch_opt->rhs_fields;
-        make_dataset_numerical(glob, 
-                               celldata_gid, 
-                               "rhs", 
-                               2, patch_dims, 
-                               num_patches_to_buffer, 
-                               H5T_NATIVE_FLOAT, 
-                               rhs_cb,
-                               &default_vtable);
-        make_dataset_numerical(glob, 
-                               celldata_gid, 
-                               "soln", 
-                               2, patch_dims, 
-                               num_patches_to_buffer, 
-                               H5T_NATIVE_FLOAT, 
-                               soln_cb,
-                               &default_vtable);
-        make_dataset_numerical(glob, 
-                               celldata_gid, 
-                               "error", 
-                               2, patch_dims, 
-                               num_patches_to_buffer, 
-                               H5T_NATIVE_FLOAT, 
-                               error_cb,
-                               &default_vtable);
-    }
-
-    //write aux data
-    int num_aux = 0;
-    for(int i = 0; i < clawpatch_opt->maux; i++)
-    {
-        if(clawpatch_opt->hdf5_aux_out[i] > 0)
+        fclaw_clawpatch_vtk_vtable_entry_t* entry =
+            (fclaw_clawpatch_vtk_vtable_entry_t*) curr_entry->data;
+        fclaw_hdf5_patch_data_t patch_cb = NULL;
+        if (strcmp(entry->name, "meqn") == 0)
         {
-            num_aux++;
+            patch_cb = value_cb;
         }
+        write_vtable_entry_dataset(glob,
+                                   celldata_gid,
+                                   entry->name,
+                                   entry,
+                                   num_patches_to_buffer,
+                                   fits32,
+                                   patch_cb);
+        curr_entry = curr_entry->next;
     }
-    if(num_aux > 0)
-    {
-        patch_dims[0] = num_cells_per_patch;
-        patch_dims[1] = num_aux;
-        make_dataset_numerical(glob, 
-                               celldata_gid, 
-                               "aux", 
-                               2, patch_dims, 
-                               num_patches_to_buffer, 
-                               H5T_NATIVE_FLOAT, 
-                               aux_cb,
-                               &default_vtable);
-    }
-
-    // write blockno
-    patch_dims[0] = num_cells_per_patch;
-    make_dataset_numerical(glob, 
-                           celldata_gid, 
-                           "blockno", 
-                           1, patch_dims, 
-                           num_patches_to_buffer, 
-                           H5T_NATIVE_INT, 
-                           blockno_cb,
-                           &default_vtable);
-
-    //write patchno
-    patch_dims[0] = num_cells_per_patch;
-    make_dataset_numerical(glob, 
-                           celldata_gid, 
-                           "patchno", 
-                           1, patch_dims, 
-                           num_patches_to_buffer, 
-                           H5T_NATIVE_INT, 
-                           patchno_cb,
-                           &default_vtable);
-
-    //write mpirank
-    patch_dims[0] = num_cells_per_patch;
-    make_dataset_numerical(glob, 
-                           celldata_gid, 
-                           "mpirank", 
-                           1, patch_dims, 
-                           num_patches_to_buffer, 
-                           H5T_NATIVE_INT, 
-                           mpirank_cb,
-                           &default_vtable);
 
     status |= H5Gclose(celldata_gid);
 
@@ -1439,8 +813,8 @@ void fclaw_clawpatch_output_hdf5_to_file (struct fclaw_global* glob,
 {
     fclaw_hdf_write_file (glob, 
                           filename, 
-                          coordinate_cb == NULL ? get_coordinates : coordinate_cb, 
-                          coordinate_cb == NULL ? meqn_cb : value_cb);
+                          coordinate_cb,
+                          value_cb);
 }
 
 void fclaw_clawpatch_output_hdf5 (fclaw_global_t * glob, int iframe)
