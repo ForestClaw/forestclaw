@@ -236,7 +236,8 @@ make_dataset(const fclaw_clawpatch_options_t *clawpatch_opts,
              const char *dset_name, 
              int rank, 
              const hsize_t *dims, 
-             const hsize_t *patch_dims)
+             const hsize_t *patch_dims,
+             int limit_other_dims)
 {
     herr_t status = 0;
 
@@ -343,6 +344,7 @@ write_vtable_entry_dataset(fclaw_global_t *glob,
                            const fclaw_clawpatch_vtk_vtable_entry_t *entry,
                            int num_patches_to_buffer,
                            int fits32,
+                           int limit_other_dims,
                            fclaw_hdf5_patch_data_t patch_cb)
 {
     if (entry == NULL)
@@ -411,7 +413,8 @@ write_vtable_entry_dataset(fclaw_global_t *glob,
                              dset_name,
                              rank,
                              dataset_dims,
-                             patch_dims);
+                             patch_dims,
+                             limit_other_dims);
 
     hid_t plist_id = H5Pcreate(H5P_DATASET_XFER);
     herr_t io_status = 0;
@@ -689,6 +692,7 @@ fclaw_hdf_write_file (fclaw_global_t * glob,
                                                                   &vtk_vtable->position_entry,
                                                                   num_patches_to_buffer,
                                                                   fits32,
+                                                                  0,
                                                                   coordinate_cb);
     hsize_t written_number_of_connectivity_ids = write_vtable_entry_dataset(glob,
                                                                             vtkhdf_gid,
@@ -696,6 +700,7 @@ fclaw_hdf_write_file (fclaw_global_t * glob,
                                                                             &vtk_vtable->connectivity_entry,
                                                                             num_patches_to_buffer,
                                                                             fits32,
+                                                                            0,
                                                                             NULL);
     hsize_t written_number_of_cells = write_vtable_entry_dataset(glob,
                                                                  vtkhdf_gid,
@@ -703,6 +708,7 @@ fclaw_hdf_write_file (fclaw_global_t * glob,
                                                                  &vtk_vtable->offsets_entry,
                                                                  num_patches_to_buffer,
                                                                  fits32,
+                                                                 0,
                                                                  NULL);
     write_vtable_entry_dataset(glob,
                                vtkhdf_gid,
@@ -710,6 +716,7 @@ fclaw_hdf_write_file (fclaw_global_t * glob,
                                &vtk_vtable->types_entry,
                                num_patches_to_buffer,
                                fits32,
+                               0,
                                NULL);
 
     FCLAW_ASSERT(written_number_of_points == number_of_points);
@@ -744,6 +751,7 @@ fclaw_hdf_write_file (fclaw_global_t * glob,
                                    entry,
                                    num_patches_to_buffer,
                                    fits32,
+                                   0,
                                    NULL);
         curr_entry = curr_entry->next;
     }
@@ -782,6 +790,7 @@ fclaw_hdf_write_file (fclaw_global_t * glob,
                                    entry,
                                    num_patches_to_buffer,
                                    fits32,
+                                   1,
                                    patch_cb);
         curr_entry = curr_entry->next;
     }
