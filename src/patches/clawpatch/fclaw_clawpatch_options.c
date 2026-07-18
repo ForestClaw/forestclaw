@@ -98,6 +98,10 @@ clawpatch_register(fclaw_clawpatch_options_t *clawpatch_options,
                        &clawpatch_options->vtk_patch_threshold, 0,
                        "Number of patches to buffer before each write in vtk output. 0 means buffer all patches before writing [0]");
 
+    sc_options_add_bool (opt, 0, "vtk-ghost-out", 
+                         &clawpatch_options->vtk_ghost_out, 0,
+                         "Output ghost cells in vtk files [F]");
+
     fclaw_options_add_int_array(opt, 0, "vtk-aux-out",
                                 &clawpatch_options->vtk_aux_out_string, "",
                                 &clawpatch_options->vtk_aux_out, 0,
