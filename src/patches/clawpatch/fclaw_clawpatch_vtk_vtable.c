@@ -480,6 +480,10 @@ write_offsets_cb (fclaw_global_t* glob, fclaw_patch_t* patch,
     if (ctx->fits32)
     {
         int32_t *idata = (int32_t *) buffer;
+        if(ctx->offsets_include_zero && glob->mpirank == 0 && patchno == 0 && blockno == 0)
+        {
+            *idata++ = 0;
+        }
         int32_t k = num_points_per_cell * (int32_t) (cbefore + 1);
         for (int c = 0; c < cells_per_patch; k += num_points_per_cell, ++c)
         {
@@ -489,6 +493,10 @@ write_offsets_cb (fclaw_global_t* glob, fclaw_patch_t* patch,
     else
     {
         int64_t *idata = (int64_t *) buffer;
+        if(ctx->offsets_include_zero && glob->mpirank == 0 && patchno == 0 && blockno == 0)
+        {
+            *idata++ = 0;
+        }
         int64_t k = num_points_per_cell * (cbefore + 1);
         for (int c = 0; c < cells_per_patch; k += num_points_per_cell, ++c)
         {
@@ -834,9 +842,7 @@ offsets_in_patch (fclaw_global_t* glob, fclaw_patch_t* patch,
                   fclaw_vtk_cb_context_t* ctx)
 {
     size_t retval = cells_in_patch(glob, patch, blockno, patchno, ctx);
-    if(glob->mpirank == glob->mpisize - 1 
-       && blockno == glob->domain->num_blocks - 1 
-       && patchno == glob->domain->blocks[blockno].num_patches - 1)
+    if(ctx->offsets_include_zero && glob->mpirank == 0 && patchno == 0 && blockno == 0)
     {
         retval += 1;
     }

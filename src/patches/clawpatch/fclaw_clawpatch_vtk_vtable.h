@@ -50,6 +50,7 @@ struct fclaw_patch;
 typedef struct fclaw_vtk_cb_context
 {
     int fits32; /* whether the mesh connectivity fits in 32 bits */
+    int offsets_include_zero; /* whether the offsets dataset should include a leading zero */
 } fclaw_vtk_cb_context_t;
 
 /** 

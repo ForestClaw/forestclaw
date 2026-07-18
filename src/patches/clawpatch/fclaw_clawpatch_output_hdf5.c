@@ -353,6 +353,7 @@ write_vtable_entry_dataset(fclaw_global_t *glob,
 
     fclaw_vtk_cb_context_t ctx;
     ctx.fits32 = fits32;
+    ctx.offsets_include_zero = 1;
 
     unsigned long long local_total = 0;
     for (int local_patch_index = 0;
@@ -669,10 +670,11 @@ fclaw_hdf_write_file (fclaw_global_t * glob,
 
     fclaw_vtk_cb_context_t size_ctx;
     size_ctx.fits32 = 0;
+    size_ctx.offsets_include_zero = 1;
 
     hsize_t number_of_points = hdf5_entry_global_count(glob, &vtk_vtable->position_entry, &size_ctx);
     hsize_t number_of_connectivity_ids = hdf5_entry_global_count(glob, &vtk_vtable->connectivity_entry, &size_ctx);
-    hsize_t number_of_cells = hdf5_entry_global_count(glob, &vtk_vtable->offsets_entry, &size_ctx);
+    hsize_t number_of_cells = hdf5_entry_global_count(glob, &vtk_vtable->types_entry, &size_ctx);
 
     int fits32 = number_of_points <= INT32_MAX
         && number_of_connectivity_ids <= INT32_MAX
@@ -710,7 +712,7 @@ fclaw_hdf_write_file (fclaw_global_t * glob,
 
     FCLAW_ASSERT(written_number_of_points == number_of_points);
     FCLAW_ASSERT(written_number_of_connectivity_ids == number_of_connectivity_ids);
-    FCLAW_ASSERT(written_number_of_cells == number_of_cells);
+    FCLAW_ASSERT(written_number_of_cells == number_of_cells + 1);
 
     dims[0] = 1;
     long number_of_cells_long = (long) number_of_cells;

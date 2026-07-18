@@ -251,6 +251,7 @@ fclaw2d_vtk_write_header (fclaw_domain_t * domain, fclaw2d_vtk_state_t * s)
                                   "    </DataArray>\n";
 
     // write primary point entry
+    curr_offset = s->point_offsets;
     retval = retval || print_dataarray_entry(file,
                                              s,
                                              &s->vtk_vt->position_entry,
@@ -263,6 +264,7 @@ fclaw2d_vtk_write_header (fclaw_domain_t * domain, fclaw2d_vtk_state_t * s)
     retval = retval || fprintf (file, "   <Cells>\n") < 0;
 
     // write primary cell entries
+    curr_offset = s->cell_offsets;
     retval = retval || print_dataarray_entry(file,
                                              s,
                                              &s->vtk_vt->connectivity_entry,
@@ -484,6 +486,7 @@ fclaw2d_vtk_write_field (fclaw_global_t * glob, fclaw2d_vtk_state_t * s,
     write_field_iter_user_t iter;
     iter.s = s;
     iter.ctx.fits32 = s->fits32;
+    iter.ctx.offsets_include_zero = 0;
     iter.entry = entry;
     fclaw_global_iterate_patches (glob, write_entry_cb, &iter);
 
