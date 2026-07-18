@@ -109,6 +109,8 @@ void set_attribute_numerical(hid_t loc_id,
     }
 }
 
+
+
 /**
  * Creates a single-value dataset in an HDF5 file.
  *
@@ -745,9 +747,20 @@ fclaw_hdf_write_file (fclaw_global_t * glob,
                                    NULL);
         curr_entry = curr_entry->next;
     }
+
+    int patch_dim[3];
+    patch_dim[0] = clawpatch_opt->mx;
+    patch_dim[1] = clawpatch_opt->my;
+    patch_dim[2] = (clawpatch_opt->patch_dim == 3) ? clawpatch_opt->mz : 1;
+    hsize_t patch_dim_dims[2] = {1, 3};
+    make_single_value_dataset_numerical(glob->mpirank, fielddata_gid, "patch_dimension", 2, patch_dim_dims, H5T_NATIVE_INT, patch_dim);
+
+    double time_val = glob->curr_time;
+    hsize_t time_val_dims[1] = {1};
+    make_single_value_dataset_numerical(glob->mpirank, fielddata_gid, "TimeValue", 1, time_val_dims, H5T_NATIVE_DOUBLE, &time_val);
+
     status |= H5Gclose(fielddata_gid);
 
-    /* avoid resource leaks by closing */
     status |= H5Gclose(vtkhdf_gid);
 
 
