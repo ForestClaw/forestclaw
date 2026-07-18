@@ -36,6 +36,7 @@ TEST_CASE("fclaw_clawpatch_options_new 2d")
 
 	CHECK_EQ(opts->patch_dim,     2);
 	CHECK_EQ(opts->mx,  0);
+	CHECK_EQ(opts->vtk_ghost_out, 0);
 
 	fclaw_clawpatch_options_destroy(opts);
 }
@@ -46,6 +47,7 @@ TEST_CASE("fclaw_clawpatch_options_new 3d")
 
 	CHECK_EQ(opts->patch_dim,     3);
 	CHECK_EQ(opts->mx,  0);
+	CHECK_EQ(opts->vtk_ghost_out, 0);
 
 	fclaw_clawpatch_options_destroy(opts);
 }
