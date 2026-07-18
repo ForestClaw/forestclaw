@@ -236,7 +236,6 @@ make_dataset(const fclaw_clawpatch_options_t *clawpatch_opts,
              const char *dset_name, 
              int rank, 
              const hsize_t *dims, 
-             const hsize_t *patch_dims,
              int limit_other_dims)
 {
     herr_t status = 0;
@@ -245,12 +244,12 @@ make_dataset(const fclaw_clawpatch_options_t *clawpatch_opts,
 
     status |= H5Pset_fill_time(prop_id, H5D_FILL_TIME_NEVER);
     
-    if(patch_dims != NULL && clawpatch_opts->hdf5_compression_level > 0)
+    if(clawpatch_opts->hdf5_compression_level > 0)
     {
         hsize_t limited_chunk_dims[rank];
         get_chunk_size(tid,
                    rank,
-                   patch_dims,
+                   dims,
                    limited_chunk_dims,
                    0);
         status |= H5Pset_chunk(prop_id, rank, limited_chunk_dims);
@@ -400,20 +399,12 @@ write_vtable_entry_dataset(fclaw_global_t *glob,
         dataset_dims[1] = (hsize_t) entry->number_of_components;
     }
 
-    hsize_t patch_dims[2] = {0, 0};
-    patch_dims[0] = (hsize_t) entry->elements_per_patch;
-    if (rank == 2)
-    {
-        patch_dims[1] = (hsize_t) entry->number_of_components;
-    }
-
     hid_t did = make_dataset(fclaw_clawpatch_get_options(glob),
                              loc_id,
                              tid,
                              dset_name,
                              rank,
                              dataset_dims,
-                             patch_dims,
                              limit_other_dims);
 
     hid_t plist_id = H5Pcreate(H5P_DATASET_XFER);
