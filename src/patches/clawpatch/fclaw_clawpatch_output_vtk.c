@@ -23,6 +23,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include <fclaw_config.h>
 #include <fclaw_clawpatch_output_vtk.h>
 
 #include <fclaw_clawpatch.h>
@@ -61,6 +62,10 @@ typedef struct fclaw2d_vtk_state
     int64_t *point_offsets;
     int64_t *cell_offsets;
     int64_t *celldata_offsets;
+    int64_t *field_num_elements;
+    int64_t *point_num_elements;
+    int64_t *cell_num_elements;
+    int64_t *celldata_num_elements;
     int64_t offset_end;
     const char *inttype;
     fclaw_vtk_patch_data_t coordinate_cb;
@@ -76,6 +81,7 @@ typedef struct fclaw2d_vtk_state
     MPI_Offset mpibegin;
 #endif
     char *buf;
+    size_t buf_capacity;
 
     /* The following three struct elements are dedicated to manage buffering
      * patches.
@@ -170,6 +176,51 @@ print_dataarray_entry(FILE *file,
                    (long long) offset) < 0;
 }
 
+typedef struct count_elements_user
+{
+    fclaw2d_vtk_state_t *s;
+    fclaw_vtk_cb_context_t ctx;
+    fclaw_clawpatch_vtk_vtable_entry_t *entry;
+    unsigned long long num_elements;
+} count_elements_user_t;
+
+static void
+count_elements_cb (fclaw_domain_t * domain, fclaw_patch_t * patch,
+                   int blockno, int patchno, void *user)
+{
+    fclaw_global_iterate_t *g = (fclaw_global_iterate_t*) user;
+    count_elements_user_t *iter = (count_elements_user_t *) g->user;
+
+    iter->num_elements += iter->entry->elements_in_patch (g->glob, patch, blockno, patchno, &iter->ctx);
+}
+
+static int64_t
+get_global_num_elements (fclaw_global_t *glob, fclaw2d_vtk_state_t *s, fclaw_clawpatch_vtk_vtable_entry_t *entry)
+{
+    fclaw_domain_t *domain = glob->domain;
+    if (entry->elements_in_patch == NULL)
+    {
+        return (int64_t) entry->elements_per_patch * domain->global_num_patches;
+    }
+
+    count_elements_user_t count_user;
+    count_user.s = s;
+    count_user.ctx.fits32 = s->fits32;
+    count_user.ctx.offsets_include_zero = 0;
+    count_user.entry = entry;
+    count_user.num_elements = 0;
+
+    fclaw_global_iterate_patches (glob, count_elements_cb, &count_user);
+
+    unsigned long long local_num_elements = count_user.num_elements;
+    unsigned long long global_num_elements = 0;
+    int mpiret = sc_MPI_Allreduce (&local_num_elements, &global_num_elements, 1,
+                                   sc_MPI_UNSIGNED_LONG_LONG, sc_MPI_SUM, domain->mpicomm);
+    SC_CHECK_MPI (mpiret);
+
+    return (int64_t) global_num_elements;
+}
+
 static int
 fclaw2d_vtk_write_header (fclaw_domain_t * domain, fclaw2d_vtk_state_t * s)
 {
@@ -211,12 +262,13 @@ fclaw2d_vtk_write_header (fclaw_domain_t * domain, fclaw2d_vtk_state_t * s)
     // write field vtable entries
     sc_link_t* curr_entry = s->vtk_vt->field_entries->first;
     int64_t* curr_offset = s->field_offsets;
+    int i = 0;
     while (curr_entry != NULL)
     {
         fclaw_clawpatch_vtk_vtable_entry_t* entry =
             (fclaw_clawpatch_vtk_vtable_entry_t*) curr_entry->data;
         const char* vtk_type_str = vtk_type_to_string(s, entry->type);
-        long long number_of_tuples = (long long) entry->elements_per_patch * s->global_num_patches;
+        long long number_of_tuples = (long long) s->field_num_elements[i];
         if (entry->number_of_components == 1)
         {
             retval = retval || fprintf (file, field_format_single,
@@ -236,6 +288,7 @@ fclaw2d_vtk_write_header (fclaw_domain_t * domain, fclaw2d_vtk_state_t * s)
         }
         curr_offset++;
         curr_entry = curr_entry->next;
+        i++;
     }
 
     retval = retval || fprintf (file, "  </FieldData>\n") < 0;
@@ -361,14 +414,10 @@ add_to_buffer (fclaw2d_vtk_state_t * s, int64_t psize_field)
     size_t retvalz;
 #endif
     FCLAW_ASSERT (s->patch_threshold >= 0);
-    FCLAW_ASSERT (((int) s->sink->buffer_bytes) % psize_field == 0);
 
     if (s->patch_threshold != 0
         && (s->num_buffered_patches + 1 > s->patch_threshold))
     {
-        FCLAW_ASSERT ((int) s->sink->buffer_bytes >= psize_field);
-        FCLAW_ASSERT (((int) s->sink->buffer_bytes) / psize_field ==
-                      s->num_buffered_patches);
         /* buffer threshold exceeded */
         /* write the current buffer to disk */
 #ifdef P4EST_ENABLE_MPIIO
@@ -414,18 +463,52 @@ write_entry_cb (fclaw_domain_t * domain, fclaw_patch_t * patch,
     fclaw_global_iterate_t *g = (fclaw_global_iterate_t*) user;
     write_field_iter_user_t *iter = (write_field_iter_user_t *) g->user;
 
-    iter->entry->callback (g->glob, patch, blockno, patchno, &iter->ctx, iter->s->buf);
+    size_t num_elements = iter->entry->elements_in_patch (g->glob, patch, blockno, patchno, &iter->ctx);
+    int64_t psize = num_elements * iter->entry->number_of_components * sizeof_vtk_type(iter->s, iter->entry->type);
 
-    int64_t psize = iter->entry->elements_per_patch * iter->entry->number_of_components * sizeof_vtk_type(iter->s, iter->entry->type);
-    add_to_buffer (iter->s, psize);
+    if (psize > 0)
+    {
+        if ((size_t) psize > iter->s->buf_capacity)
+        {
+            if (iter->s->buf != NULL)
+            {
+                P4EST_FREE (iter->s->buf);
+            }
+            iter->s->buf = P4EST_ALLOC (char, psize);
+            iter->s->buf_capacity = psize;
+        }
+
+        iter->entry->callback (g->glob, patch, blockno, patchno, &iter->ctx, iter->s->buf);
+        add_to_buffer (iter->s, psize);
+    }
+}
+
+typedef struct count_bytes_user
+{
+    fclaw2d_vtk_state_t *s;
+    fclaw_vtk_cb_context_t ctx;
+    fclaw_clawpatch_vtk_vtable_entry_t *entry;
+    int64_t local_bytes;
+} count_bytes_user_t;
+
+static void
+count_bytes_cb (fclaw_domain_t * domain, fclaw_patch_t * patch,
+                int blockno, int patchno, void *user)
+{
+    fclaw_global_iterate_t *g = (fclaw_global_iterate_t*) user;
+    count_bytes_user_t *iter = (count_bytes_user_t *) g->user;
+
+    size_t num_elements = iter->entry->elements_in_patch (g->glob, patch, blockno, patchno, &iter->ctx);
+    int64_t psize = num_elements * iter->entry->number_of_components * sizeof_vtk_type(iter->s, iter->entry->type);
+    iter->local_bytes += psize;
 }
 
 static void
 fclaw2d_vtk_write_field (fclaw_global_t * glob, fclaw2d_vtk_state_t * s,
                          int64_t offset_field, fclaw_clawpatch_vtk_vtable_entry_t* entry)
 {
-    int64_t psize_field = entry->elements_per_patch * entry->number_of_components * sizeof_vtk_type(s, entry->type);
-    if(psize_field == 0)
+    int64_t global_num_elements = get_global_num_elements (glob, s, entry);
+    if (global_num_elements == 0)
     {
         /* some fields are optional */
         return;
@@ -448,9 +531,35 @@ fclaw2d_vtk_write_field (fclaw_global_t * glob, fclaw2d_vtk_state_t * s,
     MPI_Status mpistatus;
 #endif
 
-    s->buf = P4EST_ALLOC (char, psize_field);
+    count_bytes_user_t bytes_user;
+    bytes_user.s = s;
+    bytes_user.ctx.fits32 = s->fits32;
+    bytes_user.ctx.offsets_include_zero = 0;
+    bytes_user.entry = entry;
+    bytes_user.local_bytes = 0;
+
+    fclaw_global_iterate_patches (glob, count_bytes_cb, &bytes_user);
+
+    unsigned long long local_bytes = bytes_user.local_bytes;
+    unsigned long long prefix_bytes = 0;
+    unsigned long long global_bytes = 0;
+#ifdef FCLAW_ENABLE_MPI
+    int mpiret_allreduce = sc_MPI_Scan (&local_bytes, &prefix_bytes, 1, sc_MPI_UNSIGNED_LONG_LONG, sc_MPI_SUM, domain->mpicomm);
+    SC_CHECK_MPI (mpiret_allreduce);
+    mpiret_allreduce = sc_MPI_Allreduce (&local_bytes, &global_bytes, 1, sc_MPI_UNSIGNED_LONG_LONG, sc_MPI_SUM, domain->mpicomm);
+    SC_CHECK_MPI (mpiret_allreduce);
+#else
+    prefix_bytes = local_bytes;
+    global_bytes = local_bytes;
+#endif
+
+    unsigned long long bytes_before = prefix_bytes - local_bytes;
+
+    s->buf = NULL;
+    s->buf_capacity = 0;
+
     /* The buffer array will be resized when required. */
-    sc_array_init_size (&buffer, 1, psize_field);
+    sc_array_init_size (&buffer, 1, 0);
     s->sink = sc_io_sink_new (SC_IO_TYPE_BUFFER, SC_IO_MODE_APPEND,
                               SC_IO_ENCODE_NONE, &buffer);
     FCLAW_ASSERT (s->num_buffered_patches == 0);
@@ -460,7 +569,7 @@ fclaw2d_vtk_write_field (fclaw_global_t * glob, fclaw2d_vtk_state_t * s,
     if (domain->mpirank > 0)
     {
         /* account for byte count */
-        mpipos += s->ndsize + psize_field * domain->global_num_patches_before;
+        mpipos += s->ndsize + bytes_before;
     }
     mpiret = MPI_File_seek (s->mpifile, mpipos, MPI_SEEK_SET);
     SC_CHECK_MPI (mpiret);
@@ -468,7 +577,7 @@ fclaw2d_vtk_write_field (fclaw_global_t * glob, fclaw2d_vtk_state_t * s,
     if (domain->mpirank == 0)
     {
         /* write byte count */
-        bcount = psize_field * domain->global_num_patches;
+        bcount = (int64_t) global_bytes;
 #if 0
         P4EST_LDEBUGF ("offset %lld psize %lld bcount %d %o %x\n",
                        (long long) offset_field, (long long) psize_field,
@@ -534,7 +643,12 @@ fclaw2d_vtk_write_field (fclaw_global_t * glob, fclaw2d_vtk_state_t * s,
     /* free buffers */
     sc_array_reset (&buffer);
     sc_io_sink_destroy (s->sink);
-    P4EST_FREE (s->buf);
+    if (s->buf != NULL)
+    {
+        P4EST_FREE (s->buf);
+        s->buf = NULL;
+    }
+    s->buf_capacity = 0;
     s->num_buffered_patches = 0;
 
 #ifdef P4EST_ENABLE_MPIIO
@@ -543,11 +657,11 @@ fclaw2d_vtk_write_field (fclaw_global_t * glob, fclaw2d_vtk_state_t * s,
     SC_CHECK_MPI (mpiret);
     FCLAW_ASSERT (mpinew - mpipos ==
                   (domain->mpirank == 0 ? s->ndsize : 0) +
-                  domain->local_num_patches * psize_field);
+                  local_bytes);
     FCLAW_ASSERT (domain->mpirank < domain->mpisize - 1 ||
                   mpinew - s->mpibegin ==
                   offset_field + s->ndsize +
-                  psize_field * domain->global_num_patches);
+                  global_bytes);
 #endif
 #endif
 }
@@ -682,17 +796,17 @@ fclaw_vtk_write_file (int dim, fclaw_global_t * glob, const char *basename,
     s->meqn = meqn;
     s->rhs_fields = rhs_fields;
     s->num_aux_fields = num_aux_fields;
-    s->points_per_patch = (mx + 1) * (my + 1);
-    s->cells_per_patch = mx * my;
-    if(dim == 3)
-    {
-        s->points_per_patch *= (mz + 1);
-        s->cells_per_patch *= mz;
-    }
+    s->points_per_patch = 0; /* not used */
+    s->cells_per_patch = 0;  /* not used */
     snprintf (s->filename, BUFSIZ, "%s.vtu", basename);
-    s->global_num_points = s->points_per_patch * domain->global_num_patches;
-    s->global_num_cells = s->cells_per_patch * domain->global_num_patches;
-    s->global_num_connectivity = s->patch_children * (s->global_num_cells + 1);
+
+    s->vtk_vt = fclaw_clawpatch_vtk_vtable(glob);
+
+    s->fits32 = 1;
+    s->global_num_points = get_global_num_elements (glob, s, &s->vtk_vt->position_entry);
+    s->global_num_cells = get_global_num_elements (glob, s, &s->vtk_vt->types_entry);
+    s->global_num_connectivity = get_global_num_elements (glob, s, &s->vtk_vt->connectivity_entry);
+
     s->global_num_patches = domain->global_num_patches;
     s->fits32 = s->global_num_points <= INT32_MAX
         && s->global_num_connectivity <= INT32_MAX;
@@ -707,82 +821,101 @@ fclaw_vtk_write_file (int dim, fclaw_global_t * glob, const char *basename,
     s->soln_cb = soln_cb;
     s->error_cb = error_cb;
 
-    s->vtk_vt = fclaw_clawpatch_vtk_vtable(glob);
-
     /* compute offsets in bytes after beginning of appended data section */
     int64_t curr_offset = 0;
 
     int num_field_entries = s->vtk_vt->field_entries->elem_count;
     s->field_offsets = FCLAW_ALLOC (int64_t, num_field_entries);
+    s->field_num_elements = FCLAW_ALLOC (int64_t, num_field_entries);
 
     sc_link_t* curr_entry = s->vtk_vt->field_entries->first;
     int64_t* curr_entry_offset = s->field_offsets;
+    int i = 0;
     while (curr_entry != NULL)
     {
         fclaw_clawpatch_vtk_vtable_entry_t* entry =
             (fclaw_clawpatch_vtk_vtable_entry_t*) curr_entry->data;
         *curr_entry_offset = curr_offset;
-        size_t psize = entry->elements_per_patch * entry->number_of_components * sizeof_vtk_type(s, entry->type);
-        curr_offset += s->ndsize + psize * s->global_num_patches;
+        int64_t global_num_elements = get_global_num_elements (glob, s, entry);
+        s->field_num_elements[i] = global_num_elements;
+        int64_t total_bytes = global_num_elements * entry->number_of_components * sizeof_vtk_type(s, entry->type);
+        curr_offset += s->ndsize + total_bytes;
         curr_entry_offset++;
         curr_entry = curr_entry->next;
+        i++;
     }
 
 
     int num_point_entries = 1;
     s->point_offsets = FCLAW_ALLOC (int64_t, num_point_entries);
+    s->point_num_elements = FCLAW_ALLOC (int64_t, num_point_entries);
 
     curr_entry_offset = s->point_offsets;
 
     fclaw_clawpatch_vtk_vtable_entry_t* entry = &s->vtk_vt->position_entry;
     *curr_entry_offset = curr_offset;
-    size_t psize = entry->elements_per_patch * entry->number_of_components * sizeof_vtk_type(s, entry->type);
-    curr_offset += s->ndsize + psize * s->global_num_patches;
+    int64_t global_num_elements = get_global_num_elements (glob, s, entry);
+    s->point_num_elements[0] = global_num_elements;
+    int64_t total_bytes = global_num_elements * entry->number_of_components * sizeof_vtk_type(s, entry->type);
+    curr_offset += s->ndsize + total_bytes;
     curr_entry_offset++;
 
     int num_cell_entries = 3;
     s->cell_offsets = FCLAW_ALLOC (int64_t, num_cell_entries);
+    s->cell_num_elements = FCLAW_ALLOC (int64_t, num_cell_entries);
 
     curr_entry_offset = s->cell_offsets;
 
     entry = &s->vtk_vt->connectivity_entry;
     *curr_entry_offset = curr_offset;
-    psize = entry->elements_per_patch * entry->number_of_components * sizeof_vtk_type(s, entry->type);
-    curr_offset += s->ndsize + psize * s->global_num_patches;
+    global_num_elements = get_global_num_elements (glob, s, entry);
+    s->cell_num_elements[0] = global_num_elements;
+    total_bytes = global_num_elements * entry->number_of_components * sizeof_vtk_type(s, entry->type);
+    curr_offset += s->ndsize + total_bytes;
     curr_entry_offset++;
 
     entry = &s->vtk_vt->offsets_entry;
     *curr_entry_offset = curr_offset;
-    psize = entry->elements_per_patch * entry->number_of_components * sizeof_vtk_type(s, entry->type);
-    curr_offset += s->ndsize + psize * s->global_num_patches;
+    global_num_elements = get_global_num_elements (glob, s, entry);
+    s->cell_num_elements[1] = global_num_elements;
+    total_bytes = global_num_elements * entry->number_of_components * sizeof_vtk_type(s, entry->type);
+    curr_offset += s->ndsize + total_bytes;
     curr_entry_offset++;
 
     entry = &s->vtk_vt->types_entry;
     *curr_entry_offset = curr_offset;
-    psize = entry->elements_per_patch * entry->number_of_components * sizeof_vtk_type(s, entry->type);
-    curr_offset += s->ndsize + psize * s->global_num_patches;
+    global_num_elements = get_global_num_elements (glob, s, entry);
+    s->cell_num_elements[2] = global_num_elements;
+    total_bytes = global_num_elements * entry->number_of_components * sizeof_vtk_type(s, entry->type);
+    curr_offset += s->ndsize + total_bytes;
     curr_entry_offset++;
 
 
     int num_celldata_entries = s->vtk_vt->celldata_entries->elem_count;
     s->celldata_offsets = FCLAW_ALLOC (int64_t, num_celldata_entries);
+    s->celldata_num_elements = FCLAW_ALLOC (int64_t, num_celldata_entries);
 
     curr_entry = s->vtk_vt->celldata_entries->first;
     curr_entry_offset = s->celldata_offsets;
+    i = 0;
     while (curr_entry != NULL)    
     {
         fclaw_clawpatch_vtk_vtable_entry_t* entry =
             (fclaw_clawpatch_vtk_vtable_entry_t*) curr_entry->data;
         *curr_entry_offset = curr_offset;
-        size_t psize = entry->elements_per_patch * entry->number_of_components * sizeof_vtk_type(s, entry->type);
-        curr_offset += s->ndsize + psize * s->global_num_patches;
+        global_num_elements = get_global_num_elements (glob, s, entry);
+        s->celldata_num_elements[i] = global_num_elements;
+        total_bytes = global_num_elements * entry->number_of_components * sizeof_vtk_type(s, entry->type);
+        curr_offset += s->ndsize + total_bytes;
         curr_entry_offset++;
         curr_entry = curr_entry->next;
+        i++;
     }
 
     s->offset_end = curr_offset;
 
     s->buf = NULL;
+    s->buf_capacity = 0;
     s->sink = NULL;
     /* See the documentation of fclaw2d_vtk_state_t for further information. */
     s->patch_threshold = patch_threshold;
@@ -792,7 +925,7 @@ fclaw_vtk_write_file (int dim, fclaw_global_t * glob, const char *basename,
     retval = 0;
     if (domain->mpirank == 0)
     {
-        retval = fclaw2d_vtk_write_header (glob->domain, s);
+        retval = fclaw2d_vtk_write_header (domain, s);
     }
     mpiret = sc_MPI_Allreduce (&retval, &gretval, 1, sc_MPI_INT, sc_MPI_MIN,
                                domain->mpicomm);
@@ -812,11 +945,15 @@ fclaw_vtk_write_file (int dim, fclaw_global_t * glob, const char *basename,
         retval = fclaw2d_vtk_write_footer (domain, s);
     }
 
-    // free offset arrays
+    // free offset and count arrays
     FCLAW_FREE (s->field_offsets);
     FCLAW_FREE (s->point_offsets);
     FCLAW_FREE (s->cell_offsets);
     FCLAW_FREE (s->celldata_offsets);
+    FCLAW_FREE (s->field_num_elements);
+    FCLAW_FREE (s->point_num_elements);
+    FCLAW_FREE (s->cell_num_elements);
+    FCLAW_FREE (s->celldata_num_elements);
 
     mpiret = sc_MPI_Allreduce (&retval, &gretval, 1, sc_MPI_INT, sc_MPI_MIN,
                                domain->mpicomm);
