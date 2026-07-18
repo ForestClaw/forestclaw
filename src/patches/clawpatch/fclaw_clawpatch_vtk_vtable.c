@@ -215,20 +215,36 @@ write_2d_coordinate_cb (fclaw_global_t * glob, fclaw_patch_t * patch,
                                 &xlower,&ylower,&dx,&dy);
 
     const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
+    const fclaw_clawpatch_options_t *clawpatch_opt = fclaw_clawpatch_get_options(glob);
     fclaw_map_context_t* cont = fclaw_map_get(glob);
 
     /* Enumerate point coordinates in the patch */
     double *d = (double *) buffer;
-    int i, j;
-    double xpp,ypp,zpp;
-    for (j = 0; j <= my; ++j)
+    int jstart,jend,istart,iend;
+    if(clawpatch_opt->vtk_ghost_out)
+    {
+        jstart = -mbc;
+        jend = my + mbc;
+        istart = -mbc;
+        iend = mx + mbc;
+    }
+    else
+    {
+        jstart = 0;
+        jend = my;
+        istart = 0;
+        iend = mx;
+    }
+
+    for (int j = jstart; j <= jend; ++j)
     {
         const double y = ylower + j * dy;
-        for (i = 0; i <= mx; ++i)
+        for (int i = istart; i <= iend; ++i)
         {
             const double x = xlower + i * dx;
             if (fclaw_opt->manifold)
             {
+                double xpp,ypp,zpp;
                 FCLAW_MAP_2D_C2M(&cont,&blockno,&x,&y,&xpp,&ypp,&zpp);
                 *d++ = xpp;
                 *d++ = ypp;
@@ -255,22 +271,42 @@ write_coordinate_3d_cb (fclaw_global_t * glob, fclaw_patch_t * patch,
                                 &xlower,&ylower,&zlower, &dx,&dy, &dz);
 
     const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
+    const fclaw_clawpatch_options_t *clawpatch_opt = fclaw_clawpatch_get_options(glob);
     fclaw_map_context_t* cont = fclaw_map_get(glob);
     /* Enumerate point coordinates in the patch */
     double *d = (double *) buffer;
-    int i, j, k;
-    double xpp,ypp,zpp;
-    for (k = 0; k <= mz; ++k)
+
+    int kstart,kend,jstart,jend,istart,iend;
+    if(clawpatch_opt->vtk_ghost_out)
+    {
+        kstart = -mbc;
+        kend = mz + mbc;
+        jstart = -mbc;
+        jend = my + mbc;
+        istart = -mbc;
+        iend = mx + mbc;
+    }
+    else
+    {
+        kstart = 0;
+        kend = mz;
+        jstart = 0;
+        jend = my;
+        istart = 0;
+        iend = mx;
+    }
+    for (int k = kstart; k <= kend; ++k)
     {
         const double z = zlower + k * dz;
-        for (j = 0; j <= my; ++j)
+        for (int j = jstart; j <= jend; ++j)
         {
             const double y = ylower + j * dy;
-            for (i = 0; i <= mx; ++i)
+            for (int i = istart; i <= iend; ++i)
             {
                 const double x = xlower + i * dx;
                 if (fclaw_opt->manifold)
                 {
+                    double xpp,ypp,zpp;
                     FCLAW_MAP_3D_C2M(&cont,&blockno,&x,&y,&z,&xpp,&ypp,&zpp);
                     *d++ = xpp;
                     *d++ = ypp;
@@ -312,28 +348,53 @@ write_2d_connectivity_cb (fclaw_global_t* glob, fclaw_patch_t* patch,
     int mx,my,mbc;
     double xlower,ylower,dx,dy;
 
+    const fclaw_clawpatch_options_t *clawpatch_opt = fclaw_clawpatch_get_options(glob);
+
     fclaw_clawpatch_2d_grid_data(glob,patch,&mx,&my,&mbc,
                                  &xlower,&ylower,&dx,&dy);
 
 
-    const int64_t pbefore = (mx + 1) * (my + 1) *
-        (glob->domain->global_num_patches_before +
-         glob->domain->blocks[blockno].num_patches_before + patchno);
+    int64_t pbefore;
+    if(clawpatch_opt->vtk_ghost_out)
+    {
+        pbefore = (mx + 1 + 2*mbc) * (my + 1 + 2*mbc) *
+            (glob->domain->global_num_patches_before +
+             glob->domain->blocks[blockno].num_patches_before + patchno);
+    }
+    else
+    {
+        pbefore = (mx + 1) * (my + 1) *
+            (glob->domain->global_num_patches_before +
+             glob->domain->blocks[blockno].num_patches_before + patchno);
+    }
 
+    int iend,jend, ystride;
+    if(clawpatch_opt->vtk_ghost_out)
+    {
+        iend = mx + 2*mbc;
+        jend = my + 2*mbc;
+        ystride = mx + 1 + 2*mbc;
+    }
+    else
+    {
+        iend = mx;
+        jend = my;
+        ystride = mx + 1;
+    }
     if (ctx->fits32)
     {
         int32_t *idata = (int32_t *) buffer;
         int32_t l;
 
-        for (int j = 0; j < my; ++j)
+        for (int j = 0; j < jend; ++j)
         {
-            for (int i = 0; i < mx; ++i)
+            for (int i = 0; i < iend; ++i)
             {
-                l = (int32_t) pbefore + i + j * (mx + 1);
+                l = (int32_t) pbefore + i + j * ystride;
                 *idata++ = l;
                 *idata++ = l + 1;
-                *idata++ = l + (mx + 2);
-                *idata++ = l + (mx + 1);
+                *idata++ = l + ystride + 1;
+                *idata++ = l + ystride;
             }
         }
     }
@@ -341,15 +402,15 @@ write_2d_connectivity_cb (fclaw_global_t* glob, fclaw_patch_t* patch,
     {
         int64_t *idata = (int64_t *) buffer;
         int64_t l;
-        for (int j = 0; j < my; ++j)
+        for (int j = 0; j < jend; ++j)
         {
-            for (int i = 0; i < mx; ++i)
+            for (int i = 0; i < iend; ++i)
             {
-                l = pbefore + i + j * (mx + 1);
+                l = pbefore + i + j * ystride;
                 *idata++ = l;
                 *idata++ = l + 1;
-                *idata++ = l + (mx + 2);
-                *idata++ = l + (mx + 1);
+                *idata++ = l + ystride + 1;
+                *idata++ = l + ystride;
             }
         }
     }
@@ -363,35 +424,65 @@ write_3d_connectivity_cb (fclaw_global_t* glob, fclaw_patch_t* patch,
     int mx, my, mz, mbc;
     double xlower, ylower, zlower, dx, dy, dz;
 
+    const fclaw_clawpatch_options_t *clawpatch_opt = fclaw_clawpatch_get_options(glob);
+
     fclaw_clawpatch_3d_grid_data (glob, patch, &mx, &my, &mz, &mbc,
                                   &xlower, &ylower, &zlower,
                                   &dx, &dy, &dz);
 
-    const int64_t pbefore = (mx + 1) * (my + 1) * (mz + 1) *
-        (glob->domain->global_num_patches_before +
-         glob->domain->blocks[blockno].num_patches_before + patchno);
+    int64_t pbefore;
+    if(clawpatch_opt->vtk_ghost_out)
+    {
+        pbefore = (mx + 1 + 2*mbc) * (my + 1 + 2*mbc) * (mz + 1 + 2*mbc) *
+            (glob->domain->global_num_patches_before +
+             glob->domain->blocks[blockno].num_patches_before + patchno);
+    }
+    else
+    {
+        pbefore = (mx + 1) * (my + 1) * (mz + 1) *
+            (glob->domain->global_num_patches_before +
+             glob->domain->blocks[blockno].num_patches_before + patchno);
+    }
+
+    int iend, jend, kend, ystride, zstride;
+    if(clawpatch_opt->vtk_ghost_out)
+    {
+        iend = mx + 2*mbc;
+        jend = my + 2*mbc;
+        kend = mz + 2*mbc;
+        ystride = mx + 1 + 2*mbc;
+        zstride = (mx + 1 + 2*mbc) * (my + 1 + 2*mbc);
+    }
+    else
+    {
+        iend = mx;
+        jend = my;
+        kend = mz;
+        ystride = mx + 1;
+        zstride = (mx + 1) * (my + 1);
+    }
 
     if (ctx->fits32)
     {
         int32_t *idata = (int32_t *) buffer;
         int32_t l;
 
-        for (int k = 0; k < mz; ++k)
+        for (int k = 0; k < kend; ++k)
         {
-            for (int j = 0; j < my; ++j)
+            for (int j = 0; j < jend; ++j)
             {
-                for (int i = 0; i < mx; ++i)
+                for (int i = 0; i < iend; ++i)
                 {
-                    l = (int32_t) pbefore + i + j * (mx + 1)
-                         + k * (my + 1) * (mx + 1);
+                    l = (int32_t) pbefore + i + j * ystride
+                         + k * zstride;
                     *idata++ = l;
                     *idata++ = l + 1;
-                    *idata++ = l + (mx + 2);
-                    *idata++ = l + (mx + 1);
-                    *idata++ = l + (mx + 1) * (my + 1);
-                    *idata++ = l + (mx + 1) * (my + 1) + 1;
-                    *idata++ = l + (mx + 1) * (my + 1) + (mx + 2);
-                    *idata++ = l + (mx + 1) * (my + 1) + (mx + 1);
+                    *idata++ = l + ystride + 1;
+                    *idata++ = l + ystride;
+                    *idata++ = l + zstride;
+                    *idata++ = l + zstride + 1;
+                    *idata++ = l + zstride + ystride + 1;
+                    *idata++ = l + zstride + ystride;
                 }
             }
         }
@@ -401,22 +492,22 @@ write_3d_connectivity_cb (fclaw_global_t* glob, fclaw_patch_t* patch,
         int64_t *idata = (int64_t *) buffer;
         int64_t l;
 
-        for (int k = 0; k < mz; ++k)
+        for (int k = 0; k < kend; ++k)
         {
-            for (int j = 0; j < my; ++j)
+            for (int j = 0; j < jend; ++j)
             {
-                for (int i = 0; i < mx; ++i)
+                for (int i = 0; i < iend; ++i)
                 {
-                    l = pbefore + i + j * (mx + 1)
-                         + k * (my + 1) * (mx + 1);
+                    l = pbefore + i + j * ystride
+                         + k * zstride;
                     *idata++ = l;
                     *idata++ = l + 1;
-                    *idata++ = l + (mx + 2);
-                    *idata++ = l + (mx + 1);
-                    *idata++ = l + (mx + 1) * (my + 1);
-                    *idata++ = l + (mx + 1) * (my + 1) + 1;
-                    *idata++ = l + (mx + 1) * (my + 1) + (mx + 2);
-                    *idata++ = l + (mx + 1) * (my + 1) + (mx + 1);
+                    *idata++ = l + ystride + 1;
+                    *idata++ = l + ystride;
+                    *idata++ = l + zstride;
+                    *idata++ = l + zstride + 1;
+                    *idata++ = l + zstride + ystride + 1;
+                    *idata++ = l + zstride + ystride;
                 }
             }
         }
@@ -441,20 +532,42 @@ write_connectivity_cb (fclaw_global_t* glob, fclaw_patch_t* patch,
 static int
 get_cells_per_patch(fclaw_global_t *glob, fclaw_patch_t *patch)
 {
+    const fclaw_clawpatch_options_t *clawpatch_opt = fclaw_clawpatch_get_options(glob);
+
     int mx, my, mz, mbc;
     double xlower, ylower, zlower, dx, dy, dz;
 
+    int num_cells = 0;
     if (fclaw_clawpatch_dim(patch) == 2)
     {
         fclaw_clawpatch_2d_grid_data(glob, patch, &mx, &my, &mbc,
                                      &xlower, &ylower, &dx, &dy);
-        return mx * my;
+
+        if(clawpatch_opt->vtk_ghost_out)
+        {
+            num_cells = (mx + 2*mbc) * (my + 2*mbc);
+        }
+        else
+        {
+            num_cells = mx * my;
+        }
+    }
+    else
+    {
+        fclaw_clawpatch_3d_grid_data(glob, patch, &mx, &my, &mz, &mbc,
+                                     &xlower, &ylower, &zlower,
+                                     &dx, &dy, &dz);
+        if(clawpatch_opt->vtk_ghost_out)
+        {
+            num_cells = (mx + 2*mbc) * (my + 2*mbc) * (mz + 2*mbc);
+        }
+        else
+        {
+            num_cells = mx * my * mz;
+        }
     }
 
-    fclaw_clawpatch_3d_grid_data(glob, patch, &mx, &my, &mz, &mbc,
-                                 &xlower, &ylower, &zlower,
-                                 &dx, &dy, &dz);
-    return mx * my * mz;
+    return num_cells;
 }
 
 static void
@@ -580,6 +693,7 @@ pack_data (fclaw_global_t * glob,
            patch_data_access_t access,
            char *a)
 {
+    const fclaw_clawpatch_options_t *clawpatch_opt = fclaw_clawpatch_get_options(glob);
 
     int meqn;
     double *q;
@@ -599,12 +713,26 @@ pack_data (fclaw_global_t * glob,
 
         // Enumerate equation data in the patch
         float *f = (float *) a;
-        int i, j, k;
-        for (j = 0; j < my; ++j)
+        int istart,iend,jstart,jend;
+        if(clawpatch_opt->vtk_ghost_out)
         {
-            for (i = 0; i < mx; ++i)
+            jstart = -mbc;
+            jend = my + mbc;
+            istart = -mbc;
+            iend = mx + mbc;
+        }
+        else
+        {
+            jstart = 0;
+            jend = my;
+            istart = 0;
+            iend = mx;
+        }
+        for (int j = jstart; j < jend; ++j)
+        {
+            for (int i = istart; i < iend; ++i)
             {
-                for (k = 0; k < meqn; ++k)
+                for (int k = 0; k < meqn; ++k)
                 {
                     /* For Clawpack 5.0 layout */
                     //*f++ = (float) q[((j+mbc)*xlane + (i+mbc))*meqn + k];
@@ -629,14 +757,32 @@ pack_data (fclaw_global_t * glob,
 
         // Enumerate equation data in the patch
         float *f = (float *) a;
-        int i, j, k, eqn;
-        for (k = 0; k < mz; ++k)
+        int istart,iend,jstart,jend,kstart,kend;
+        if(clawpatch_opt->vtk_ghost_out)
         {
-            for (j = 0; j < my; ++j)
+            kstart = -mbc;
+            kend = mz + mbc;
+            jstart = -mbc;
+            jend = my + mbc;
+            istart = -mbc;
+            iend = mx + mbc;
+        }
+        else
+        {
+            kstart = 0;
+            kend = mz;
+            jstart = 0;
+            jend = my;
+            istart = 0; 
+            iend = mx;
+        }
+        for (int k = kstart; k < kend; ++k)
+        {
+            for (int j = jstart; j < jend; ++j)
             {
-                for (i = 0; i < mx; ++i)
+                for (int i = istart; i < iend; ++i)
                 {
-                    for (eqn = 0; eqn < meqn; ++eqn)
+                    for (int eqn = 0; eqn < meqn; ++eqn)
                     {
                         /* For Clawpack 5.0 layout */
                         //*f++ = (float) q[((j+mbc)*xlane + (i+mbc))*meqn + k];
@@ -682,12 +828,26 @@ write_aux_cb (fclaw_global_t * glob, fclaw_patch_t * patch,
 
         // Enumerate equation data in the patch
         float *f = (float *) buffer;
-        int i, j, k;
-        for (j = 0; j < my; ++j)
+        int istart,iend,jstart,jend;
+        if(clawpatch_opt->vtk_ghost_out)
         {
-            for (i = 0; i < mx; ++i)
+            jstart = -mbc;
+            jend = my + mbc;
+            istart = -mbc;
+            iend = mx + mbc;
+        }
+        else
+        {
+            jstart = 0;
+            jend = my;
+            istart = 0;
+            iend = mx;
+        }
+        for (int j = jstart; j < jend; ++j)
+        {
+            for (int i = istart; i < iend; ++i)
             {
-                for (k = 0; k < maux; ++k)
+                for (int k = 0; k < maux; ++k)
                 {
                     if(clawpatch_opt->vtk_aux_out[k] > 0)
                     {
@@ -716,14 +876,32 @@ write_aux_cb (fclaw_global_t * glob, fclaw_patch_t * patch,
 
         // Enumerate equation data in the patch
         float *f = (float *) buffer;
-        int i, j, k, eqn;
-        for (k = 0; k < mz; ++k)
+        int istart,iend,jstart,jend,kstart,kend;
+        if(clawpatch_opt->vtk_ghost_out)
         {
-            for (j = 0; j < my; ++j)
+            kstart = -mbc;
+            kend = mz + mbc;
+            jstart = -mbc;
+            jend = my + mbc;
+            istart = -mbc;
+            iend = mx + mbc;
+        }
+        else
+        {
+            kstart = 0;
+            kend = mz;
+            jstart = 0;
+            jend = my;
+            istart = 0;
+            iend = mx;
+        }
+        for (int k = kstart; k < kend; ++k)
+        {
+            for (int j = jstart; j < jend; ++j)
             {
-                for (i = 0; i < mx; ++i)
+                for (int i = istart; i < iend; ++i)
                 {
-                    for (eqn = 0; eqn < maux; ++eqn)
+                    for (int eqn = 0; eqn < maux; ++eqn)
                     {
                         if(clawpatch_opt->vtk_aux_out[eqn])
                         {
@@ -766,6 +944,65 @@ write_error_cb (fclaw_global_t * glob, fclaw_patch_t * patch,
     pack_data(glob, patch, blockno, patchno, &fclaw_clawpatch_elliptic_error_data, buffer);
 }
 
+static void
+write_ghost_cb (fclaw_global_t * glob, fclaw_patch_t * patch,
+                int blockno, int patchno,
+                fclaw_vtk_cb_context_t* ctx, char* buffer)
+{
+    int patch_dim = fclaw_clawpatch_dim(patch);
+    if(patch_dim == 2)
+    {
+        int mx,my,mbc;
+        double xlower,ylower,dx,dy;
+
+        fclaw_clawpatch_2d_grid_data(glob,patch,&mx,&my,&mbc,
+                                    &xlower,&ylower,&dx,&dy);
+
+        // Enumerate equation data in the patch
+        for (int j = -mbc; j < my + mbc; ++j)
+        {
+            for (int i = -mbc; i < mx + mbc; ++i)
+            {
+                if(i < 0 || i >= mx || j < 0 || j >= my)
+                {
+                    *buffer ++ = 1;
+                }
+                else
+                {
+                    *buffer ++ = 0;
+                }
+            }
+        }
+
+    }
+    else
+    {
+        int mx,my,mz,mbc;
+        double xlower,ylower,zlower,dx,dy,dz;
+        fclaw_clawpatch_3d_grid_data(glob,patch,&mx,&my,&mz, &mbc,
+                                   &xlower,&ylower,&zlower, &dx,&dy, &dz);
+
+        // Enumerate equation data in the patch
+        for(int k = -mbc; k < mz + mbc; ++k)
+        {
+            for (int j = -mbc; j < my + mbc; ++j)
+            {
+                for (int i = -mbc; i < mx + mbc; ++i)
+                {
+                    if(i < 0 || i >= mx || j < 0 || j >= my || k < 0 || k >= mz)
+                    {
+                        *buffer ++ = 1;
+                    }
+                    else
+                    {
+                        *buffer ++ = 0;
+                    }
+                }
+            }
+        }
+    }
+}
+
 // size callbacks
 
 static size_t
@@ -781,41 +1018,77 @@ points_in_patch (fclaw_global_t* glob, fclaw_patch_t* patch,
                  int blockno, int patchno,
                  fclaw_vtk_cb_context_t* ctx)
 {
+    const fclaw_clawpatch_options_t *clawpatch_opt = fclaw_clawpatch_get_options(glob);
     int mx, my, mz, mbc;
     double xlower, ylower, zlower, dx, dy, dz;
+    size_t num_points = 0;
     if (fclaw_clawpatch_dim(patch) == 2)
     {
         fclaw_clawpatch_2d_grid_data(glob, patch, &mx, &my, &mbc, 
                                      &xlower, &ylower, &dx, &dy);
-        return (size_t) (mx + 1) * (my + 1);
+        if(clawpatch_opt->vtk_ghost_out)
+        {
+            num_points = (size_t) (mx + 1 + 2*mbc) * (my + 1 + 2*mbc);
+        }
+        else
+        {
+            num_points = (size_t) (mx + 1) * (my + 1);
+        }
     }
     else
     {
         fclaw_clawpatch_3d_grid_data(glob, patch, &mx, &my, &mz, &mbc, 
                                      &xlower, &ylower, &zlower, &dx, &dy, &dz);
-        return (size_t) (mx + 1) * (my + 1) * (mz + 1);
+        if(clawpatch_opt->vtk_ghost_out)
+        {
+            num_points = (size_t) (mx + 1 + 2*mbc) * (my + 1 + 2*mbc) * (mz + 1 + 2*mbc);
+        }
+        else
+        {
+            num_points = (size_t) (mx + 1) * (my + 1) * (mz + 1);
+        }
     }
-}   
+    return num_points;
+}
 
 static size_t
 cells_in_patch (fclaw_global_t* glob, fclaw_patch_t* patch, 
                 int blockno, int patchno,
                 fclaw_vtk_cb_context_t* ctx)
 {
+    const fclaw_clawpatch_options_t *clawpatch_opt = fclaw_clawpatch_get_options(glob);
+
     int mx, my, mz, mbc;
     double xlower, ylower, zlower, dx, dy, dz;
+
+    int num_cells = 0;
     if (fclaw_clawpatch_dim(patch) == 2)
     {
         fclaw_clawpatch_2d_grid_data(glob, patch, &mx, &my, &mbc, 
                                      &xlower, &ylower, &dx, &dy);
-        return (size_t) mx * my;
+        if(clawpatch_opt->vtk_ghost_out)
+        {
+            num_cells = (size_t) (mx + 2*mbc) * (my + 2*mbc);
+        }
+        else
+        {
+            num_cells = (size_t) mx * my;
+        }
     }
     else
     {
         fclaw_clawpatch_3d_grid_data(glob, patch, &mx, &my, &mz, &mbc, 
                                      &xlower, &ylower, &zlower, &dx, &dy, &dz);
-        return (size_t) mx * my * mz;
+        if(clawpatch_opt->vtk_ghost_out)
+        {
+            num_cells = (size_t) (mx + 2*mbc) * (my + 2*mbc) * (mz + 2*mbc);
+        }
+        else
+        {
+            num_cells = (size_t) mx * my * mz;
+        }
     }
+    return num_cells;
 }
 
 static size_t
@@ -970,6 +1243,13 @@ void fclaw_clawpatch_vtk_vtable_initialize(struct fclaw_global* glob)
                                &write_error_cb);
     }
 
+    if(clawpatch_opt->vtk_ghost_out)
+    {
+        vtk_add_celldata_entry(vtk_vt, "vtkGhostType", FCLAW_VTK_UINT8,
+                               1, num_cells_per_patch, 
+                               &cells_in_patch,
+                               &write_ghost_cb);
+    }
 
 	fclaw_global_vtable_store((fclaw_global_t*) glob,
 							  "fclaw_clawpatch_vtk_vtable",
