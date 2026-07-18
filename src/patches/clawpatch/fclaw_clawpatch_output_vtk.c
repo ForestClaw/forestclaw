@@ -484,7 +484,6 @@ fclaw2d_vtk_write_field (fclaw_global_t * glob, fclaw2d_vtk_state_t * s,
     write_field_iter_user_t iter;
     iter.s = s;
     iter.ctx.fits32 = s->fits32;
-    iter.ctx.cells_per_patch = s->cells_per_patch;
     iter.entry = entry;
     fclaw_global_iterate_patches (glob, write_entry_cb, &iter);
 

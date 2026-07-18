@@ -438,6 +438,25 @@ write_connectivity_cb (fclaw_global_t* glob, fclaw_patch_t* patch,
     }
 }
 
+static int
+get_cells_per_patch(fclaw_global_t *glob, fclaw_patch_t *patch)
+{
+    int mx, my, mz, mbc;
+    double xlower, ylower, zlower, dx, dy, dz;
+
+    if (fclaw_clawpatch_dim(patch) == 2)
+    {
+        fclaw_clawpatch_2d_grid_data(glob, patch, &mx, &my, &mbc,
+                                     &xlower, &ylower, &dx, &dy);
+        return mx * my;
+    }
+
+    fclaw_clawpatch_3d_grid_data(glob, patch, &mx, &my, &mz, &mbc,
+                                 &xlower, &ylower, &zlower,
+                                 &dx, &dy, &dz);
+    return mx * my * mz;
+}
+
 static void
 write_offsets_cb (fclaw_global_t* glob, fclaw_patch_t* patch,
                   int blockno, int patchno,
@@ -453,7 +472,8 @@ write_offsets_cb (fclaw_global_t* glob, fclaw_patch_t* patch,
         num_points_per_cell = 8;
     }
 
-    const int64_t cbefore = ctx->cells_per_patch *
+    const int cells_per_patch = get_cells_per_patch(glob, patch);
+    const int64_t cbefore = cells_per_patch *
         (glob->domain->global_num_patches_before +
          glob->domain->blocks[blockno].num_patches_before + patchno);
 
@@ -461,7 +481,7 @@ write_offsets_cb (fclaw_global_t* glob, fclaw_patch_t* patch,
     {
         int32_t *idata = (int32_t *) buffer;
         int32_t k = num_points_per_cell * (int32_t) (cbefore + 1);
-        for (int c = 0; c < ctx->cells_per_patch; k += num_points_per_cell, ++c)
+        for (int c = 0; c < cells_per_patch; k += num_points_per_cell, ++c)
         {
             *idata++ = k;
         }
@@ -470,7 +490,7 @@ write_offsets_cb (fclaw_global_t* glob, fclaw_patch_t* patch,
     {
         int64_t *idata = (int64_t *) buffer;
         int64_t k = num_points_per_cell * (cbefore + 1);
-        for (int c = 0; c < ctx->cells_per_patch; k += num_points_per_cell, ++c)
+        for (int c = 0; c < cells_per_patch; k += num_points_per_cell, ++c)
         {
             *idata++ = k;
         }
@@ -483,16 +503,17 @@ write_types_cb (fclaw_global_t* glob, fclaw_patch_t* patch,
                 fclaw_vtk_cb_context_t* ctx, char* buffer)
 {
     char *cdata = buffer;
+    const int cells_per_patch = get_cells_per_patch(glob, patch);
     if(fclaw_clawpatch_dim(patch) == 2)
     {
-        for (int c = 0; c < ctx->cells_per_patch; ++c)
+        for (int c = 0; c < cells_per_patch; ++c)
         {
             *cdata++ = 9;
         }
     }
     else 
     {
-        for (int c = 0; c < ctx->cells_per_patch; ++c)
+        for (int c = 0; c < cells_per_patch; ++c)
         {
             *cdata++ = 12;
         }
@@ -508,7 +529,8 @@ write_mpirank_cb (fclaw_global_t* glob,
                   fclaw_vtk_cb_context_t* ctx, char* buffer)
 {
     int *idata = (int *) buffer;
-    for (int c = 0; c < ctx->cells_per_patch; ++c)
+    const int cells_per_patch = get_cells_per_patch(glob, patch);
+    for (int c = 0; c < cells_per_patch; ++c)
     {
         *idata++ = glob->mpirank;
     }
@@ -520,7 +542,8 @@ write_blockno_cb (fclaw_global_t* glob, fclaw_patch_t* patch,
                   fclaw_vtk_cb_context_t* ctx, char* buffer)
 {
     int *idata = (int *) buffer;
-    for (int c = 0; c < ctx->cells_per_patch; ++c)
+    const int cells_per_patch = get_cells_per_patch(glob, patch);
+    for (int c = 0; c < cells_per_patch; ++c)
     {
         *idata++ = blockno;
     }
@@ -531,26 +554,11 @@ write_patchno_cb (fclaw_global_t* glob, fclaw_patch_t* patch,
                   int blockno, int patchno,
                   fclaw_vtk_cb_context_t* ctx, char* buffer)
 {
-    const int64_t gpno =
-        glob->domain->global_num_patches_before +
-        glob->domain->blocks[blockno].num_patches_before + patchno;
-
-    if (ctx->fits32)
+    int *idata = (int32_t *) buffer;
+    const int cells_per_patch = get_cells_per_patch(glob, patch);
+    for (int c = 0; c < cells_per_patch; ++c)
     {
-        const int32_t igpno = (int32_t) gpno;
-        int32_t *idata = (int32_t *) buffer;
-        for (int c = 0; c < ctx->cells_per_patch; ++c)
-        {
-            *idata++ = igpno;
-        }
-    }
-    else
-    {
-        int64_t *idata = (int64_t *) buffer;
-        for (int c = 0; c < ctx->cells_per_patch; ++c)
-        {
-            *idata++ = gpno;
-        }
+        *idata++ = patchno;
     }
 }
 

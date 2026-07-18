@@ -50,7 +50,6 @@ struct fclaw_patch;
 typedef struct fclaw_vtk_cb_context
 {
     int fits32; /* whether the mesh connectivity fits in 32 bits */
-    int cells_per_patch; /* number of cells per patch */
 } fclaw_vtk_cb_context_t;
 
 /** 

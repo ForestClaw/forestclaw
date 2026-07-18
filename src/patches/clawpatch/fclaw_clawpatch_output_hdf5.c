@@ -353,7 +353,6 @@ write_vtable_entry_dataset(fclaw_global_t *glob,
 
     fclaw_vtk_cb_context_t ctx;
     ctx.fits32 = fits32;
-    ctx.cells_per_patch = (int) entry->elements_per_patch;
 
     unsigned long long local_total = 0;
     for (int local_patch_index = 0;
@@ -633,21 +632,6 @@ fclaw_hdf_write_file (fclaw_global_t * glob,
         num_patches_to_buffer = glob->domain->local_max_patches;
     }
 
-    //get mx, my, mz, meqn from clawpatch options
-    int64_t mx   = clawpatch_opt->mx;
-    int64_t my   = clawpatch_opt->my;
-    int64_t mz   = clawpatch_opt->mz;
-
-    int64_t num_cells_per_patch;
-    if(clawpatch_opt->patch_dim == 2)
-    {
-        num_cells_per_patch = mx * my;
-    }
-    else
-    {
-        num_cells_per_patch = mx * my * mz;
-    }
-
     char vtkhdf[8] = "/VTKHDF";
     char celldata[18] = "/VTKHDF/CellData";
     
@@ -685,7 +669,6 @@ fclaw_hdf_write_file (fclaw_global_t * glob,
 
     fclaw_vtk_cb_context_t size_ctx;
     size_ctx.fits32 = 0;
-    size_ctx.cells_per_patch = (int) num_cells_per_patch;
 
     hsize_t number_of_points = hdf5_entry_global_count(glob, &vtk_vtable->position_entry, &size_ctx);
     hsize_t number_of_connectivity_ids = hdf5_entry_global_count(glob, &vtk_vtable->connectivity_entry, &size_ctx);
@@ -696,8 +679,6 @@ fclaw_hdf_write_file (fclaw_global_t * glob,
         && number_of_cells <= INT32_MAX;
 
     s_hdf5_vtk_ctx.fits32 = fits32;
-    s_hdf5_vtk_ctx.cells_per_patch = (int) num_cells_per_patch;
-
     hsize_t written_number_of_points = write_vtable_entry_dataset(glob,
                                                                   vtkhdf_gid,
                                                                   "Points",
