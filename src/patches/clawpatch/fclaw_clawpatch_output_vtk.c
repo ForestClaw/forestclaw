@@ -70,10 +70,6 @@ typedef struct fclaw2d_vtk_state
     const char *inttype;
     fclaw_vtk_patch_data_t coordinate_cb;
     fclaw_vtk_patch_data_t value_cb;
-    fclaw_vtk_patch_data_t aux_cb;
-    fclaw_vtk_patch_data_t rhs_cb;
-    fclaw_vtk_patch_data_t soln_cb;
-    fclaw_vtk_patch_data_t error_cb;
     fclaw_clawpatch_vtk_vtable_t *vtk_vt;
     FILE *file;
 #ifdef P4EST_ENABLE_MPIIO
@@ -474,7 +470,18 @@ write_entry_cb (fclaw_domain_t * domain, fclaw_patch_t * patch,
             iter->s->buf_capacity = psize;
         }
 
-        iter->entry->callback (g->glob, patch, blockno, patchno, &iter->ctx, iter->s->buf);
+        if (iter->entry == &iter->s->vtk_vt->position_entry && iter->s->coordinate_cb != NULL)
+        {
+            iter->s->coordinate_cb (g->glob, patch, blockno, patchno, iter->s->buf);
+        }
+        else if (strcmp(iter->entry->name, "meqn") == 0 && iter->s->value_cb != NULL)
+        {
+            iter->s->value_cb (g->glob, patch, blockno, patchno, iter->s->buf);
+        }
+        else
+        {
+            iter->entry->callback (g->glob, patch, blockno, patchno, &iter->ctx, iter->s->buf);
+        }
         add_to_buffer (iter->s, psize);
     }
 }
@@ -762,10 +769,6 @@ fclaw_vtk_write_file (int dim, fclaw_global_t * glob, const char *basename,
                       double vtkspace, int vtkwrite,
                       fclaw_vtk_patch_data_t coordinate_cb,
                       fclaw_vtk_patch_data_t value_cb,
-                      fclaw_vtk_patch_data_t aux_cb,
-                      fclaw_vtk_patch_data_t rhs_cb,
-                      fclaw_vtk_patch_data_t soln_cb,
-                      fclaw_vtk_patch_data_t error_cb,
                       int patch_threshold)
 {
     fclaw_domain_t *domain = glob->domain;
@@ -812,10 +815,6 @@ fclaw_vtk_write_file (int dim, fclaw_global_t * glob, const char *basename,
     s->time_value = glob->curr_time;
     s->coordinate_cb = coordinate_cb;
     s->value_cb = value_cb;
-    s->aux_cb = aux_cb;
-    s->rhs_cb = rhs_cb;
-    s->soln_cb = soln_cb;
-    s->error_cb = error_cb;
 
     /* compute offsets in bytes after beginning of appended data section */
     int64_t curr_offset = 0;
@@ -972,7 +971,7 @@ fclaw_vtk_write_2d_file (fclaw_global_t * glob, const char *basename,
                         int patch_threshold)
 {
     return fclaw_vtk_write_file(2,glob,basename,mx,my,0,meqn,0,0,vtkspace,vtkwrite,
-                                coordinate_cb,value_cb,NULL,NULL,NULL,NULL, patch_threshold);
+                                coordinate_cb,value_cb, patch_threshold);
 }
 
 int
@@ -985,322 +984,8 @@ fclaw_vtk_write_3d_file (fclaw_global_t * glob, const char *basename,
                         int patch_threshold)
 {
     return fclaw_vtk_write_file(3,glob,basename,mx,my,mz,meqn,0,0,vtkspace,vtkwrite,
-                                coordinate_cb,value_cb,NULL,NULL,NULL,NULL, patch_threshold);
+                                coordinate_cb,value_cb, patch_threshold);
 }
-
-static void
-fclaw2d_output_vtk_coordinate_cb (fclaw_global_t * glob,
-                                  fclaw_patch_t * patch,
-                                  int blockno, int patchno,
-                                  char *a)
-{
-    int mx,my,mbc;
-    double dx,dy,xlower,ylower;
-    fclaw_clawpatch_2d_grid_data(glob,patch,&mx,&my,&mbc,
-                                &xlower,&ylower,&dx,&dy);
-
-    const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
-    fclaw_map_context_t* cont = fclaw_map_get(glob);
-
-    /* Enumerate point coordinates in the patch */
-    double *d = (double *) a;
-    int i, j;
-    double xpp,ypp,zpp;
-    for (j = 0; j <= my; ++j)
-    {
-        const double y = ylower + j * dy;
-        for (i = 0; i <= mx; ++i)
-        {
-            const double x = xlower + i * dx;
-            if (fclaw_opt->manifold)
-            {
-                FCLAW_MAP_2D_C2M(&cont,&blockno,&x,&y,&xpp,&ypp,&zpp);
-                *d++ = xpp;
-                *d++ = ypp;
-                *d++ = zpp;
-            }
-            else
-            {
-                *d++ = x;
-                *d++ = y;
-                *d++ = 0;
-            }
-        }
-    }
-}
-
-static void
-fclaw3d_output_vtk_coordinate_cb (fclaw_global_t * glob,
-                                  fclaw_patch_t * patch,
-                                  int blockno, int patchno,
-                                  char *a)
-{
-    int mx,my,mz,mbc;
-    double dx,dy,dz,xlower,ylower,zlower;
-    fclaw_clawpatch_3d_grid_data(glob,patch,&mx,&my,&mz, &mbc,
-                                &xlower,&ylower,&zlower, &dx,&dy, &dz);
-
-    const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
-    fclaw_map_context_t* cont = fclaw_map_get(glob);
-    /* Enumerate point coordinates in the patch */
-    double *d = (double *) a;
-    int i, j, k;
-    double xpp,ypp,zpp;
-    for (k = 0; k <= mz; ++k)
-    {
-        const double z = zlower + k * dz;
-        for (j = 0; j <= my; ++j)
-        {
-            const double y = ylower + j * dy;
-            for (i = 0; i <= mx; ++i)
-            {
-                const double x = xlower + i * dx;
-                if (fclaw_opt->manifold)
-                {
-                    FCLAW_MAP_3D_C2M(&cont,&blockno,&x,&y,&z,&xpp,&ypp,&zpp);
-                    *d++ = xpp;
-                    *d++ = ypp;
-                    *d++ = zpp;
-                }
-                else
-                {
-                    *d++ = x;
-                    *d++ = y;
-                    *d++ = z;
-                }
-            }
-        }
-    }
-}
-
-
-/* typdef for data acess functions q,rhs,etc */
-typedef void (*patch_data_access_t)(struct fclaw_global *glob, struct fclaw_patch *patch, double **q, int *meqn);
-
-static void
-pack_data (fclaw_global_t * glob,
-           fclaw_patch_t * patch,
-           int blockno, int patchno,
-           patch_data_access_t access,
-           char *a)
-{
-
-    int meqn;
-    double *q;
-    access(glob, patch, &q, &meqn);
-
-    int patch_dim = fclaw_clawpatch_dim(patch);
-    if(patch_dim == 2)
-    {
-        int mx,my,mbc;
-        double xlower,ylower,dx,dy;
-
-        fclaw_clawpatch_2d_grid_data(glob,patch,&mx,&my,&mbc,
-                                    &xlower,&ylower,&dx,&dy);
-
-        const int xlane = mx + 2 * mbc;
-        const int ylane = my + 2 * mbc;
-
-        // Enumerate equation data in the patch
-        float *f = (float *) a;
-        int i, j, k;
-        for (j = 0; j < my; ++j)
-        {
-            for (i = 0; i < mx; ++i)
-            {
-                for (k = 0; k < meqn; ++k)
-                {
-                    /* For Clawpack 5.0 layout */
-                    //*f++ = (float) q[((j+mbc)*xlane + (i+mbc))*meqn + k];
-
-                    /* For Clawpack 4.x layout */
-                    *f++ = (float) q[(k * ylane + j + mbc) * xlane + i + mbc];
-                }
-            }
-        }
-
-    }
-    else
-    {
-        int mx,my,mz,mbc;
-        double xlower,ylower,zlower,dx,dy,dz;
-        fclaw_clawpatch_3d_grid_data(glob,patch,&mx,&my,&mz, &mbc,
-                                   &xlower,&ylower,&zlower, &dx,&dy, &dz);
-
-        const int xlane = mx + 2 * mbc;
-        const int ylane = my + 2 * mbc;
-        const int zlane = mz + 2 * mbc;
-
-        // Enumerate equation data in the patch
-        float *f = (float *) a;
-        int i, j, k, eqn;
-        for (k = 0; k < mz; ++k)
-        {
-            for (j = 0; j < my; ++j)
-            {
-                for (i = 0; i < mx; ++i)
-                {
-                    for (eqn = 0; eqn < meqn; ++eqn)
-                    {
-                        /* For Clawpack 5.0 layout */
-                        //*f++ = (float) q[((j+mbc)*xlane + (i+mbc))*meqn + k];
-
-                        /* For Clawpack 4.x layout */
-                        *f++ = (float) q[eqn * zlane * ylane * xlane + (k + mbc) * ylane * xlane + (j + mbc) * xlane + i + mbc];
-                    }
-                }
-            }
-        }
-    }
-}
-
-static void
-fclaw_output_vtk_value_cb (fclaw_global_t * glob,
-                           fclaw_patch_t * patch,
-                           int blockno, int patchno,
-                           char *a)
-{
-    pack_data(glob, patch, blockno, patchno, &fclaw_clawpatch_soln_data, a);
-}
-
-static void
-fclaw_output_vtk_aux_cb (fclaw_global_t * glob,
-                         fclaw_patch_t * patch,
-                         int blockno, int patchno,
-                         char *a)
-{
-    fclaw_clawpatch_options_t *clawpatch_opt = fclaw_clawpatch_get_options(glob);
-    int maux;
-    double *q;
-    fclaw_clawpatch_aux_data(glob, patch, &q, &maux);
-
-    int patch_dim = fclaw_clawpatch_dim(patch);
-    if(patch_dim == 2)
-    {
-        int mx,my,mbc;
-        double xlower,ylower,dx,dy;
-
-        fclaw_clawpatch_2d_grid_data(glob,patch,&mx,&my,&mbc,
-                                    &xlower,&ylower,&dx,&dy);
-
-        const int xlane = mx + 2 * mbc;
-        const int ylane = my + 2 * mbc;
-
-        // Enumerate equation data in the patch
-        float *f = (float *) a;
-        int i, j, k;
-        for (j = 0; j < my; ++j)
-        {
-            for (i = 0; i < mx; ++i)
-            {
-                for (k = 0; k < maux; ++k)
-                {
-                    if(clawpatch_opt->vtk_aux_out[k] > 0)
-                    {
-                        /* For Clawpack 5.0 layout */
-                        //*f++ = (float) q[((j+mbc)*xlane + (i+mbc))*meqn + k];
-
-                        /* For Clawpack 4.x layout */
-                        int aux_out = clawpatch_opt->vtk_aux_out[k] - 1;
-                        *f++ = (float) q[(aux_out * ylane + j + mbc) * xlane + i + mbc];
-                    }
-                }
-            }
-        }
-
-    }
-    else
-    {
-        int mx,my,mz,mbc;
-        double xlower,ylower,zlower,dx,dy,dz;
-        fclaw_clawpatch_3d_grid_data(glob,patch,&mx,&my,&mz, &mbc,
-                                   &xlower,&ylower,&zlower, &dx,&dy, &dz);
-
-        const int xlane = mx + 2 * mbc;
-        const int ylane = my + 2 * mbc;
-        const int zlane = mz + 2 * mbc;
-
-        // Enumerate equation data in the patch
-        float *f = (float *) a;
-        int i, j, k, eqn;
-        for (k = 0; k < mz; ++k)
-        {
-            for (j = 0; j < my; ++j)
-            {
-                for (i = 0; i < mx; ++i)
-                {
-                    for (eqn = 0; eqn < maux; ++eqn)
-                    {
-                        if(clawpatch_opt->vtk_aux_out[eqn])
-                        {
-                            /* For Clawpack 5.0 layout */
-                            //*f++ = (float) q[((j+mbc)*xlane + (i+mbc))*meqn + k];
-
-                            /* For Clawpack 4.x layout */
-                            int aux_out = clawpatch_opt->vtk_aux_out[eqn] - 1;
-                            *f++ = (float) q[aux_out * zlane * ylane * xlane + (k + mbc) * ylane * xlane + (j + mbc) * xlane + i + mbc];
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-}
-
-static void
-fclaw_output_vtk_rhs_cb (fclaw_global_t * glob,
-                         fclaw_patch_t * patch,
-                         int blockno, int patchno,
-                         char *a)
-{
-    pack_data(glob, patch, blockno, patchno, &fclaw_clawpatch_rhs_data, a);
-}
-
-static void
-fclaw_output_vtk_soln_cb (fclaw_global_t * glob,
-                          fclaw_patch_t * patch,
-                          int blockno, int patchno,
-                          char *a)
-{
-    pack_data(glob, patch, blockno, patchno, &fclaw_clawpatch_elliptic_soln_data, a);
-}
-
-static void
-fclaw_output_vtk_error_cb (fclaw_global_t * glob,
-                           fclaw_patch_t * patch,
-                           int blockno, int patchno,
-                           char *a)
-{
-    pack_data(glob, patch, blockno, patchno, &fclaw_clawpatch_elliptic_error_data, a);
-}
-
-/*  --------------------------------------------------------------------------
-    Used for debugging
-    ------------------------------------------------------------------------- */
-#if 0
-static void
-fclaw2d_output_write_vtk_debug (fclaw_global_t * glob, const char *basename)
-{
-    const fclaw_options_t *fclaw_opt = fclaw_get_options(glob);
-    const fclaw_clawpatch_options_t *clawpatch_opt = fclaw_clawpatch_get_options(glob);
-
-    (void) fclaw2d_vtk_write_file (glob, basename,
-                                   clawpatch_opt->mx, clawpatch_opt->my,
-#if PATCH_DIM == 3
-                                   clawpatch_opt->mz,
-#endif
-                                   clawpatch_opt->meqn,
-                                   fclaw_opt->vtkspace, 0,
-                                   fclaw2d_output_vtk_coordinate_cb,
-                                   fclaw2d_output_vtk_value_cb);
-}
-#endif
-
-
-/*  ---------------------------------------------------------------------------
-    Public interface
-    --------------------------------------------------------------------------- */
 
 void fclaw_clawpatch_output_vtk_to_file (fclaw_global_t * glob, const char* filename)
 {
@@ -1326,12 +1011,8 @@ void fclaw_clawpatch_output_vtk_to_file (fclaw_global_t * glob, const char* file
                               num_aux_fields,
                               clawpatch_opt->rhs_fields,
                               fclaw_opt->vtkspace, 0,
-                              fclaw2d_output_vtk_coordinate_cb,
-                              fclaw_output_vtk_value_cb,
-                              fclaw_output_vtk_aux_cb,
-                              fclaw_output_vtk_rhs_cb,
-                              fclaw_output_vtk_soln_cb,
-                              fclaw_output_vtk_error_cb,
+                              NULL,
+                              NULL,
                               clawpatch_opt->vtk_patch_threshold);
     }
     else 
@@ -1344,12 +1025,8 @@ void fclaw_clawpatch_output_vtk_to_file (fclaw_global_t * glob, const char* file
                               num_aux_fields,
                               clawpatch_opt->rhs_fields,
                               fclaw_opt->vtkspace, 0,
-                              fclaw3d_output_vtk_coordinate_cb,
-                              fclaw_output_vtk_value_cb,
-                              fclaw_output_vtk_aux_cb,
-                              fclaw_output_vtk_rhs_cb,
-                              fclaw_output_vtk_soln_cb,
-                              fclaw_output_vtk_error_cb,
+                              NULL,
+                              NULL,
                               clawpatch_opt->vtk_patch_threshold);
     }
 }
