@@ -28,12 +28,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_clawpatch.h>
 #include <fclaw_clawpatch_options.h>
 #include <fclaw_clawpatch_vtk_vtable.h>
+#include <fclaw_physical_bc.h>
 
 static
 fclaw_clawpatch_vtk_vtable_entry_t* vtk_vt_entry_new(const char* name,
                                                      fclaw_vtk_entry_type_t type,
                                                      int number_of_components,
-                                                     size_t elements_per_patch,
                                                      fclaw_vtk_patch_elements_cb_t elements_in_patch,
                                                      fclaw_vtk_patch_cb_t callback)
 {
@@ -43,7 +43,6 @@ fclaw_clawpatch_vtk_vtable_entry_t* vtk_vt_entry_new(const char* name,
 	entry->name = name;
 	entry->type = type;
 	entry->number_of_components = number_of_components;
-	entry->elements_per_patch = elements_per_patch;
     entry->elements_in_patch = elements_in_patch;
 	entry->callback = callback;
 
@@ -55,14 +54,12 @@ void vtk_vt_entry_init(fclaw_clawpatch_vtk_vtable_entry_t* entry,
                        const char* name,
                        fclaw_vtk_entry_type_t type,
                        int number_of_components,
-                       size_t elements_per_patch,
                        fclaw_vtk_patch_elements_cb_t elements_in_patch,
                        fclaw_vtk_patch_cb_t callback)
 {
     entry->name = name;
     entry->type = type;
     entry->number_of_components = number_of_components;
-    entry->elements_per_patch = elements_per_patch;
     entry->elements_in_patch = elements_in_patch;
     entry->callback = callback;
 }
@@ -72,12 +69,11 @@ void vtk_add_field_entry(fclaw_clawpatch_vtk_vtable_t* vtk_vt,
 						 const char* name,
 						 fclaw_vtk_entry_type_t type,
                          int number_of_components,
-						 size_t elements_per_patch,
                          fclaw_vtk_patch_elements_cb_t elements_in_patch,
 						 fclaw_vtk_patch_cb_t callback)
 {
 	fclaw_clawpatch_vtk_vtable_entry_t* entry =
-		vtk_vt_entry_new(name, type, number_of_components, elements_per_patch, elements_in_patch, callback);
+		vtk_vt_entry_new(name, type, number_of_components, elements_in_patch, callback);
 	sc_list_append(vtk_vt->field_entries, entry);
 }
 
@@ -86,12 +82,11 @@ void vtk_add_celldata_entry(fclaw_clawpatch_vtk_vtable_t* vtk_vt,
                             const char* name,
                             fclaw_vtk_entry_type_t type,
                             int number_of_components,
-                            size_t size_per_patch,
                             fclaw_vtk_patch_elements_cb_t elements_in_patch,
                             fclaw_vtk_patch_cb_t callback)
 {
     fclaw_clawpatch_vtk_vtable_entry_t* entry =
-        vtk_vt_entry_new(name, type, number_of_components, size_per_patch, elements_in_patch, callback);
+        vtk_vt_entry_new(name, type, number_of_components, elements_in_patch, callback);
     sc_list_append(vtk_vt->celldata_entries, entry);
 }
 
@@ -965,7 +960,7 @@ write_ghost_cb (fclaw_global_t * glob, fclaw_patch_t * patch,
             {
                 if(i < 0 || i >= mx || j < 0 || j >= my)
                 {
-                    *buffer ++ = 1;
+                    *buffer ++ = 32;
                 }
                 else
                 {
@@ -982,7 +977,9 @@ write_ghost_cb (fclaw_global_t * glob, fclaw_patch_t * patch,
         fclaw_clawpatch_3d_grid_data(glob,patch,&mx,&my,&mz, &mbc,
                                    &xlower,&ylower,&zlower, &dx,&dy, &dz);
 
-        // Enumerate equation data in the patch
+        //get physcial boundaries
+        int intersects_bc[6] = {1,1,1,1,1,1};
+        fclaw_physical_get_bc(glob, blockno, patchno, intersects_bc);
         for(int k = -mbc; k < mz + mbc; ++k)
         {
             for (int j = -mbc; j < my + mbc; ++j)
@@ -991,7 +988,16 @@ write_ghost_cb (fclaw_global_t * glob, fclaw_patch_t * patch,
                 {
                     if(i < 0 || i >= mx || j < 0 || j >= my || k < 0 || k >= mz)
                     {
-                        *buffer ++ = 1;
+                        if((i < 0 && intersects_bc[0]) || (i >= mx && intersects_bc[1]) ||
+                           (j < 0 && intersects_bc[2]) || (j >= my && intersects_bc[3]) ||
+                           (k < 0 && intersects_bc[4]) || (k >= mz && intersects_bc[5]))
+                        {
+                            *buffer ++ = 32;
+                        }
+                        else
+                        {
+                            *buffer ++ = 32;
+                        }
                     }
                     else
                     {
@@ -1139,73 +1145,57 @@ void fclaw_clawpatch_vtk_vtable_initialize(struct fclaw_global* glob)
 	fclaw_clawpatch_vtk_vtable_t* vtk_vt = vtk_vt_new();
     fclaw_clawpatch_options_t *clawpatch_opt = fclaw_clawpatch_get_options(glob);
 
-    int num_points_per_patch;
-    int num_cells_per_patch;
-    int num_points_per_cell;
-    if (clawpatch_opt->patch_dim == 2)
-    {
-        num_points_per_patch = (clawpatch_opt->mx + 1) * (clawpatch_opt->my + 1);
-        num_cells_per_patch = clawpatch_opt->mx * clawpatch_opt->my;
-        num_points_per_cell = 4;
-    }
-    else
-    {
-        num_points_per_patch = (clawpatch_opt->mx + 1) * (clawpatch_opt->my + 1) * (clawpatch_opt->mz + 1);
-        num_cells_per_patch = clawpatch_opt->mx * clawpatch_opt->my * clawpatch_opt->mz;
-        num_points_per_cell = 8;
-    }
-
     // field entries
     vtk_add_field_entry(vtk_vt, "levels", FCLAW_VTK_INT32, 
-                        1, 1, 
+                        1,
                         &one_element_per_patch,
                         &write_level_cb);
     vtk_add_field_entry(vtk_vt, "patch_starts", FCLAW_VTK_FLOAT64, 
-                        3, 1, 
+                        3,
                         &one_element_per_patch,
                         &write_patch_starts_cb);
     vtk_add_field_entry(vtk_vt, "patch_spacings", FCLAW_VTK_FLOAT64, 
-                        3, 1, 
+                        3,
                         &one_element_per_patch,
                         &write_patch_spacings_cb);
 
     // primary point entry
     vtk_vt_entry_init(&vtk_vt->position_entry, "Position", FCLAW_VTK_FLOAT64,
-                      3, num_points_per_patch,
+                      3,
                       &points_in_patch,
                       &write_coordinate_cb);
 
     // primary cell entries
     vtk_vt_entry_init(&vtk_vt->connectivity_entry, "connectivity", FCLAW_VTK_INT32_OR_64,
-                      1, num_cells_per_patch * num_points_per_cell,
+                      1,
                       &connectivity_in_patch,
                       &write_connectivity_cb);
     vtk_vt_entry_init(&vtk_vt->offsets_entry, "offsets", FCLAW_VTK_INT32_OR_64,
-                      1, num_cells_per_patch,
+                      1,
                       &offsets_in_patch,
                       &write_offsets_cb);
     vtk_vt_entry_init(&vtk_vt->types_entry, "types", FCLAW_VTK_UINT8,
-                      1, num_cells_per_patch,
+                      1,
                       &cells_in_patch,
                       &write_types_cb);
 
     int meqn = clawpatch_opt->meqn;
     // celldata entries
     vtk_add_celldata_entry(vtk_vt, "mpirank", FCLAW_VTK_INT32,
-                           1, num_cells_per_patch, 
+                           1,
                            &cells_in_patch,
                            &write_mpirank_cb);
     vtk_add_celldata_entry(vtk_vt, "blockno", FCLAW_VTK_INT32,
-                           1, num_cells_per_patch, 
+                           1,
                            &cells_in_patch,
                            &write_blockno_cb);
     vtk_add_celldata_entry(vtk_vt, "patchno", FCLAW_VTK_INT32,
-                           1, num_cells_per_patch, 
+                           1,
                             &cells_in_patch,
                            &write_patchno_cb);
 
     vtk_add_celldata_entry(vtk_vt, "meqn", FCLAW_VTK_FLOAT32,
-                           meqn, num_cells_per_patch, 
+                           meqn,
                            &cells_in_patch,
                            &write_value_cb);
     
@@ -1221,7 +1211,7 @@ void fclaw_clawpatch_vtk_vtable_initialize(struct fclaw_global* glob)
     if (num_aux_fields > 0)
     {
         vtk_add_celldata_entry(vtk_vt, "aux", FCLAW_VTK_FLOAT32,
-                               num_aux_fields, num_cells_per_patch, 
+                               num_aux_fields,
                                &cells_in_patch,
                                &write_aux_cb);
     }
@@ -1230,15 +1220,15 @@ void fclaw_clawpatch_vtk_vtable_initialize(struct fclaw_global* glob)
     if (rhs_fields > 0)
     {
         vtk_add_celldata_entry(vtk_vt, "rhs", FCLAW_VTK_FLOAT32,
-                               rhs_fields, num_cells_per_patch, 
+                               rhs_fields,
                                &cells_in_patch,
                                &write_rhs_cb);
         vtk_add_celldata_entry(vtk_vt, "soln", FCLAW_VTK_FLOAT32,
-                               rhs_fields, num_cells_per_patch, 
+                               rhs_fields,
                                &cells_in_patch,
                                &write_soln_cb);
         vtk_add_celldata_entry(vtk_vt, "error", FCLAW_VTK_FLOAT32,
-                               rhs_fields, num_cells_per_patch, 
+                               rhs_fields,
                                &cells_in_patch,
                                &write_error_cb);
     }
@@ -1246,7 +1236,7 @@ void fclaw_clawpatch_vtk_vtable_initialize(struct fclaw_global* glob)
     if(clawpatch_opt->vtk_ghost_out)
     {
         vtk_add_celldata_entry(vtk_vt, "vtkGhostType", FCLAW_VTK_UINT8,
-                               1, num_cells_per_patch, 
+                               1,
                                &cells_in_patch,
                                &write_ghost_cb);
     }

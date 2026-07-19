@@ -198,10 +198,6 @@ static int64_t
 get_global_num_elements (fclaw_global_t *glob, fclaw2d_vtk_state_t *s, fclaw_clawpatch_vtk_vtable_entry_t *entry)
 {
     fclaw_domain_t *domain = glob->domain;
-    if (entry->elements_in_patch == NULL)
-    {
-        return (int64_t) entry->elements_per_patch * domain->global_num_patches;
-    }
 
     count_elements_user_t count_user;
     count_user.s = s;
