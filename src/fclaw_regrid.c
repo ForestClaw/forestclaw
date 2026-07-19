@@ -318,6 +318,65 @@ void cb_refine_after_partition(fclaw_domain_t *domain,
 
 }
 
+/**
+ * @brief Compare two domains patch by patch to see if they are different.
+ * This call is collective and should be called by all processes.
+ * 
+ * @param domain1 the first domain.
+ * @param domain2 the second domain.
+ * @return int 1 if different, 0 if the same
+ */
+static int domains_are_different(fclaw_domain_t *domain1, fclaw_domain_t *domain2)
+{
+    if(domain1->global_num_patches != domain2->global_num_patches)
+    {
+        return 1;
+    }
+
+    int different = 0;
+    if(domain1->local_num_patches != domain2->local_num_patches)
+    {
+        different = 1;
+    }
+    else
+    {
+        for(int b = 0; b < domain1->num_blocks; ++b)
+        {
+            fclaw_block_t *block1 = &domain1->blocks[b];
+            fclaw_block_t *block2 = &domain2->blocks[b];
+            for(int p = 0; p < block1->num_patches; ++p)
+            {
+                fclaw_patch_t *patch1 = &block1->patches[p];
+                fclaw_patch_t *patch2 = &block2->patches[p];
+                //if(patch1->level != patch2->level)
+                //{
+                    //different = 1;
+                    //break;
+                //}
+                // compare xyz
+                if(patch1->xlower != patch2->xlower ||
+                   patch1->ylower != patch2->ylower ||
+                   patch1->zlower != patch2->zlower ||
+                   patch1->xupper != patch2->xupper ||
+                   patch1->yupper != patch2->yupper ||
+                   patch1->zupper != patch2->zupper)
+                {
+                    different = 1;
+                    break;
+                }
+            }
+            if(different)
+            {
+                break;
+            }
+        }
+    }
+
+    int global_different;
+    sc_MPI_Allreduce(&different, &global_different, 1, sc_MPI_INT, sc_MPI_MAX, domain1->mpicomm);
+    return global_different;
+}
+
 /* ----------------------------------------------------------------
    Public interface
    -------------------------------------------------------------- */
@@ -498,12 +557,15 @@ void fclaw_regrid(fclaw_global_t *glob)
         fclaw_timer_stop (&glob->timers[FCLAW_TIMER_REGRID]);
         fclaw_timer_start (&glob->timers[FCLAW_TIMER_ADAPT_COMM]);
         fclaw_domain_t *new_domain = fclaw_domain_adapt(*domain);
+        int have_new_refinement = 0;
 
-        int have_new_refinement = new_domain != NULL;
-
-        if (have_new_refinement)
+        if (new_domain != NULL)
         {
-            has_been_refined = 1;
+            if(domains_are_different(*domain, new_domain))
+            {
+                has_been_refined = 1;
+                have_new_refinement = 1;
+            }
             /* allocate memory for user patch data and user domain data in the new
                domain;  copy data from the old to new the domain. */
             fclaw_domain_setup(glob, new_domain);
@@ -513,7 +575,7 @@ void fclaw_regrid(fclaw_global_t *glob)
         fclaw_timer_stop (&glob->timers[FCLAW_TIMER_ADAPT_COMM]);
         fclaw_timer_start (&glob->timers[FCLAW_TIMER_REGRID]);
 
-        if (have_new_refinement)
+        if (new_domain != NULL)
         {
             fclaw_global_infof(" -- Have new refinement\n");
 
@@ -537,7 +599,10 @@ void fclaw_regrid(fclaw_global_t *glob)
                                  time_interp,
                                  FCLAW_TIMER_REGRID);
 
-            ++glob->count_amr_new_domain;
+            if(have_new_refinement)
+            {
+                ++glob->count_amr_new_domain;
+            }
         }
         else
         {
