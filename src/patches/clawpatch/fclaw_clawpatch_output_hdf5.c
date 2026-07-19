@@ -253,6 +253,7 @@ make_dataset(const fclaw_clawpatch_options_t *clawpatch_opts,
                    limited_chunk_dims,
                    limit_other_dims);
         status |= H5Pset_chunk(prop_id, rank, limited_chunk_dims);
+#if 0
         if(H5Tget_class(tid) == H5T_INTEGER)
         {
             status |= H5Pset_scaleoffset(prop_id, H5Z_SO_INT, 1);
@@ -261,6 +262,7 @@ make_dataset(const fclaw_clawpatch_options_t *clawpatch_opts,
         {
             status |= H5Pset_shuffle(prop_id);
         }
+#endif
         status |= H5Pset_deflate(prop_id, clawpatch_opts->hdf5_compression_level);
     }
 
