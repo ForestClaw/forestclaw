@@ -251,9 +251,9 @@ make_dataset(const fclaw_clawpatch_options_t *clawpatch_opts,
                    rank,
                    dims,
                    limited_chunk_dims,
-                   0);
+                   limit_other_dims);
         status |= H5Pset_chunk(prop_id, rank, limited_chunk_dims);
-        if(tid == H5T_NATIVE_INT || tid == H5T_NATIVE_UINT8)
+        if(H5Tget_class(tid) == H5T_INTEGER)
         {
             status |= H5Pset_scaleoffset(prop_id, H5Z_SO_INT, 1);
         }
