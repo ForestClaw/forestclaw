@@ -693,7 +693,7 @@ fclaw_hdf_write_file (fclaw_global_t * glob,
                                                                             fits32,
                                                                             0,
                                                                             NULL);
-    hsize_t written_number_of_cells = write_vtable_entry_dataset(glob,
+    hsize_t written_number_of_offsets = write_vtable_entry_dataset(glob,
                                                                  vtkhdf_gid,
                                                                  "Offsets",
                                                                  &vtk_vtable->offsets_entry,
@@ -712,7 +712,7 @@ fclaw_hdf_write_file (fclaw_global_t * glob,
 
     FCLAW_ASSERT(written_number_of_points == number_of_points);
     FCLAW_ASSERT(written_number_of_connectivity_ids == number_of_connectivity_ids);
-    FCLAW_ASSERT(written_number_of_cells == number_of_cells + 1);
+    FCLAW_ASSERT(written_number_of_offsets == number_of_cells + 1);
 
     dims[0] = 1;
     long number_of_cells_long = (long) number_of_cells;
