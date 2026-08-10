@@ -240,6 +240,7 @@ struct fclaw_options
 
     int output;                    
     int checkpoint;                    
+    int checkpoint_interval;
 
     int restart;                    
     const char * restart_file; /**< filename of restart file */

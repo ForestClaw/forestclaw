@@ -127,6 +127,9 @@ fclaw_register (fclaw_options_t* fclaw_opt, sc_options_t * opt)
     sc_options_add_bool (opt, 0, "checkpoint", &fclaw_opt->checkpoint, 0,
                             "Enable checkpoint output [F]");
 
+    sc_options_add_int (opt, 0, "checkpoint-interval", &fclaw_opt->checkpoint_interval, 1,
+                        "Output a checkpoint at every n output frames [1]");
+
     /* ------------------------------- Restart options --------------------------------- */
 
     sc_options_add_bool (opt, 0, "restart", &fclaw_opt->restart, 0,
@@ -463,6 +466,12 @@ fclaw_options_check (fclaw_options_t * fclaw_opt)
         return FCLAW_EXIT_ERROR;        
     }
 #endif
+
+    if (fclaw_opt->checkpoint_interval < 1)
+    {
+        fclaw_global_essentialf("Options : checkpoint-interval must be >= 1\n");
+        return FCLAW_EXIT_ERROR;
+    }
 
     return FCLAW_NOEXIT;
 }
