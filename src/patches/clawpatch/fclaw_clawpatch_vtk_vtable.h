@@ -49,7 +49,6 @@ struct fclaw_patch;
  */
 typedef struct fclaw_vtk_cb_context
 {
-    int fits32; /* whether the mesh connectivity fits in 32 bits */
     int offsets_include_zero; /* whether the offsets dataset should include a leading zero */
 } fclaw_vtk_cb_context_t;
 
@@ -88,8 +87,7 @@ typedef enum {
     FCLAW_VTK_INT64,
     FCLAW_VTK_UINT64,
     FCLAW_VTK_FLOAT32,
-    FCLAW_VTK_FLOAT64,
-    FCLAW_VTK_INT32_OR_64 /* use int32 if connectivity fits in 32 bits, otherwise use int64 */
+    FCLAW_VTK_FLOAT64
 } fclaw_vtk_entry_type_t;
 
 typedef struct fclaw_clawpatch_vtk_vtable_entry

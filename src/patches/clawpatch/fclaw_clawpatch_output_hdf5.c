@@ -299,7 +299,7 @@ hdf5_vtk_entry_adapter(fclaw_global_t *glob,
 }
 
 static hid_t
-hdf5_tid_from_vtk_type(fclaw_vtk_entry_type_t type, int fits32)
+hdf5_tid_from_vtk_type(fclaw_vtk_entry_type_t type)
 {
     switch (type)
     {
@@ -315,8 +315,6 @@ hdf5_tid_from_vtk_type(fclaw_vtk_entry_type_t type, int fits32)
         return H5T_NATIVE_FLOAT;
     case FCLAW_VTK_FLOAT64:
         return H5T_NATIVE_DOUBLE;
-    case FCLAW_VTK_INT32_OR_64:
-        return fits32 ? H5T_NATIVE_INT32 : H5T_NATIVE_INT64;
     default:
         fclaw_abortf("fclaw_clawpatch_output_hdf5.c Unsupported vtk entry type\n");
         return H5T_NATIVE_INT32;
@@ -344,7 +342,6 @@ write_vtable_entry_dataset(fclaw_global_t *glob,
                            const char *dset_name,
                            const fclaw_clawpatch_vtk_vtable_entry_t *entry,
                            int num_patches_to_buffer,
-                           int fits32,
                            int limit_other_dims,
                            fclaw_hdf5_patch_data_t patch_cb)
 {
@@ -354,10 +351,9 @@ write_vtable_entry_dataset(fclaw_global_t *glob,
     }
 
     const int rank = entry->number_of_components == 1 ? 1 : 2;
-    hid_t tid = hdf5_tid_from_vtk_type(entry->type, fits32);
+    hid_t tid = hdf5_tid_from_vtk_type(entry->type);
 
     fclaw_vtk_cb_context_t ctx;
-    ctx.fits32 = fits32;
     ctx.offsets_include_zero = 1;
 
     unsigned long long local_total = 0;
@@ -667,24 +663,17 @@ fclaw_hdf_write_file (fclaw_global_t * glob,
     // write single value datasets for vtk
 
     fclaw_vtk_cb_context_t size_ctx;
-    size_ctx.fits32 = 0;
     size_ctx.offsets_include_zero = 1;
 
     hsize_t number_of_points = hdf5_entry_global_count(glob, &vtk_vtable->position_entry, &size_ctx);
     hsize_t number_of_connectivity_ids = hdf5_entry_global_count(glob, &vtk_vtable->connectivity_entry, &size_ctx);
     hsize_t number_of_cells = hdf5_entry_global_count(glob, &vtk_vtable->types_entry, &size_ctx);
 
-    int fits32 = number_of_points <= INT32_MAX
-        && number_of_connectivity_ids <= INT32_MAX
-        && number_of_cells <= INT32_MAX;
-
-    s_hdf5_vtk_ctx.fits32 = fits32;
     hsize_t written_number_of_points = write_vtable_entry_dataset(glob,
                                                                   vtkhdf_gid,
                                                                   "Points",
                                                                   &vtk_vtable->position_entry,
                                                                   num_patches_to_buffer,
-                                                                  fits32,
                                                                   0,
                                                                   coordinate_cb);
     hsize_t written_number_of_connectivity_ids = write_vtable_entry_dataset(glob,
@@ -692,7 +681,6 @@ fclaw_hdf_write_file (fclaw_global_t * glob,
                                                                             "Connectivity",
                                                                             &vtk_vtable->connectivity_entry,
                                                                             num_patches_to_buffer,
-                                                                            fits32,
                                                                             0,
                                                                             NULL);
     hsize_t written_number_of_offsets = write_vtable_entry_dataset(glob,
@@ -700,7 +688,6 @@ fclaw_hdf_write_file (fclaw_global_t * glob,
                                                                  "Offsets",
                                                                  &vtk_vtable->offsets_entry,
                                                                  num_patches_to_buffer,
-                                                                 fits32,
                                                                  0,
                                                                  NULL);
     write_vtable_entry_dataset(glob,
@@ -708,7 +695,6 @@ fclaw_hdf_write_file (fclaw_global_t * glob,
                                "Types",
                                &vtk_vtable->types_entry,
                                num_patches_to_buffer,
-                               fits32,
                                0,
                                NULL);
 
@@ -717,16 +703,16 @@ fclaw_hdf_write_file (fclaw_global_t * glob,
     FCLAW_ASSERT(written_number_of_offsets == number_of_cells + 1);
 
     dims[0] = 1;
-    long number_of_cells_long = (long) number_of_cells;
-    make_single_value_dataset_numerical(glob->mpirank, vtkhdf_gid, "NumberOfCells", 1, dims, H5T_NATIVE_LONG, &number_of_cells_long);
+    int64_t number_of_cells_int64 = (int64_t) number_of_cells;
+    make_single_value_dataset_numerical(glob->mpirank, vtkhdf_gid, "NumberOfCells", 1, dims, H5T_NATIVE_INT64, &number_of_cells_int64);
 
-    long number_of_points_long = (long) number_of_points;
+    int64_t number_of_points_int64 = (int64_t) number_of_points;
     dims[0] = 1;
-    make_single_value_dataset_numerical(glob->mpirank, vtkhdf_gid, "NumberOfPoints", 1, dims, H5T_NATIVE_LONG, &number_of_points_long);
+    make_single_value_dataset_numerical(glob->mpirank, vtkhdf_gid, "NumberOfPoints", 1, dims, H5T_NATIVE_INT64, &number_of_points_int64);
 
-    long number_of_connectivity_ids_long = (long) number_of_connectivity_ids;
+    int64_t number_of_connectivity_ids_int64 = (int64_t) number_of_connectivity_ids;
     dims[0] = 1;
-    make_single_value_dataset_numerical(glob->mpirank, vtkhdf_gid, "NumberOfConnectivityIds", 1, dims, H5T_NATIVE_LONG, &number_of_connectivity_ids_long);
+    make_single_value_dataset_numerical(glob->mpirank, vtkhdf_gid, "NumberOfConnectivityIds", 1, dims, H5T_NATIVE_INT64, &number_of_connectivity_ids_int64);
 
     hid_t fielddata_gid = H5Gcreate2(file_id,
                                      "/VTKHDF/FieldData",
@@ -743,7 +729,6 @@ fclaw_hdf_write_file (fclaw_global_t * glob,
                                    entry->name,
                                    entry,
                                    num_patches_to_buffer,
-                                   fits32,
                                    0,
                                    NULL);
         curr_entry = curr_entry->next;
@@ -782,7 +767,6 @@ fclaw_hdf_write_file (fclaw_global_t * glob,
                                    entry->name,
                                    entry,
                                    num_patches_to_buffer,
-                                   fits32,
                                    1,
                                    patch_cb);
         curr_entry = curr_entry->next;
@@ -824,6 +808,5 @@ void fclaw_clawpatch_output_hdf5 (fclaw_global_t * glob, int iframe)
 
     fclaw_clawpatch_output_hdf5_to_file(glob,basename, NULL, NULL);
 }
-
 
 

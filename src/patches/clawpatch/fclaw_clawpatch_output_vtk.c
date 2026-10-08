@@ -51,12 +51,10 @@ typedef struct fclaw2d_vtk_state
     int num_aux_fields;
     int rhs_fields;
     int points_per_patch, cells_per_patch;
-    int intsize, ndsize;
-    int fits32;
+    int ndsize;
     double time_value;
     char filename[BUFSIZ];
     int64_t global_num_points, global_num_cells;
-    int64_t global_num_connectivity;
     int64_t global_num_patches;
     int64_t *field_offsets;
     int64_t *point_offsets;
@@ -67,7 +65,6 @@ typedef struct fclaw2d_vtk_state
     int64_t *cell_num_elements;
     int64_t *celldata_num_elements;
     int64_t offset_end;
-    const char *inttype;
     fclaw_vtk_patch_data_t coordinate_cb;
     fclaw_vtk_patch_data_t value_cb;
     fclaw_clawpatch_vtk_vtable_t *vtk_vt;
@@ -115,11 +112,6 @@ sizeof_vtk_type(fclaw2d_vtk_state_t *s, fclaw_vtk_entry_type_t type)
             return sizeof(float);
         case FCLAW_VTK_FLOAT64:
             return sizeof(double);
-        case FCLAW_VTK_INT32_OR_64:
-            /* this is a special entry type that is used for connectivity and
-             * offsets; the actual type used depends on whether the number of
-             * points/cells fits in 32 bits */
-            return s->fits32 ? sizeof(int32_t) : sizeof(int64_t);
         default:
             fclaw_abortf("Invalid VTK entry type %d\n", (int) type);
     }
@@ -142,8 +134,6 @@ vtk_type_to_string(fclaw2d_vtk_state_t *s, fclaw_vtk_entry_type_t type)
             return "Float32";
         case FCLAW_VTK_FLOAT64:
             return "Float64";
-        case FCLAW_VTK_INT32_OR_64:
-            return s->fits32 ? "Int32" : "Int64";
         default:
             fclaw_abortf("Invalid VTK entry type %d\n", (int) type);
     }
@@ -197,7 +187,6 @@ get_global_num_elements (fclaw_global_t *glob, fclaw2d_vtk_state_t *s, fclaw_cla
 
     count_elements_user_t count_user;
     count_user.s = s;
-    count_user.ctx.fits32 = s->fits32;
     count_user.ctx.offsets_include_zero = 0;
     count_user.entry = entry;
     count_user.num_elements = 0;
@@ -536,7 +525,6 @@ fclaw2d_vtk_write_field (fclaw_global_t * glob, fclaw2d_vtk_state_t * s,
 
     count_bytes_user_t bytes_user;
     bytes_user.s = s;
-    bytes_user.ctx.fits32 = s->fits32;
     bytes_user.ctx.offsets_include_zero = 0;
     bytes_user.entry = entry;
     bytes_user.local_bytes = 0;
@@ -597,7 +585,6 @@ fclaw2d_vtk_write_field (fclaw_global_t * glob, fclaw2d_vtk_state_t * s,
     }
     write_field_iter_user_t iter;
     iter.s = s;
-    iter.ctx.fits32 = s->fits32;
     iter.ctx.offsets_include_zero = 0;
     iter.entry = entry;
     fclaw_global_iterate_patches (glob, write_entry_cb, &iter);
@@ -801,16 +788,10 @@ fclaw_vtk_write_file (int dim, fclaw_global_t * glob, const char *basename,
 
     s->vtk_vt = fclaw_clawpatch_vtk_vtable(glob);
 
-    s->fits32 = 1;
     s->global_num_points = get_global_num_elements (glob, s, &s->vtk_vt->position_entry);
     s->global_num_cells = get_global_num_elements (glob, s, &s->vtk_vt->types_entry);
-    s->global_num_connectivity = get_global_num_elements (glob, s, &s->vtk_vt->connectivity_entry);
 
     s->global_num_patches = domain->global_num_patches;
-    s->fits32 = s->global_num_points <= INT32_MAX
-        && s->global_num_connectivity <= INT32_MAX;
-    s->inttype = s->fits32 ? "Int32" : "Int64";
-    s->intsize = s->fits32 ? sizeof (int32_t) : sizeof (int64_t);
     s->ndsize = 8;   /* uint64 */
     s->time_value = glob->curr_time;
     s->coordinate_cb = coordinate_cb;
@@ -1039,6 +1020,4 @@ void fclaw_clawpatch_output_vtk (fclaw_global_t * glob, int iframe)
 
     fclaw_clawpatch_output_vtk_to_file(glob,basename);
 }
-
-
 

@@ -376,37 +376,17 @@ write_2d_connectivity_cb (fclaw_global_t* glob, fclaw_patch_t* patch,
         jend = my;
         ystride = mx + 1;
     }
-    if (ctx->fits32)
+    int64_t *idata = (int64_t *) buffer;
+    int64_t l;
+    for (int j = 0; j < jend; ++j)
     {
-        int32_t *idata = (int32_t *) buffer;
-        int32_t l;
-
-        for (int j = 0; j < jend; ++j)
+        for (int i = 0; i < iend; ++i)
         {
-            for (int i = 0; i < iend; ++i)
-            {
-                l = (int32_t) pbefore + i + j * ystride;
-                *idata++ = l;
-                *idata++ = l + 1;
-                *idata++ = l + ystride + 1;
-                *idata++ = l + ystride;
-            }
-        }
-    }
-    else
-    {
-        int64_t *idata = (int64_t *) buffer;
-        int64_t l;
-        for (int j = 0; j < jend; ++j)
-        {
-            for (int i = 0; i < iend; ++i)
-            {
-                l = pbefore + i + j * ystride;
-                *idata++ = l;
-                *idata++ = l + 1;
-                *idata++ = l + ystride + 1;
-                *idata++ = l + ystride;
-            }
+            l = pbefore + i + j * ystride;
+            *idata++ = l;
+            *idata++ = l + 1;
+            *idata++ = l + ystride + 1;
+            *idata++ = l + ystride;
         }
     }
 }
@@ -457,53 +437,24 @@ write_3d_connectivity_cb (fclaw_global_t* glob, fclaw_patch_t* patch,
         zstride = (mx + 1) * (my + 1);
     }
 
-    if (ctx->fits32)
+    int64_t *idata = (int64_t *) buffer;
+    int64_t l;
+    for (int k = 0; k < kend; ++k)
     {
-        int32_t *idata = (int32_t *) buffer;
-        int32_t l;
-
-        for (int k = 0; k < kend; ++k)
+        for (int j = 0; j < jend; ++j)
         {
-            for (int j = 0; j < jend; ++j)
+            for (int i = 0; i < iend; ++i)
             {
-                for (int i = 0; i < iend; ++i)
-                {
-                    l = (int32_t) pbefore + i + j * ystride
-                         + k * zstride;
-                    *idata++ = l;
-                    *idata++ = l + 1;
-                    *idata++ = l + ystride + 1;
-                    *idata++ = l + ystride;
-                    *idata++ = l + zstride;
-                    *idata++ = l + zstride + 1;
-                    *idata++ = l + zstride + ystride + 1;
-                    *idata++ = l + zstride + ystride;
-                }
-            }
-        }
-    }
-    else
-    {
-        int64_t *idata = (int64_t *) buffer;
-        int64_t l;
-
-        for (int k = 0; k < kend; ++k)
-        {
-            for (int j = 0; j < jend; ++j)
-            {
-                for (int i = 0; i < iend; ++i)
-                {
-                    l = pbefore + i + j * ystride
-                         + k * zstride;
-                    *idata++ = l;
-                    *idata++ = l + 1;
-                    *idata++ = l + ystride + 1;
-                    *idata++ = l + ystride;
-                    *idata++ = l + zstride;
-                    *idata++ = l + zstride + 1;
-                    *idata++ = l + zstride + ystride + 1;
-                    *idata++ = l + zstride + ystride;
-                }
+                l = pbefore + i + j * ystride
+                     + k * zstride;
+                *idata++ = l;
+                *idata++ = l + 1;
+                *idata++ = l + ystride + 1;
+                *idata++ = l + ystride;
+                *idata++ = l + zstride;
+                *idata++ = l + zstride + 1;
+                *idata++ = l + zstride + ystride + 1;
+                *idata++ = l + zstride + ystride;
             }
         }
     }
@@ -585,31 +536,15 @@ write_offsets_cb (fclaw_global_t* glob, fclaw_patch_t* patch,
         (glob->domain->global_num_patches_before +
          glob->domain->blocks[blockno].num_patches_before + patchno);
 
-    if (ctx->fits32)
+    int64_t *idata = (int64_t *) buffer;
+    if(ctx->offsets_include_zero && glob->domain->global_num_patches_before == 0 && blockno == 0 && patchno == 0)
     {
-        int32_t *idata = (int32_t *) buffer;
-        if(ctx->offsets_include_zero && glob->domain->global_num_patches_before == 0 && blockno == 0 && patchno == 0)
-        {
-            *idata++ = 0;
-        }
-        int32_t k = num_points_per_cell * (int32_t) (cbefore + 1);
-        for (int c = 0; c < cells_per_patch; k += num_points_per_cell, ++c)
-        {
-            *idata++ = k;
-        }
+        *idata++ = 0;
     }
-    else
+    int64_t k = num_points_per_cell * (cbefore + 1);
+    for (int c = 0; c < cells_per_patch; k += num_points_per_cell, ++c)
     {
-        int64_t *idata = (int64_t *) buffer;
-        if(ctx->offsets_include_zero && glob->domain->global_num_patches_before == 0 && blockno == 0 && patchno == 0)
-        {
-            *idata++ = 0;
-        }
-        int64_t k = num_points_per_cell * (cbefore + 1);
-        for (int c = 0; c < cells_per_patch; k += num_points_per_cell, ++c)
-        {
-            *idata++ = k;
-        }
+        *idata++ = k;
     }
 }
 
@@ -1166,11 +1101,11 @@ void fclaw_clawpatch_vtk_vtable_initialize(struct fclaw_global* glob)
                       &write_coordinate_cb);
 
     // primary cell entries
-    vtk_vt_entry_init(&vtk_vt->connectivity_entry, "connectivity", FCLAW_VTK_INT32_OR_64,
+    vtk_vt_entry_init(&vtk_vt->connectivity_entry, "connectivity", FCLAW_VTK_INT64,
                       1,
                       &connectivity_in_patch,
                       &write_connectivity_cb);
-    vtk_vt_entry_init(&vtk_vt->offsets_entry, "offsets", FCLAW_VTK_INT32_OR_64,
+    vtk_vt_entry_init(&vtk_vt->offsets_entry, "offsets", FCLAW_VTK_INT64,
                       1,
                       &offsets_in_patch,
                       &write_offsets_cb);
@@ -1246,5 +1181,4 @@ void fclaw_clawpatch_vtk_vtable_initialize(struct fclaw_global* glob)
 							  vtk_vt,
 							  vtk_vt_destroy);
 }
-
 
