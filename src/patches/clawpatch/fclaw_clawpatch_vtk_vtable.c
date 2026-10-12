@@ -30,6 +30,27 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_clawpatch_vtk_vtable.h>
 #include <fclaw_physical_bc.h>
 
+static int
+vtk_patch_dim(fclaw_global_t* glob, fclaw_patch_t* patch)
+{
+    int clawpatch_dim = fclaw_clawpatch_dim(patch);
+    int output_dim = clawpatch_dim;
+    if(clawpatch_dim == 3 && patch->refine_dim == 2)
+    {
+        int mx, my, mz, mbc;
+        double xlower, ylower, zlower, dx, dy, dz;
+        fclaw_clawpatch_3d_grid_data (glob, patch, &mx, &my, &mz, &mbc,
+                                      &xlower, &ylower, &zlower,
+                                      &dx, &dy, &dz);
+        if(mz == 1)
+        {
+            output_dim = 2;
+        }
+    }
+
+    return output_dim;
+}
+
 static
 fclaw_clawpatch_vtk_vtable_entry_t* vtk_vt_entry_new(const char* name,
                                                      fclaw_vtk_entry_type_t type,
@@ -144,7 +165,7 @@ get_patch_geometry (fclaw_global_t * glob, fclaw_patch_t * patch,
                     double *xlower, double *ylower, double *zlower,
                     double *dx, double *dy, double *dz)
 {
-    if (fclaw_clawpatch_dim(patch) == 2)
+    if (vtk_patch_dim(glob, patch) == 2)
     {
         int mx, my, mbc;
         fclaw_clawpatch_2d_grid_data (glob, patch, &mx, &my, &mbc,
@@ -323,7 +344,7 @@ write_coordinate_cb (fclaw_global_t * glob, fclaw_patch_t * patch,
                     int blockno, int patchno,
                     fclaw_vtk_cb_context_t* ctx, char* buffer)
 {
-    if (fclaw_clawpatch_dim(patch) == 2)
+    if (vtk_patch_dim(glob, patch) == 2)
     {
         write_2d_coordinate_cb(glob, patch, blockno, patchno, ctx, buffer);
     }
@@ -465,7 +486,7 @@ write_connectivity_cb (fclaw_global_t* glob, fclaw_patch_t* patch,
                        int blockno, int patchno,
                        fclaw_vtk_cb_context_t* ctx, char* buffer)
 {
-    if (fclaw_clawpatch_dim(patch) == 2)
+    if (vtk_patch_dim(glob, patch) == 2)
     {
         write_2d_connectivity_cb(glob, patch, blockno, patchno, ctx, buffer);
     }
@@ -484,7 +505,7 @@ get_cells_per_patch(fclaw_global_t *glob, fclaw_patch_t *patch)
     double xlower, ylower, zlower, dx, dy, dz;
 
     int num_cells = 0;
-    if (fclaw_clawpatch_dim(patch) == 2)
+    if (vtk_patch_dim(glob, patch) == 2)
     {
         fclaw_clawpatch_2d_grid_data(glob, patch, &mx, &my, &mbc,
                                      &xlower, &ylower, &dx, &dy);
@@ -522,7 +543,7 @@ write_offsets_cb (fclaw_global_t* glob, fclaw_patch_t* patch,
                   fclaw_vtk_cb_context_t* ctx, char* buffer)
 {
     int num_points_per_cell;
-    if(fclaw_clawpatch_dim(patch) == 2)
+    if(vtk_patch_dim(glob, patch) == 2)
     {
         num_points_per_cell = 4;
     }
@@ -555,7 +576,7 @@ write_types_cb (fclaw_global_t* glob, fclaw_patch_t* patch,
 {
     char *cdata = buffer;
     const int cells_per_patch = get_cells_per_patch(glob, patch);
-    if(fclaw_clawpatch_dim(patch) == 2)
+    if(vtk_patch_dim(glob, patch) == 2)
     {
         for (int c = 0; c < cells_per_patch; ++c)
         {
@@ -629,7 +650,7 @@ pack_data (fclaw_global_t * glob,
     double *q;
     access(glob, patch, &q, &meqn);
 
-    int patch_dim = fclaw_clawpatch_dim(patch);
+    int patch_dim = vtk_patch_dim(glob, patch);
     if(patch_dim == 2)
     {
         int mx,my,mbc;
@@ -744,7 +765,7 @@ write_aux_cb (fclaw_global_t * glob, fclaw_patch_t * patch,
     double *q;
     fclaw_clawpatch_aux_data(glob, patch, &q, &maux);
 
-    int patch_dim = fclaw_clawpatch_dim(patch);
+    int patch_dim = vtk_patch_dim(glob, patch);
     if(patch_dim == 2)
     {
         int mx,my,mbc;
@@ -879,7 +900,7 @@ write_ghost_cb (fclaw_global_t * glob, fclaw_patch_t * patch,
                 int blockno, int patchno,
                 fclaw_vtk_cb_context_t* ctx, char* buffer)
 {
-    int patch_dim = fclaw_clawpatch_dim(patch);
+    int patch_dim = vtk_patch_dim(glob, patch);
     if(patch_dim == 2)
     {
         int mx,my,mbc;
@@ -963,7 +984,7 @@ points_in_patch (fclaw_global_t* glob, fclaw_patch_t* patch,
     int mx, my, mz, mbc;
     double xlower, ylower, zlower, dx, dy, dz;
     size_t num_points = 0;
-    if (fclaw_clawpatch_dim(patch) == 2)
+    if (vtk_patch_dim(glob, patch) == 2)
     {
         fclaw_clawpatch_2d_grid_data(glob, patch, &mx, &my, &mbc, 
                                      &xlower, &ylower, &dx, &dy);
@@ -1003,7 +1024,7 @@ cells_in_patch (fclaw_global_t* glob, fclaw_patch_t* patch,
     double xlower, ylower, zlower, dx, dy, dz;
 
     int num_cells = 0;
-    if (fclaw_clawpatch_dim(patch) == 2)
+    if (vtk_patch_dim(glob, patch) == 2)
     {
         fclaw_clawpatch_2d_grid_data(glob, patch, &mx, &my, &mbc, 
                                      &xlower, &ylower, &dx, &dy);
@@ -1039,7 +1060,7 @@ connectivity_in_patch (fclaw_global_t* glob, fclaw_patch_t* patch,
 {
     int num_cells = cells_in_patch(glob, patch, blockno, patchno, ctx);
     int num_points_per_cell;
-    if(fclaw_clawpatch_dim(patch) == 2)
+    if(vtk_patch_dim(glob, patch) == 2)
     {
         num_points_per_cell = 4;
     }
@@ -1181,4 +1202,3 @@ void fclaw_clawpatch_vtk_vtable_initialize(struct fclaw_global* glob)
 							  vtk_vt,
 							  vtk_vt_destroy);
 }
-
