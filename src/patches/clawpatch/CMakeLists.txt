@@ -182,10 +182,16 @@ if(BUILD_TESTING)
       fclaw_clawpatch.h.3d.interpolate.TEST.cpp
       fclaw_clawpatch.h.3d.average.TEST.cpp
       fclaw_clawpatch_options.h.TEST.cpp
+      fclaw_clawpatch_vtk_vtable.TEST.cpp
+      fclaw_clawpatch_output_vtk.TEST.cpp
+      fclaw_clawpatch_output_hdf5.TEST.cpp
       fclaw_clawpatch_diagnostics.h.TEST.cpp
       fclaw2d_clawpatch_fort.h.TEST.cpp
       ${metric}/fclaw2d_metric.h.TEST.cpp
   )
   target_link_libraries(clawpatch.TEST testutils clawpatch forestclaw)
+  if(FCLAW_ENABLE_HDF5)
+    target_link_libraries(clawpatch.TEST HDF5::HDF5)
+  endif()
   register_unit_tests(clawpatch.TEST)
 endif(BUILD_TESTING)
