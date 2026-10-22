@@ -158,25 +158,57 @@ static void make_single_value_dataset_numerical(int mpirank,
     }
 }
 
+static hsize_t
+largest_divisor_at_most(hsize_t value, hsize_t limit)
+{
+    if (value == 0)
+    {
+        return 1;
+    }
+
+    hsize_t largest_divisor = 1;
+    for (hsize_t divisor = 1; divisor <= value / divisor; ++divisor)
+    {
+        if (value % divisor == 0)
+        {
+            hsize_t paired_divisor = value / divisor;
+            if (divisor <= limit && divisor > largest_divisor)
+            {
+                largest_divisor = divisor;
+            }
+            if (paired_divisor <= limit &&
+                paired_divisor > largest_divisor)
+            {
+                largest_divisor = paired_divisor;
+            }
+        }
+    }
+    return largest_divisor;
+}
+
 /**
  * Computes chunk dimensions for compressed datasets.
  *
  * The target chunk payload is 8 MiB. Dimensions 1..rank-1 are either copied from
  * dataset_dims or set to 1 when limit_other_dims is enabled. The first dimension
- * is then reduced as needed to keep the total chunk payload within the target.
+ * is then set to the largest divisor of the patch-size hint that fits within
+ * the target chunk size. Since rank offsets are multiples of the patch size,
+ * this keeps processor boundaries on chunk boundaries.
  *
  * @param tid The HDF5 datatype identifier.
  * @param rank The rank of the dataset.
  * @param dataset_dims The full dataset dimensions used as the initial chunk shape.
  * @param chunk_dims Output chunk dimensions.
  * @param limit_other_dims If nonzero, dimensions 1..rank-1 are forced to 1.
+ * @param patch_size_hint The number of elements contributed by a typical patch.
  */
 static void
 get_chunk_size(hid_t tid, 
                int rank, 
                const hsize_t *dataset_dims, 
                hsize_t *chunk_dims,
-               int limit_other_dims)
+               int limit_other_dims,
+               hsize_t patch_size_hint)
 {
     // target 8 MiB chunk size
     const hsize_t target_chunk_size = ((hsize_t) 8) << 20; /* 8 MiB */
@@ -209,11 +241,10 @@ get_chunk_size(hid_t tid,
         }
     }
 
-    chunk_dims[0] = dataset_dims[0] < max_dim0 ? dataset_dims[0] : max_dim0;
-    if (chunk_dims[0] < 1)
-    {
-        chunk_dims[0] = 1;
-    }
+    hsize_t max_chunk_dim0 =
+        dataset_dims[0] < max_dim0 ? dataset_dims[0] : max_dim0;
+    chunk_dims[0] = largest_divisor_at_most(patch_size_hint,
+                                             max_chunk_dim0);
 }
 
 /**
@@ -226,7 +257,7 @@ get_chunk_size(hid_t tid,
  * @param dset_name The name of the dataset.
  * @param rank The rank of the dataset.
  * @param dims The dimensions of the dataset.
- * @param patch_dims The dimensions for a single patch.
+ * @param patch_size_hint The number of elements contributed by a typical patch.
  * @return The dataset identifier.
  */
 static hid_t 
@@ -236,7 +267,8 @@ make_dataset(const fclaw_clawpatch_options_t *clawpatch_opts,
              const char *dset_name, 
              int rank, 
              const hsize_t *dims, 
-             int limit_other_dims)
+             int limit_other_dims,
+             hsize_t patch_size_hint)
 {
     herr_t status = 0;
 
@@ -251,7 +283,8 @@ make_dataset(const fclaw_clawpatch_options_t *clawpatch_opts,
                    rank,
                    dims,
                    limited_chunk_dims,
-                   limit_other_dims);
+                   limit_other_dims,
+                   patch_size_hint);
         status |= H5Pset_chunk(prop_id, rank, limited_chunk_dims);
 #if 0
         if(H5Tget_class(tid) == H5T_INTEGER)
@@ -368,8 +401,9 @@ write_vtable_entry_dataset(fclaw_global_t *glob,
         {
             patch = &glob->domain->blocks[blockno].patches[patchno];
         }
-        local_total += (unsigned long long)
+        unsigned long long patch_count = (unsigned long long)
             hdf5_entry_elements_in_patch(glob, patch, blockno, patchno, entry, &ctx);
+        local_total += patch_count;
     }
 
     unsigned long long global_start = 0;
@@ -390,6 +424,18 @@ write_vtable_entry_dataset(fclaw_global_t *glob,
     global_start = prefix_total - local_total;
 #endif
 
+    unsigned long long patch_size_total = global_total;
+    if (strcmp(dset_name, "Offsets") == 0 && patch_size_total > 0)
+    {
+        --patch_size_total;
+    }
+    hsize_t patch_size_hint = 1;
+    if (glob->domain->global_num_patches > 0)
+    {
+        patch_size_hint = (hsize_t)
+            (patch_size_total / (unsigned long long) glob->domain->global_num_patches);
+    }
+
     hsize_t dataset_dims[2] = {0, 0};
     dataset_dims[0] = (hsize_t) global_total;
     if (rank == 2)
@@ -403,7 +449,8 @@ write_vtable_entry_dataset(fclaw_global_t *glob,
                              dset_name,
                              rank,
                              dataset_dims,
-                             limit_other_dims);
+                             limit_other_dims,
+                             patch_size_hint);
 
     hid_t plist_id = H5Pcreate(H5P_DATASET_XFER);
     herr_t io_status = 0;
@@ -808,5 +855,3 @@ void fclaw_clawpatch_output_hdf5 (fclaw_global_t * glob, int iframe)
 
     fclaw_clawpatch_output_hdf5_to_file(glob,basename, NULL, NULL);
 }
-
-

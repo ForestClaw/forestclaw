@@ -58,22 +58,35 @@ public:
     fclaw_options_t fopts;
     fclaw_clawpatch_options_t* opts;
     std::string basename;
+    sc_MPI_Comm comm;
+    int rank;
 
-    TestData()
+    explicit TestData(sc_MPI_Comm test_comm = sc_MPI_COMM_SELF)
+        : comm(test_comm), rank(0)
     {
-        const auto timestamp =
-            std::chrono::steady_clock::now().time_since_epoch().count();
-        basename = (std::filesystem::temp_directory_path() /
-                    ("forestclaw-output-test-" + std::to_string(timestamp))).string();
+        sc_MPI_Comm_rank(comm, &rank);
+        char shared_basename[1024] = {};
+        if (rank == 0)
+        {
+            const auto timestamp =
+                std::chrono::steady_clock::now().time_since_epoch().count();
+            const std::string path =
+                (std::filesystem::temp_directory_path() /
+                 ("forestclaw-output-test-" + std::to_string(timestamp))).string();
+            std::snprintf(shared_basename, sizeof(shared_basename), "%s",
+                          path.c_str());
+        }
+        sc_MPI_Bcast(shared_basename, sizeof(shared_basename), sc_MPI_CHAR, 0, comm);
+        basename = shared_basename;
 
-        domain = fclaw_domain_new_unitsquare(sc_MPI_COMM_SELF, 0);
+        domain = fclaw_domain_new_unitsquare(comm, 1);
         map = fclaw_map_new_nomap();
-        glob = fclaw_global_new_comm(sc_MPI_COMM_SELF, 1, 0);
+        glob = fclaw_global_new_comm(comm, 1, 0);
         opts = fclaw_clawpatch_options_new(2);
 
         std::memset(&fopts, 0, sizeof(fopts));
-        fopts.minlevel = 0;
-        fopts.maxlevel = 0;
+        fopts.minlevel = 1;
+        fopts.maxlevel = 1;
         fopts.refratio = 2;
         fopts.bx = 1;
         fopts.by = 1;
@@ -111,8 +124,12 @@ public:
 
     ~TestData()
     {
-        std::remove((basename + ".vtu").c_str());
-        std::remove((basename + ".vtkhdf").c_str());
+        sc_MPI_Barrier(comm);
+        if (rank == 0)
+        {
+            std::remove((basename + ".vtu").c_str());
+            std::remove((basename + ".vtkhdf").c_str());
+        }
         fclaw_finalize(glob);
         fclaw_global_destroy(glob);
         fclaw_clawpatch_options_destroy(opts);
