@@ -537,6 +537,15 @@ get_cells_per_patch(fclaw_global_t *glob, fclaw_patch_t *patch)
     return num_cells;
 }
 
+/* Use the global patch index so trailing empty ranks/blocks are harmless. */
+static int
+is_last_global_patch(fclaw_global_t *glob, int blockno, int patchno)
+{
+    return glob->domain->global_num_patches_before +
+        glob->domain->blocks[blockno].num_patches_before + patchno ==
+        glob->domain->global_num_patches - 1;
+}
+
 static void
 write_offsets_cb (fclaw_global_t* glob, fclaw_patch_t* patch,
                   int blockno, int patchno,
@@ -553,19 +562,21 @@ write_offsets_cb (fclaw_global_t* glob, fclaw_patch_t* patch,
     }
 
     const int cells_per_patch = get_cells_per_patch(glob, patch);
-    const int64_t cbefore = cells_per_patch *
+    const int64_t cbefore = (int64_t) cells_per_patch *
         (glob->domain->global_num_patches_before +
          glob->domain->blocks[blockno].num_patches_before + patchno);
 
     int64_t *idata = (int64_t *) buffer;
-    if(ctx->offsets_include_zero && glob->domain->global_num_patches_before == 0 && blockno == 0 && patchno == 0)
-    {
-        *idata++ = 0;
-    }
-    int64_t k = num_points_per_cell * (cbefore + 1);
+    /* HDF uses cell starts plus one terminal offset; VTU uses cell ends. */
+    int64_t k = num_points_per_cell *
+        (cbefore + (ctx->offsets_include_zero ? 0 : 1));
     for (int c = 0; c < cells_per_patch; k += num_points_per_cell, ++c)
     {
         *idata++ = k;
+    }
+    if(ctx->offsets_include_zero && is_last_global_patch(glob, blockno, patchno))
+    {
+        *idata = k;
     }
 }
 
@@ -1077,7 +1088,7 @@ offsets_in_patch (fclaw_global_t* glob, fclaw_patch_t* patch,
                   fclaw_vtk_cb_context_t* ctx)
 {
     size_t retval = cells_in_patch(glob, patch, blockno, patchno, ctx);
-    if(ctx->offsets_include_zero && glob->domain->global_num_patches_before == 0 && blockno == 0 && patchno == 0)
+    if(ctx->offsets_include_zero && is_last_global_patch(glob, blockno, patchno))
     {
         retval += 1;
     }
