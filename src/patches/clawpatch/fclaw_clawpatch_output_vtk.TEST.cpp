@@ -28,6 +28,7 @@ POSSIBILITY OF SUCH DAMAGE.
 #include <test.hpp>
 
 #include "fclaw_clawpatch_output_test_utils.hpp"
+#include <fclaw_clawpatch_vtk_vtable.h>
 
 #include <cstring>
 #include <fstream>
@@ -50,9 +51,10 @@ read_file(const std::string& filename)
                        std::istreambuf_iterator<char>());
 }
 
+template <typename T>
 bool
-vtu_dataarray_floats(const std::string& contents, const std::string& name,
-                     std::vector<float>* values)
+vtu_dataarray_values(const std::string& contents, const std::string& name,
+                     std::vector<T>* values)
 {
     const std::string name_attribute = "Name=\"" + name + "\"";
     const size_t tag_start = contents.find(name_attribute);
@@ -96,18 +98,69 @@ vtu_dataarray_floats(const std::string& contents, const std::string& name,
     }
     uint64_t byte_count;
     std::memcpy(&byte_count, contents.data() + data_start, sizeof(byte_count));
-    if (byte_count % sizeof(float) != 0 ||
+    if (byte_count % sizeof(T) != 0 ||
         data_start + sizeof(byte_count) + byte_count > contents.size())
     {
         return false;
     }
-    values->resize(byte_count / sizeof(float));
+    values->resize(byte_count / sizeof(T));
     std::memcpy(values->data(), contents.data() + data_start + sizeof(byte_count),
                 byte_count);
     return true;
 }
 
 } // namespace
+
+static void
+write_pressure(fclaw_global_t*, fclaw_patch_t*, int, int,
+               fclaw_vtk_cb_context_t*, char* buffer)
+{
+    double* values = (double*) buffer;
+    for (int cell = 0; cell < 4; ++cell)
+    {
+        values[cell] = 10. + cell;
+    }
+}
+
+static void
+write_velocity(fclaw_global_t*, fclaw_patch_t*, int, int,
+               fclaw_vtk_cb_context_t*, char* buffer)
+{
+    double* values = (double*) buffer;
+    for (int cell = 0; cell < 4; ++cell)
+    {
+        for (int component = 0; component < 3; ++component)
+        {
+            values[3 * cell + component] = 100. * cell + component;
+        }
+    }
+}
+
+TEST_CASE("VTU output includes registered scalar and vector cell data")
+{
+    fclaw_clawpatch_output_test::TestData test_data;
+    fclaw_clawpatch_vtk_vtable_add_celldata(test_data.glob, "pressure",
+                                            FCLAW_VTK_FLOAT64, 1, write_pressure);
+    fclaw_clawpatch_vtk_vtable_add_celldata(test_data.glob, "velocity",
+                                            FCLAW_VTK_FLOAT64, 3, write_velocity);
+    fclaw_clawpatch_output_vtk_to_file(test_data.glob, test_data.basename.c_str());
+    const std::string contents = read_file(test_data.basename + ".vtu");
+    std::vector<double> pressure, velocity;
+    REQUIRE(vtu_dataarray_values(contents, "pressure", &pressure));
+    REQUIRE(vtu_dataarray_values(contents, "velocity", &velocity));
+    /* Four patches, each containing four cells. */
+    REQUIRE_EQ(pressure.size(), 16);
+    REQUIRE_EQ(velocity.size(), 48);
+    for (int cell = 0; cell < 16; ++cell)
+    {
+        CHECK_EQ(pressure[cell], 10. + cell % 4);
+        for (int component = 0; component < 3; ++component)
+        {
+            CHECK_EQ(velocity[3 * cell + component],
+                     100. * (cell % 4) + component);
+        }
+    }
+}
 
 TEST_CASE("VTU output contains the expected mesh and cell values")
 {
@@ -122,7 +175,7 @@ TEST_CASE("VTU output contains the expected mesh and cell values")
     CHECK(contents.find("Name=\"meqn\"") != std::string::npos);
 
     std::vector<float> cell_values;
-    REQUIRE(vtu_dataarray_floats(contents, "meqn", &cell_values));
+    REQUIRE(vtu_dataarray_values(contents, "meqn", &cell_values));
     REQUIRE_EQ(cell_values.size(), 4);
     for (float value : cell_values)
     {

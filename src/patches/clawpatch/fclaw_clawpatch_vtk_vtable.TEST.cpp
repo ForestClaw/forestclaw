@@ -125,3 +125,126 @@ TEST_CASE("VTK vtable includes ghost-cell metadata when requested")
     fclaw_global_destroy(glob);
     fclaw_clawpatch_options_destroy(options);
 }
+
+static void
+write_custom_values(fclaw_global_t*, fclaw_patch_t*, int, int,
+                    fclaw_vtk_cb_context_t*, char* buffer)
+{
+    double* values = (double*) buffer;
+    values[0] = 1.;
+    values[1] = 2.;
+    values[2] = 3.;
+}
+
+TEST_CASE("VTK custom cell data owns names and uses the mesh cell count")
+{
+    fclaw_global_t* glob = fclaw_global_new_comm(sc_MPI_COMM_SELF, 1, 0);
+    fclaw_clawpatch_options_t* options = fclaw_clawpatch_options_new(2);
+    fclaw_clawpatch_vtk_vtable_t* vtk_vt = initialize_vtk_vtable(glob, options);
+    const size_t original_count = vtk_vt->celldata_entries->elem_count;
+    char pressure_name[] = "pressure";
+    fclaw_clawpatch_vtk_vtable_add_celldata(glob, pressure_name, FCLAW_VTK_FLOAT64,
+                                            1, write_custom_values);
+    pressure_name[0] = 'X';
+    fclaw_clawpatch_vtk_vtable_add_celldata(glob, "velocity", FCLAW_VTK_FLOAT64,
+                                            3, write_custom_values);
+
+    CHECK_EQ(vtk_vt->celldata_entries->elem_count, original_count + 2);
+    fclaw_clawpatch_vtk_vtable_entry_t* pressure =
+        find_entry(vtk_vt->celldata_entries, "pressure");
+    fclaw_clawpatch_vtk_vtable_entry_t* velocity =
+        find_entry(vtk_vt->celldata_entries, "velocity");
+    REQUIRE(pressure != NULL);
+    REQUIRE(velocity != NULL);
+    CHECK_EQ(pressure->type, FCLAW_VTK_FLOAT64);
+    CHECK_EQ(pressure->number_of_components, 1);
+    CHECK_EQ(velocity->number_of_components, 3);
+    CHECK(pressure->elements_in_patch == vtk_vt->types_entry.elements_in_patch);
+    CHECK(velocity->elements_in_patch == vtk_vt->types_entry.elements_in_patch);
+    CHECK(velocity->callback == write_custom_values);
+    double values[3] = {0., 0., 0.};
+    fclaw_vtk_cb_context_t ctx = {};
+    velocity->callback(glob, NULL, 0, 0, &ctx, (char*) values);
+    CHECK_EQ(values[0], 1.);
+    CHECK_EQ(values[1], 2.);
+    CHECK_EQ(values[2], 3.);
+
+    fclaw_global_destroy(glob);
+    fclaw_clawpatch_options_destroy(options);
+}
+
+TEST_CASE("VTK cell-data registration rejects invalid entries without changing the vtable")
+{
+    fclaw_global_t* glob = fclaw_global_new_comm(sc_MPI_COMM_SELF, 1, 0);
+    fclaw_clawpatch_options_t* options = fclaw_clawpatch_options_new(2);
+    fclaw_clawpatch_vtk_vtable_t* vtk_vt = initialize_vtk_vtable(glob, options);
+    fclaw_clawpatch_vtk_vtable_add_celldata(glob, "pressure", FCLAW_VTK_FLOAT64,
+                                            1, write_custom_values);
+    const size_t original_count = vtk_vt->celldata_entries->elem_count;
+    fclaw_clawpatch_vtk_vtable_entry_t* pressure =
+        find_entry(vtk_vt->celldata_entries, "pressure");
+
+    SUBCASE("null name")
+    {
+        CHECK_SC_ABORTED(fclaw_clawpatch_vtk_vtable_add_celldata(
+            glob, NULL, FCLAW_VTK_FLOAT64, 1, write_custom_values));
+    }
+    SUBCASE("empty name")
+    {
+        CHECK_SC_ABORTED(fclaw_clawpatch_vtk_vtable_add_celldata(
+            glob, "", FCLAW_VTK_FLOAT64, 1, write_custom_values));
+    }
+    SUBCASE("type below the valid range")
+    {
+        CHECK_SC_ABORTED(fclaw_clawpatch_vtk_vtable_add_celldata(
+            glob, "invalid", static_cast<fclaw_vtk_entry_type_t>(-1),
+            1, write_custom_values));
+    }
+    SUBCASE("type above the valid range")
+    {
+        CHECK_SC_ABORTED(fclaw_clawpatch_vtk_vtable_add_celldata(
+            glob, "invalid", static_cast<fclaw_vtk_entry_type_t>(FCLAW_VTK_FLOAT64 + 1),
+            1, write_custom_values));
+    }
+    SUBCASE("zero components")
+    {
+        CHECK_SC_ABORTED(fclaw_clawpatch_vtk_vtable_add_celldata(
+            glob, "invalid", FCLAW_VTK_FLOAT64, 0, write_custom_values));
+    }
+    SUBCASE("negative components")
+    {
+        CHECK_SC_ABORTED(fclaw_clawpatch_vtk_vtable_add_celldata(
+            glob, "invalid", FCLAW_VTK_FLOAT64, -1, write_custom_values));
+    }
+    SUBCASE("null callback")
+    {
+        CHECK_SC_ABORTED(fclaw_clawpatch_vtk_vtable_add_celldata(
+            glob, "invalid", FCLAW_VTK_FLOAT64, 1, NULL));
+    }
+    SUBCASE("duplicate built-in name")
+    {
+        CHECK_SC_ABORTED(fclaw_clawpatch_vtk_vtable_add_celldata(
+            glob, "mpirank", FCLAW_VTK_FLOAT64, 1, write_custom_values));
+    }
+    SUBCASE("duplicate custom name")
+    {
+        CHECK_SC_ABORTED(fclaw_clawpatch_vtk_vtable_add_celldata(
+            glob, "pressure", FCLAW_VTK_FLOAT32, 3, write_custom_values));
+    }
+
+    CHECK_EQ(vtk_vt->celldata_entries->elem_count, original_count);
+    CHECK(find_entry(vtk_vt->celldata_entries, "pressure") == pressure);
+    CHECK(find_entry(vtk_vt->celldata_entries, "invalid") == NULL);
+    REQUIRE(pressure != NULL);
+    CHECK_EQ(pressure->type, FCLAW_VTK_FLOAT64);
+    CHECK_EQ(pressure->number_of_components, 1);
+    CHECK(pressure->callback == write_custom_values);
+
+    fclaw_clawpatch_vtk_vtable_add_celldata(glob, "velocity", FCLAW_VTK_FLOAT64,
+                                            3, write_custom_values);
+    CHECK_EQ(vtk_vt->celldata_entries->elem_count, original_count + 1);
+    CHECK(find_entry(vtk_vt->celldata_entries, "velocity") != NULL);
+
+    fclaw_global_destroy(glob);
+    fclaw_clawpatch_options_destroy(options);
+}

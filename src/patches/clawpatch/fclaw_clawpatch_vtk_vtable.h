@@ -122,6 +122,31 @@ fclaw_clawpatch_vtk_vtable_t* fclaw_clawpatch_vtk_vtable(struct fclaw_global* gl
  * @param glob the global context
  */
 void fclaw_clawpatch_vtk_vtable_initialize(struct fclaw_global* glob);
+
+/**
+ * @brief Register a named cell-data array for VTK output.
+ *
+ * Call after VTK vtable initialization and before output, with the same entries
+ * in the same order on every MPI rank. Names must be nonempty and unique among
+ * cell-data arrays; the name is copied and owned by the vtable.
+ *
+ * ForestClaw allocates the buffer and supplies the output cell count, including
+ * ghost cells when vtk_ghost_out is enabled. The callback must fill one tuple
+ * per output cell, with i varying fastest, then j, then k, and components
+ * contiguous within each tuple. Cast the buffer to the registered numeric type.
+ * The callback must not retain or free the buffer.
+ *
+ * @param glob the global context
+ * @param name the output array name
+ * @param type the numeric type written by callback
+ * @param number_of_components positive number of values per cell
+ * @param callback callback that fills the patch output buffer
+ */
+void fclaw_clawpatch_vtk_vtable_add_celldata(struct fclaw_global* glob,
+                                             const char* name,
+                                             fclaw_vtk_entry_type_t type,
+                                             int number_of_components,
+                                             fclaw_vtk_patch_cb_t callback);
 #ifdef __cplusplus
 #if 0
 {                               /* need this because indent is dumb */

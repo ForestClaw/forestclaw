@@ -29,6 +29,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fclaw_clawpatch_options.h>
 #include <fclaw_clawpatch_vtk_vtable.h>
 #include <fclaw_physical_bc.h>
+#include <string.h>
 
 static int
 vtk_patch_dim(fclaw_global_t* glob, fclaw_patch_t* patch)
@@ -61,7 +62,7 @@ fclaw_clawpatch_vtk_vtable_entry_t* vtk_vt_entry_new(const char* name,
 	fclaw_clawpatch_vtk_vtable_entry_t* entry =
 		FCLAW_ALLOC(fclaw_clawpatch_vtk_vtable_entry_t, 1);
 
-	entry->name = name;
+	entry->name = FCLAW_STRDUP(name);
 	entry->type = type;
 	entry->number_of_components = number_of_components;
     entry->elements_in_patch = elements_in_patch;
@@ -137,6 +138,7 @@ void vtk_vt_destroy(void* vt)
 		{
 			entry = (fclaw_clawpatch_vtk_vtable_entry_t*)
 				sc_list_pop(vtk_vt->field_entries);
+			FCLAW_FREE((char*) entry->name);
 			FCLAW_FREE(entry);
 		}
 		sc_list_destroy(vtk_vt->field_entries);
@@ -147,6 +149,7 @@ void vtk_vt_destroy(void* vt)
         {
             entry = (fclaw_clawpatch_vtk_vtable_entry_t*)
                 sc_list_pop(vtk_vt->celldata_entries);
+            FCLAW_FREE((char*) entry->name);
             FCLAW_FREE(entry);
         }
         sc_list_destroy(vtk_vt->celldata_entries);
@@ -1105,6 +1108,44 @@ fclaw_clawpatch_vtk_vtable(struct fclaw_global* glob)
 								"fclaw_clawpatch_vtk_vtable");
 	FCLAW_ASSERT(vtk_vt != NULL);
 	return vtk_vt;
+}
+
+void fclaw_clawpatch_vtk_vtable_add_celldata(struct fclaw_global* glob,
+                                             const char* name,
+                                             fclaw_vtk_entry_type_t type,
+                                             int number_of_components,
+                                             fclaw_vtk_patch_cb_t callback)
+{
+    fclaw_clawpatch_vtk_vtable_t* vtk_vt = fclaw_clawpatch_vtk_vtable(glob);
+    if (name == NULL || name[0] == '\0')
+    {
+        fclaw_abortf("VTK cell-data name must be nonempty\n");
+    }
+    if (type < FCLAW_VTK_UINT8 || type > FCLAW_VTK_FLOAT64)
+    {
+        fclaw_abortf("Invalid VTK cell-data type %d for '%s'\n", (int) type, name);
+    }
+    if (number_of_components <= 0)
+    {
+        fclaw_abortf("VTK cell-data component count must be positive for '%s': %d\n",
+                    name, number_of_components);
+    }
+    if (callback == NULL)
+    {
+        fclaw_abortf("VTK cell-data callback is required for '%s'\n", name);
+    }
+    for (sc_link_t* link = vtk_vt->celldata_entries->first;
+         link != NULL; link = link->next)
+    {
+        fclaw_clawpatch_vtk_vtable_entry_t* entry =
+            (fclaw_clawpatch_vtk_vtable_entry_t*) link->data;
+        if (strcmp(entry->name, name) == 0)
+        {
+            fclaw_abortf("Duplicate VTK cell-data name '%s'\n", name);
+        }
+    }
+    vtk_add_celldata_entry(vtk_vt, name, type, number_of_components,
+                          &cells_in_patch, callback);
 }
 
 void fclaw_clawpatch_vtk_vtable_initialize(struct fclaw_global* glob)
