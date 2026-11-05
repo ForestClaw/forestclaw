@@ -45,6 +45,9 @@ vtk_patch_dim(fclaw_global_t* glob, fclaw_patch_t* patch)
                                       &dx, &dy, &dz);
         if(mz == 1)
         {
+            /* Export single-layer extruded patches as a 2D surface of
+               quads in VTU and VTKHDF. The solver arrays still use 3D
+               storage, including ghost planes in z. */
             output_dim = 2;
         }
     }
