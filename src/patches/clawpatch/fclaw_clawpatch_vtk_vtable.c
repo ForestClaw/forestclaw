@@ -643,11 +643,13 @@ write_patchno_cb (fclaw_global_t* glob, fclaw_patch_t* patch,
                   int blockno, int patchno,
                   fclaw_vtk_cb_context_t* ctx, char* buffer)
 {
-    int *idata = (int32_t *) buffer;
+    int32_t *idata = (int32_t *) buffer;
+    const int32_t global_patchno = glob->domain->global_num_patches_before +
+        glob->domain->blocks[blockno].num_patches_before + patchno;
     const int cells_per_patch = get_cells_per_patch(glob, patch);
     for (int c = 0; c < cells_per_patch; ++c)
     {
-        *idata++ = patchno;
+        *idata++ = global_patchno;
     }
 }
 
