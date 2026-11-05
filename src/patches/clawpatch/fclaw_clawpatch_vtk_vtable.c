@@ -1208,7 +1208,7 @@ void fclaw_clawpatch_vtk_vtable_initialize(struct fclaw_global* glob)
                            &write_value_cb);
     
     int num_aux_fields = 0;
-    for (int i = 0; i < clawpatch_opt->maux; ++i)
+    for (int i = 0; clawpatch_opt->vtk_aux_out && i < clawpatch_opt->maux; ++i)
     {
         if (clawpatch_opt->vtk_aux_out[i] > 0)
         {

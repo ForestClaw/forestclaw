@@ -170,13 +170,13 @@ TEST_CASE("VTU output contains the expected mesh and cell values")
     const std::string contents = read_file(test_data.basename + ".vtu");
     REQUIRE_FALSE(contents.empty());
     CHECK(contents.find("<VTKFile type=\"UnstructuredGrid\"") != std::string::npos);
-    CHECK(contents.find("<Piece NumberOfPoints=\"9\" NumberOfCells=\"4\">") !=
+    CHECK(contents.find("<Piece NumberOfPoints=\"36\" NumberOfCells=\"16\">") !=
           std::string::npos);
     CHECK(contents.find("Name=\"meqn\"") != std::string::npos);
 
     std::vector<float> cell_values;
     REQUIRE(vtu_dataarray_values(contents, "meqn", &cell_values));
-    REQUIRE_EQ(cell_values.size(), 4);
+    REQUIRE_EQ(cell_values.size(), 16);
     for (float value : cell_values)
     {
         CHECK_EQ(value, fclaw_clawpatch_output_test::output_value);

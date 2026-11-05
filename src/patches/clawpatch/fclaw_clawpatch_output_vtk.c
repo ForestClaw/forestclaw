@@ -974,7 +974,7 @@ void fclaw_clawpatch_output_vtk_to_file (fclaw_global_t * glob, const char* file
     const fclaw_clawpatch_options_t *clawpatch_opt = fclaw_clawpatch_get_options(glob);
 
     int num_aux_fields = 0;
-    for(int i = 0; i < clawpatch_opt->maux; i++)
+    for (int i = 0; clawpatch_opt->vtk_aux_out && i < clawpatch_opt->maux; ++i)
     {
         if (clawpatch_opt->vtk_aux_out[i] > 0)
         {

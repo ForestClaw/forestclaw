@@ -81,7 +81,7 @@ public:
 
         domain = fclaw_domain_new_unitsquare(comm, 1);
         map = fclaw_map_new_nomap();
-        glob = fclaw_global_new_comm(comm, 1, 0);
+        glob = fclaw_global_new_comm(comm, domain->mpisize, rank);
         opts = fclaw_clawpatch_options_new(2);
 
         std::memset(&fopts, 0, sizeof(fopts));
