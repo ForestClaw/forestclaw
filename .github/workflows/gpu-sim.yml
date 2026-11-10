@@ -1,0 +1,117 @@
+name: CudaClaw on simulated H100
+
+# Optional, non-required check. The hosted runners have no GPU, so this builds
+# ForestClaw with CudaClaw and runs the CudaClaw example applications on a
+# simulated NVIDIA H100 (https://github.com/pantheongpu/pantheonsim). A
+# simulator cannot reproduce hardware-specific behavior or timing, so it
+# complements real-GPU testing and does not replace it. It does not depend on
+# the jobs in ci_cmake.yml.
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "src/solvers/fc2d_cudaclaw/**"
+      - "src/patches/clawpatch/**"
+      - "applications/cudaclaw/**"
+      - "CMakeLists.txt"
+      - "cmake/**"
+      - ".github/workflows/gpu-sim.yml"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  cudaclaw:
+    name: CudaClaw on simulated H100
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          submodules: recursive
+          persist-credentials: false
+
+      # CUDA 12.6: the cudaclaw library links CUDA::nvToolsExt, which CUDA 13
+      # no longer ships. The toolkit installed here has no NVTX library, so
+      # cuda-nvtx-12-6 is added below.
+      - name: Set up the simulated GPU and CUDA toolkit
+        uses: pantheongpu/setup-pantheonsim@ca87fe3143b29166822b923d6050945c5179408c # v0.1.5
+        with:
+          gpu: nvidia/h100
+          cuda-toolkit: "12.6"
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends gfortran ninja-build cuda-nvtx-12-6
+
+      # cub::BlockReduce returns the block maximum only in thread 0, but
+      # cudaclaw_flux2.cu stores the return value from every thread. The other
+      # threads get an undefined value, which the simulator does not hide the
+      # way real hardware seems to: the CFL number becomes garbage and the
+      # time step is retaken forever, or the run traps a floating point
+      # exception. This changes the store so that only thread 0 writes it.
+      - name: Make only thread 0 store the block maximum
+        run: |
+          sed -i 's|^\( *\)maxcflblocks\[blockIdx.z\] = BlockReduce(temp_storage).Reduce(maxcfl,cub::Max());|\1{ double blockmax = BlockReduce(temp_storage).Reduce(maxcfl,cub::Max()); if (threadIdx.x == 0) maxcflblocks[blockIdx.z] = blockmax; }|' \
+            src/solvers/fc2d_cudaclaw/cuda_source/cudaclaw_flux2.cu
+          grep -c 'blockmax' src/solvers/fc2d_cudaclaw/cuda_source/cudaclaw_flux2.cu
+
+      # 90-virtual embeds PTX only, which the simulator runs, and the simulator
+      # needs a shared CUDA runtime. The example applications call device
+      # function pointers that are defined in their own .cu files, so they
+      # need relocatable device code like the cudaclaw library; without it
+      # the kernels fail with an illegal memory access (also on real hardware).
+      - name: Configure
+        run: |
+          cmake -S . -B build -G Ninja \
+            -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+            -Dcudaclaw=ON \
+            -DCMAKE_CUDA_ARCHITECTURES=90-virtual \
+            -DCMAKE_CUDA_RUNTIME_LIBRARY=Shared \
+            -DCMAKE_CUDA_SEPARABLE_COMPILATION=ON
+
+      - name: Build
+        run: cmake --build build -j3
+
+      # Each application checks its run against a CSV of integer counts
+      # (count_amr_advance, global_num_patches, count_amr_new_domain), so the
+      # comparison is exact and has no tolerance. The expected values below
+      # were taken from runs on a real GPU with the same inputs. The runs are
+      # shortened (lower maxlevel and final time) to fit the simulator, and
+      # floating point trapping (trapfpe) is switched off because it traps on
+      # the simulator in the first time step. The swirl example is not run: it
+      # never assigns its aux array.
+      - name: Run the shallow water bump example
+        working-directory: applications/cudaclaw/shallow/2d/bump
+        run: |
+          printf 'count_amr_advance,24\nglobal_num_patches,820\ncount_amr_new_domain,14\n' > "$RUNNER_TEMP/bump.csv"
+          sed 's/trapfpe *= *T/trapfpe = F/' regression.ini > "$RUNNER_TEMP/bump.ini"
+          vgpu run "$GITHUB_WORKSPACE/build/applications/cudaclaw/shallow/2d/bump/bump_cuda" \
+            -F "$RUNNER_TEMP/bump.ini" --regression-check="$RUNNER_TEMP/bump.csv"
+
+      - name: Run the acoustics radial example
+        if: ${{ !cancelled() }}
+        working-directory: applications/cudaclaw/acoustics/2d/radial
+        run: |
+          printf 'count_amr_advance,13\nglobal_num_patches,172\ncount_amr_new_domain,0\n' > "$RUNNER_TEMP/radial.csv"
+          sed 's/maxlevel = 6/maxlevel = 4/; s/tfinal = 0.6/tfinal = 0.2/; s/trapfpe *= *T/trapfpe = F/' regression.ini > "$RUNNER_TEMP/radial.ini"
+          vgpu run "$GITHUB_WORKSPACE/build/applications/cudaclaw/acoustics/2d/radial/radial_cuda" \
+            -F "$RUNNER_TEMP/radial.ini" --regression-check="$RUNNER_TEMP/radial.csv"
+
+      # regression.ini of this example is the Clawpack 5 one (meqn 5), so the
+      # CudaClaw input fclaw_options.ini is used.
+      - name: Run the Euler shock bubble example
+        if: ${{ !cancelled() }}
+        working-directory: applications/cudaclaw/euler/2d/shockbubble
+        run: |
+          printf 'count_amr_advance,100\nglobal_num_patches,37\ncount_amr_new_domain,2\n' > "$RUNNER_TEMP/sb.csv"
+          sed 's/maxlevel *= *4/maxlevel = 2/; s/tfinal *= *0.75/tfinal = 0.05/; s/nout *= *600/nout = 100/; s/^\( *\)mx *= *32/\1mx = 16/; s/^\( *\)my *= *32/\1my = 16/' fclaw_options.ini > "$RUNNER_TEMP/sb.ini"
+          vgpu run "$GITHUB_WORKSPACE/build/applications/cudaclaw/euler/2d/shockbubble/shockbubble_cuda" \
+            -F "$RUNNER_TEMP/sb.ini" --regression-check="$RUNNER_TEMP/sb.csv"
