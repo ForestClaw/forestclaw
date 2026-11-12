@@ -221,16 +221,6 @@ TEST_CASE("VTK cell-data registration rejects invalid entries without changing t
         CHECK_SC_ABORTED(fclaw_clawpatch_vtk_vtable_add_celldata(
             glob, "invalid", FCLAW_VTK_FLOAT64, 1, NULL));
     }
-    SUBCASE("duplicate built-in name")
-    {
-        CHECK_SC_ABORTED(fclaw_clawpatch_vtk_vtable_add_celldata(
-            glob, "mpirank", FCLAW_VTK_FLOAT64, 1, write_custom_values));
-    }
-    SUBCASE("duplicate custom name")
-    {
-        CHECK_SC_ABORTED(fclaw_clawpatch_vtk_vtable_add_celldata(
-            glob, "pressure", FCLAW_VTK_FLOAT32, 3, write_custom_values));
-    }
 
     CHECK_EQ(vtk_vt->celldata_entries->elem_count, original_count);
     CHECK(find_entry(vtk_vt->celldata_entries, "pressure") == pressure);
@@ -244,6 +234,75 @@ TEST_CASE("VTK cell-data registration rejects invalid entries without changing t
                                             3, write_custom_values);
     CHECK_EQ(vtk_vt->celldata_entries->elem_count, original_count + 1);
     CHECK(find_entry(vtk_vt->celldata_entries, "velocity") != NULL);
+
+    fclaw_global_destroy(glob);
+    fclaw_clawpatch_options_destroy(options);
+}
+
+static void
+write_other_values(fclaw_global_t*, fclaw_patch_t*, int, int,
+                   fclaw_vtk_cb_context_t*, char* buffer)
+{
+    float* values = (float*) buffer;
+    values[0] = 4.f;
+}
+
+static size_t
+entry_index(sc_list_t* entries, const char* name)
+{
+    size_t index = 0;
+    for (sc_link_t* link = entries->first; link != NULL; link = link->next, ++index)
+    {
+        fclaw_clawpatch_vtk_vtable_entry_t* entry =
+            (fclaw_clawpatch_vtk_vtable_entry_t*) link->data;
+        if (strcmp(entry->name, name) == 0)
+        {
+            return index;
+        }
+    }
+    return (size_t) -1;
+}
+
+TEST_CASE("VTK cell-data registration overwrites an existing entry in place")
+{
+    fclaw_global_t* glob = fclaw_global_new_comm(sc_MPI_COMM_SELF, 1, 0);
+    fclaw_clawpatch_options_t* options = fclaw_clawpatch_options_new(2);
+    fclaw_clawpatch_vtk_vtable_t* vtk_vt = initialize_vtk_vtable(glob, options);
+    fclaw_clawpatch_vtk_vtable_add_celldata(glob, "pressure", FCLAW_VTK_FLOAT64,
+                                            1, write_custom_values);
+    fclaw_clawpatch_vtk_vtable_add_celldata(glob, "velocity", FCLAW_VTK_FLOAT64,
+                                            3, write_custom_values);
+    const size_t original_count = vtk_vt->celldata_entries->elem_count;
+
+    SUBCASE("custom name")
+    {
+        const size_t index = entry_index(vtk_vt->celldata_entries, "pressure");
+        fclaw_clawpatch_vtk_vtable_add_celldata(glob, "pressure", FCLAW_VTK_FLOAT32,
+                                                2, write_other_values);
+        CHECK_EQ(vtk_vt->celldata_entries->elem_count, original_count);
+        CHECK_EQ(entry_index(vtk_vt->celldata_entries, "pressure"), index);
+        fclaw_clawpatch_vtk_vtable_entry_t* pressure =
+            find_entry(vtk_vt->celldata_entries, "pressure");
+        REQUIRE(pressure != NULL);
+        CHECK_EQ(pressure->type, FCLAW_VTK_FLOAT32);
+        CHECK_EQ(pressure->number_of_components, 2);
+        CHECK(pressure->callback == write_other_values);
+        CHECK(pressure->elements_in_patch == vtk_vt->types_entry.elements_in_patch);
+    }
+    SUBCASE("built-in name")
+    {
+        const size_t index = entry_index(vtk_vt->celldata_entries, "mpirank");
+        fclaw_clawpatch_vtk_vtable_add_celldata(glob, "mpirank", FCLAW_VTK_FLOAT32,
+                                                1, write_other_values);
+        CHECK_EQ(vtk_vt->celldata_entries->elem_count, original_count);
+        CHECK_EQ(entry_index(vtk_vt->celldata_entries, "mpirank"), index);
+        fclaw_clawpatch_vtk_vtable_entry_t* mpirank =
+            find_entry(vtk_vt->celldata_entries, "mpirank");
+        REQUIRE(mpirank != NULL);
+        CHECK_EQ(mpirank->type, FCLAW_VTK_FLOAT32);
+        CHECK_EQ(mpirank->number_of_components, 1);
+        CHECK(mpirank->callback == write_other_values);
+    }
 
     fclaw_global_destroy(glob);
     fclaw_clawpatch_options_destroy(options);

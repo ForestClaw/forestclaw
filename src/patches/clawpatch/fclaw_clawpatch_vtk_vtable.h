@@ -127,8 +127,11 @@ void fclaw_clawpatch_vtk_vtable_initialize(struct fclaw_global* glob);
  * @brief Register a named cell-data array for VTK output.
  *
  * Call after VTK vtable initialization and before output, with the same entries
- * in the same order on every MPI rank. Names must be nonempty and unique among
- * cell-data arrays; the name is copied and owned by the vtable.
+ * in the same order on every MPI rank. Names must be nonempty; the name is
+ * copied and owned by the vtable. If a cell-data array with the same name is
+ * already registered (including built-in arrays such as "meqn" or "mpirank"),
+ * its type, component count, and callback are replaced in place and it keeps
+ * its original position in the output.
  *
  * ForestClaw allocates the buffer and supplies the output cell count, including
  * ghost cells when vtk_ghost_out is enabled. The callback must fill one tuple

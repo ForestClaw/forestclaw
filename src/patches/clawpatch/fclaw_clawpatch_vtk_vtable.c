@@ -1146,7 +1146,12 @@ void fclaw_clawpatch_vtk_vtable_add_celldata(struct fclaw_global* glob,
             (fclaw_clawpatch_vtk_vtable_entry_t*) link->data;
         if (strcmp(entry->name, name) == 0)
         {
-            fclaw_abortf("Duplicate VTK cell-data name '%s'\n", name);
+            /* overwrite in place, keeping the entry's position in the list */
+            entry->type = type;
+            entry->number_of_components = number_of_components;
+            entry->elements_in_patch = &cells_in_patch;
+            entry->callback = callback;
+            return;
         }
     }
     vtk_add_celldata_entry(vtk_vt, name, type, number_of_components,
